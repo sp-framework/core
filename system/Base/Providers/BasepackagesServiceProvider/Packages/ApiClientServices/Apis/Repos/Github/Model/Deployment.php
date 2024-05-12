@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * Deployment Class Doc Comment
  *
  * @category Class
- * @description The [deployment](https://docs.github.com/enterprise-server@3.12/rest/deployments/deployments#list-deployments).
+ * @description The [deployment](https://docs.github.com/rest/deployments/deployments#list-deployments).
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

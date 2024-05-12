@@ -231,7 +231,6 @@ class ActionsWorkflowAccessToRepository implements ModelInterface, ArrayAccess, 
     public const ACCESS_LEVEL_NONE = 'none';
     public const ACCESS_LEVEL_USER = 'user';
     public const ACCESS_LEVEL_ORGANIZATION = 'organization';
-    public const ACCESS_LEVEL_ENTERPRISE = 'enterprise';
 
     /**
      * Gets allowable values of the enum
@@ -244,7 +243,6 @@ class ActionsWorkflowAccessToRepository implements ModelInterface, ArrayAccess, 
             self::ACCESS_LEVEL_NONE,
             self::ACCESS_LEVEL_USER,
             self::ACCESS_LEVEL_ORGANIZATION,
-            self::ACCESS_LEVEL_ENTERPRISE,
         ];
     }
 
@@ -333,7 +331,7 @@ class ActionsWorkflowAccessToRepository implements ModelInterface, ArrayAccess, 
     /**
      * Sets access_level
      *
-     * @param string $access_level Defines the level of access that workflows outside of the repository have to actions and reusable workflows within the repository.  `none` means the access is only possible from workflows in this repository. `user` level access allows sharing across user owned private repositories only. `organization` level access allows sharing across the organization. `enterprise` level access allows sharing across the enterprise.
+     * @param string $access_level Defines the level of access that workflows outside of the repository have to actions and reusable workflows within the repository.  `none` means the access is only possible from workflows in this repository. `user` level access allows sharing across user owned private repositories only. `organization` level access allows sharing across the organization.
      *
      * @return self
      */

@@ -579,7 +579,7 @@ class WebhookCreate implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets ref
      *
-     * @param string $ref The [`git ref`](https://docs.github.com/enterprise-server@3.12/rest/git/refs#get-a-reference) resource.
+     * @param string $ref The [`git ref`](https://docs.github.com/rest/git/refs#get-a-reference) resource.
      *
      * @return self
      */

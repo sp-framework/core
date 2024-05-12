@@ -59,10 +59,20 @@ class ApiOverview implements ModelInterface, ArrayAccess, \JsonSerializable
       */
     protected static $openAPITypes = [
         'verifiable_password_authentication' => 'bool',
+        'ssh_key_fingerprints' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ApiOverviewSshKeyFingerprints',
+        'ssh_keys' => 'string[]',
+        'hooks' => 'string[]',
+        'github_enterprise_importer' => 'string[]',
+        'web' => 'string[]',
+        'api' => 'string[]',
+        'git' => 'string[]',
         'packages' => 'string[]',
+        'pages' => 'string[]',
+        'importer' => 'string[]',
+        'actions' => 'string[]',
+        'actions_macos' => 'string[]',
         'dependabot' => 'string[]',
-        'domains' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ApiOverviewDomains',
-        'installed_version' => 'string'
+        'domains' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ApiOverviewDomains'
     ];
 
     /**
@@ -74,10 +84,20 @@ class ApiOverview implements ModelInterface, ArrayAccess, \JsonSerializable
       */
     protected static $openAPIFormats = [
         'verifiable_password_authentication' => null,
+        'ssh_key_fingerprints' => null,
+        'ssh_keys' => null,
+        'hooks' => null,
+        'github_enterprise_importer' => null,
+        'web' => null,
+        'api' => null,
+        'git' => null,
         'packages' => null,
+        'pages' => null,
+        'importer' => null,
+        'actions' => null,
+        'actions_macos' => null,
         'dependabot' => null,
-        'domains' => null,
-        'installed_version' => null
+        'domains' => null
     ];
 
     /**
@@ -87,10 +107,20 @@ class ApiOverview implements ModelInterface, ArrayAccess, \JsonSerializable
       */
     protected static array $openAPINullables = [
         'verifiable_password_authentication' => false,
+        'ssh_key_fingerprints' => false,
+        'ssh_keys' => false,
+        'hooks' => false,
+        'github_enterprise_importer' => false,
+        'web' => false,
+        'api' => false,
+        'git' => false,
         'packages' => false,
+        'pages' => false,
+        'importer' => false,
+        'actions' => false,
+        'actions_macos' => false,
         'dependabot' => false,
-        'domains' => false,
-        'installed_version' => false
+        'domains' => false
     ];
 
     /**
@@ -180,10 +210,20 @@ class ApiOverview implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     protected static $attributeMap = [
         'verifiable_password_authentication' => 'verifiable_password_authentication',
+        'ssh_key_fingerprints' => 'ssh_key_fingerprints',
+        'ssh_keys' => 'ssh_keys',
+        'hooks' => 'hooks',
+        'github_enterprise_importer' => 'github_enterprise_importer',
+        'web' => 'web',
+        'api' => 'api',
+        'git' => 'git',
         'packages' => 'packages',
+        'pages' => 'pages',
+        'importer' => 'importer',
+        'actions' => 'actions',
+        'actions_macos' => 'actions_macos',
         'dependabot' => 'dependabot',
-        'domains' => 'domains',
-        'installed_version' => 'installed_version'
+        'domains' => 'domains'
     ];
 
     /**
@@ -193,10 +233,20 @@ class ApiOverview implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     protected static $setters = [
         'verifiable_password_authentication' => 'setVerifiablePasswordAuthentication',
+        'ssh_key_fingerprints' => 'setSshKeyFingerprints',
+        'ssh_keys' => 'setSshKeys',
+        'hooks' => 'setHooks',
+        'github_enterprise_importer' => 'setGithubEnterpriseImporter',
+        'web' => 'setWeb',
+        'api' => 'setApi',
+        'git' => 'setGit',
         'packages' => 'setPackages',
+        'pages' => 'setPages',
+        'importer' => 'setImporter',
+        'actions' => 'setActions',
+        'actions_macos' => 'setActionsMacos',
         'dependabot' => 'setDependabot',
-        'domains' => 'setDomains',
-        'installed_version' => 'setInstalledVersion'
+        'domains' => 'setDomains'
     ];
 
     /**
@@ -206,10 +256,20 @@ class ApiOverview implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     protected static $getters = [
         'verifiable_password_authentication' => 'getVerifiablePasswordAuthentication',
+        'ssh_key_fingerprints' => 'getSshKeyFingerprints',
+        'ssh_keys' => 'getSshKeys',
+        'hooks' => 'getHooks',
+        'github_enterprise_importer' => 'getGithubEnterpriseImporter',
+        'web' => 'getWeb',
+        'api' => 'getApi',
+        'git' => 'getGit',
         'packages' => 'getPackages',
+        'pages' => 'getPages',
+        'importer' => 'getImporter',
+        'actions' => 'getActions',
+        'actions_macos' => 'getActionsMacos',
         'dependabot' => 'getDependabot',
-        'domains' => 'getDomains',
-        'installed_version' => 'getInstalledVersion'
+        'domains' => 'getDomains'
     ];
 
     /**
@@ -270,10 +330,20 @@ class ApiOverview implements ModelInterface, ArrayAccess, \JsonSerializable
     public function __construct(array $data = null)
     {
         $this->setIfExists('verifiable_password_authentication', $data ?? [], null);
+        $this->setIfExists('ssh_key_fingerprints', $data ?? [], null);
+        $this->setIfExists('ssh_keys', $data ?? [], null);
+        $this->setIfExists('hooks', $data ?? [], null);
+        $this->setIfExists('github_enterprise_importer', $data ?? [], null);
+        $this->setIfExists('web', $data ?? [], null);
+        $this->setIfExists('api', $data ?? [], null);
+        $this->setIfExists('git', $data ?? [], null);
         $this->setIfExists('packages', $data ?? [], null);
+        $this->setIfExists('pages', $data ?? [], null);
+        $this->setIfExists('importer', $data ?? [], null);
+        $this->setIfExists('actions', $data ?? [], null);
+        $this->setIfExists('actions_macos', $data ?? [], null);
         $this->setIfExists('dependabot', $data ?? [], null);
         $this->setIfExists('domains', $data ?? [], null);
-        $this->setIfExists('installed_version', $data ?? [], null);
     }
 
     /**
@@ -349,6 +419,195 @@ class ApiOverview implements ModelInterface, ArrayAccess, \JsonSerializable
     }
 
     /**
+     * Gets ssh_key_fingerprints
+     *
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ApiOverviewSshKeyFingerprints|null
+     */
+    public function getSshKeyFingerprints()
+    {
+        return $this->container['ssh_key_fingerprints'];
+    }
+
+    /**
+     * Sets ssh_key_fingerprints
+     *
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ApiOverviewSshKeyFingerprints|null $ssh_key_fingerprints ssh_key_fingerprints
+     *
+     * @return self
+     */
+    public function setSshKeyFingerprints($ssh_key_fingerprints)
+    {
+        if (is_null($ssh_key_fingerprints)) {
+            throw new \InvalidArgumentException('non-nullable ssh_key_fingerprints cannot be null');
+        }
+        $this->container['ssh_key_fingerprints'] = $ssh_key_fingerprints;
+
+        return $this;
+    }
+
+    /**
+     * Gets ssh_keys
+     *
+     * @return string[]|null
+     */
+    public function getSshKeys()
+    {
+        return $this->container['ssh_keys'];
+    }
+
+    /**
+     * Sets ssh_keys
+     *
+     * @param string[]|null $ssh_keys ssh_keys
+     *
+     * @return self
+     */
+    public function setSshKeys($ssh_keys)
+    {
+        if (is_null($ssh_keys)) {
+            throw new \InvalidArgumentException('non-nullable ssh_keys cannot be null');
+        }
+        $this->container['ssh_keys'] = $ssh_keys;
+
+        return $this;
+    }
+
+    /**
+     * Gets hooks
+     *
+     * @return string[]|null
+     */
+    public function getHooks()
+    {
+        return $this->container['hooks'];
+    }
+
+    /**
+     * Sets hooks
+     *
+     * @param string[]|null $hooks hooks
+     *
+     * @return self
+     */
+    public function setHooks($hooks)
+    {
+        if (is_null($hooks)) {
+            throw new \InvalidArgumentException('non-nullable hooks cannot be null');
+        }
+        $this->container['hooks'] = $hooks;
+
+        return $this;
+    }
+
+    /**
+     * Gets github_enterprise_importer
+     *
+     * @return string[]|null
+     */
+    public function getGithubEnterpriseImporter()
+    {
+        return $this->container['github_enterprise_importer'];
+    }
+
+    /**
+     * Sets github_enterprise_importer
+     *
+     * @param string[]|null $github_enterprise_importer github_enterprise_importer
+     *
+     * @return self
+     */
+    public function setGithubEnterpriseImporter($github_enterprise_importer)
+    {
+        if (is_null($github_enterprise_importer)) {
+            throw new \InvalidArgumentException('non-nullable github_enterprise_importer cannot be null');
+        }
+        $this->container['github_enterprise_importer'] = $github_enterprise_importer;
+
+        return $this;
+    }
+
+    /**
+     * Gets web
+     *
+     * @return string[]|null
+     */
+    public function getWeb()
+    {
+        return $this->container['web'];
+    }
+
+    /**
+     * Sets web
+     *
+     * @param string[]|null $web web
+     *
+     * @return self
+     */
+    public function setWeb($web)
+    {
+        if (is_null($web)) {
+            throw new \InvalidArgumentException('non-nullable web cannot be null');
+        }
+        $this->container['web'] = $web;
+
+        return $this;
+    }
+
+    /**
+     * Gets api
+     *
+     * @return string[]|null
+     */
+    public function getApi()
+    {
+        return $this->container['api'];
+    }
+
+    /**
+     * Sets api
+     *
+     * @param string[]|null $api api
+     *
+     * @return self
+     */
+    public function setApi($api)
+    {
+        if (is_null($api)) {
+            throw new \InvalidArgumentException('non-nullable api cannot be null');
+        }
+        $this->container['api'] = $api;
+
+        return $this;
+    }
+
+    /**
+     * Gets git
+     *
+     * @return string[]|null
+     */
+    public function getGit()
+    {
+        return $this->container['git'];
+    }
+
+    /**
+     * Sets git
+     *
+     * @param string[]|null $git git
+     *
+     * @return self
+     */
+    public function setGit($git)
+    {
+        if (is_null($git)) {
+            throw new \InvalidArgumentException('non-nullable git cannot be null');
+        }
+        $this->container['git'] = $git;
+
+        return $this;
+    }
+
+    /**
      * Gets packages
      *
      * @return string[]|null
@@ -371,6 +630,114 @@ class ApiOverview implements ModelInterface, ArrayAccess, \JsonSerializable
             throw new \InvalidArgumentException('non-nullable packages cannot be null');
         }
         $this->container['packages'] = $packages;
+
+        return $this;
+    }
+
+    /**
+     * Gets pages
+     *
+     * @return string[]|null
+     */
+    public function getPages()
+    {
+        return $this->container['pages'];
+    }
+
+    /**
+     * Sets pages
+     *
+     * @param string[]|null $pages pages
+     *
+     * @return self
+     */
+    public function setPages($pages)
+    {
+        if (is_null($pages)) {
+            throw new \InvalidArgumentException('non-nullable pages cannot be null');
+        }
+        $this->container['pages'] = $pages;
+
+        return $this;
+    }
+
+    /**
+     * Gets importer
+     *
+     * @return string[]|null
+     */
+    public function getImporter()
+    {
+        return $this->container['importer'];
+    }
+
+    /**
+     * Sets importer
+     *
+     * @param string[]|null $importer importer
+     *
+     * @return self
+     */
+    public function setImporter($importer)
+    {
+        if (is_null($importer)) {
+            throw new \InvalidArgumentException('non-nullable importer cannot be null');
+        }
+        $this->container['importer'] = $importer;
+
+        return $this;
+    }
+
+    /**
+     * Gets actions
+     *
+     * @return string[]|null
+     */
+    public function getActions()
+    {
+        return $this->container['actions'];
+    }
+
+    /**
+     * Sets actions
+     *
+     * @param string[]|null $actions actions
+     *
+     * @return self
+     */
+    public function setActions($actions)
+    {
+        if (is_null($actions)) {
+            throw new \InvalidArgumentException('non-nullable actions cannot be null');
+        }
+        $this->container['actions'] = $actions;
+
+        return $this;
+    }
+
+    /**
+     * Gets actions_macos
+     *
+     * @return string[]|null
+     */
+    public function getActionsMacos()
+    {
+        return $this->container['actions_macos'];
+    }
+
+    /**
+     * Sets actions_macos
+     *
+     * @param string[]|null $actions_macos actions_macos
+     *
+     * @return self
+     */
+    public function setActionsMacos($actions_macos)
+    {
+        if (is_null($actions_macos)) {
+            throw new \InvalidArgumentException('non-nullable actions_macos cannot be null');
+        }
+        $this->container['actions_macos'] = $actions_macos;
 
         return $this;
     }
@@ -425,33 +792,6 @@ class ApiOverview implements ModelInterface, ArrayAccess, \JsonSerializable
             throw new \InvalidArgumentException('non-nullable domains cannot be null');
         }
         $this->container['domains'] = $domains;
-
-        return $this;
-    }
-
-    /**
-     * Gets installed_version
-     *
-     * @return string|null
-     */
-    public function getInstalledVersion()
-    {
-        return $this->container['installed_version'];
-    }
-
-    /**
-     * Sets installed_version
-     *
-     * @param string|null $installed_version installed_version
-     *
-     * @return self
-     */
-    public function setInstalledVersion($installed_version)
-    {
-        if (is_null($installed_version)) {
-            throw new \InvalidArgumentException('non-nullable installed_version cannot be null');
-        }
-        $this->container['installed_version'] = $installed_version;
 
         return $this;
     }

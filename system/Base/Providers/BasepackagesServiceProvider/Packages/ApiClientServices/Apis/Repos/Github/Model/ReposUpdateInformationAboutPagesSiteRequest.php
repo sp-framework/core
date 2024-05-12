@@ -347,7 +347,7 @@ class ReposUpdateInformationAboutPagesSiteRequest implements ModelInterface, Arr
     /**
      * Sets cname
      *
-     * @param string|null $cname Specify a custom domain for the repository. Sending a `null` value will remove the custom domain. For more about custom domains, see \"[Using a custom domain with GitHub Pages](https://docs.github.com/enterprise-server@3.12/articles/using-a-custom-domain-with-github-pages/).\"
+     * @param string|null $cname Specify a custom domain for the repository. Sending a `null` value will remove the custom domain. For more about custom domains, see \"[Using a custom domain with GitHub Pages](https://docs.github.com/pages/configuring-a-custom-domain-for-your-github-pages-site).\"
      *
      * @return self
      */

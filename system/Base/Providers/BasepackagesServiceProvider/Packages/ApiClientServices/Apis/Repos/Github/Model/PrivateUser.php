@@ -97,7 +97,7 @@ class PrivateUser implements ModelInterface, ArrayAccess, \JsonSerializable
         'disk_usage' => 'int',
         'collaborators' => 'int',
         'two_factor_authentication' => 'bool',
-        'plan' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\LdapMappingUserPlan',
+        'plan' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PublicUserPlan',
         'suspended_at' => '\DateTime',
         'business_plus' => 'bool',
         'ldap_dn' => 'string'
@@ -1821,7 +1821,7 @@ class PrivateUser implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets plan
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\LdapMappingUserPlan|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PublicUserPlan|null
      */
     public function getPlan()
     {
@@ -1831,7 +1831,7 @@ class PrivateUser implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets plan
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\LdapMappingUserPlan|null $plan plan
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PublicUserPlan|null $plan plan
      *
      * @return self
      */

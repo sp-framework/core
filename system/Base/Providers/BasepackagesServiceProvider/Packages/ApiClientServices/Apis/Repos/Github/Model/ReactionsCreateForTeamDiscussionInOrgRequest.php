@@ -341,7 +341,7 @@ class ReactionsCreateForTeamDiscussionInOrgRequest implements ModelInterface, Ar
     /**
      * Sets content
      *
-     * @param string $content The [reaction type](https://docs.github.com/enterprise-server@3.12/rest/reactions/reactions#about-reactions) to add to the team discussion.
+     * @param string $content The [reaction type](https://docs.github.com/rest/reactions/reactions#about-reactions) to add to the team discussion.
      *
      * @return self
      */

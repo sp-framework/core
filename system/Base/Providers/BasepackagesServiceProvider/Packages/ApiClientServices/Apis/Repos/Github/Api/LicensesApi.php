@@ -511,8 +511,8 @@ class LicensesApi
      * Get all commonly used licenses
      *
      * @param  bool $featured featured (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['licensesGetAllCommonlyUsed'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -531,8 +531,8 @@ class LicensesApi
      * Get all commonly used licenses
      *
      * @param  bool $featured (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['licensesGetAllCommonlyUsed'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -657,8 +657,8 @@ class LicensesApi
      * Get all commonly used licenses
      *
      * @param  bool $featured (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['licensesGetAllCommonlyUsed'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -680,8 +680,8 @@ class LicensesApi
      * Get all commonly used licenses
      *
      * @param  bool $featured (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['licensesGetAllCommonlyUsed'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -732,8 +732,8 @@ class LicensesApi
      * Create request for operation 'licensesGetAllCommonlyUsed'
      *
      * @param  bool $featured (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['licensesGetAllCommonlyUsed'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -844,15 +844,16 @@ class LicensesApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ref The Git reference for the results you want to list. The &#x60;ref&#x60; for a branch can be formatted either as &#x60;refs/heads/&lt;branch name&gt;&#x60; or simply &#x60;&lt;branch name&gt;&#x60;. To reference a pull request use &#x60;refs/pull/&lt;number&gt;/merge&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['licensesGetForRepo'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
      * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\LicenseContent|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
      */
-    public function licensesGetForRepo($owner, $repo, string $contentType = self::contentTypes['licensesGetForRepo'][0])
+    public function licensesGetForRepo($owner, $repo, $ref = null, string $contentType = self::contentTypes['licensesGetForRepo'][0])
     {
-        list($response) = $this->licensesGetForRepoWithHttpInfo($owner, $repo, $contentType);
+        list($response) = $this->licensesGetForRepoWithHttpInfo($owner, $repo, $ref, $contentType);
         return $response;
     }
 
@@ -863,15 +864,16 @@ class LicensesApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ref The Git reference for the results you want to list. The &#x60;ref&#x60; for a branch can be formatted either as &#x60;refs/heads/&lt;branch name&gt;&#x60; or simply &#x60;&lt;branch name&gt;&#x60;. To reference a pull request use &#x60;refs/pull/&lt;number&gt;/merge&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['licensesGetForRepo'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
      * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\LicenseContent|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
      */
-    public function licensesGetForRepoWithHttpInfo($owner, $repo, string $contentType = self::contentTypes['licensesGetForRepo'][0])
+    public function licensesGetForRepoWithHttpInfo($owner, $repo, $ref = null, string $contentType = self::contentTypes['licensesGetForRepo'][0])
     {
-        $request = $this->licensesGetForRepoRequest($owner, $repo, $contentType);
+        $request = $this->licensesGetForRepoRequest($owner, $repo, $ref, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -1023,14 +1025,15 @@ class LicensesApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ref The Git reference for the results you want to list. The &#x60;ref&#x60; for a branch can be formatted either as &#x60;refs/heads/&lt;branch name&gt;&#x60; or simply &#x60;&lt;branch name&gt;&#x60;. To reference a pull request use &#x60;refs/pull/&lt;number&gt;/merge&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['licensesGetForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function licensesGetForRepoAsync($owner, $repo, string $contentType = self::contentTypes['licensesGetForRepo'][0])
+    public function licensesGetForRepoAsync($owner, $repo, $ref = null, string $contentType = self::contentTypes['licensesGetForRepo'][0])
     {
-        return $this->licensesGetForRepoAsyncWithHttpInfo($owner, $repo, $contentType)
+        return $this->licensesGetForRepoAsyncWithHttpInfo($owner, $repo, $ref, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -1045,15 +1048,16 @@ class LicensesApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ref The Git reference for the results you want to list. The &#x60;ref&#x60; for a branch can be formatted either as &#x60;refs/heads/&lt;branch name&gt;&#x60; or simply &#x60;&lt;branch name&gt;&#x60;. To reference a pull request use &#x60;refs/pull/&lt;number&gt;/merge&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['licensesGetForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function licensesGetForRepoAsyncWithHttpInfo($owner, $repo, string $contentType = self::contentTypes['licensesGetForRepo'][0])
+    public function licensesGetForRepoAsyncWithHttpInfo($owner, $repo, $ref = null, string $contentType = self::contentTypes['licensesGetForRepo'][0])
     {
         $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\LicenseContent';
-        $request = $this->licensesGetForRepoRequest($owner, $repo, $contentType);
+        $request = $this->licensesGetForRepoRequest($owner, $repo, $ref, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -1096,12 +1100,13 @@ class LicensesApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ref The Git reference for the results you want to list. The &#x60;ref&#x60; for a branch can be formatted either as &#x60;refs/heads/&lt;branch name&gt;&#x60; or simply &#x60;&lt;branch name&gt;&#x60;. To reference a pull request use &#x60;refs/pull/&lt;number&gt;/merge&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['licensesGetForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function licensesGetForRepoRequest($owner, $repo, string $contentType = self::contentTypes['licensesGetForRepo'][0])
+    public function licensesGetForRepoRequest($owner, $repo, $ref = null, string $contentType = self::contentTypes['licensesGetForRepo'][0])
     {
 
         // verify the required parameter 'owner' is set
@@ -1119,6 +1124,7 @@ class LicensesApi
         }
 
 
+
         $resourcePath = '/repos/{owner}/{repo}/license';
         $formParams = [];
         $queryParams = [];
@@ -1126,6 +1132,15 @@ class LicensesApi
         $httpBody = '';
         $multipart = false;
 
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $ref,
+            'ref', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
 
 
         // path params

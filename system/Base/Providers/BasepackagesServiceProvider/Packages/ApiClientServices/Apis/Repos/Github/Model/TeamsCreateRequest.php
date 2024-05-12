@@ -64,8 +64,7 @@ class TeamsCreateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         'privacy' => 'string',
         'notification_setting' => 'string',
         'permission' => 'string',
-        'parent_team_id' => 'int',
-        'ldap_dn' => 'string'
+        'parent_team_id' => 'int'
     ];
 
     /**
@@ -83,8 +82,7 @@ class TeamsCreateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         'privacy' => null,
         'notification_setting' => null,
         'permission' => null,
-        'parent_team_id' => null,
-        'ldap_dn' => null
+        'parent_team_id' => null
     ];
 
     /**
@@ -100,8 +98,7 @@ class TeamsCreateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         'privacy' => false,
         'notification_setting' => false,
         'permission' => false,
-        'parent_team_id' => false,
-        'ldap_dn' => false
+        'parent_team_id' => false
     ];
 
     /**
@@ -197,8 +194,7 @@ class TeamsCreateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         'privacy' => 'privacy',
         'notification_setting' => 'notification_setting',
         'permission' => 'permission',
-        'parent_team_id' => 'parent_team_id',
-        'ldap_dn' => 'ldap_dn'
+        'parent_team_id' => 'parent_team_id'
     ];
 
     /**
@@ -214,8 +210,7 @@ class TeamsCreateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         'privacy' => 'setPrivacy',
         'notification_setting' => 'setNotificationSetting',
         'permission' => 'setPermission',
-        'parent_team_id' => 'setParentTeamId',
-        'ldap_dn' => 'setLdapDn'
+        'parent_team_id' => 'setParentTeamId'
     ];
 
     /**
@@ -231,8 +226,7 @@ class TeamsCreateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         'privacy' => 'getPrivacy',
         'notification_setting' => 'getNotificationSetting',
         'permission' => 'getPermission',
-        'parent_team_id' => 'getParentTeamId',
-        'ldap_dn' => 'getLdapDn'
+        'parent_team_id' => 'getParentTeamId'
     ];
 
     /**
@@ -345,7 +339,6 @@ class TeamsCreateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         $this->setIfExists('notification_setting', $data ?? [], null);
         $this->setIfExists('permission', $data ?? [], 'pull');
         $this->setIfExists('parent_team_id', $data ?? [], null);
-        $this->setIfExists('ldap_dn', $data ?? [], null);
     }
 
     /**
@@ -662,33 +655,6 @@ class TeamsCreateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
             throw new \InvalidArgumentException('non-nullable parent_team_id cannot be null');
         }
         $this->container['parent_team_id'] = $parent_team_id;
-
-        return $this;
-    }
-
-    /**
-     * Gets ldap_dn
-     *
-     * @return string|null
-     */
-    public function getLdapDn()
-    {
-        return $this->container['ldap_dn'];
-    }
-
-    /**
-     * Sets ldap_dn
-     *
-     * @param string|null $ldap_dn The [distinguished name](https://www.ldap.com/ldap-dns-and-rdns) (DN) of the LDAP entry to map to a team. LDAP synchronization must be enabled to map LDAP entries to a team. Use the \"[Update LDAP mapping for a team](https://docs.github.com/enterprise-server@3.12/rest/enterprise-admin/ldap#update-ldap-mapping-for-a-team)\" endpoint to change the LDAP DN. For more information, see \"[Using LDAP](https://docs.github.com/enterprise-server@3.12/admin/identity-and-access-management/authenticating-users-for-your-github-enterprise-server-instance/using-ldap#enabling-ldap-sync).\"
-     *
-     * @return self
-     */
-    public function setLdapDn($ldap_dn)
-    {
-        if (is_null($ldap_dn)) {
-            throw new \InvalidArgumentException('non-nullable ldap_dn cannot be null');
-        }
-        $this->container['ldap_dn'] = $ldap_dn;
 
         return $this;
     }

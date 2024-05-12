@@ -305,7 +305,7 @@ class DependabotSetSelectedReposForOrgSecretRequest implements ModelInterface, A
     /**
      * Sets selected_repository_ids
      *
-     * @param int[] $selected_repository_ids An array of repository ids that can access the organization secret. You can only provide a list of repository ids when the `visibility` is set to `selected`. You can add and remove individual repositories using the [Set selected repositories for an organization secret](https://docs.github.com/enterprise-server@3.12/rest/dependabot/secrets#set-selected-repositories-for-an-organization-secret) and [Remove selected repository from an organization secret](https://docs.github.com/enterprise-server@3.12/rest/dependabot/secrets#remove-selected-repository-from-an-organization-secret) endpoints.
+     * @param int[] $selected_repository_ids An array of repository ids that can access the organization secret. You can only provide a list of repository ids when the `visibility` is set to `selected`. You can add and remove individual repositories using the [Set selected repositories for an organization secret](https://docs.github.com/rest/dependabot/secrets#set-selected-repositories-for-an-organization-secret) and [Remove selected repository from an organization secret](https://docs.github.com/rest/dependabot/secrets#remove-selected-repository-from-an-organization-secret) endpoints.
      *
      * @return self
      */

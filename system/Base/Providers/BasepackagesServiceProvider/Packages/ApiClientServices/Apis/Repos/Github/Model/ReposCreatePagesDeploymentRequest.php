@@ -58,6 +58,7 @@ class ReposCreatePagesDeploymentRequest implements ModelInterface, ArrayAccess, 
       * @var string[]
       */
     protected static $openAPITypes = [
+        'artifact_id' => 'float',
         'artifact_url' => 'string',
         'environment' => 'string',
         'pages_build_version' => 'string',
@@ -72,6 +73,7 @@ class ReposCreatePagesDeploymentRequest implements ModelInterface, ArrayAccess, 
       * @psalm-var array<string, string|null>
       */
     protected static $openAPIFormats = [
+        'artifact_id' => null,
         'artifact_url' => null,
         'environment' => null,
         'pages_build_version' => null,
@@ -84,6 +86,7 @@ class ReposCreatePagesDeploymentRequest implements ModelInterface, ArrayAccess, 
       * @var boolean[]
       */
     protected static array $openAPINullables = [
+        'artifact_id' => false,
         'artifact_url' => false,
         'environment' => false,
         'pages_build_version' => false,
@@ -176,6 +179,7 @@ class ReposCreatePagesDeploymentRequest implements ModelInterface, ArrayAccess, 
      * @var string[]
      */
     protected static $attributeMap = [
+        'artifact_id' => 'artifact_id',
         'artifact_url' => 'artifact_url',
         'environment' => 'environment',
         'pages_build_version' => 'pages_build_version',
@@ -188,6 +192,7 @@ class ReposCreatePagesDeploymentRequest implements ModelInterface, ArrayAccess, 
      * @var string[]
      */
     protected static $setters = [
+        'artifact_id' => 'setArtifactId',
         'artifact_url' => 'setArtifactUrl',
         'environment' => 'setEnvironment',
         'pages_build_version' => 'setPagesBuildVersion',
@@ -200,6 +205,7 @@ class ReposCreatePagesDeploymentRequest implements ModelInterface, ArrayAccess, 
      * @var string[]
      */
     protected static $getters = [
+        'artifact_id' => 'getArtifactId',
         'artifact_url' => 'getArtifactUrl',
         'environment' => 'getEnvironment',
         'pages_build_version' => 'getPagesBuildVersion',
@@ -263,6 +269,7 @@ class ReposCreatePagesDeploymentRequest implements ModelInterface, ArrayAccess, 
      */
     public function __construct(array $data = null)
     {
+        $this->setIfExists('artifact_id', $data ?? [], null);
         $this->setIfExists('artifact_url', $data ?? [], null);
         $this->setIfExists('environment', $data ?? [], 'github-pages');
         $this->setIfExists('pages_build_version', $data ?? [], 'GITHUB_SHA');
@@ -296,9 +303,6 @@ class ReposCreatePagesDeploymentRequest implements ModelInterface, ArrayAccess, 
     {
         $invalidProperties = [];
 
-        if ($this->container['artifact_url'] === null) {
-            $invalidProperties[] = "'artifact_url' can't be null";
-        }
         if ($this->container['pages_build_version'] === null) {
             $invalidProperties[] = "'pages_build_version' can't be null";
         }
@@ -321,9 +325,36 @@ class ReposCreatePagesDeploymentRequest implements ModelInterface, ArrayAccess, 
 
 
     /**
+     * Gets artifact_id
+     *
+     * @return float|null
+     */
+    public function getArtifactId()
+    {
+        return $this->container['artifact_id'];
+    }
+
+    /**
+     * Sets artifact_id
+     *
+     * @param float|null $artifact_id The ID of an artifact that contains the .zip or .tar of static assets to deploy. The artifact belongs to the repository. Either `artifact_id` or `artifact_url` are required.
+     *
+     * @return self
+     */
+    public function setArtifactId($artifact_id)
+    {
+        if (is_null($artifact_id)) {
+            throw new \InvalidArgumentException('non-nullable artifact_id cannot be null');
+        }
+        $this->container['artifact_id'] = $artifact_id;
+
+        return $this;
+    }
+
+    /**
      * Gets artifact_url
      *
-     * @return string
+     * @return string|null
      */
     public function getArtifactUrl()
     {
@@ -333,7 +364,7 @@ class ReposCreatePagesDeploymentRequest implements ModelInterface, ArrayAccess, 
     /**
      * Sets artifact_url
      *
-     * @param string $artifact_url The URL of an artifact that contains the .zip or .tar of static assets to deploy. The artifact belongs to the repository.
+     * @param string|null $artifact_url The URL of an artifact that contains the .zip or .tar of static assets to deploy. The artifact belongs to the repository. Either `artifact_id` or `artifact_url` are required.
      *
      * @return self
      */

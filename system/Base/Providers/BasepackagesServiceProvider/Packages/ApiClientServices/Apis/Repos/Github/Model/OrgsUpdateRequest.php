@@ -73,6 +73,8 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
         'members_can_create_public_repositories' => 'bool',
         'members_allowed_repository_creation_type' => 'string',
         'members_can_create_pages' => 'bool',
+        'members_can_create_public_pages' => 'bool',
+        'members_can_create_private_pages' => 'bool',
         'members_can_fork_private_repositories' => 'bool',
         'web_commit_signoff_required' => 'bool',
         'blog' => 'string',
@@ -110,6 +112,8 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
         'members_can_create_public_repositories' => null,
         'members_allowed_repository_creation_type' => null,
         'members_can_create_pages' => null,
+        'members_can_create_public_pages' => null,
+        'members_can_create_private_pages' => null,
         'members_can_fork_private_repositories' => null,
         'web_commit_signoff_required' => null,
         'blog' => null,
@@ -145,6 +149,8 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
         'members_can_create_public_repositories' => false,
         'members_allowed_repository_creation_type' => false,
         'members_can_create_pages' => false,
+        'members_can_create_public_pages' => false,
+        'members_can_create_private_pages' => false,
         'members_can_fork_private_repositories' => false,
         'web_commit_signoff_required' => false,
         'blog' => false,
@@ -260,6 +266,8 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
         'members_can_create_public_repositories' => 'members_can_create_public_repositories',
         'members_allowed_repository_creation_type' => 'members_allowed_repository_creation_type',
         'members_can_create_pages' => 'members_can_create_pages',
+        'members_can_create_public_pages' => 'members_can_create_public_pages',
+        'members_can_create_private_pages' => 'members_can_create_private_pages',
         'members_can_fork_private_repositories' => 'members_can_fork_private_repositories',
         'web_commit_signoff_required' => 'web_commit_signoff_required',
         'blog' => 'blog',
@@ -295,6 +303,8 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
         'members_can_create_public_repositories' => 'setMembersCanCreatePublicRepositories',
         'members_allowed_repository_creation_type' => 'setMembersAllowedRepositoryCreationType',
         'members_can_create_pages' => 'setMembersCanCreatePages',
+        'members_can_create_public_pages' => 'setMembersCanCreatePublicPages',
+        'members_can_create_private_pages' => 'setMembersCanCreatePrivatePages',
         'members_can_fork_private_repositories' => 'setMembersCanForkPrivateRepositories',
         'web_commit_signoff_required' => 'setWebCommitSignoffRequired',
         'blog' => 'setBlog',
@@ -330,6 +340,8 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
         'members_can_create_public_repositories' => 'getMembersCanCreatePublicRepositories',
         'members_allowed_repository_creation_type' => 'getMembersAllowedRepositoryCreationType',
         'members_can_create_pages' => 'getMembersCanCreatePages',
+        'members_can_create_public_pages' => 'getMembersCanCreatePublicPages',
+        'members_can_create_private_pages' => 'getMembersCanCreatePrivatePages',
         'members_can_fork_private_repositories' => 'getMembersCanForkPrivateRepositories',
         'web_commit_signoff_required' => 'getWebCommitSignoffRequired',
         'blog' => 'getBlog',
@@ -452,6 +464,8 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
         $this->setIfExists('members_can_create_public_repositories', $data ?? [], null);
         $this->setIfExists('members_allowed_repository_creation_type', $data ?? [], null);
         $this->setIfExists('members_can_create_pages', $data ?? [], true);
+        $this->setIfExists('members_can_create_public_pages', $data ?? [], true);
+        $this->setIfExists('members_can_create_private_pages', $data ?? [], true);
         $this->setIfExists('members_can_fork_private_repositories', $data ?? [], false);
         $this->setIfExists('web_commit_signoff_required', $data ?? [], false);
         $this->setIfExists('blog', $data ?? [], null);
@@ -845,7 +859,7 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Sets members_can_create_internal_repositories
      *
-     * @param bool|null $members_can_create_internal_repositories Whether organization members can create internal repositories, which are visible to all enterprise members. You can only allow members to create internal repositories if your organization is associated with an enterprise account using GitHub Enterprise Cloud or GitHub Enterprise Server 2.20+. For more information, see \"[Restricting repository creation in your organization](https://docs.github.com/enterprise-server@3.12/github/setting-up-and-managing-organizations-and-teams/restricting-repository-creation-in-your-organization)\" in the GitHub Help documentation.
+     * @param bool|null $members_can_create_internal_repositories Whether organization members can create internal repositories, which are visible to all enterprise members. You can only allow members to create internal repositories if your organization is associated with an enterprise account using GitHub Enterprise Cloud or GitHub Enterprise Server 2.20+. For more information, see \"[Restricting repository creation in your organization](https://docs.github.com/github/setting-up-and-managing-organizations-and-teams/restricting-repository-creation-in-your-organization)\" in the GitHub Help documentation.
      *
      * @return self
      */
@@ -872,7 +886,7 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Sets members_can_create_private_repositories
      *
-     * @param bool|null $members_can_create_private_repositories Whether organization members can create private repositories, which are visible to organization members with permission. For more information, see \"[Restricting repository creation in your organization](https://docs.github.com/enterprise-server@3.12/github/setting-up-and-managing-organizations-and-teams/restricting-repository-creation-in-your-organization)\" in the GitHub Help documentation.
+     * @param bool|null $members_can_create_private_repositories Whether organization members can create private repositories, which are visible to organization members with permission. For more information, see \"[Restricting repository creation in your organization](https://docs.github.com/github/setting-up-and-managing-organizations-and-teams/restricting-repository-creation-in-your-organization)\" in the GitHub Help documentation.
      *
      * @return self
      */
@@ -899,7 +913,7 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Sets members_can_create_public_repositories
      *
-     * @param bool|null $members_can_create_public_repositories Whether organization members can create public repositories, which are visible to anyone. For more information, see \"[Restricting repository creation in your organization](https://docs.github.com/enterprise-server@3.12/github/setting-up-and-managing-organizations-and-teams/restricting-repository-creation-in-your-organization)\" in the GitHub Help documentation.
+     * @param bool|null $members_can_create_public_repositories Whether organization members can create public repositories, which are visible to anyone. For more information, see \"[Restricting repository creation in your organization](https://docs.github.com/github/setting-up-and-managing-organizations-and-teams/restricting-repository-creation-in-your-organization)\" in the GitHub Help documentation.
      *
      * @return self
      */
@@ -926,7 +940,7 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Sets members_allowed_repository_creation_type
      *
-     * @param string|null $members_allowed_repository_creation_type Specifies which types of repositories non-admin organization members can create.  **Note:** This parameter is deprecated and will be removed in the future. Its return value ignores internal repositories. Using this parameter overrides values set in `members_can_create_repositories`. See the parameter deprecation notice in the operation description for details.
+     * @param string|null $members_allowed_repository_creation_type Specifies which types of repositories non-admin organization members can create. `private` is only available to repositories that are part of an organization on GitHub Enterprise Cloud.  **Note:** This parameter is deprecated and will be removed in the future. Its return value ignores internal repositories. Using this parameter overrides values set in `members_can_create_repositories`. See the parameter deprecation notice in the operation description for details.
      *
      * @return self
      */
@@ -973,6 +987,60 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
             throw new \InvalidArgumentException('non-nullable members_can_create_pages cannot be null');
         }
         $this->container['members_can_create_pages'] = $members_can_create_pages;
+
+        return $this;
+    }
+
+    /**
+     * Gets members_can_create_public_pages
+     *
+     * @return bool|null
+     */
+    public function getMembersCanCreatePublicPages()
+    {
+        return $this->container['members_can_create_public_pages'];
+    }
+
+    /**
+     * Sets members_can_create_public_pages
+     *
+     * @param bool|null $members_can_create_public_pages Whether organization members can create public GitHub Pages sites. Existing published sites will not be impacted.
+     *
+     * @return self
+     */
+    public function setMembersCanCreatePublicPages($members_can_create_public_pages)
+    {
+        if (is_null($members_can_create_public_pages)) {
+            throw new \InvalidArgumentException('non-nullable members_can_create_public_pages cannot be null');
+        }
+        $this->container['members_can_create_public_pages'] = $members_can_create_public_pages;
+
+        return $this;
+    }
+
+    /**
+     * Gets members_can_create_private_pages
+     *
+     * @return bool|null
+     */
+    public function getMembersCanCreatePrivatePages()
+    {
+        return $this->container['members_can_create_private_pages'];
+    }
+
+    /**
+     * Sets members_can_create_private_pages
+     *
+     * @param bool|null $members_can_create_private_pages Whether organization members can create private GitHub Pages sites. Existing published sites will not be impacted.
+     *
+     * @return self
+     */
+    public function setMembersCanCreatePrivatePages($members_can_create_private_pages)
+    {
+        if (is_null($members_can_create_private_pages)) {
+            throw new \InvalidArgumentException('non-nullable members_can_create_private_pages cannot be null');
+        }
+        $this->container['members_can_create_private_pages'] = $members_can_create_private_pages;
 
         return $this;
     }
@@ -1071,7 +1139,7 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Sets advanced_security_enabled_for_new_repositories
      *
-     * @param bool|null $advanced_security_enabled_for_new_repositories Whether GitHub Advanced Security is automatically enabled for new repositories.  To use this parameter, you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see \"[Managing security managers in your organization](https://docs.github.com/enterprise-server@3.12/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).\"  You can check which security and analysis features are currently enabled by using a `GET /orgs/{org}` request.
+     * @param bool|null $advanced_security_enabled_for_new_repositories Whether GitHub Advanced Security is automatically enabled for new repositories.  To use this parameter, you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see \"[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).\"  You can check which security and analysis features are currently enabled by using a `GET /orgs/{org}` request.
      *
      * @return self
      */
@@ -1098,7 +1166,7 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Sets dependabot_alerts_enabled_for_new_repositories
      *
-     * @param bool|null $dependabot_alerts_enabled_for_new_repositories Whether Dependabot alerts is automatically enabled for new repositories.  To use this parameter, you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see \"[Managing security managers in your organization](https://docs.github.com/enterprise-server@3.12/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).\"  You can check which security and analysis features are currently enabled by using a `GET /orgs/{org}` request.
+     * @param bool|null $dependabot_alerts_enabled_for_new_repositories Whether Dependabot alerts is automatically enabled for new repositories.  To use this parameter, you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see \"[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).\"  You can check which security and analysis features are currently enabled by using a `GET /orgs/{org}` request.
      *
      * @return self
      */
@@ -1125,7 +1193,7 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Sets dependabot_security_updates_enabled_for_new_repositories
      *
-     * @param bool|null $dependabot_security_updates_enabled_for_new_repositories Whether Dependabot security updates is automatically enabled for new repositories.  To use this parameter, you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see \"[Managing security managers in your organization](https://docs.github.com/enterprise-server@3.12/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).\"  You can check which security and analysis features are currently enabled by using a `GET /orgs/{org}` request.
+     * @param bool|null $dependabot_security_updates_enabled_for_new_repositories Whether Dependabot security updates is automatically enabled for new repositories.  To use this parameter, you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see \"[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).\"  You can check which security and analysis features are currently enabled by using a `GET /orgs/{org}` request.
      *
      * @return self
      */
@@ -1152,7 +1220,7 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Sets dependency_graph_enabled_for_new_repositories
      *
-     * @param bool|null $dependency_graph_enabled_for_new_repositories Whether dependency graph is automatically enabled for new repositories.  To use this parameter, you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see \"[Managing security managers in your organization](https://docs.github.com/enterprise-server@3.12/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).\"  You can check which security and analysis features are currently enabled by using a `GET /orgs/{org}` request.
+     * @param bool|null $dependency_graph_enabled_for_new_repositories Whether dependency graph is automatically enabled for new repositories.  To use this parameter, you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see \"[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).\"  You can check which security and analysis features are currently enabled by using a `GET /orgs/{org}` request.
      *
      * @return self
      */
@@ -1179,7 +1247,7 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Sets secret_scanning_enabled_for_new_repositories
      *
-     * @param bool|null $secret_scanning_enabled_for_new_repositories Whether secret scanning is automatically enabled for new repositories.  To use this parameter, you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see \"[Managing security managers in your organization](https://docs.github.com/enterprise-server@3.12/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).\"  You can check which security and analysis features are currently enabled by using a `GET /orgs/{org}` request.
+     * @param bool|null $secret_scanning_enabled_for_new_repositories Whether secret scanning is automatically enabled for new repositories.  To use this parameter, you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see \"[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).\"  You can check which security and analysis features are currently enabled by using a `GET /orgs/{org}` request.
      *
      * @return self
      */
@@ -1206,7 +1274,7 @@ class OrgsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Sets secret_scanning_push_protection_enabled_for_new_repositories
      *
-     * @param bool|null $secret_scanning_push_protection_enabled_for_new_repositories Whether secret scanning push protection is automatically enabled for new repositories.  To use this parameter, you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see \"[Managing security managers in your organization](https://docs.github.com/enterprise-server@3.12/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).\"  You can check which security and analysis features are currently enabled by using a `GET /orgs/{org}` request.
+     * @param bool|null $secret_scanning_push_protection_enabled_for_new_repositories Whether secret scanning push protection is automatically enabled for new repositories.  To use this parameter, you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see \"[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).\"  You can check which security and analysis features are currently enabled by using a `GET /orgs/{org}` request.
      *
      * @return self
      */

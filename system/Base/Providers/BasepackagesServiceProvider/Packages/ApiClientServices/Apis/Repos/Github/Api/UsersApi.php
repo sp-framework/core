@@ -77,6 +77,12 @@ class UsersApi
         'usersAddSocialAccountForAuthenticatedUser' => [
             'application/json',
         ],
+        'usersBlock' => [
+            'application/json',
+        ],
+        'usersCheckBlocked' => [
+            'application/json',
+        ],
         'usersCheckFollowingForUser' => [
             'application/json',
         ],
@@ -131,6 +137,9 @@ class UsersApi
         'usersList' => [
             'application/json',
         ],
+        'usersListBlockedByAuthenticatedUser' => [
+            'application/json',
+        ],
         'usersListEmailsForAuthenticatedUser' => [
             'application/json',
         ],
@@ -171,6 +180,12 @@ class UsersApi
             'application/json',
         ],
         'usersListSshSigningKeysForUser' => [
+            'application/json',
+        ],
+        'usersSetPrimaryEmailVisibilityForAuthenticatedUser' => [
+            'application/json',
+        ],
+        'usersUnblock' => [
             'application/json',
         ],
         'usersUnfollow' => [
@@ -1107,6 +1122,520 @@ class UsersApi
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
             'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation usersBlock
+     *
+     * Block a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersBlock'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function usersBlock($username, string $contentType = self::contentTypes['usersBlock'][0])
+    {
+        $this->usersBlockWithHttpInfo($username, $contentType);
+    }
+
+    /**
+     * Operation usersBlockWithHttpInfo
+     *
+     * Block a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersBlock'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function usersBlockWithHttpInfo($username, string $contentType = self::contentTypes['usersBlock'][0])
+    {
+        $request = $this->usersBlockRequest($username, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation usersBlockAsync
+     *
+     * Block a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersBlock'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function usersBlockAsync($username, string $contentType = self::contentTypes['usersBlock'][0])
+    {
+        return $this->usersBlockAsyncWithHttpInfo($username, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation usersBlockAsyncWithHttpInfo
+     *
+     * Block a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersBlock'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function usersBlockAsyncWithHttpInfo($username, string $contentType = self::contentTypes['usersBlock'][0])
+    {
+        $returnType = '';
+        $request = $this->usersBlockRequest($username, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'usersBlock'
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersBlock'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function usersBlockRequest($username, string $contentType = self::contentTypes['usersBlock'][0])
+    {
+
+        // verify the required parameter 'username' is set
+        if ($username === null || (is_array($username) && count($username) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $username when calling usersBlock'
+            );
+        }
+
+
+        $resourcePath = '/user/blocks/{username}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($username !== null) {
+            $resourcePath = str_replace(
+                '{' . 'username' . '}',
+                ObjectSerializer::toPathValue($username),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'PUT',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation usersCheckBlocked
+     *
+     * Check if a user is blocked by the authenticated user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersCheckBlocked'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function usersCheckBlocked($username, string $contentType = self::contentTypes['usersCheckBlocked'][0])
+    {
+        $this->usersCheckBlockedWithHttpInfo($username, $contentType);
+    }
+
+    /**
+     * Operation usersCheckBlockedWithHttpInfo
+     *
+     * Check if a user is blocked by the authenticated user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersCheckBlocked'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function usersCheckBlockedWithHttpInfo($username, string $contentType = self::contentTypes['usersCheckBlocked'][0])
+    {
+        $request = $this->usersCheckBlockedRequest($username, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation usersCheckBlockedAsync
+     *
+     * Check if a user is blocked by the authenticated user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersCheckBlocked'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function usersCheckBlockedAsync($username, string $contentType = self::contentTypes['usersCheckBlocked'][0])
+    {
+        return $this->usersCheckBlockedAsyncWithHttpInfo($username, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation usersCheckBlockedAsyncWithHttpInfo
+     *
+     * Check if a user is blocked by the authenticated user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersCheckBlocked'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function usersCheckBlockedAsyncWithHttpInfo($username, string $contentType = self::contentTypes['usersCheckBlocked'][0])
+    {
+        $returnType = '';
+        $request = $this->usersCheckBlockedRequest($username, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'usersCheckBlocked'
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersCheckBlocked'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function usersCheckBlockedRequest($username, string $contentType = self::contentTypes['usersCheckBlocked'][0])
+    {
+
+        // verify the required parameter 'username' is set
+        if ($username === null || (is_array($username) && count($username) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $username when calling usersCheckBlocked'
+            );
+        }
+
+
+        $resourcePath = '/user/blocks/{username}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($username !== null) {
+            $resourcePath = str_replace(
+                '{' . 'username' . '}',
+                ObjectSerializer::toPathValue($username),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody
@@ -6835,7 +7364,7 @@ class UsersApi
      * List users
      *
      * @param  int $since A user ID. Only return users with an ID greater than this ID. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersList'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -6854,7 +7383,7 @@ class UsersApi
      * List users
      *
      * @param  int $since A user ID. Only return users with an ID greater than this ID. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersList'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -6979,7 +7508,7 @@ class UsersApi
      * List users
      *
      * @param  int $since A user ID. Only return users with an ID greater than this ID. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersList'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7001,7 +7530,7 @@ class UsersApi
      * List users
      *
      * @param  int $since A user ID. Only return users with an ID greater than this ID. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersList'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7052,7 +7581,7 @@ class UsersApi
      * Create request for operation 'usersList'
      *
      * @param  int $since A user ID. Only return users with an ID greater than this ID. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersList'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7147,12 +7676,434 @@ class UsersApi
     }
 
     /**
+     * Operation usersListBlockedByAuthenticatedUser
+     *
+     * List users blocked by the authenticated user
+     *
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListBlockedByAuthenticatedUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     */
+    public function usersListBlockedByAuthenticatedUser($per_page = 30, $page = 1, string $contentType = self::contentTypes['usersListBlockedByAuthenticatedUser'][0])
+    {
+        list($response) = $this->usersListBlockedByAuthenticatedUserWithHttpInfo($per_page, $page, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation usersListBlockedByAuthenticatedUserWithHttpInfo
+     *
+     * List users blocked by the authenticated user
+     *
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListBlockedByAuthenticatedUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function usersListBlockedByAuthenticatedUserWithHttpInfo($per_page = 30, $page = 1, string $contentType = self::contentTypes['usersListBlockedByAuthenticatedUser'][0])
+    {
+        $request = $this->usersListBlockedByAuthenticatedUserRequest($per_page, $page, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 401:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation usersListBlockedByAuthenticatedUserAsync
+     *
+     * List users blocked by the authenticated user
+     *
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListBlockedByAuthenticatedUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function usersListBlockedByAuthenticatedUserAsync($per_page = 30, $page = 1, string $contentType = self::contentTypes['usersListBlockedByAuthenticatedUser'][0])
+    {
+        return $this->usersListBlockedByAuthenticatedUserAsyncWithHttpInfo($per_page, $page, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation usersListBlockedByAuthenticatedUserAsyncWithHttpInfo
+     *
+     * List users blocked by the authenticated user
+     *
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListBlockedByAuthenticatedUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function usersListBlockedByAuthenticatedUserAsyncWithHttpInfo($per_page = 30, $page = 1, string $contentType = self::contentTypes['usersListBlockedByAuthenticatedUser'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]';
+        $request = $this->usersListBlockedByAuthenticatedUserRequest($per_page, $page, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'usersListBlockedByAuthenticatedUser'
+     *
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListBlockedByAuthenticatedUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function usersListBlockedByAuthenticatedUserRequest($per_page = 30, $page = 1, string $contentType = self::contentTypes['usersListBlockedByAuthenticatedUser'][0])
+    {
+
+
+
+
+        $resourcePath = '/user/blocks';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $per_page,
+            'per_page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $page,
+            'page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+
+
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
      * Operation usersListEmailsForAuthenticatedUser
      *
      * List email addresses for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListEmailsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -7170,8 +8121,8 @@ class UsersApi
      *
      * List email addresses for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListEmailsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -7400,8 +8351,8 @@ class UsersApi
      *
      * List email addresses for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListEmailsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7422,8 +8373,8 @@ class UsersApi
      *
      * List email addresses for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListEmailsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7473,8 +8424,8 @@ class UsersApi
     /**
      * Create request for operation 'usersListEmailsForAuthenticatedUser'
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListEmailsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7573,8 +8524,8 @@ class UsersApi
      *
      * List the people the authenticated user follows
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowedByAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -7592,8 +8543,8 @@ class UsersApi
      *
      * List the people the authenticated user follows
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowedByAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -7787,8 +8738,8 @@ class UsersApi
      *
      * List the people the authenticated user follows
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowedByAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7809,8 +8760,8 @@ class UsersApi
      *
      * List the people the authenticated user follows
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowedByAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7860,8 +8811,8 @@ class UsersApi
     /**
      * Create request for operation 'usersListFollowedByAuthenticatedUser'
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowedByAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7960,8 +8911,8 @@ class UsersApi
      *
      * List followers of the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowersForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -7979,8 +8930,8 @@ class UsersApi
      *
      * List followers of the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowersForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -8174,8 +9125,8 @@ class UsersApi
      *
      * List followers of the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowersForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -8196,8 +9147,8 @@ class UsersApi
      *
      * List followers of the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowersForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -8247,8 +9198,8 @@ class UsersApi
     /**
      * Create request for operation 'usersListFollowersForAuthenticatedUser'
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowersForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -8348,8 +9299,8 @@ class UsersApi
      * List followers of a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowersForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -8368,8 +9319,8 @@ class UsersApi
      * List followers of a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowersForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -8494,8 +9445,8 @@ class UsersApi
      * List followers of a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowersForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -8517,8 +9468,8 @@ class UsersApi
      * List followers of a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowersForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -8569,8 +9520,8 @@ class UsersApi
      * Create request for operation 'usersListFollowersForUser'
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowersForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -8685,8 +9636,8 @@ class UsersApi
      * List the people a user follows
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowingForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -8705,8 +9656,8 @@ class UsersApi
      * List the people a user follows
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowingForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -8831,8 +9782,8 @@ class UsersApi
      * List the people a user follows
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowingForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -8854,8 +9805,8 @@ class UsersApi
      * List the people a user follows
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowingForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -8906,8 +9857,8 @@ class UsersApi
      * Create request for operation 'usersListFollowingForUser'
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListFollowingForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9021,8 +9972,8 @@ class UsersApi
      *
      * List GPG keys for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListGpgKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -9040,8 +9991,8 @@ class UsersApi
      *
      * List GPG keys for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListGpgKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -9270,8 +10221,8 @@ class UsersApi
      *
      * List GPG keys for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListGpgKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9292,8 +10243,8 @@ class UsersApi
      *
      * List GPG keys for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListGpgKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9343,8 +10294,8 @@ class UsersApi
     /**
      * Create request for operation 'usersListGpgKeysForAuthenticatedUser'
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListGpgKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9444,8 +10395,8 @@ class UsersApi
      * List GPG keys for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListGpgKeysForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -9464,8 +10415,8 @@ class UsersApi
      * List GPG keys for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListGpgKeysForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -9590,8 +10541,8 @@ class UsersApi
      * List GPG keys for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListGpgKeysForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9613,8 +10564,8 @@ class UsersApi
      * List GPG keys for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListGpgKeysForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9665,8 +10616,8 @@ class UsersApi
      * Create request for operation 'usersListGpgKeysForUser'
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListGpgKeysForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9780,8 +10731,8 @@ class UsersApi
      *
      * List public email addresses for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicEmailsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -9799,8 +10750,8 @@ class UsersApi
      *
      * List public email addresses for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicEmailsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -10029,8 +10980,8 @@ class UsersApi
      *
      * List public email addresses for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicEmailsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10051,8 +11002,8 @@ class UsersApi
      *
      * List public email addresses for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicEmailsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10102,8 +11053,8 @@ class UsersApi
     /**
      * Create request for operation 'usersListPublicEmailsForAuthenticatedUser'
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicEmailsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10203,8 +11154,8 @@ class UsersApi
      * List public keys for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicKeysForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -10223,8 +11174,8 @@ class UsersApi
      * List public keys for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicKeysForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -10349,8 +11300,8 @@ class UsersApi
      * List public keys for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicKeysForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10372,8 +11323,8 @@ class UsersApi
      * List public keys for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicKeysForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10424,8 +11375,8 @@ class UsersApi
      * Create request for operation 'usersListPublicKeysForUser'
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicKeysForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10539,8 +11490,8 @@ class UsersApi
      *
      * List public SSH keys for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicSshKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -10558,8 +11509,8 @@ class UsersApi
      *
      * List public SSH keys for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicSshKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -10788,8 +11739,8 @@ class UsersApi
      *
      * List public SSH keys for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicSshKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10810,8 +11761,8 @@ class UsersApi
      *
      * List public SSH keys for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicSshKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10861,8 +11812,8 @@ class UsersApi
     /**
      * Create request for operation 'usersListPublicSshKeysForAuthenticatedUser'
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListPublicSshKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10961,8 +11912,8 @@ class UsersApi
      *
      * List social accounts for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSocialAccountsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -10980,8 +11931,8 @@ class UsersApi
      *
      * List social accounts for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSocialAccountsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -11210,8 +12161,8 @@ class UsersApi
      *
      * List social accounts for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSocialAccountsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -11232,8 +12183,8 @@ class UsersApi
      *
      * List social accounts for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSocialAccountsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -11283,8 +12234,8 @@ class UsersApi
     /**
      * Create request for operation 'usersListSocialAccountsForAuthenticatedUser'
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSocialAccountsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -11384,8 +12335,8 @@ class UsersApi
      * List social accounts for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSocialAccountsForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -11404,8 +12355,8 @@ class UsersApi
      * List social accounts for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSocialAccountsForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -11530,8 +12481,8 @@ class UsersApi
      * List social accounts for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSocialAccountsForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -11553,8 +12504,8 @@ class UsersApi
      * List social accounts for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSocialAccountsForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -11605,8 +12556,8 @@ class UsersApi
      * Create request for operation 'usersListSocialAccountsForUser'
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSocialAccountsForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -11720,8 +12671,8 @@ class UsersApi
      *
      * List SSH signing keys for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSshSigningKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -11739,8 +12690,8 @@ class UsersApi
      *
      * List SSH signing keys for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSshSigningKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -11969,8 +12920,8 @@ class UsersApi
      *
      * List SSH signing keys for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSshSigningKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -11991,8 +12942,8 @@ class UsersApi
      *
      * List SSH signing keys for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSshSigningKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -12042,8 +12993,8 @@ class UsersApi
     /**
      * Create request for operation 'usersListSshSigningKeysForAuthenticatedUser'
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSshSigningKeysForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -12143,8 +13094,8 @@ class UsersApi
      * List SSH signing keys for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSshSigningKeysForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -12163,8 +13114,8 @@ class UsersApi
      * List SSH signing keys for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSshSigningKeysForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -12289,8 +13240,8 @@ class UsersApi
      * List SSH signing keys for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSshSigningKeysForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -12312,8 +13263,8 @@ class UsersApi
      * List SSH signing keys for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSshSigningKeysForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -12364,8 +13315,8 @@ class UsersApi
      * Create request for operation 'usersListSshSigningKeysForUser'
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersListSshSigningKeysForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -12468,6 +13419,705 @@ class UsersApi
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
             'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation usersSetPrimaryEmailVisibilityForAuthenticatedUser
+     *
+     * Set primary email visibility for the authenticated user
+     *
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequest $users_set_primary_email_visibility_for_authenticated_user_request users_set_primary_email_visibility_for_authenticated_user_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersSetPrimaryEmailVisibilityForAuthenticatedUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Email[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError
+     */
+    public function usersSetPrimaryEmailVisibilityForAuthenticatedUser($users_set_primary_email_visibility_for_authenticated_user_request, string $contentType = self::contentTypes['usersSetPrimaryEmailVisibilityForAuthenticatedUser'][0])
+    {
+        list($response) = $this->usersSetPrimaryEmailVisibilityForAuthenticatedUserWithHttpInfo($users_set_primary_email_visibility_for_authenticated_user_request, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation usersSetPrimaryEmailVisibilityForAuthenticatedUserWithHttpInfo
+     *
+     * Set primary email visibility for the authenticated user
+     *
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequest $users_set_primary_email_visibility_for_authenticated_user_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersSetPrimaryEmailVisibilityForAuthenticatedUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Email[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function usersSetPrimaryEmailVisibilityForAuthenticatedUserWithHttpInfo($users_set_primary_email_visibility_for_authenticated_user_request, string $contentType = self::contentTypes['usersSetPrimaryEmailVisibilityForAuthenticatedUser'][0])
+    {
+        $request = $this->usersSetPrimaryEmailVisibilityForAuthenticatedUserRequest($users_set_primary_email_visibility_for_authenticated_user_request, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Email[]' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Email[]' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Email[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 401:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 422:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Email[]';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Email[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation usersSetPrimaryEmailVisibilityForAuthenticatedUserAsync
+     *
+     * Set primary email visibility for the authenticated user
+     *
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequest $users_set_primary_email_visibility_for_authenticated_user_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersSetPrimaryEmailVisibilityForAuthenticatedUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function usersSetPrimaryEmailVisibilityForAuthenticatedUserAsync($users_set_primary_email_visibility_for_authenticated_user_request, string $contentType = self::contentTypes['usersSetPrimaryEmailVisibilityForAuthenticatedUser'][0])
+    {
+        return $this->usersSetPrimaryEmailVisibilityForAuthenticatedUserAsyncWithHttpInfo($users_set_primary_email_visibility_for_authenticated_user_request, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation usersSetPrimaryEmailVisibilityForAuthenticatedUserAsyncWithHttpInfo
+     *
+     * Set primary email visibility for the authenticated user
+     *
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequest $users_set_primary_email_visibility_for_authenticated_user_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersSetPrimaryEmailVisibilityForAuthenticatedUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function usersSetPrimaryEmailVisibilityForAuthenticatedUserAsyncWithHttpInfo($users_set_primary_email_visibility_for_authenticated_user_request, string $contentType = self::contentTypes['usersSetPrimaryEmailVisibilityForAuthenticatedUser'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Email[]';
+        $request = $this->usersSetPrimaryEmailVisibilityForAuthenticatedUserRequest($users_set_primary_email_visibility_for_authenticated_user_request, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'usersSetPrimaryEmailVisibilityForAuthenticatedUser'
+     *
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequest $users_set_primary_email_visibility_for_authenticated_user_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersSetPrimaryEmailVisibilityForAuthenticatedUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function usersSetPrimaryEmailVisibilityForAuthenticatedUserRequest($users_set_primary_email_visibility_for_authenticated_user_request, string $contentType = self::contentTypes['usersSetPrimaryEmailVisibilityForAuthenticatedUser'][0])
+    {
+
+        // verify the required parameter 'users_set_primary_email_visibility_for_authenticated_user_request' is set
+        if ($users_set_primary_email_visibility_for_authenticated_user_request === null || (is_array($users_set_primary_email_visibility_for_authenticated_user_request) && count($users_set_primary_email_visibility_for_authenticated_user_request) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $users_set_primary_email_visibility_for_authenticated_user_request when calling usersSetPrimaryEmailVisibilityForAuthenticatedUser'
+            );
+        }
+
+
+        $resourcePath = '/user/email/visibility';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (isset($users_set_primary_email_visibility_for_authenticated_user_request)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($users_set_primary_email_visibility_for_authenticated_user_request));
+            } else {
+                $httpBody = $users_set_primary_email_visibility_for_authenticated_user_request;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'PATCH',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation usersUnblock
+     *
+     * Unblock a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersUnblock'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function usersUnblock($username, string $contentType = self::contentTypes['usersUnblock'][0])
+    {
+        $this->usersUnblockWithHttpInfo($username, $contentType);
+    }
+
+    /**
+     * Operation usersUnblockWithHttpInfo
+     *
+     * Unblock a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersUnblock'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function usersUnblockWithHttpInfo($username, string $contentType = self::contentTypes['usersUnblock'][0])
+    {
+        $request = $this->usersUnblockRequest($username, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation usersUnblockAsync
+     *
+     * Unblock a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersUnblock'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function usersUnblockAsync($username, string $contentType = self::contentTypes['usersUnblock'][0])
+    {
+        return $this->usersUnblockAsyncWithHttpInfo($username, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation usersUnblockAsyncWithHttpInfo
+     *
+     * Unblock a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersUnblock'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function usersUnblockAsyncWithHttpInfo($username, string $contentType = self::contentTypes['usersUnblock'][0])
+    {
+        $returnType = '';
+        $request = $this->usersUnblockRequest($username, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'usersUnblock'
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['usersUnblock'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function usersUnblockRequest($username, string $contentType = self::contentTypes['usersUnblock'][0])
+    {
+
+        // verify the required parameter 'username' is set
+        if ($username === null || (is_array($username) && count($username) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $username when calling usersUnblock'
+            );
+        }
+
+
+        $resourcePath = '/user/blocks/{username}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($username !== null) {
+            $resourcePath = str_replace(
+                '{' . 'username' . '}',
+                ObjectSerializer::toPathValue($username),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'DELETE',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody

@@ -245,6 +245,7 @@ class RepositoryRulesetBypassActor implements ModelInterface, ArrayAccess, \Json
     public const ACTOR_TYPE_ORGANIZATION_ADMIN = 'OrganizationAdmin';
     public const ACTOR_TYPE_REPOSITORY_ROLE = 'RepositoryRole';
     public const ACTOR_TYPE_TEAM = 'Team';
+    public const ACTOR_TYPE_DEPLOY_KEY = 'DeployKey';
     public const BYPASS_MODE_ALWAYS = 'always';
     public const BYPASS_MODE_PULL_REQUEST = 'pull_request';
 
@@ -260,6 +261,7 @@ class RepositoryRulesetBypassActor implements ModelInterface, ArrayAccess, \Json
             self::ACTOR_TYPE_ORGANIZATION_ADMIN,
             self::ACTOR_TYPE_REPOSITORY_ROLE,
             self::ACTOR_TYPE_TEAM,
+            self::ACTOR_TYPE_DEPLOY_KEY,
         ];
     }
 
@@ -323,9 +325,6 @@ class RepositoryRulesetBypassActor implements ModelInterface, ArrayAccess, \Json
     {
         $invalidProperties = [];
 
-        if ($this->container['actor_id'] === null) {
-            $invalidProperties[] = "'actor_id' can't be null";
-        }
         if ($this->container['actor_type'] === null) {
             $invalidProperties[] = "'actor_type' can't be null";
         }
@@ -368,7 +367,7 @@ class RepositoryRulesetBypassActor implements ModelInterface, ArrayAccess, \Json
     /**
      * Gets actor_id
      *
-     * @return int
+     * @return int|null
      */
     public function getActorId()
     {
@@ -378,7 +377,7 @@ class RepositoryRulesetBypassActor implements ModelInterface, ArrayAccess, \Json
     /**
      * Sets actor_id
      *
-     * @param int $actor_id The ID of the actor that can bypass a ruleset. If `actor_type` is `OrganizationAdmin`, this should be `1`.
+     * @param int|null $actor_id The ID of the actor that can bypass a ruleset. If `actor_type` is `OrganizationAdmin`, this should be `1`. If `actor_type` is `DeployKey`, this should be null. `OrganizationAdmin` is not applicable for personal repositories.
      *
      * @return self
      */
@@ -412,7 +411,7 @@ class RepositoryRulesetBypassActor implements ModelInterface, ArrayAccess, \Json
     /**
      * Sets actor_type
      *
-     * @param string $actor_type The type of actor that can bypass a ruleset
+     * @param string $actor_type The type of actor that can bypass a ruleset.
      *
      * @return self
      */

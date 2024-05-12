@@ -71,10 +71,34 @@ class SecurityAdvisoriesApi
 
     /** @var string[] $contentTypes **/
     public const contentTypes = [
+        'securityAdvisoriesCreateFork' => [
+            'application/json',
+        ],
+        'securityAdvisoriesCreatePrivateVulnerabilityReport' => [
+            'application/json',
+        ],
+        'securityAdvisoriesCreateRepositoryAdvisory' => [
+            'application/json',
+        ],
+        'securityAdvisoriesCreateRepositoryAdvisoryCveRequest' => [
+            'application/json',
+        ],
         'securityAdvisoriesGetGlobalAdvisory' => [
             'application/json',
         ],
+        'securityAdvisoriesGetRepositoryAdvisory' => [
+            'application/json',
+        ],
         'securityAdvisoriesListGlobalAdvisories' => [
+            'application/json',
+        ],
+        'securityAdvisoriesListOrgRepositoryAdvisories' => [
+            'application/json',
+        ],
+        'securityAdvisoriesListRepositoryAdvisories' => [
+            'application/json',
+        ],
+        'securityAdvisoriesUpdateRepositoryAdvisory' => [
             'application/json',
         ],
     ];
@@ -123,6 +147,1882 @@ class SecurityAdvisoriesApi
     public function getConfig()
     {
         return $this->config;
+    }
+
+    /**
+     * Operation securityAdvisoriesCreateFork
+     *
+     * Create a temporary private fork
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateFork'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\FullRepository|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     */
+    public function securityAdvisoriesCreateFork($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesCreateFork'][0])
+    {
+        list($response) = $this->securityAdvisoriesCreateForkWithHttpInfo($owner, $repo, $ghsa_id, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation securityAdvisoriesCreateForkWithHttpInfo
+     *
+     * Create a temporary private fork
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateFork'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\FullRepository|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function securityAdvisoriesCreateForkWithHttpInfo($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesCreateFork'][0])
+    {
+        $request = $this->securityAdvisoriesCreateForkRequest($owner, $repo, $ghsa_id, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 202:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\FullRepository' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\FullRepository' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\FullRepository', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 400:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 422:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\FullRepository';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 202:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\FullRepository',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 400:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation securityAdvisoriesCreateForkAsync
+     *
+     * Create a temporary private fork
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateFork'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesCreateForkAsync($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesCreateFork'][0])
+    {
+        return $this->securityAdvisoriesCreateForkAsyncWithHttpInfo($owner, $repo, $ghsa_id, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation securityAdvisoriesCreateForkAsyncWithHttpInfo
+     *
+     * Create a temporary private fork
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateFork'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesCreateForkAsyncWithHttpInfo($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesCreateFork'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\FullRepository';
+        $request = $this->securityAdvisoriesCreateForkRequest($owner, $repo, $ghsa_id, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'securityAdvisoriesCreateFork'
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateFork'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function securityAdvisoriesCreateForkRequest($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesCreateFork'][0])
+    {
+
+        // verify the required parameter 'owner' is set
+        if ($owner === null || (is_array($owner) && count($owner) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $owner when calling securityAdvisoriesCreateFork'
+            );
+        }
+
+        // verify the required parameter 'repo' is set
+        if ($repo === null || (is_array($repo) && count($repo) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $repo when calling securityAdvisoriesCreateFork'
+            );
+        }
+
+        // verify the required parameter 'ghsa_id' is set
+        if ($ghsa_id === null || (is_array($ghsa_id) && count($ghsa_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $ghsa_id when calling securityAdvisoriesCreateFork'
+            );
+        }
+
+
+        $resourcePath = '/repos/{owner}/{repo}/security-advisories/{ghsa_id}/forks';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($owner !== null) {
+            $resourcePath = str_replace(
+                '{' . 'owner' . '}',
+                ObjectSerializer::toPathValue($owner),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($repo !== null) {
+            $resourcePath = str_replace(
+                '{' . 'repo' . '}',
+                ObjectSerializer::toPathValue($repo),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($ghsa_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'ghsa_id' . '}',
+                ObjectSerializer::toPathValue($ghsa_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', 'application/scim+json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation securityAdvisoriesCreatePrivateVulnerabilityReport
+     *
+     * Privately report a security vulnerability
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PrivateVulnerabilityReportCreate $private_vulnerability_report_create private_vulnerability_report_create (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreatePrivateVulnerabilityReport'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError
+     */
+    public function securityAdvisoriesCreatePrivateVulnerabilityReport($owner, $repo, $private_vulnerability_report_create, string $contentType = self::contentTypes['securityAdvisoriesCreatePrivateVulnerabilityReport'][0])
+    {
+        list($response) = $this->securityAdvisoriesCreatePrivateVulnerabilityReportWithHttpInfo($owner, $repo, $private_vulnerability_report_create, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation securityAdvisoriesCreatePrivateVulnerabilityReportWithHttpInfo
+     *
+     * Privately report a security vulnerability
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PrivateVulnerabilityReportCreate $private_vulnerability_report_create (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreatePrivateVulnerabilityReport'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function securityAdvisoriesCreatePrivateVulnerabilityReportWithHttpInfo($owner, $repo, $private_vulnerability_report_create, string $contentType = self::contentTypes['securityAdvisoriesCreatePrivateVulnerabilityReport'][0])
+    {
+        $request = $this->securityAdvisoriesCreatePrivateVulnerabilityReportRequest($owner, $repo, $private_vulnerability_report_create, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 201:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 422:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 201:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation securityAdvisoriesCreatePrivateVulnerabilityReportAsync
+     *
+     * Privately report a security vulnerability
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PrivateVulnerabilityReportCreate $private_vulnerability_report_create (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreatePrivateVulnerabilityReport'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesCreatePrivateVulnerabilityReportAsync($owner, $repo, $private_vulnerability_report_create, string $contentType = self::contentTypes['securityAdvisoriesCreatePrivateVulnerabilityReport'][0])
+    {
+        return $this->securityAdvisoriesCreatePrivateVulnerabilityReportAsyncWithHttpInfo($owner, $repo, $private_vulnerability_report_create, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation securityAdvisoriesCreatePrivateVulnerabilityReportAsyncWithHttpInfo
+     *
+     * Privately report a security vulnerability
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PrivateVulnerabilityReportCreate $private_vulnerability_report_create (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreatePrivateVulnerabilityReport'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesCreatePrivateVulnerabilityReportAsyncWithHttpInfo($owner, $repo, $private_vulnerability_report_create, string $contentType = self::contentTypes['securityAdvisoriesCreatePrivateVulnerabilityReport'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory';
+        $request = $this->securityAdvisoriesCreatePrivateVulnerabilityReportRequest($owner, $repo, $private_vulnerability_report_create, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'securityAdvisoriesCreatePrivateVulnerabilityReport'
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PrivateVulnerabilityReportCreate $private_vulnerability_report_create (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreatePrivateVulnerabilityReport'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function securityAdvisoriesCreatePrivateVulnerabilityReportRequest($owner, $repo, $private_vulnerability_report_create, string $contentType = self::contentTypes['securityAdvisoriesCreatePrivateVulnerabilityReport'][0])
+    {
+
+        // verify the required parameter 'owner' is set
+        if ($owner === null || (is_array($owner) && count($owner) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $owner when calling securityAdvisoriesCreatePrivateVulnerabilityReport'
+            );
+        }
+
+        // verify the required parameter 'repo' is set
+        if ($repo === null || (is_array($repo) && count($repo) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $repo when calling securityAdvisoriesCreatePrivateVulnerabilityReport'
+            );
+        }
+
+        // verify the required parameter 'private_vulnerability_report_create' is set
+        if ($private_vulnerability_report_create === null || (is_array($private_vulnerability_report_create) && count($private_vulnerability_report_create) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $private_vulnerability_report_create when calling securityAdvisoriesCreatePrivateVulnerabilityReport'
+            );
+        }
+
+
+        $resourcePath = '/repos/{owner}/{repo}/security-advisories/reports';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($owner !== null) {
+            $resourcePath = str_replace(
+                '{' . 'owner' . '}',
+                ObjectSerializer::toPathValue($owner),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($repo !== null) {
+            $resourcePath = str_replace(
+                '{' . 'repo' . '}',
+                ObjectSerializer::toPathValue($repo),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (isset($private_vulnerability_report_create)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($private_vulnerability_report_create));
+            } else {
+                $httpBody = $private_vulnerability_report_create;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation securityAdvisoriesCreateRepositoryAdvisory
+     *
+     * Create a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisoryCreate $repository_advisory_create repository_advisory_create (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError
+     */
+    public function securityAdvisoriesCreateRepositoryAdvisory($owner, $repo, $repository_advisory_create, string $contentType = self::contentTypes['securityAdvisoriesCreateRepositoryAdvisory'][0])
+    {
+        list($response) = $this->securityAdvisoriesCreateRepositoryAdvisoryWithHttpInfo($owner, $repo, $repository_advisory_create, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation securityAdvisoriesCreateRepositoryAdvisoryWithHttpInfo
+     *
+     * Create a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisoryCreate $repository_advisory_create (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function securityAdvisoriesCreateRepositoryAdvisoryWithHttpInfo($owner, $repo, $repository_advisory_create, string $contentType = self::contentTypes['securityAdvisoriesCreateRepositoryAdvisory'][0])
+    {
+        $request = $this->securityAdvisoriesCreateRepositoryAdvisoryRequest($owner, $repo, $repository_advisory_create, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 201:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 422:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 201:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation securityAdvisoriesCreateRepositoryAdvisoryAsync
+     *
+     * Create a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisoryCreate $repository_advisory_create (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesCreateRepositoryAdvisoryAsync($owner, $repo, $repository_advisory_create, string $contentType = self::contentTypes['securityAdvisoriesCreateRepositoryAdvisory'][0])
+    {
+        return $this->securityAdvisoriesCreateRepositoryAdvisoryAsyncWithHttpInfo($owner, $repo, $repository_advisory_create, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation securityAdvisoriesCreateRepositoryAdvisoryAsyncWithHttpInfo
+     *
+     * Create a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisoryCreate $repository_advisory_create (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesCreateRepositoryAdvisoryAsyncWithHttpInfo($owner, $repo, $repository_advisory_create, string $contentType = self::contentTypes['securityAdvisoriesCreateRepositoryAdvisory'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory';
+        $request = $this->securityAdvisoriesCreateRepositoryAdvisoryRequest($owner, $repo, $repository_advisory_create, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'securityAdvisoriesCreateRepositoryAdvisory'
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisoryCreate $repository_advisory_create (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function securityAdvisoriesCreateRepositoryAdvisoryRequest($owner, $repo, $repository_advisory_create, string $contentType = self::contentTypes['securityAdvisoriesCreateRepositoryAdvisory'][0])
+    {
+
+        // verify the required parameter 'owner' is set
+        if ($owner === null || (is_array($owner) && count($owner) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $owner when calling securityAdvisoriesCreateRepositoryAdvisory'
+            );
+        }
+
+        // verify the required parameter 'repo' is set
+        if ($repo === null || (is_array($repo) && count($repo) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $repo when calling securityAdvisoriesCreateRepositoryAdvisory'
+            );
+        }
+
+        // verify the required parameter 'repository_advisory_create' is set
+        if ($repository_advisory_create === null || (is_array($repository_advisory_create) && count($repository_advisory_create) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $repository_advisory_create when calling securityAdvisoriesCreateRepositoryAdvisory'
+            );
+        }
+
+
+        $resourcePath = '/repos/{owner}/{repo}/security-advisories';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($owner !== null) {
+            $resourcePath = str_replace(
+                '{' . 'owner' . '}',
+                ObjectSerializer::toPathValue($owner),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($repo !== null) {
+            $resourcePath = str_replace(
+                '{' . 'repo' . '}',
+                ObjectSerializer::toPathValue($repo),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (isset($repository_advisory_create)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($repository_advisory_create));
+            } else {
+                $httpBody = $repository_advisory_create;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation securityAdvisoriesCreateRepositoryAdvisoryCveRequest
+     *
+     * Request a CVE for a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateRepositoryAdvisoryCveRequest'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return object|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError
+     */
+    public function securityAdvisoriesCreateRepositoryAdvisoryCveRequest($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesCreateRepositoryAdvisoryCveRequest'][0])
+    {
+        list($response) = $this->securityAdvisoriesCreateRepositoryAdvisoryCveRequestWithHttpInfo($owner, $repo, $ghsa_id, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation securityAdvisoriesCreateRepositoryAdvisoryCveRequestWithHttpInfo
+     *
+     * Request a CVE for a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateRepositoryAdvisoryCveRequest'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of object|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function securityAdvisoriesCreateRepositoryAdvisoryCveRequestWithHttpInfo($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesCreateRepositoryAdvisoryCveRequest'][0])
+    {
+        $request = $this->securityAdvisoriesCreateRepositoryAdvisoryCveRequestRequest($owner, $repo, $ghsa_id, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 202:
+                    if ('object' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('object' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, 'object', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 400:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 422:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = 'object';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 202:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        'object',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 400:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation securityAdvisoriesCreateRepositoryAdvisoryCveRequestAsync
+     *
+     * Request a CVE for a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateRepositoryAdvisoryCveRequest'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesCreateRepositoryAdvisoryCveRequestAsync($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesCreateRepositoryAdvisoryCveRequest'][0])
+    {
+        return $this->securityAdvisoriesCreateRepositoryAdvisoryCveRequestAsyncWithHttpInfo($owner, $repo, $ghsa_id, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation securityAdvisoriesCreateRepositoryAdvisoryCveRequestAsyncWithHttpInfo
+     *
+     * Request a CVE for a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateRepositoryAdvisoryCveRequest'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesCreateRepositoryAdvisoryCveRequestAsyncWithHttpInfo($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesCreateRepositoryAdvisoryCveRequest'][0])
+    {
+        $returnType = 'object';
+        $request = $this->securityAdvisoriesCreateRepositoryAdvisoryCveRequestRequest($owner, $repo, $ghsa_id, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'securityAdvisoriesCreateRepositoryAdvisoryCveRequest'
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesCreateRepositoryAdvisoryCveRequest'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function securityAdvisoriesCreateRepositoryAdvisoryCveRequestRequest($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesCreateRepositoryAdvisoryCveRequest'][0])
+    {
+
+        // verify the required parameter 'owner' is set
+        if ($owner === null || (is_array($owner) && count($owner) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $owner when calling securityAdvisoriesCreateRepositoryAdvisoryCveRequest'
+            );
+        }
+
+        // verify the required parameter 'repo' is set
+        if ($repo === null || (is_array($repo) && count($repo) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $repo when calling securityAdvisoriesCreateRepositoryAdvisoryCveRequest'
+            );
+        }
+
+        // verify the required parameter 'ghsa_id' is set
+        if ($ghsa_id === null || (is_array($ghsa_id) && count($ghsa_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $ghsa_id when calling securityAdvisoriesCreateRepositoryAdvisoryCveRequest'
+            );
+        }
+
+
+        $resourcePath = '/repos/{owner}/{repo}/security-advisories/{ghsa_id}/cve';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($owner !== null) {
+            $resourcePath = str_replace(
+                '{' . 'owner' . '}',
+                ObjectSerializer::toPathValue($owner),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($repo !== null) {
+            $resourcePath = str_replace(
+                '{' . 'repo' . '}',
+                ObjectSerializer::toPathValue($repo),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($ghsa_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'ghsa_id' . '}',
+                ObjectSerializer::toPathValue($ghsa_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', 'application/scim+json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
     }
 
     /**
@@ -468,6 +2368,423 @@ class SecurityAdvisoriesApi
     }
 
     /**
+     * Operation securityAdvisoriesGetRepositoryAdvisory
+     *
+     * Get a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesGetRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     */
+    public function securityAdvisoriesGetRepositoryAdvisory($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesGetRepositoryAdvisory'][0])
+    {
+        list($response) = $this->securityAdvisoriesGetRepositoryAdvisoryWithHttpInfo($owner, $repo, $ghsa_id, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation securityAdvisoriesGetRepositoryAdvisoryWithHttpInfo
+     *
+     * Get a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesGetRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function securityAdvisoriesGetRepositoryAdvisoryWithHttpInfo($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesGetRepositoryAdvisory'][0])
+    {
+        $request = $this->securityAdvisoriesGetRepositoryAdvisoryRequest($owner, $repo, $ghsa_id, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation securityAdvisoriesGetRepositoryAdvisoryAsync
+     *
+     * Get a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesGetRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesGetRepositoryAdvisoryAsync($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesGetRepositoryAdvisory'][0])
+    {
+        return $this->securityAdvisoriesGetRepositoryAdvisoryAsyncWithHttpInfo($owner, $repo, $ghsa_id, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation securityAdvisoriesGetRepositoryAdvisoryAsyncWithHttpInfo
+     *
+     * Get a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesGetRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesGetRepositoryAdvisoryAsyncWithHttpInfo($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesGetRepositoryAdvisory'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory';
+        $request = $this->securityAdvisoriesGetRepositoryAdvisoryRequest($owner, $repo, $ghsa_id, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'securityAdvisoriesGetRepositoryAdvisory'
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesGetRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function securityAdvisoriesGetRepositoryAdvisoryRequest($owner, $repo, $ghsa_id, string $contentType = self::contentTypes['securityAdvisoriesGetRepositoryAdvisory'][0])
+    {
+
+        // verify the required parameter 'owner' is set
+        if ($owner === null || (is_array($owner) && count($owner) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $owner when calling securityAdvisoriesGetRepositoryAdvisory'
+            );
+        }
+
+        // verify the required parameter 'repo' is set
+        if ($repo === null || (is_array($repo) && count($repo) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $repo when calling securityAdvisoriesGetRepositoryAdvisory'
+            );
+        }
+
+        // verify the required parameter 'ghsa_id' is set
+        if ($ghsa_id === null || (is_array($ghsa_id) && count($ghsa_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $ghsa_id when calling securityAdvisoriesGetRepositoryAdvisory'
+            );
+        }
+
+
+        $resourcePath = '/repos/{owner}/{repo}/security-advisories/{ghsa_id}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($owner !== null) {
+            $resourcePath = str_replace(
+                '{' . 'owner' . '}',
+                ObjectSerializer::toPathValue($owner),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($repo !== null) {
+            $resourcePath = str_replace(
+                '{' . 'repo' . '}',
+                ObjectSerializer::toPathValue($repo),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($ghsa_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'ghsa_id' . '}',
+                ObjectSerializer::toPathValue($ghsa_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
      * Operation securityAdvisoriesListGlobalAdvisories
      *
      * List global security advisories
@@ -480,13 +2797,13 @@ class SecurityAdvisoriesApi
      * @param  SecurityAdvisoriesListGlobalAdvisoriesCwesParameter $cwes If specified, only advisories with these Common Weakness Enumerations (CWEs) will be returned.  Example: &#x60;cwes&#x3D;79,284,22&#x60; or &#x60;cwes[]&#x3D;79&amp;cwes[]&#x3D;284&amp;cwes[]&#x3D;22&#x60; (optional)
      * @param  bool $is_withdrawn Whether to only return advisories that have been withdrawn. (optional)
      * @param  SecurityAdvisoriesListGlobalAdvisoriesAffectsParameter $affects If specified, only return advisories that affect any of &#x60;package&#x60; or &#x60;package@version&#x60;. A maximum of 1000 packages can be specified. If the query parameter causes the URL to exceed the maximum URL length supported by your client, you must specify fewer packages.  Example: &#x60;affects&#x3D;package1,package2@1.0.0,package3@^2.0.0&#x60; or &#x60;affects[]&#x3D;package1&amp;affects[]&#x3D;package2@1.0.0&#x60; (optional)
-     * @param  string $published If specified, only return advisories that were published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $updated If specified, only return advisories that were updated on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $modified If specified, only show advisories that were updated or published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
-     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $published If specified, only return advisories that were published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $updated If specified, only return advisories that were updated on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $modified If specified, only show advisories that were updated or published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $sort The property to sort the results by. (optional, default to 'published')
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListGlobalAdvisories'] to see the possible values for this operation
      *
@@ -513,13 +2830,13 @@ class SecurityAdvisoriesApi
      * @param  SecurityAdvisoriesListGlobalAdvisoriesCwesParameter $cwes If specified, only advisories with these Common Weakness Enumerations (CWEs) will be returned.  Example: &#x60;cwes&#x3D;79,284,22&#x60; or &#x60;cwes[]&#x3D;79&amp;cwes[]&#x3D;284&amp;cwes[]&#x3D;22&#x60; (optional)
      * @param  bool $is_withdrawn Whether to only return advisories that have been withdrawn. (optional)
      * @param  SecurityAdvisoriesListGlobalAdvisoriesAffectsParameter $affects If specified, only return advisories that affect any of &#x60;package&#x60; or &#x60;package@version&#x60;. A maximum of 1000 packages can be specified. If the query parameter causes the URL to exceed the maximum URL length supported by your client, you must specify fewer packages.  Example: &#x60;affects&#x3D;package1,package2@1.0.0,package3@^2.0.0&#x60; or &#x60;affects[]&#x3D;package1&amp;affects[]&#x3D;package2@1.0.0&#x60; (optional)
-     * @param  string $published If specified, only return advisories that were published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $updated If specified, only return advisories that were updated on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $modified If specified, only show advisories that were updated or published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
-     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $published If specified, only return advisories that were published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $updated If specified, only return advisories that were updated on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $modified If specified, only show advisories that were updated or published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $sort The property to sort the results by. (optional, default to 'published')
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListGlobalAdvisories'] to see the possible values for this operation
      *
@@ -722,13 +3039,13 @@ class SecurityAdvisoriesApi
      * @param  SecurityAdvisoriesListGlobalAdvisoriesCwesParameter $cwes If specified, only advisories with these Common Weakness Enumerations (CWEs) will be returned.  Example: &#x60;cwes&#x3D;79,284,22&#x60; or &#x60;cwes[]&#x3D;79&amp;cwes[]&#x3D;284&amp;cwes[]&#x3D;22&#x60; (optional)
      * @param  bool $is_withdrawn Whether to only return advisories that have been withdrawn. (optional)
      * @param  SecurityAdvisoriesListGlobalAdvisoriesAffectsParameter $affects If specified, only return advisories that affect any of &#x60;package&#x60; or &#x60;package@version&#x60;. A maximum of 1000 packages can be specified. If the query parameter causes the URL to exceed the maximum URL length supported by your client, you must specify fewer packages.  Example: &#x60;affects&#x3D;package1,package2@1.0.0,package3@^2.0.0&#x60; or &#x60;affects[]&#x3D;package1&amp;affects[]&#x3D;package2@1.0.0&#x60; (optional)
-     * @param  string $published If specified, only return advisories that were published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $updated If specified, only return advisories that were updated on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $modified If specified, only show advisories that were updated or published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
-     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $published If specified, only return advisories that were published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $updated If specified, only return advisories that were updated on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $modified If specified, only show advisories that were updated or published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $sort The property to sort the results by. (optional, default to 'published')
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListGlobalAdvisories'] to see the possible values for this operation
      *
@@ -758,13 +3075,13 @@ class SecurityAdvisoriesApi
      * @param  SecurityAdvisoriesListGlobalAdvisoriesCwesParameter $cwes If specified, only advisories with these Common Weakness Enumerations (CWEs) will be returned.  Example: &#x60;cwes&#x3D;79,284,22&#x60; or &#x60;cwes[]&#x3D;79&amp;cwes[]&#x3D;284&amp;cwes[]&#x3D;22&#x60; (optional)
      * @param  bool $is_withdrawn Whether to only return advisories that have been withdrawn. (optional)
      * @param  SecurityAdvisoriesListGlobalAdvisoriesAffectsParameter $affects If specified, only return advisories that affect any of &#x60;package&#x60; or &#x60;package@version&#x60;. A maximum of 1000 packages can be specified. If the query parameter causes the URL to exceed the maximum URL length supported by your client, you must specify fewer packages.  Example: &#x60;affects&#x3D;package1,package2@1.0.0,package3@^2.0.0&#x60; or &#x60;affects[]&#x3D;package1&amp;affects[]&#x3D;package2@1.0.0&#x60; (optional)
-     * @param  string $published If specified, only return advisories that were published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $updated If specified, only return advisories that were updated on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $modified If specified, only show advisories that were updated or published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
-     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $published If specified, only return advisories that were published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $updated If specified, only return advisories that were updated on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $modified If specified, only show advisories that were updated or published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $sort The property to sort the results by. (optional, default to 'published')
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListGlobalAdvisories'] to see the possible values for this operation
      *
@@ -823,13 +3140,13 @@ class SecurityAdvisoriesApi
      * @param  SecurityAdvisoriesListGlobalAdvisoriesCwesParameter $cwes If specified, only advisories with these Common Weakness Enumerations (CWEs) will be returned.  Example: &#x60;cwes&#x3D;79,284,22&#x60; or &#x60;cwes[]&#x3D;79&amp;cwes[]&#x3D;284&amp;cwes[]&#x3D;22&#x60; (optional)
      * @param  bool $is_withdrawn Whether to only return advisories that have been withdrawn. (optional)
      * @param  SecurityAdvisoriesListGlobalAdvisoriesAffectsParameter $affects If specified, only return advisories that affect any of &#x60;package&#x60; or &#x60;package@version&#x60;. A maximum of 1000 packages can be specified. If the query parameter causes the URL to exceed the maximum URL length supported by your client, you must specify fewer packages.  Example: &#x60;affects&#x3D;package1,package2@1.0.0,package3@^2.0.0&#x60; or &#x60;affects[]&#x3D;package1&amp;affects[]&#x3D;package2@1.0.0&#x60; (optional)
-     * @param  string $published If specified, only return advisories that were published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $updated If specified, only return advisories that were updated on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $modified If specified, only show advisories that were updated or published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
-     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
-     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $published If specified, only return advisories that were published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $updated If specified, only return advisories that were updated on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $modified If specified, only show advisories that were updated or published on a date or date range.  For more information on the syntax of the date range, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $sort The property to sort the results by. (optional, default to 'published')
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListGlobalAdvisories'] to see the possible values for this operation
      *
@@ -1064,6 +3381,1443 @@ class SecurityAdvisoriesApi
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
             'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation securityAdvisoriesListOrgRepositoryAdvisories
+     *
+     * List repository security advisories for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
+     * @param  string $sort The property to sort the results by. (optional, default to 'created')
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  int $per_page The number of advisories to return per page. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  string $state Filter by the state of the repository advisories. Only advisories of this state will be returned. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListOrgRepositoryAdvisories'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     */
+    public function securityAdvisoriesListOrgRepositoryAdvisories($org, $direction = 'desc', $sort = 'created', $before = null, $after = null, $per_page = 30, $state = null, string $contentType = self::contentTypes['securityAdvisoriesListOrgRepositoryAdvisories'][0])
+    {
+        list($response) = $this->securityAdvisoriesListOrgRepositoryAdvisoriesWithHttpInfo($org, $direction, $sort, $before, $after, $per_page, $state, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation securityAdvisoriesListOrgRepositoryAdvisoriesWithHttpInfo
+     *
+     * List repository security advisories for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
+     * @param  string $sort The property to sort the results by. (optional, default to 'created')
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  int $per_page The number of advisories to return per page. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  string $state Filter by the state of the repository advisories. Only advisories of this state will be returned. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListOrgRepositoryAdvisories'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function securityAdvisoriesListOrgRepositoryAdvisoriesWithHttpInfo($org, $direction = 'desc', $sort = 'created', $before = null, $after = null, $per_page = 30, $state = null, string $contentType = self::contentTypes['securityAdvisoriesListOrgRepositoryAdvisories'][0])
+    {
+        $request = $this->securityAdvisoriesListOrgRepositoryAdvisoriesRequest($org, $direction, $sort, $before, $after, $per_page, $state, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 400:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 400:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation securityAdvisoriesListOrgRepositoryAdvisoriesAsync
+     *
+     * List repository security advisories for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
+     * @param  string $sort The property to sort the results by. (optional, default to 'created')
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  int $per_page The number of advisories to return per page. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  string $state Filter by the state of the repository advisories. Only advisories of this state will be returned. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListOrgRepositoryAdvisories'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesListOrgRepositoryAdvisoriesAsync($org, $direction = 'desc', $sort = 'created', $before = null, $after = null, $per_page = 30, $state = null, string $contentType = self::contentTypes['securityAdvisoriesListOrgRepositoryAdvisories'][0])
+    {
+        return $this->securityAdvisoriesListOrgRepositoryAdvisoriesAsyncWithHttpInfo($org, $direction, $sort, $before, $after, $per_page, $state, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation securityAdvisoriesListOrgRepositoryAdvisoriesAsyncWithHttpInfo
+     *
+     * List repository security advisories for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
+     * @param  string $sort The property to sort the results by. (optional, default to 'created')
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  int $per_page The number of advisories to return per page. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  string $state Filter by the state of the repository advisories. Only advisories of this state will be returned. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListOrgRepositoryAdvisories'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesListOrgRepositoryAdvisoriesAsyncWithHttpInfo($org, $direction = 'desc', $sort = 'created', $before = null, $after = null, $per_page = 30, $state = null, string $contentType = self::contentTypes['securityAdvisoriesListOrgRepositoryAdvisories'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]';
+        $request = $this->securityAdvisoriesListOrgRepositoryAdvisoriesRequest($org, $direction, $sort, $before, $after, $per_page, $state, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'securityAdvisoriesListOrgRepositoryAdvisories'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
+     * @param  string $sort The property to sort the results by. (optional, default to 'created')
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  int $per_page The number of advisories to return per page. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  string $state Filter by the state of the repository advisories. Only advisories of this state will be returned. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListOrgRepositoryAdvisories'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function securityAdvisoriesListOrgRepositoryAdvisoriesRequest($org, $direction = 'desc', $sort = 'created', $before = null, $after = null, $per_page = 30, $state = null, string $contentType = self::contentTypes['securityAdvisoriesListOrgRepositoryAdvisories'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling securityAdvisoriesListOrgRepositoryAdvisories'
+            );
+        }
+
+
+
+
+
+        if ($per_page !== null && $per_page > 100) {
+            throw new \InvalidArgumentException('invalid value for "$per_page" when calling SecurityAdvisoriesApi.securityAdvisoriesListOrgRepositoryAdvisories, must be smaller than or equal to 100.');
+        }
+        if ($per_page !== null && $per_page < 1) {
+            throw new \InvalidArgumentException('invalid value for "$per_page" when calling SecurityAdvisoriesApi.securityAdvisoriesListOrgRepositoryAdvisories, must be bigger than or equal to 1.');
+        }
+        
+
+
+        $resourcePath = '/orgs/{org}/security-advisories';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $direction,
+            'direction', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $sort,
+            'sort', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $before,
+            'before', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $after,
+            'after', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $per_page,
+            'per_page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $state,
+            'state', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', 'application/scim+json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation securityAdvisoriesListRepositoryAdvisories
+     *
+     * List repository security advisories
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
+     * @param  string $sort The property to sort the results by. (optional, default to 'created')
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  int $per_page The number of advisories to return per page. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  string $state Filter by state of the repository advisories. Only advisories of this state will be returned. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListRepositoryAdvisories'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     */
+    public function securityAdvisoriesListRepositoryAdvisories($owner, $repo, $direction = 'desc', $sort = 'created', $before = null, $after = null, $per_page = 30, $state = null, string $contentType = self::contentTypes['securityAdvisoriesListRepositoryAdvisories'][0])
+    {
+        list($response) = $this->securityAdvisoriesListRepositoryAdvisoriesWithHttpInfo($owner, $repo, $direction, $sort, $before, $after, $per_page, $state, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation securityAdvisoriesListRepositoryAdvisoriesWithHttpInfo
+     *
+     * List repository security advisories
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
+     * @param  string $sort The property to sort the results by. (optional, default to 'created')
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  int $per_page The number of advisories to return per page. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  string $state Filter by state of the repository advisories. Only advisories of this state will be returned. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListRepositoryAdvisories'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function securityAdvisoriesListRepositoryAdvisoriesWithHttpInfo($owner, $repo, $direction = 'desc', $sort = 'created', $before = null, $after = null, $per_page = 30, $state = null, string $contentType = self::contentTypes['securityAdvisoriesListRepositoryAdvisories'][0])
+    {
+        $request = $this->securityAdvisoriesListRepositoryAdvisoriesRequest($owner, $repo, $direction, $sort, $before, $after, $per_page, $state, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 400:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 400:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation securityAdvisoriesListRepositoryAdvisoriesAsync
+     *
+     * List repository security advisories
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
+     * @param  string $sort The property to sort the results by. (optional, default to 'created')
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  int $per_page The number of advisories to return per page. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  string $state Filter by state of the repository advisories. Only advisories of this state will be returned. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListRepositoryAdvisories'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesListRepositoryAdvisoriesAsync($owner, $repo, $direction = 'desc', $sort = 'created', $before = null, $after = null, $per_page = 30, $state = null, string $contentType = self::contentTypes['securityAdvisoriesListRepositoryAdvisories'][0])
+    {
+        return $this->securityAdvisoriesListRepositoryAdvisoriesAsyncWithHttpInfo($owner, $repo, $direction, $sort, $before, $after, $per_page, $state, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation securityAdvisoriesListRepositoryAdvisoriesAsyncWithHttpInfo
+     *
+     * List repository security advisories
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
+     * @param  string $sort The property to sort the results by. (optional, default to 'created')
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  int $per_page The number of advisories to return per page. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  string $state Filter by state of the repository advisories. Only advisories of this state will be returned. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListRepositoryAdvisories'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesListRepositoryAdvisoriesAsyncWithHttpInfo($owner, $repo, $direction = 'desc', $sort = 'created', $before = null, $after = null, $per_page = 30, $state = null, string $contentType = self::contentTypes['securityAdvisoriesListRepositoryAdvisories'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory[]';
+        $request = $this->securityAdvisoriesListRepositoryAdvisoriesRequest($owner, $repo, $direction, $sort, $before, $after, $per_page, $state, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'securityAdvisoriesListRepositoryAdvisories'
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
+     * @param  string $sort The property to sort the results by. (optional, default to 'created')
+     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional)
+     * @param  int $per_page The number of advisories to return per page. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  string $state Filter by state of the repository advisories. Only advisories of this state will be returned. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesListRepositoryAdvisories'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function securityAdvisoriesListRepositoryAdvisoriesRequest($owner, $repo, $direction = 'desc', $sort = 'created', $before = null, $after = null, $per_page = 30, $state = null, string $contentType = self::contentTypes['securityAdvisoriesListRepositoryAdvisories'][0])
+    {
+
+        // verify the required parameter 'owner' is set
+        if ($owner === null || (is_array($owner) && count($owner) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $owner when calling securityAdvisoriesListRepositoryAdvisories'
+            );
+        }
+
+        // verify the required parameter 'repo' is set
+        if ($repo === null || (is_array($repo) && count($repo) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $repo when calling securityAdvisoriesListRepositoryAdvisories'
+            );
+        }
+
+
+
+
+
+        if ($per_page !== null && $per_page > 100) {
+            throw new \InvalidArgumentException('invalid value for "$per_page" when calling SecurityAdvisoriesApi.securityAdvisoriesListRepositoryAdvisories, must be smaller than or equal to 100.');
+        }
+        if ($per_page !== null && $per_page < 1) {
+            throw new \InvalidArgumentException('invalid value for "$per_page" when calling SecurityAdvisoriesApi.securityAdvisoriesListRepositoryAdvisories, must be bigger than or equal to 1.');
+        }
+        
+
+
+        $resourcePath = '/repos/{owner}/{repo}/security-advisories';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $direction,
+            'direction', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $sort,
+            'sort', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $before,
+            'before', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $after,
+            'after', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $per_page,
+            'per_page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $state,
+            'state', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+
+
+        // path params
+        if ($owner !== null) {
+            $resourcePath = str_replace(
+                '{' . 'owner' . '}',
+                ObjectSerializer::toPathValue($owner),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($repo !== null) {
+            $resourcePath = str_replace(
+                '{' . 'repo' . '}',
+                ObjectSerializer::toPathValue($repo),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', 'application/scim+json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation securityAdvisoriesUpdateRepositoryAdvisory
+     *
+     * Update a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisoryUpdate $repository_advisory_update repository_advisory_update (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesUpdateRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError
+     */
+    public function securityAdvisoriesUpdateRepositoryAdvisory($owner, $repo, $ghsa_id, $repository_advisory_update, string $contentType = self::contentTypes['securityAdvisoriesUpdateRepositoryAdvisory'][0])
+    {
+        list($response) = $this->securityAdvisoriesUpdateRepositoryAdvisoryWithHttpInfo($owner, $repo, $ghsa_id, $repository_advisory_update, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation securityAdvisoriesUpdateRepositoryAdvisoryWithHttpInfo
+     *
+     * Update a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisoryUpdate $repository_advisory_update (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesUpdateRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function securityAdvisoriesUpdateRepositoryAdvisoryWithHttpInfo($owner, $repo, $ghsa_id, $repository_advisory_update, string $contentType = self::contentTypes['securityAdvisoriesUpdateRepositoryAdvisory'][0])
+    {
+        $request = $this->securityAdvisoriesUpdateRepositoryAdvisoryRequest($owner, $repo, $ghsa_id, $repository_advisory_update, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 422:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation securityAdvisoriesUpdateRepositoryAdvisoryAsync
+     *
+     * Update a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisoryUpdate $repository_advisory_update (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesUpdateRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesUpdateRepositoryAdvisoryAsync($owner, $repo, $ghsa_id, $repository_advisory_update, string $contentType = self::contentTypes['securityAdvisoriesUpdateRepositoryAdvisory'][0])
+    {
+        return $this->securityAdvisoriesUpdateRepositoryAdvisoryAsyncWithHttpInfo($owner, $repo, $ghsa_id, $repository_advisory_update, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation securityAdvisoriesUpdateRepositoryAdvisoryAsyncWithHttpInfo
+     *
+     * Update a repository security advisory
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisoryUpdate $repository_advisory_update (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesUpdateRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function securityAdvisoriesUpdateRepositoryAdvisoryAsyncWithHttpInfo($owner, $repo, $ghsa_id, $repository_advisory_update, string $contentType = self::contentTypes['securityAdvisoriesUpdateRepositoryAdvisory'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisory';
+        $request = $this->securityAdvisoriesUpdateRepositoryAdvisoryRequest($owner, $repo, $ghsa_id, $repository_advisory_update, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'securityAdvisoriesUpdateRepositoryAdvisory'
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  string $ghsa_id The GHSA (GitHub Security Advisory) identifier of the advisory. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryAdvisoryUpdate $repository_advisory_update (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['securityAdvisoriesUpdateRepositoryAdvisory'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function securityAdvisoriesUpdateRepositoryAdvisoryRequest($owner, $repo, $ghsa_id, $repository_advisory_update, string $contentType = self::contentTypes['securityAdvisoriesUpdateRepositoryAdvisory'][0])
+    {
+
+        // verify the required parameter 'owner' is set
+        if ($owner === null || (is_array($owner) && count($owner) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $owner when calling securityAdvisoriesUpdateRepositoryAdvisory'
+            );
+        }
+
+        // verify the required parameter 'repo' is set
+        if ($repo === null || (is_array($repo) && count($repo) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $repo when calling securityAdvisoriesUpdateRepositoryAdvisory'
+            );
+        }
+
+        // verify the required parameter 'ghsa_id' is set
+        if ($ghsa_id === null || (is_array($ghsa_id) && count($ghsa_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $ghsa_id when calling securityAdvisoriesUpdateRepositoryAdvisory'
+            );
+        }
+
+        // verify the required parameter 'repository_advisory_update' is set
+        if ($repository_advisory_update === null || (is_array($repository_advisory_update) && count($repository_advisory_update) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $repository_advisory_update when calling securityAdvisoriesUpdateRepositoryAdvisory'
+            );
+        }
+
+
+        $resourcePath = '/repos/{owner}/{repo}/security-advisories/{ghsa_id}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($owner !== null) {
+            $resourcePath = str_replace(
+                '{' . 'owner' . '}',
+                ObjectSerializer::toPathValue($owner),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($repo !== null) {
+            $resourcePath = str_replace(
+                '{' . 'repo' . '}',
+                ObjectSerializer::toPathValue($repo),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($ghsa_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'ghsa_id' . '}',
+                ObjectSerializer::toPathValue($ghsa_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (isset($repository_advisory_update)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($repository_advisory_update));
+            } else {
+                $httpBody = $repository_advisory_update;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'PATCH',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody

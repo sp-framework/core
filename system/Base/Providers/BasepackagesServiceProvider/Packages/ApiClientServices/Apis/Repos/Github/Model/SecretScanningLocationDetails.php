@@ -66,6 +66,7 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
         'blob_url' => 'string',
         'commit_sha' => 'string',
         'commit_url' => 'string',
+        'page_url' => 'string',
         'issue_title_url' => 'string',
         'issue_body_url' => 'string',
         'issue_comment_url' => 'string',
@@ -96,6 +97,7 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
         'blob_url' => null,
         'commit_sha' => null,
         'commit_url' => null,
+        'page_url' => null,
         'issue_title_url' => 'uri',
         'issue_body_url' => 'uri',
         'issue_comment_url' => 'uri',
@@ -124,6 +126,7 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
         'blob_url' => false,
         'commit_sha' => false,
         'commit_url' => false,
+        'page_url' => false,
         'issue_title_url' => false,
         'issue_body_url' => false,
         'issue_comment_url' => false,
@@ -232,6 +235,7 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
         'blob_url' => 'blob_url',
         'commit_sha' => 'commit_sha',
         'commit_url' => 'commit_url',
+        'page_url' => 'page_url',
         'issue_title_url' => 'issue_title_url',
         'issue_body_url' => 'issue_body_url',
         'issue_comment_url' => 'issue_comment_url',
@@ -260,6 +264,7 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
         'blob_url' => 'setBlobUrl',
         'commit_sha' => 'setCommitSha',
         'commit_url' => 'setCommitUrl',
+        'page_url' => 'setPageUrl',
         'issue_title_url' => 'setIssueTitleUrl',
         'issue_body_url' => 'setIssueBodyUrl',
         'issue_comment_url' => 'setIssueCommentUrl',
@@ -288,6 +293,7 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
         'blob_url' => 'getBlobUrl',
         'commit_sha' => 'getCommitSha',
         'commit_url' => 'getCommitUrl',
+        'page_url' => 'getPageUrl',
         'issue_title_url' => 'getIssueTitleUrl',
         'issue_body_url' => 'getIssueBodyUrl',
         'issue_comment_url' => 'getIssueCommentUrl',
@@ -367,6 +373,7 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
         $this->setIfExists('blob_url', $data ?? [], null);
         $this->setIfExists('commit_sha', $data ?? [], null);
         $this->setIfExists('commit_url', $data ?? [], null);
+        $this->setIfExists('page_url', $data ?? [], null);
         $this->setIfExists('issue_title_url', $data ?? [], null);
         $this->setIfExists('issue_body_url', $data ?? [], null);
         $this->setIfExists('issue_comment_url', $data ?? [], null);
@@ -434,6 +441,9 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
         if ($this->container['commit_url'] === null) {
             $invalidProperties[] = "'commit_url' can't be null";
         }
+        if ($this->container['page_url'] === null) {
+            $invalidProperties[] = "'page_url' can't be null";
+        }
         if ($this->container['issue_title_url'] === null) {
             $invalidProperties[] = "'issue_title_url' can't be null";
         }
@@ -495,7 +505,7 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets path
      *
-     * @param string $path The file path in the repository
+     * @param string $path The file path of the wiki page
      *
      * @return self
      */
@@ -576,7 +586,7 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets start_column
      *
-     * @param float $start_column The column at which the secret starts within the start line when the file is interpreted as 8BIT ASCII
+     * @param float $start_column The column at which the secret starts within the start line when the file is interpreted as 8-bit ASCII.
      *
      * @return self
      */
@@ -603,7 +613,7 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets end_column
      *
-     * @param float $end_column The column at which the secret ends within the end line when the file is interpreted as 8BIT ASCII
+     * @param float $end_column The column at which the secret ends within the end line when the file is interpreted as 8-bit ASCII.
      *
      * @return self
      */
@@ -711,7 +721,7 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets commit_url
      *
-     * @param string $commit_url The API URL to get the associated commit resource
+     * @param string $commit_url The GitHub URL to get the associated wiki commit
      *
      * @return self
      */
@@ -721,6 +731,33 @@ class SecretScanningLocationDetails implements ModelInterface, ArrayAccess, \Jso
             throw new \InvalidArgumentException('non-nullable commit_url cannot be null');
         }
         $this->container['commit_url'] = $commit_url;
+
+        return $this;
+    }
+
+    /**
+     * Gets page_url
+     *
+     * @return string
+     */
+    public function getPageUrl()
+    {
+        return $this->container['page_url'];
+    }
+
+    /**
+     * Sets page_url
+     *
+     * @param string $page_url The GitHub URL to get the associated wiki page
+     *
+     * @return self
+     */
+    public function setPageUrl($page_url)
+    {
+        if (is_null($page_url)) {
+            throw new \InvalidArgumentException('non-nullable page_url cannot be null');
+        }
+        $this->container['page_url'] = $page_url;
 
         return $this;
     }

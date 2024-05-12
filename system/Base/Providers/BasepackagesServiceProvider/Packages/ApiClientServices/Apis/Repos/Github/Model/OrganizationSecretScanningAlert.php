@@ -779,7 +779,7 @@ class OrganizationSecretScanningAlert implements ModelInterface, ArrayAccess, \J
     /**
      * Sets secret_type_display_name
      *
-     * @param string|null $secret_type_display_name User-friendly name for the detected secret, matching the `secret_type`. For a list of built-in patterns, see \"[Secret scanning patterns](https://docs.github.com/enterprise-server@3.12/code-security/secret-scanning/secret-scanning-patterns#supported-secrets-for-advanced-security).\"
+     * @param string|null $secret_type_display_name User-friendly name for the detected secret, matching the `secret_type`. For a list of built-in patterns, see \"[Secret scanning patterns](https://docs.github.com/code-security/secret-scanning/secret-scanning-patterns#supported-secrets-for-advanced-security).\"
      *
      * @return self
      */

@@ -62,7 +62,7 @@ class WebhookPullRequestReviewRequestRemovedOneOf implements ModelInterface, Arr
         'installation' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleInstallation',
         'number' => 'int',
         'organization' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationSimpleWebhooks',
-        'pull_request' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5',
+        'pull_request' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6',
         'repository' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryWebhooks',
         'requested_reviewer' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User',
         'sender' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUserWebhooks'
@@ -533,7 +533,7 @@ class WebhookPullRequestReviewRequestRemovedOneOf implements ModelInterface, Arr
     /**
      * Gets pull_request
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6
      */
     public function getPullRequest()
     {
@@ -543,7 +543,7 @@ class WebhookPullRequestReviewRequestRemovedOneOf implements ModelInterface, Arr
     /**
      * Sets pull_request
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5 $pull_request pull_request
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6 $pull_request pull_request
      *
      * @return self
      */

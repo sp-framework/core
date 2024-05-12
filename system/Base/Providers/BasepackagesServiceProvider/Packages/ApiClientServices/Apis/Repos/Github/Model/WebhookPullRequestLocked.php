@@ -62,7 +62,7 @@ class WebhookPullRequestLocked implements ModelInterface, ArrayAccess, \JsonSeri
         'installation' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleInstallation',
         'number' => 'int',
         'organization' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationSimpleWebhooks',
-        'pull_request' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest4',
+        'pull_request' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5',
         'repository' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryWebhooks',
         'sender' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUserWebhooks'
     ];
@@ -523,7 +523,7 @@ class WebhookPullRequestLocked implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Gets pull_request
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest4
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5
      */
     public function getPullRequest()
     {
@@ -533,7 +533,7 @@ class WebhookPullRequestLocked implements ModelInterface, ArrayAccess, \JsonSeri
     /**
      * Sets pull_request
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest4 $pull_request pull_request
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5 $pull_request pull_request
      *
      * @return self
      */

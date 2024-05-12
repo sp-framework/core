@@ -58,6 +58,7 @@ class SelectedActions implements ModelInterface, ArrayAccess, \JsonSerializable
       */
     protected static $openAPITypes = [
         'github_owned_allowed' => 'bool',
+        'verified_allowed' => 'bool',
         'patterns_allowed' => 'string[]'
     ];
 
@@ -70,6 +71,7 @@ class SelectedActions implements ModelInterface, ArrayAccess, \JsonSerializable
       */
     protected static $openAPIFormats = [
         'github_owned_allowed' => null,
+        'verified_allowed' => null,
         'patterns_allowed' => null
     ];
 
@@ -80,6 +82,7 @@ class SelectedActions implements ModelInterface, ArrayAccess, \JsonSerializable
       */
     protected static array $openAPINullables = [
         'github_owned_allowed' => false,
+        'verified_allowed' => false,
         'patterns_allowed' => false
     ];
 
@@ -170,6 +173,7 @@ class SelectedActions implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     protected static $attributeMap = [
         'github_owned_allowed' => 'github_owned_allowed',
+        'verified_allowed' => 'verified_allowed',
         'patterns_allowed' => 'patterns_allowed'
     ];
 
@@ -180,6 +184,7 @@ class SelectedActions implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     protected static $setters = [
         'github_owned_allowed' => 'setGithubOwnedAllowed',
+        'verified_allowed' => 'setVerifiedAllowed',
         'patterns_allowed' => 'setPatternsAllowed'
     ];
 
@@ -190,6 +195,7 @@ class SelectedActions implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     protected static $getters = [
         'github_owned_allowed' => 'getGithubOwnedAllowed',
+        'verified_allowed' => 'getVerifiedAllowed',
         'patterns_allowed' => 'getPatternsAllowed'
     ];
 
@@ -251,6 +257,7 @@ class SelectedActions implements ModelInterface, ArrayAccess, \JsonSerializable
     public function __construct(array $data = null)
     {
         $this->setIfExists('github_owned_allowed', $data ?? [], null);
+        $this->setIfExists('verified_allowed', $data ?? [], null);
         $this->setIfExists('patterns_allowed', $data ?? [], null);
     }
 
@@ -281,12 +288,6 @@ class SelectedActions implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
-        if ($this->container['github_owned_allowed'] === null) {
-            $invalidProperties[] = "'github_owned_allowed' can't be null";
-        }
-        if ($this->container['patterns_allowed'] === null) {
-            $invalidProperties[] = "'patterns_allowed' can't be null";
-        }
         return $invalidProperties;
     }
 
@@ -305,7 +306,7 @@ class SelectedActions implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets github_owned_allowed
      *
-     * @return bool
+     * @return bool|null
      */
     public function getGithubOwnedAllowed()
     {
@@ -315,7 +316,7 @@ class SelectedActions implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets github_owned_allowed
      *
-     * @param bool $github_owned_allowed Whether GitHub-owned actions are allowed. For example, this includes the actions in the `actions` organization.
+     * @param bool|null $github_owned_allowed Whether GitHub-owned actions are allowed. For example, this includes the actions in the `actions` organization.
      *
      * @return self
      */
@@ -330,9 +331,36 @@ class SelectedActions implements ModelInterface, ArrayAccess, \JsonSerializable
     }
 
     /**
+     * Gets verified_allowed
+     *
+     * @return bool|null
+     */
+    public function getVerifiedAllowed()
+    {
+        return $this->container['verified_allowed'];
+    }
+
+    /**
+     * Sets verified_allowed
+     *
+     * @param bool|null $verified_allowed Whether actions from GitHub Marketplace verified creators are allowed. Set to `true` to allow all actions by GitHub Marketplace verified creators.
+     *
+     * @return self
+     */
+    public function setVerifiedAllowed($verified_allowed)
+    {
+        if (is_null($verified_allowed)) {
+            throw new \InvalidArgumentException('non-nullable verified_allowed cannot be null');
+        }
+        $this->container['verified_allowed'] = $verified_allowed;
+
+        return $this;
+    }
+
+    /**
      * Gets patterns_allowed
      *
-     * @return string[]
+     * @return string[]|null
      */
     public function getPatternsAllowed()
     {
@@ -342,7 +370,7 @@ class SelectedActions implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets patterns_allowed
      *
-     * @param string[] $patterns_allowed Specifies a list of string-matching patterns to allow specific action(s). Wildcards, tags, and SHAs are allowed. For example, `monalisa/octocat@*`, `monalisa/octocat@v2`, `monalisa/_*`.
+     * @param string[]|null $patterns_allowed Specifies a list of string-matching patterns to allow specific action(s) and reusable workflow(s). Wildcards, tags, and SHAs are allowed. For example, `monalisa/octocat@*`, `monalisa/octocat@v2`, `monalisa/_*`.  **Note**: The `patterns_allowed` setting only applies to public repositories.
      *
      * @return self
      */

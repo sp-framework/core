@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * WebhookForkForkee Class Doc Comment
  *
  * @category Class
- * @description The created [&#x60;repository&#x60;](https://docs.github.com/enterprise-server@3.12/rest/repos/repos#get-a-repository) resource.
+ * @description The created [&#x60;repository&#x60;](https://docs.github.com/rest/repos/repos#get-a-repository) resource.
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

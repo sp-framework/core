@@ -5252,8 +5252,8 @@ class ProjectsApi
      *
      * @param  int $column_id The unique identifier of the column. (required)
      * @param  string $archived_state Filters the project cards that are returned by the card&#39;s state. (optional, default to 'not_archived')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListCards'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -5273,8 +5273,8 @@ class ProjectsApi
      *
      * @param  int $column_id The unique identifier of the column. (required)
      * @param  string $archived_state Filters the project cards that are returned by the card&#39;s state. (optional, default to 'not_archived')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListCards'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -5470,8 +5470,8 @@ class ProjectsApi
      *
      * @param  int $column_id The unique identifier of the column. (required)
      * @param  string $archived_state Filters the project cards that are returned by the card&#39;s state. (optional, default to 'not_archived')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListCards'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -5494,8 +5494,8 @@ class ProjectsApi
      *
      * @param  int $column_id The unique identifier of the column. (required)
      * @param  string $archived_state Filters the project cards that are returned by the card&#39;s state. (optional, default to 'not_archived')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListCards'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -5547,8 +5547,8 @@ class ProjectsApi
      *
      * @param  int $column_id The unique identifier of the column. (required)
      * @param  string $archived_state Filters the project cards that are returned by the card&#39;s state. (optional, default to 'not_archived')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListCards'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -5674,8 +5674,8 @@ class ProjectsApi
      *
      * @param  int $project_id The unique identifier of the project. (required)
      * @param  string $affiliation Filters the collaborators by their affiliation. &#x60;outside&#x60; means outside collaborators of a project that are not a member of the project&#39;s organization. &#x60;direct&#x60; means collaborators with permissions to a project, regardless of organization membership status. &#x60;all&#x60; means all collaborators the authenticated user can see. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListCollaborators'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -5695,8 +5695,8 @@ class ProjectsApi
      *
      * @param  int $project_id The unique identifier of the project. (required)
      * @param  string $affiliation Filters the collaborators by their affiliation. &#x60;outside&#x60; means outside collaborators of a project that are not a member of the project&#39;s organization. &#x60;direct&#x60; means collaborators with permissions to a project, regardless of organization membership status. &#x60;all&#x60; means all collaborators the authenticated user can see. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListCollaborators'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -5962,8 +5962,8 @@ class ProjectsApi
      *
      * @param  int $project_id The unique identifier of the project. (required)
      * @param  string $affiliation Filters the collaborators by their affiliation. &#x60;outside&#x60; means outside collaborators of a project that are not a member of the project&#39;s organization. &#x60;direct&#x60; means collaborators with permissions to a project, regardless of organization membership status. &#x60;all&#x60; means all collaborators the authenticated user can see. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListCollaborators'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -5986,8 +5986,8 @@ class ProjectsApi
      *
      * @param  int $project_id The unique identifier of the project. (required)
      * @param  string $affiliation Filters the collaborators by their affiliation. &#x60;outside&#x60; means outside collaborators of a project that are not a member of the project&#39;s organization. &#x60;direct&#x60; means collaborators with permissions to a project, regardless of organization membership status. &#x60;all&#x60; means all collaborators the authenticated user can see. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListCollaborators'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -6039,8 +6039,8 @@ class ProjectsApi
      *
      * @param  int $project_id The unique identifier of the project. (required)
      * @param  string $affiliation Filters the collaborators by their affiliation. &#x60;outside&#x60; means outside collaborators of a project that are not a member of the project&#39;s organization. &#x60;direct&#x60; means collaborators with permissions to a project, regardless of organization membership status. &#x60;all&#x60; means all collaborators the authenticated user can see. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListCollaborators'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -6165,8 +6165,8 @@ class ProjectsApi
      * List project columns
      *
      * @param  int $project_id The unique identifier of the project. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListColumns'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -6185,8 +6185,8 @@ class ProjectsApi
      * List project columns
      *
      * @param  int $project_id The unique identifier of the project. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListColumns'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -6381,8 +6381,8 @@ class ProjectsApi
      * List project columns
      *
      * @param  int $project_id The unique identifier of the project. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListColumns'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -6404,8 +6404,8 @@ class ProjectsApi
      * List project columns
      *
      * @param  int $project_id The unique identifier of the project. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListColumns'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -6456,8 +6456,8 @@ class ProjectsApi
      * Create request for operation 'projectsListColumns'
      *
      * @param  int $project_id The unique identifier of the project. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListColumns'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -6573,8 +6573,8 @@ class ProjectsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -6594,8 +6594,8 @@ class ProjectsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -6756,8 +6756,8 @@ class ProjectsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -6780,8 +6780,8 @@ class ProjectsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -6833,8 +6833,8 @@ class ProjectsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -6961,8 +6961,8 @@ class ProjectsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForRepo'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -6983,8 +6983,8 @@ class ProjectsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForRepo'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -7286,8 +7286,8 @@ class ProjectsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7311,8 +7311,8 @@ class ProjectsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7365,8 +7365,8 @@ class ProjectsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7507,8 +7507,8 @@ class ProjectsApi
      *
      * @param  string $username The handle for the GitHub user account. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -7528,8 +7528,8 @@ class ProjectsApi
      *
      * @param  string $username The handle for the GitHub user account. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -7690,8 +7690,8 @@ class ProjectsApi
      *
      * @param  string $username The handle for the GitHub user account. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7714,8 +7714,8 @@ class ProjectsApi
      *
      * @param  string $username The handle for the GitHub user account. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7767,8 +7767,8 @@ class ProjectsApi
      *
      * @param  string $username The handle for the GitHub user account. (required)
      * @param  string $state Indicates the state of the projects to return. (optional, default to 'open')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['projectsListForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException

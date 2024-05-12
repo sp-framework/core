@@ -260,6 +260,7 @@ class ReposCreateOrgRulesetRequest implements ModelInterface, ArrayAccess, \Json
 
     public const TARGET_BRANCH = 'branch';
     public const TARGET_TAG = 'tag';
+    public const TARGET_PUSH = 'push';
 
     /**
      * Gets allowable values of the enum
@@ -271,6 +272,7 @@ class ReposCreateOrgRulesetRequest implements ModelInterface, ArrayAccess, \Json
         return [
             self::TARGET_BRANCH,
             self::TARGET_TAG,
+            self::TARGET_PUSH,
         ];
     }
 
@@ -394,7 +396,7 @@ class ReposCreateOrgRulesetRequest implements ModelInterface, ArrayAccess, \Json
     /**
      * Sets target
      *
-     * @param string|null $target The target of the ruleset.
+     * @param string|null $target The target of the ruleset  **Note**: The `push` target is in beta and is subject to change.
      *
      * @return self
      */

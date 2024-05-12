@@ -381,7 +381,7 @@ class OrgsUpdateWebhookRequestConfig implements ModelInterface, ArrayAccess, \Js
     /**
      * Sets secret
      *
-     * @param string|null $secret If provided, the `secret` will be used as the `key` to generate the HMAC hex digest value for [delivery signature headers](https://docs.github.com/enterprise-server@3.12/webhooks/event-payloads/#delivery-headers).
+     * @param string|null $secret If provided, the `secret` will be used as the `key` to generate the HMAC hex digest value for [delivery signature headers](https://docs.github.com/webhooks/event-payloads/#delivery-headers).
      *
      * @return self
      */

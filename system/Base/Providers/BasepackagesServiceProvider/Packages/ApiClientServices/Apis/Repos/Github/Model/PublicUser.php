@@ -91,7 +91,7 @@ class PublicUser implements ModelInterface, ArrayAccess, \JsonSerializable
         'following' => 'int',
         'created_at' => '\DateTime',
         'updated_at' => '\DateTime',
-        'plan' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\LdapMappingUserPlan',
+        'plan' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PublicUserPlan',
         'suspended_at' => '\DateTime',
         'private_gists' => 'int',
         'total_private_repos' => 'int',
@@ -1620,7 +1620,7 @@ class PublicUser implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets plan
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\LdapMappingUserPlan|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PublicUserPlan|null
      */
     public function getPlan()
     {
@@ -1630,7 +1630,7 @@ class PublicUser implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets plan
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\LdapMappingUserPlan|null $plan plan
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PublicUserPlan|null $plan plan
      *
      * @return self
      */

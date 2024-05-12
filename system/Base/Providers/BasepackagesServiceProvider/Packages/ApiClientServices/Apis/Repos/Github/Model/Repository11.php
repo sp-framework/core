@@ -113,8 +113,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'languages_url' => 'string',
         'license' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\License',
         'master_branch' => 'string',
-        'merge_commit_message' => 'string',
-        'merge_commit_title' => 'string',
         'merges_url' => 'string',
         'milestones_url' => 'string',
         'mirror_url' => 'string',
@@ -133,8 +131,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'releases_url' => 'string',
         'role_name' => 'string',
         'size' => 'int',
-        'squash_merge_commit_message' => 'string',
-        'squash_merge_commit_title' => 'string',
         'ssh_url' => 'string',
         'stargazers' => 'int',
         'stargazers_count' => 'int',
@@ -149,7 +145,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'trees_url' => 'string',
         'updated_at' => '\DateTime',
         'url' => 'string',
-        'use_squash_pr_title_as_default' => 'bool',
         'visibility' => 'string',
         'watchers' => 'int',
         'watchers_count' => 'int',
@@ -219,8 +214,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'languages_url' => 'uri',
         'license' => null,
         'master_branch' => null,
-        'merge_commit_message' => null,
-        'merge_commit_title' => null,
         'merges_url' => 'uri',
         'milestones_url' => 'uri-template',
         'mirror_url' => 'uri',
@@ -239,8 +232,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'releases_url' => 'uri-template',
         'role_name' => null,
         'size' => null,
-        'squash_merge_commit_message' => null,
-        'squash_merge_commit_title' => null,
         'ssh_url' => null,
         'stargazers' => null,
         'stargazers_count' => null,
@@ -255,7 +246,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'trees_url' => 'uri-template',
         'updated_at' => 'date-time',
         'url' => 'uri',
-        'use_squash_pr_title_as_default' => null,
         'visibility' => null,
         'watchers' => null,
         'watchers_count' => null,
@@ -323,8 +313,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'languages_url' => false,
         'license' => true,
         'master_branch' => false,
-        'merge_commit_message' => false,
-        'merge_commit_title' => false,
         'merges_url' => false,
         'milestones_url' => false,
         'mirror_url' => true,
@@ -343,8 +331,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'releases_url' => false,
         'role_name' => true,
         'size' => false,
-        'squash_merge_commit_message' => false,
-        'squash_merge_commit_title' => false,
         'ssh_url' => false,
         'stargazers' => false,
         'stargazers_count' => false,
@@ -359,7 +345,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'trees_url' => false,
         'updated_at' => false,
         'url' => false,
-        'use_squash_pr_title_as_default' => false,
         'visibility' => false,
         'watchers' => false,
         'watchers_count' => false,
@@ -507,8 +492,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'languages_url' => 'languages_url',
         'license' => 'license',
         'master_branch' => 'master_branch',
-        'merge_commit_message' => 'merge_commit_message',
-        'merge_commit_title' => 'merge_commit_title',
         'merges_url' => 'merges_url',
         'milestones_url' => 'milestones_url',
         'mirror_url' => 'mirror_url',
@@ -527,8 +510,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'releases_url' => 'releases_url',
         'role_name' => 'role_name',
         'size' => 'size',
-        'squash_merge_commit_message' => 'squash_merge_commit_message',
-        'squash_merge_commit_title' => 'squash_merge_commit_title',
         'ssh_url' => 'ssh_url',
         'stargazers' => 'stargazers',
         'stargazers_count' => 'stargazers_count',
@@ -543,7 +524,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'trees_url' => 'trees_url',
         'updated_at' => 'updated_at',
         'url' => 'url',
-        'use_squash_pr_title_as_default' => 'use_squash_pr_title_as_default',
         'visibility' => 'visibility',
         'watchers' => 'watchers',
         'watchers_count' => 'watchers_count',
@@ -611,8 +591,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'languages_url' => 'setLanguagesUrl',
         'license' => 'setLicense',
         'master_branch' => 'setMasterBranch',
-        'merge_commit_message' => 'setMergeCommitMessage',
-        'merge_commit_title' => 'setMergeCommitTitle',
         'merges_url' => 'setMergesUrl',
         'milestones_url' => 'setMilestonesUrl',
         'mirror_url' => 'setMirrorUrl',
@@ -631,8 +609,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'releases_url' => 'setReleasesUrl',
         'role_name' => 'setRoleName',
         'size' => 'setSize',
-        'squash_merge_commit_message' => 'setSquashMergeCommitMessage',
-        'squash_merge_commit_title' => 'setSquashMergeCommitTitle',
         'ssh_url' => 'setSshUrl',
         'stargazers' => 'setStargazers',
         'stargazers_count' => 'setStargazersCount',
@@ -647,7 +623,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'trees_url' => 'setTreesUrl',
         'updated_at' => 'setUpdatedAt',
         'url' => 'setUrl',
-        'use_squash_pr_title_as_default' => 'setUseSquashPrTitleAsDefault',
         'visibility' => 'setVisibility',
         'watchers' => 'setWatchers',
         'watchers_count' => 'setWatchersCount',
@@ -715,8 +690,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'languages_url' => 'getLanguagesUrl',
         'license' => 'getLicense',
         'master_branch' => 'getMasterBranch',
-        'merge_commit_message' => 'getMergeCommitMessage',
-        'merge_commit_title' => 'getMergeCommitTitle',
         'merges_url' => 'getMergesUrl',
         'milestones_url' => 'getMilestonesUrl',
         'mirror_url' => 'getMirrorUrl',
@@ -735,8 +708,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'releases_url' => 'getReleasesUrl',
         'role_name' => 'getRoleName',
         'size' => 'getSize',
-        'squash_merge_commit_message' => 'getSquashMergeCommitMessage',
-        'squash_merge_commit_title' => 'getSquashMergeCommitTitle',
         'ssh_url' => 'getSshUrl',
         'stargazers' => 'getStargazers',
         'stargazers_count' => 'getStargazersCount',
@@ -751,7 +722,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'trees_url' => 'getTreesUrl',
         'updated_at' => 'getUpdatedAt',
         'url' => 'getUrl',
-        'use_squash_pr_title_as_default' => 'getUseSquashPrTitleAsDefault',
         'visibility' => 'getVisibility',
         'watchers' => 'getWatchers',
         'watchers_count' => 'getWatchersCount',
@@ -799,73 +769,9 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         return self::$openAPIModelName;
     }
 
-    public const MERGE_COMMIT_MESSAGE_PR_BODY = 'PR_BODY';
-    public const MERGE_COMMIT_MESSAGE_PR_TITLE = 'PR_TITLE';
-    public const MERGE_COMMIT_MESSAGE_BLANK = 'BLANK';
-    public const MERGE_COMMIT_TITLE_PR_TITLE = 'PR_TITLE';
-    public const MERGE_COMMIT_TITLE_MERGE_MESSAGE = 'MERGE_MESSAGE';
-    public const SQUASH_MERGE_COMMIT_MESSAGE_PR_BODY = 'PR_BODY';
-    public const SQUASH_MERGE_COMMIT_MESSAGE_COMMIT_MESSAGES = 'COMMIT_MESSAGES';
-    public const SQUASH_MERGE_COMMIT_MESSAGE_BLANK = 'BLANK';
-    public const SQUASH_MERGE_COMMIT_TITLE_PR_TITLE = 'PR_TITLE';
-    public const SQUASH_MERGE_COMMIT_TITLE_COMMIT_OR_PR_TITLE = 'COMMIT_OR_PR_TITLE';
     public const VISIBILITY__PUBLIC = 'public';
     public const VISIBILITY__PRIVATE = 'private';
     public const VISIBILITY_INTERNAL = 'internal';
-
-    /**
-     * Gets allowable values of the enum
-     *
-     * @return string[]
-     */
-    public function getMergeCommitMessageAllowableValues()
-    {
-        return [
-            self::MERGE_COMMIT_MESSAGE_PR_BODY,
-            self::MERGE_COMMIT_MESSAGE_PR_TITLE,
-            self::MERGE_COMMIT_MESSAGE_BLANK,
-        ];
-    }
-
-    /**
-     * Gets allowable values of the enum
-     *
-     * @return string[]
-     */
-    public function getMergeCommitTitleAllowableValues()
-    {
-        return [
-            self::MERGE_COMMIT_TITLE_PR_TITLE,
-            self::MERGE_COMMIT_TITLE_MERGE_MESSAGE,
-        ];
-    }
-
-    /**
-     * Gets allowable values of the enum
-     *
-     * @return string[]
-     */
-    public function getSquashMergeCommitMessageAllowableValues()
-    {
-        return [
-            self::SQUASH_MERGE_COMMIT_MESSAGE_PR_BODY,
-            self::SQUASH_MERGE_COMMIT_MESSAGE_COMMIT_MESSAGES,
-            self::SQUASH_MERGE_COMMIT_MESSAGE_BLANK,
-        ];
-    }
-
-    /**
-     * Gets allowable values of the enum
-     *
-     * @return string[]
-     */
-    public function getSquashMergeCommitTitleAllowableValues()
-    {
-        return [
-            self::SQUASH_MERGE_COMMIT_TITLE_PR_TITLE,
-            self::SQUASH_MERGE_COMMIT_TITLE_COMMIT_OR_PR_TITLE,
-        ];
-    }
 
     /**
      * Gets allowable values of the enum
@@ -951,8 +857,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         $this->setIfExists('languages_url', $data ?? [], null);
         $this->setIfExists('license', $data ?? [], null);
         $this->setIfExists('master_branch', $data ?? [], null);
-        $this->setIfExists('merge_commit_message', $data ?? [], null);
-        $this->setIfExists('merge_commit_title', $data ?? [], null);
         $this->setIfExists('merges_url', $data ?? [], null);
         $this->setIfExists('milestones_url', $data ?? [], null);
         $this->setIfExists('mirror_url', $data ?? [], null);
@@ -971,8 +875,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         $this->setIfExists('releases_url', $data ?? [], null);
         $this->setIfExists('role_name', $data ?? [], null);
         $this->setIfExists('size', $data ?? [], null);
-        $this->setIfExists('squash_merge_commit_message', $data ?? [], null);
-        $this->setIfExists('squash_merge_commit_title', $data ?? [], null);
         $this->setIfExists('ssh_url', $data ?? [], null);
         $this->setIfExists('stargazers', $data ?? [], null);
         $this->setIfExists('stargazers_count', $data ?? [], null);
@@ -987,7 +889,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         $this->setIfExists('trees_url', $data ?? [], null);
         $this->setIfExists('updated_at', $data ?? [], null);
         $this->setIfExists('url', $data ?? [], null);
-        $this->setIfExists('use_squash_pr_title_as_default', $data ?? [], false);
         $this->setIfExists('visibility', $data ?? [], null);
         $this->setIfExists('watchers', $data ?? [], null);
         $this->setIfExists('watchers_count', $data ?? [], null);
@@ -1156,24 +1057,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         if ($this->container['license'] === null) {
             $invalidProperties[] = "'license' can't be null";
         }
-        $allowedValues = $this->getMergeCommitMessageAllowableValues();
-        if (!is_null($this->container['merge_commit_message']) && !in_array($this->container['merge_commit_message'], $allowedValues, true)) {
-            $invalidProperties[] = sprintf(
-                "invalid value '%s' for 'merge_commit_message', must be one of '%s'",
-                $this->container['merge_commit_message'],
-                implode("', '", $allowedValues)
-            );
-        }
-
-        $allowedValues = $this->getMergeCommitTitleAllowableValues();
-        if (!is_null($this->container['merge_commit_title']) && !in_array($this->container['merge_commit_title'], $allowedValues, true)) {
-            $invalidProperties[] = sprintf(
-                "invalid value '%s' for 'merge_commit_title', must be one of '%s'",
-                $this->container['merge_commit_title'],
-                implode("', '", $allowedValues)
-            );
-        }
-
         if ($this->container['merges_url'] === null) {
             $invalidProperties[] = "'merges_url' can't be null";
         }
@@ -1216,24 +1099,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
         if ($this->container['size'] === null) {
             $invalidProperties[] = "'size' can't be null";
         }
-        $allowedValues = $this->getSquashMergeCommitMessageAllowableValues();
-        if (!is_null($this->container['squash_merge_commit_message']) && !in_array($this->container['squash_merge_commit_message'], $allowedValues, true)) {
-            $invalidProperties[] = sprintf(
-                "invalid value '%s' for 'squash_merge_commit_message', must be one of '%s'",
-                $this->container['squash_merge_commit_message'],
-                implode("', '", $allowedValues)
-            );
-        }
-
-        $allowedValues = $this->getSquashMergeCommitTitleAllowableValues();
-        if (!is_null($this->container['squash_merge_commit_title']) && !in_array($this->container['squash_merge_commit_title'], $allowedValues, true)) {
-            $invalidProperties[] = sprintf(
-                "invalid value '%s' for 'squash_merge_commit_title', must be one of '%s'",
-                $this->container['squash_merge_commit_title'],
-                implode("', '", $allowedValues)
-            );
-        }
-
         if ($this->container['ssh_url'] === null) {
             $invalidProperties[] = "'ssh_url' can't be null";
         }
@@ -2820,80 +2685,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
     }
 
     /**
-     * Gets merge_commit_message
-     *
-     * @return string|null
-     */
-    public function getMergeCommitMessage()
-    {
-        return $this->container['merge_commit_message'];
-    }
-
-    /**
-     * Sets merge_commit_message
-     *
-     * @param string|null $merge_commit_message The default value for a merge commit message.
-     *
-     * @return self
-     */
-    public function setMergeCommitMessage($merge_commit_message)
-    {
-        if (is_null($merge_commit_message)) {
-            throw new \InvalidArgumentException('non-nullable merge_commit_message cannot be null');
-        }
-        $allowedValues = $this->getMergeCommitMessageAllowableValues();
-        if (!in_array($merge_commit_message, $allowedValues, true)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    "Invalid value '%s' for 'merge_commit_message', must be one of '%s'",
-                    $merge_commit_message,
-                    implode("', '", $allowedValues)
-                )
-            );
-        }
-        $this->container['merge_commit_message'] = $merge_commit_message;
-
-        return $this;
-    }
-
-    /**
-     * Gets merge_commit_title
-     *
-     * @return string|null
-     */
-    public function getMergeCommitTitle()
-    {
-        return $this->container['merge_commit_title'];
-    }
-
-    /**
-     * Sets merge_commit_title
-     *
-     * @param string|null $merge_commit_title The default value for a merge commit message title.
-     *
-     * @return self
-     */
-    public function setMergeCommitTitle($merge_commit_title)
-    {
-        if (is_null($merge_commit_title)) {
-            throw new \InvalidArgumentException('non-nullable merge_commit_title cannot be null');
-        }
-        $allowedValues = $this->getMergeCommitTitleAllowableValues();
-        if (!in_array($merge_commit_title, $allowedValues, true)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    "Invalid value '%s' for 'merge_commit_title', must be one of '%s'",
-                    $merge_commit_title,
-                    implode("', '", $allowedValues)
-                )
-            );
-        }
-        $this->container['merge_commit_title'] = $merge_commit_title;
-
-        return $this;
-    }
-
-    /**
      * Gets merges_url
      *
      * @return string
@@ -3408,80 +3199,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
     }
 
     /**
-     * Gets squash_merge_commit_message
-     *
-     * @return string|null
-     */
-    public function getSquashMergeCommitMessage()
-    {
-        return $this->container['squash_merge_commit_message'];
-    }
-
-    /**
-     * Sets squash_merge_commit_message
-     *
-     * @param string|null $squash_merge_commit_message The default value for a squash merge commit message:  - `PR_BODY` - default to the pull request's body. - `COMMIT_MESSAGES` - default to the branch's commit messages. - `BLANK` - default to a blank commit message.
-     *
-     * @return self
-     */
-    public function setSquashMergeCommitMessage($squash_merge_commit_message)
-    {
-        if (is_null($squash_merge_commit_message)) {
-            throw new \InvalidArgumentException('non-nullable squash_merge_commit_message cannot be null');
-        }
-        $allowedValues = $this->getSquashMergeCommitMessageAllowableValues();
-        if (!in_array($squash_merge_commit_message, $allowedValues, true)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    "Invalid value '%s' for 'squash_merge_commit_message', must be one of '%s'",
-                    $squash_merge_commit_message,
-                    implode("', '", $allowedValues)
-                )
-            );
-        }
-        $this->container['squash_merge_commit_message'] = $squash_merge_commit_message;
-
-        return $this;
-    }
-
-    /**
-     * Gets squash_merge_commit_title
-     *
-     * @return string|null
-     */
-    public function getSquashMergeCommitTitle()
-    {
-        return $this->container['squash_merge_commit_title'];
-    }
-
-    /**
-     * Sets squash_merge_commit_title
-     *
-     * @param string|null $squash_merge_commit_title The default value for a squash merge commit title:  - `PR_TITLE` - default to the pull request's title. - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit).
-     *
-     * @return self
-     */
-    public function setSquashMergeCommitTitle($squash_merge_commit_title)
-    {
-        if (is_null($squash_merge_commit_title)) {
-            throw new \InvalidArgumentException('non-nullable squash_merge_commit_title cannot be null');
-        }
-        $allowedValues = $this->getSquashMergeCommitTitleAllowableValues();
-        if (!in_array($squash_merge_commit_title, $allowedValues, true)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    "Invalid value '%s' for 'squash_merge_commit_title', must be one of '%s'",
-                    $squash_merge_commit_title,
-                    implode("', '", $allowedValues)
-                )
-            );
-        }
-        $this->container['squash_merge_commit_title'] = $squash_merge_commit_title;
-
-        return $this;
-    }
-
-    /**
      * Gets ssh_url
      *
      * @return string
@@ -3855,33 +3572,6 @@ class Repository11 implements ModelInterface, ArrayAccess, \JsonSerializable
             throw new \InvalidArgumentException('non-nullable url cannot be null');
         }
         $this->container['url'] = $url;
-
-        return $this;
-    }
-
-    /**
-     * Gets use_squash_pr_title_as_default
-     *
-     * @return bool|null
-     */
-    public function getUseSquashPrTitleAsDefault()
-    {
-        return $this->container['use_squash_pr_title_as_default'];
-    }
-
-    /**
-     * Sets use_squash_pr_title_as_default
-     *
-     * @param bool|null $use_squash_pr_title_as_default Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead.
-     *
-     * @return self
-     */
-    public function setUseSquashPrTitleAsDefault($use_squash_pr_title_as_default)
-    {
-        if (is_null($use_squash_pr_title_as_default)) {
-            throw new \InvalidArgumentException('non-nullable use_squash_pr_title_as_default cannot be null');
-        }
-        $this->container['use_squash_pr_title_as_default'] = $use_squash_pr_title_as_default;
 
         return $this;
     }

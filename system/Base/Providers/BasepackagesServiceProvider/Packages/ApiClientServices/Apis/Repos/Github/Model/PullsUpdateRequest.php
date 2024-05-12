@@ -472,7 +472,7 @@ class PullsUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
     /**
      * Sets maintainer_can_modify
      *
-     * @param bool|null $maintainer_can_modify Indicates whether [maintainers can modify](https://docs.github.com/enterprise-server@3.12/articles/allowing-changes-to-a-pull-request-branch-created-from-a-fork/) the pull request.
+     * @param bool|null $maintainer_can_modify Indicates whether [maintainers can modify](https://docs.github.com/articles/allowing-changes-to-a-pull-request-branch-created-from-a-fork/) the pull request.
      *
      * @return self
      */

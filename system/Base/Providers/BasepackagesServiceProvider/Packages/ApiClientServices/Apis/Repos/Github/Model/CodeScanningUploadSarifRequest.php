@@ -62,7 +62,8 @@ class CodeScanningUploadSarifRequest implements ModelInterface, ArrayAccess, \Js
         'sarif' => 'string',
         'checkout_uri' => 'string',
         'started_at' => '\DateTime',
-        'tool_name' => 'string'
+        'tool_name' => 'string',
+        'validate' => 'bool'
     ];
 
     /**
@@ -78,7 +79,8 @@ class CodeScanningUploadSarifRequest implements ModelInterface, ArrayAccess, \Js
         'sarif' => null,
         'checkout_uri' => 'uri',
         'started_at' => 'date-time',
-        'tool_name' => null
+        'tool_name' => null,
+        'validate' => null
     ];
 
     /**
@@ -92,7 +94,8 @@ class CodeScanningUploadSarifRequest implements ModelInterface, ArrayAccess, \Js
         'sarif' => false,
         'checkout_uri' => false,
         'started_at' => false,
-        'tool_name' => false
+        'tool_name' => false,
+        'validate' => false
     ];
 
     /**
@@ -186,7 +189,8 @@ class CodeScanningUploadSarifRequest implements ModelInterface, ArrayAccess, \Js
         'sarif' => 'sarif',
         'checkout_uri' => 'checkout_uri',
         'started_at' => 'started_at',
-        'tool_name' => 'tool_name'
+        'tool_name' => 'tool_name',
+        'validate' => 'validate'
     ];
 
     /**
@@ -200,7 +204,8 @@ class CodeScanningUploadSarifRequest implements ModelInterface, ArrayAccess, \Js
         'sarif' => 'setSarif',
         'checkout_uri' => 'setCheckoutUri',
         'started_at' => 'setStartedAt',
-        'tool_name' => 'setToolName'
+        'tool_name' => 'setToolName',
+        'validate' => 'setValidate'
     ];
 
     /**
@@ -214,7 +219,8 @@ class CodeScanningUploadSarifRequest implements ModelInterface, ArrayAccess, \Js
         'sarif' => 'getSarif',
         'checkout_uri' => 'getCheckoutUri',
         'started_at' => 'getStartedAt',
-        'tool_name' => 'getToolName'
+        'tool_name' => 'getToolName',
+        'validate' => 'getValidate'
     ];
 
     /**
@@ -280,6 +286,7 @@ class CodeScanningUploadSarifRequest implements ModelInterface, ArrayAccess, \Js
         $this->setIfExists('checkout_uri', $data ?? [], null);
         $this->setIfExists('started_at', $data ?? [], null);
         $this->setIfExists('tool_name', $data ?? [], null);
+        $this->setIfExists('validate', $data ?? [], null);
     }
 
     /**
@@ -431,7 +438,7 @@ class CodeScanningUploadSarifRequest implements ModelInterface, ArrayAccess, \Js
     /**
      * Sets sarif
      *
-     * @param string $sarif A Base64 string representing the SARIF file to upload. You must first compress your SARIF file using [`gzip`](http://www.gnu.org/software/gzip/manual/gzip.html) and then translate the contents of the file into a Base64 encoding string. For more information, see \"[SARIF support for code scanning](https://docs.github.com/enterprise-server@3.12/code-security/secure-coding/sarif-support-for-code-scanning).\"
+     * @param string $sarif A Base64 string representing the SARIF file to upload. You must first compress your SARIF file using [`gzip`](http://www.gnu.org/software/gzip/manual/gzip.html) and then translate the contents of the file into a Base64 encoding string. For more information, see \"[SARIF support for code scanning](https://docs.github.com/code-security/secure-coding/sarif-support-for-code-scanning).\"
      *
      * @return self
      */
@@ -522,6 +529,33 @@ class CodeScanningUploadSarifRequest implements ModelInterface, ArrayAccess, \Js
             throw new \InvalidArgumentException('non-nullable tool_name cannot be null');
         }
         $this->container['tool_name'] = $tool_name;
+
+        return $this;
+    }
+
+    /**
+     * Gets validate
+     *
+     * @return bool|null
+     */
+    public function getValidate()
+    {
+        return $this->container['validate'];
+    }
+
+    /**
+     * Sets validate
+     *
+     * @param bool|null $validate Whether the SARIF file will be validated according to the code scanning specifications. This parameter is intended to help integrators ensure that the uploaded SARIF files are correctly rendered by code scanning.
+     *
+     * @return self
+     */
+    public function setValidate($validate)
+    {
+        if (is_null($validate)) {
+            throw new \InvalidArgumentException('non-nullable validate cannot be null');
+        }
+        $this->container['validate'] = $validate;
 
         return $this;
     }

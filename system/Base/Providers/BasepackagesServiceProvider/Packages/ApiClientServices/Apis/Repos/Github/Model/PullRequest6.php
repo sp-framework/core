@@ -64,7 +64,7 @@ class PullRequest6 implements ModelInterface, ArrayAccess, \JsonSerializable
         'assignees' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[]',
         'author_association' => 'string',
         'auto_merge' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestAutoMerge',
-        'base' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase',
+        'base' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6Base',
         'body' => 'string',
         'changed_files' => 'int',
         'closed_at' => '\DateTime',
@@ -94,7 +94,7 @@ class PullRequest6 implements ModelInterface, ArrayAccess, \JsonSerializable
         'number' => 'int',
         'patch_url' => 'string',
         'rebaseable' => 'bool',
-        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5RequestedReviewersInner[]',
+        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6RequestedReviewersInner[]',
         'requested_teams' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team1[]',
         'review_comment_url' => 'string',
         'review_comments' => 'int',
@@ -1049,7 +1049,7 @@ class PullRequest6 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets base
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6Base
      */
     public function getBase()
     {
@@ -1059,7 +1059,7 @@ class PullRequest6 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets base
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase $base base
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6Base $base base
      *
      * @return self
      */
@@ -1922,7 +1922,7 @@ class PullRequest6 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets requested_reviewers
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5RequestedReviewersInner[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6RequestedReviewersInner[]
      */
     public function getRequestedReviewers()
     {
@@ -1932,7 +1932,7 @@ class PullRequest6 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets requested_reviewers
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5RequestedReviewersInner[] $requested_reviewers requested_reviewers
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6RequestedReviewersInner[] $requested_reviewers requested_reviewers
      *
      * @return self
      */

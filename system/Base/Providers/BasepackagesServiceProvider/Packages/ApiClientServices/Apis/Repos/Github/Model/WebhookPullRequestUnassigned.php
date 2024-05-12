@@ -63,7 +63,7 @@ class WebhookPullRequestUnassigned implements ModelInterface, ArrayAccess, \Json
         'installation' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleInstallation',
         'number' => 'int',
         'organization' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationSimpleWebhooks',
-        'pull_request' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest10',
+        'pull_request' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest11',
         'repository' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryWebhooks',
         'sender' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUserWebhooks'
     ];
@@ -561,7 +561,7 @@ class WebhookPullRequestUnassigned implements ModelInterface, ArrayAccess, \Json
     /**
      * Gets pull_request
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest10
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest11
      */
     public function getPullRequest()
     {
@@ -571,7 +571,7 @@ class WebhookPullRequestUnassigned implements ModelInterface, ArrayAccess, \Json
     /**
      * Sets pull_request
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest10 $pull_request pull_request
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest11 $pull_request pull_request
      *
      * @return self
      */

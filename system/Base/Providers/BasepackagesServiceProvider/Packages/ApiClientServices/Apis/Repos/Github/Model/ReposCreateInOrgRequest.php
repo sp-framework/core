@@ -374,7 +374,6 @@ class ReposCreateInOrgRequest implements ModelInterface, ArrayAccess, \JsonSeria
 
     public const VISIBILITY__PUBLIC = 'public';
     public const VISIBILITY__PRIVATE = 'private';
-    public const VISIBILITY_INTERNAL = 'internal';
     public const SQUASH_MERGE_COMMIT_TITLE_PR_TITLE = 'PR_TITLE';
     public const SQUASH_MERGE_COMMIT_TITLE_COMMIT_OR_PR_TITLE = 'COMMIT_OR_PR_TITLE';
     public const SQUASH_MERGE_COMMIT_MESSAGE_PR_BODY = 'PR_BODY';
@@ -396,7 +395,6 @@ class ReposCreateInOrgRequest implements ModelInterface, ArrayAccess, \JsonSeria
         return [
             self::VISIBILITY__PUBLIC,
             self::VISIBILITY__PRIVATE,
-            self::VISIBILITY_INTERNAL,
         ];
     }
 
@@ -707,7 +705,7 @@ class ReposCreateInOrgRequest implements ModelInterface, ArrayAccess, \JsonSeria
     /**
      * Sets visibility
      *
-     * @param string|null $visibility The visibility of the repository. **Note**: For GitHub Enterprise Server, this endpoint will only list repositories available to all users on the enterprise. For more information, see \"[Creating an internal repository](https://docs.github.com/enterprise-server@3.12/github/creating-cloning-and-archiving-repositories/about-repository-visibility#about-internal-repositories)\" in the GitHub Help documentation.   The `visibility` parameter overrides the `private` parameter when you use both parameters with the `nebula-preview` preview header.
+     * @param string|null $visibility The visibility of the repository.
      *
      * @return self
      */
@@ -960,7 +958,7 @@ class ReposCreateInOrgRequest implements ModelInterface, ArrayAccess, \JsonSeria
     /**
      * Sets license_template
      *
-     * @param string|null $license_template Choose an [open source license template](https://choosealicense.com/) that best suits your needs, and then use the [license keyword](https://docs.github.com/enterprise-server@3.12/articles/licensing-a-repository/#searching-github-by-license-type) as the `license_template` string. For example, \"mit\" or \"mpl-2.0\".
+     * @param string|null $license_template Choose an [open source license template](https://choosealicense.com/) that best suits your needs, and then use the [license keyword](https://docs.github.com/articles/licensing-a-repository/#searching-github-by-license-type) as the `license_template` string. For example, \"mit\" or \"mpl-2.0\".
      *
      * @return self
      */

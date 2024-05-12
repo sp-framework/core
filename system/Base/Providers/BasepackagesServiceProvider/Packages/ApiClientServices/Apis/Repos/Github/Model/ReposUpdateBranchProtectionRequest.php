@@ -520,7 +520,7 @@ class ReposUpdateBranchProtectionRequest implements ModelInterface, ArrayAccess,
     /**
      * Sets required_linear_history
      *
-     * @param bool|null $required_linear_history Enforces a linear commit Git history, which prevents anyone from pushing merge commits to a branch. Set to `true` to enforce a linear commit history. Set to `false` to disable a linear commit Git history. Your repository must allow squash merging or rebase merging before you can enable a linear commit history. Default: `false`. For more information, see \"[Requiring a linear commit history](https://docs.github.com/enterprise-server@3.12/github/administering-a-repository/requiring-a-linear-commit-history)\" in the GitHub Help documentation.
+     * @param bool|null $required_linear_history Enforces a linear commit Git history, which prevents anyone from pushing merge commits to a branch. Set to `true` to enforce a linear commit history. Set to `false` to disable a linear commit Git history. Your repository must allow squash merging or rebase merging before you can enable a linear commit history. Default: `false`. For more information, see \"[Requiring a linear commit history](https://docs.github.com/github/administering-a-repository/requiring-a-linear-commit-history)\" in the GitHub Help documentation.
      *
      * @return self
      */
@@ -547,7 +547,7 @@ class ReposUpdateBranchProtectionRequest implements ModelInterface, ArrayAccess,
     /**
      * Sets allow_force_pushes
      *
-     * @param bool|null $allow_force_pushes Permits force pushes to the protected branch by anyone with write access to the repository. Set to `true` to allow force pushes. Set to `false` or `null` to block force pushes. Default: `false`. For more information, see \"[Enabling force pushes to a protected branch](https://docs.github.com/enterprise-server@3.12/github/administering-a-repository/enabling-force-pushes-to-a-protected-branch)\" in the GitHub Help documentation.\"
+     * @param bool|null $allow_force_pushes Permits force pushes to the protected branch by anyone with write access to the repository. Set to `true` to allow force pushes. Set to `false` or `null` to block force pushes. Default: `false`. For more information, see \"[Enabling force pushes to a protected branch](https://docs.github.com/github/administering-a-repository/enabling-force-pushes-to-a-protected-branch)\" in the GitHub Help documentation.\"
      *
      * @return self
      */
@@ -581,7 +581,7 @@ class ReposUpdateBranchProtectionRequest implements ModelInterface, ArrayAccess,
     /**
      * Sets allow_deletions
      *
-     * @param bool|null $allow_deletions Allows deletion of the protected branch by anyone with write access to the repository. Set to `false` to prevent deletion of the protected branch. Default: `false`. For more information, see \"[Enabling force pushes to a protected branch](https://docs.github.com/enterprise-server@3.12/github/administering-a-repository/enabling-force-pushes-to-a-protected-branch)\" in the GitHub Help documentation.
+     * @param bool|null $allow_deletions Allows deletion of the protected branch by anyone with write access to the repository. Set to `false` to prevent deletion of the protected branch. Default: `false`. For more information, see \"[Enabling force pushes to a protected branch](https://docs.github.com/github/administering-a-repository/enabling-force-pushes-to-a-protected-branch)\" in the GitHub Help documentation.
      *
      * @return self
      */

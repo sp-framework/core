@@ -60,7 +60,7 @@ class PullRequest4 implements ModelInterface, ArrayAccess, \JsonSerializable
         '_links' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5Links',
         'active_lock_reason' => 'string',
         'additions' => 'int',
-        'assignee' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User',
+        'assignee' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1',
         'assignees' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[]',
         'author_association' => 'string',
         'auto_merge' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestAutoMerge',
@@ -89,7 +89,7 @@ class PullRequest4 implements ModelInterface, ArrayAccess, \JsonSerializable
         'merged' => 'bool',
         'merged_at' => '\DateTime',
         'merged_by' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1',
-        'milestone' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone1',
+        'milestone' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone',
         'node_id' => 'string',
         'number' => 'int',
         'patch_url' => 'string',
@@ -917,7 +917,7 @@ class PullRequest4 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets assignee
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1
      */
     public function getAssignee()
     {
@@ -927,7 +927,7 @@ class PullRequest4 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets assignee
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User $assignee assignee
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1 $assignee assignee
      *
      * @return self
      */
@@ -1773,7 +1773,7 @@ class PullRequest4 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets milestone
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone1
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone
      */
     public function getMilestone()
     {
@@ -1783,7 +1783,7 @@ class PullRequest4 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets milestone
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone1 $milestone milestone
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone $milestone milestone
      *
      * @return self
      */

@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * WebhooksIssueComment Class Doc Comment
  *
  * @category Class
- * @description The [comment](https://docs.github.com/enterprise-server@3.12/rest/issues/comments#get-an-issue-comment) itself.
+ * @description The [comment](https://docs.github.com/rest/issues/comments#get-an-issue-comment) itself.
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

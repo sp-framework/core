@@ -94,7 +94,7 @@ class PullRequest8 implements ModelInterface, ArrayAccess, \JsonSerializable
         'number' => 'int',
         'patch_url' => 'string',
         'rebaseable' => 'bool',
-        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5RequestedReviewersInner[]',
+        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6RequestedReviewersInner[]',
         'requested_teams' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]',
         'review_comment_url' => 'string',
         'review_comments' => 'int',
@@ -1922,7 +1922,7 @@ class PullRequest8 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets requested_reviewers
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5RequestedReviewersInner[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6RequestedReviewersInner[]
      */
     public function getRequestedReviewers()
     {
@@ -1932,7 +1932,7 @@ class PullRequest8 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets requested_reviewers
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5RequestedReviewersInner[] $requested_reviewers requested_reviewers
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6RequestedReviewersInner[] $requested_reviewers requested_reviewers
      *
      * @return self
      */

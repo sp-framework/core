@@ -61,10 +61,10 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
         'active_lock_reason' => 'string',
         'additions' => 'int',
         'assignee' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User',
-        'assignees' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[]',
+        'assignees' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[]',
         'author_association' => 'string',
         'auto_merge' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestAutoMerge',
-        'base' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5Base',
+        'base' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase',
         'body' => 'string',
         'changed_files' => 'int',
         'closed_at' => '\DateTime',
@@ -76,7 +76,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
         'deletions' => 'int',
         'diff_url' => 'string',
         'draft' => 'bool',
-        'head' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase',
+        'head' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestHead',
         'html_url' => 'string',
         'id' => 'int',
         'issue_url' => 'string',
@@ -88,14 +88,14 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
         'mergeable_state' => 'string',
         'merged' => 'bool',
         'merged_at' => '\DateTime',
-        'merged_by' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User',
+        'merged_by' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1',
         'milestone' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone1',
         'node_id' => 'string',
         'number' => 'int',
         'patch_url' => 'string',
         'rebaseable' => 'bool',
-        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5RequestedReviewersInner[]',
-        'requested_teams' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team1[]',
+        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestRequestedReviewersInner[]',
+        'requested_teams' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]',
         'review_comment_url' => 'string',
         'review_comments' => 'int',
         'review_comments_url' => 'string',
@@ -104,7 +104,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
         'title' => 'string',
         'updated_at' => '\DateTime',
         'url' => 'string',
-        'user' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User'
+        'user' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1'
     ];
 
     /**
@@ -951,7 +951,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets assignees
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[]
      */
     public function getAssignees()
     {
@@ -961,7 +961,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets assignees
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[] $assignees assignees
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[] $assignees assignees
      *
      * @return self
      */
@@ -1049,7 +1049,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets base
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5Base
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase
      */
     public function getBase()
     {
@@ -1059,7 +1059,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets base
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5Base $base base
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase $base base
      *
      * @return self
      */
@@ -1387,7 +1387,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets head
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestHead
      */
     public function getHead()
     {
@@ -1397,7 +1397,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets head
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase $head head
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestHead $head head
      *
      * @return self
      */
@@ -1739,7 +1739,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets merged_by
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1|null
      */
     public function getMergedBy()
     {
@@ -1749,7 +1749,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets merged_by
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User|null $merged_by merged_by
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1|null $merged_by merged_by
      *
      * @return self
      */
@@ -1922,7 +1922,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets requested_reviewers
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5RequestedReviewersInner[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestRequestedReviewersInner[]
      */
     public function getRequestedReviewers()
     {
@@ -1932,7 +1932,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets requested_reviewers
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5RequestedReviewersInner[] $requested_reviewers requested_reviewers
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestRequestedReviewersInner[] $requested_reviewers requested_reviewers
      *
      * @return self
      */
@@ -1949,7 +1949,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets requested_teams
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team1[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]
      */
     public function getRequestedTeams()
     {
@@ -1959,7 +1959,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets requested_teams
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team1[] $requested_teams requested_teams
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[] $requested_teams requested_teams
      *
      * @return self
      */
@@ -2202,7 +2202,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets user
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1
      */
     public function getUser()
     {
@@ -2212,7 +2212,7 @@ class PullRequest5 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets user
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User $user user
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1 $user user
      *
      * @return self
      */

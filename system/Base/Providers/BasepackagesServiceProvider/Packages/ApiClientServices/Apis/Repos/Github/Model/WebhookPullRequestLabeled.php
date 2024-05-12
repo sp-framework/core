@@ -63,7 +63,7 @@ class WebhookPullRequestLabeled implements ModelInterface, ArrayAccess, \JsonSer
         'label' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksLabel',
         'number' => 'int',
         'organization' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationSimpleWebhooks',
-        'pull_request' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest3',
+        'pull_request' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest4',
         'repository' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryWebhooks',
         'sender' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUserWebhooks'
     ];
@@ -557,7 +557,7 @@ class WebhookPullRequestLabeled implements ModelInterface, ArrayAccess, \JsonSer
     /**
      * Gets pull_request
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest3
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest4
      */
     public function getPullRequest()
     {
@@ -567,7 +567,7 @@ class WebhookPullRequestLabeled implements ModelInterface, ArrayAccess, \JsonSer
     /**
      * Sets pull_request
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest3 $pull_request pull_request
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest4 $pull_request pull_request
      *
      * @return self
      */

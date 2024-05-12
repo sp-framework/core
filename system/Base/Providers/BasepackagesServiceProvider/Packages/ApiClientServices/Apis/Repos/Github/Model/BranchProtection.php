@@ -64,11 +64,11 @@ class BranchProtection implements ModelInterface, ArrayAccess, \JsonSerializable
         'enforce_admins' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ProtectedBranchAdminEnforced',
         'required_pull_request_reviews' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ProtectedBranchPullRequestReview',
         'restrictions' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchRestrictionPolicy',
-        'required_linear_history' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages',
-        'allow_force_pushes' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages',
-        'allow_deletions' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages',
-        'block_creations' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages',
-        'required_conversation_resolution' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages',
+        'required_linear_history' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory',
+        'allow_force_pushes' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory',
+        'allow_deletions' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory',
+        'block_creations' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory',
+        'required_conversation_resolution' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory',
         'name' => 'string',
         'protection_url' => 'string',
         'required_signatures' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredSignatures',
@@ -560,7 +560,7 @@ class BranchProtection implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets required_linear_history
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory|null
      */
     public function getRequiredLinearHistory()
     {
@@ -570,7 +570,7 @@ class BranchProtection implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets required_linear_history
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages|null $required_linear_history required_linear_history
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory|null $required_linear_history required_linear_history
      *
      * @return self
      */
@@ -587,7 +587,7 @@ class BranchProtection implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets allow_force_pushes
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory|null
      */
     public function getAllowForcePushes()
     {
@@ -597,7 +597,7 @@ class BranchProtection implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets allow_force_pushes
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages|null $allow_force_pushes allow_force_pushes
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory|null $allow_force_pushes allow_force_pushes
      *
      * @return self
      */
@@ -614,7 +614,7 @@ class BranchProtection implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets allow_deletions
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory|null
      */
     public function getAllowDeletions()
     {
@@ -624,7 +624,7 @@ class BranchProtection implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets allow_deletions
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages|null $allow_deletions allow_deletions
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory|null $allow_deletions allow_deletions
      *
      * @return self
      */
@@ -641,7 +641,7 @@ class BranchProtection implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets block_creations
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory|null
      */
     public function getBlockCreations()
     {
@@ -651,7 +651,7 @@ class BranchProtection implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets block_creations
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages|null $block_creations block_creations
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory|null $block_creations block_creations
      *
      * @return self
      */
@@ -668,7 +668,7 @@ class BranchProtection implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets required_conversation_resolution
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory|null
      */
     public function getRequiredConversationResolution()
     {
@@ -678,7 +678,7 @@ class BranchProtection implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets required_conversation_resolution
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GhesGetSettingsPages|null $required_conversation_resolution required_conversation_resolution
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BranchProtectionRequiredLinearHistory|null $required_conversation_resolution required_conversation_resolution
      *
      * @return self
      */

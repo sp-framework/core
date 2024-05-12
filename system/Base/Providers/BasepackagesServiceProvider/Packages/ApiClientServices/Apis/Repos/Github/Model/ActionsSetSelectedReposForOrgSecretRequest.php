@@ -305,7 +305,7 @@ class ActionsSetSelectedReposForOrgSecretRequest implements ModelInterface, Arra
     /**
      * Sets selected_repository_ids
      *
-     * @param int[] $selected_repository_ids An array of repository ids that can access the organization secret. You can only provide a list of repository ids when the `visibility` is set to `selected`. You can add and remove individual repositories using the [Add selected repository to an organization secret](https://docs.github.com/enterprise-server@3.12/rest/actions/secrets#add-selected-repository-to-an-organization-secret) and [Remove selected repository from an organization secret](https://docs.github.com/enterprise-server@3.12/rest/actions/secrets#remove-selected-repository-from-an-organization-secret) endpoints.
+     * @param int[] $selected_repository_ids An array of repository ids that can access the organization secret. You can only provide a list of repository ids when the `visibility` is set to `selected`. You can add and remove individual repositories using the [Add selected repository to an organization secret](https://docs.github.com/rest/actions/secrets#add-selected-repository-to-an-organization-secret) and [Remove selected repository from an organization secret](https://docs.github.com/rest/actions/secrets#remove-selected-repository-from-an-organization-secret) endpoints.
      *
      * @return self
      */

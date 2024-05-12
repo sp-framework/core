@@ -373,7 +373,7 @@ class ActionsRepositoryPermissions implements ModelInterface, ArrayAccess, \Json
     /**
      * Sets selected_actions_url
      *
-     * @param string|null $selected_actions_url The API URL to use to get or set the actions that are allowed to run, when `allowed_actions` is set to `selected`.
+     * @param string|null $selected_actions_url The API URL to use to get or set the actions and reusable workflows that are allowed to run, when `allowed_actions` is set to `selected`.
      *
      * @return self
      */

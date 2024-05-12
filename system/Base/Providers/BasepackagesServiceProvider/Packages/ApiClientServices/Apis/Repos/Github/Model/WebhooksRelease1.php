@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * WebhooksRelease1 Class Doc Comment
  *
  * @category Class
- * @description The [release](https://docs.github.com/enterprise-server@3.12/rest/releases/releases/#get-a-release) object.
+ * @description The [release](https://docs.github.com/rest/releases/releases/#get-a-release) object.
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

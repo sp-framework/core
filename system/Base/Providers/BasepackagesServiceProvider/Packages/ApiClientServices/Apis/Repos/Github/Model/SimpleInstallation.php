@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * SimpleInstallation Class Doc Comment
  *
  * @category Class
- * @description The GitHub App installation. Webhook payloads contain the &#x60;installation&#x60; property when the event is configured for and sent to a GitHub App. For more information, see \&quot;[Using webhooks with GitHub Apps](https://docs.github.com/enterprise-server@3.12/apps/creating-github-apps/registering-a-github-app/using-webhooks-with-github-apps).\&quot;
+ * @description The GitHub App installation. Webhook payloads contain the &#x60;installation&#x60; property when the event is configured for and sent to a GitHub App. For more information, see \&quot;[Using webhooks with GitHub Apps](https://docs.github.com/apps/creating-github-apps/registering-a-github-app/using-webhooks-with-github-apps).\&quot;
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

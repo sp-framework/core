@@ -309,6 +309,7 @@ class RepositoryRuleset implements ModelInterface, ArrayAccess, \JsonSerializabl
 
     public const TARGET_BRANCH = 'branch';
     public const TARGET_TAG = 'tag';
+    public const TARGET_PUSH = 'push';
     public const SOURCE_TYPE_REPOSITORY = 'Repository';
     public const SOURCE_TYPE_ORGANIZATION = 'Organization';
     public const CURRENT_USER_CAN_BYPASS_ALWAYS = 'always';
@@ -325,6 +326,7 @@ class RepositoryRuleset implements ModelInterface, ArrayAccess, \JsonSerializabl
         return [
             self::TARGET_BRANCH,
             self::TARGET_TAG,
+            self::TARGET_PUSH,
         ];
     }
 
@@ -534,7 +536,7 @@ class RepositoryRuleset implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Sets target
      *
-     * @param string|null $target The target of the ruleset.
+     * @param string|null $target The target of the ruleset  **Note**: The `push` target is in beta and is subject to change.
      *
      * @return self
      */

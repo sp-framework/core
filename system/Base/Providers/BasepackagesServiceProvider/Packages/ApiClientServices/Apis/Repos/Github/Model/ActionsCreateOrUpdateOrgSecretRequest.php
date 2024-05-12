@@ -356,7 +356,7 @@ class ActionsCreateOrUpdateOrgSecretRequest implements ModelInterface, ArrayAcce
     /**
      * Sets encrypted_value
      *
-     * @param string|null $encrypted_value Value for your secret, encrypted with [LibSodium](https://libsodium.gitbook.io/doc/bindings_for_other_languages) using the public key retrieved from the [Get an organization public key](https://docs.github.com/enterprise-server@3.12/rest/actions/secrets#get-an-organization-public-key) endpoint.
+     * @param string|null $encrypted_value Value for your secret, encrypted with [LibSodium](https://libsodium.gitbook.io/doc/bindings_for_other_languages) using the public key retrieved from the [Get an organization public key](https://docs.github.com/rest/actions/secrets#get-an-organization-public-key) endpoint.
      *
      * @return self
      */
@@ -452,7 +452,7 @@ class ActionsCreateOrUpdateOrgSecretRequest implements ModelInterface, ArrayAcce
     /**
      * Sets selected_repository_ids
      *
-     * @param int[]|null $selected_repository_ids An array of repository ids that can access the organization secret. You can only provide a list of repository ids when the `visibility` is set to `selected`. You can manage the list of selected repositories using the [List selected repositories for an organization secret](https://docs.github.com/enterprise-server@3.12/rest/actions/secrets#list-selected-repositories-for-an-organization-secret), [Set selected repositories for an organization secret](https://docs.github.com/enterprise-server@3.12/rest/actions/secrets#set-selected-repositories-for-an-organization-secret), and [Remove selected repository from an organization secret](https://docs.github.com/enterprise-server@3.12/rest/actions/secrets#remove-selected-repository-from-an-organization-secret) endpoints.
+     * @param int[]|null $selected_repository_ids An array of repository ids that can access the organization secret. You can only provide a list of repository ids when the `visibility` is set to `selected`. You can manage the list of selected repositories using the [List selected repositories for an organization secret](https://docs.github.com/rest/actions/secrets#list-selected-repositories-for-an-organization-secret), [Set selected repositories for an organization secret](https://docs.github.com/rest/actions/secrets#set-selected-repositories-for-an-organization-secret), and [Remove selected repository from an organization secret](https://docs.github.com/rest/actions/secrets#remove-selected-repository-from-an-organization-secret) endpoints.
      *
      * @return self
      */

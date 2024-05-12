@@ -60,10 +60,10 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
         '_links' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5Links',
         'active_lock_reason' => 'string',
         'additions' => 'int',
-        'assignee' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User',
-        'assignees' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[]',
+        'assignee' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1',
+        'assignees' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[]',
         'author_association' => 'string',
-        'auto_merge' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestAutoMerge1',
+        'auto_merge' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestAutoMerge',
         'base' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase',
         'body' => 'string',
         'changed_files' => 'int',
@@ -76,7 +76,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
         'deletions' => 'int',
         'diff_url' => 'string',
         'draft' => 'bool',
-        'head' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhookPullRequestReviewCommentDeletedPullRequestHead',
+        'head' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest12Head',
         'html_url' => 'string',
         'id' => 'int',
         'issue_url' => 'string',
@@ -89,12 +89,12 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
         'merged' => 'bool',
         'merged_at' => '\DateTime',
         'merged_by' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User',
-        'milestone' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone1',
+        'milestone' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone',
         'node_id' => 'string',
         'number' => 'int',
         'patch_url' => 'string',
         'rebaseable' => 'bool',
-        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5RequestedReviewersInner[]',
+        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestRequestedReviewersInner[]',
         'requested_teams' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]',
         'review_comment_url' => 'string',
         'review_comments' => 'int',
@@ -104,7 +104,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
         'title' => 'string',
         'updated_at' => '\DateTime',
         'url' => 'string',
-        'user' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User'
+        'user' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1'
     ];
 
     /**
@@ -917,7 +917,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets assignee
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1
      */
     public function getAssignee()
     {
@@ -927,7 +927,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets assignee
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User $assignee assignee
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1 $assignee assignee
      *
      * @return self
      */
@@ -951,7 +951,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets assignees
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[]
      */
     public function getAssignees()
     {
@@ -961,7 +961,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets assignees
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[] $assignees assignees
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[] $assignees assignees
      *
      * @return self
      */
@@ -1015,7 +1015,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets auto_merge
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestAutoMerge1
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestAutoMerge
      */
     public function getAutoMerge()
     {
@@ -1025,7 +1025,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets auto_merge
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestAutoMerge1 $auto_merge auto_merge
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestAutoMerge $auto_merge auto_merge
      *
      * @return self
      */
@@ -1387,7 +1387,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets head
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhookPullRequestReviewCommentDeletedPullRequestHead
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest12Head
      */
     public function getHead()
     {
@@ -1397,7 +1397,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets head
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhookPullRequestReviewCommentDeletedPullRequestHead $head head
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest12Head $head head
      *
      * @return self
      */
@@ -1773,7 +1773,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets milestone
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone1
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone
      */
     public function getMilestone()
     {
@@ -1783,7 +1783,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets milestone
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone1 $milestone milestone
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone $milestone milestone
      *
      * @return self
      */
@@ -1922,7 +1922,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets requested_reviewers
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5RequestedReviewersInner[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestRequestedReviewersInner[]
      */
     public function getRequestedReviewers()
     {
@@ -1932,7 +1932,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets requested_reviewers
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5RequestedReviewersInner[] $requested_reviewers requested_reviewers
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestRequestedReviewersInner[] $requested_reviewers requested_reviewers
      *
      * @return self
      */
@@ -2202,7 +2202,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets user
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1
      */
     public function getUser()
     {
@@ -2212,7 +2212,7 @@ class PullRequest12 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets user
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User $user user
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1 $user user
      *
      * @return self
      */

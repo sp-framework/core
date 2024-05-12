@@ -337,7 +337,7 @@ class ReactionsCreateForReleaseRequest implements ModelInterface, ArrayAccess, \
     /**
      * Sets content
      *
-     * @param string $content The [reaction type](https://docs.github.com/enterprise-server@3.12/rest/reactions/reactions#about-reactions) to add to the release.
+     * @param string $content The [reaction type](https://docs.github.com/rest/reactions/reactions#about-reactions) to add to the release.
      *
      * @return self
      */

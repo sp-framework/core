@@ -33,7 +33,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * AllowedActions Class Doc Comment
  *
  * @category Class
- * @description The permissions policy that controls the actions that are allowed to run.
+ * @description The permissions policy that controls the actions and reusable workflows that are allowed to run.
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

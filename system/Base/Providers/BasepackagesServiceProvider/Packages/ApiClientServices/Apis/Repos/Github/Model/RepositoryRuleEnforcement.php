@@ -33,7 +33,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * RepositoryRuleEnforcement Class Doc Comment
  *
  * @category Class
- * @description The enforcement level of the ruleset. &#x60;evaluate&#x60; allows admins to test rules before enforcing them. Admins can view insights on the Rule Insights page.
+ * @description The enforcement level of the ruleset. &#x60;evaluate&#x60; allows admins to test rules before enforcing them. Admins can view insights on the Rule Insights page (&#x60;evaluate&#x60; is only available with GitHub Enterprise).
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

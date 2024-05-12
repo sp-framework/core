@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * WebhookCheckSuiteCompletedCheckSuite Class Doc Comment
  *
  * @category Class
- * @description The [check_suite](https://docs.github.com/enterprise-server@3.12/rest/checks/suites#get-a-check-suite).
+ * @description The [check_suite](https://docs.github.com/rest/checks/suites#get-a-check-suite).
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

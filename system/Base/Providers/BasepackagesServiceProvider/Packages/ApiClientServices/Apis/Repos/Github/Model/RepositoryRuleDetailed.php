@@ -62,7 +62,7 @@ class RepositoryRuleDetailed implements ModelInterface, ArrayAccess, \JsonSerial
         'ruleset_source_type' => 'string',
         'ruleset_source' => 'string',
         'ruleset_id' => 'int',
-        'parameters' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRuleWorkflowsParameters'
+        'parameters' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRuleCodeScanningParameters'
     ];
 
     /**
@@ -268,6 +268,7 @@ class RepositoryRuleDetailed implements ModelInterface, ArrayAccess, \JsonSerial
     public const TYPE_BRANCH_NAME_PATTERN = 'branch_name_pattern';
     public const TYPE_TAG_NAME_PATTERN = 'tag_name_pattern';
     public const TYPE_WORKFLOWS = 'workflows';
+    public const TYPE_CODE_SCANNING = 'code_scanning';
     public const RULESET_SOURCE_TYPE_REPOSITORY = 'Repository';
     public const RULESET_SOURCE_TYPE_ORGANIZATION = 'Organization';
 
@@ -294,6 +295,7 @@ class RepositoryRuleDetailed implements ModelInterface, ArrayAccess, \JsonSerial
             self::TYPE_BRANCH_NAME_PATTERN,
             self::TYPE_TAG_NAME_PATTERN,
             self::TYPE_WORKFLOWS,
+            self::TYPE_CODE_SCANNING,
         ];
     }
 
@@ -526,7 +528,7 @@ class RepositoryRuleDetailed implements ModelInterface, ArrayAccess, \JsonSerial
     /**
      * Gets parameters
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRuleWorkflowsParameters|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRuleCodeScanningParameters|null
      */
     public function getParameters()
     {
@@ -536,7 +538,7 @@ class RepositoryRuleDetailed implements ModelInterface, ArrayAccess, \JsonSerial
     /**
      * Sets parameters
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRuleWorkflowsParameters|null $parameters parameters
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRuleCodeScanningParameters|null $parameters parameters
      *
      * @return self
      */

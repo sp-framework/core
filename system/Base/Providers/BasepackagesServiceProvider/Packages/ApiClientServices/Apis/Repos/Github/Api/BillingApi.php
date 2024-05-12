@@ -71,10 +71,22 @@ class BillingApi
 
     /** @var string[] $contentTypes **/
     public const contentTypes = [
-        'billingGetGithubAdvancedSecurityBillingGhe' => [
+        'billingGetGithubActionsBillingOrg' => [
             'application/json',
         ],
-        'billingGetGithubAdvancedSecurityBillingOrg' => [
+        'billingGetGithubActionsBillingUser' => [
+            'application/json',
+        ],
+        'billingGetGithubPackagesBillingOrg' => [
+            'application/json',
+        ],
+        'billingGetGithubPackagesBillingUser' => [
+            'application/json',
+        ],
+        'billingGetSharedStorageBillingOrg' => [
+            'application/json',
+        ],
+        'billingGetSharedStorageBillingUser' => [
             'application/json',
         ],
     ];
@@ -126,42 +138,38 @@ class BillingApi
     }
 
     /**
-     * Operation billingGetGithubAdvancedSecurityBillingGhe
+     * Operation billingGetGithubActionsBillingOrg
      *
-     * Get GitHub Advanced Security active committers for an enterprise
+     * Get GitHub Actions billing for an organization
      *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubAdvancedSecurityBillingGhe'] to see the possible values for this operation
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubActionsBillingOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage
      */
-    public function billingGetGithubAdvancedSecurityBillingGhe($enterprise, $per_page = 30, $page = 1, string $contentType = self::contentTypes['billingGetGithubAdvancedSecurityBillingGhe'][0])
+    public function billingGetGithubActionsBillingOrg($org, string $contentType = self::contentTypes['billingGetGithubActionsBillingOrg'][0])
     {
-        list($response) = $this->billingGetGithubAdvancedSecurityBillingGheWithHttpInfo($enterprise, $per_page, $page, $contentType);
+        list($response) = $this->billingGetGithubActionsBillingOrgWithHttpInfo($org, $contentType);
         return $response;
     }
 
     /**
-     * Operation billingGetGithubAdvancedSecurityBillingGheWithHttpInfo
+     * Operation billingGetGithubActionsBillingOrgWithHttpInfo
      *
-     * Get GitHub Advanced Security active committers for an enterprise
+     * Get GitHub Actions billing for an organization
      *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubAdvancedSecurityBillingGhe'] to see the possible values for this operation
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubActionsBillingOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage, HTTP status code, HTTP response headers (array of strings)
      */
-    public function billingGetGithubAdvancedSecurityBillingGheWithHttpInfo($enterprise, $per_page = 30, $page = 1, string $contentType = self::contentTypes['billingGetGithubAdvancedSecurityBillingGhe'][0])
+    public function billingGetGithubActionsBillingOrgWithHttpInfo($org, string $contentType = self::contentTypes['billingGetGithubActionsBillingOrg'][0])
     {
-        $request = $this->billingGetGithubAdvancedSecurityBillingGheRequest($enterprise, $per_page, $page, $contentType);
+        $request = $this->billingGetGithubActionsBillingOrgRequest($org, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -200,11 +208,11 @@ class BillingApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -222,40 +230,13 @@ class BillingApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                case 403:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -288,15 +269,7 @@ class BillingApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-                case 403:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -307,21 +280,19 @@ class BillingApi
     }
 
     /**
-     * Operation billingGetGithubAdvancedSecurityBillingGheAsync
+     * Operation billingGetGithubActionsBillingOrgAsync
      *
-     * Get GitHub Advanced Security active committers for an enterprise
+     * Get GitHub Actions billing for an organization
      *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubAdvancedSecurityBillingGhe'] to see the possible values for this operation
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubActionsBillingOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function billingGetGithubAdvancedSecurityBillingGheAsync($enterprise, $per_page = 30, $page = 1, string $contentType = self::contentTypes['billingGetGithubAdvancedSecurityBillingGhe'][0])
+    public function billingGetGithubActionsBillingOrgAsync($org, string $contentType = self::contentTypes['billingGetGithubActionsBillingOrg'][0])
     {
-        return $this->billingGetGithubAdvancedSecurityBillingGheAsyncWithHttpInfo($enterprise, $per_page, $page, $contentType)
+        return $this->billingGetGithubActionsBillingOrgAsyncWithHttpInfo($org, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -330,22 +301,20 @@ class BillingApi
     }
 
     /**
-     * Operation billingGetGithubAdvancedSecurityBillingGheAsyncWithHttpInfo
+     * Operation billingGetGithubActionsBillingOrgAsyncWithHttpInfo
      *
-     * Get GitHub Advanced Security active committers for an enterprise
+     * Get GitHub Actions billing for an organization
      *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubAdvancedSecurityBillingGhe'] to see the possible values for this operation
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubActionsBillingOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function billingGetGithubAdvancedSecurityBillingGheAsyncWithHttpInfo($enterprise, $per_page = 30, $page = 1, string $contentType = self::contentTypes['billingGetGithubAdvancedSecurityBillingGhe'][0])
+    public function billingGetGithubActionsBillingOrgAsyncWithHttpInfo($org, string $contentType = self::contentTypes['billingGetGithubActionsBillingOrg'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters';
-        $request = $this->billingGetGithubAdvancedSecurityBillingGheRequest($enterprise, $per_page, $page, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage';
+        $request = $this->billingGetGithubActionsBillingOrgRequest($org, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -384,61 +353,39 @@ class BillingApi
     }
 
     /**
-     * Create request for operation 'billingGetGithubAdvancedSecurityBillingGhe'
+     * Create request for operation 'billingGetGithubActionsBillingOrg'
      *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubAdvancedSecurityBillingGhe'] to see the possible values for this operation
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubActionsBillingOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function billingGetGithubAdvancedSecurityBillingGheRequest($enterprise, $per_page = 30, $page = 1, string $contentType = self::contentTypes['billingGetGithubAdvancedSecurityBillingGhe'][0])
+    public function billingGetGithubActionsBillingOrgRequest($org, string $contentType = self::contentTypes['billingGetGithubActionsBillingOrg'][0])
     {
 
-        // verify the required parameter 'enterprise' is set
-        if ($enterprise === null || (is_array($enterprise) && count($enterprise) === 0)) {
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $enterprise when calling billingGetGithubAdvancedSecurityBillingGhe'
+                'Missing the required parameter $org when calling billingGetGithubActionsBillingOrg'
             );
         }
 
 
-
-
-        $resourcePath = '/enterprises/{enterprise}/settings/billing/advanced-security';
+        $resourcePath = '/orgs/{org}/settings/billing/actions';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
         $httpBody = '';
         $multipart = false;
 
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $per_page,
-            'per_page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $page,
-            'page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
 
 
         // path params
-        if ($enterprise !== null) {
+        if ($org !== null) {
             $resourcePath = str_replace(
-                '{' . 'enterprise' . '}',
-                ObjectSerializer::toPathValue($enterprise),
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
                 $resourcePath
             );
         }
@@ -498,42 +445,38 @@ class BillingApi
     }
 
     /**
-     * Operation billingGetGithubAdvancedSecurityBillingOrg
+     * Operation billingGetGithubActionsBillingUser
      *
-     * Get GitHub Advanced Security active committers for an organization
+     * Get GitHub Actions billing for a user
      *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubAdvancedSecurityBillingOrg'] to see the possible values for this operation
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubActionsBillingUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage
      */
-    public function billingGetGithubAdvancedSecurityBillingOrg($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['billingGetGithubAdvancedSecurityBillingOrg'][0])
+    public function billingGetGithubActionsBillingUser($username, string $contentType = self::contentTypes['billingGetGithubActionsBillingUser'][0])
     {
-        list($response) = $this->billingGetGithubAdvancedSecurityBillingOrgWithHttpInfo($org, $per_page, $page, $contentType);
+        list($response) = $this->billingGetGithubActionsBillingUserWithHttpInfo($username, $contentType);
         return $response;
     }
 
     /**
-     * Operation billingGetGithubAdvancedSecurityBillingOrgWithHttpInfo
+     * Operation billingGetGithubActionsBillingUserWithHttpInfo
      *
-     * Get GitHub Advanced Security active committers for an organization
+     * Get GitHub Actions billing for a user
      *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubAdvancedSecurityBillingOrg'] to see the possible values for this operation
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubActionsBillingUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage, HTTP status code, HTTP response headers (array of strings)
      */
-    public function billingGetGithubAdvancedSecurityBillingOrgWithHttpInfo($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['billingGetGithubAdvancedSecurityBillingOrg'][0])
+    public function billingGetGithubActionsBillingUserWithHttpInfo($username, string $contentType = self::contentTypes['billingGetGithubActionsBillingUser'][0])
     {
-        $request = $this->billingGetGithubAdvancedSecurityBillingOrgRequest($org, $per_page, $page, $contentType);
+        $request = $this->billingGetGithubActionsBillingUserRequest($username, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -572,11 +515,11 @@ class BillingApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -594,40 +537,13 @@ class BillingApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                case 403:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -660,15 +576,7 @@ class BillingApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-                case 403:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -679,21 +587,19 @@ class BillingApi
     }
 
     /**
-     * Operation billingGetGithubAdvancedSecurityBillingOrgAsync
+     * Operation billingGetGithubActionsBillingUserAsync
      *
-     * Get GitHub Advanced Security active committers for an organization
+     * Get GitHub Actions billing for a user
      *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubAdvancedSecurityBillingOrg'] to see the possible values for this operation
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubActionsBillingUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function billingGetGithubAdvancedSecurityBillingOrgAsync($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['billingGetGithubAdvancedSecurityBillingOrg'][0])
+    public function billingGetGithubActionsBillingUserAsync($username, string $contentType = self::contentTypes['billingGetGithubActionsBillingUser'][0])
     {
-        return $this->billingGetGithubAdvancedSecurityBillingOrgAsyncWithHttpInfo($org, $per_page, $page, $contentType)
+        return $this->billingGetGithubActionsBillingUserAsyncWithHttpInfo($username, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -702,22 +608,20 @@ class BillingApi
     }
 
     /**
-     * Operation billingGetGithubAdvancedSecurityBillingOrgAsyncWithHttpInfo
+     * Operation billingGetGithubActionsBillingUserAsyncWithHttpInfo
      *
-     * Get GitHub Advanced Security active committers for an organization
+     * Get GitHub Actions billing for a user
      *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubAdvancedSecurityBillingOrg'] to see the possible values for this operation
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubActionsBillingUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function billingGetGithubAdvancedSecurityBillingOrgAsyncWithHttpInfo($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['billingGetGithubAdvancedSecurityBillingOrg'][0])
+    public function billingGetGithubActionsBillingUserAsyncWithHttpInfo($username, string $contentType = self::contentTypes['billingGetGithubActionsBillingUser'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AdvancedSecurityActiveCommitters';
-        $request = $this->billingGetGithubAdvancedSecurityBillingOrgRequest($org, $per_page, $page, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsBillingUsage';
+        $request = $this->billingGetGithubActionsBillingUserRequest($username, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -756,54 +660,339 @@ class BillingApi
     }
 
     /**
-     * Create request for operation 'billingGetGithubAdvancedSecurityBillingOrg'
+     * Create request for operation 'billingGetGithubActionsBillingUser'
      *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubAdvancedSecurityBillingOrg'] to see the possible values for this operation
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubActionsBillingUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function billingGetGithubAdvancedSecurityBillingOrgRequest($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['billingGetGithubAdvancedSecurityBillingOrg'][0])
+    public function billingGetGithubActionsBillingUserRequest($username, string $contentType = self::contentTypes['billingGetGithubActionsBillingUser'][0])
     {
 
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
+        // verify the required parameter 'username' is set
+        if ($username === null || (is_array($username) && count($username) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling billingGetGithubAdvancedSecurityBillingOrg'
+                'Missing the required parameter $username when calling billingGetGithubActionsBillingUser'
             );
         }
 
 
-
-
-        $resourcePath = '/orgs/{org}/settings/billing/advanced-security';
+        $resourcePath = '/users/{username}/settings/billing/actions';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
         $httpBody = '';
         $multipart = false;
 
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $per_page,
-            'per_page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $page,
-            'page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
+
+
+        // path params
+        if ($username !== null) {
+            $resourcePath = str_replace(
+                '{' . 'username' . '}',
+                ObjectSerializer::toPathValue($username),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation billingGetGithubPackagesBillingOrg
+     *
+     * Get GitHub Packages billing for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubPackagesBillingOrg'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage
+     */
+    public function billingGetGithubPackagesBillingOrg($org, string $contentType = self::contentTypes['billingGetGithubPackagesBillingOrg'][0])
+    {
+        list($response) = $this->billingGetGithubPackagesBillingOrgWithHttpInfo($org, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation billingGetGithubPackagesBillingOrgWithHttpInfo
+     *
+     * Get GitHub Packages billing for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubPackagesBillingOrg'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function billingGetGithubPackagesBillingOrgWithHttpInfo($org, string $contentType = self::contentTypes['billingGetGithubPackagesBillingOrg'][0])
+    {
+        $request = $this->billingGetGithubPackagesBillingOrgRequest($org, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation billingGetGithubPackagesBillingOrgAsync
+     *
+     * Get GitHub Packages billing for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubPackagesBillingOrg'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function billingGetGithubPackagesBillingOrgAsync($org, string $contentType = self::contentTypes['billingGetGithubPackagesBillingOrg'][0])
+    {
+        return $this->billingGetGithubPackagesBillingOrgAsyncWithHttpInfo($org, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation billingGetGithubPackagesBillingOrgAsyncWithHttpInfo
+     *
+     * Get GitHub Packages billing for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubPackagesBillingOrg'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function billingGetGithubPackagesBillingOrgAsyncWithHttpInfo($org, string $contentType = self::contentTypes['billingGetGithubPackagesBillingOrg'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage';
+        $request = $this->billingGetGithubPackagesBillingOrgRequest($org, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'billingGetGithubPackagesBillingOrg'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubPackagesBillingOrg'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function billingGetGithubPackagesBillingOrgRequest($org, string $contentType = self::contentTypes['billingGetGithubPackagesBillingOrg'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling billingGetGithubPackagesBillingOrg'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/settings/billing/packages';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
 
 
         // path params
@@ -811,6 +1000,927 @@ class BillingApi
             $resourcePath = str_replace(
                 '{' . 'org' . '}',
                 ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation billingGetGithubPackagesBillingUser
+     *
+     * Get GitHub Packages billing for a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubPackagesBillingUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage
+     */
+    public function billingGetGithubPackagesBillingUser($username, string $contentType = self::contentTypes['billingGetGithubPackagesBillingUser'][0])
+    {
+        list($response) = $this->billingGetGithubPackagesBillingUserWithHttpInfo($username, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation billingGetGithubPackagesBillingUserWithHttpInfo
+     *
+     * Get GitHub Packages billing for a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubPackagesBillingUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function billingGetGithubPackagesBillingUserWithHttpInfo($username, string $contentType = self::contentTypes['billingGetGithubPackagesBillingUser'][0])
+    {
+        $request = $this->billingGetGithubPackagesBillingUserRequest($username, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation billingGetGithubPackagesBillingUserAsync
+     *
+     * Get GitHub Packages billing for a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubPackagesBillingUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function billingGetGithubPackagesBillingUserAsync($username, string $contentType = self::contentTypes['billingGetGithubPackagesBillingUser'][0])
+    {
+        return $this->billingGetGithubPackagesBillingUserAsyncWithHttpInfo($username, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation billingGetGithubPackagesBillingUserAsyncWithHttpInfo
+     *
+     * Get GitHub Packages billing for a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubPackagesBillingUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function billingGetGithubPackagesBillingUserAsyncWithHttpInfo($username, string $contentType = self::contentTypes['billingGetGithubPackagesBillingUser'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PackagesBillingUsage';
+        $request = $this->billingGetGithubPackagesBillingUserRequest($username, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'billingGetGithubPackagesBillingUser'
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetGithubPackagesBillingUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function billingGetGithubPackagesBillingUserRequest($username, string $contentType = self::contentTypes['billingGetGithubPackagesBillingUser'][0])
+    {
+
+        // verify the required parameter 'username' is set
+        if ($username === null || (is_array($username) && count($username) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $username when calling billingGetGithubPackagesBillingUser'
+            );
+        }
+
+
+        $resourcePath = '/users/{username}/settings/billing/packages';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($username !== null) {
+            $resourcePath = str_replace(
+                '{' . 'username' . '}',
+                ObjectSerializer::toPathValue($username),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation billingGetSharedStorageBillingOrg
+     *
+     * Get shared storage billing for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetSharedStorageBillingOrg'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage
+     */
+    public function billingGetSharedStorageBillingOrg($org, string $contentType = self::contentTypes['billingGetSharedStorageBillingOrg'][0])
+    {
+        list($response) = $this->billingGetSharedStorageBillingOrgWithHttpInfo($org, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation billingGetSharedStorageBillingOrgWithHttpInfo
+     *
+     * Get shared storage billing for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetSharedStorageBillingOrg'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function billingGetSharedStorageBillingOrgWithHttpInfo($org, string $contentType = self::contentTypes['billingGetSharedStorageBillingOrg'][0])
+    {
+        $request = $this->billingGetSharedStorageBillingOrgRequest($org, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation billingGetSharedStorageBillingOrgAsync
+     *
+     * Get shared storage billing for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetSharedStorageBillingOrg'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function billingGetSharedStorageBillingOrgAsync($org, string $contentType = self::contentTypes['billingGetSharedStorageBillingOrg'][0])
+    {
+        return $this->billingGetSharedStorageBillingOrgAsyncWithHttpInfo($org, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation billingGetSharedStorageBillingOrgAsyncWithHttpInfo
+     *
+     * Get shared storage billing for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetSharedStorageBillingOrg'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function billingGetSharedStorageBillingOrgAsyncWithHttpInfo($org, string $contentType = self::contentTypes['billingGetSharedStorageBillingOrg'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage';
+        $request = $this->billingGetSharedStorageBillingOrgRequest($org, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'billingGetSharedStorageBillingOrg'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetSharedStorageBillingOrg'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function billingGetSharedStorageBillingOrgRequest($org, string $contentType = self::contentTypes['billingGetSharedStorageBillingOrg'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling billingGetSharedStorageBillingOrg'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/settings/billing/shared-storage';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation billingGetSharedStorageBillingUser
+     *
+     * Get shared storage billing for a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetSharedStorageBillingUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage
+     */
+    public function billingGetSharedStorageBillingUser($username, string $contentType = self::contentTypes['billingGetSharedStorageBillingUser'][0])
+    {
+        list($response) = $this->billingGetSharedStorageBillingUserWithHttpInfo($username, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation billingGetSharedStorageBillingUserWithHttpInfo
+     *
+     * Get shared storage billing for a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetSharedStorageBillingUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function billingGetSharedStorageBillingUserWithHttpInfo($username, string $contentType = self::contentTypes['billingGetSharedStorageBillingUser'][0])
+    {
+        $request = $this->billingGetSharedStorageBillingUserRequest($username, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation billingGetSharedStorageBillingUserAsync
+     *
+     * Get shared storage billing for a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetSharedStorageBillingUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function billingGetSharedStorageBillingUserAsync($username, string $contentType = self::contentTypes['billingGetSharedStorageBillingUser'][0])
+    {
+        return $this->billingGetSharedStorageBillingUserAsyncWithHttpInfo($username, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation billingGetSharedStorageBillingUserAsyncWithHttpInfo
+     *
+     * Get shared storage billing for a user
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetSharedStorageBillingUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function billingGetSharedStorageBillingUserAsyncWithHttpInfo($username, string $contentType = self::contentTypes['billingGetSharedStorageBillingUser'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\CombinedBillingUsage';
+        $request = $this->billingGetSharedStorageBillingUserRequest($username, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'billingGetSharedStorageBillingUser'
+     *
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['billingGetSharedStorageBillingUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function billingGetSharedStorageBillingUserRequest($username, string $contentType = self::contentTypes['billingGetSharedStorageBillingUser'][0])
+    {
+
+        // verify the required parameter 'username' is set
+        if ($username === null || (is_array($username) && count($username) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $username when calling billingGetSharedStorageBillingUser'
+            );
+        }
+
+
+        $resourcePath = '/users/{username}/settings/billing/shared-storage';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($username !== null) {
+            $resourcePath = str_replace(
+                '{' . 'username' . '}',
+                ObjectSerializer::toPathValue($username),
                 $resourcePath
             );
         }

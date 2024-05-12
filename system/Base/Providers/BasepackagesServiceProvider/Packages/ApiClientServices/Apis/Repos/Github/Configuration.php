@@ -93,7 +93,7 @@ class Configuration
      *
      * @var string
      */
-    protected $host = 'http://HOSTNAME/api/v3';
+    protected $host = 'https://api.github.com';
 
     /**
      * User agent of the HTTP request, set to "OpenAPI-Generator/{version}/PHP" by default
@@ -472,18 +472,8 @@ class Configuration
     {
         return [
             [
-                "url" => "{protocol}://{hostname}/api/v3",
+                "url" => "https://api.github.com",
                 "description" => "No description provided",
-                "variables" => [
-                    "hostname" => [
-                        "description" => "Self-hosted Enterprise Server hostname",
-                        "default_value" => "HOSTNAME",
-                    ],
-                    "protocol" => [
-                        "description" => "Self-hosted Enterprise Server protocol",
-                        "default_value" => "http",
-                    ]
-                ]
             ]
         ];
     }

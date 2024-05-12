@@ -123,6 +123,7 @@ class RepositoryWebhooks implements ModelInterface, ArrayAccess, \JsonSerializab
         'open_issues_count' => 'int',
         'is_template' => 'bool',
         'topics' => 'string[]',
+        'custom_properties' => 'array<string,mixed>',
         'has_issues' => 'bool',
         'has_projects' => 'bool',
         'has_wiki' => 'bool',
@@ -232,6 +233,7 @@ class RepositoryWebhooks implements ModelInterface, ArrayAccess, \JsonSerializab
         'open_issues_count' => null,
         'is_template' => null,
         'topics' => null,
+        'custom_properties' => null,
         'has_issues' => null,
         'has_projects' => null,
         'has_wiki' => null,
@@ -339,6 +341,7 @@ class RepositoryWebhooks implements ModelInterface, ArrayAccess, \JsonSerializab
         'open_issues_count' => false,
         'is_template' => false,
         'topics' => false,
+        'custom_properties' => false,
         'has_issues' => false,
         'has_projects' => false,
         'has_wiki' => false,
@@ -526,6 +529,7 @@ class RepositoryWebhooks implements ModelInterface, ArrayAccess, \JsonSerializab
         'open_issues_count' => 'open_issues_count',
         'is_template' => 'is_template',
         'topics' => 'topics',
+        'custom_properties' => 'custom_properties',
         'has_issues' => 'has_issues',
         'has_projects' => 'has_projects',
         'has_wiki' => 'has_wiki',
@@ -633,6 +637,7 @@ class RepositoryWebhooks implements ModelInterface, ArrayAccess, \JsonSerializab
         'open_issues_count' => 'setOpenIssuesCount',
         'is_template' => 'setIsTemplate',
         'topics' => 'setTopics',
+        'custom_properties' => 'setCustomProperties',
         'has_issues' => 'setHasIssues',
         'has_projects' => 'setHasProjects',
         'has_wiki' => 'setHasWiki',
@@ -740,6 +745,7 @@ class RepositoryWebhooks implements ModelInterface, ArrayAccess, \JsonSerializab
         'open_issues_count' => 'getOpenIssuesCount',
         'is_template' => 'getIsTemplate',
         'topics' => 'getTopics',
+        'custom_properties' => 'getCustomProperties',
         'has_issues' => 'getHasIssues',
         'has_projects' => 'getHasProjects',
         'has_wiki' => 'getHasWiki',
@@ -962,6 +968,7 @@ class RepositoryWebhooks implements ModelInterface, ArrayAccess, \JsonSerializab
         $this->setIfExists('open_issues_count', $data ?? [], null);
         $this->setIfExists('is_template', $data ?? [], false);
         $this->setIfExists('topics', $data ?? [], null);
+        $this->setIfExists('custom_properties', $data ?? [], null);
         $this->setIfExists('has_issues', $data ?? [], true);
         $this->setIfExists('has_projects', $data ?? [], true);
         $this->setIfExists('has_wiki', $data ?? [], true);
@@ -3088,6 +3095,33 @@ class RepositoryWebhooks implements ModelInterface, ArrayAccess, \JsonSerializab
             throw new \InvalidArgumentException('non-nullable topics cannot be null');
         }
         $this->container['topics'] = $topics;
+
+        return $this;
+    }
+
+    /**
+     * Gets custom_properties
+     *
+     * @return array<string,mixed>|null
+     */
+    public function getCustomProperties()
+    {
+        return $this->container['custom_properties'];
+    }
+
+    /**
+     * Sets custom_properties
+     *
+     * @param array<string,mixed>|null $custom_properties The custom properties that were defined for the repository. The keys are the custom property names, and the values are the corresponding custom property values.
+     *
+     * @return self
+     */
+    public function setCustomProperties($custom_properties)
+    {
+        if (is_null($custom_properties)) {
+            throw new \InvalidArgumentException('non-nullable custom_properties cannot be null');
+        }
+        $this->container['custom_properties'] = $custom_properties;
 
         return $this;
     }

@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * WebhooksDeployKey Class Doc Comment
  *
  * @category Class
- * @description The [&#x60;deploy key&#x60;](https://docs.github.com/enterprise-server@3.12/rest/deploy-keys/deploy-keys#get-a-deploy-key) resource.
+ * @description The [&#x60;deploy key&#x60;](https://docs.github.com/rest/deploy-keys/deploy-keys#get-a-deploy-key) resource.
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

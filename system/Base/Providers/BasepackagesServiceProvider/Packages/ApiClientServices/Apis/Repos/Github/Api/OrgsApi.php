@@ -71,16 +71,22 @@ class OrgsApi
 
     /** @var string[] $contentTypes **/
     public const contentTypes = [
-        'announcementBannersGetAnnouncementBannerForOrg' => [
-            'application/json',
-        ],
-        'announcementBannersRemoveAnnouncementBannerForOrg' => [
-            'application/json',
-        ],
-        'announcementBannersSetAnnouncementBannerForOrg' => [
-            'application/json',
-        ],
         'orgsAddSecurityManagerTeam' => [
+            'application/json',
+        ],
+        'orgsAssignTeamToOrgRole' => [
+            'application/json',
+        ],
+        'orgsAssignUserToOrgRole' => [
+            'application/json',
+        ],
+        'orgsBlockUser' => [
+            'application/json',
+        ],
+        'orgsCancelInvitation' => [
+            'application/json',
+        ],
+        'orgsCheckBlockedUser' => [
             'application/json',
         ],
         'orgsCheckMembershipForUser' => [
@@ -92,7 +98,19 @@ class OrgsApi
         'orgsConvertMemberToOutsideCollaborator' => [
             'application/json',
         ],
-        'orgsCreateCustomRepoRole' => [
+        'orgsCreateCustomOrganizationRole' => [
+            'application/json',
+        ],
+        'orgsCreateInvitation' => [
+            'application/json',
+        ],
+        'orgsCreateOrUpdateCustomProperties' => [
+            'application/json',
+        ],
+        'orgsCreateOrUpdateCustomPropertiesValuesForRepos' => [
+            'application/json',
+        ],
+        'orgsCreateOrUpdateCustomProperty' => [
             'application/json',
         ],
         'orgsCreateWebhook' => [
@@ -101,7 +119,7 @@ class OrgsApi
         'orgsDelete' => [
             'application/json',
         ],
-        'orgsDeleteCustomRepoRole' => [
+        'orgsDeleteCustomOrganizationRole' => [
             'application/json',
         ],
         'orgsDeleteWebhook' => [
@@ -113,16 +131,19 @@ class OrgsApi
         'orgsGet' => [
             'application/json',
         ],
-        'orgsGetAuditLog' => [
+        'orgsGetAllCustomProperties' => [
             'application/json',
         ],
-        'orgsGetCustomRepoRole' => [
+        'orgsGetCustomProperty' => [
             'application/json',
         ],
         'orgsGetMembershipForAuthenticatedUser' => [
             'application/json',
         ],
         'orgsGetMembershipForUser' => [
+            'application/json',
+        ],
+        'orgsGetOrgRole' => [
             'application/json',
         ],
         'orgsGetWebhook' => [
@@ -140,10 +161,13 @@ class OrgsApi
         'orgsListAppInstallations' => [
             'application/json',
         ],
-        'orgsListCustomRepoRoles' => [
+        'orgsListBlockedUsers' => [
             'application/json',
         ],
-        'orgsListCustomRoles' => [
+        'orgsListCustomPropertiesValuesForRepos' => [
+            'application/json',
+        ],
+        'orgsListFailedInvitations' => [
             'application/json',
         ],
         'orgsListForAuthenticatedUser' => [
@@ -152,10 +176,25 @@ class OrgsApi
         'orgsListForUser' => [
             'application/json',
         ],
+        'orgsListInvitationTeams' => [
+            'application/json',
+        ],
         'orgsListMembers' => [
             'application/json',
         ],
         'orgsListMembershipsForAuthenticatedUser' => [
+            'application/json',
+        ],
+        'orgsListOrgRoleTeams' => [
+            'application/json',
+        ],
+        'orgsListOrgRoleUsers' => [
+            'application/json',
+        ],
+        'orgsListOrgRoles' => [
+            'application/json',
+        ],
+        'orgsListOrganizationFineGrainedPermissions' => [
             'application/json',
         ],
         'orgsListOutsideCollaborators' => [
@@ -173,10 +212,10 @@ class OrgsApi
         'orgsListPatGrants' => [
             'application/json',
         ],
-        'orgsListPublicMembers' => [
+        'orgsListPendingInvitations' => [
             'application/json',
         ],
-        'orgsListRepoFineGrainedPermissions' => [
+        'orgsListPublicMembers' => [
             'application/json',
         ],
         'orgsListSecurityManagerTeams' => [
@@ -188,10 +227,16 @@ class OrgsApi
         'orgsListWebhooks' => [
             'application/json',
         ],
+        'orgsPatchCustomOrganizationRole' => [
+            'application/json',
+        ],
         'orgsPingWebhook' => [
             'application/json',
         ],
         'orgsRedeliverWebhookDelivery' => [
+            'application/json',
+        ],
+        'orgsRemoveCustomProperty' => [
             'application/json',
         ],
         'orgsRemoveMember' => [
@@ -215,16 +260,28 @@ class OrgsApi
         'orgsReviewPatGrantRequestsInBulk' => [
             'application/json',
         ],
+        'orgsRevokeAllOrgRolesTeam' => [
+            'application/json',
+        ],
+        'orgsRevokeAllOrgRolesUser' => [
+            'application/json',
+        ],
+        'orgsRevokeOrgRoleTeam' => [
+            'application/json',
+        ],
+        'orgsRevokeOrgRoleUser' => [
+            'application/json',
+        ],
         'orgsSetMembershipForUser' => [
             'application/json',
         ],
         'orgsSetPublicMembershipForAuthenticatedUser' => [
             'application/json',
         ],
-        'orgsUpdate' => [
+        'orgsUnblockUser' => [
             'application/json',
         ],
-        'orgsUpdateCustomRepoRole' => [
+        'orgsUpdate' => [
             'application/json',
         ],
         'orgsUpdateMembershipForAuthenticatedUser' => [
@@ -288,868 +345,6 @@ class OrgsApi
     public function getConfig()
     {
         return $this->config;
-    }
-
-    /**
-     * Operation announcementBannersGetAnnouncementBannerForOrg
-     *
-     * Get announcement banner for organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersGetAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner
-     */
-    public function announcementBannersGetAnnouncementBannerForOrg($org, string $contentType = self::contentTypes['announcementBannersGetAnnouncementBannerForOrg'][0])
-    {
-        list($response) = $this->announcementBannersGetAnnouncementBannerForOrgWithHttpInfo($org, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation announcementBannersGetAnnouncementBannerForOrgWithHttpInfo
-     *
-     * Get announcement banner for organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersGetAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function announcementBannersGetAnnouncementBannerForOrgWithHttpInfo($org, string $contentType = self::contentTypes['announcementBannersGetAnnouncementBannerForOrg'][0])
-    {
-        $request = $this->announcementBannersGetAnnouncementBannerForOrgRequest($org, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation announcementBannersGetAnnouncementBannerForOrgAsync
-     *
-     * Get announcement banner for organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersGetAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function announcementBannersGetAnnouncementBannerForOrgAsync($org, string $contentType = self::contentTypes['announcementBannersGetAnnouncementBannerForOrg'][0])
-    {
-        return $this->announcementBannersGetAnnouncementBannerForOrgAsyncWithHttpInfo($org, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation announcementBannersGetAnnouncementBannerForOrgAsyncWithHttpInfo
-     *
-     * Get announcement banner for organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersGetAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function announcementBannersGetAnnouncementBannerForOrgAsyncWithHttpInfo($org, string $contentType = self::contentTypes['announcementBannersGetAnnouncementBannerForOrg'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner';
-        $request = $this->announcementBannersGetAnnouncementBannerForOrgRequest($org, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'announcementBannersGetAnnouncementBannerForOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersGetAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function announcementBannersGetAnnouncementBannerForOrgRequest($org, string $contentType = self::contentTypes['announcementBannersGetAnnouncementBannerForOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling announcementBannersGetAnnouncementBannerForOrg'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/announcement';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'GET',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation announcementBannersRemoveAnnouncementBannerForOrg
-     *
-     * Remove announcement banner from organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersRemoveAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return void
-     */
-    public function announcementBannersRemoveAnnouncementBannerForOrg($org, string $contentType = self::contentTypes['announcementBannersRemoveAnnouncementBannerForOrg'][0])
-    {
-        $this->announcementBannersRemoveAnnouncementBannerForOrgWithHttpInfo($org, $contentType);
-    }
-
-    /**
-     * Operation announcementBannersRemoveAnnouncementBannerForOrgWithHttpInfo
-     *
-     * Remove announcement banner from organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersRemoveAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function announcementBannersRemoveAnnouncementBannerForOrgWithHttpInfo($org, string $contentType = self::contentTypes['announcementBannersRemoveAnnouncementBannerForOrg'][0])
-    {
-        $request = $this->announcementBannersRemoveAnnouncementBannerForOrgRequest($org, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            return [null, $statusCode, $response->getHeaders()];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation announcementBannersRemoveAnnouncementBannerForOrgAsync
-     *
-     * Remove announcement banner from organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersRemoveAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function announcementBannersRemoveAnnouncementBannerForOrgAsync($org, string $contentType = self::contentTypes['announcementBannersRemoveAnnouncementBannerForOrg'][0])
-    {
-        return $this->announcementBannersRemoveAnnouncementBannerForOrgAsyncWithHttpInfo($org, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation announcementBannersRemoveAnnouncementBannerForOrgAsyncWithHttpInfo
-     *
-     * Remove announcement banner from organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersRemoveAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function announcementBannersRemoveAnnouncementBannerForOrgAsyncWithHttpInfo($org, string $contentType = self::contentTypes['announcementBannersRemoveAnnouncementBannerForOrg'][0])
-    {
-        $returnType = '';
-        $request = $this->announcementBannersRemoveAnnouncementBannerForOrgRequest($org, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    return [null, $response->getStatusCode(), $response->getHeaders()];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'announcementBannersRemoveAnnouncementBannerForOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersRemoveAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function announcementBannersRemoveAnnouncementBannerForOrgRequest($org, string $contentType = self::contentTypes['announcementBannersRemoveAnnouncementBannerForOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling announcementBannersRemoveAnnouncementBannerForOrg'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/announcement';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            [],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'DELETE',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation announcementBannersSetAnnouncementBannerForOrg
-     *
-     * Set announcement banner for organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Announcement $announcement announcement (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersSetAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner
-     */
-    public function announcementBannersSetAnnouncementBannerForOrg($org, $announcement, string $contentType = self::contentTypes['announcementBannersSetAnnouncementBannerForOrg'][0])
-    {
-        list($response) = $this->announcementBannersSetAnnouncementBannerForOrgWithHttpInfo($org, $announcement, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation announcementBannersSetAnnouncementBannerForOrgWithHttpInfo
-     *
-     * Set announcement banner for organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Announcement $announcement (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersSetAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function announcementBannersSetAnnouncementBannerForOrgWithHttpInfo($org, $announcement, string $contentType = self::contentTypes['announcementBannersSetAnnouncementBannerForOrg'][0])
-    {
-        $request = $this->announcementBannersSetAnnouncementBannerForOrgRequest($org, $announcement, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation announcementBannersSetAnnouncementBannerForOrgAsync
-     *
-     * Set announcement banner for organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Announcement $announcement (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersSetAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function announcementBannersSetAnnouncementBannerForOrgAsync($org, $announcement, string $contentType = self::contentTypes['announcementBannersSetAnnouncementBannerForOrg'][0])
-    {
-        return $this->announcementBannersSetAnnouncementBannerForOrgAsyncWithHttpInfo($org, $announcement, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation announcementBannersSetAnnouncementBannerForOrgAsyncWithHttpInfo
-     *
-     * Set announcement banner for organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Announcement $announcement (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersSetAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function announcementBannersSetAnnouncementBannerForOrgAsyncWithHttpInfo($org, $announcement, string $contentType = self::contentTypes['announcementBannersSetAnnouncementBannerForOrg'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AnnouncementBanner';
-        $request = $this->announcementBannersSetAnnouncementBannerForOrgRequest($org, $announcement, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'announcementBannersSetAnnouncementBannerForOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Announcement $announcement (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['announcementBannersSetAnnouncementBannerForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function announcementBannersSetAnnouncementBannerForOrgRequest($org, $announcement, string $contentType = self::contentTypes['announcementBannersSetAnnouncementBannerForOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling announcementBannersSetAnnouncementBannerForOrg'
-            );
-        }
-
-        // verify the required parameter 'announcement' is set
-        if ($announcement === null || (is_array($announcement) && count($announcement) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $announcement when calling announcementBannersSetAnnouncementBannerForOrg'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/announcement';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (isset($announcement)) {
-            if (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($announcement));
-            } else {
-                $httpBody = $announcement;
-            }
-        } elseif (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'PATCH',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
     }
 
     /**
@@ -1395,6 +590,1323 @@ class OrgsApi
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
             'PUT',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsAssignTeamToOrgRole
+     *
+     * Assign an organization role to a team
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsAssignTeamToOrgRole'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function orgsAssignTeamToOrgRole($org, $team_slug, $role_id, string $contentType = self::contentTypes['orgsAssignTeamToOrgRole'][0])
+    {
+        $this->orgsAssignTeamToOrgRoleWithHttpInfo($org, $team_slug, $role_id, $contentType);
+    }
+
+    /**
+     * Operation orgsAssignTeamToOrgRoleWithHttpInfo
+     *
+     * Assign an organization role to a team
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsAssignTeamToOrgRole'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsAssignTeamToOrgRoleWithHttpInfo($org, $team_slug, $role_id, string $contentType = self::contentTypes['orgsAssignTeamToOrgRole'][0])
+    {
+        $request = $this->orgsAssignTeamToOrgRoleRequest($org, $team_slug, $role_id, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsAssignTeamToOrgRoleAsync
+     *
+     * Assign an organization role to a team
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsAssignTeamToOrgRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsAssignTeamToOrgRoleAsync($org, $team_slug, $role_id, string $contentType = self::contentTypes['orgsAssignTeamToOrgRole'][0])
+    {
+        return $this->orgsAssignTeamToOrgRoleAsyncWithHttpInfo($org, $team_slug, $role_id, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsAssignTeamToOrgRoleAsyncWithHttpInfo
+     *
+     * Assign an organization role to a team
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsAssignTeamToOrgRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsAssignTeamToOrgRoleAsyncWithHttpInfo($org, $team_slug, $role_id, string $contentType = self::contentTypes['orgsAssignTeamToOrgRole'][0])
+    {
+        $returnType = '';
+        $request = $this->orgsAssignTeamToOrgRoleRequest($org, $team_slug, $role_id, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsAssignTeamToOrgRole'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsAssignTeamToOrgRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsAssignTeamToOrgRoleRequest($org, $team_slug, $role_id, string $contentType = self::contentTypes['orgsAssignTeamToOrgRole'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsAssignTeamToOrgRole'
+            );
+        }
+
+        // verify the required parameter 'team_slug' is set
+        if ($team_slug === null || (is_array($team_slug) && count($team_slug) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $team_slug when calling orgsAssignTeamToOrgRole'
+            );
+        }
+
+        // verify the required parameter 'role_id' is set
+        if ($role_id === null || (is_array($role_id) && count($role_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $role_id when calling orgsAssignTeamToOrgRole'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/organization-roles/teams/{team_slug}/{role_id}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($team_slug !== null) {
+            $resourcePath = str_replace(
+                '{' . 'team_slug' . '}',
+                ObjectSerializer::toPathValue($team_slug),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($role_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'role_id' . '}',
+                ObjectSerializer::toPathValue($role_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            [],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'PUT',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsAssignUserToOrgRole
+     *
+     * Assign an organization role to a user
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsAssignUserToOrgRole'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function orgsAssignUserToOrgRole($org, $username, $role_id, string $contentType = self::contentTypes['orgsAssignUserToOrgRole'][0])
+    {
+        $this->orgsAssignUserToOrgRoleWithHttpInfo($org, $username, $role_id, $contentType);
+    }
+
+    /**
+     * Operation orgsAssignUserToOrgRoleWithHttpInfo
+     *
+     * Assign an organization role to a user
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsAssignUserToOrgRole'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsAssignUserToOrgRoleWithHttpInfo($org, $username, $role_id, string $contentType = self::contentTypes['orgsAssignUserToOrgRole'][0])
+    {
+        $request = $this->orgsAssignUserToOrgRoleRequest($org, $username, $role_id, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsAssignUserToOrgRoleAsync
+     *
+     * Assign an organization role to a user
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsAssignUserToOrgRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsAssignUserToOrgRoleAsync($org, $username, $role_id, string $contentType = self::contentTypes['orgsAssignUserToOrgRole'][0])
+    {
+        return $this->orgsAssignUserToOrgRoleAsyncWithHttpInfo($org, $username, $role_id, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsAssignUserToOrgRoleAsyncWithHttpInfo
+     *
+     * Assign an organization role to a user
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsAssignUserToOrgRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsAssignUserToOrgRoleAsyncWithHttpInfo($org, $username, $role_id, string $contentType = self::contentTypes['orgsAssignUserToOrgRole'][0])
+    {
+        $returnType = '';
+        $request = $this->orgsAssignUserToOrgRoleRequest($org, $username, $role_id, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsAssignUserToOrgRole'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsAssignUserToOrgRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsAssignUserToOrgRoleRequest($org, $username, $role_id, string $contentType = self::contentTypes['orgsAssignUserToOrgRole'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsAssignUserToOrgRole'
+            );
+        }
+
+        // verify the required parameter 'username' is set
+        if ($username === null || (is_array($username) && count($username) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $username when calling orgsAssignUserToOrgRole'
+            );
+        }
+
+        // verify the required parameter 'role_id' is set
+        if ($role_id === null || (is_array($role_id) && count($role_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $role_id when calling orgsAssignUserToOrgRole'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/organization-roles/users/{username}/{role_id}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($username !== null) {
+            $resourcePath = str_replace(
+                '{' . 'username' . '}',
+                ObjectSerializer::toPathValue($username),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($role_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'role_id' . '}',
+                ObjectSerializer::toPathValue($role_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            [],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'PUT',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsBlockUser
+     *
+     * Block a user from an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsBlockUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function orgsBlockUser($org, $username, string $contentType = self::contentTypes['orgsBlockUser'][0])
+    {
+        $this->orgsBlockUserWithHttpInfo($org, $username, $contentType);
+    }
+
+    /**
+     * Operation orgsBlockUserWithHttpInfo
+     *
+     * Block a user from an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsBlockUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsBlockUserWithHttpInfo($org, $username, string $contentType = self::contentTypes['orgsBlockUser'][0])
+    {
+        $request = $this->orgsBlockUserRequest($org, $username, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsBlockUserAsync
+     *
+     * Block a user from an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsBlockUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsBlockUserAsync($org, $username, string $contentType = self::contentTypes['orgsBlockUser'][0])
+    {
+        return $this->orgsBlockUserAsyncWithHttpInfo($org, $username, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsBlockUserAsyncWithHttpInfo
+     *
+     * Block a user from an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsBlockUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsBlockUserAsyncWithHttpInfo($org, $username, string $contentType = self::contentTypes['orgsBlockUser'][0])
+    {
+        $returnType = '';
+        $request = $this->orgsBlockUserRequest($org, $username, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsBlockUser'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsBlockUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsBlockUserRequest($org, $username, string $contentType = self::contentTypes['orgsBlockUser'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsBlockUser'
+            );
+        }
+
+        // verify the required parameter 'username' is set
+        if ($username === null || (is_array($username) && count($username) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $username when calling orgsBlockUser'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/blocks/{username}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($username !== null) {
+            $resourcePath = str_replace(
+                '{' . 'username' . '}',
+                ObjectSerializer::toPathValue($username),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'PUT',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsCancelInvitation
+     *
+     * Cancel an organization invitation
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $invitation_id The unique identifier of the invitation. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCancelInvitation'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function orgsCancelInvitation($org, $invitation_id, string $contentType = self::contentTypes['orgsCancelInvitation'][0])
+    {
+        $this->orgsCancelInvitationWithHttpInfo($org, $invitation_id, $contentType);
+    }
+
+    /**
+     * Operation orgsCancelInvitationWithHttpInfo
+     *
+     * Cancel an organization invitation
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $invitation_id The unique identifier of the invitation. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCancelInvitation'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsCancelInvitationWithHttpInfo($org, $invitation_id, string $contentType = self::contentTypes['orgsCancelInvitation'][0])
+    {
+        $request = $this->orgsCancelInvitationRequest($org, $invitation_id, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsCancelInvitationAsync
+     *
+     * Cancel an organization invitation
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $invitation_id The unique identifier of the invitation. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCancelInvitation'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsCancelInvitationAsync($org, $invitation_id, string $contentType = self::contentTypes['orgsCancelInvitation'][0])
+    {
+        return $this->orgsCancelInvitationAsyncWithHttpInfo($org, $invitation_id, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsCancelInvitationAsyncWithHttpInfo
+     *
+     * Cancel an organization invitation
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $invitation_id The unique identifier of the invitation. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCancelInvitation'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsCancelInvitationAsyncWithHttpInfo($org, $invitation_id, string $contentType = self::contentTypes['orgsCancelInvitation'][0])
+    {
+        $returnType = '';
+        $request = $this->orgsCancelInvitationRequest($org, $invitation_id, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsCancelInvitation'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $invitation_id The unique identifier of the invitation. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCancelInvitation'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsCancelInvitationRequest($org, $invitation_id, string $contentType = self::contentTypes['orgsCancelInvitation'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsCancelInvitation'
+            );
+        }
+
+        // verify the required parameter 'invitation_id' is set
+        if ($invitation_id === null || (is_array($invitation_id) && count($invitation_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $invitation_id when calling orgsCancelInvitation'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/invitations/{invitation_id}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($invitation_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'invitation_id' . '}',
+                ObjectSerializer::toPathValue($invitation_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'DELETE',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsCheckBlockedUser
+     *
+     * Check if a user is blocked by an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCheckBlockedUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function orgsCheckBlockedUser($org, $username, string $contentType = self::contentTypes['orgsCheckBlockedUser'][0])
+    {
+        $this->orgsCheckBlockedUserWithHttpInfo($org, $username, $contentType);
+    }
+
+    /**
+     * Operation orgsCheckBlockedUserWithHttpInfo
+     *
+     * Check if a user is blocked by an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCheckBlockedUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsCheckBlockedUserWithHttpInfo($org, $username, string $contentType = self::contentTypes['orgsCheckBlockedUser'][0])
+    {
+        $request = $this->orgsCheckBlockedUserRequest($org, $username, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsCheckBlockedUserAsync
+     *
+     * Check if a user is blocked by an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCheckBlockedUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsCheckBlockedUserAsync($org, $username, string $contentType = self::contentTypes['orgsCheckBlockedUser'][0])
+    {
+        return $this->orgsCheckBlockedUserAsyncWithHttpInfo($org, $username, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsCheckBlockedUserAsyncWithHttpInfo
+     *
+     * Check if a user is blocked by an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCheckBlockedUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsCheckBlockedUserAsyncWithHttpInfo($org, $username, string $contentType = self::contentTypes['orgsCheckBlockedUser'][0])
+    {
+        $returnType = '';
+        $request = $this->orgsCheckBlockedUserRequest($org, $username, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsCheckBlockedUser'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCheckBlockedUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsCheckBlockedUserRequest($org, $username, string $contentType = self::contentTypes['orgsCheckBlockedUser'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsCheckBlockedUser'
+            );
+        }
+
+        // verify the required parameter 'username' is set
+        if ($username === null || (is_array($username) && count($username) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $username when calling orgsCheckBlockedUser'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/blocks/{username}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($username !== null) {
+            $resourcePath = str_replace(
+                '{' . 'username' . '}',
+                ObjectSerializer::toPathValue($username),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody
@@ -2275,40 +2787,40 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsCreateCustomRepoRole
+     * Operation orgsCreateCustomOrganizationRole
      *
-     * Create a custom repository role
+     * Create a custom organization role
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRoleCreateSchema $organization_custom_repository_role_create_schema organization_custom_repository_role_create_schema (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateCustomRepoRole'] to see the possible values for this operation
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateCustomOrganizationRoleRequest $orgs_create_custom_organization_role_request orgs_create_custom_organization_role_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateCustomOrganizationRole'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
      */
-    public function orgsCreateCustomRepoRole($org, $organization_custom_repository_role_create_schema, string $contentType = self::contentTypes['orgsCreateCustomRepoRole'][0])
+    public function orgsCreateCustomOrganizationRole($org, $orgs_create_custom_organization_role_request, string $contentType = self::contentTypes['orgsCreateCustomOrganizationRole'][0])
     {
-        list($response) = $this->orgsCreateCustomRepoRoleWithHttpInfo($org, $organization_custom_repository_role_create_schema, $contentType);
+        list($response) = $this->orgsCreateCustomOrganizationRoleWithHttpInfo($org, $orgs_create_custom_organization_role_request, $contentType);
         return $response;
     }
 
     /**
-     * Operation orgsCreateCustomRepoRoleWithHttpInfo
+     * Operation orgsCreateCustomOrganizationRoleWithHttpInfo
      *
-     * Create a custom repository role
+     * Create a custom organization role
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRoleCreateSchema $organization_custom_repository_role_create_schema (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateCustomRepoRole'] to see the possible values for this operation
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateCustomOrganizationRoleRequest $orgs_create_custom_organization_role_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateCustomOrganizationRole'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
      */
-    public function orgsCreateCustomRepoRoleWithHttpInfo($org, $organization_custom_repository_role_create_schema, string $contentType = self::contentTypes['orgsCreateCustomRepoRole'][0])
+    public function orgsCreateCustomOrganizationRoleWithHttpInfo($org, $orgs_create_custom_organization_role_request, string $contentType = self::contentTypes['orgsCreateCustomOrganizationRole'][0])
     {
-        $request = $this->orgsCreateCustomRepoRoleRequest($org, $organization_custom_repository_role_create_schema, $contentType);
+        $request = $this->orgsCreateCustomOrganizationRoleRequest($org, $orgs_create_custom_organization_role_request, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -2347,11 +2859,11 @@ class OrgsApi
 
             switch($statusCode) {
                 case 201:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -2369,7 +2881,438 @@ class OrgsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 422:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 409:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 201:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 409:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsCreateCustomOrganizationRoleAsync
+     *
+     * Create a custom organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateCustomOrganizationRoleRequest $orgs_create_custom_organization_role_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateCustomOrganizationRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsCreateCustomOrganizationRoleAsync($org, $orgs_create_custom_organization_role_request, string $contentType = self::contentTypes['orgsCreateCustomOrganizationRole'][0])
+    {
+        return $this->orgsCreateCustomOrganizationRoleAsyncWithHttpInfo($org, $orgs_create_custom_organization_role_request, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsCreateCustomOrganizationRoleAsyncWithHttpInfo
+     *
+     * Create a custom organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateCustomOrganizationRoleRequest $orgs_create_custom_organization_role_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateCustomOrganizationRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsCreateCustomOrganizationRoleAsyncWithHttpInfo($org, $orgs_create_custom_organization_role_request, string $contentType = self::contentTypes['orgsCreateCustomOrganizationRole'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole';
+        $request = $this->orgsCreateCustomOrganizationRoleRequest($org, $orgs_create_custom_organization_role_request, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsCreateCustomOrganizationRole'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateCustomOrganizationRoleRequest $orgs_create_custom_organization_role_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateCustomOrganizationRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsCreateCustomOrganizationRoleRequest($org, $orgs_create_custom_organization_role_request, string $contentType = self::contentTypes['orgsCreateCustomOrganizationRole'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsCreateCustomOrganizationRole'
+            );
+        }
+
+        // verify the required parameter 'orgs_create_custom_organization_role_request' is set
+        if ($orgs_create_custom_organization_role_request === null || (is_array($orgs_create_custom_organization_role_request) && count($orgs_create_custom_organization_role_request) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $orgs_create_custom_organization_role_request when calling orgsCreateCustomOrganizationRole'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/organization-roles';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (isset($orgs_create_custom_organization_role_request)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($orgs_create_custom_organization_role_request));
+            } else {
+                $httpBody = $orgs_create_custom_organization_role_request;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsCreateInvitation
+     *
+     * Create an organization invitation
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateInvitationRequest $orgs_create_invitation_request orgs_create_invitation_request (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateInvitation'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     */
+    public function orgsCreateInvitation($org, $orgs_create_invitation_request = null, string $contentType = self::contentTypes['orgsCreateInvitation'][0])
+    {
+        list($response) = $this->orgsCreateInvitationWithHttpInfo($org, $orgs_create_invitation_request, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation orgsCreateInvitationWithHttpInfo
+     *
+     * Create an organization invitation
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateInvitationRequest $orgs_create_invitation_request (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateInvitation'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsCreateInvitationWithHttpInfo($org, $orgs_create_invitation_request = null, string $contentType = self::contentTypes['orgsCreateInvitation'][0])
+    {
+        $request = $this->orgsCreateInvitationRequest($org, $orgs_create_invitation_request, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 201:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -2429,7 +3372,7 @@ class OrgsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -2462,7 +3405,7 @@ class OrgsApi
                 case 201:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -2489,20 +3432,20 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsCreateCustomRepoRoleAsync
+     * Operation orgsCreateInvitationAsync
      *
-     * Create a custom repository role
+     * Create an organization invitation
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRoleCreateSchema $organization_custom_repository_role_create_schema (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateCustomRepoRole'] to see the possible values for this operation
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateInvitationRequest $orgs_create_invitation_request (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateInvitation'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function orgsCreateCustomRepoRoleAsync($org, $organization_custom_repository_role_create_schema, string $contentType = self::contentTypes['orgsCreateCustomRepoRole'][0])
+    public function orgsCreateInvitationAsync($org, $orgs_create_invitation_request = null, string $contentType = self::contentTypes['orgsCreateInvitation'][0])
     {
-        return $this->orgsCreateCustomRepoRoleAsyncWithHttpInfo($org, $organization_custom_repository_role_create_schema, $contentType)
+        return $this->orgsCreateInvitationAsyncWithHttpInfo($org, $orgs_create_invitation_request, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -2511,21 +3454,21 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsCreateCustomRepoRoleAsyncWithHttpInfo
+     * Operation orgsCreateInvitationAsyncWithHttpInfo
      *
-     * Create a custom repository role
+     * Create an organization invitation
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRoleCreateSchema $organization_custom_repository_role_create_schema (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateCustomRepoRole'] to see the possible values for this operation
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateInvitationRequest $orgs_create_invitation_request (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateInvitation'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function orgsCreateCustomRepoRoleAsyncWithHttpInfo($org, $organization_custom_repository_role_create_schema, string $contentType = self::contentTypes['orgsCreateCustomRepoRole'][0])
+    public function orgsCreateInvitationAsyncWithHttpInfo($org, $orgs_create_invitation_request = null, string $contentType = self::contentTypes['orgsCreateInvitation'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole';
-        $request = $this->orgsCreateCustomRepoRoleRequest($org, $organization_custom_repository_role_create_schema, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation';
+        $request = $this->orgsCreateInvitationRequest($org, $orgs_create_invitation_request, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -2564,34 +3507,28 @@ class OrgsApi
     }
 
     /**
-     * Create request for operation 'orgsCreateCustomRepoRole'
+     * Create request for operation 'orgsCreateInvitation'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRoleCreateSchema $organization_custom_repository_role_create_schema (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateCustomRepoRole'] to see the possible values for this operation
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateInvitationRequest $orgs_create_invitation_request (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateInvitation'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function orgsCreateCustomRepoRoleRequest($org, $organization_custom_repository_role_create_schema, string $contentType = self::contentTypes['orgsCreateCustomRepoRole'][0])
+    public function orgsCreateInvitationRequest($org, $orgs_create_invitation_request = null, string $contentType = self::contentTypes['orgsCreateInvitation'][0])
     {
 
         // verify the required parameter 'org' is set
         if ($org === null || (is_array($org) && count($org) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling orgsCreateCustomRepoRole'
-            );
-        }
-
-        // verify the required parameter 'organization_custom_repository_role_create_schema' is set
-        if ($organization_custom_repository_role_create_schema === null || (is_array($organization_custom_repository_role_create_schema) && count($organization_custom_repository_role_create_schema) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $organization_custom_repository_role_create_schema when calling orgsCreateCustomRepoRole'
+                'Missing the required parameter $org when calling orgsCreateInvitation'
             );
         }
 
 
-        $resourcePath = '/orgs/{org}/custom-repository-roles';
+
+        $resourcePath = '/orgs/{org}/invitations';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
@@ -2617,12 +3554,12 @@ class OrgsApi
         );
 
         // for model (json/xml)
-        if (isset($organization_custom_repository_role_create_schema)) {
+        if (isset($orgs_create_invitation_request)) {
             if (stripos($headers['Content-Type'], 'application/json') !== false) {
                 # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($organization_custom_repository_role_create_schema));
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($orgs_create_invitation_request));
             } else {
-                $httpBody = $organization_custom_repository_role_create_schema;
+                $httpBody = $orgs_create_invitation_request;
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -2664,6 +3601,1090 @@ class OrgsApi
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
             'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsCreateOrUpdateCustomProperties
+     *
+     * Create or update custom properties for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertiesRequest $orgs_create_or_update_custom_properties_request orgs_create_or_update_custom_properties_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomProperties'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     */
+    public function orgsCreateOrUpdateCustomProperties($org, $orgs_create_or_update_custom_properties_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomProperties'][0])
+    {
+        list($response) = $this->orgsCreateOrUpdateCustomPropertiesWithHttpInfo($org, $orgs_create_or_update_custom_properties_request, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation orgsCreateOrUpdateCustomPropertiesWithHttpInfo
+     *
+     * Create or update custom properties for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertiesRequest $orgs_create_or_update_custom_properties_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomProperties'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsCreateOrUpdateCustomPropertiesWithHttpInfo($org, $orgs_create_or_update_custom_properties_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomProperties'][0])
+    {
+        $request = $this->orgsCreateOrUpdateCustomPropertiesRequest($org, $orgs_create_or_update_custom_properties_request, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsCreateOrUpdateCustomPropertiesAsync
+     *
+     * Create or update custom properties for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertiesRequest $orgs_create_or_update_custom_properties_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomProperties'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsCreateOrUpdateCustomPropertiesAsync($org, $orgs_create_or_update_custom_properties_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomProperties'][0])
+    {
+        return $this->orgsCreateOrUpdateCustomPropertiesAsyncWithHttpInfo($org, $orgs_create_or_update_custom_properties_request, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsCreateOrUpdateCustomPropertiesAsyncWithHttpInfo
+     *
+     * Create or update custom properties for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertiesRequest $orgs_create_or_update_custom_properties_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomProperties'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsCreateOrUpdateCustomPropertiesAsyncWithHttpInfo($org, $orgs_create_or_update_custom_properties_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomProperties'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]';
+        $request = $this->orgsCreateOrUpdateCustomPropertiesRequest($org, $orgs_create_or_update_custom_properties_request, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsCreateOrUpdateCustomProperties'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertiesRequest $orgs_create_or_update_custom_properties_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomProperties'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsCreateOrUpdateCustomPropertiesRequest($org, $orgs_create_or_update_custom_properties_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomProperties'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsCreateOrUpdateCustomProperties'
+            );
+        }
+
+        // verify the required parameter 'orgs_create_or_update_custom_properties_request' is set
+        if ($orgs_create_or_update_custom_properties_request === null || (is_array($orgs_create_or_update_custom_properties_request) && count($orgs_create_or_update_custom_properties_request) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $orgs_create_or_update_custom_properties_request when calling orgsCreateOrUpdateCustomProperties'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/properties/schema';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (isset($orgs_create_or_update_custom_properties_request)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($orgs_create_or_update_custom_properties_request));
+            } else {
+                $httpBody = $orgs_create_or_update_custom_properties_request;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'PATCH',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsCreateOrUpdateCustomPropertiesValuesForRepos
+     *
+     * Create or update custom property values for organization repositories
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertiesValuesForReposRequest $orgs_create_or_update_custom_properties_values_for_repos_request orgs_create_or_update_custom_properties_values_for_repos_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomPropertiesValuesForRepos'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function orgsCreateOrUpdateCustomPropertiesValuesForRepos($org, $orgs_create_or_update_custom_properties_values_for_repos_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomPropertiesValuesForRepos'][0])
+    {
+        $this->orgsCreateOrUpdateCustomPropertiesValuesForReposWithHttpInfo($org, $orgs_create_or_update_custom_properties_values_for_repos_request, $contentType);
+    }
+
+    /**
+     * Operation orgsCreateOrUpdateCustomPropertiesValuesForReposWithHttpInfo
+     *
+     * Create or update custom property values for organization repositories
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertiesValuesForReposRequest $orgs_create_or_update_custom_properties_values_for_repos_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomPropertiesValuesForRepos'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsCreateOrUpdateCustomPropertiesValuesForReposWithHttpInfo($org, $orgs_create_or_update_custom_properties_values_for_repos_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomPropertiesValuesForRepos'][0])
+    {
+        $request = $this->orgsCreateOrUpdateCustomPropertiesValuesForReposRequest($org, $orgs_create_or_update_custom_properties_values_for_repos_request, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsCreateOrUpdateCustomPropertiesValuesForReposAsync
+     *
+     * Create or update custom property values for organization repositories
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertiesValuesForReposRequest $orgs_create_or_update_custom_properties_values_for_repos_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomPropertiesValuesForRepos'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsCreateOrUpdateCustomPropertiesValuesForReposAsync($org, $orgs_create_or_update_custom_properties_values_for_repos_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomPropertiesValuesForRepos'][0])
+    {
+        return $this->orgsCreateOrUpdateCustomPropertiesValuesForReposAsyncWithHttpInfo($org, $orgs_create_or_update_custom_properties_values_for_repos_request, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsCreateOrUpdateCustomPropertiesValuesForReposAsyncWithHttpInfo
+     *
+     * Create or update custom property values for organization repositories
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertiesValuesForReposRequest $orgs_create_or_update_custom_properties_values_for_repos_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomPropertiesValuesForRepos'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsCreateOrUpdateCustomPropertiesValuesForReposAsyncWithHttpInfo($org, $orgs_create_or_update_custom_properties_values_for_repos_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomPropertiesValuesForRepos'][0])
+    {
+        $returnType = '';
+        $request = $this->orgsCreateOrUpdateCustomPropertiesValuesForReposRequest($org, $orgs_create_or_update_custom_properties_values_for_repos_request, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsCreateOrUpdateCustomPropertiesValuesForRepos'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertiesValuesForReposRequest $orgs_create_or_update_custom_properties_values_for_repos_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomPropertiesValuesForRepos'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsCreateOrUpdateCustomPropertiesValuesForReposRequest($org, $orgs_create_or_update_custom_properties_values_for_repos_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomPropertiesValuesForRepos'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsCreateOrUpdateCustomPropertiesValuesForRepos'
+            );
+        }
+
+        // verify the required parameter 'orgs_create_or_update_custom_properties_values_for_repos_request' is set
+        if ($orgs_create_or_update_custom_properties_values_for_repos_request === null || (is_array($orgs_create_or_update_custom_properties_values_for_repos_request) && count($orgs_create_or_update_custom_properties_values_for_repos_request) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $orgs_create_or_update_custom_properties_values_for_repos_request when calling orgsCreateOrUpdateCustomPropertiesValuesForRepos'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/properties/values';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (isset($orgs_create_or_update_custom_properties_values_for_repos_request)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($orgs_create_or_update_custom_properties_values_for_repos_request));
+            } else {
+                $httpBody = $orgs_create_or_update_custom_properties_values_for_repos_request;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'PATCH',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsCreateOrUpdateCustomProperty
+     *
+     * Create or update a custom property for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertyRequest $orgs_create_or_update_custom_property_request orgs_create_or_update_custom_property_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomProperty'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     */
+    public function orgsCreateOrUpdateCustomProperty($org, $custom_property_name, $orgs_create_or_update_custom_property_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomProperty'][0])
+    {
+        list($response) = $this->orgsCreateOrUpdateCustomPropertyWithHttpInfo($org, $custom_property_name, $orgs_create_or_update_custom_property_request, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation orgsCreateOrUpdateCustomPropertyWithHttpInfo
+     *
+     * Create or update a custom property for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertyRequest $orgs_create_or_update_custom_property_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomProperty'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsCreateOrUpdateCustomPropertyWithHttpInfo($org, $custom_property_name, $orgs_create_or_update_custom_property_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomProperty'][0])
+    {
+        $request = $this->orgsCreateOrUpdateCustomPropertyRequest($org, $custom_property_name, $orgs_create_or_update_custom_property_request, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsCreateOrUpdateCustomPropertyAsync
+     *
+     * Create or update a custom property for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertyRequest $orgs_create_or_update_custom_property_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomProperty'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsCreateOrUpdateCustomPropertyAsync($org, $custom_property_name, $orgs_create_or_update_custom_property_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomProperty'][0])
+    {
+        return $this->orgsCreateOrUpdateCustomPropertyAsyncWithHttpInfo($org, $custom_property_name, $orgs_create_or_update_custom_property_request, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsCreateOrUpdateCustomPropertyAsyncWithHttpInfo
+     *
+     * Create or update a custom property for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertyRequest $orgs_create_or_update_custom_property_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomProperty'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsCreateOrUpdateCustomPropertyAsyncWithHttpInfo($org, $custom_property_name, $orgs_create_or_update_custom_property_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomProperty'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty';
+        $request = $this->orgsCreateOrUpdateCustomPropertyRequest($org, $custom_property_name, $orgs_create_or_update_custom_property_request, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsCreateOrUpdateCustomProperty'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsCreateOrUpdateCustomPropertyRequest $orgs_create_or_update_custom_property_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsCreateOrUpdateCustomProperty'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsCreateOrUpdateCustomPropertyRequest($org, $custom_property_name, $orgs_create_or_update_custom_property_request, string $contentType = self::contentTypes['orgsCreateOrUpdateCustomProperty'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsCreateOrUpdateCustomProperty'
+            );
+        }
+
+        // verify the required parameter 'custom_property_name' is set
+        if ($custom_property_name === null || (is_array($custom_property_name) && count($custom_property_name) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $custom_property_name when calling orgsCreateOrUpdateCustomProperty'
+            );
+        }
+
+        // verify the required parameter 'orgs_create_or_update_custom_property_request' is set
+        if ($orgs_create_or_update_custom_property_request === null || (is_array($orgs_create_or_update_custom_property_request) && count($orgs_create_or_update_custom_property_request) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $orgs_create_or_update_custom_property_request when calling orgsCreateOrUpdateCustomProperty'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/properties/schema/{custom_property_name}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($custom_property_name !== null) {
+            $resourcePath = str_replace(
+                '{' . 'custom_property_name' . '}',
+                ObjectSerializer::toPathValue($custom_property_name),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (isset($orgs_create_or_update_custom_property_request)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($orgs_create_or_update_custom_property_request));
+            } else {
+                $httpBody = $orgs_create_or_update_custom_property_request;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'PUT',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody
@@ -3444,39 +5465,39 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsDeleteCustomRepoRole
+     * Operation orgsDeleteCustomOrganizationRole
      *
-     * Delete a custom repository role
+     * Delete a custom organization role.
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $role_id The unique identifier of the role. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsDeleteCustomRepoRole'] to see the possible values for this operation
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsDeleteCustomOrganizationRole'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
      * @return void
      */
-    public function orgsDeleteCustomRepoRole($org, $role_id, string $contentType = self::contentTypes['orgsDeleteCustomRepoRole'][0])
+    public function orgsDeleteCustomOrganizationRole($org, $role_id, string $contentType = self::contentTypes['orgsDeleteCustomOrganizationRole'][0])
     {
-        $this->orgsDeleteCustomRepoRoleWithHttpInfo($org, $role_id, $contentType);
+        $this->orgsDeleteCustomOrganizationRoleWithHttpInfo($org, $role_id, $contentType);
     }
 
     /**
-     * Operation orgsDeleteCustomRepoRoleWithHttpInfo
+     * Operation orgsDeleteCustomOrganizationRoleWithHttpInfo
      *
-     * Delete a custom repository role
+     * Delete a custom organization role.
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $role_id The unique identifier of the role. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsDeleteCustomRepoRole'] to see the possible values for this operation
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsDeleteCustomOrganizationRole'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
-    public function orgsDeleteCustomRepoRoleWithHttpInfo($org, $role_id, string $contentType = self::contentTypes['orgsDeleteCustomRepoRole'][0])
+    public function orgsDeleteCustomOrganizationRoleWithHttpInfo($org, $role_id, string $contentType = self::contentTypes['orgsDeleteCustomOrganizationRole'][0])
     {
-        $request = $this->orgsDeleteCustomRepoRoleRequest($org, $role_id, $contentType);
+        $request = $this->orgsDeleteCustomOrganizationRoleRequest($org, $role_id, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -3523,20 +5544,20 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsDeleteCustomRepoRoleAsync
+     * Operation orgsDeleteCustomOrganizationRoleAsync
      *
-     * Delete a custom repository role
+     * Delete a custom organization role.
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $role_id The unique identifier of the role. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsDeleteCustomRepoRole'] to see the possible values for this operation
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsDeleteCustomOrganizationRole'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function orgsDeleteCustomRepoRoleAsync($org, $role_id, string $contentType = self::contentTypes['orgsDeleteCustomRepoRole'][0])
+    public function orgsDeleteCustomOrganizationRoleAsync($org, $role_id, string $contentType = self::contentTypes['orgsDeleteCustomOrganizationRole'][0])
     {
-        return $this->orgsDeleteCustomRepoRoleAsyncWithHttpInfo($org, $role_id, $contentType)
+        return $this->orgsDeleteCustomOrganizationRoleAsyncWithHttpInfo($org, $role_id, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -3545,21 +5566,21 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsDeleteCustomRepoRoleAsyncWithHttpInfo
+     * Operation orgsDeleteCustomOrganizationRoleAsyncWithHttpInfo
      *
-     * Delete a custom repository role
+     * Delete a custom organization role.
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $role_id The unique identifier of the role. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsDeleteCustomRepoRole'] to see the possible values for this operation
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsDeleteCustomOrganizationRole'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function orgsDeleteCustomRepoRoleAsyncWithHttpInfo($org, $role_id, string $contentType = self::contentTypes['orgsDeleteCustomRepoRole'][0])
+    public function orgsDeleteCustomOrganizationRoleAsyncWithHttpInfo($org, $role_id, string $contentType = self::contentTypes['orgsDeleteCustomOrganizationRole'][0])
     {
         $returnType = '';
-        $request = $this->orgsDeleteCustomRepoRoleRequest($org, $role_id, $contentType);
+        $request = $this->orgsDeleteCustomOrganizationRoleRequest($org, $role_id, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -3585,34 +5606,34 @@ class OrgsApi
     }
 
     /**
-     * Create request for operation 'orgsDeleteCustomRepoRole'
+     * Create request for operation 'orgsDeleteCustomOrganizationRole'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $role_id The unique identifier of the role. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsDeleteCustomRepoRole'] to see the possible values for this operation
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsDeleteCustomOrganizationRole'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function orgsDeleteCustomRepoRoleRequest($org, $role_id, string $contentType = self::contentTypes['orgsDeleteCustomRepoRole'][0])
+    public function orgsDeleteCustomOrganizationRoleRequest($org, $role_id, string $contentType = self::contentTypes['orgsDeleteCustomOrganizationRole'][0])
     {
 
         // verify the required parameter 'org' is set
         if ($org === null || (is_array($org) && count($org) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling orgsDeleteCustomRepoRole'
+                'Missing the required parameter $org when calling orgsDeleteCustomOrganizationRole'
             );
         }
 
         // verify the required parameter 'role_id' is set
         if ($role_id === null || (is_array($role_id) && count($role_id) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $role_id when calling orgsDeleteCustomRepoRole'
+                'Missing the required parameter $role_id when calling orgsDeleteCustomOrganizationRole'
             );
         }
 
 
-        $resourcePath = '/orgs/{org}/custom-repository-roles/{role_id}';
+        $resourcePath = '/orgs/{org}/organization-roles/{role_id}';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
@@ -4574,52 +6595,38 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsGetAuditLog
+     * Operation orgsGetAllCustomProperties
      *
-     * Get the audit log for an organization
+     * Get all custom properties for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $phrase A search phrase. For more information, see [Searching the audit log](https://docs.github.com/enterprise-server@3.12/github/setting-up-and-managing-organizations-and-teams/reviewing-the-audit-log-for-your-organization#searching-the-audit-log). (optional)
-     * @param  string $include The event types to include:  - &#x60;web&#x60; - returns web (non-Git) events. - &#x60;git&#x60; - returns Git events. - &#x60;all&#x60; - returns both web and Git events.  The default is &#x60;web&#x60;. (optional)
-     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for events after this cursor. (optional)
-     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for events before this cursor. (optional)
-     * @param  string $order The order of audit log events. To list newest events first, specify &#x60;desc&#x60;. To list oldest events first, specify &#x60;asc&#x60;.  The default is &#x60;desc&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetAuditLog'] to see the possible values for this operation
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetAllCustomProperties'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AuditLogEvent[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
      */
-    public function orgsGetAuditLog($org, $phrase = null, $include = null, $after = null, $before = null, $order = null, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsGetAuditLog'][0])
+    public function orgsGetAllCustomProperties($org, string $contentType = self::contentTypes['orgsGetAllCustomProperties'][0])
     {
-        list($response) = $this->orgsGetAuditLogWithHttpInfo($org, $phrase, $include, $after, $before, $order, $per_page, $page, $contentType);
+        list($response) = $this->orgsGetAllCustomPropertiesWithHttpInfo($org, $contentType);
         return $response;
     }
 
     /**
-     * Operation orgsGetAuditLogWithHttpInfo
+     * Operation orgsGetAllCustomPropertiesWithHttpInfo
      *
-     * Get the audit log for an organization
+     * Get all custom properties for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $phrase A search phrase. For more information, see [Searching the audit log](https://docs.github.com/enterprise-server@3.12/github/setting-up-and-managing-organizations-and-teams/reviewing-the-audit-log-for-your-organization#searching-the-audit-log). (optional)
-     * @param  string $include The event types to include:  - &#x60;web&#x60; - returns web (non-Git) events. - &#x60;git&#x60; - returns Git events. - &#x60;all&#x60; - returns both web and Git events.  The default is &#x60;web&#x60;. (optional)
-     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for events after this cursor. (optional)
-     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for events before this cursor. (optional)
-     * @param  string $order The order of audit log events. To list newest events first, specify &#x60;desc&#x60;. To list oldest events first, specify &#x60;asc&#x60;.  The default is &#x60;desc&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetAuditLog'] to see the possible values for this operation
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetAllCustomProperties'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AuditLogEvent[], HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
      */
-    public function orgsGetAuditLogWithHttpInfo($org, $phrase = null, $include = null, $after = null, $before = null, $order = null, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsGetAuditLog'][0])
+    public function orgsGetAllCustomPropertiesWithHttpInfo($org, string $contentType = self::contentTypes['orgsGetAllCustomProperties'][0])
     {
-        $request = $this->orgsGetAuditLogRequest($org, $phrase, $include, $after, $before, $order, $per_page, $page, $contentType);
+        $request = $this->orgsGetAllCustomPropertiesRequest($org, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -4658,11 +6665,11 @@ class OrgsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AuditLogEvent[]' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AuditLogEvent[]' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -4680,13 +6687,67 @@ class OrgsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AuditLogEvent[]', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AuditLogEvent[]';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -4719,7 +6780,23 @@ class OrgsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AuditLogEvent[]',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -4730,26 +6807,19 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsGetAuditLogAsync
+     * Operation orgsGetAllCustomPropertiesAsync
      *
-     * Get the audit log for an organization
+     * Get all custom properties for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $phrase A search phrase. For more information, see [Searching the audit log](https://docs.github.com/enterprise-server@3.12/github/setting-up-and-managing-organizations-and-teams/reviewing-the-audit-log-for-your-organization#searching-the-audit-log). (optional)
-     * @param  string $include The event types to include:  - &#x60;web&#x60; - returns web (non-Git) events. - &#x60;git&#x60; - returns Git events. - &#x60;all&#x60; - returns both web and Git events.  The default is &#x60;web&#x60;. (optional)
-     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for events after this cursor. (optional)
-     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for events before this cursor. (optional)
-     * @param  string $order The order of audit log events. To list newest events first, specify &#x60;desc&#x60;. To list oldest events first, specify &#x60;asc&#x60;.  The default is &#x60;desc&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetAuditLog'] to see the possible values for this operation
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetAllCustomProperties'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function orgsGetAuditLogAsync($org, $phrase = null, $include = null, $after = null, $before = null, $order = null, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsGetAuditLog'][0])
+    public function orgsGetAllCustomPropertiesAsync($org, string $contentType = self::contentTypes['orgsGetAllCustomProperties'][0])
     {
-        return $this->orgsGetAuditLogAsyncWithHttpInfo($org, $phrase, $include, $after, $before, $order, $per_page, $page, $contentType)
+        return $this->orgsGetAllCustomPropertiesAsyncWithHttpInfo($org, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -4758,27 +6828,20 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsGetAuditLogAsyncWithHttpInfo
+     * Operation orgsGetAllCustomPropertiesAsyncWithHttpInfo
      *
-     * Get the audit log for an organization
+     * Get all custom properties for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $phrase A search phrase. For more information, see [Searching the audit log](https://docs.github.com/enterprise-server@3.12/github/setting-up-and-managing-organizations-and-teams/reviewing-the-audit-log-for-your-organization#searching-the-audit-log). (optional)
-     * @param  string $include The event types to include:  - &#x60;web&#x60; - returns web (non-Git) events. - &#x60;git&#x60; - returns Git events. - &#x60;all&#x60; - returns both web and Git events.  The default is &#x60;web&#x60;. (optional)
-     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for events after this cursor. (optional)
-     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for events before this cursor. (optional)
-     * @param  string $order The order of audit log events. To list newest events first, specify &#x60;desc&#x60;. To list oldest events first, specify &#x60;asc&#x60;.  The default is &#x60;desc&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetAuditLog'] to see the possible values for this operation
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetAllCustomProperties'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function orgsGetAuditLogAsyncWithHttpInfo($org, $phrase = null, $include = null, $after = null, $before = null, $order = null, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsGetAuditLog'][0])
+    public function orgsGetAllCustomPropertiesAsyncWithHttpInfo($org, string $contentType = self::contentTypes['orgsGetAllCustomProperties'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\AuditLogEvent[]';
-        $request = $this->orgsGetAuditLogRequest($org, $phrase, $include, $after, $before, $order, $per_page, $page, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty[]';
+        $request = $this->orgsGetAllCustomPropertiesRequest($org, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -4817,109 +6880,32 @@ class OrgsApi
     }
 
     /**
-     * Create request for operation 'orgsGetAuditLog'
+     * Create request for operation 'orgsGetAllCustomProperties'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $phrase A search phrase. For more information, see [Searching the audit log](https://docs.github.com/enterprise-server@3.12/github/setting-up-and-managing-organizations-and-teams/reviewing-the-audit-log-for-your-organization#searching-the-audit-log). (optional)
-     * @param  string $include The event types to include:  - &#x60;web&#x60; - returns web (non-Git) events. - &#x60;git&#x60; - returns Git events. - &#x60;all&#x60; - returns both web and Git events.  The default is &#x60;web&#x60;. (optional)
-     * @param  string $after A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for events after this cursor. (optional)
-     * @param  string $before A cursor, as given in the [Link header](https://docs.github.com/enterprise-server@3.12/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for events before this cursor. (optional)
-     * @param  string $order The order of audit log events. To list newest events first, specify &#x60;desc&#x60;. To list oldest events first, specify &#x60;asc&#x60;.  The default is &#x60;desc&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetAuditLog'] to see the possible values for this operation
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetAllCustomProperties'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function orgsGetAuditLogRequest($org, $phrase = null, $include = null, $after = null, $before = null, $order = null, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsGetAuditLog'][0])
+    public function orgsGetAllCustomPropertiesRequest($org, string $contentType = self::contentTypes['orgsGetAllCustomProperties'][0])
     {
 
         // verify the required parameter 'org' is set
         if ($org === null || (is_array($org) && count($org) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling orgsGetAuditLog'
+                'Missing the required parameter $org when calling orgsGetAllCustomProperties'
             );
         }
 
 
-
-
-
-
-
-
-
-        $resourcePath = '/orgs/{org}/audit-log';
+        $resourcePath = '/orgs/{org}/properties/schema';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
         $httpBody = '';
         $multipart = false;
 
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $phrase,
-            'phrase', // param base name
-            'string', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $include,
-            'include', // param base name
-            'string', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $after,
-            'after', // param base name
-            'string', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $before,
-            'before', // param base name
-            'string', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $order,
-            'order', // param base name
-            'string', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $per_page,
-            'per_page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $page,
-            'page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
 
 
         // path params
@@ -4986,40 +6972,40 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsGetCustomRepoRole
+     * Operation orgsGetCustomProperty
      *
-     * Get a custom repository role
+     * Get a custom property for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $role_id The unique identifier of the role. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetCustomRepoRole'] to see the possible values for this operation
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetCustomProperty'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
      */
-    public function orgsGetCustomRepoRole($org, $role_id, string $contentType = self::contentTypes['orgsGetCustomRepoRole'][0])
+    public function orgsGetCustomProperty($org, $custom_property_name, string $contentType = self::contentTypes['orgsGetCustomProperty'][0])
     {
-        list($response) = $this->orgsGetCustomRepoRoleWithHttpInfo($org, $role_id, $contentType);
+        list($response) = $this->orgsGetCustomPropertyWithHttpInfo($org, $custom_property_name, $contentType);
         return $response;
     }
 
     /**
-     * Operation orgsGetCustomRepoRoleWithHttpInfo
+     * Operation orgsGetCustomPropertyWithHttpInfo
      *
-     * Get a custom repository role
+     * Get a custom property for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $role_id The unique identifier of the role. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetCustomRepoRole'] to see the possible values for this operation
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetCustomProperty'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
      */
-    public function orgsGetCustomRepoRoleWithHttpInfo($org, $role_id, string $contentType = self::contentTypes['orgsGetCustomRepoRole'][0])
+    public function orgsGetCustomPropertyWithHttpInfo($org, $custom_property_name, string $contentType = self::contentTypes['orgsGetCustomProperty'][0])
     {
-        $request = $this->orgsGetCustomRepoRoleRequest($org, $role_id, $contentType);
+        $request = $this->orgsGetCustomPropertyRequest($org, $custom_property_name, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -5058,11 +7044,11 @@ class OrgsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -5080,7 +7066,34 @@ class OrgsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -5113,7 +7126,7 @@ class OrgsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -5146,7 +7159,15 @@ class OrgsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -5165,20 +7186,20 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsGetCustomRepoRoleAsync
+     * Operation orgsGetCustomPropertyAsync
      *
-     * Get a custom repository role
+     * Get a custom property for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $role_id The unique identifier of the role. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetCustomRepoRole'] to see the possible values for this operation
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetCustomProperty'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function orgsGetCustomRepoRoleAsync($org, $role_id, string $contentType = self::contentTypes['orgsGetCustomRepoRole'][0])
+    public function orgsGetCustomPropertyAsync($org, $custom_property_name, string $contentType = self::contentTypes['orgsGetCustomProperty'][0])
     {
-        return $this->orgsGetCustomRepoRoleAsyncWithHttpInfo($org, $role_id, $contentType)
+        return $this->orgsGetCustomPropertyAsyncWithHttpInfo($org, $custom_property_name, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -5187,21 +7208,21 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsGetCustomRepoRoleAsyncWithHttpInfo
+     * Operation orgsGetCustomPropertyAsyncWithHttpInfo
      *
-     * Get a custom repository role
+     * Get a custom property for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $role_id The unique identifier of the role. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetCustomRepoRole'] to see the possible values for this operation
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetCustomProperty'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function orgsGetCustomRepoRoleAsyncWithHttpInfo($org, $role_id, string $contentType = self::contentTypes['orgsGetCustomRepoRole'][0])
+    public function orgsGetCustomPropertyAsyncWithHttpInfo($org, $custom_property_name, string $contentType = self::contentTypes['orgsGetCustomProperty'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole';
-        $request = $this->orgsGetCustomRepoRoleRequest($org, $role_id, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgCustomProperty';
+        $request = $this->orgsGetCustomPropertyRequest($org, $custom_property_name, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -5240,34 +7261,34 @@ class OrgsApi
     }
 
     /**
-     * Create request for operation 'orgsGetCustomRepoRole'
+     * Create request for operation 'orgsGetCustomProperty'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $role_id The unique identifier of the role. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetCustomRepoRole'] to see the possible values for this operation
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetCustomProperty'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function orgsGetCustomRepoRoleRequest($org, $role_id, string $contentType = self::contentTypes['orgsGetCustomRepoRole'][0])
+    public function orgsGetCustomPropertyRequest($org, $custom_property_name, string $contentType = self::contentTypes['orgsGetCustomProperty'][0])
     {
 
         // verify the required parameter 'org' is set
         if ($org === null || (is_array($org) && count($org) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling orgsGetCustomRepoRole'
+                'Missing the required parameter $org when calling orgsGetCustomProperty'
             );
         }
 
-        // verify the required parameter 'role_id' is set
-        if ($role_id === null || (is_array($role_id) && count($role_id) === 0)) {
+        // verify the required parameter 'custom_property_name' is set
+        if ($custom_property_name === null || (is_array($custom_property_name) && count($custom_property_name) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $role_id when calling orgsGetCustomRepoRole'
+                'Missing the required parameter $custom_property_name when calling orgsGetCustomProperty'
             );
         }
 
 
-        $resourcePath = '/orgs/{org}/custom-repository-roles/{role_id}';
+        $resourcePath = '/orgs/{org}/properties/schema/{custom_property_name}';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
@@ -5285,10 +7306,10 @@ class OrgsApi
             );
         }
         // path params
-        if ($role_id !== null) {
+        if ($custom_property_name !== null) {
             $resourcePath = str_replace(
-                '{' . 'role_id' . '}',
-                ObjectSerializer::toPathValue($role_id),
+                '{' . 'custom_property_name' . '}',
+                ObjectSerializer::toPathValue($custom_property_name),
                 $resourcePath
             );
         }
@@ -6063,6 +8084,403 @@ class OrgsApi
             $resourcePath = str_replace(
                 '{' . 'username' . '}',
                 ObjectSerializer::toPathValue($username),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsGetOrgRole
+     *
+     * Get an organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetOrgRole'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError
+     */
+    public function orgsGetOrgRole($org, $role_id, string $contentType = self::contentTypes['orgsGetOrgRole'][0])
+    {
+        list($response) = $this->orgsGetOrgRoleWithHttpInfo($org, $role_id, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation orgsGetOrgRoleWithHttpInfo
+     *
+     * Get an organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetOrgRole'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsGetOrgRoleWithHttpInfo($org, $role_id, string $contentType = self::contentTypes['orgsGetOrgRole'][0])
+    {
+        $request = $this->orgsGetOrgRoleRequest($org, $role_id, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 422:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsGetOrgRoleAsync
+     *
+     * Get an organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetOrgRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsGetOrgRoleAsync($org, $role_id, string $contentType = self::contentTypes['orgsGetOrgRole'][0])
+    {
+        return $this->orgsGetOrgRoleAsyncWithHttpInfo($org, $role_id, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsGetOrgRoleAsyncWithHttpInfo
+     *
+     * Get an organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetOrgRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsGetOrgRoleAsyncWithHttpInfo($org, $role_id, string $contentType = self::contentTypes['orgsGetOrgRole'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole';
+        $request = $this->orgsGetOrgRoleRequest($org, $role_id, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsGetOrgRole'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsGetOrgRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsGetOrgRoleRequest($org, $role_id, string $contentType = self::contentTypes['orgsGetOrgRole'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsGetOrgRole'
+            );
+        }
+
+        // verify the required parameter 'role_id' is set
+        if ($role_id === null || (is_array($role_id) && count($role_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $role_id when calling orgsGetOrgRole'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/organization-roles/{role_id}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($role_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'role_id' . '}',
+                ObjectSerializer::toPathValue($role_id),
                 $resourcePath
             );
         }
@@ -7233,7 +9651,7 @@ class OrgsApi
      * List organizations
      *
      * @param  int $since An organization ID. Only return organizations with an ID greater than this ID. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsList'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -7252,7 +9670,7 @@ class OrgsApi
      * List organizations
      *
      * @param  int $since An organization ID. Only return organizations with an ID greater than this ID. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsList'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -7377,7 +9795,7 @@ class OrgsApi
      * List organizations
      *
      * @param  int $since An organization ID. Only return organizations with an ID greater than this ID. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsList'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7399,7 +9817,7 @@ class OrgsApi
      * List organizations
      *
      * @param  int $since An organization ID. Only return organizations with an ID greater than this ID. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsList'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7450,7 +9868,7 @@ class OrgsApi
      * Create request for operation 'orgsList'
      *
      * @param  int $since An organization ID. Only return organizations with an ID greater than this ID. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsList'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7550,8 +9968,8 @@ class OrgsApi
      * List app installations for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListAppInstallations'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -7570,8 +9988,8 @@ class OrgsApi
      * List app installations for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListAppInstallations'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -7696,8 +10114,8 @@ class OrgsApi
      * List app installations for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListAppInstallations'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7719,8 +10137,8 @@ class OrgsApi
      * List app installations for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListAppInstallations'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7771,8 +10189,8 @@ class OrgsApi
      * Create request for operation 'orgsListAppInstallations'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListAppInstallations'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -7882,38 +10300,42 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsListCustomRepoRoles
+     * Operation orgsListBlockedUsers
      *
-     * List custom repository roles in an organization
+     * List users blocked by an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomRepoRoles'] to see the possible values for this operation
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListBlockedUsers'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]
      */
-    public function orgsListCustomRepoRoles($org, string $contentType = self::contentTypes['orgsListCustomRepoRoles'][0])
+    public function orgsListBlockedUsers($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListBlockedUsers'][0])
     {
-        list($response) = $this->orgsListCustomRepoRolesWithHttpInfo($org, $contentType);
+        list($response) = $this->orgsListBlockedUsersWithHttpInfo($org, $per_page, $page, $contentType);
         return $response;
     }
 
     /**
-     * Operation orgsListCustomRepoRolesWithHttpInfo
+     * Operation orgsListBlockedUsersWithHttpInfo
      *
-     * List custom repository roles in an organization
+     * List users blocked by an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomRepoRoles'] to see the possible values for this operation
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListBlockedUsers'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[], HTTP status code, HTTP response headers (array of strings)
      */
-    public function orgsListCustomRepoRolesWithHttpInfo($org, string $contentType = self::contentTypes['orgsListCustomRepoRoles'][0])
+    public function orgsListBlockedUsersWithHttpInfo($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListBlockedUsers'][0])
     {
-        $request = $this->orgsListCustomRepoRolesRequest($org, $contentType);
+        $request = $this->orgsListBlockedUsersRequest($org, $per_page, $page, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -7952,11 +10374,11 @@ class OrgsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -7974,13 +10396,13 @@ class OrgsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -8013,7 +10435,7 @@ class OrgsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -8024,19 +10446,21 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsListCustomRepoRolesAsync
+     * Operation orgsListBlockedUsersAsync
      *
-     * List custom repository roles in an organization
+     * List users blocked by an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomRepoRoles'] to see the possible values for this operation
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListBlockedUsers'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function orgsListCustomRepoRolesAsync($org, string $contentType = self::contentTypes['orgsListCustomRepoRoles'][0])
+    public function orgsListBlockedUsersAsync($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListBlockedUsers'][0])
     {
-        return $this->orgsListCustomRepoRolesAsyncWithHttpInfo($org, $contentType)
+        return $this->orgsListBlockedUsersAsyncWithHttpInfo($org, $per_page, $page, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -8045,20 +10469,22 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsListCustomRepoRolesAsyncWithHttpInfo
+     * Operation orgsListBlockedUsersAsyncWithHttpInfo
      *
-     * List custom repository roles in an organization
+     * List users blocked by an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomRepoRoles'] to see the possible values for this operation
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListBlockedUsers'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function orgsListCustomRepoRolesAsyncWithHttpInfo($org, string $contentType = self::contentTypes['orgsListCustomRepoRoles'][0])
+    public function orgsListBlockedUsersAsyncWithHttpInfo($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListBlockedUsers'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response';
-        $request = $this->orgsListCustomRepoRolesRequest($org, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]';
+        $request = $this->orgsListBlockedUsersRequest($org, $per_page, $page, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -8097,32 +10523,54 @@ class OrgsApi
     }
 
     /**
-     * Create request for operation 'orgsListCustomRepoRoles'
+     * Create request for operation 'orgsListBlockedUsers'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomRepoRoles'] to see the possible values for this operation
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListBlockedUsers'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function orgsListCustomRepoRolesRequest($org, string $contentType = self::contentTypes['orgsListCustomRepoRoles'][0])
+    public function orgsListBlockedUsersRequest($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListBlockedUsers'][0])
     {
 
         // verify the required parameter 'org' is set
         if ($org === null || (is_array($org) && count($org) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling orgsListCustomRepoRoles'
+                'Missing the required parameter $org when calling orgsListBlockedUsers'
             );
         }
 
 
-        $resourcePath = '/orgs/{org}/custom-repository-roles';
+
+
+        $resourcePath = '/orgs/{org}/blocks';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
         $httpBody = '';
         $multipart = false;
 
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $per_page,
+            'per_page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $page,
+            'page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
 
 
         // path params
@@ -8189,40 +10637,44 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsListCustomRoles
+     * Operation orgsListCustomPropertiesValuesForRepos
      *
-     * Deprecated - List custom repository roles in an organization
+     * List custom property values for organization repositories
      *
-     * @param  string $organization_id The unique identifier of the organization. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomRoles'] to see the possible values for this operation
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $repository_query Finds repositories in the organization with a query containing one or more search keywords and qualifiers. Qualifiers allow you to limit your search to specific areas of GitHub. The REST API supports the same qualifiers as the web interface for GitHub. To learn more about the format of the query, see [Constructing a search query](https://docs.github.com/rest/search/search#constructing-a-search-query). See \&quot;[Searching for repositories](https://docs.github.com/articles/searching-for-repositories/)\&quot; for a detailed list of qualifiers. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomPropertiesValuesForRepos'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response
-     * @deprecated
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgRepoCustomPropertyValues[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
      */
-    public function orgsListCustomRoles($organization_id, string $contentType = self::contentTypes['orgsListCustomRoles'][0])
+    public function orgsListCustomPropertiesValuesForRepos($org, $per_page = 30, $page = 1, $repository_query = null, string $contentType = self::contentTypes['orgsListCustomPropertiesValuesForRepos'][0])
     {
-        list($response) = $this->orgsListCustomRolesWithHttpInfo($organization_id, $contentType);
+        list($response) = $this->orgsListCustomPropertiesValuesForReposWithHttpInfo($org, $per_page, $page, $repository_query, $contentType);
         return $response;
     }
 
     /**
-     * Operation orgsListCustomRolesWithHttpInfo
+     * Operation orgsListCustomPropertiesValuesForReposWithHttpInfo
      *
-     * Deprecated - List custom repository roles in an organization
+     * List custom property values for organization repositories
      *
-     * @param  string $organization_id The unique identifier of the organization. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomRoles'] to see the possible values for this operation
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $repository_query Finds repositories in the organization with a query containing one or more search keywords and qualifiers. Qualifiers allow you to limit your search to specific areas of GitHub. The REST API supports the same qualifiers as the web interface for GitHub. To learn more about the format of the query, see [Constructing a search query](https://docs.github.com/rest/search/search#constructing-a-search-query). See \&quot;[Searching for repositories](https://docs.github.com/articles/searching-for-repositories/)\&quot; for a detailed list of qualifiers. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomPropertiesValuesForRepos'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response, HTTP status code, HTTP response headers (array of strings)
-     * @deprecated
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgRepoCustomPropertyValues[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
      */
-    public function orgsListCustomRolesWithHttpInfo($organization_id, string $contentType = self::contentTypes['orgsListCustomRoles'][0])
+    public function orgsListCustomPropertiesValuesForReposWithHttpInfo($org, $per_page = 30, $page = 1, $repository_query = null, string $contentType = self::contentTypes['orgsListCustomPropertiesValuesForRepos'][0])
     {
-        $request = $this->orgsListCustomRolesRequest($organization_id, $contentType);
+        $request = $this->orgsListCustomPropertiesValuesForReposRequest($org, $per_page, $page, $repository_query, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -8261,11 +10713,11 @@ class OrgsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgRepoCustomPropertyValues[]' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgRepoCustomPropertyValues[]' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -8283,13 +10735,67 @@ class OrgsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgRepoCustomPropertyValues[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgRepoCustomPropertyValues[]';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -8322,7 +10828,23 @@ class OrgsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgRepoCustomPropertyValues[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -8333,20 +10855,22 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsListCustomRolesAsync
+     * Operation orgsListCustomPropertiesValuesForReposAsync
      *
-     * Deprecated - List custom repository roles in an organization
+     * List custom property values for organization repositories
      *
-     * @param  string $organization_id The unique identifier of the organization. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomRoles'] to see the possible values for this operation
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $repository_query Finds repositories in the organization with a query containing one or more search keywords and qualifiers. Qualifiers allow you to limit your search to specific areas of GitHub. The REST API supports the same qualifiers as the web interface for GitHub. To learn more about the format of the query, see [Constructing a search query](https://docs.github.com/rest/search/search#constructing-a-search-query). See \&quot;[Searching for repositories](https://docs.github.com/articles/searching-for-repositories/)\&quot; for a detailed list of qualifiers. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomPropertiesValuesForRepos'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
-     * @deprecated
      */
-    public function orgsListCustomRolesAsync($organization_id, string $contentType = self::contentTypes['orgsListCustomRoles'][0])
+    public function orgsListCustomPropertiesValuesForReposAsync($org, $per_page = 30, $page = 1, $repository_query = null, string $contentType = self::contentTypes['orgsListCustomPropertiesValuesForRepos'][0])
     {
-        return $this->orgsListCustomRolesAsyncWithHttpInfo($organization_id, $contentType)
+        return $this->orgsListCustomPropertiesValuesForReposAsyncWithHttpInfo($org, $per_page, $page, $repository_query, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -8355,21 +10879,23 @@ class OrgsApi
     }
 
     /**
-     * Operation orgsListCustomRolesAsyncWithHttpInfo
+     * Operation orgsListCustomPropertiesValuesForReposAsyncWithHttpInfo
      *
-     * Deprecated - List custom repository roles in an organization
+     * List custom property values for organization repositories
      *
-     * @param  string $organization_id The unique identifier of the organization. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomRoles'] to see the possible values for this operation
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $repository_query Finds repositories in the organization with a query containing one or more search keywords and qualifiers. Qualifiers allow you to limit your search to specific areas of GitHub. The REST API supports the same qualifiers as the web interface for GitHub. To learn more about the format of the query, see [Constructing a search query](https://docs.github.com/rest/search/search#constructing-a-search-query). See \&quot;[Searching for repositories](https://docs.github.com/articles/searching-for-repositories/)\&quot; for a detailed list of qualifiers. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomPropertiesValuesForRepos'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
-     * @deprecated
      */
-    public function orgsListCustomRolesAsyncWithHttpInfo($organization_id, string $contentType = self::contentTypes['orgsListCustomRoles'][0])
+    public function orgsListCustomPropertiesValuesForReposAsyncWithHttpInfo($org, $per_page = 30, $page = 1, $repository_query = null, string $contentType = self::contentTypes['orgsListCustomPropertiesValuesForRepos'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListCustomRoles200Response';
-        $request = $this->orgsListCustomRolesRequest($organization_id, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgRepoCustomPropertyValues[]';
+        $request = $this->orgsListCustomPropertiesValuesForReposRequest($org, $per_page, $page, $repository_query, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -8408,40 +10934,444 @@ class OrgsApi
     }
 
     /**
-     * Create request for operation 'orgsListCustomRoles'
+     * Create request for operation 'orgsListCustomPropertiesValuesForRepos'
      *
-     * @param  string $organization_id The unique identifier of the organization. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomRoles'] to see the possible values for this operation
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $repository_query Finds repositories in the organization with a query containing one or more search keywords and qualifiers. Qualifiers allow you to limit your search to specific areas of GitHub. The REST API supports the same qualifiers as the web interface for GitHub. To learn more about the format of the query, see [Constructing a search query](https://docs.github.com/rest/search/search#constructing-a-search-query). See \&quot;[Searching for repositories](https://docs.github.com/articles/searching-for-repositories/)\&quot; for a detailed list of qualifiers. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListCustomPropertiesValuesForRepos'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
-     * @deprecated
      */
-    public function orgsListCustomRolesRequest($organization_id, string $contentType = self::contentTypes['orgsListCustomRoles'][0])
+    public function orgsListCustomPropertiesValuesForReposRequest($org, $per_page = 30, $page = 1, $repository_query = null, string $contentType = self::contentTypes['orgsListCustomPropertiesValuesForRepos'][0])
     {
 
-        // verify the required parameter 'organization_id' is set
-        if ($organization_id === null || (is_array($organization_id) && count($organization_id) === 0)) {
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $organization_id when calling orgsListCustomRoles'
+                'Missing the required parameter $org when calling orgsListCustomPropertiesValuesForRepos'
             );
         }
 
 
-        $resourcePath = '/organizations/{organization_id}/custom_roles';
+
+
+
+        $resourcePath = '/orgs/{org}/properties/values';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
         $httpBody = '';
         $multipart = false;
 
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $per_page,
+            'per_page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $page,
+            'page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $repository_query,
+            'repository_query', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
 
 
         // path params
-        if ($organization_id !== null) {
+        if ($org !== null) {
             $resourcePath = str_replace(
-                '{' . 'organization_id' . '}',
-                ObjectSerializer::toPathValue($organization_id),
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsListFailedInvitations
+     *
+     * List failed organization invitations
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListFailedInvitations'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     */
+    public function orgsListFailedInvitations($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListFailedInvitations'][0])
+    {
+        list($response) = $this->orgsListFailedInvitationsWithHttpInfo($org, $per_page, $page, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation orgsListFailedInvitationsWithHttpInfo
+     *
+     * List failed organization invitations
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListFailedInvitations'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsListFailedInvitationsWithHttpInfo($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListFailedInvitations'][0])
+    {
+        $request = $this->orgsListFailedInvitationsRequest($org, $per_page, $page, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsListFailedInvitationsAsync
+     *
+     * List failed organization invitations
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListFailedInvitations'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListFailedInvitationsAsync($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListFailedInvitations'][0])
+    {
+        return $this->orgsListFailedInvitationsAsyncWithHttpInfo($org, $per_page, $page, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsListFailedInvitationsAsyncWithHttpInfo
+     *
+     * List failed organization invitations
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListFailedInvitations'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListFailedInvitationsAsyncWithHttpInfo($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListFailedInvitations'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]';
+        $request = $this->orgsListFailedInvitationsRequest($org, $per_page, $page, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsListFailedInvitations'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListFailedInvitations'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsListFailedInvitationsRequest($org, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListFailedInvitations'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsListFailedInvitations'
+            );
+        }
+
+
+
+
+        $resourcePath = '/orgs/{org}/failed_invitations';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $per_page,
+            'per_page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $page,
+            'page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
                 $resourcePath
             );
         }
@@ -8505,8 +11435,8 @@ class OrgsApi
      *
      * List organizations for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -8524,8 +11454,8 @@ class OrgsApi
      *
      * List organizations for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -8719,8 +11649,8 @@ class OrgsApi
      *
      * List organizations for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -8741,8 +11671,8 @@ class OrgsApi
      *
      * List organizations for the authenticated user
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -8792,8 +11722,8 @@ class OrgsApi
     /**
      * Create request for operation 'orgsListForAuthenticatedUser'
      *
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -8893,8 +11823,8 @@ class OrgsApi
      * List organizations for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -8913,8 +11843,8 @@ class OrgsApi
      * List organizations for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListForUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -9039,8 +11969,8 @@ class OrgsApi
      * List organizations for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9062,8 +11992,8 @@ class OrgsApi
      * List organizations for a user
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9114,8 +12044,8 @@ class OrgsApi
      * Create request for operation 'orgsListForUser'
      *
      * @param  string $username The handle for the GitHub user account. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListForUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9225,6 +12155,398 @@ class OrgsApi
     }
 
     /**
+     * Operation orgsListInvitationTeams
+     *
+     * List organization invitation teams
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $invitation_id The unique identifier of the invitation. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListInvitationTeams'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     */
+    public function orgsListInvitationTeams($org, $invitation_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListInvitationTeams'][0])
+    {
+        list($response) = $this->orgsListInvitationTeamsWithHttpInfo($org, $invitation_id, $per_page, $page, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation orgsListInvitationTeamsWithHttpInfo
+     *
+     * List organization invitation teams
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $invitation_id The unique identifier of the invitation. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListInvitationTeams'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsListInvitationTeamsWithHttpInfo($org, $invitation_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListInvitationTeams'][0])
+    {
+        $request = $this->orgsListInvitationTeamsRequest($org, $invitation_id, $per_page, $page, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsListInvitationTeamsAsync
+     *
+     * List organization invitation teams
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $invitation_id The unique identifier of the invitation. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListInvitationTeams'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListInvitationTeamsAsync($org, $invitation_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListInvitationTeams'][0])
+    {
+        return $this->orgsListInvitationTeamsAsyncWithHttpInfo($org, $invitation_id, $per_page, $page, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsListInvitationTeamsAsyncWithHttpInfo
+     *
+     * List organization invitation teams
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $invitation_id The unique identifier of the invitation. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListInvitationTeams'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListInvitationTeamsAsyncWithHttpInfo($org, $invitation_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListInvitationTeams'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]';
+        $request = $this->orgsListInvitationTeamsRequest($org, $invitation_id, $per_page, $page, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsListInvitationTeams'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $invitation_id The unique identifier of the invitation. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListInvitationTeams'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsListInvitationTeamsRequest($org, $invitation_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListInvitationTeams'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsListInvitationTeams'
+            );
+        }
+
+        // verify the required parameter 'invitation_id' is set
+        if ($invitation_id === null || (is_array($invitation_id) && count($invitation_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $invitation_id when calling orgsListInvitationTeams'
+            );
+        }
+
+
+
+
+        $resourcePath = '/orgs/{org}/invitations/{invitation_id}/teams';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $per_page,
+            'per_page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $page,
+            'page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($invitation_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'invitation_id' . '}',
+                ObjectSerializer::toPathValue($invitation_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
      * Operation orgsListMembers
      *
      * List organization members
@@ -9232,8 +12554,8 @@ class OrgsApi
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $filter Filter members returned in the list. &#x60;2fa_disabled&#x60; means that only members without [two-factor authentication](https://github.com/blog/1614-two-factor-authentication) enabled will be returned. This options is only available for organization owners. (optional, default to 'all')
      * @param  string $role Filter members returned by their role. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListMembers'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -9254,8 +12576,8 @@ class OrgsApi
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $filter Filter members returned in the list. &#x60;2fa_disabled&#x60; means that only members without [two-factor authentication](https://github.com/blog/1614-two-factor-authentication) enabled will be returned. This options is only available for organization owners. (optional, default to 'all')
      * @param  string $role Filter members returned by their role. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListMembers'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -9417,8 +12739,8 @@ class OrgsApi
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $filter Filter members returned in the list. &#x60;2fa_disabled&#x60; means that only members without [two-factor authentication](https://github.com/blog/1614-two-factor-authentication) enabled will be returned. This options is only available for organization owners. (optional, default to 'all')
      * @param  string $role Filter members returned by their role. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListMembers'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9442,8 +12764,8 @@ class OrgsApi
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $filter Filter members returned in the list. &#x60;2fa_disabled&#x60; means that only members without [two-factor authentication](https://github.com/blog/1614-two-factor-authentication) enabled will be returned. This options is only available for organization owners. (optional, default to 'all')
      * @param  string $role Filter members returned by their role. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListMembers'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9496,8 +12818,8 @@ class OrgsApi
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $filter Filter members returned in the list. &#x60;2fa_disabled&#x60; means that only members without [two-factor authentication](https://github.com/blog/1614-two-factor-authentication) enabled will be returned. This options is only available for organization owners. (optional, default to 'all')
      * @param  string $role Filter members returned by their role. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListMembers'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9632,8 +12954,8 @@ class OrgsApi
      * List organization memberships for the authenticated user
      *
      * @param  string $state Indicates the state of the memberships to return. If not specified, the API returns both active and pending memberships. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListMembershipsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -9652,8 +12974,8 @@ class OrgsApi
      * List organization memberships for the authenticated user
      *
      * @param  string $state Indicates the state of the memberships to return. If not specified, the API returns both active and pending memberships. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListMembershipsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -9883,8 +13205,8 @@ class OrgsApi
      * List organization memberships for the authenticated user
      *
      * @param  string $state Indicates the state of the memberships to return. If not specified, the API returns both active and pending memberships. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListMembershipsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9906,8 +13228,8 @@ class OrgsApi
      * List organization memberships for the authenticated user
      *
      * @param  string $state Indicates the state of the memberships to return. If not specified, the API returns both active and pending memberships. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListMembershipsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -9958,8 +13280,8 @@ class OrgsApi
      * Create request for operation 'orgsListMembershipsForAuthenticatedUser'
      *
      * @param  string $state Indicates the state of the memberships to return. If not specified, the API returns both active and pending memberships. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListMembershipsForAuthenticatedUser'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10064,14 +13386,1482 @@ class OrgsApi
     }
 
     /**
+     * Operation orgsListOrgRoleTeams
+     *
+     * List teams that are assigned to an organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoleTeams'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]
+     */
+    public function orgsListOrgRoleTeams($org, $role_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListOrgRoleTeams'][0])
+    {
+        list($response) = $this->orgsListOrgRoleTeamsWithHttpInfo($org, $role_id, $per_page, $page, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation orgsListOrgRoleTeamsWithHttpInfo
+     *
+     * List teams that are assigned to an organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoleTeams'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[], HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsListOrgRoleTeamsWithHttpInfo($org, $role_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListOrgRoleTeams'][0])
+    {
+        $request = $this->orgsListOrgRoleTeamsRequest($org, $role_id, $per_page, $page, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsListOrgRoleTeamsAsync
+     *
+     * List teams that are assigned to an organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoleTeams'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListOrgRoleTeamsAsync($org, $role_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListOrgRoleTeams'][0])
+    {
+        return $this->orgsListOrgRoleTeamsAsyncWithHttpInfo($org, $role_id, $per_page, $page, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsListOrgRoleTeamsAsyncWithHttpInfo
+     *
+     * List teams that are assigned to an organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoleTeams'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListOrgRoleTeamsAsyncWithHttpInfo($org, $role_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListOrgRoleTeams'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]';
+        $request = $this->orgsListOrgRoleTeamsRequest($org, $role_id, $per_page, $page, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsListOrgRoleTeams'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoleTeams'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsListOrgRoleTeamsRequest($org, $role_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListOrgRoleTeams'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsListOrgRoleTeams'
+            );
+        }
+
+        // verify the required parameter 'role_id' is set
+        if ($role_id === null || (is_array($role_id) && count($role_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $role_id when calling orgsListOrgRoleTeams'
+            );
+        }
+
+
+
+
+        $resourcePath = '/orgs/{org}/organization-roles/{role_id}/teams';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $per_page,
+            'per_page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $page,
+            'page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($role_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'role_id' . '}',
+                ObjectSerializer::toPathValue($role_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsListOrgRoleUsers
+     *
+     * List users that are assigned to an organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoleUsers'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]
+     */
+    public function orgsListOrgRoleUsers($org, $role_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListOrgRoleUsers'][0])
+    {
+        list($response) = $this->orgsListOrgRoleUsersWithHttpInfo($org, $role_id, $per_page, $page, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation orgsListOrgRoleUsersWithHttpInfo
+     *
+     * List users that are assigned to an organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoleUsers'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[], HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsListOrgRoleUsersWithHttpInfo($org, $role_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListOrgRoleUsers'][0])
+    {
+        $request = $this->orgsListOrgRoleUsersRequest($org, $role_id, $per_page, $page, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsListOrgRoleUsersAsync
+     *
+     * List users that are assigned to an organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoleUsers'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListOrgRoleUsersAsync($org, $role_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListOrgRoleUsers'][0])
+    {
+        return $this->orgsListOrgRoleUsersAsyncWithHttpInfo($org, $role_id, $per_page, $page, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsListOrgRoleUsersAsyncWithHttpInfo
+     *
+     * List users that are assigned to an organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoleUsers'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListOrgRoleUsersAsyncWithHttpInfo($org, $role_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListOrgRoleUsers'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUser[]';
+        $request = $this->orgsListOrgRoleUsersRequest($org, $role_id, $per_page, $page, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsListOrgRoleUsers'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoleUsers'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsListOrgRoleUsersRequest($org, $role_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['orgsListOrgRoleUsers'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsListOrgRoleUsers'
+            );
+        }
+
+        // verify the required parameter 'role_id' is set
+        if ($role_id === null || (is_array($role_id) && count($role_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $role_id when calling orgsListOrgRoleUsers'
+            );
+        }
+
+
+
+
+        $resourcePath = '/orgs/{org}/organization-roles/{role_id}/users';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $per_page,
+            'per_page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $page,
+            'page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($role_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'role_id' . '}',
+                ObjectSerializer::toPathValue($role_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsListOrgRoles
+     *
+     * Get all organization roles for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoles'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListOrgRoles200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError
+     */
+    public function orgsListOrgRoles($org, string $contentType = self::contentTypes['orgsListOrgRoles'][0])
+    {
+        list($response) = $this->orgsListOrgRolesWithHttpInfo($org, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation orgsListOrgRolesWithHttpInfo
+     *
+     * Get all organization roles for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoles'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListOrgRoles200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsListOrgRolesWithHttpInfo($org, string $contentType = self::contentTypes['orgsListOrgRoles'][0])
+    {
+        $request = $this->orgsListOrgRolesRequest($org, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListOrgRoles200Response' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListOrgRoles200Response' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListOrgRoles200Response', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 422:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListOrgRoles200Response';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListOrgRoles200Response',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsListOrgRolesAsync
+     *
+     * Get all organization roles for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoles'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListOrgRolesAsync($org, string $contentType = self::contentTypes['orgsListOrgRoles'][0])
+    {
+        return $this->orgsListOrgRolesAsyncWithHttpInfo($org, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsListOrgRolesAsyncWithHttpInfo
+     *
+     * Get all organization roles for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoles'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListOrgRolesAsyncWithHttpInfo($org, string $contentType = self::contentTypes['orgsListOrgRoles'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsListOrgRoles200Response';
+        $request = $this->orgsListOrgRolesRequest($org, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsListOrgRoles'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrgRoles'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsListOrgRolesRequest($org, string $contentType = self::contentTypes['orgsListOrgRoles'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsListOrgRoles'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/organization-roles';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsListOrganizationFineGrainedPermissions
+     *
+     * List organization fine-grained permissions for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrganizationFineGrainedPermissions'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationFineGrainedPermission[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError
+     */
+    public function orgsListOrganizationFineGrainedPermissions($org, string $contentType = self::contentTypes['orgsListOrganizationFineGrainedPermissions'][0])
+    {
+        list($response) = $this->orgsListOrganizationFineGrainedPermissionsWithHttpInfo($org, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation orgsListOrganizationFineGrainedPermissionsWithHttpInfo
+     *
+     * List organization fine-grained permissions for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrganizationFineGrainedPermissions'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationFineGrainedPermission[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsListOrganizationFineGrainedPermissionsWithHttpInfo($org, string $contentType = self::contentTypes['orgsListOrganizationFineGrainedPermissions'][0])
+    {
+        $request = $this->orgsListOrganizationFineGrainedPermissionsRequest($org, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationFineGrainedPermission[]' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationFineGrainedPermission[]' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationFineGrainedPermission[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 422:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationFineGrainedPermission[]';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationFineGrainedPermission[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsListOrganizationFineGrainedPermissionsAsync
+     *
+     * List organization fine-grained permissions for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrganizationFineGrainedPermissions'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListOrganizationFineGrainedPermissionsAsync($org, string $contentType = self::contentTypes['orgsListOrganizationFineGrainedPermissions'][0])
+    {
+        return $this->orgsListOrganizationFineGrainedPermissionsAsyncWithHttpInfo($org, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsListOrganizationFineGrainedPermissionsAsyncWithHttpInfo
+     *
+     * List organization fine-grained permissions for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrganizationFineGrainedPermissions'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListOrganizationFineGrainedPermissionsAsyncWithHttpInfo($org, string $contentType = self::contentTypes['orgsListOrganizationFineGrainedPermissions'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationFineGrainedPermission[]';
+        $request = $this->orgsListOrganizationFineGrainedPermissionsRequest($org, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsListOrganizationFineGrainedPermissions'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOrganizationFineGrainedPermissions'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsListOrganizationFineGrainedPermissionsRequest($org, string $contentType = self::contentTypes['orgsListOrganizationFineGrainedPermissions'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsListOrganizationFineGrainedPermissions'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/organization-fine-grained-permissions';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
      * Operation orgsListOutsideCollaborators
      *
      * List outside collaborators for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $filter Filter the list of outside collaborators. &#x60;2fa_disabled&#x60; means that only outside collaborators without [two-factor authentication](https://github.com/blog/1614-two-factor-authentication) enabled will be returned. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOutsideCollaborators'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -10091,8 +14881,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $filter Filter the list of outside collaborators. &#x60;2fa_disabled&#x60; means that only outside collaborators without [two-factor authentication](https://github.com/blog/1614-two-factor-authentication) enabled will be returned. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOutsideCollaborators'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -10218,8 +15008,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $filter Filter the list of outside collaborators. &#x60;2fa_disabled&#x60; means that only outside collaborators without [two-factor authentication](https://github.com/blog/1614-two-factor-authentication) enabled will be returned. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOutsideCollaborators'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10242,8 +15032,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $filter Filter the list of outside collaborators. &#x60;2fa_disabled&#x60; means that only outside collaborators without [two-factor authentication](https://github.com/blog/1614-two-factor-authentication) enabled will be returned. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOutsideCollaborators'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10295,8 +15085,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $filter Filter the list of outside collaborators. &#x60;2fa_disabled&#x60; means that only outside collaborators without [two-factor authentication](https://github.com/blog/1614-two-factor-authentication) enabled will be returned. (optional, default to 'all')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListOutsideCollaborators'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10422,8 +15212,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $pat_id Unique identifier of the fine-grained personal access token. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPatGrantRepositories'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -10443,8 +15233,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $pat_id Unique identifier of the fine-grained personal access token. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPatGrantRepositories'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -10675,8 +15465,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $pat_id Unique identifier of the fine-grained personal access token. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPatGrantRepositories'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10699,8 +15489,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $pat_id Unique identifier of the fine-grained personal access token. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPatGrantRepositories'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10752,8 +15542,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $pat_id Unique identifier of the fine-grained personal access token. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPatGrantRepositories'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -10884,8 +15674,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $pat_request_id Unique identifier of the request for access via fine-grained personal access token. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPatGrantRequestRepositories'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -10905,8 +15695,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $pat_request_id Unique identifier of the request for access via fine-grained personal access token. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPatGrantRequestRepositories'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -11137,8 +15927,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $pat_request_id Unique identifier of the request for access via fine-grained personal access token. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPatGrantRequestRepositories'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -11161,8 +15951,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $pat_request_id Unique identifier of the request for access via fine-grained personal access token. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPatGrantRequestRepositories'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -11214,8 +16004,8 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $pat_request_id Unique identifier of the request for access via fine-grained personal access token. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPatGrantRequestRepositories'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -11345,8 +16135,8 @@ class OrgsApi
      * List requests to access organization resources with fine-grained personal access tokens
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $sort The property by which to sort the results. (optional, default to 'created_at')
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
      * @param  string[] $owner A list of owner usernames to use to filter the results. (optional)
@@ -11372,8 +16162,8 @@ class OrgsApi
      * List requests to access organization resources with fine-grained personal access tokens
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $sort The property by which to sort the results. (optional, default to 'created_at')
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
      * @param  string[] $owner A list of owner usernames to use to filter the results. (optional)
@@ -11645,8 +16435,8 @@ class OrgsApi
      * List requests to access organization resources with fine-grained personal access tokens
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $sort The property by which to sort the results. (optional, default to 'created_at')
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
      * @param  string[] $owner A list of owner usernames to use to filter the results. (optional)
@@ -11675,8 +16465,8 @@ class OrgsApi
      * List requests to access organization resources with fine-grained personal access tokens
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $sort The property by which to sort the results. (optional, default to 'created_at')
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
      * @param  string[] $owner A list of owner usernames to use to filter the results. (optional)
@@ -11734,8 +16524,8 @@ class OrgsApi
      * Create request for operation 'orgsListPatGrantRequests'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $sort The property by which to sort the results. (optional, default to 'created_at')
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
      * @param  string[] $owner A list of owner usernames to use to filter the results. (optional)
@@ -11930,8 +16720,8 @@ class OrgsApi
      * List fine-grained personal access tokens with access to organization resources
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $sort The property by which to sort the results. (optional, default to 'created_at')
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
      * @param  string[] $owner A list of owner usernames to use to filter the results. (optional)
@@ -11957,8 +16747,8 @@ class OrgsApi
      * List fine-grained personal access tokens with access to organization resources
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $sort The property by which to sort the results. (optional, default to 'created_at')
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
      * @param  string[] $owner A list of owner usernames to use to filter the results. (optional)
@@ -12230,8 +17020,8 @@ class OrgsApi
      * List fine-grained personal access tokens with access to organization resources
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $sort The property by which to sort the results. (optional, default to 'created_at')
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
      * @param  string[] $owner A list of owner usernames to use to filter the results. (optional)
@@ -12260,8 +17050,8 @@ class OrgsApi
      * List fine-grained personal access tokens with access to organization resources
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $sort The property by which to sort the results. (optional, default to 'created_at')
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
      * @param  string[] $owner A list of owner usernames to use to filter the results. (optional)
@@ -12319,8 +17109,8 @@ class OrgsApi
      * Create request for operation 'orgsListPatGrants'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $sort The property by which to sort the results. (optional, default to 'created_at')
      * @param  string $direction The direction to sort the results by. (optional, default to 'desc')
      * @param  string[] $owner A list of owner usernames to use to filter the results. (optional)
@@ -12510,13 +17300,415 @@ class OrgsApi
     }
 
     /**
+     * Operation orgsListPendingInvitations
+     *
+     * List pending organization invitations
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $role Filter invitations by their member role. (optional, default to 'all')
+     * @param  string $invitation_source Filter invitations by their invitation source. (optional, default to 'all')
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPendingInvitations'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     */
+    public function orgsListPendingInvitations($org, $per_page = 30, $page = 1, $role = 'all', $invitation_source = 'all', string $contentType = self::contentTypes['orgsListPendingInvitations'][0])
+    {
+        list($response) = $this->orgsListPendingInvitationsWithHttpInfo($org, $per_page, $page, $role, $invitation_source, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation orgsListPendingInvitationsWithHttpInfo
+     *
+     * List pending organization invitations
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $role Filter invitations by their member role. (optional, default to 'all')
+     * @param  string $invitation_source Filter invitations by their invitation source. (optional, default to 'all')
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPendingInvitations'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsListPendingInvitationsWithHttpInfo($org, $per_page = 30, $page = 1, $role = 'all', $invitation_source = 'all', string $contentType = self::contentTypes['orgsListPendingInvitations'][0])
+    {
+        $request = $this->orgsListPendingInvitationsRequest($org, $per_page, $page, $role, $invitation_source, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsListPendingInvitationsAsync
+     *
+     * List pending organization invitations
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $role Filter invitations by their member role. (optional, default to 'all')
+     * @param  string $invitation_source Filter invitations by their invitation source. (optional, default to 'all')
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPendingInvitations'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListPendingInvitationsAsync($org, $per_page = 30, $page = 1, $role = 'all', $invitation_source = 'all', string $contentType = self::contentTypes['orgsListPendingInvitations'][0])
+    {
+        return $this->orgsListPendingInvitationsAsyncWithHttpInfo($org, $per_page, $page, $role, $invitation_source, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsListPendingInvitationsAsyncWithHttpInfo
+     *
+     * List pending organization invitations
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $role Filter invitations by their member role. (optional, default to 'all')
+     * @param  string $invitation_source Filter invitations by their invitation source. (optional, default to 'all')
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPendingInvitations'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsListPendingInvitationsAsyncWithHttpInfo($org, $per_page = 30, $page = 1, $role = 'all', $invitation_source = 'all', string $contentType = self::contentTypes['orgsListPendingInvitations'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationInvitation[]';
+        $request = $this->orgsListPendingInvitationsRequest($org, $per_page, $page, $role, $invitation_source, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsListPendingInvitations'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  string $role Filter invitations by their member role. (optional, default to 'all')
+     * @param  string $invitation_source Filter invitations by their invitation source. (optional, default to 'all')
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPendingInvitations'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsListPendingInvitationsRequest($org, $per_page = 30, $page = 1, $role = 'all', $invitation_source = 'all', string $contentType = self::contentTypes['orgsListPendingInvitations'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsListPendingInvitations'
+            );
+        }
+
+
+
+
+
+
+        $resourcePath = '/orgs/{org}/invitations';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $per_page,
+            'per_page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $page,
+            'page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $role,
+            'role', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $invitation_source,
+            'invitation_source', // param base name
+            'string', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
      * Operation orgsListPublicMembers
      *
      * List public organization members
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPublicMembers'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -12535,8 +17727,8 @@ class OrgsApi
      * List public organization members
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPublicMembers'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -12661,8 +17853,8 @@ class OrgsApi
      * List public organization members
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPublicMembers'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -12684,8 +17876,8 @@ class OrgsApi
      * List public organization members
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPublicMembers'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -12736,8 +17928,8 @@ class OrgsApi
      * Create request for operation 'orgsListPublicMembers'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListPublicMembers'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -12781,313 +17973,6 @@ class OrgsApi
             true, // explode
             false // required
         ) ?? []);
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'GET',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation orgsListRepoFineGrainedPermissions
-     *
-     * List repository fine-grained permissions for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListRepoFineGrainedPermissions'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryFineGrainedPermission[]
-     */
-    public function orgsListRepoFineGrainedPermissions($org, string $contentType = self::contentTypes['orgsListRepoFineGrainedPermissions'][0])
-    {
-        list($response) = $this->orgsListRepoFineGrainedPermissionsWithHttpInfo($org, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation orgsListRepoFineGrainedPermissionsWithHttpInfo
-     *
-     * List repository fine-grained permissions for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListRepoFineGrainedPermissions'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryFineGrainedPermission[], HTTP status code, HTTP response headers (array of strings)
-     */
-    public function orgsListRepoFineGrainedPermissionsWithHttpInfo($org, string $contentType = self::contentTypes['orgsListRepoFineGrainedPermissions'][0])
-    {
-        $request = $this->orgsListRepoFineGrainedPermissionsRequest($org, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryFineGrainedPermission[]' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryFineGrainedPermission[]' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryFineGrainedPermission[]', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryFineGrainedPermission[]';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryFineGrainedPermission[]',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation orgsListRepoFineGrainedPermissionsAsync
-     *
-     * List repository fine-grained permissions for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListRepoFineGrainedPermissions'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function orgsListRepoFineGrainedPermissionsAsync($org, string $contentType = self::contentTypes['orgsListRepoFineGrainedPermissions'][0])
-    {
-        return $this->orgsListRepoFineGrainedPermissionsAsyncWithHttpInfo($org, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation orgsListRepoFineGrainedPermissionsAsyncWithHttpInfo
-     *
-     * List repository fine-grained permissions for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListRepoFineGrainedPermissions'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function orgsListRepoFineGrainedPermissionsAsyncWithHttpInfo($org, string $contentType = self::contentTypes['orgsListRepoFineGrainedPermissions'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryFineGrainedPermission[]';
-        $request = $this->orgsListRepoFineGrainedPermissionsRequest($org, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'orgsListRepoFineGrainedPermissions'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListRepoFineGrainedPermissions'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function orgsListRepoFineGrainedPermissionsRequest($org, string $contentType = self::contentTypes['orgsListRepoFineGrainedPermissions'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling orgsListRepoFineGrainedPermissions'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/repository-fine-grained-permissions';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
 
 
         // path params
@@ -13467,7 +18352,7 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $hook_id The unique identifier of the hook. You can find this value in the &#x60;X-GitHub-Hook-ID&#x60; header of a webhook delivery. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $cursor Used for pagination: the starting delivery from which the page of deliveries is fetched. Refer to the &#x60;link&#x60; header for the next and previous page cursors. (optional)
      * @param  bool $redelivery redelivery (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListWebhookDeliveries'] to see the possible values for this operation
@@ -13489,7 +18374,7 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $hook_id The unique identifier of the hook. You can find this value in the &#x60;X-GitHub-Hook-ID&#x60; header of a webhook delivery. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $cursor Used for pagination: the starting delivery from which the page of deliveries is fetched. Refer to the &#x60;link&#x60; header for the next and previous page cursors. (optional)
      * @param  bool $redelivery (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListWebhookDeliveries'] to see the possible values for this operation
@@ -13687,7 +18572,7 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $hook_id The unique identifier of the hook. You can find this value in the &#x60;X-GitHub-Hook-ID&#x60; header of a webhook delivery. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $cursor Used for pagination: the starting delivery from which the page of deliveries is fetched. Refer to the &#x60;link&#x60; header for the next and previous page cursors. (optional)
      * @param  bool $redelivery (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListWebhookDeliveries'] to see the possible values for this operation
@@ -13712,7 +18597,7 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $hook_id The unique identifier of the hook. You can find this value in the &#x60;X-GitHub-Hook-ID&#x60; header of a webhook delivery. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $cursor Used for pagination: the starting delivery from which the page of deliveries is fetched. Refer to the &#x60;link&#x60; header for the next and previous page cursors. (optional)
      * @param  bool $redelivery (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListWebhookDeliveries'] to see the possible values for this operation
@@ -13766,7 +18651,7 @@ class OrgsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $hook_id The unique identifier of the hook. You can find this value in the &#x60;X-GitHub-Hook-ID&#x60; header of a webhook delivery. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $cursor Used for pagination: the starting delivery from which the page of deliveries is fetched. Refer to the &#x60;link&#x60; header for the next and previous page cursors. (optional)
      * @param  bool $redelivery (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListWebhookDeliveries'] to see the possible values for this operation
@@ -13908,8 +18793,8 @@ class OrgsApi
      * List organization webhooks
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListWebhooks'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -13928,8 +18813,8 @@ class OrgsApi
      * List organization webhooks
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListWebhooks'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -14089,8 +18974,8 @@ class OrgsApi
      * List organization webhooks
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListWebhooks'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -14112,8 +18997,8 @@ class OrgsApi
      * List organization webhooks
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListWebhooks'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -14164,8 +19049,8 @@ class OrgsApi
      * Create request for operation 'orgsListWebhooks'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsListWebhooks'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -14268,6 +19153,457 @@ class OrgsApi
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
             'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsPatchCustomOrganizationRole
+     *
+     * Update a custom organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsPatchCustomOrganizationRoleRequest $orgs_patch_custom_organization_role_request orgs_patch_custom_organization_role_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsPatchCustomOrganizationRole'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     */
+    public function orgsPatchCustomOrganizationRole($org, $role_id, $orgs_patch_custom_organization_role_request, string $contentType = self::contentTypes['orgsPatchCustomOrganizationRole'][0])
+    {
+        list($response) = $this->orgsPatchCustomOrganizationRoleWithHttpInfo($org, $role_id, $orgs_patch_custom_organization_role_request, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation orgsPatchCustomOrganizationRoleWithHttpInfo
+     *
+     * Update a custom organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsPatchCustomOrganizationRoleRequest $orgs_patch_custom_organization_role_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsPatchCustomOrganizationRole'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsPatchCustomOrganizationRoleWithHttpInfo($org, $role_id, $orgs_patch_custom_organization_role_request, string $contentType = self::contentTypes['orgsPatchCustomOrganizationRole'][0])
+    {
+        $request = $this->orgsPatchCustomOrganizationRoleRequest($org, $role_id, $orgs_patch_custom_organization_role_request, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 422:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 409:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 409:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsPatchCustomOrganizationRoleAsync
+     *
+     * Update a custom organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsPatchCustomOrganizationRoleRequest $orgs_patch_custom_organization_role_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsPatchCustomOrganizationRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsPatchCustomOrganizationRoleAsync($org, $role_id, $orgs_patch_custom_organization_role_request, string $contentType = self::contentTypes['orgsPatchCustomOrganizationRole'][0])
+    {
+        return $this->orgsPatchCustomOrganizationRoleAsyncWithHttpInfo($org, $role_id, $orgs_patch_custom_organization_role_request, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsPatchCustomOrganizationRoleAsyncWithHttpInfo
+     *
+     * Update a custom organization role
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsPatchCustomOrganizationRoleRequest $orgs_patch_custom_organization_role_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsPatchCustomOrganizationRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsPatchCustomOrganizationRoleAsyncWithHttpInfo($org, $role_id, $orgs_patch_custom_organization_role_request, string $contentType = self::contentTypes['orgsPatchCustomOrganizationRole'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationRole';
+        $request = $this->orgsPatchCustomOrganizationRoleRequest($org, $role_id, $orgs_patch_custom_organization_role_request, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsPatchCustomOrganizationRole'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrgsPatchCustomOrganizationRoleRequest $orgs_patch_custom_organization_role_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsPatchCustomOrganizationRole'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsPatchCustomOrganizationRoleRequest($org, $role_id, $orgs_patch_custom_organization_role_request, string $contentType = self::contentTypes['orgsPatchCustomOrganizationRole'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsPatchCustomOrganizationRole'
+            );
+        }
+
+        // verify the required parameter 'role_id' is set
+        if ($role_id === null || (is_array($role_id) && count($role_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $role_id when calling orgsPatchCustomOrganizationRole'
+            );
+        }
+
+        // verify the required parameter 'orgs_patch_custom_organization_role_request' is set
+        if ($orgs_patch_custom_organization_role_request === null || (is_array($orgs_patch_custom_organization_role_request) && count($orgs_patch_custom_organization_role_request) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $orgs_patch_custom_organization_role_request when calling orgsPatchCustomOrganizationRole'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/organization-roles/{role_id}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($role_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'role_id' . '}',
+                ObjectSerializer::toPathValue($role_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (isset($orgs_patch_custom_organization_role_request)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($orgs_patch_custom_organization_role_request));
+            } else {
+                $httpBody = $orgs_patch_custom_organization_role_request;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'PATCH',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody
@@ -14942,6 +20278,271 @@ class OrgsApi
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
             'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsRemoveCustomProperty
+     *
+     * Remove a custom property for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRemoveCustomProperty'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function orgsRemoveCustomProperty($org, $custom_property_name, string $contentType = self::contentTypes['orgsRemoveCustomProperty'][0])
+    {
+        $this->orgsRemoveCustomPropertyWithHttpInfo($org, $custom_property_name, $contentType);
+    }
+
+    /**
+     * Operation orgsRemoveCustomPropertyWithHttpInfo
+     *
+     * Remove a custom property for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRemoveCustomProperty'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsRemoveCustomPropertyWithHttpInfo($org, $custom_property_name, string $contentType = self::contentTypes['orgsRemoveCustomProperty'][0])
+    {
+        $request = $this->orgsRemoveCustomPropertyRequest($org, $custom_property_name, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsRemoveCustomPropertyAsync
+     *
+     * Remove a custom property for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRemoveCustomProperty'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsRemoveCustomPropertyAsync($org, $custom_property_name, string $contentType = self::contentTypes['orgsRemoveCustomProperty'][0])
+    {
+        return $this->orgsRemoveCustomPropertyAsyncWithHttpInfo($org, $custom_property_name, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsRemoveCustomPropertyAsyncWithHttpInfo
+     *
+     * Remove a custom property for an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRemoveCustomProperty'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsRemoveCustomPropertyAsyncWithHttpInfo($org, $custom_property_name, string $contentType = self::contentTypes['orgsRemoveCustomProperty'][0])
+    {
+        $returnType = '';
+        $request = $this->orgsRemoveCustomPropertyRequest($org, $custom_property_name, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsRemoveCustomProperty'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $custom_property_name The custom property name. The name is case sensitive. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRemoveCustomProperty'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsRemoveCustomPropertyRequest($org, $custom_property_name, string $contentType = self::contentTypes['orgsRemoveCustomProperty'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsRemoveCustomProperty'
+            );
+        }
+
+        // verify the required parameter 'custom_property_name' is set
+        if ($custom_property_name === null || (is_array($custom_property_name) && count($custom_property_name) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $custom_property_name when calling orgsRemoveCustomProperty'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/properties/schema/{custom_property_name}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($custom_property_name !== null) {
+            $resourcePath = str_replace(
+                '{' . 'custom_property_name' . '}',
+                ObjectSerializer::toPathValue($custom_property_name),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'DELETE',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody
@@ -16992,6 +22593,1042 @@ class OrgsApi
     }
 
     /**
+     * Operation orgsRevokeAllOrgRolesTeam
+     *
+     * Remove all organization roles for a team
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeAllOrgRolesTeam'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function orgsRevokeAllOrgRolesTeam($org, $team_slug, string $contentType = self::contentTypes['orgsRevokeAllOrgRolesTeam'][0])
+    {
+        $this->orgsRevokeAllOrgRolesTeamWithHttpInfo($org, $team_slug, $contentType);
+    }
+
+    /**
+     * Operation orgsRevokeAllOrgRolesTeamWithHttpInfo
+     *
+     * Remove all organization roles for a team
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeAllOrgRolesTeam'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsRevokeAllOrgRolesTeamWithHttpInfo($org, $team_slug, string $contentType = self::contentTypes['orgsRevokeAllOrgRolesTeam'][0])
+    {
+        $request = $this->orgsRevokeAllOrgRolesTeamRequest($org, $team_slug, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsRevokeAllOrgRolesTeamAsync
+     *
+     * Remove all organization roles for a team
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeAllOrgRolesTeam'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsRevokeAllOrgRolesTeamAsync($org, $team_slug, string $contentType = self::contentTypes['orgsRevokeAllOrgRolesTeam'][0])
+    {
+        return $this->orgsRevokeAllOrgRolesTeamAsyncWithHttpInfo($org, $team_slug, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsRevokeAllOrgRolesTeamAsyncWithHttpInfo
+     *
+     * Remove all organization roles for a team
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeAllOrgRolesTeam'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsRevokeAllOrgRolesTeamAsyncWithHttpInfo($org, $team_slug, string $contentType = self::contentTypes['orgsRevokeAllOrgRolesTeam'][0])
+    {
+        $returnType = '';
+        $request = $this->orgsRevokeAllOrgRolesTeamRequest($org, $team_slug, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsRevokeAllOrgRolesTeam'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeAllOrgRolesTeam'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsRevokeAllOrgRolesTeamRequest($org, $team_slug, string $contentType = self::contentTypes['orgsRevokeAllOrgRolesTeam'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsRevokeAllOrgRolesTeam'
+            );
+        }
+
+        // verify the required parameter 'team_slug' is set
+        if ($team_slug === null || (is_array($team_slug) && count($team_slug) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $team_slug when calling orgsRevokeAllOrgRolesTeam'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/organization-roles/teams/{team_slug}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($team_slug !== null) {
+            $resourcePath = str_replace(
+                '{' . 'team_slug' . '}',
+                ObjectSerializer::toPathValue($team_slug),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            [],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'DELETE',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsRevokeAllOrgRolesUser
+     *
+     * Remove all organization roles for a user
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeAllOrgRolesUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function orgsRevokeAllOrgRolesUser($org, $username, string $contentType = self::contentTypes['orgsRevokeAllOrgRolesUser'][0])
+    {
+        $this->orgsRevokeAllOrgRolesUserWithHttpInfo($org, $username, $contentType);
+    }
+
+    /**
+     * Operation orgsRevokeAllOrgRolesUserWithHttpInfo
+     *
+     * Remove all organization roles for a user
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeAllOrgRolesUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsRevokeAllOrgRolesUserWithHttpInfo($org, $username, string $contentType = self::contentTypes['orgsRevokeAllOrgRolesUser'][0])
+    {
+        $request = $this->orgsRevokeAllOrgRolesUserRequest($org, $username, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsRevokeAllOrgRolesUserAsync
+     *
+     * Remove all organization roles for a user
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeAllOrgRolesUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsRevokeAllOrgRolesUserAsync($org, $username, string $contentType = self::contentTypes['orgsRevokeAllOrgRolesUser'][0])
+    {
+        return $this->orgsRevokeAllOrgRolesUserAsyncWithHttpInfo($org, $username, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsRevokeAllOrgRolesUserAsyncWithHttpInfo
+     *
+     * Remove all organization roles for a user
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeAllOrgRolesUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsRevokeAllOrgRolesUserAsyncWithHttpInfo($org, $username, string $contentType = self::contentTypes['orgsRevokeAllOrgRolesUser'][0])
+    {
+        $returnType = '';
+        $request = $this->orgsRevokeAllOrgRolesUserRequest($org, $username, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsRevokeAllOrgRolesUser'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeAllOrgRolesUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsRevokeAllOrgRolesUserRequest($org, $username, string $contentType = self::contentTypes['orgsRevokeAllOrgRolesUser'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsRevokeAllOrgRolesUser'
+            );
+        }
+
+        // verify the required parameter 'username' is set
+        if ($username === null || (is_array($username) && count($username) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $username when calling orgsRevokeAllOrgRolesUser'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/organization-roles/users/{username}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($username !== null) {
+            $resourcePath = str_replace(
+                '{' . 'username' . '}',
+                ObjectSerializer::toPathValue($username),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            [],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'DELETE',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsRevokeOrgRoleTeam
+     *
+     * Remove an organization role from a team
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeOrgRoleTeam'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function orgsRevokeOrgRoleTeam($org, $team_slug, $role_id, string $contentType = self::contentTypes['orgsRevokeOrgRoleTeam'][0])
+    {
+        $this->orgsRevokeOrgRoleTeamWithHttpInfo($org, $team_slug, $role_id, $contentType);
+    }
+
+    /**
+     * Operation orgsRevokeOrgRoleTeamWithHttpInfo
+     *
+     * Remove an organization role from a team
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeOrgRoleTeam'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsRevokeOrgRoleTeamWithHttpInfo($org, $team_slug, $role_id, string $contentType = self::contentTypes['orgsRevokeOrgRoleTeam'][0])
+    {
+        $request = $this->orgsRevokeOrgRoleTeamRequest($org, $team_slug, $role_id, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsRevokeOrgRoleTeamAsync
+     *
+     * Remove an organization role from a team
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeOrgRoleTeam'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsRevokeOrgRoleTeamAsync($org, $team_slug, $role_id, string $contentType = self::contentTypes['orgsRevokeOrgRoleTeam'][0])
+    {
+        return $this->orgsRevokeOrgRoleTeamAsyncWithHttpInfo($org, $team_slug, $role_id, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsRevokeOrgRoleTeamAsyncWithHttpInfo
+     *
+     * Remove an organization role from a team
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeOrgRoleTeam'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsRevokeOrgRoleTeamAsyncWithHttpInfo($org, $team_slug, $role_id, string $contentType = self::contentTypes['orgsRevokeOrgRoleTeam'][0])
+    {
+        $returnType = '';
+        $request = $this->orgsRevokeOrgRoleTeamRequest($org, $team_slug, $role_id, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsRevokeOrgRoleTeam'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $team_slug The slug of the team name. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeOrgRoleTeam'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsRevokeOrgRoleTeamRequest($org, $team_slug, $role_id, string $contentType = self::contentTypes['orgsRevokeOrgRoleTeam'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsRevokeOrgRoleTeam'
+            );
+        }
+
+        // verify the required parameter 'team_slug' is set
+        if ($team_slug === null || (is_array($team_slug) && count($team_slug) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $team_slug when calling orgsRevokeOrgRoleTeam'
+            );
+        }
+
+        // verify the required parameter 'role_id' is set
+        if ($role_id === null || (is_array($role_id) && count($role_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $role_id when calling orgsRevokeOrgRoleTeam'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/organization-roles/teams/{team_slug}/{role_id}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($team_slug !== null) {
+            $resourcePath = str_replace(
+                '{' . 'team_slug' . '}',
+                ObjectSerializer::toPathValue($team_slug),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($role_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'role_id' . '}',
+                ObjectSerializer::toPathValue($role_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            [],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'DELETE',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation orgsRevokeOrgRoleUser
+     *
+     * Remove an organization role from a user
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeOrgRoleUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function orgsRevokeOrgRoleUser($org, $username, $role_id, string $contentType = self::contentTypes['orgsRevokeOrgRoleUser'][0])
+    {
+        $this->orgsRevokeOrgRoleUserWithHttpInfo($org, $username, $role_id, $contentType);
+    }
+
+    /**
+     * Operation orgsRevokeOrgRoleUserWithHttpInfo
+     *
+     * Remove an organization role from a user
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeOrgRoleUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsRevokeOrgRoleUserWithHttpInfo($org, $username, $role_id, string $contentType = self::contentTypes['orgsRevokeOrgRoleUser'][0])
+    {
+        $request = $this->orgsRevokeOrgRoleUserRequest($org, $username, $role_id, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsRevokeOrgRoleUserAsync
+     *
+     * Remove an organization role from a user
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeOrgRoleUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsRevokeOrgRoleUserAsync($org, $username, $role_id, string $contentType = self::contentTypes['orgsRevokeOrgRoleUser'][0])
+    {
+        return $this->orgsRevokeOrgRoleUserAsyncWithHttpInfo($org, $username, $role_id, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsRevokeOrgRoleUserAsyncWithHttpInfo
+     *
+     * Remove an organization role from a user
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeOrgRoleUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsRevokeOrgRoleUserAsyncWithHttpInfo($org, $username, $role_id, string $contentType = self::contentTypes['orgsRevokeOrgRoleUser'][0])
+    {
+        $returnType = '';
+        $request = $this->orgsRevokeOrgRoleUserRequest($org, $username, $role_id, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsRevokeOrgRoleUser'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  int $role_id The unique identifier of the role. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsRevokeOrgRoleUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsRevokeOrgRoleUserRequest($org, $username, $role_id, string $contentType = self::contentTypes['orgsRevokeOrgRoleUser'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsRevokeOrgRoleUser'
+            );
+        }
+
+        // verify the required parameter 'username' is set
+        if ($username === null || (is_array($username) && count($username) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $username when calling orgsRevokeOrgRoleUser'
+            );
+        }
+
+        // verify the required parameter 'role_id' is set
+        if ($role_id === null || (is_array($role_id) && count($role_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $role_id when calling orgsRevokeOrgRoleUser'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/organization-roles/users/{username}/{role_id}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($username !== null) {
+            $resourcePath = str_replace(
+                '{' . 'username' . '}',
+                ObjectSerializer::toPathValue($username),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($role_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'role_id' . '}',
+                ObjectSerializer::toPathValue($role_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            [],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'DELETE',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
      * Operation orgsSetMembershipForUser
      *
      * Set organization membership for a user
@@ -17659,6 +24296,255 @@ class OrgsApi
     }
 
     /**
+     * Operation orgsUnblockUser
+     *
+     * Unblock a user from an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsUnblockUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return void
+     */
+    public function orgsUnblockUser($org, $username, string $contentType = self::contentTypes['orgsUnblockUser'][0])
+    {
+        $this->orgsUnblockUserWithHttpInfo($org, $username, $contentType);
+    }
+
+    /**
+     * Operation orgsUnblockUserWithHttpInfo
+     *
+     * Unblock a user from an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsUnblockUser'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function orgsUnblockUserWithHttpInfo($org, $username, string $contentType = self::contentTypes['orgsUnblockUser'][0])
+    {
+        $request = $this->orgsUnblockUserRequest($org, $username, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return [null, $statusCode, $response->getHeaders()];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation orgsUnblockUserAsync
+     *
+     * Unblock a user from an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsUnblockUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsUnblockUserAsync($org, $username, string $contentType = self::contentTypes['orgsUnblockUser'][0])
+    {
+        return $this->orgsUnblockUserAsyncWithHttpInfo($org, $username, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation orgsUnblockUserAsyncWithHttpInfo
+     *
+     * Unblock a user from an organization
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsUnblockUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function orgsUnblockUserAsyncWithHttpInfo($org, $username, string $contentType = self::contentTypes['orgsUnblockUser'][0])
+    {
+        $returnType = '';
+        $request = $this->orgsUnblockUserRequest($org, $username, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'orgsUnblockUser'
+     *
+     * @param  string $org The organization name. The name is not case sensitive. (required)
+     * @param  string $username The handle for the GitHub user account. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsUnblockUser'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function orgsUnblockUserRequest($org, $username, string $contentType = self::contentTypes['orgsUnblockUser'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling orgsUnblockUser'
+            );
+        }
+
+        // verify the required parameter 'username' is set
+        if ($username === null || (is_array($username) && count($username) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $username when calling orgsUnblockUser'
+            );
+        }
+
+
+        $resourcePath = '/orgs/{org}/blocks/{username}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{' . 'org' . '}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($username !== null) {
+            $resourcePath = str_replace(
+                '{' . 'username' . '}',
+                ObjectSerializer::toPathValue($username),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            [],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'DELETE',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
      * Operation orgsUpdate
      *
      * Update an organization
@@ -18001,422 +24887,6 @@ class OrgsApi
                 $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($orgs_update_request));
             } else {
                 $httpBody = $orgs_update_request;
-            }
-        } elseif (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'PATCH',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation orgsUpdateCustomRepoRole
-     *
-     * Update a custom repository role
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $role_id The unique identifier of the role. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRoleUpdateSchema $organization_custom_repository_role_update_schema organization_custom_repository_role_update_schema (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsUpdateCustomRepoRole'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
-     */
-    public function orgsUpdateCustomRepoRole($org, $role_id, $organization_custom_repository_role_update_schema, string $contentType = self::contentTypes['orgsUpdateCustomRepoRole'][0])
-    {
-        list($response) = $this->orgsUpdateCustomRepoRoleWithHttpInfo($org, $role_id, $organization_custom_repository_role_update_schema, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation orgsUpdateCustomRepoRoleWithHttpInfo
-     *
-     * Update a custom repository role
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $role_id The unique identifier of the role. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRoleUpdateSchema $organization_custom_repository_role_update_schema (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsUpdateCustomRepoRole'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function orgsUpdateCustomRepoRoleWithHttpInfo($org, $role_id, $organization_custom_repository_role_update_schema, string $contentType = self::contentTypes['orgsUpdateCustomRepoRole'][0])
-    {
-        $request = $this->orgsUpdateCustomRepoRoleRequest($org, $role_id, $organization_custom_repository_role_update_schema, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                case 422:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                case 404:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-                case 422:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationError',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-                case 404:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation orgsUpdateCustomRepoRoleAsync
-     *
-     * Update a custom repository role
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $role_id The unique identifier of the role. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRoleUpdateSchema $organization_custom_repository_role_update_schema (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsUpdateCustomRepoRole'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function orgsUpdateCustomRepoRoleAsync($org, $role_id, $organization_custom_repository_role_update_schema, string $contentType = self::contentTypes['orgsUpdateCustomRepoRole'][0])
-    {
-        return $this->orgsUpdateCustomRepoRoleAsyncWithHttpInfo($org, $role_id, $organization_custom_repository_role_update_schema, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation orgsUpdateCustomRepoRoleAsyncWithHttpInfo
-     *
-     * Update a custom repository role
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $role_id The unique identifier of the role. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRoleUpdateSchema $organization_custom_repository_role_update_schema (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsUpdateCustomRepoRole'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function orgsUpdateCustomRepoRoleAsyncWithHttpInfo($org, $role_id, $organization_custom_repository_role_update_schema, string $contentType = self::contentTypes['orgsUpdateCustomRepoRole'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRole';
-        $request = $this->orgsUpdateCustomRepoRoleRequest($org, $role_id, $organization_custom_repository_role_update_schema, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'orgsUpdateCustomRepoRole'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $role_id The unique identifier of the role. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationCustomRepositoryRoleUpdateSchema $organization_custom_repository_role_update_schema (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['orgsUpdateCustomRepoRole'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function orgsUpdateCustomRepoRoleRequest($org, $role_id, $organization_custom_repository_role_update_schema, string $contentType = self::contentTypes['orgsUpdateCustomRepoRole'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling orgsUpdateCustomRepoRole'
-            );
-        }
-
-        // verify the required parameter 'role_id' is set
-        if ($role_id === null || (is_array($role_id) && count($role_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $role_id when calling orgsUpdateCustomRepoRole'
-            );
-        }
-
-        // verify the required parameter 'organization_custom_repository_role_update_schema' is set
-        if ($organization_custom_repository_role_update_schema === null || (is_array($organization_custom_repository_role_update_schema) && count($organization_custom_repository_role_update_schema) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $organization_custom_repository_role_update_schema when calling orgsUpdateCustomRepoRole'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/custom-repository-roles/{role_id}';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($role_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'role_id' . '}',
-                ObjectSerializer::toPathValue($role_id),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (isset($organization_custom_repository_role_update_schema)) {
-            if (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($organization_custom_repository_role_update_schema));
-            } else {
-                $httpBody = $organization_custom_repository_role_update_schema;
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {

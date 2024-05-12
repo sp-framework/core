@@ -392,7 +392,7 @@ class ReposUpdateBranchProtectionRequestRequiredPullRequestReviews implements Mo
     /**
      * Sets require_code_owner_reviews
      *
-     * @param bool|null $require_code_owner_reviews Blocks merging pull requests until [code owners](https://docs.github.com/enterprise-server@3.12/articles/about-code-owners/) review them.
+     * @param bool|null $require_code_owner_reviews Blocks merging pull requests until [code owners](https://docs.github.com/articles/about-code-owners/) review them.
      *
      * @return self
      */

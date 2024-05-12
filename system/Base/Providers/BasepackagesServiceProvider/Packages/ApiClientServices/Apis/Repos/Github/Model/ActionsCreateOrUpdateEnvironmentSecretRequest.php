@@ -319,7 +319,7 @@ class ActionsCreateOrUpdateEnvironmentSecretRequest implements ModelInterface, A
     /**
      * Sets encrypted_value
      *
-     * @param string $encrypted_value Value for your secret, encrypted with [LibSodium](https://libsodium.gitbook.io/doc/bindings_for_other_languages) using the public key retrieved from the [Get an environment public key](https://docs.github.com/enterprise-server@3.12/rest/actions/secrets#get-an-environment-public-key) endpoint.
+     * @param string $encrypted_value Value for your secret, encrypted with [LibSodium](https://libsodium.gitbook.io/doc/bindings_for_other_languages) using the public key retrieved from the [Get an environment public key](https://docs.github.com/rest/actions/secrets#get-an-environment-public-key) endpoint.
      *
      * @return self
      */

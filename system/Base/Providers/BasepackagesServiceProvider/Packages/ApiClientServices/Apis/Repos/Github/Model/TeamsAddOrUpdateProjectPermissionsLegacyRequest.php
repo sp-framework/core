@@ -328,7 +328,7 @@ class TeamsAddOrUpdateProjectPermissionsLegacyRequest implements ModelInterface,
     /**
      * Sets permission
      *
-     * @param string|null $permission The permission to grant to the team for this project. Default: the team's `permission` attribute will be used to determine what permission to grant the team on this project. Note that, if you choose not to pass any parameters, you'll need to set `Content-Length` to zero when calling this endpoint. For more information, see \"[HTTP method](https://docs.github.com/enterprise-server@3.12/rest/guides/getting-started-with-the-rest-api#http-method).\"
+     * @param string|null $permission The permission to grant to the team for this project. Default: the team's `permission` attribute will be used to determine what permission to grant the team on this project. Note that, if you choose not to pass any parameters, you'll need to set `Content-Length` to zero when calling this endpoint. For more information, see \"[HTTP method](https://docs.github.com/rest/guides/getting-started-with-the-rest-api#http-method).\"
      *
      * @return self
      */

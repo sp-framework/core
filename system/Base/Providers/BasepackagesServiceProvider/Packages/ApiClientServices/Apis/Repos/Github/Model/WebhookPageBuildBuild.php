@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * WebhookPageBuildBuild Class Doc Comment
  *
  * @category Class
- * @description The [List GitHub Pages builds](https://docs.github.com/enterprise-server@3.12/rest/pages/pages#list-github-pages-builds) itself.
+ * @description The [List GitHub Pages builds](https://docs.github.com/rest/pages/pages#list-github-pages-builds) itself.
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

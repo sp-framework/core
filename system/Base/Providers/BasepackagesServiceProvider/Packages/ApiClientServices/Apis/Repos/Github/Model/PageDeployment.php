@@ -58,6 +58,7 @@ class PageDeployment implements ModelInterface, ArrayAccess, \JsonSerializable
       * @var string[]
       */
     protected static $openAPITypes = [
+        'id' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PageDeploymentId',
         'status_url' => 'string',
         'page_url' => 'string',
         'preview_url' => 'string'
@@ -71,6 +72,7 @@ class PageDeployment implements ModelInterface, ArrayAccess, \JsonSerializable
       * @psalm-var array<string, string|null>
       */
     protected static $openAPIFormats = [
+        'id' => null,
         'status_url' => 'uri',
         'page_url' => 'uri',
         'preview_url' => 'uri'
@@ -82,6 +84,7 @@ class PageDeployment implements ModelInterface, ArrayAccess, \JsonSerializable
       * @var boolean[]
       */
     protected static array $openAPINullables = [
+        'id' => false,
         'status_url' => false,
         'page_url' => false,
         'preview_url' => false
@@ -173,6 +176,7 @@ class PageDeployment implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $attributeMap = [
+        'id' => 'id',
         'status_url' => 'status_url',
         'page_url' => 'page_url',
         'preview_url' => 'preview_url'
@@ -184,6 +188,7 @@ class PageDeployment implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $setters = [
+        'id' => 'setId',
         'status_url' => 'setStatusUrl',
         'page_url' => 'setPageUrl',
         'preview_url' => 'setPreviewUrl'
@@ -195,6 +200,7 @@ class PageDeployment implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $getters = [
+        'id' => 'getId',
         'status_url' => 'getStatusUrl',
         'page_url' => 'getPageUrl',
         'preview_url' => 'getPreviewUrl'
@@ -257,6 +263,7 @@ class PageDeployment implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     public function __construct(array $data = null)
     {
+        $this->setIfExists('id', $data ?? [], null);
         $this->setIfExists('status_url', $data ?? [], null);
         $this->setIfExists('page_url', $data ?? [], null);
         $this->setIfExists('preview_url', $data ?? [], null);
@@ -289,6 +296,9 @@ class PageDeployment implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
+        if ($this->container['id'] === null) {
+            $invalidProperties[] = "'id' can't be null";
+        }
         if ($this->container['status_url'] === null) {
             $invalidProperties[] = "'status_url' can't be null";
         }
@@ -309,6 +319,33 @@ class PageDeployment implements ModelInterface, ArrayAccess, \JsonSerializable
         return count($this->listInvalidProperties()) === 0;
     }
 
+
+    /**
+     * Gets id
+     *
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PageDeploymentId
+     */
+    public function getId()
+    {
+        return $this->container['id'];
+    }
+
+    /**
+     * Sets id
+     *
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PageDeploymentId $id id
+     *
+     * @return self
+     */
+    public function setId($id)
+    {
+        if (is_null($id)) {
+            throw new \InvalidArgumentException('non-nullable id cannot be null');
+        }
+        $this->container['id'] = $id;
+
+        return $this;
+    }
 
     /**
      * Gets status_url

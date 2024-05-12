@@ -64,7 +64,7 @@ class PullRequest11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'assignees' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[]',
         'author_association' => 'string',
         'auto_merge' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestAutoMerge',
-        'base' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase',
+        'base' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest11Base',
         'body' => 'string',
         'changed_files' => 'int',
         'closed_at' => '\DateTime',
@@ -76,7 +76,7 @@ class PullRequest11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'deletions' => 'int',
         'diff_url' => 'string',
         'draft' => 'bool',
-        'head' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest11Head',
+        'head' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestHead',
         'html_url' => 'string',
         'id' => 'int',
         'issue_url' => 'string',
@@ -88,7 +88,7 @@ class PullRequest11 implements ModelInterface, ArrayAccess, \JsonSerializable
         'mergeable_state' => 'string',
         'merged' => 'bool',
         'merged_at' => '\DateTime',
-        'merged_by' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User',
+        'merged_by' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1',
         'milestone' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone',
         'node_id' => 'string',
         'number' => 'int',
@@ -1049,7 +1049,7 @@ class PullRequest11 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets base
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest11Base
      */
     public function getBase()
     {
@@ -1059,7 +1059,7 @@ class PullRequest11 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets base
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase $base base
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest11Base $base base
      *
      * @return self
      */
@@ -1387,7 +1387,7 @@ class PullRequest11 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets head
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest11Head
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestHead
      */
     public function getHead()
     {
@@ -1397,7 +1397,7 @@ class PullRequest11 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets head
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest11Head $head head
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestHead $head head
      *
      * @return self
      */
@@ -1739,7 +1739,7 @@ class PullRequest11 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets merged_by
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1|null
      */
     public function getMergedBy()
     {
@@ -1749,7 +1749,7 @@ class PullRequest11 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets merged_by
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User|null $merged_by merged_by
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1|null $merged_by merged_by
      *
      * @return self
      */

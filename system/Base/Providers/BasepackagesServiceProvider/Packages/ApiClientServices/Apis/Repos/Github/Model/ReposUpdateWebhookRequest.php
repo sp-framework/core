@@ -357,7 +357,7 @@ class ReposUpdateWebhookRequest implements ModelInterface, ArrayAccess, \JsonSer
     /**
      * Sets events
      *
-     * @param string[]|null $events Determines what [events](https://docs.github.com/enterprise-server@3.12/webhooks/event-payloads) the hook is triggered for. This replaces the entire array of events.
+     * @param string[]|null $events Determines what [events](https://docs.github.com/webhooks/event-payloads) the hook is triggered for. This replaces the entire array of events.
      *
      * @return self
      */

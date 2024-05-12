@@ -391,7 +391,7 @@ class ReposUpdatePullRequestReviewProtectionRequest implements ModelInterface, A
     /**
      * Sets require_code_owner_reviews
      *
-     * @param bool|null $require_code_owner_reviews Blocks merging pull requests until [code owners](https://docs.github.com/enterprise-server@3.12/articles/about-code-owners/) have reviewed.
+     * @param bool|null $require_code_owner_reviews Blocks merging pull requests until [code owners](https://docs.github.com/articles/about-code-owners/) have reviewed.
      *
      * @return self
      */

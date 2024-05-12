@@ -476,6 +476,9 @@ class Collaborator implements ModelInterface, ArrayAccess, \JsonSerializable
         if ($this->container['site_admin'] === null) {
             $invalidProperties[] = "'site_admin' can't be null";
         }
+        if ($this->container['role_name'] === null) {
+            $invalidProperties[] = "'role_name' can't be null";
+        }
         return $invalidProperties;
     }
 
@@ -1082,7 +1085,7 @@ class Collaborator implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets role_name
      *
-     * @return string|null
+     * @return string
      */
     public function getRoleName()
     {
@@ -1092,7 +1095,7 @@ class Collaborator implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets role_name
      *
-     * @param string|null $role_name role_name
+     * @param string $role_name role_name
      *
      * @return self
      */

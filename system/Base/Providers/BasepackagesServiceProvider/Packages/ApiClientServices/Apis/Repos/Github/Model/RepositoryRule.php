@@ -59,7 +59,7 @@ class RepositoryRule implements ModelInterface, ArrayAccess, \JsonSerializable
       */
     protected static $openAPITypes = [
         'type' => 'string',
-        'parameters' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRuleWorkflowsParameters'
+        'parameters' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRuleCodeScanningParameters'
     ];
 
     /**
@@ -249,7 +249,12 @@ class RepositoryRule implements ModelInterface, ArrayAccess, \JsonSerializable
     public const TYPE_COMMITTER_EMAIL_PATTERN = 'committer_email_pattern';
     public const TYPE_BRANCH_NAME_PATTERN = 'branch_name_pattern';
     public const TYPE_TAG_NAME_PATTERN = 'tag_name_pattern';
+    public const TYPE_FILE_PATH_RESTRICTION = 'file_path_restriction';
+    public const TYPE_MAX_FILE_PATH_LENGTH = 'max_file_path_length';
+    public const TYPE_FILE_EXTENSION_RESTRICTION = 'file_extension_restriction';
+    public const TYPE_MAX_FILE_SIZE = 'max_file_size';
     public const TYPE_WORKFLOWS = 'workflows';
+    public const TYPE_CODE_SCANNING = 'code_scanning';
 
     /**
      * Gets allowable values of the enum
@@ -273,7 +278,12 @@ class RepositoryRule implements ModelInterface, ArrayAccess, \JsonSerializable
             self::TYPE_COMMITTER_EMAIL_PATTERN,
             self::TYPE_BRANCH_NAME_PATTERN,
             self::TYPE_TAG_NAME_PATTERN,
+            self::TYPE_FILE_PATH_RESTRICTION,
+            self::TYPE_MAX_FILE_PATH_LENGTH,
+            self::TYPE_FILE_EXTENSION_RESTRICTION,
+            self::TYPE_MAX_FILE_SIZE,
             self::TYPE_WORKFLOWS,
+            self::TYPE_CODE_SCANNING,
         ];
     }
 
@@ -390,7 +400,7 @@ class RepositoryRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets parameters
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRuleWorkflowsParameters|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRuleCodeScanningParameters|null
      */
     public function getParameters()
     {
@@ -400,7 +410,7 @@ class RepositoryRule implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets parameters
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRuleWorkflowsParameters|null $parameters parameters
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRuleCodeScanningParameters|null $parameters parameters
      *
      * @return self
      */

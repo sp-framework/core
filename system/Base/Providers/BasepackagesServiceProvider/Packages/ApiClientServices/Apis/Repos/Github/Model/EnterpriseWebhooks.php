@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * EnterpriseWebhooks Class Doc Comment
  *
  * @category Class
- * @description An enterprise on GitHub. Webhook payloads contain the &#x60;enterprise&#x60; property when the webhook is configured on an enterprise account or an organization that&#39;s part of an enterprise account. For more information, see \&quot;[About enterprise accounts](https://docs.github.com/enterprise-server@3.12/admin/overview/about-enterprise-accounts).\&quot;
+ * @description An enterprise on GitHub. Webhook payloads contain the &#x60;enterprise&#x60; property when the webhook is configured on an enterprise account or an organization that&#39;s part of an enterprise account. For more information, see \&quot;[About enterprise accounts](https://docs.github.com/admin/overview/about-enterprise-accounts).\&quot;
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

@@ -313,7 +313,7 @@ class ActionsCreateOrUpdateRepoSecretRequest implements ModelInterface, ArrayAcc
     /**
      * Sets encrypted_value
      *
-     * @param string|null $encrypted_value Value for your secret, encrypted with [LibSodium](https://libsodium.gitbook.io/doc/bindings_for_other_languages) using the public key retrieved from the [Get a repository public key](https://docs.github.com/enterprise-server@3.12/rest/actions/secrets#get-a-repository-public-key) endpoint.
+     * @param string|null $encrypted_value Value for your secret, encrypted with [LibSodium](https://libsodium.gitbook.io/doc/bindings_for_other_languages) using the public key retrieved from the [Get a repository public key](https://docs.github.com/rest/actions/secrets#get-a-repository-public-key) endpoint.
      *
      * @return self
      */

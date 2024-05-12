@@ -260,6 +260,7 @@ class ReposUpdateRepoRulesetRequest implements ModelInterface, ArrayAccess, \Jso
 
     public const TARGET_BRANCH = 'branch';
     public const TARGET_TAG = 'tag';
+    public const TARGET_PUSH = 'push';
 
     /**
      * Gets allowable values of the enum
@@ -271,6 +272,7 @@ class ReposUpdateRepoRulesetRequest implements ModelInterface, ArrayAccess, \Jso
         return [
             self::TARGET_BRANCH,
             self::TARGET_TAG,
+            self::TARGET_PUSH,
         ];
     }
 
@@ -388,7 +390,7 @@ class ReposUpdateRepoRulesetRequest implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets target
      *
-     * @param string|null $target The target of the ruleset.
+     * @param string|null $target The target of the ruleset  **Note**: The `push` target is in beta and is subject to change.
      *
      * @return self
      */

@@ -77,6 +77,7 @@ class Repository2 implements ModelInterface, ArrayAccess, \JsonSerializable
         'contents_url' => 'string',
         'contributors_url' => 'string',
         'created_at' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryCreatedAt',
+        'custom_properties' => 'array<string,mixed>',
         'default_branch' => 'string',
         'delete_branch_on_merge' => 'bool',
         'deployments_url' => 'string',
@@ -178,6 +179,7 @@ class Repository2 implements ModelInterface, ArrayAccess, \JsonSerializable
         'contents_url' => 'uri-template',
         'contributors_url' => 'uri',
         'created_at' => null,
+        'custom_properties' => null,
         'default_branch' => null,
         'delete_branch_on_merge' => null,
         'deployments_url' => 'uri',
@@ -277,6 +279,7 @@ class Repository2 implements ModelInterface, ArrayAccess, \JsonSerializable
         'contents_url' => false,
         'contributors_url' => false,
         'created_at' => false,
+        'custom_properties' => false,
         'default_branch' => false,
         'delete_branch_on_merge' => false,
         'deployments_url' => false,
@@ -456,6 +459,7 @@ class Repository2 implements ModelInterface, ArrayAccess, \JsonSerializable
         'contents_url' => 'contents_url',
         'contributors_url' => 'contributors_url',
         'created_at' => 'created_at',
+        'custom_properties' => 'custom_properties',
         'default_branch' => 'default_branch',
         'delete_branch_on_merge' => 'delete_branch_on_merge',
         'deployments_url' => 'deployments_url',
@@ -555,6 +559,7 @@ class Repository2 implements ModelInterface, ArrayAccess, \JsonSerializable
         'contents_url' => 'setContentsUrl',
         'contributors_url' => 'setContributorsUrl',
         'created_at' => 'setCreatedAt',
+        'custom_properties' => 'setCustomProperties',
         'default_branch' => 'setDefaultBranch',
         'delete_branch_on_merge' => 'setDeleteBranchOnMerge',
         'deployments_url' => 'setDeploymentsUrl',
@@ -654,6 +659,7 @@ class Repository2 implements ModelInterface, ArrayAccess, \JsonSerializable
         'contents_url' => 'getContentsUrl',
         'contributors_url' => 'getContributorsUrl',
         'created_at' => 'getCreatedAt',
+        'custom_properties' => 'getCustomProperties',
         'default_branch' => 'getDefaultBranch',
         'delete_branch_on_merge' => 'getDeleteBranchOnMerge',
         'deployments_url' => 'getDeploymentsUrl',
@@ -821,6 +827,7 @@ class Repository2 implements ModelInterface, ArrayAccess, \JsonSerializable
         $this->setIfExists('contents_url', $data ?? [], null);
         $this->setIfExists('contributors_url', $data ?? [], null);
         $this->setIfExists('created_at', $data ?? [], null);
+        $this->setIfExists('custom_properties', $data ?? [], null);
         $this->setIfExists('default_branch', $data ?? [], null);
         $this->setIfExists('delete_branch_on_merge', $data ?? [], false);
         $this->setIfExists('deployments_url', $data ?? [], null);
@@ -1680,6 +1687,33 @@ class Repository2 implements ModelInterface, ArrayAccess, \JsonSerializable
             throw new \InvalidArgumentException('non-nullable created_at cannot be null');
         }
         $this->container['created_at'] = $created_at;
+
+        return $this;
+    }
+
+    /**
+     * Gets custom_properties
+     *
+     * @return array<string,mixed>|null
+     */
+    public function getCustomProperties()
+    {
+        return $this->container['custom_properties'];
+    }
+
+    /**
+     * Sets custom_properties
+     *
+     * @param array<string,mixed>|null $custom_properties The custom properties that were defined for the repository. The keys are the custom property names, and the values are the corresponding custom property values.
+     *
+     * @return self
+     */
+    public function setCustomProperties($custom_properties)
+    {
+        if (is_null($custom_properties)) {
+            throw new \InvalidArgumentException('non-nullable custom_properties cannot be null');
+        }
+        $this->container['custom_properties'] = $custom_properties;
 
         return $this;
     }

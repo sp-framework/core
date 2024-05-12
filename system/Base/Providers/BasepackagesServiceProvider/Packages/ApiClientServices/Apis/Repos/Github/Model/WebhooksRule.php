@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * WebhooksRule Class Doc Comment
  *
  * @category Class
- * @description The branch protection rule. Includes a &#x60;name&#x60; and all the [branch protection settings](https://docs.github.com/enterprise-server@3.12/github/administering-a-repository/defining-the-mergeability-of-pull-requests/about-protected-branches#about-branch-protection-settings) applied to branches that match the name. Binary settings are boolean. Multi-level configurations are one of &#x60;off&#x60;, &#x60;non_admins&#x60;, or &#x60;everyone&#x60;. Actor and build lists are arrays of strings.
+ * @description The branch protection rule. Includes a &#x60;name&#x60; and all the [branch protection settings](https://docs.github.com/github/administering-a-repository/defining-the-mergeability-of-pull-requests/about-protected-branches#about-branch-protection-settings) applied to branches that match the name. Binary settings are boolean. Multi-level configurations are one of &#x60;off&#x60;, &#x60;non_admins&#x60;, or &#x60;everyone&#x60;. Actor and build lists are arrays of strings.
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

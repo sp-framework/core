@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * WebhooksReviewComment Class Doc Comment
  *
  * @category Class
- * @description The [comment](https://docs.github.com/enterprise-server@3.12/rest/pulls/comments#get-a-review-comment-for-a-pull-request) itself.
+ * @description The [comment](https://docs.github.com/rest/pulls/comments#get-a-review-comment-for-a-pull-request) itself.
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

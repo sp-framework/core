@@ -59,7 +59,7 @@ class SimplePullRequest3Head implements ModelInterface, ArrayAccess, \JsonSerial
     protected static $openAPITypes = [
         'label' => 'string',
         'ref' => 'string',
-        'repo' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Repository10',
+        'repo' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Repository11',
         'sha' => 'string',
         'user' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User'
     ];
@@ -396,7 +396,7 @@ class SimplePullRequest3Head implements ModelInterface, ArrayAccess, \JsonSerial
     /**
      * Gets repo
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Repository10
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Repository11
      */
     public function getRepo()
     {
@@ -406,7 +406,7 @@ class SimplePullRequest3Head implements ModelInterface, ArrayAccess, \JsonSerial
     /**
      * Sets repo
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Repository10 $repo repo
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Repository11 $repo repo
      *
      * @return self
      */

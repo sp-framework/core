@@ -60,8 +60,8 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
         '_links' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5Links',
         'active_lock_reason' => 'string',
         'additions' => 'int',
-        'assignee' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1',
-        'assignees' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[]',
+        'assignee' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User',
+        'assignees' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[]',
         'author_association' => 'string',
         'auto_merge' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestAutoMerge',
         'base' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase',
@@ -89,13 +89,13 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
         'merged' => 'bool',
         'merged_at' => '\DateTime',
         'merged_by' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User',
-        'milestone' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone',
+        'milestone' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone1',
         'node_id' => 'string',
         'number' => 'int',
         'patch_url' => 'string',
         'rebaseable' => 'bool',
-        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5RequestedReviewersInner[]',
-        'requested_teams' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]',
+        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6RequestedReviewersInner[]',
+        'requested_teams' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team1[]',
         'review_comment_url' => 'string',
         'review_comments' => 'int',
         'review_comments_url' => 'string',
@@ -104,7 +104,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
         'title' => 'string',
         'updated_at' => '\DateTime',
         'url' => 'string',
-        'user' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1'
+        'user' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User'
     ];
 
     /**
@@ -917,7 +917,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets assignee
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User
      */
     public function getAssignee()
     {
@@ -927,7 +927,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets assignee
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1 $assignee assignee
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User $assignee assignee
      *
      * @return self
      */
@@ -951,7 +951,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets assignees
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[]
      */
     public function getAssignees()
     {
@@ -961,7 +961,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets assignees
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[] $assignees assignees
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[] $assignees assignees
      *
      * @return self
      */
@@ -1773,7 +1773,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets milestone
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone1
      */
     public function getMilestone()
     {
@@ -1783,7 +1783,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets milestone
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone $milestone milestone
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone1 $milestone milestone
      *
      * @return self
      */
@@ -1922,7 +1922,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets requested_reviewers
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5RequestedReviewersInner[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6RequestedReviewersInner[]
      */
     public function getRequestedReviewers()
     {
@@ -1932,7 +1932,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets requested_reviewers
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest5RequestedReviewersInner[] $requested_reviewers requested_reviewers
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest6RequestedReviewersInner[] $requested_reviewers requested_reviewers
      *
      * @return self
      */
@@ -1949,7 +1949,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets requested_teams
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team1[]
      */
     public function getRequestedTeams()
     {
@@ -1959,7 +1959,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets requested_teams
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[] $requested_teams requested_teams
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team1[] $requested_teams requested_teams
      *
      * @return self
      */
@@ -2202,7 +2202,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets user
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User
      */
     public function getUser()
     {
@@ -2212,7 +2212,7 @@ class PullRequest7 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets user
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1 $user user
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User $user user
      *
      * @return self
      */

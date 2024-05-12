@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * WebhookCommitCommentCreatedComment Class Doc Comment
  *
  * @category Class
- * @description The [commit comment](https://docs.github.com/enterprise-server@3.12/rest/commits/comments#get-a-commit-comment) resource.
+ * @description The [commit comment](https://docs.github.com/rest/commits/comments#get-a-commit-comment) resource.
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

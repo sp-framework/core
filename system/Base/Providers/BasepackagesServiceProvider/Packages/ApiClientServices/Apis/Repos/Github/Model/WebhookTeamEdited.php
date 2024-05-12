@@ -62,7 +62,7 @@ class WebhookTeamEdited implements ModelInterface, ArrayAccess, \JsonSerializabl
         'enterprise' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseWebhooks',
         'installation' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleInstallation',
         'organization' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\OrganizationSimpleWebhooks',
-        'repository' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Repository7',
+        'repository' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Repository14',
         'sender' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SimpleUserWebhooks',
         'team' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksTeam1'
     ];
@@ -523,7 +523,7 @@ class WebhookTeamEdited implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Gets repository
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Repository7|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Repository14|null
      */
     public function getRepository()
     {
@@ -533,7 +533,7 @@ class WebhookTeamEdited implements ModelInterface, ArrayAccess, \JsonSerializabl
     /**
      * Sets repository
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Repository7|null $repository repository
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Repository14|null $repository repository
      *
      * @return self
      */

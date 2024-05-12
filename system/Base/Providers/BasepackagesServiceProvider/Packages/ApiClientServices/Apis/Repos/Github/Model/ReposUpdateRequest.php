@@ -71,6 +71,7 @@ class ReposUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         'allow_squash_merge' => 'bool',
         'allow_merge_commit' => 'bool',
         'allow_rebase_merge' => 'bool',
+        'allow_auto_merge' => 'bool',
         'delete_branch_on_merge' => 'bool',
         'allow_update_branch' => 'bool',
         'use_squash_pr_title_as_default' => 'bool',
@@ -105,6 +106,7 @@ class ReposUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         'allow_squash_merge' => null,
         'allow_merge_commit' => null,
         'allow_rebase_merge' => null,
+        'allow_auto_merge' => null,
         'delete_branch_on_merge' => null,
         'allow_update_branch' => null,
         'use_squash_pr_title_as_default' => null,
@@ -137,6 +139,7 @@ class ReposUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         'allow_squash_merge' => false,
         'allow_merge_commit' => false,
         'allow_rebase_merge' => false,
+        'allow_auto_merge' => false,
         'delete_branch_on_merge' => false,
         'allow_update_branch' => false,
         'use_squash_pr_title_as_default' => false,
@@ -249,6 +252,7 @@ class ReposUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         'allow_squash_merge' => 'allow_squash_merge',
         'allow_merge_commit' => 'allow_merge_commit',
         'allow_rebase_merge' => 'allow_rebase_merge',
+        'allow_auto_merge' => 'allow_auto_merge',
         'delete_branch_on_merge' => 'delete_branch_on_merge',
         'allow_update_branch' => 'allow_update_branch',
         'use_squash_pr_title_as_default' => 'use_squash_pr_title_as_default',
@@ -281,6 +285,7 @@ class ReposUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         'allow_squash_merge' => 'setAllowSquashMerge',
         'allow_merge_commit' => 'setAllowMergeCommit',
         'allow_rebase_merge' => 'setAllowRebaseMerge',
+        'allow_auto_merge' => 'setAllowAutoMerge',
         'delete_branch_on_merge' => 'setDeleteBranchOnMerge',
         'allow_update_branch' => 'setAllowUpdateBranch',
         'use_squash_pr_title_as_default' => 'setUseSquashPrTitleAsDefault',
@@ -313,6 +318,7 @@ class ReposUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         'allow_squash_merge' => 'getAllowSquashMerge',
         'allow_merge_commit' => 'getAllowMergeCommit',
         'allow_rebase_merge' => 'getAllowRebaseMerge',
+        'allow_auto_merge' => 'getAllowAutoMerge',
         'delete_branch_on_merge' => 'getDeleteBranchOnMerge',
         'allow_update_branch' => 'getAllowUpdateBranch',
         'use_squash_pr_title_as_default' => 'getUseSquashPrTitleAsDefault',
@@ -368,7 +374,6 @@ class ReposUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
 
     public const VISIBILITY__PUBLIC = 'public';
     public const VISIBILITY__PRIVATE = 'private';
-    public const VISIBILITY_INTERNAL = 'internal';
     public const SQUASH_MERGE_COMMIT_TITLE_PR_TITLE = 'PR_TITLE';
     public const SQUASH_MERGE_COMMIT_TITLE_COMMIT_OR_PR_TITLE = 'COMMIT_OR_PR_TITLE';
     public const SQUASH_MERGE_COMMIT_MESSAGE_PR_BODY = 'PR_BODY';
@@ -390,7 +395,6 @@ class ReposUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         return [
             self::VISIBILITY__PUBLIC,
             self::VISIBILITY__PRIVATE,
-            self::VISIBILITY_INTERNAL,
         ];
     }
 
@@ -477,6 +481,7 @@ class ReposUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
         $this->setIfExists('allow_squash_merge', $data ?? [], true);
         $this->setIfExists('allow_merge_commit', $data ?? [], true);
         $this->setIfExists('allow_rebase_merge', $data ?? [], true);
+        $this->setIfExists('allow_auto_merge', $data ?? [], false);
         $this->setIfExists('delete_branch_on_merge', $data ?? [], false);
         $this->setIfExists('allow_update_branch', $data ?? [], false);
         $this->setIfExists('use_squash_pr_title_as_default', $data ?? [], false);
@@ -670,7 +675,7 @@ class ReposUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
     /**
      * Sets private
      *
-     * @param bool|null $private Either `true` to make the repository private or `false` to make it public. Default: `false`.   **Note**: You will get a `422` error if the organization restricts [changing repository visibility](https://docs.github.com/enterprise-server@3.12/articles/repository-permission-levels-for-an-organization#changing-the-visibility-of-repositories) to organization owners and a non-owner tries to change the value of private.
+     * @param bool|null $private Either `true` to make the repository private or `false` to make it public. Default: `false`.   **Note**: You will get a `422` error if the organization restricts [changing repository visibility](https://docs.github.com/articles/repository-permission-levels-for-an-organization#changing-the-visibility-of-repositories) to organization owners and a non-owner tries to change the value of private.
      *
      * @return self
      */
@@ -967,6 +972,33 @@ class ReposUpdateRequest implements ModelInterface, ArrayAccess, \JsonSerializab
             throw new \InvalidArgumentException('non-nullable allow_rebase_merge cannot be null');
         }
         $this->container['allow_rebase_merge'] = $allow_rebase_merge;
+
+        return $this;
+    }
+
+    /**
+     * Gets allow_auto_merge
+     *
+     * @return bool|null
+     */
+    public function getAllowAutoMerge()
+    {
+        return $this->container['allow_auto_merge'];
+    }
+
+    /**
+     * Sets allow_auto_merge
+     *
+     * @param bool|null $allow_auto_merge Either `true` to allow auto-merge on pull requests, or `false` to disallow auto-merge.
+     *
+     * @return self
+     */
+    public function setAllowAutoMerge($allow_auto_merge)
+    {
+        if (is_null($allow_auto_merge)) {
+            throw new \InvalidArgumentException('non-nullable allow_auto_merge cannot be null');
+        }
+        $this->container['allow_auto_merge'] = $allow_auto_merge;
 
         return $this;
     }

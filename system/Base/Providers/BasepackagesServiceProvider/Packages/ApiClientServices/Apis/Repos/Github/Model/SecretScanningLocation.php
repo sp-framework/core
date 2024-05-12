@@ -235,6 +235,7 @@ class SecretScanningLocation implements ModelInterface, ArrayAccess, \JsonSerial
     }
 
     public const TYPE_COMMIT = 'commit';
+    public const TYPE_WIKI_COMMIT = 'wiki_commit';
     public const TYPE_ISSUE_TITLE = 'issue_title';
     public const TYPE_ISSUE_BODY = 'issue_body';
     public const TYPE_ISSUE_COMMENT = 'issue_comment';
@@ -256,6 +257,7 @@ class SecretScanningLocation implements ModelInterface, ArrayAccess, \JsonSerial
     {
         return [
             self::TYPE_COMMIT,
+            self::TYPE_WIKI_COMMIT,
             self::TYPE_ISSUE_TITLE,
             self::TYPE_ISSUE_BODY,
             self::TYPE_ISSUE_COMMENT,
@@ -316,9 +318,6 @@ class SecretScanningLocation implements ModelInterface, ArrayAccess, \JsonSerial
     {
         $invalidProperties = [];
 
-        if ($this->container['type'] === null) {
-            $invalidProperties[] = "'type' can't be null";
-        }
         $allowedValues = $this->getTypeAllowableValues();
         if (!is_null($this->container['type']) && !in_array($this->container['type'], $allowedValues, true)) {
             $invalidProperties[] = sprintf(
@@ -328,9 +327,6 @@ class SecretScanningLocation implements ModelInterface, ArrayAccess, \JsonSerial
             );
         }
 
-        if ($this->container['details'] === null) {
-            $invalidProperties[] = "'details' can't be null";
-        }
         return $invalidProperties;
     }
 
@@ -349,7 +345,7 @@ class SecretScanningLocation implements ModelInterface, ArrayAccess, \JsonSerial
     /**
      * Gets type
      *
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -359,7 +355,7 @@ class SecretScanningLocation implements ModelInterface, ArrayAccess, \JsonSerial
     /**
      * Sets type
      *
-     * @param string $type The location type. Because secrets may be found in different types of resources (ie. code, comments, issues, pull requests, discussions), this field identifies the type of resource where the secret was found.
+     * @param string|null $type The location type. Because secrets may be found in different types of resources (ie. code, comments, issues, pull requests, discussions), this field identifies the type of resource where the secret was found.
      *
      * @return self
      */
@@ -386,7 +382,7 @@ class SecretScanningLocation implements ModelInterface, ArrayAccess, \JsonSerial
     /**
      * Gets details
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SecretScanningLocationDetails
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SecretScanningLocationDetails|null
      */
     public function getDetails()
     {
@@ -396,7 +392,7 @@ class SecretScanningLocation implements ModelInterface, ArrayAccess, \JsonSerial
     /**
      * Sets details
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SecretScanningLocationDetails $details details
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SecretScanningLocationDetails|null $details details
      *
      * @return self
      */

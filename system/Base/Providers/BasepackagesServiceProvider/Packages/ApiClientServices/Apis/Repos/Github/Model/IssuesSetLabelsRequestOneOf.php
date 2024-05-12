@@ -306,7 +306,7 @@ class IssuesSetLabelsRequestOneOf implements ModelInterface, ArrayAccess, \JsonS
     /**
      * Sets labels
      *
-     * @param string[]|null $labels The names of the labels to set for the issue. The labels you set replace any existing labels. You can pass an empty array to remove all labels. Alternatively, you can pass a single label as a `string` or an `array` of labels directly, but GitHub recommends passing an object with the `labels` key. You can also add labels to the existing labels for an issue. For more information, see \"[Add labels to an issue](https://docs.github.com/enterprise-server@3.12/rest/issues/labels#add-labels-to-an-issue).\"
+     * @param string[]|null $labels The names of the labels to set for the issue. The labels you set replace any existing labels. You can pass an empty array to remove all labels. Alternatively, you can pass a single label as a `string` or an `array` of labels directly, but GitHub recommends passing an object with the `labels` key. You can also add labels to the existing labels for an issue. For more information, see \"[Add labels to an issue](https://docs.github.com/rest/issues/labels#add-labels-to-an-issue).\"
      *
      * @return self
      */

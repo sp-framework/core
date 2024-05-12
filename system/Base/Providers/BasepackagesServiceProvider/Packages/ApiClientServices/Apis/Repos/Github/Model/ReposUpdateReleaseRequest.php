@@ -63,7 +63,8 @@ class ReposUpdateReleaseRequest implements ModelInterface, ArrayAccess, \JsonSer
         'body' => 'string',
         'draft' => 'bool',
         'prerelease' => 'bool',
-        'make_latest' => 'string'
+        'make_latest' => 'string',
+        'discussion_category_name' => 'string'
     ];
 
     /**
@@ -80,7 +81,8 @@ class ReposUpdateReleaseRequest implements ModelInterface, ArrayAccess, \JsonSer
         'body' => null,
         'draft' => null,
         'prerelease' => null,
-        'make_latest' => null
+        'make_latest' => null,
+        'discussion_category_name' => null
     ];
 
     /**
@@ -95,7 +97,8 @@ class ReposUpdateReleaseRequest implements ModelInterface, ArrayAccess, \JsonSer
         'body' => false,
         'draft' => false,
         'prerelease' => false,
-        'make_latest' => false
+        'make_latest' => false,
+        'discussion_category_name' => false
     ];
 
     /**
@@ -190,7 +193,8 @@ class ReposUpdateReleaseRequest implements ModelInterface, ArrayAccess, \JsonSer
         'body' => 'body',
         'draft' => 'draft',
         'prerelease' => 'prerelease',
-        'make_latest' => 'make_latest'
+        'make_latest' => 'make_latest',
+        'discussion_category_name' => 'discussion_category_name'
     ];
 
     /**
@@ -205,7 +209,8 @@ class ReposUpdateReleaseRequest implements ModelInterface, ArrayAccess, \JsonSer
         'body' => 'setBody',
         'draft' => 'setDraft',
         'prerelease' => 'setPrerelease',
-        'make_latest' => 'setMakeLatest'
+        'make_latest' => 'setMakeLatest',
+        'discussion_category_name' => 'setDiscussionCategoryName'
     ];
 
     /**
@@ -220,7 +225,8 @@ class ReposUpdateReleaseRequest implements ModelInterface, ArrayAccess, \JsonSer
         'body' => 'getBody',
         'draft' => 'getDraft',
         'prerelease' => 'getPrerelease',
-        'make_latest' => 'getMakeLatest'
+        'make_latest' => 'getMakeLatest',
+        'discussion_category_name' => 'getDiscussionCategoryName'
     ];
 
     /**
@@ -304,6 +310,7 @@ class ReposUpdateReleaseRequest implements ModelInterface, ArrayAccess, \JsonSer
         $this->setIfExists('draft', $data ?? [], null);
         $this->setIfExists('prerelease', $data ?? [], null);
         $this->setIfExists('make_latest', $data ?? [], 'true');
+        $this->setIfExists('discussion_category_name', $data ?? [], null);
     }
 
     /**
@@ -552,6 +559,33 @@ class ReposUpdateReleaseRequest implements ModelInterface, ArrayAccess, \JsonSer
             );
         }
         $this->container['make_latest'] = $make_latest;
+
+        return $this;
+    }
+
+    /**
+     * Gets discussion_category_name
+     *
+     * @return string|null
+     */
+    public function getDiscussionCategoryName()
+    {
+        return $this->container['discussion_category_name'];
+    }
+
+    /**
+     * Sets discussion_category_name
+     *
+     * @param string|null $discussion_category_name If specified, a discussion of the specified category is created and linked to the release. The value must be a category that already exists in the repository. If there is already a discussion linked to the release, this parameter is ignored. For more information, see \"[Managing categories for discussions in your repository](https://docs.github.com/discussions/managing-discussions-for-your-community/managing-categories-for-discussions-in-your-repository).\"
+     *
+     * @return self
+     */
+    public function setDiscussionCategoryName($discussion_category_name)
+    {
+        if (is_null($discussion_category_name)) {
+            throw new \InvalidArgumentException('non-nullable discussion_category_name cannot be null');
+        }
+        $this->container['discussion_category_name'] = $discussion_category_name;
 
         return $this;
     }

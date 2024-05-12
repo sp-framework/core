@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * WebhookDeploymentStatusCreatedDeploymentStatus Class Doc Comment
  *
  * @category Class
- * @description The [deployment status](https://docs.github.com/enterprise-server@3.12/rest/deployments/statuses#list-deployment-statuses).
+ * @description The [deployment status](https://docs.github.com/rest/deployments/statuses#list-deployment-statuses).
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

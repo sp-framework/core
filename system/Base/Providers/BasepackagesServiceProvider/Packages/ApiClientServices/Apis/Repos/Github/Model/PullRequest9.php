@@ -76,7 +76,7 @@ class PullRequest9 implements ModelInterface, ArrayAccess, \JsonSerializable
         'deletions' => 'int',
         'diff_url' => 'string',
         'draft' => 'bool',
-        'head' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest9Head',
+        'head' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase',
         'html_url' => 'string',
         'id' => 'int',
         'issue_url' => 'string',
@@ -94,7 +94,7 @@ class PullRequest9 implements ModelInterface, ArrayAccess, \JsonSerializable
         'number' => 'int',
         'patch_url' => 'string',
         'rebaseable' => 'bool',
-        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestRequestedReviewersInner[]',
+        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5RequestedReviewersInner[]',
         'requested_teams' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]',
         'review_comment_url' => 'string',
         'review_comments' => 'int',
@@ -1387,7 +1387,7 @@ class PullRequest9 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets head
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest9Head
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase
      */
     public function getHead()
     {
@@ -1397,7 +1397,7 @@ class PullRequest9 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets head
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequest9Head $head head
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase $head head
      *
      * @return self
      */
@@ -1922,7 +1922,7 @@ class PullRequest9 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets requested_reviewers
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestRequestedReviewersInner[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5RequestedReviewersInner[]
      */
     public function getRequestedReviewers()
     {
@@ -1932,7 +1932,7 @@ class PullRequest9 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets requested_reviewers
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestRequestedReviewersInner[] $requested_reviewers requested_reviewers
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5RequestedReviewersInner[] $requested_reviewers requested_reviewers
      *
      * @return self
      */

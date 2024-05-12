@@ -341,7 +341,7 @@ class ReactionsCreateForCommitCommentRequest implements ModelInterface, ArrayAcc
     /**
      * Sets content
      *
-     * @param string $content The [reaction type](https://docs.github.com/enterprise-server@3.12/rest/reactions/reactions#about-reactions) to add to the commit comment.
+     * @param string $content The [reaction type](https://docs.github.com/rest/reactions/reactions#about-reactions) to add to the commit comment.
      *
      * @return self
      */

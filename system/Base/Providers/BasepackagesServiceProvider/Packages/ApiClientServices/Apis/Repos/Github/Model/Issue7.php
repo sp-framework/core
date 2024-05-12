@@ -35,7 +35,7 @@ use \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientService
  * Issue7 Class Doc Comment
  *
  * @category Class
- * @description The [issue](https://docs.github.com/enterprise-server@3.12/rest/issues/issues#get-an-issue) itself.
+ * @description The [issue](https://docs.github.com/rest/issues/issues#get-an-issue) itself.
  * @package  System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech

@@ -442,7 +442,7 @@ class ReposCreateDeploymentRequest implements ModelInterface, ArrayAccess, \Json
     /**
      * Sets required_contexts
      *
-     * @param string[]|null $required_contexts The [status](https://docs.github.com/enterprise-server@3.12/rest/commits/statuses) contexts to verify against commit status checks. If you omit this parameter, GitHub verifies all unique contexts before creating a deployment. To bypass checking entirely, pass an empty array. Defaults to all unique contexts.
+     * @param string[]|null $required_contexts The [status](https://docs.github.com/rest/commits/statuses) contexts to verify against commit status checks. If you omit this parameter, GitHub verifies all unique contexts before creating a deployment. To bypass checking entirely, pass an empty array. Defaults to all unique contexts.
      *
      * @return self
      */

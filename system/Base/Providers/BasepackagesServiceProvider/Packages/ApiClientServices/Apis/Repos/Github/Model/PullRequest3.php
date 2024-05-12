@@ -60,8 +60,8 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
         '_links' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5Links',
         'active_lock_reason' => 'string',
         'additions' => 'int',
-        'assignee' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1',
-        'assignees' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[]',
+        'assignee' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User',
+        'assignees' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[]',
         'author_association' => 'string',
         'auto_merge' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestAutoMerge',
         'base' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase',
@@ -76,7 +76,7 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
         'deletions' => 'int',
         'diff_url' => 'string',
         'draft' => 'bool',
-        'head' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestHead',
+        'head' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase',
         'html_url' => 'string',
         'id' => 'int',
         'issue_url' => 'string',
@@ -88,13 +88,13 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
         'mergeable_state' => 'string',
         'merged' => 'bool',
         'merged_at' => '\DateTime',
-        'merged_by' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1',
+        'merged_by' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User',
         'milestone' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Milestone',
         'node_id' => 'string',
         'number' => 'int',
         'patch_url' => 'string',
         'rebaseable' => 'bool',
-        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestRequestedReviewersInner[]',
+        'requested_reviewers' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5RequestedReviewersInner[]',
         'requested_teams' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\Team[]',
         'review_comment_url' => 'string',
         'review_comments' => 'int',
@@ -917,7 +917,7 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets assignee
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User
      */
     public function getAssignee()
     {
@@ -927,7 +927,7 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets assignee
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1 $assignee assignee
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User $assignee assignee
      *
      * @return self
      */
@@ -951,7 +951,7 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets assignees
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[]
      */
     public function getAssignees()
     {
@@ -961,7 +961,7 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets assignees
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1[] $assignees assignees
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User[] $assignees assignees
      *
      * @return self
      */
@@ -1387,7 +1387,7 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets head
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestHead
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase
      */
     public function getHead()
     {
@@ -1397,7 +1397,7 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets head
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestHead $head head
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestBase $head head
      *
      * @return self
      */
@@ -1739,7 +1739,7 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets merged_by
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1|null
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User|null
      */
     public function getMergedBy()
     {
@@ -1749,7 +1749,7 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets merged_by
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User1|null $merged_by merged_by
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\User|null $merged_by merged_by
      *
      * @return self
      */
@@ -1922,7 +1922,7 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets requested_reviewers
      *
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestRequestedReviewersInner[]
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5RequestedReviewersInner[]
      */
     public function getRequestedReviewers()
     {
@@ -1932,7 +1932,7 @@ class PullRequest3 implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets requested_reviewers
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\PullRequestRequestedReviewersInner[] $requested_reviewers requested_reviewers
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WebhooksPullRequest5RequestedReviewersInner[] $requested_reviewers requested_reviewers
      *
      * @return self
      */

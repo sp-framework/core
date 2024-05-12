@@ -59,7 +59,8 @@ class RepositoryRulesetConditions implements ModelInterface, ArrayAccess, \JsonS
     protected static $openAPITypes = [
         'ref_name' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRulesetConditionsRefName',
         'repository_name' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRulesetConditionsRepositoryNameTargetRepositoryName',
-        'repository_id' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRulesetConditionsRepositoryIdTargetRepositoryId'
+        'repository_id' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRulesetConditionsRepositoryIdTargetRepositoryId',
+        'repository_property' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRulesetConditionsRepositoryPropertyTargetRepositoryProperty'
     ];
 
     /**
@@ -72,7 +73,8 @@ class RepositoryRulesetConditions implements ModelInterface, ArrayAccess, \JsonS
     protected static $openAPIFormats = [
         'ref_name' => null,
         'repository_name' => null,
-        'repository_id' => null
+        'repository_id' => null,
+        'repository_property' => null
     ];
 
     /**
@@ -83,7 +85,8 @@ class RepositoryRulesetConditions implements ModelInterface, ArrayAccess, \JsonS
     protected static array $openAPINullables = [
         'ref_name' => false,
         'repository_name' => false,
-        'repository_id' => false
+        'repository_id' => false,
+        'repository_property' => false
     ];
 
     /**
@@ -174,7 +177,8 @@ class RepositoryRulesetConditions implements ModelInterface, ArrayAccess, \JsonS
     protected static $attributeMap = [
         'ref_name' => 'ref_name',
         'repository_name' => 'repository_name',
-        'repository_id' => 'repository_id'
+        'repository_id' => 'repository_id',
+        'repository_property' => 'repository_property'
     ];
 
     /**
@@ -185,7 +189,8 @@ class RepositoryRulesetConditions implements ModelInterface, ArrayAccess, \JsonS
     protected static $setters = [
         'ref_name' => 'setRefName',
         'repository_name' => 'setRepositoryName',
-        'repository_id' => 'setRepositoryId'
+        'repository_id' => 'setRepositoryId',
+        'repository_property' => 'setRepositoryProperty'
     ];
 
     /**
@@ -196,7 +201,8 @@ class RepositoryRulesetConditions implements ModelInterface, ArrayAccess, \JsonS
     protected static $getters = [
         'ref_name' => 'getRefName',
         'repository_name' => 'getRepositoryName',
-        'repository_id' => 'getRepositoryId'
+        'repository_id' => 'getRepositoryId',
+        'repository_property' => 'getRepositoryProperty'
     ];
 
     /**
@@ -259,6 +265,7 @@ class RepositoryRulesetConditions implements ModelInterface, ArrayAccess, \JsonS
         $this->setIfExists('ref_name', $data ?? [], null);
         $this->setIfExists('repository_name', $data ?? [], null);
         $this->setIfExists('repository_id', $data ?? [], null);
+        $this->setIfExists('repository_property', $data ?? [], null);
     }
 
     /**
@@ -293,6 +300,9 @@ class RepositoryRulesetConditions implements ModelInterface, ArrayAccess, \JsonS
         }
         if ($this->container['repository_id'] === null) {
             $invalidProperties[] = "'repository_id' can't be null";
+        }
+        if ($this->container['repository_property'] === null) {
+            $invalidProperties[] = "'repository_property' can't be null";
         }
         return $invalidProperties;
     }
@@ -386,6 +396,33 @@ class RepositoryRulesetConditions implements ModelInterface, ArrayAccess, \JsonS
             throw new \InvalidArgumentException('non-nullable repository_id cannot be null');
         }
         $this->container['repository_id'] = $repository_id;
+
+        return $this;
+    }
+
+    /**
+     * Gets repository_property
+     *
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRulesetConditionsRepositoryPropertyTargetRepositoryProperty
+     */
+    public function getRepositoryProperty()
+    {
+        return $this->container['repository_property'];
+    }
+
+    /**
+     * Sets repository_property
+     *
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RepositoryRulesetConditionsRepositoryPropertyTargetRepositoryProperty $repository_property repository_property
+     *
+     * @return self
+     */
+    public function setRepositoryProperty($repository_property)
+    {
+        if (is_null($repository_property)) {
+            throw new \InvalidArgumentException('non-nullable repository_property cannot be null');
+        }
+        $this->container['repository_property'] = $repository_property;
 
         return $this;
     }

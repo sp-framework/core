@@ -77,16 +77,13 @@ class ActionsApi
         'actionsAddCustomLabelsToSelfHostedRunnerForRepo' => [
             'application/json',
         ],
-        'actionsAddRepoAccessToSelfHostedRunnerGroupInOrg' => [
-            'application/json',
-        ],
         'actionsAddSelectedRepoToOrgSecret' => [
             'application/json',
         ],
         'actionsAddSelectedRepoToOrgVariable' => [
             'application/json',
         ],
-        'actionsAddSelfHostedRunnerToGroupForOrg' => [
+        'actionsApproveWorkflowRun' => [
             'application/json',
         ],
         'actionsCancelWorkflowRun' => [
@@ -120,9 +117,6 @@ class ActionsApi
             'application/json',
         ],
         'actionsCreateRepoVariable' => [
-            'application/json',
-        ],
-        'actionsCreateSelfHostedRunnerGroupForOrg' => [
             'application/json',
         ],
         'actionsCreateWorkflowDispatch' => [
@@ -161,9 +155,6 @@ class ActionsApi
         'actionsDeleteSelfHostedRunnerFromRepo' => [
             'application/json',
         ],
-        'actionsDeleteSelfHostedRunnerGroupFromOrg' => [
-            'application/json',
-        ],
         'actionsDeleteWorkflowRun' => [
             'application/json',
         ],
@@ -197,9 +188,6 @@ class ActionsApi
         'actionsForceCancelWorkflowRun' => [
             'application/json',
         ],
-        'actionsGenerateRunnerJitconfigForEnterprise' => [
-            'application/json',
-        ],
         'actionsGenerateRunnerJitconfigForOrg' => [
             'application/json',
         ],
@@ -215,16 +203,7 @@ class ActionsApi
         'actionsGetActionsCacheUsageByRepoForOrg' => [
             'application/json',
         ],
-        'actionsGetActionsCacheUsageForEnterprise' => [
-            'application/json',
-        ],
         'actionsGetActionsCacheUsageForOrg' => [
-            'application/json',
-        ],
-        'actionsGetActionsCacheUsagePolicy' => [
-            'application/json',
-        ],
-        'actionsGetActionsCacheUsagePolicyForEnterprise' => [
             'application/json',
         ],
         'actionsGetAllowedActionsOrganization' => [
@@ -246,9 +225,6 @@ class ActionsApi
             'application/json',
         ],
         'actionsGetEnvironmentVariable' => [
-            'application/json',
-        ],
-        'actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise' => [
             'application/json',
         ],
         'actionsGetGithubActionsDefaultWorkflowPermissionsOrganization' => [
@@ -296,9 +272,6 @@ class ActionsApi
         'actionsGetSelfHostedRunnerForRepo' => [
             'application/json',
         ],
-        'actionsGetSelfHostedRunnerGroupForOrg' => [
-            'application/json',
-        ],
         'actionsGetWorkflow' => [
             'application/json',
         ],
@@ -309,6 +282,12 @@ class ActionsApi
             'application/json',
         ],
         'actionsGetWorkflowRunAttempt' => [
+            'application/json',
+        ],
+        'actionsGetWorkflowRunUsage' => [
+            'application/json',
+        ],
+        'actionsGetWorkflowUsage' => [
             'application/json',
         ],
         'actionsListArtifactsForRepo' => [
@@ -336,9 +315,6 @@ class ActionsApi
             'application/json',
         ],
         'actionsListOrgVariables' => [
-            'application/json',
-        ],
-        'actionsListRepoAccessToSelfHostedRunnerGroupInOrg' => [
             'application/json',
         ],
         'actionsListRepoOrganizationSecrets' => [
@@ -371,16 +347,10 @@ class ActionsApi
         'actionsListSelectedRepositoriesEnabledGithubActionsOrganization' => [
             'application/json',
         ],
-        'actionsListSelfHostedRunnerGroupsForOrg' => [
-            'application/json',
-        ],
         'actionsListSelfHostedRunnersForOrg' => [
             'application/json',
         ],
         'actionsListSelfHostedRunnersForRepo' => [
-            'application/json',
-        ],
-        'actionsListSelfHostedRunnersInGroupForOrg' => [
             'application/json',
         ],
         'actionsListWorkflowRunArtifacts' => [
@@ -413,28 +383,16 @@ class ActionsApi
         'actionsRemoveCustomLabelFromSelfHostedRunnerForRepo' => [
             'application/json',
         ],
-        'actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg' => [
-            'application/json',
-        ],
         'actionsRemoveSelectedRepoFromOrgSecret' => [
             'application/json',
         ],
         'actionsRemoveSelectedRepoFromOrgVariable' => [
             'application/json',
         ],
-        'actionsRemoveSelfHostedRunnerFromGroupForOrg' => [
-            'application/json',
-        ],
         'actionsReviewCustomGatesForRun' => [
             'application/json',
         ],
         'actionsReviewPendingDeploymentsForRun' => [
-            'application/json',
-        ],
-        'actionsSetActionsCacheUsagePolicy' => [
-            'application/json',
-        ],
-        'actionsSetActionsCacheUsagePolicyForEnterprise' => [
             'application/json',
         ],
         'actionsSetAllowedActionsOrganization' => [
@@ -452,9 +410,6 @@ class ActionsApi
         'actionsSetCustomOidcSubClaimForRepo' => [
             'application/json',
         ],
-        'actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise' => [
-            'application/json',
-        ],
         'actionsSetGithubActionsDefaultWorkflowPermissionsOrganization' => [
             'application/json',
         ],
@@ -467,9 +422,6 @@ class ActionsApi
         'actionsSetGithubActionsPermissionsRepository' => [
             'application/json',
         ],
-        'actionsSetRepoAccessToSelfHostedRunnerGroupInOrg' => [
-            'application/json',
-        ],
         'actionsSetSelectedReposForOrgSecret' => [
             'application/json',
         ],
@@ -477,9 +429,6 @@ class ActionsApi
             'application/json',
         ],
         'actionsSetSelectedRepositoriesEnabledGithubActionsOrganization' => [
-            'application/json',
-        ],
-        'actionsSetSelfHostedRunnersInGroupForOrg' => [
             'application/json',
         ],
         'actionsSetWorkflowAccessToRepository' => [
@@ -492,9 +441,6 @@ class ActionsApi
             'application/json',
         ],
         'actionsUpdateRepoVariable' => [
-            'application/json',
-        ],
-        'actionsUpdateSelfHostedRunnerGroupForOrg' => [
             'application/json',
         ],
     ];
@@ -552,16 +498,16 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminAddCustomLabelsToSelfHostedRunnerForEnterpriseRequest $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest $actions_add_custom_labels_to_self_hosted_runner_for_org_request actions_add_custom_labels_to_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
      */
-    public function actionsAddCustomLabelsToSelfHostedRunnerForOrg($org, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'][0])
+    public function actionsAddCustomLabelsToSelfHostedRunnerForOrg($org, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'][0])
     {
-        list($response) = $this->actionsAddCustomLabelsToSelfHostedRunnerForOrgWithHttpInfo($org, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, $contentType);
+        list($response) = $this->actionsAddCustomLabelsToSelfHostedRunnerForOrgWithHttpInfo($org, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, $contentType);
         return $response;
     }
 
@@ -572,16 +518,16 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminAddCustomLabelsToSelfHostedRunnerForEnterpriseRequest $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest $actions_add_custom_labels_to_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
      */
-    public function actionsAddCustomLabelsToSelfHostedRunnerForOrgWithHttpInfo($org, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'][0])
+    public function actionsAddCustomLabelsToSelfHostedRunnerForOrgWithHttpInfo($org, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'][0])
     {
-        $request = $this->actionsAddCustomLabelsToSelfHostedRunnerForOrgRequest($org, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, $contentType);
+        $request = $this->actionsAddCustomLabelsToSelfHostedRunnerForOrgRequest($org, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -620,11 +566,11 @@ class ActionsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -642,7 +588,7 @@ class ActionsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -702,7 +648,7 @@ class ActionsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -735,7 +681,7 @@ class ActionsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -768,15 +714,15 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminAddCustomLabelsToSelfHostedRunnerForEnterpriseRequest $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest $actions_add_custom_labels_to_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsAddCustomLabelsToSelfHostedRunnerForOrgAsync($org, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'][0])
+    public function actionsAddCustomLabelsToSelfHostedRunnerForOrgAsync($org, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'][0])
     {
-        return $this->actionsAddCustomLabelsToSelfHostedRunnerForOrgAsyncWithHttpInfo($org, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, $contentType)
+        return $this->actionsAddCustomLabelsToSelfHostedRunnerForOrgAsyncWithHttpInfo($org, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -791,16 +737,16 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminAddCustomLabelsToSelfHostedRunnerForEnterpriseRequest $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest $actions_add_custom_labels_to_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsAddCustomLabelsToSelfHostedRunnerForOrgAsyncWithHttpInfo($org, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'][0])
+    public function actionsAddCustomLabelsToSelfHostedRunnerForOrgAsyncWithHttpInfo($org, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
-        $request = $this->actionsAddCustomLabelsToSelfHostedRunnerForOrgRequest($org, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
+        $request = $this->actionsAddCustomLabelsToSelfHostedRunnerForOrgRequest($org, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -843,13 +789,13 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminAddCustomLabelsToSelfHostedRunnerForEnterpriseRequest $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest $actions_add_custom_labels_to_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function actionsAddCustomLabelsToSelfHostedRunnerForOrgRequest($org, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'][0])
+    public function actionsAddCustomLabelsToSelfHostedRunnerForOrgRequest($org, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForOrg'][0])
     {
 
         // verify the required parameter 'org' is set
@@ -866,10 +812,10 @@ class ActionsApi
             );
         }
 
-        // verify the required parameter 'enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request' is set
-        if ($enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request === null || (is_array($enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request) && count($enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request) === 0)) {
+        // verify the required parameter 'actions_add_custom_labels_to_self_hosted_runner_for_org_request' is set
+        if ($actions_add_custom_labels_to_self_hosted_runner_for_org_request === null || (is_array($actions_add_custom_labels_to_self_hosted_runner_for_org_request) && count($actions_add_custom_labels_to_self_hosted_runner_for_org_request) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request when calling actionsAddCustomLabelsToSelfHostedRunnerForOrg'
+                'Missing the required parameter $actions_add_custom_labels_to_self_hosted_runner_for_org_request when calling actionsAddCustomLabelsToSelfHostedRunnerForOrg'
             );
         }
 
@@ -908,12 +854,12 @@ class ActionsApi
         );
 
         // for model (json/xml)
-        if (isset($enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request)) {
+        if (isset($actions_add_custom_labels_to_self_hosted_runner_for_org_request)) {
             if (stripos($headers['Content-Type'], 'application/json') !== false) {
                 # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request));
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_add_custom_labels_to_self_hosted_runner_for_org_request));
             } else {
-                $httpBody = $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request;
+                $httpBody = $actions_add_custom_labels_to_self_hosted_runner_for_org_request;
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -969,16 +915,16 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminAddCustomLabelsToSelfHostedRunnerForEnterpriseRequest $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest $actions_add_custom_labels_to_self_hosted_runner_for_org_request actions_add_custom_labels_to_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
      */
-    public function actionsAddCustomLabelsToSelfHostedRunnerForRepo($owner, $repo, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'][0])
+    public function actionsAddCustomLabelsToSelfHostedRunnerForRepo($owner, $repo, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'][0])
     {
-        list($response) = $this->actionsAddCustomLabelsToSelfHostedRunnerForRepoWithHttpInfo($owner, $repo, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, $contentType);
+        list($response) = $this->actionsAddCustomLabelsToSelfHostedRunnerForRepoWithHttpInfo($owner, $repo, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, $contentType);
         return $response;
     }
 
@@ -990,16 +936,16 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminAddCustomLabelsToSelfHostedRunnerForEnterpriseRequest $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest $actions_add_custom_labels_to_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
      */
-    public function actionsAddCustomLabelsToSelfHostedRunnerForRepoWithHttpInfo($owner, $repo, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'][0])
+    public function actionsAddCustomLabelsToSelfHostedRunnerForRepoWithHttpInfo($owner, $repo, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'][0])
     {
-        $request = $this->actionsAddCustomLabelsToSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, $contentType);
+        $request = $this->actionsAddCustomLabelsToSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -1038,11 +984,11 @@ class ActionsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -1060,7 +1006,7 @@ class ActionsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -1120,7 +1066,7 @@ class ActionsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -1153,7 +1099,7 @@ class ActionsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -1187,15 +1133,15 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminAddCustomLabelsToSelfHostedRunnerForEnterpriseRequest $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest $actions_add_custom_labels_to_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsAddCustomLabelsToSelfHostedRunnerForRepoAsync($owner, $repo, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'][0])
+    public function actionsAddCustomLabelsToSelfHostedRunnerForRepoAsync($owner, $repo, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'][0])
     {
-        return $this->actionsAddCustomLabelsToSelfHostedRunnerForRepoAsyncWithHttpInfo($owner, $repo, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, $contentType)
+        return $this->actionsAddCustomLabelsToSelfHostedRunnerForRepoAsyncWithHttpInfo($owner, $repo, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -1211,16 +1157,16 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminAddCustomLabelsToSelfHostedRunnerForEnterpriseRequest $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest $actions_add_custom_labels_to_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsAddCustomLabelsToSelfHostedRunnerForRepoAsyncWithHttpInfo($owner, $repo, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'][0])
+    public function actionsAddCustomLabelsToSelfHostedRunnerForRepoAsyncWithHttpInfo($owner, $repo, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
-        $request = $this->actionsAddCustomLabelsToSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
+        $request = $this->actionsAddCustomLabelsToSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -1264,13 +1210,13 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminAddCustomLabelsToSelfHostedRunnerForEnterpriseRequest $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest $actions_add_custom_labels_to_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function actionsAddCustomLabelsToSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'][0])
+    public function actionsAddCustomLabelsToSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $actions_add_custom_labels_to_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsAddCustomLabelsToSelfHostedRunnerForRepo'][0])
     {
 
         // verify the required parameter 'owner' is set
@@ -1294,10 +1240,10 @@ class ActionsApi
             );
         }
 
-        // verify the required parameter 'enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request' is set
-        if ($enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request === null || (is_array($enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request) && count($enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request) === 0)) {
+        // verify the required parameter 'actions_add_custom_labels_to_self_hosted_runner_for_org_request' is set
+        if ($actions_add_custom_labels_to_self_hosted_runner_for_org_request === null || (is_array($actions_add_custom_labels_to_self_hosted_runner_for_org_request) && count($actions_add_custom_labels_to_self_hosted_runner_for_org_request) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request when calling actionsAddCustomLabelsToSelfHostedRunnerForRepo'
+                'Missing the required parameter $actions_add_custom_labels_to_self_hosted_runner_for_org_request when calling actionsAddCustomLabelsToSelfHostedRunnerForRepo'
             );
         }
 
@@ -1344,12 +1290,12 @@ class ActionsApi
         );
 
         // for model (json/xml)
-        if (isset($enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request)) {
+        if (isset($actions_add_custom_labels_to_self_hosted_runner_for_org_request)) {
             if (stripos($headers['Content-Type'], 'application/json') !== false) {
                 # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request));
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_add_custom_labels_to_self_hosted_runner_for_org_request));
             } else {
-                $httpBody = $enterprise_admin_add_custom_labels_to_self_hosted_runner_for_enterprise_request;
+                $httpBody = $actions_add_custom_labels_to_self_hosted_runner_for_org_request;
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -1391,275 +1337,6 @@ class ActionsApi
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
             'POST',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation actionsAddRepoAccessToSelfHostedRunnerGroupInOrg
-     *
-     * Add repository access to a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $repository_id The unique identifier of the repository. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return void
-     */
-    public function actionsAddRepoAccessToSelfHostedRunnerGroupInOrg($org, $runner_group_id, $repository_id, string $contentType = self::contentTypes['actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        $this->actionsAddRepoAccessToSelfHostedRunnerGroupInOrgWithHttpInfo($org, $runner_group_id, $repository_id, $contentType);
-    }
-
-    /**
-     * Operation actionsAddRepoAccessToSelfHostedRunnerGroupInOrgWithHttpInfo
-     *
-     * Add repository access to a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $repository_id The unique identifier of the repository. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsAddRepoAccessToSelfHostedRunnerGroupInOrgWithHttpInfo($org, $runner_group_id, $repository_id, string $contentType = self::contentTypes['actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        $request = $this->actionsAddRepoAccessToSelfHostedRunnerGroupInOrgRequest($org, $runner_group_id, $repository_id, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            return [null, $statusCode, $response->getHeaders()];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsAddRepoAccessToSelfHostedRunnerGroupInOrgAsync
-     *
-     * Add repository access to a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $repository_id The unique identifier of the repository. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsAddRepoAccessToSelfHostedRunnerGroupInOrgAsync($org, $runner_group_id, $repository_id, string $contentType = self::contentTypes['actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        return $this->actionsAddRepoAccessToSelfHostedRunnerGroupInOrgAsyncWithHttpInfo($org, $runner_group_id, $repository_id, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsAddRepoAccessToSelfHostedRunnerGroupInOrgAsyncWithHttpInfo
-     *
-     * Add repository access to a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $repository_id The unique identifier of the repository. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsAddRepoAccessToSelfHostedRunnerGroupInOrgAsyncWithHttpInfo($org, $runner_group_id, $repository_id, string $contentType = self::contentTypes['actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        $returnType = '';
-        $request = $this->actionsAddRepoAccessToSelfHostedRunnerGroupInOrgRequest($org, $runner_group_id, $repository_id, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    return [null, $response->getStatusCode(), $response->getHeaders()];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $repository_id The unique identifier of the repository. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsAddRepoAccessToSelfHostedRunnerGroupInOrgRequest($org, $runner_group_id, $repository_id, string $contentType = self::contentTypes['actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'
-            );
-        }
-
-        // verify the required parameter 'runner_group_id' is set
-        if ($runner_group_id === null || (is_array($runner_group_id) && count($runner_group_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_group_id when calling actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'
-            );
-        }
-
-        // verify the required parameter 'repository_id' is set
-        if ($repository_id === null || (is_array($repository_id) && count($repository_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $repository_id when calling actionsAddRepoAccessToSelfHostedRunnerGroupInOrg'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/actions/runner-groups/{runner_group_id}/repositories/{repository_id}';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($runner_group_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'runner_group_id' . '}',
-                ObjectSerializer::toPathValue($runner_group_id),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($repository_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'repository_id' . '}',
-                ObjectSerializer::toPathValue($repository_id),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            [],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'PUT',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody
@@ -2205,41 +1882,42 @@ class ActionsApi
     }
 
     /**
-     * Operation actionsAddSelfHostedRunnerToGroupForOrg
+     * Operation actionsApproveWorkflowRun
      *
-     * Add a self-hosted runner to a group for an organization
+     * Approve a workflow run for a fork pull request
      *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddSelfHostedRunnerToGroupForOrg'] to see the possible values for this operation
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  int $run_id The unique identifier of the workflow run. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsApproveWorkflowRun'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return void
+     * @return object|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
      */
-    public function actionsAddSelfHostedRunnerToGroupForOrg($org, $runner_group_id, $runner_id, string $contentType = self::contentTypes['actionsAddSelfHostedRunnerToGroupForOrg'][0])
+    public function actionsApproveWorkflowRun($owner, $repo, $run_id, string $contentType = self::contentTypes['actionsApproveWorkflowRun'][0])
     {
-        $this->actionsAddSelfHostedRunnerToGroupForOrgWithHttpInfo($org, $runner_group_id, $runner_id, $contentType);
+        list($response) = $this->actionsApproveWorkflowRunWithHttpInfo($owner, $repo, $run_id, $contentType);
+        return $response;
     }
 
     /**
-     * Operation actionsAddSelfHostedRunnerToGroupForOrgWithHttpInfo
+     * Operation actionsApproveWorkflowRunWithHttpInfo
      *
-     * Add a self-hosted runner to a group for an organization
+     * Approve a workflow run for a fork pull request
      *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddSelfHostedRunnerToGroupForOrg'] to see the possible values for this operation
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  int $run_id The unique identifier of the workflow run. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsApproveWorkflowRun'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     * @return array of object|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
      */
-    public function actionsAddSelfHostedRunnerToGroupForOrgWithHttpInfo($org, $runner_group_id, $runner_id, string $contentType = self::contentTypes['actionsAddSelfHostedRunnerToGroupForOrg'][0])
+    public function actionsApproveWorkflowRunWithHttpInfo($owner, $repo, $run_id, string $contentType = self::contentTypes['actionsApproveWorkflowRun'][0])
     {
-        $request = $this->actionsAddSelfHostedRunnerToGroupForOrgRequest($org, $runner_group_id, $runner_id, $contentType);
+        $request = $this->actionsApproveWorkflowRunRequest($owner, $repo, $run_id, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -2276,31 +1954,165 @@ class ActionsApi
                 );
             }
 
-            return [null, $statusCode, $response->getHeaders()];
+            switch($statusCode) {
+                case 201:
+                    if ('object' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('object' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, 'object', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = 'object';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
 
         } catch (ApiException $e) {
             switch ($e->getCode()) {
+                case 201:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        'object',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
             }
             throw $e;
         }
     }
 
     /**
-     * Operation actionsAddSelfHostedRunnerToGroupForOrgAsync
+     * Operation actionsApproveWorkflowRunAsync
      *
-     * Add a self-hosted runner to a group for an organization
+     * Approve a workflow run for a fork pull request
      *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddSelfHostedRunnerToGroupForOrg'] to see the possible values for this operation
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  int $run_id The unique identifier of the workflow run. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsApproveWorkflowRun'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsAddSelfHostedRunnerToGroupForOrgAsync($org, $runner_group_id, $runner_id, string $contentType = self::contentTypes['actionsAddSelfHostedRunnerToGroupForOrg'][0])
+    public function actionsApproveWorkflowRunAsync($owner, $repo, $run_id, string $contentType = self::contentTypes['actionsApproveWorkflowRun'][0])
     {
-        return $this->actionsAddSelfHostedRunnerToGroupForOrgAsyncWithHttpInfo($org, $runner_group_id, $runner_id, $contentType)
+        return $this->actionsApproveWorkflowRunAsyncWithHttpInfo($owner, $repo, $run_id, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -2309,28 +2121,41 @@ class ActionsApi
     }
 
     /**
-     * Operation actionsAddSelfHostedRunnerToGroupForOrgAsyncWithHttpInfo
+     * Operation actionsApproveWorkflowRunAsyncWithHttpInfo
      *
-     * Add a self-hosted runner to a group for an organization
+     * Approve a workflow run for a fork pull request
      *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddSelfHostedRunnerToGroupForOrg'] to see the possible values for this operation
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  int $run_id The unique identifier of the workflow run. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsApproveWorkflowRun'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsAddSelfHostedRunnerToGroupForOrgAsyncWithHttpInfo($org, $runner_group_id, $runner_id, string $contentType = self::contentTypes['actionsAddSelfHostedRunnerToGroupForOrg'][0])
+    public function actionsApproveWorkflowRunAsyncWithHttpInfo($owner, $repo, $run_id, string $contentType = self::contentTypes['actionsApproveWorkflowRun'][0])
     {
-        $returnType = '';
-        $request = $this->actionsAddSelfHostedRunnerToGroupForOrgRequest($org, $runner_group_id, $runner_id, $contentType);
+        $returnType = 'object';
+        $request = $this->actionsApproveWorkflowRunRequest($owner, $repo, $run_id, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
             ->then(
                 function ($response) use ($returnType) {
-                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
                 },
                 function ($exception) {
                     $response = $exception->getResponse();
@@ -2350,42 +2175,42 @@ class ActionsApi
     }
 
     /**
-     * Create request for operation 'actionsAddSelfHostedRunnerToGroupForOrg'
+     * Create request for operation 'actionsApproveWorkflowRun'
      *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsAddSelfHostedRunnerToGroupForOrg'] to see the possible values for this operation
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  int $run_id The unique identifier of the workflow run. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsApproveWorkflowRun'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function actionsAddSelfHostedRunnerToGroupForOrgRequest($org, $runner_group_id, $runner_id, string $contentType = self::contentTypes['actionsAddSelfHostedRunnerToGroupForOrg'][0])
+    public function actionsApproveWorkflowRunRequest($owner, $repo, $run_id, string $contentType = self::contentTypes['actionsApproveWorkflowRun'][0])
     {
 
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
+        // verify the required parameter 'owner' is set
+        if ($owner === null || (is_array($owner) && count($owner) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsAddSelfHostedRunnerToGroupForOrg'
+                'Missing the required parameter $owner when calling actionsApproveWorkflowRun'
             );
         }
 
-        // verify the required parameter 'runner_group_id' is set
-        if ($runner_group_id === null || (is_array($runner_group_id) && count($runner_group_id) === 0)) {
+        // verify the required parameter 'repo' is set
+        if ($repo === null || (is_array($repo) && count($repo) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_group_id when calling actionsAddSelfHostedRunnerToGroupForOrg'
+                'Missing the required parameter $repo when calling actionsApproveWorkflowRun'
             );
         }
 
-        // verify the required parameter 'runner_id' is set
-        if ($runner_id === null || (is_array($runner_id) && count($runner_id) === 0)) {
+        // verify the required parameter 'run_id' is set
+        if ($run_id === null || (is_array($run_id) && count($run_id) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_id when calling actionsAddSelfHostedRunnerToGroupForOrg'
+                'Missing the required parameter $run_id when calling actionsApproveWorkflowRun'
             );
         }
 
 
-        $resourcePath = '/orgs/{org}/actions/runner-groups/{runner_group_id}/runners/{runner_id}';
+        $resourcePath = '/repos/{owner}/{repo}/actions/runs/{run_id}/approve';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
@@ -2395,33 +2220,33 @@ class ActionsApi
 
 
         // path params
-        if ($org !== null) {
+        if ($owner !== null) {
             $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
+                '{' . 'owner' . '}',
+                ObjectSerializer::toPathValue($owner),
                 $resourcePath
             );
         }
         // path params
-        if ($runner_group_id !== null) {
+        if ($repo !== null) {
             $resourcePath = str_replace(
-                '{' . 'runner_group_id' . '}',
-                ObjectSerializer::toPathValue($runner_group_id),
+                '{' . 'repo' . '}',
+                ObjectSerializer::toPathValue($repo),
                 $resourcePath
             );
         }
         // path params
-        if ($runner_id !== null) {
+        if ($run_id !== null) {
             $resourcePath = str_replace(
-                '{' . 'runner_id' . '}',
-                ObjectSerializer::toPathValue($runner_id),
+                '{' . 'run_id' . '}',
+                ObjectSerializer::toPathValue($run_id),
                 $resourcePath
             );
         }
 
 
         $headers = $this->headerSelector->selectHeaders(
-            [],
+            ['application/json', ],
             $contentType,
             $multipart
         );
@@ -2466,7 +2291,7 @@ class ActionsApi
         $operationHost = $this->config->getHost();
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
-            'PUT',
+            'POST',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody
@@ -6260,332 +6085,6 @@ class ActionsApi
     }
 
     /**
-     * Operation actionsCreateSelfHostedRunnerGroupForOrg
-     *
-     * Create a self-hosted runner group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCreateSelfHostedRunnerGroupForOrgRequest $actions_create_self_hosted_runner_group_for_org_request actions_create_self_hosted_runner_group_for_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsCreateSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg
-     */
-    public function actionsCreateSelfHostedRunnerGroupForOrg($org, $actions_create_self_hosted_runner_group_for_org_request, string $contentType = self::contentTypes['actionsCreateSelfHostedRunnerGroupForOrg'][0])
-    {
-        list($response) = $this->actionsCreateSelfHostedRunnerGroupForOrgWithHttpInfo($org, $actions_create_self_hosted_runner_group_for_org_request, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation actionsCreateSelfHostedRunnerGroupForOrgWithHttpInfo
-     *
-     * Create a self-hosted runner group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCreateSelfHostedRunnerGroupForOrgRequest $actions_create_self_hosted_runner_group_for_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsCreateSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsCreateSelfHostedRunnerGroupForOrgWithHttpInfo($org, $actions_create_self_hosted_runner_group_for_org_request, string $contentType = self::contentTypes['actionsCreateSelfHostedRunnerGroupForOrg'][0])
-    {
-        $request = $this->actionsCreateSelfHostedRunnerGroupForOrgRequest($org, $actions_create_self_hosted_runner_group_for_org_request, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 201:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 201:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsCreateSelfHostedRunnerGroupForOrgAsync
-     *
-     * Create a self-hosted runner group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCreateSelfHostedRunnerGroupForOrgRequest $actions_create_self_hosted_runner_group_for_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsCreateSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsCreateSelfHostedRunnerGroupForOrgAsync($org, $actions_create_self_hosted_runner_group_for_org_request, string $contentType = self::contentTypes['actionsCreateSelfHostedRunnerGroupForOrg'][0])
-    {
-        return $this->actionsCreateSelfHostedRunnerGroupForOrgAsyncWithHttpInfo($org, $actions_create_self_hosted_runner_group_for_org_request, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsCreateSelfHostedRunnerGroupForOrgAsyncWithHttpInfo
-     *
-     * Create a self-hosted runner group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCreateSelfHostedRunnerGroupForOrgRequest $actions_create_self_hosted_runner_group_for_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsCreateSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsCreateSelfHostedRunnerGroupForOrgAsyncWithHttpInfo($org, $actions_create_self_hosted_runner_group_for_org_request, string $contentType = self::contentTypes['actionsCreateSelfHostedRunnerGroupForOrg'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg';
-        $request = $this->actionsCreateSelfHostedRunnerGroupForOrgRequest($org, $actions_create_self_hosted_runner_group_for_org_request, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsCreateSelfHostedRunnerGroupForOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCreateSelfHostedRunnerGroupForOrgRequest $actions_create_self_hosted_runner_group_for_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsCreateSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsCreateSelfHostedRunnerGroupForOrgRequest($org, $actions_create_self_hosted_runner_group_for_org_request, string $contentType = self::contentTypes['actionsCreateSelfHostedRunnerGroupForOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsCreateSelfHostedRunnerGroupForOrg'
-            );
-        }
-
-        // verify the required parameter 'actions_create_self_hosted_runner_group_for_org_request' is set
-        if ($actions_create_self_hosted_runner_group_for_org_request === null || (is_array($actions_create_self_hosted_runner_group_for_org_request) && count($actions_create_self_hosted_runner_group_for_org_request) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $actions_create_self_hosted_runner_group_for_org_request when calling actionsCreateSelfHostedRunnerGroupForOrg'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/actions/runner-groups';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (isset($actions_create_self_hosted_runner_group_for_org_request)) {
-            if (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_create_self_hosted_runner_group_for_org_request));
-            } else {
-                $httpBody = $actions_create_self_hosted_runner_group_for_org_request;
-            }
-        } elseif (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'POST',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
      * Operation actionsCreateWorkflowDispatch
      *
      * Create a workflow dispatch event
@@ -9907,255 +9406,6 @@ class ActionsApi
     }
 
     /**
-     * Operation actionsDeleteSelfHostedRunnerGroupFromOrg
-     *
-     * Delete a self-hosted runner group from an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsDeleteSelfHostedRunnerGroupFromOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return void
-     */
-    public function actionsDeleteSelfHostedRunnerGroupFromOrg($org, $runner_group_id, string $contentType = self::contentTypes['actionsDeleteSelfHostedRunnerGroupFromOrg'][0])
-    {
-        $this->actionsDeleteSelfHostedRunnerGroupFromOrgWithHttpInfo($org, $runner_group_id, $contentType);
-    }
-
-    /**
-     * Operation actionsDeleteSelfHostedRunnerGroupFromOrgWithHttpInfo
-     *
-     * Delete a self-hosted runner group from an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsDeleteSelfHostedRunnerGroupFromOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsDeleteSelfHostedRunnerGroupFromOrgWithHttpInfo($org, $runner_group_id, string $contentType = self::contentTypes['actionsDeleteSelfHostedRunnerGroupFromOrg'][0])
-    {
-        $request = $this->actionsDeleteSelfHostedRunnerGroupFromOrgRequest($org, $runner_group_id, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            return [null, $statusCode, $response->getHeaders()];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsDeleteSelfHostedRunnerGroupFromOrgAsync
-     *
-     * Delete a self-hosted runner group from an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsDeleteSelfHostedRunnerGroupFromOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsDeleteSelfHostedRunnerGroupFromOrgAsync($org, $runner_group_id, string $contentType = self::contentTypes['actionsDeleteSelfHostedRunnerGroupFromOrg'][0])
-    {
-        return $this->actionsDeleteSelfHostedRunnerGroupFromOrgAsyncWithHttpInfo($org, $runner_group_id, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsDeleteSelfHostedRunnerGroupFromOrgAsyncWithHttpInfo
-     *
-     * Delete a self-hosted runner group from an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsDeleteSelfHostedRunnerGroupFromOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsDeleteSelfHostedRunnerGroupFromOrgAsyncWithHttpInfo($org, $runner_group_id, string $contentType = self::contentTypes['actionsDeleteSelfHostedRunnerGroupFromOrg'][0])
-    {
-        $returnType = '';
-        $request = $this->actionsDeleteSelfHostedRunnerGroupFromOrgRequest($org, $runner_group_id, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    return [null, $response->getStatusCode(), $response->getHeaders()];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsDeleteSelfHostedRunnerGroupFromOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsDeleteSelfHostedRunnerGroupFromOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsDeleteSelfHostedRunnerGroupFromOrgRequest($org, $runner_group_id, string $contentType = self::contentTypes['actionsDeleteSelfHostedRunnerGroupFromOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsDeleteSelfHostedRunnerGroupFromOrg'
-            );
-        }
-
-        // verify the required parameter 'runner_group_id' is set
-        if ($runner_group_id === null || (is_array($runner_group_id) && count($runner_group_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_group_id when calling actionsDeleteSelfHostedRunnerGroupFromOrg'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/actions/runner-groups/{runner_group_id}';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($runner_group_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'runner_group_id' . '}',
-                ObjectSerializer::toPathValue($runner_group_id),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            [],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'DELETE',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
      * Operation actionsDeleteWorkflowRun
      *
      * Delete a workflow run
@@ -13252,417 +12502,21 @@ class ActionsApi
     }
 
     /**
-     * Operation actionsGenerateRunnerJitconfigForEnterprise
-     *
-     * Create configuration for a just-in-time runner for an Enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request actions_generate_runner_jitconfig_for_enterprise_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
-     */
-    public function actionsGenerateRunnerJitconfigForEnterprise($enterprise, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForEnterprise'][0])
-    {
-        list($response) = $this->actionsGenerateRunnerJitconfigForEnterpriseWithHttpInfo($enterprise, $actions_generate_runner_jitconfig_for_enterprise_request, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation actionsGenerateRunnerJitconfigForEnterpriseWithHttpInfo
-     *
-     * Create configuration for a just-in-time runner for an Enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsGenerateRunnerJitconfigForEnterpriseWithHttpInfo($enterprise, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForEnterprise'][0])
-    {
-        $request = $this->actionsGenerateRunnerJitconfigForEnterpriseRequest($enterprise, $actions_generate_runner_jitconfig_for_enterprise_request, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 201:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                case 404:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                case 422:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 201:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-                case 404:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-                case 422:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsGenerateRunnerJitconfigForEnterpriseAsync
-     *
-     * Create configuration for a just-in-time runner for an Enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsGenerateRunnerJitconfigForEnterpriseAsync($enterprise, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForEnterprise'][0])
-    {
-        return $this->actionsGenerateRunnerJitconfigForEnterpriseAsyncWithHttpInfo($enterprise, $actions_generate_runner_jitconfig_for_enterprise_request, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsGenerateRunnerJitconfigForEnterpriseAsyncWithHttpInfo
-     *
-     * Create configuration for a just-in-time runner for an Enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsGenerateRunnerJitconfigForEnterpriseAsyncWithHttpInfo($enterprise, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForEnterprise'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response';
-        $request = $this->actionsGenerateRunnerJitconfigForEnterpriseRequest($enterprise, $actions_generate_runner_jitconfig_for_enterprise_request, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsGenerateRunnerJitconfigForEnterprise'
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsGenerateRunnerJitconfigForEnterpriseRequest($enterprise, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForEnterprise'][0])
-    {
-
-        // verify the required parameter 'enterprise' is set
-        if ($enterprise === null || (is_array($enterprise) && count($enterprise) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $enterprise when calling actionsGenerateRunnerJitconfigForEnterprise'
-            );
-        }
-
-        // verify the required parameter 'actions_generate_runner_jitconfig_for_enterprise_request' is set
-        if ($actions_generate_runner_jitconfig_for_enterprise_request === null || (is_array($actions_generate_runner_jitconfig_for_enterprise_request) && count($actions_generate_runner_jitconfig_for_enterprise_request) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $actions_generate_runner_jitconfig_for_enterprise_request when calling actionsGenerateRunnerJitconfigForEnterprise'
-            );
-        }
-
-
-        $resourcePath = '/enterprises/{enterprise}/actions/runners/generate-jitconfig';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($enterprise !== null) {
-            $resourcePath = str_replace(
-                '{' . 'enterprise' . '}',
-                ObjectSerializer::toPathValue($enterprise),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (isset($actions_generate_runner_jitconfig_for_enterprise_request)) {
-            if (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_generate_runner_jitconfig_for_enterprise_request));
-            } else {
-                $httpBody = $actions_generate_runner_jitconfig_for_enterprise_request;
-            }
-        } elseif (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'POST',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
      * Operation actionsGenerateRunnerJitconfigForOrg
      *
      * Create configuration for a just-in-time runner for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request actions_generate_runner_jitconfig_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrgRequest $actions_generate_runner_jitconfig_for_org_request actions_generate_runner_jitconfig_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
      */
-    public function actionsGenerateRunnerJitconfigForOrg($org, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForOrg'][0])
+    public function actionsGenerateRunnerJitconfigForOrg($org, $actions_generate_runner_jitconfig_for_org_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForOrg'][0])
     {
-        list($response) = $this->actionsGenerateRunnerJitconfigForOrgWithHttpInfo($org, $actions_generate_runner_jitconfig_for_enterprise_request, $contentType);
+        list($response) = $this->actionsGenerateRunnerJitconfigForOrgWithHttpInfo($org, $actions_generate_runner_jitconfig_for_org_request, $contentType);
         return $response;
     }
 
@@ -13672,16 +12526,16 @@ class ActionsApi
      * Create configuration for a just-in-time runner for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrgRequest $actions_generate_runner_jitconfig_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
      */
-    public function actionsGenerateRunnerJitconfigForOrgWithHttpInfo($org, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForOrg'][0])
+    public function actionsGenerateRunnerJitconfigForOrgWithHttpInfo($org, $actions_generate_runner_jitconfig_for_org_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForOrg'][0])
     {
-        $request = $this->actionsGenerateRunnerJitconfigForOrgRequest($org, $actions_generate_runner_jitconfig_for_enterprise_request, $contentType);
+        $request = $this->actionsGenerateRunnerJitconfigForOrgRequest($org, $actions_generate_runner_jitconfig_for_org_request, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -13720,11 +12574,11 @@ class ActionsApi
 
             switch($statusCode) {
                 case 201:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -13742,7 +12596,7 @@ class ActionsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -13802,7 +12656,7 @@ class ActionsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -13835,7 +12689,7 @@ class ActionsApi
                 case 201:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -13867,15 +12721,15 @@ class ActionsApi
      * Create configuration for a just-in-time runner for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrgRequest $actions_generate_runner_jitconfig_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsGenerateRunnerJitconfigForOrgAsync($org, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForOrg'][0])
+    public function actionsGenerateRunnerJitconfigForOrgAsync($org, $actions_generate_runner_jitconfig_for_org_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForOrg'][0])
     {
-        return $this->actionsGenerateRunnerJitconfigForOrgAsyncWithHttpInfo($org, $actions_generate_runner_jitconfig_for_enterprise_request, $contentType)
+        return $this->actionsGenerateRunnerJitconfigForOrgAsyncWithHttpInfo($org, $actions_generate_runner_jitconfig_for_org_request, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -13889,16 +12743,16 @@ class ActionsApi
      * Create configuration for a just-in-time runner for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrgRequest $actions_generate_runner_jitconfig_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsGenerateRunnerJitconfigForOrgAsyncWithHttpInfo($org, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForOrg'][0])
+    public function actionsGenerateRunnerJitconfigForOrgAsyncWithHttpInfo($org, $actions_generate_runner_jitconfig_for_org_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForOrg'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response';
-        $request = $this->actionsGenerateRunnerJitconfigForOrgRequest($org, $actions_generate_runner_jitconfig_for_enterprise_request, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response';
+        $request = $this->actionsGenerateRunnerJitconfigForOrgRequest($org, $actions_generate_runner_jitconfig_for_org_request, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -13940,13 +12794,13 @@ class ActionsApi
      * Create request for operation 'actionsGenerateRunnerJitconfigForOrg'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrgRequest $actions_generate_runner_jitconfig_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function actionsGenerateRunnerJitconfigForOrgRequest($org, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForOrg'][0])
+    public function actionsGenerateRunnerJitconfigForOrgRequest($org, $actions_generate_runner_jitconfig_for_org_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForOrg'][0])
     {
 
         // verify the required parameter 'org' is set
@@ -13956,10 +12810,10 @@ class ActionsApi
             );
         }
 
-        // verify the required parameter 'actions_generate_runner_jitconfig_for_enterprise_request' is set
-        if ($actions_generate_runner_jitconfig_for_enterprise_request === null || (is_array($actions_generate_runner_jitconfig_for_enterprise_request) && count($actions_generate_runner_jitconfig_for_enterprise_request) === 0)) {
+        // verify the required parameter 'actions_generate_runner_jitconfig_for_org_request' is set
+        if ($actions_generate_runner_jitconfig_for_org_request === null || (is_array($actions_generate_runner_jitconfig_for_org_request) && count($actions_generate_runner_jitconfig_for_org_request) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $actions_generate_runner_jitconfig_for_enterprise_request when calling actionsGenerateRunnerJitconfigForOrg'
+                'Missing the required parameter $actions_generate_runner_jitconfig_for_org_request when calling actionsGenerateRunnerJitconfigForOrg'
             );
         }
 
@@ -13990,12 +12844,12 @@ class ActionsApi
         );
 
         // for model (json/xml)
-        if (isset($actions_generate_runner_jitconfig_for_enterprise_request)) {
+        if (isset($actions_generate_runner_jitconfig_for_org_request)) {
             if (stripos($headers['Content-Type'], 'application/json') !== false) {
                 # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_generate_runner_jitconfig_for_enterprise_request));
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_generate_runner_jitconfig_for_org_request));
             } else {
-                $httpBody = $actions_generate_runner_jitconfig_for_enterprise_request;
+                $httpBody = $actions_generate_runner_jitconfig_for_org_request;
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -14050,16 +12904,16 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request actions_generate_runner_jitconfig_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrgRequest $actions_generate_runner_jitconfig_for_org_request actions_generate_runner_jitconfig_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForRepo'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
      */
-    public function actionsGenerateRunnerJitconfigForRepo($owner, $repo, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForRepo'][0])
+    public function actionsGenerateRunnerJitconfigForRepo($owner, $repo, $actions_generate_runner_jitconfig_for_org_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForRepo'][0])
     {
-        list($response) = $this->actionsGenerateRunnerJitconfigForRepoWithHttpInfo($owner, $repo, $actions_generate_runner_jitconfig_for_enterprise_request, $contentType);
+        list($response) = $this->actionsGenerateRunnerJitconfigForRepoWithHttpInfo($owner, $repo, $actions_generate_runner_jitconfig_for_org_request, $contentType);
         return $response;
     }
 
@@ -14070,16 +12924,16 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrgRequest $actions_generate_runner_jitconfig_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForRepo'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
      */
-    public function actionsGenerateRunnerJitconfigForRepoWithHttpInfo($owner, $repo, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForRepo'][0])
+    public function actionsGenerateRunnerJitconfigForRepoWithHttpInfo($owner, $repo, $actions_generate_runner_jitconfig_for_org_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForRepo'][0])
     {
-        $request = $this->actionsGenerateRunnerJitconfigForRepoRequest($owner, $repo, $actions_generate_runner_jitconfig_for_enterprise_request, $contentType);
+        $request = $this->actionsGenerateRunnerJitconfigForRepoRequest($owner, $repo, $actions_generate_runner_jitconfig_for_org_request, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -14118,11 +12972,11 @@ class ActionsApi
 
             switch($statusCode) {
                 case 201:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -14140,7 +12994,7 @@ class ActionsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -14200,7 +13054,7 @@ class ActionsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -14233,7 +13087,7 @@ class ActionsApi
                 case 201:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -14266,15 +13120,15 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrgRequest $actions_generate_runner_jitconfig_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsGenerateRunnerJitconfigForRepoAsync($owner, $repo, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForRepo'][0])
+    public function actionsGenerateRunnerJitconfigForRepoAsync($owner, $repo, $actions_generate_runner_jitconfig_for_org_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForRepo'][0])
     {
-        return $this->actionsGenerateRunnerJitconfigForRepoAsyncWithHttpInfo($owner, $repo, $actions_generate_runner_jitconfig_for_enterprise_request, $contentType)
+        return $this->actionsGenerateRunnerJitconfigForRepoAsyncWithHttpInfo($owner, $repo, $actions_generate_runner_jitconfig_for_org_request, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -14289,16 +13143,16 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrgRequest $actions_generate_runner_jitconfig_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsGenerateRunnerJitconfigForRepoAsyncWithHttpInfo($owner, $repo, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForRepo'][0])
+    public function actionsGenerateRunnerJitconfigForRepoAsyncWithHttpInfo($owner, $repo, $actions_generate_runner_jitconfig_for_org_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForRepo'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterprise201Response';
-        $request = $this->actionsGenerateRunnerJitconfigForRepoRequest($owner, $repo, $actions_generate_runner_jitconfig_for_enterprise_request, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrg201Response';
+        $request = $this->actionsGenerateRunnerJitconfigForRepoRequest($owner, $repo, $actions_generate_runner_jitconfig_for_org_request, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -14341,13 +13195,13 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForEnterpriseRequest $actions_generate_runner_jitconfig_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGenerateRunnerJitconfigForOrgRequest $actions_generate_runner_jitconfig_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGenerateRunnerJitconfigForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function actionsGenerateRunnerJitconfigForRepoRequest($owner, $repo, $actions_generate_runner_jitconfig_for_enterprise_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForRepo'][0])
+    public function actionsGenerateRunnerJitconfigForRepoRequest($owner, $repo, $actions_generate_runner_jitconfig_for_org_request, string $contentType = self::contentTypes['actionsGenerateRunnerJitconfigForRepo'][0])
     {
 
         // verify the required parameter 'owner' is set
@@ -14364,10 +13218,10 @@ class ActionsApi
             );
         }
 
-        // verify the required parameter 'actions_generate_runner_jitconfig_for_enterprise_request' is set
-        if ($actions_generate_runner_jitconfig_for_enterprise_request === null || (is_array($actions_generate_runner_jitconfig_for_enterprise_request) && count($actions_generate_runner_jitconfig_for_enterprise_request) === 0)) {
+        // verify the required parameter 'actions_generate_runner_jitconfig_for_org_request' is set
+        if ($actions_generate_runner_jitconfig_for_org_request === null || (is_array($actions_generate_runner_jitconfig_for_org_request) && count($actions_generate_runner_jitconfig_for_org_request) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $actions_generate_runner_jitconfig_for_enterprise_request when calling actionsGenerateRunnerJitconfigForRepo'
+                'Missing the required parameter $actions_generate_runner_jitconfig_for_org_request when calling actionsGenerateRunnerJitconfigForRepo'
             );
         }
 
@@ -14406,12 +13260,12 @@ class ActionsApi
         );
 
         // for model (json/xml)
-        if (isset($actions_generate_runner_jitconfig_for_enterprise_request)) {
+        if (isset($actions_generate_runner_jitconfig_for_org_request)) {
             if (stripos($headers['Content-Type'], 'application/json') !== false) {
                 # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_generate_runner_jitconfig_for_enterprise_request));
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_generate_runner_jitconfig_for_org_request));
             } else {
-                $httpBody = $actions_generate_runner_jitconfig_for_enterprise_request;
+                $httpBody = $actions_generate_runner_jitconfig_for_org_request;
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -14466,8 +13320,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $ref The full Git reference for narrowing down the cache. The &#x60;ref&#x60; for a branch should be formatted as &#x60;refs/heads/&lt;branch name&gt;&#x60;. To reference a pull request use &#x60;refs/pull/&lt;number&gt;/merge&#x60;. (optional)
      * @param  string $key An explicit key or prefix for identifying the cache (optional)
      * @param  string $sort The property to sort the results by. &#x60;created_at&#x60; means when the cache was created. &#x60;last_accessed_at&#x60; means when the cache was last accessed. &#x60;size_in_bytes&#x60; is the size of the cache in bytes. (optional, default to 'last_accessed_at')
@@ -14491,8 +13345,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $ref The full Git reference for narrowing down the cache. The &#x60;ref&#x60; for a branch should be formatted as &#x60;refs/heads/&lt;branch name&gt;&#x60;. To reference a pull request use &#x60;refs/pull/&lt;number&gt;/merge&#x60;. (optional)
      * @param  string $key An explicit key or prefix for identifying the cache (optional)
      * @param  string $sort The property to sort the results by. &#x60;created_at&#x60; means when the cache was created. &#x60;last_accessed_at&#x60; means when the cache was last accessed. &#x60;size_in_bytes&#x60; is the size of the cache in bytes. (optional, default to 'last_accessed_at')
@@ -14622,8 +13476,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $ref The full Git reference for narrowing down the cache. The &#x60;ref&#x60; for a branch should be formatted as &#x60;refs/heads/&lt;branch name&gt;&#x60;. To reference a pull request use &#x60;refs/pull/&lt;number&gt;/merge&#x60;. (optional)
      * @param  string $key An explicit key or prefix for identifying the cache (optional)
      * @param  string $sort The property to sort the results by. &#x60;created_at&#x60; means when the cache was created. &#x60;last_accessed_at&#x60; means when the cache was last accessed. &#x60;size_in_bytes&#x60; is the size of the cache in bytes. (optional, default to 'last_accessed_at')
@@ -14650,8 +13504,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $ref The full Git reference for narrowing down the cache. The &#x60;ref&#x60; for a branch should be formatted as &#x60;refs/heads/&lt;branch name&gt;&#x60;. To reference a pull request use &#x60;refs/pull/&lt;number&gt;/merge&#x60;. (optional)
      * @param  string $key An explicit key or prefix for identifying the cache (optional)
      * @param  string $sort The property to sort the results by. &#x60;created_at&#x60; means when the cache was created. &#x60;last_accessed_at&#x60; means when the cache was last accessed. &#x60;size_in_bytes&#x60; is the size of the cache in bytes. (optional, default to 'last_accessed_at')
@@ -14707,8 +13561,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $ref The full Git reference for narrowing down the cache. The &#x60;ref&#x60; for a branch should be formatted as &#x60;refs/heads/&lt;branch name&gt;&#x60;. To reference a pull request use &#x60;refs/pull/&lt;number&gt;/merge&#x60;. (optional)
      * @param  string $key An explicit key or prefix for identifying the cache (optional)
      * @param  string $sort The property to sort the results by. &#x60;created_at&#x60; means when the cache was created. &#x60;last_accessed_at&#x60; means when the cache was last accessed. &#x60;size_in_bytes&#x60; is the size of the cache in bytes. (optional, default to 'last_accessed_at')
@@ -15209,8 +14063,8 @@ class ActionsApi
      * List repositories with GitHub Actions cache usage for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsageByRepoForOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -15229,8 +14083,8 @@ class ActionsApi
      * List repositories with GitHub Actions cache usage for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsageByRepoForOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -15355,8 +14209,8 @@ class ActionsApi
      * List repositories with GitHub Actions cache usage for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsageByRepoForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -15378,8 +14232,8 @@ class ActionsApi
      * List repositories with GitHub Actions cache usage for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsageByRepoForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -15430,8 +14284,8 @@ class ActionsApi
      * Create request for operation 'actionsGetActionsCacheUsageByRepoForOrg'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsageByRepoForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -15482,313 +14336,6 @@ class ActionsApi
             $resourcePath = str_replace(
                 '{' . 'org' . '}',
                 ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'GET',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation actionsGetActionsCacheUsageForEnterprise
-     *
-     * Get GitHub Actions cache usage for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsageForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsageOrgEnterprise
-     */
-    public function actionsGetActionsCacheUsageForEnterprise($enterprise, string $contentType = self::contentTypes['actionsGetActionsCacheUsageForEnterprise'][0])
-    {
-        list($response) = $this->actionsGetActionsCacheUsageForEnterpriseWithHttpInfo($enterprise, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation actionsGetActionsCacheUsageForEnterpriseWithHttpInfo
-     *
-     * Get GitHub Actions cache usage for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsageForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsageOrgEnterprise, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsGetActionsCacheUsageForEnterpriseWithHttpInfo($enterprise, string $contentType = self::contentTypes['actionsGetActionsCacheUsageForEnterprise'][0])
-    {
-        $request = $this->actionsGetActionsCacheUsageForEnterpriseRequest($enterprise, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsageOrgEnterprise' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsageOrgEnterprise' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsageOrgEnterprise', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsageOrgEnterprise';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsageOrgEnterprise',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsGetActionsCacheUsageForEnterpriseAsync
-     *
-     * Get GitHub Actions cache usage for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsageForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsGetActionsCacheUsageForEnterpriseAsync($enterprise, string $contentType = self::contentTypes['actionsGetActionsCacheUsageForEnterprise'][0])
-    {
-        return $this->actionsGetActionsCacheUsageForEnterpriseAsyncWithHttpInfo($enterprise, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsGetActionsCacheUsageForEnterpriseAsyncWithHttpInfo
-     *
-     * Get GitHub Actions cache usage for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsageForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsGetActionsCacheUsageForEnterpriseAsyncWithHttpInfo($enterprise, string $contentType = self::contentTypes['actionsGetActionsCacheUsageForEnterprise'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsageOrgEnterprise';
-        $request = $this->actionsGetActionsCacheUsageForEnterpriseRequest($enterprise, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsGetActionsCacheUsageForEnterprise'
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsageForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsGetActionsCacheUsageForEnterpriseRequest($enterprise, string $contentType = self::contentTypes['actionsGetActionsCacheUsageForEnterprise'][0])
-    {
-
-        // verify the required parameter 'enterprise' is set
-        if ($enterprise === null || (is_array($enterprise) && count($enterprise) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $enterprise when calling actionsGetActionsCacheUsageForEnterprise'
-            );
-        }
-
-
-        $resourcePath = '/enterprises/{enterprise}/actions/cache/usage';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($enterprise !== null) {
-            $resourcePath = str_replace(
-                '{' . 'enterprise' . '}',
-                ObjectSerializer::toPathValue($enterprise),
                 $resourcePath
             );
         }
@@ -16155,643 +14702,9 @@ class ActionsApi
     }
 
     /**
-     * Operation actionsGetActionsCacheUsagePolicy
-     *
-     * Get GitHub Actions cache usage policy for a repository
-     *
-     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
-     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsagePolicy'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository
-     */
-    public function actionsGetActionsCacheUsagePolicy($owner, $repo, string $contentType = self::contentTypes['actionsGetActionsCacheUsagePolicy'][0])
-    {
-        list($response) = $this->actionsGetActionsCacheUsagePolicyWithHttpInfo($owner, $repo, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation actionsGetActionsCacheUsagePolicyWithHttpInfo
-     *
-     * Get GitHub Actions cache usage policy for a repository
-     *
-     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
-     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsagePolicy'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsGetActionsCacheUsagePolicyWithHttpInfo($owner, $repo, string $contentType = self::contentTypes['actionsGetActionsCacheUsagePolicy'][0])
-    {
-        $request = $this->actionsGetActionsCacheUsagePolicyRequest($owner, $repo, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsGetActionsCacheUsagePolicyAsync
-     *
-     * Get GitHub Actions cache usage policy for a repository
-     *
-     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
-     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsagePolicy'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsGetActionsCacheUsagePolicyAsync($owner, $repo, string $contentType = self::contentTypes['actionsGetActionsCacheUsagePolicy'][0])
-    {
-        return $this->actionsGetActionsCacheUsagePolicyAsyncWithHttpInfo($owner, $repo, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsGetActionsCacheUsagePolicyAsyncWithHttpInfo
-     *
-     * Get GitHub Actions cache usage policy for a repository
-     *
-     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
-     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsagePolicy'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsGetActionsCacheUsagePolicyAsyncWithHttpInfo($owner, $repo, string $contentType = self::contentTypes['actionsGetActionsCacheUsagePolicy'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository';
-        $request = $this->actionsGetActionsCacheUsagePolicyRequest($owner, $repo, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsGetActionsCacheUsagePolicy'
-     *
-     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
-     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsagePolicy'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsGetActionsCacheUsagePolicyRequest($owner, $repo, string $contentType = self::contentTypes['actionsGetActionsCacheUsagePolicy'][0])
-    {
-
-        // verify the required parameter 'owner' is set
-        if ($owner === null || (is_array($owner) && count($owner) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $owner when calling actionsGetActionsCacheUsagePolicy'
-            );
-        }
-
-        // verify the required parameter 'repo' is set
-        if ($repo === null || (is_array($repo) && count($repo) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $repo when calling actionsGetActionsCacheUsagePolicy'
-            );
-        }
-
-
-        $resourcePath = '/repos/{owner}/{repo}/actions/cache/usage-policy';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($owner !== null) {
-            $resourcePath = str_replace(
-                '{' . 'owner' . '}',
-                ObjectSerializer::toPathValue($owner),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($repo !== null) {
-            $resourcePath = str_replace(
-                '{' . 'repo' . '}',
-                ObjectSerializer::toPathValue($repo),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'GET',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation actionsGetActionsCacheUsagePolicyForEnterprise
-     *
-     * Get GitHub Actions cache usage policy for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsagePolicyForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise
-     */
-    public function actionsGetActionsCacheUsagePolicyForEnterprise($enterprise, string $contentType = self::contentTypes['actionsGetActionsCacheUsagePolicyForEnterprise'][0])
-    {
-        list($response) = $this->actionsGetActionsCacheUsagePolicyForEnterpriseWithHttpInfo($enterprise, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation actionsGetActionsCacheUsagePolicyForEnterpriseWithHttpInfo
-     *
-     * Get GitHub Actions cache usage policy for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsagePolicyForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsGetActionsCacheUsagePolicyForEnterpriseWithHttpInfo($enterprise, string $contentType = self::contentTypes['actionsGetActionsCacheUsagePolicyForEnterprise'][0])
-    {
-        $request = $this->actionsGetActionsCacheUsagePolicyForEnterpriseRequest($enterprise, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsGetActionsCacheUsagePolicyForEnterpriseAsync
-     *
-     * Get GitHub Actions cache usage policy for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsagePolicyForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsGetActionsCacheUsagePolicyForEnterpriseAsync($enterprise, string $contentType = self::contentTypes['actionsGetActionsCacheUsagePolicyForEnterprise'][0])
-    {
-        return $this->actionsGetActionsCacheUsagePolicyForEnterpriseAsyncWithHttpInfo($enterprise, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsGetActionsCacheUsagePolicyForEnterpriseAsyncWithHttpInfo
-     *
-     * Get GitHub Actions cache usage policy for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsagePolicyForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsGetActionsCacheUsagePolicyForEnterpriseAsyncWithHttpInfo($enterprise, string $contentType = self::contentTypes['actionsGetActionsCacheUsagePolicyForEnterprise'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise';
-        $request = $this->actionsGetActionsCacheUsagePolicyForEnterpriseRequest($enterprise, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsGetActionsCacheUsagePolicyForEnterprise'
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetActionsCacheUsagePolicyForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsGetActionsCacheUsagePolicyForEnterpriseRequest($enterprise, string $contentType = self::contentTypes['actionsGetActionsCacheUsagePolicyForEnterprise'][0])
-    {
-
-        // verify the required parameter 'enterprise' is set
-        if ($enterprise === null || (is_array($enterprise) && count($enterprise) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $enterprise when calling actionsGetActionsCacheUsagePolicyForEnterprise'
-            );
-        }
-
-
-        $resourcePath = '/enterprises/{enterprise}/actions/cache/usage-policy';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($enterprise !== null) {
-            $resourcePath = str_replace(
-                '{' . 'enterprise' . '}',
-                ObjectSerializer::toPathValue($enterprise),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'GET',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
      * Operation actionsGetAllowedActionsOrganization
      *
-     * Get allowed actions for an organization
+     * Get allowed actions and reusable workflows for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetAllowedActionsOrganization'] to see the possible values for this operation
@@ -16809,7 +14722,7 @@ class ActionsApi
     /**
      * Operation actionsGetAllowedActionsOrganizationWithHttpInfo
      *
-     * Get allowed actions for an organization
+     * Get allowed actions and reusable workflows for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetAllowedActionsOrganization'] to see the possible values for this operation
@@ -16933,7 +14846,7 @@ class ActionsApi
     /**
      * Operation actionsGetAllowedActionsOrganizationAsync
      *
-     * Get allowed actions for an organization
+     * Get allowed actions and reusable workflows for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetAllowedActionsOrganization'] to see the possible values for this operation
@@ -16954,7 +14867,7 @@ class ActionsApi
     /**
      * Operation actionsGetAllowedActionsOrganizationAsyncWithHttpInfo
      *
-     * Get allowed actions for an organization
+     * Get allowed actions and reusable workflows for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetAllowedActionsOrganization'] to see the possible values for this operation
@@ -17098,7 +15011,7 @@ class ActionsApi
     /**
      * Operation actionsGetAllowedActionsRepository
      *
-     * Get allowed actions for a repository
+     * Get allowed actions and reusable workflows for a repository
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
@@ -17117,7 +15030,7 @@ class ActionsApi
     /**
      * Operation actionsGetAllowedActionsRepositoryWithHttpInfo
      *
-     * Get allowed actions for a repository
+     * Get allowed actions and reusable workflows for a repository
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
@@ -17242,7 +15155,7 @@ class ActionsApi
     /**
      * Operation actionsGetAllowedActionsRepositoryAsync
      *
-     * Get allowed actions for a repository
+     * Get allowed actions and reusable workflows for a repository
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
@@ -17264,7 +15177,7 @@ class ActionsApi
     /**
      * Operation actionsGetAllowedActionsRepositoryAsyncWithHttpInfo
      *
-     * Get allowed actions for a repository
+     * Get allowed actions and reusable workflows for a repository
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
@@ -19189,313 +17102,6 @@ class ActionsApi
             $resourcePath = str_replace(
                 '{' . 'name' . '}',
                 ObjectSerializer::toPathValue($name),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'GET',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise
-     *
-     * Get default workflow permissions for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGetDefaultWorkflowPermissions
-     */
-    public function actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise($enterprise, string $contentType = self::contentTypes['actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise'][0])
-    {
-        list($response) = $this->actionsGetGithubActionsDefaultWorkflowPermissionsEnterpriseWithHttpInfo($enterprise, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation actionsGetGithubActionsDefaultWorkflowPermissionsEnterpriseWithHttpInfo
-     *
-     * Get default workflow permissions for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGetDefaultWorkflowPermissions, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsGetGithubActionsDefaultWorkflowPermissionsEnterpriseWithHttpInfo($enterprise, string $contentType = self::contentTypes['actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise'][0])
-    {
-        $request = $this->actionsGetGithubActionsDefaultWorkflowPermissionsEnterpriseRequest($enterprise, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGetDefaultWorkflowPermissions' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGetDefaultWorkflowPermissions' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGetDefaultWorkflowPermissions', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGetDefaultWorkflowPermissions';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGetDefaultWorkflowPermissions',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsGetGithubActionsDefaultWorkflowPermissionsEnterpriseAsync
-     *
-     * Get default workflow permissions for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsGetGithubActionsDefaultWorkflowPermissionsEnterpriseAsync($enterprise, string $contentType = self::contentTypes['actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise'][0])
-    {
-        return $this->actionsGetGithubActionsDefaultWorkflowPermissionsEnterpriseAsyncWithHttpInfo($enterprise, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsGetGithubActionsDefaultWorkflowPermissionsEnterpriseAsyncWithHttpInfo
-     *
-     * Get default workflow permissions for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsGetGithubActionsDefaultWorkflowPermissionsEnterpriseAsyncWithHttpInfo($enterprise, string $contentType = self::contentTypes['actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsGetDefaultWorkflowPermissions';
-        $request = $this->actionsGetGithubActionsDefaultWorkflowPermissionsEnterpriseRequest($enterprise, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise'
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsGetGithubActionsDefaultWorkflowPermissionsEnterpriseRequest($enterprise, string $contentType = self::contentTypes['actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise'][0])
-    {
-
-        // verify the required parameter 'enterprise' is set
-        if ($enterprise === null || (is_array($enterprise) && count($enterprise) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $enterprise when calling actionsGetGithubActionsDefaultWorkflowPermissionsEnterprise'
-            );
-        }
-
-
-        $resourcePath = '/enterprises/{enterprise}/actions/permissions/workflow';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($enterprise !== null) {
-            $resourcePath = str_replace(
-                '{' . 'enterprise' . '}',
-                ObjectSerializer::toPathValue($enterprise),
                 $resourcePath
             );
         }
@@ -24520,333 +22126,6 @@ class ActionsApi
     }
 
     /**
-     * Operation actionsGetSelfHostedRunnerGroupForOrg
-     *
-     * Get a self-hosted runner group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg
-     */
-    public function actionsGetSelfHostedRunnerGroupForOrg($org, $runner_group_id, string $contentType = self::contentTypes['actionsGetSelfHostedRunnerGroupForOrg'][0])
-    {
-        list($response) = $this->actionsGetSelfHostedRunnerGroupForOrgWithHttpInfo($org, $runner_group_id, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation actionsGetSelfHostedRunnerGroupForOrgWithHttpInfo
-     *
-     * Get a self-hosted runner group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsGetSelfHostedRunnerGroupForOrgWithHttpInfo($org, $runner_group_id, string $contentType = self::contentTypes['actionsGetSelfHostedRunnerGroupForOrg'][0])
-    {
-        $request = $this->actionsGetSelfHostedRunnerGroupForOrgRequest($org, $runner_group_id, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsGetSelfHostedRunnerGroupForOrgAsync
-     *
-     * Get a self-hosted runner group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsGetSelfHostedRunnerGroupForOrgAsync($org, $runner_group_id, string $contentType = self::contentTypes['actionsGetSelfHostedRunnerGroupForOrg'][0])
-    {
-        return $this->actionsGetSelfHostedRunnerGroupForOrgAsyncWithHttpInfo($org, $runner_group_id, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsGetSelfHostedRunnerGroupForOrgAsyncWithHttpInfo
-     *
-     * Get a self-hosted runner group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsGetSelfHostedRunnerGroupForOrgAsyncWithHttpInfo($org, $runner_group_id, string $contentType = self::contentTypes['actionsGetSelfHostedRunnerGroupForOrg'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg';
-        $request = $this->actionsGetSelfHostedRunnerGroupForOrgRequest($org, $runner_group_id, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsGetSelfHostedRunnerGroupForOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsGetSelfHostedRunnerGroupForOrgRequest($org, $runner_group_id, string $contentType = self::contentTypes['actionsGetSelfHostedRunnerGroupForOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsGetSelfHostedRunnerGroupForOrg'
-            );
-        }
-
-        // verify the required parameter 'runner_group_id' is set
-        if ($runner_group_id === null || (is_array($runner_group_id) && count($runner_group_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_group_id when calling actionsGetSelfHostedRunnerGroupForOrg'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/actions/runner-groups/{runner_group_id}';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($runner_group_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'runner_group_id' . '}',
-                ObjectSerializer::toPathValue($runner_group_id),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'GET',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
      * Operation actionsGetWorkflow
      *
      * Get a workflow
@@ -26265,14 +23544,708 @@ class ActionsApi
     }
 
     /**
+     * Operation actionsGetWorkflowRunUsage
+     *
+     * Get workflow run usage
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  int $run_id The unique identifier of the workflow run. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetWorkflowRunUsage'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowRunUsage
+     */
+    public function actionsGetWorkflowRunUsage($owner, $repo, $run_id, string $contentType = self::contentTypes['actionsGetWorkflowRunUsage'][0])
+    {
+        list($response) = $this->actionsGetWorkflowRunUsageWithHttpInfo($owner, $repo, $run_id, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation actionsGetWorkflowRunUsageWithHttpInfo
+     *
+     * Get workflow run usage
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  int $run_id The unique identifier of the workflow run. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetWorkflowRunUsage'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowRunUsage, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function actionsGetWorkflowRunUsageWithHttpInfo($owner, $repo, $run_id, string $contentType = self::contentTypes['actionsGetWorkflowRunUsage'][0])
+    {
+        $request = $this->actionsGetWorkflowRunUsageRequest($owner, $repo, $run_id, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowRunUsage' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowRunUsage' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowRunUsage', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowRunUsage';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowRunUsage',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation actionsGetWorkflowRunUsageAsync
+     *
+     * Get workflow run usage
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  int $run_id The unique identifier of the workflow run. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetWorkflowRunUsage'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function actionsGetWorkflowRunUsageAsync($owner, $repo, $run_id, string $contentType = self::contentTypes['actionsGetWorkflowRunUsage'][0])
+    {
+        return $this->actionsGetWorkflowRunUsageAsyncWithHttpInfo($owner, $repo, $run_id, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation actionsGetWorkflowRunUsageAsyncWithHttpInfo
+     *
+     * Get workflow run usage
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  int $run_id The unique identifier of the workflow run. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetWorkflowRunUsage'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function actionsGetWorkflowRunUsageAsyncWithHttpInfo($owner, $repo, $run_id, string $contentType = self::contentTypes['actionsGetWorkflowRunUsage'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowRunUsage';
+        $request = $this->actionsGetWorkflowRunUsageRequest($owner, $repo, $run_id, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'actionsGetWorkflowRunUsage'
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  int $run_id The unique identifier of the workflow run. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetWorkflowRunUsage'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function actionsGetWorkflowRunUsageRequest($owner, $repo, $run_id, string $contentType = self::contentTypes['actionsGetWorkflowRunUsage'][0])
+    {
+
+        // verify the required parameter 'owner' is set
+        if ($owner === null || (is_array($owner) && count($owner) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $owner when calling actionsGetWorkflowRunUsage'
+            );
+        }
+
+        // verify the required parameter 'repo' is set
+        if ($repo === null || (is_array($repo) && count($repo) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $repo when calling actionsGetWorkflowRunUsage'
+            );
+        }
+
+        // verify the required parameter 'run_id' is set
+        if ($run_id === null || (is_array($run_id) && count($run_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $run_id when calling actionsGetWorkflowRunUsage'
+            );
+        }
+
+
+        $resourcePath = '/repos/{owner}/{repo}/actions/runs/{run_id}/timing';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($owner !== null) {
+            $resourcePath = str_replace(
+                '{' . 'owner' . '}',
+                ObjectSerializer::toPathValue($owner),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($repo !== null) {
+            $resourcePath = str_replace(
+                '{' . 'repo' . '}',
+                ObjectSerializer::toPathValue($repo),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($run_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'run_id' . '}',
+                ObjectSerializer::toPathValue($run_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation actionsGetWorkflowUsage
+     *
+     * Get workflow usage
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  ActionsGetWorkflowWorkflowIdParameter $workflow_id The ID of the workflow. You can also pass the workflow file name as a string. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetWorkflowUsage'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowUsage
+     */
+    public function actionsGetWorkflowUsage($owner, $repo, $workflow_id, string $contentType = self::contentTypes['actionsGetWorkflowUsage'][0])
+    {
+        list($response) = $this->actionsGetWorkflowUsageWithHttpInfo($owner, $repo, $workflow_id, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation actionsGetWorkflowUsageWithHttpInfo
+     *
+     * Get workflow usage
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  ActionsGetWorkflowWorkflowIdParameter $workflow_id The ID of the workflow. You can also pass the workflow file name as a string. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetWorkflowUsage'] to see the possible values for this operation
+     *
+     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowUsage, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function actionsGetWorkflowUsageWithHttpInfo($owner, $repo, $workflow_id, string $contentType = self::contentTypes['actionsGetWorkflowUsage'][0])
+    {
+        $request = $this->actionsGetWorkflowUsageRequest($owner, $repo, $workflow_id, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            switch($statusCode) {
+                case 200:
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowUsage' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowUsage' !== 'string') {
+                            try {
+                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                            } catch (\JsonException $exception) {
+                                throw new ApiException(
+                                    sprintf(
+                                        'Error JSON decoding server response (%s)',
+                                        $request->getUri()
+                                    ),
+                                    $statusCode,
+                                    $response->getHeaders(),
+                                    $content
+                                );
+                            }
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowUsage', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowUsage';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    try {
+                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $exception) {
+                        throw new ApiException(
+                            sprintf(
+                                'Error JSON decoding server response (%s)',
+                                $request->getUri()
+                            ),
+                            $statusCode,
+                            $response->getHeaders(),
+                            $content
+                        );
+                    }
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
+
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowUsage',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation actionsGetWorkflowUsageAsync
+     *
+     * Get workflow usage
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  ActionsGetWorkflowWorkflowIdParameter $workflow_id The ID of the workflow. You can also pass the workflow file name as a string. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetWorkflowUsage'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function actionsGetWorkflowUsageAsync($owner, $repo, $workflow_id, string $contentType = self::contentTypes['actionsGetWorkflowUsage'][0])
+    {
+        return $this->actionsGetWorkflowUsageAsyncWithHttpInfo($owner, $repo, $workflow_id, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation actionsGetWorkflowUsageAsyncWithHttpInfo
+     *
+     * Get workflow usage
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  ActionsGetWorkflowWorkflowIdParameter $workflow_id The ID of the workflow. You can also pass the workflow file name as a string. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetWorkflowUsage'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function actionsGetWorkflowUsageAsyncWithHttpInfo($owner, $repo, $workflow_id, string $contentType = self::contentTypes['actionsGetWorkflowUsage'][0])
+    {
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\WorkflowUsage';
+        $request = $this->actionsGetWorkflowUsageRequest($owner, $repo, $workflow_id, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'actionsGetWorkflowUsage'
+     *
+     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
+     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
+     * @param  ActionsGetWorkflowWorkflowIdParameter $workflow_id The ID of the workflow. You can also pass the workflow file name as a string. (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsGetWorkflowUsage'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function actionsGetWorkflowUsageRequest($owner, $repo, $workflow_id, string $contentType = self::contentTypes['actionsGetWorkflowUsage'][0])
+    {
+
+        // verify the required parameter 'owner' is set
+        if ($owner === null || (is_array($owner) && count($owner) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $owner when calling actionsGetWorkflowUsage'
+            );
+        }
+
+        // verify the required parameter 'repo' is set
+        if ($repo === null || (is_array($repo) && count($repo) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $repo when calling actionsGetWorkflowUsage'
+            );
+        }
+
+        // verify the required parameter 'workflow_id' is set
+        if ($workflow_id === null || (is_array($workflow_id) && count($workflow_id) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $workflow_id when calling actionsGetWorkflowUsage'
+            );
+        }
+
+
+        $resourcePath = '/repos/{owner}/{repo}/actions/workflows/{workflow_id}/timing';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($owner !== null) {
+            $resourcePath = str_replace(
+                '{' . 'owner' . '}',
+                ObjectSerializer::toPathValue($owner),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($repo !== null) {
+            $resourcePath = str_replace(
+                '{' . 'repo' . '}',
+                ObjectSerializer::toPathValue($repo),
+                $resourcePath
+            );
+        }
+        // path params
+        if ($workflow_id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'workflow_id' . '}',
+                ObjectSerializer::toPathValue($workflow_id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
      * Operation actionsListArtifactsForRepo
      *
      * List artifacts for a repository
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $name The name field of an artifact. When specified, only artifacts with this name will be returned. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListArtifactsForRepo'] to see the possible values for this operation
      *
@@ -26293,8 +24266,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $name The name field of an artifact. When specified, only artifacts with this name will be returned. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListArtifactsForRepo'] to see the possible values for this operation
      *
@@ -26421,8 +24394,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $name The name field of an artifact. When specified, only artifacts with this name will be returned. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListArtifactsForRepo'] to see the possible values for this operation
      *
@@ -26446,8 +24419,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $name The name field of an artifact. When specified, only artifacts with this name will be returned. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListArtifactsForRepo'] to see the possible values for this operation
      *
@@ -26500,8 +24473,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $name The name field of an artifact. When specified, only artifacts with this name will be returned. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListArtifactsForRepo'] to see the possible values for this operation
      *
@@ -26644,8 +24617,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $environment_name The name of the environment. The name must be URL encoded. For example, any slashes in the name must be replaced with &#x60;%2F&#x60;. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListEnvironmentSecrets'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -26666,8 +24639,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $environment_name The name of the environment. The name must be URL encoded. For example, any slashes in the name must be replaced with &#x60;%2F&#x60;. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListEnvironmentSecrets'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -26794,8 +24767,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $environment_name The name of the environment. The name must be URL encoded. For example, any slashes in the name must be replaced with &#x60;%2F&#x60;. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListEnvironmentSecrets'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -26819,8 +24792,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $environment_name The name of the environment. The name must be URL encoded. For example, any slashes in the name must be replaced with &#x60;%2F&#x60;. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListEnvironmentSecrets'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -26873,8 +24846,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $environment_name The name of the environment. The name must be URL encoded. For example, any slashes in the name must be replaced with &#x60;%2F&#x60;. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListEnvironmentSecrets'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -27021,8 +24994,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $environment_name The name of the environment. The name must be URL encoded. For example, any slashes in the name must be replaced with &#x60;%2F&#x60;. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListEnvironmentVariables'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -27043,8 +25016,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $environment_name The name of the environment. The name must be URL encoded. For example, any slashes in the name must be replaced with &#x60;%2F&#x60;. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListEnvironmentVariables'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -27171,8 +25144,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $environment_name The name of the environment. The name must be URL encoded. For example, any slashes in the name must be replaced with &#x60;%2F&#x60;. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListEnvironmentVariables'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -27196,8 +25169,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $environment_name The name of the environment. The name must be URL encoded. For example, any slashes in the name must be replaced with &#x60;%2F&#x60;. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListEnvironmentVariables'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -27250,8 +25223,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $environment_name The name of the environment. The name must be URL encoded. For example, any slashes in the name must be replaced with &#x60;%2F&#x60;. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListEnvironmentVariables'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -27399,8 +25372,8 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
      * @param  string $filter Filters jobs by their &#x60;completed_at&#x60; timestamp. &#x60;latest&#x60; returns jobs from the most recent execution of the workflow run. &#x60;all&#x60; returns all jobs for a workflow run, including from old executions of the workflow run. (optional, default to 'latest')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListJobsForWorkflowRun'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -27422,8 +25395,8 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
      * @param  string $filter Filters jobs by their &#x60;completed_at&#x60; timestamp. &#x60;latest&#x60; returns jobs from the most recent execution of the workflow run. &#x60;all&#x60; returns all jobs for a workflow run, including from old executions of the workflow run. (optional, default to 'latest')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListJobsForWorkflowRun'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -27551,8 +25524,8 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
      * @param  string $filter Filters jobs by their &#x60;completed_at&#x60; timestamp. &#x60;latest&#x60; returns jobs from the most recent execution of the workflow run. &#x60;all&#x60; returns all jobs for a workflow run, including from old executions of the workflow run. (optional, default to 'latest')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListJobsForWorkflowRun'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -27577,8 +25550,8 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
      * @param  string $filter Filters jobs by their &#x60;completed_at&#x60; timestamp. &#x60;latest&#x60; returns jobs from the most recent execution of the workflow run. &#x60;all&#x60; returns all jobs for a workflow run, including from old executions of the workflow run. (optional, default to 'latest')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListJobsForWorkflowRun'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -27632,8 +25605,8 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
      * @param  string $filter Filters jobs by their &#x60;completed_at&#x60; timestamp. &#x60;latest&#x60; returns jobs from the most recent execution of the workflow run. &#x60;all&#x60; returns all jobs for a workflow run, including from old executions of the workflow run. (optional, default to 'latest')
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListJobsForWorkflowRun'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -27791,8 +25764,8 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
      * @param  int $attempt_number The attempt number of the workflow run. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListJobsForWorkflowRunAttempt'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -27814,8 +25787,8 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
      * @param  int $attempt_number The attempt number of the workflow run. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListJobsForWorkflowRunAttempt'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -27978,8 +25951,8 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
      * @param  int $attempt_number The attempt number of the workflow run. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListJobsForWorkflowRunAttempt'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -28004,8 +25977,8 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
      * @param  int $attempt_number The attempt number of the workflow run. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListJobsForWorkflowRunAttempt'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -28059,8 +26032,8 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
      * @param  int $attempt_number The attempt number of the workflow run. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListJobsForWorkflowRunAttempt'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -28225,7 +26198,7 @@ class ActionsApi
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
      */
     public function actionsListLabelsForSelfHostedRunnerForOrg($org, $runner_id, string $contentType = self::contentTypes['actionsListLabelsForSelfHostedRunnerForOrg'][0])
     {
@@ -28244,7 +26217,7 @@ class ActionsApi
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
      */
     public function actionsListLabelsForSelfHostedRunnerForOrgWithHttpInfo($org, $runner_id, string $contentType = self::contentTypes['actionsListLabelsForSelfHostedRunnerForOrg'][0])
     {
@@ -28287,11 +26260,11 @@ class ActionsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -28309,7 +26282,7 @@ class ActionsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -28342,7 +26315,7 @@ class ActionsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -28375,7 +26348,7 @@ class ActionsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -28429,7 +26402,7 @@ class ActionsApi
      */
     public function actionsListLabelsForSelfHostedRunnerForOrgAsyncWithHttpInfo($org, $runner_id, string $contentType = self::contentTypes['actionsListLabelsForSelfHostedRunnerForOrg'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
         $request = $this->actionsListLabelsForSelfHostedRunnerForOrgRequest($org, $runner_id, $contentType);
 
         return $this->client
@@ -28588,7 +26561,7 @@ class ActionsApi
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
      */
     public function actionsListLabelsForSelfHostedRunnerForRepo($owner, $repo, $runner_id, string $contentType = self::contentTypes['actionsListLabelsForSelfHostedRunnerForRepo'][0])
     {
@@ -28608,7 +26581,7 @@ class ActionsApi
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
      */
     public function actionsListLabelsForSelfHostedRunnerForRepoWithHttpInfo($owner, $repo, $runner_id, string $contentType = self::contentTypes['actionsListLabelsForSelfHostedRunnerForRepo'][0])
     {
@@ -28651,11 +26624,11 @@ class ActionsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -28673,7 +26646,7 @@ class ActionsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -28706,7 +26679,7 @@ class ActionsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -28739,7 +26712,7 @@ class ActionsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -28795,7 +26768,7 @@ class ActionsApi
      */
     public function actionsListLabelsForSelfHostedRunnerForRepoAsyncWithHttpInfo($owner, $repo, $runner_id, string $contentType = self::contentTypes['actionsListLabelsForSelfHostedRunnerForRepo'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
         $request = $this->actionsListLabelsForSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $contentType);
 
         return $this->client
@@ -28964,8 +26937,8 @@ class ActionsApi
      * List organization secrets
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListOrgSecrets'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -28984,8 +26957,8 @@ class ActionsApi
      * List organization secrets
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListOrgSecrets'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -29110,8 +27083,8 @@ class ActionsApi
      * List organization secrets
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListOrgSecrets'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -29133,8 +27106,8 @@ class ActionsApi
      * List organization secrets
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListOrgSecrets'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -29185,8 +27158,8 @@ class ActionsApi
      * Create request for operation 'actionsListOrgSecrets'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListOrgSecrets'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -29301,8 +27274,8 @@ class ActionsApi
      * List organization variables
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListOrgVariables'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -29321,8 +27294,8 @@ class ActionsApi
      * List organization variables
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListOrgVariables'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -29447,8 +27420,8 @@ class ActionsApi
      * List organization variables
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListOrgVariables'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -29470,8 +27443,8 @@ class ActionsApi
      * List organization variables
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListOrgVariables'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -29522,8 +27495,8 @@ class ActionsApi
      * Create request for operation 'actionsListOrgVariables'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListOrgVariables'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -29633,371 +27606,14 @@ class ActionsApi
     }
 
     /**
-     * Operation actionsListRepoAccessToSelfHostedRunnerGroupInOrg
-     *
-     * List repository access to a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Response
-     */
-    public function actionsListRepoAccessToSelfHostedRunnerGroupInOrg($org, $runner_group_id, $page = 1, $per_page = 30, string $contentType = self::contentTypes['actionsListRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        list($response) = $this->actionsListRepoAccessToSelfHostedRunnerGroupInOrgWithHttpInfo($org, $runner_group_id, $page, $per_page, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation actionsListRepoAccessToSelfHostedRunnerGroupInOrgWithHttpInfo
-     *
-     * List repository access to a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Response, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsListRepoAccessToSelfHostedRunnerGroupInOrgWithHttpInfo($org, $runner_group_id, $page = 1, $per_page = 30, string $contentType = self::contentTypes['actionsListRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        $request = $this->actionsListRepoAccessToSelfHostedRunnerGroupInOrgRequest($org, $runner_group_id, $page, $per_page, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Response' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Response' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Response', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Response';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Response',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsListRepoAccessToSelfHostedRunnerGroupInOrgAsync
-     *
-     * List repository access to a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsListRepoAccessToSelfHostedRunnerGroupInOrgAsync($org, $runner_group_id, $page = 1, $per_page = 30, string $contentType = self::contentTypes['actionsListRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        return $this->actionsListRepoAccessToSelfHostedRunnerGroupInOrgAsyncWithHttpInfo($org, $runner_group_id, $page, $per_page, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsListRepoAccessToSelfHostedRunnerGroupInOrgAsyncWithHttpInfo
-     *
-     * List repository access to a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsListRepoAccessToSelfHostedRunnerGroupInOrgAsyncWithHttpInfo($org, $runner_group_id, $page = 1, $per_page = 30, string $contentType = self::contentTypes['actionsListRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Response';
-        $request = $this->actionsListRepoAccessToSelfHostedRunnerGroupInOrgRequest($org, $runner_group_id, $page, $per_page, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsListRepoAccessToSelfHostedRunnerGroupInOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsListRepoAccessToSelfHostedRunnerGroupInOrgRequest($org, $runner_group_id, $page = 1, $per_page = 30, string $contentType = self::contentTypes['actionsListRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsListRepoAccessToSelfHostedRunnerGroupInOrg'
-            );
-        }
-
-        // verify the required parameter 'runner_group_id' is set
-        if ($runner_group_id === null || (is_array($runner_group_id) && count($runner_group_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_group_id when calling actionsListRepoAccessToSelfHostedRunnerGroupInOrg'
-            );
-        }
-
-
-
-
-        $resourcePath = '/orgs/{org}/actions/runner-groups/{runner_group_id}/repositories';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $page,
-            'page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $per_page,
-            'per_page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($runner_group_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'runner_group_id' . '}',
-                ObjectSerializer::toPathValue($runner_group_id),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'GET',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
      * Operation actionsListRepoOrganizationSecrets
      *
      * List repository organization secrets
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoOrganizationSecrets'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -30017,8 +27633,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoOrganizationSecrets'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -30144,8 +27760,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoOrganizationSecrets'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -30168,8 +27784,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoOrganizationSecrets'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -30221,8 +27837,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoOrganizationSecrets'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -30353,8 +27969,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoOrganizationVariables'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -30374,8 +27990,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoOrganizationVariables'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -30501,8 +28117,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoOrganizationVariables'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -30525,8 +28141,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoOrganizationVariables'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -30578,8 +28194,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoOrganizationVariables'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -30710,8 +28326,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoSecrets'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -30731,8 +28347,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoSecrets'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -30858,8 +28474,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoSecrets'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -30882,8 +28498,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoSecrets'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -30935,8 +28551,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoSecrets'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -31067,8 +28683,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoVariables'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -31088,8 +28704,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoVariables'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -31215,8 +28831,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoVariables'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -31239,8 +28855,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoVariables'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -31292,8 +28908,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 30). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 10)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoVariables'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -31424,8 +29040,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoWorkflows'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -31445,8 +29061,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoWorkflows'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -31572,8 +29188,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoWorkflows'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -31596,8 +29212,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoWorkflows'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -31649,8 +29265,8 @@ class ActionsApi
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListRepoWorkflows'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -32415,8 +30031,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $secret_name The name of the secret. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedReposForOrgSecret'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -32436,8 +30052,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $secret_name The name of the secret. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedReposForOrgSecret'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -32563,8 +30179,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $secret_name The name of the secret. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedReposForOrgSecret'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -32587,8 +30203,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $secret_name The name of the secret. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedReposForOrgSecret'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -32640,8 +30256,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $secret_name The name of the secret. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedReposForOrgSecret'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -32772,8 +30388,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $name The name of the variable. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedReposForOrgVariable'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -32793,8 +30409,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $name The name of the variable. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedReposForOrgVariable'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -32920,8 +30536,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $name The name of the variable. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedReposForOrgVariable'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -32944,8 +30560,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $name The name of the variable. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedReposForOrgVariable'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -32997,8 +30613,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $name The name of the variable. (required)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedReposForOrgVariable'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -33128,8 +30744,8 @@ class ActionsApi
      * List selected repositories enabled for GitHub Actions in an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedRepositoriesEnabledGithubActionsOrganization'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -33148,8 +30764,8 @@ class ActionsApi
      * List selected repositories enabled for GitHub Actions in an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedRepositoriesEnabledGithubActionsOrganization'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -33274,8 +30890,8 @@ class ActionsApi
      * List selected repositories enabled for GitHub Actions in an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedRepositoriesEnabledGithubActionsOrganization'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -33297,8 +30913,8 @@ class ActionsApi
      * List selected repositories enabled for GitHub Actions in an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedRepositoriesEnabledGithubActionsOrganization'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -33349,8 +30965,8 @@ class ActionsApi
      * Create request for operation 'actionsListSelectedRepositoriesEnabledGithubActionsOrganization'
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelectedRepositoriesEnabledGithubActionsOrganization'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -33460,366 +31076,14 @@ class ActionsApi
     }
 
     /**
-     * Operation actionsListSelfHostedRunnerGroupsForOrg
-     *
-     * List self-hosted runner groups for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $visible_to_repository Only return runner groups that are allowed to be used by this repository. (optional)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnerGroupsForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListSelfHostedRunnerGroupsForOrg200Response
-     */
-    public function actionsListSelfHostedRunnerGroupsForOrg($org, $per_page = 30, $page = 1, $visible_to_repository = null, string $contentType = self::contentTypes['actionsListSelfHostedRunnerGroupsForOrg'][0])
-    {
-        list($response) = $this->actionsListSelfHostedRunnerGroupsForOrgWithHttpInfo($org, $per_page, $page, $visible_to_repository, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation actionsListSelfHostedRunnerGroupsForOrgWithHttpInfo
-     *
-     * List self-hosted runner groups for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $visible_to_repository Only return runner groups that are allowed to be used by this repository. (optional)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnerGroupsForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListSelfHostedRunnerGroupsForOrg200Response, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsListSelfHostedRunnerGroupsForOrgWithHttpInfo($org, $per_page = 30, $page = 1, $visible_to_repository = null, string $contentType = self::contentTypes['actionsListSelfHostedRunnerGroupsForOrg'][0])
-    {
-        $request = $this->actionsListSelfHostedRunnerGroupsForOrgRequest($org, $per_page, $page, $visible_to_repository, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListSelfHostedRunnerGroupsForOrg200Response' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListSelfHostedRunnerGroupsForOrg200Response' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListSelfHostedRunnerGroupsForOrg200Response', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListSelfHostedRunnerGroupsForOrg200Response';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListSelfHostedRunnerGroupsForOrg200Response',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsListSelfHostedRunnerGroupsForOrgAsync
-     *
-     * List self-hosted runner groups for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $visible_to_repository Only return runner groups that are allowed to be used by this repository. (optional)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnerGroupsForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsListSelfHostedRunnerGroupsForOrgAsync($org, $per_page = 30, $page = 1, $visible_to_repository = null, string $contentType = self::contentTypes['actionsListSelfHostedRunnerGroupsForOrg'][0])
-    {
-        return $this->actionsListSelfHostedRunnerGroupsForOrgAsyncWithHttpInfo($org, $per_page, $page, $visible_to_repository, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsListSelfHostedRunnerGroupsForOrgAsyncWithHttpInfo
-     *
-     * List self-hosted runner groups for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $visible_to_repository Only return runner groups that are allowed to be used by this repository. (optional)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnerGroupsForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsListSelfHostedRunnerGroupsForOrgAsyncWithHttpInfo($org, $per_page = 30, $page = 1, $visible_to_repository = null, string $contentType = self::contentTypes['actionsListSelfHostedRunnerGroupsForOrg'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListSelfHostedRunnerGroupsForOrg200Response';
-        $request = $this->actionsListSelfHostedRunnerGroupsForOrgRequest($org, $per_page, $page, $visible_to_repository, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsListSelfHostedRunnerGroupsForOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $visible_to_repository Only return runner groups that are allowed to be used by this repository. (optional)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnerGroupsForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsListSelfHostedRunnerGroupsForOrgRequest($org, $per_page = 30, $page = 1, $visible_to_repository = null, string $contentType = self::contentTypes['actionsListSelfHostedRunnerGroupsForOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsListSelfHostedRunnerGroupsForOrg'
-            );
-        }
-
-
-
-
-
-        $resourcePath = '/orgs/{org}/actions/runner-groups';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $per_page,
-            'per_page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $page,
-            'page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $visible_to_repository,
-            'visible_to_repository', // param base name
-            'string', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'GET',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
      * Operation actionsListSelfHostedRunnersForOrg
      *
      * List self-hosted runners for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $name The name of a self-hosted runner. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersForOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -33839,8 +31103,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $name The name of a self-hosted runner. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersForOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -33966,8 +31230,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $name The name of a self-hosted runner. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -33990,8 +31254,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $name The name of a self-hosted runner. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -34043,8 +31307,8 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  string $name The name of a self-hosted runner. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -34171,8 +31435,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $name The name of a self-hosted runner. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersForRepo'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -34193,8 +31457,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $name The name of a self-hosted runner. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersForRepo'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
@@ -34321,8 +31585,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $name The name of a self-hosted runner. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -34346,8 +31610,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $name The name of a self-hosted runner. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -34400,8 +31664,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $name The name of a self-hosted runner. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
@@ -34536,363 +31800,6 @@ class ActionsApi
     }
 
     /**
-     * Operation actionsListSelfHostedRunnersInGroupForOrg
-     *
-     * List self-hosted runners in a group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersInGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListSelfHostedRunnersInGroupForEnterprise200Response
-     */
-    public function actionsListSelfHostedRunnersInGroupForOrg($org, $runner_group_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['actionsListSelfHostedRunnersInGroupForOrg'][0])
-    {
-        list($response) = $this->actionsListSelfHostedRunnersInGroupForOrgWithHttpInfo($org, $runner_group_id, $per_page, $page, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation actionsListSelfHostedRunnersInGroupForOrgWithHttpInfo
-     *
-     * List self-hosted runners in a group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersInGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListSelfHostedRunnersInGroupForEnterprise200Response, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsListSelfHostedRunnersInGroupForOrgWithHttpInfo($org, $runner_group_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['actionsListSelfHostedRunnersInGroupForOrg'][0])
-    {
-        $request = $this->actionsListSelfHostedRunnersInGroupForOrgRequest($org, $runner_group_id, $per_page, $page, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListSelfHostedRunnersInGroupForEnterprise200Response' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListSelfHostedRunnersInGroupForEnterprise200Response' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListSelfHostedRunnersInGroupForEnterprise200Response', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListSelfHostedRunnersInGroupForEnterprise200Response';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListSelfHostedRunnersInGroupForEnterprise200Response',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsListSelfHostedRunnersInGroupForOrgAsync
-     *
-     * List self-hosted runners in a group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersInGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsListSelfHostedRunnersInGroupForOrgAsync($org, $runner_group_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['actionsListSelfHostedRunnersInGroupForOrg'][0])
-    {
-        return $this->actionsListSelfHostedRunnersInGroupForOrgAsyncWithHttpInfo($org, $runner_group_id, $per_page, $page, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsListSelfHostedRunnersInGroupForOrgAsyncWithHttpInfo
-     *
-     * List self-hosted runners in a group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersInGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsListSelfHostedRunnersInGroupForOrgAsyncWithHttpInfo($org, $runner_group_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['actionsListSelfHostedRunnersInGroupForOrg'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListSelfHostedRunnersInGroupForEnterprise200Response';
-        $request = $this->actionsListSelfHostedRunnersInGroupForOrgRequest($org, $runner_group_id, $per_page, $page, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsListSelfHostedRunnersInGroupForOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListSelfHostedRunnersInGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsListSelfHostedRunnersInGroupForOrgRequest($org, $runner_group_id, $per_page = 30, $page = 1, string $contentType = self::contentTypes['actionsListSelfHostedRunnersInGroupForOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsListSelfHostedRunnersInGroupForOrg'
-            );
-        }
-
-        // verify the required parameter 'runner_group_id' is set
-        if ($runner_group_id === null || (is_array($runner_group_id) && count($runner_group_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_group_id when calling actionsListSelfHostedRunnersInGroupForOrg'
-            );
-        }
-
-
-
-
-        $resourcePath = '/orgs/{org}/actions/runner-groups/{runner_group_id}/runners';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $per_page,
-            'per_page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-        // query params
-        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
-            $page,
-            'page', // param base name
-            'integer', // openApiType
-            'form', // style
-            true, // explode
-            false // required
-        ) ?? []);
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($runner_group_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'runner_group_id' . '}',
-                ObjectSerializer::toPathValue($runner_group_id),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'GET',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
      * Operation actionsListWorkflowRunArtifacts
      *
      * List workflow run artifacts
@@ -34900,8 +31807,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $name The name field of an artifact. When specified, only artifacts with this name will be returned. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListWorkflowRunArtifacts'] to see the possible values for this operation
      *
@@ -34923,8 +31830,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $name The name field of an artifact. When specified, only artifacts with this name will be returned. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListWorkflowRunArtifacts'] to see the possible values for this operation
      *
@@ -35052,8 +31959,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $name The name field of an artifact. When specified, only artifacts with this name will be returned. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListWorkflowRunArtifacts'] to see the possible values for this operation
      *
@@ -35078,8 +31985,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $name The name field of an artifact. When specified, only artifacts with this name will be returned. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListWorkflowRunArtifacts'] to see the possible values for this operation
      *
@@ -35133,8 +32040,8 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $run_id The unique identifier of the workflow run. (required)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
      * @param  string $name The name field of an artifact. When specified, only artifacts with this name will be returned. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsListWorkflowRunArtifacts'] to see the possible values for this operation
      *
@@ -35294,11 +32201,11 @@ class ActionsApi
      * @param  ActionsGetWorkflowWorkflowIdParameter $workflow_id The ID of the workflow. You can also pass the workflow file name as a string. (required)
      * @param  string $actor Returns someone&#39;s workflow runs. Use the login for the user who created the &#x60;push&#x60; associated with the check suite or workflow run. (optional)
      * @param  string $branch Returns workflow runs associated with a branch. Use the name of the branch of the &#x60;push&#x60;. (optional)
-     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/enterprise-server@3.12/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
+     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
      * @param  string $status Returns workflow runs with the check run &#x60;status&#x60; or &#x60;conclusion&#x60; that you specify. For example, a conclusion can be &#x60;success&#x60; or a status can be &#x60;in_progress&#x60;. Only GitHub Actions can set a status of &#x60;waiting&#x60;, &#x60;pending&#x60;, or &#x60;requested&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
      * @param  bool $exclude_pull_requests If &#x60;true&#x60; pull requests are omitted from the response (empty array). (optional, default to false)
      * @param  int $check_suite_id Returns workflow runs with the &#x60;check_suite_id&#x60; that you specify. (optional)
      * @param  string $head_sha Only returns workflow runs that are associated with the specified &#x60;head_sha&#x60;. (optional)
@@ -35324,11 +32231,11 @@ class ActionsApi
      * @param  ActionsGetWorkflowWorkflowIdParameter $workflow_id The ID of the workflow. You can also pass the workflow file name as a string. (required)
      * @param  string $actor Returns someone&#39;s workflow runs. Use the login for the user who created the &#x60;push&#x60; associated with the check suite or workflow run. (optional)
      * @param  string $branch Returns workflow runs associated with a branch. Use the name of the branch of the &#x60;push&#x60;. (optional)
-     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/enterprise-server@3.12/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
+     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
      * @param  string $status Returns workflow runs with the check run &#x60;status&#x60; or &#x60;conclusion&#x60; that you specify. For example, a conclusion can be &#x60;success&#x60; or a status can be &#x60;in_progress&#x60;. Only GitHub Actions can set a status of &#x60;waiting&#x60;, &#x60;pending&#x60;, or &#x60;requested&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
      * @param  bool $exclude_pull_requests If &#x60;true&#x60; pull requests are omitted from the response (empty array). (optional, default to false)
      * @param  int $check_suite_id Returns workflow runs with the &#x60;check_suite_id&#x60; that you specify. (optional)
      * @param  string $head_sha Only returns workflow runs that are associated with the specified &#x60;head_sha&#x60;. (optional)
@@ -35460,11 +32367,11 @@ class ActionsApi
      * @param  ActionsGetWorkflowWorkflowIdParameter $workflow_id The ID of the workflow. You can also pass the workflow file name as a string. (required)
      * @param  string $actor Returns someone&#39;s workflow runs. Use the login for the user who created the &#x60;push&#x60; associated with the check suite or workflow run. (optional)
      * @param  string $branch Returns workflow runs associated with a branch. Use the name of the branch of the &#x60;push&#x60;. (optional)
-     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/enterprise-server@3.12/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
+     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
      * @param  string $status Returns workflow runs with the check run &#x60;status&#x60; or &#x60;conclusion&#x60; that you specify. For example, a conclusion can be &#x60;success&#x60; or a status can be &#x60;in_progress&#x60;. Only GitHub Actions can set a status of &#x60;waiting&#x60;, &#x60;pending&#x60;, or &#x60;requested&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
      * @param  bool $exclude_pull_requests If &#x60;true&#x60; pull requests are omitted from the response (empty array). (optional, default to false)
      * @param  int $check_suite_id Returns workflow runs with the &#x60;check_suite_id&#x60; that you specify. (optional)
      * @param  string $head_sha Only returns workflow runs that are associated with the specified &#x60;head_sha&#x60;. (optional)
@@ -35493,11 +32400,11 @@ class ActionsApi
      * @param  ActionsGetWorkflowWorkflowIdParameter $workflow_id The ID of the workflow. You can also pass the workflow file name as a string. (required)
      * @param  string $actor Returns someone&#39;s workflow runs. Use the login for the user who created the &#x60;push&#x60; associated with the check suite or workflow run. (optional)
      * @param  string $branch Returns workflow runs associated with a branch. Use the name of the branch of the &#x60;push&#x60;. (optional)
-     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/enterprise-server@3.12/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
+     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
      * @param  string $status Returns workflow runs with the check run &#x60;status&#x60; or &#x60;conclusion&#x60; that you specify. For example, a conclusion can be &#x60;success&#x60; or a status can be &#x60;in_progress&#x60;. Only GitHub Actions can set a status of &#x60;waiting&#x60;, &#x60;pending&#x60;, or &#x60;requested&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
      * @param  bool $exclude_pull_requests If &#x60;true&#x60; pull requests are omitted from the response (empty array). (optional, default to false)
      * @param  int $check_suite_id Returns workflow runs with the &#x60;check_suite_id&#x60; that you specify. (optional)
      * @param  string $head_sha Only returns workflow runs that are associated with the specified &#x60;head_sha&#x60;. (optional)
@@ -35555,11 +32462,11 @@ class ActionsApi
      * @param  ActionsGetWorkflowWorkflowIdParameter $workflow_id The ID of the workflow. You can also pass the workflow file name as a string. (required)
      * @param  string $actor Returns someone&#39;s workflow runs. Use the login for the user who created the &#x60;push&#x60; associated with the check suite or workflow run. (optional)
      * @param  string $branch Returns workflow runs associated with a branch. Use the name of the branch of the &#x60;push&#x60;. (optional)
-     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/enterprise-server@3.12/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
+     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
      * @param  string $status Returns workflow runs with the check run &#x60;status&#x60; or &#x60;conclusion&#x60; that you specify. For example, a conclusion can be &#x60;success&#x60; or a status can be &#x60;in_progress&#x60;. Only GitHub Actions can set a status of &#x60;waiting&#x60;, &#x60;pending&#x60;, or &#x60;requested&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
      * @param  bool $exclude_pull_requests If &#x60;true&#x60; pull requests are omitted from the response (empty array). (optional, default to false)
      * @param  int $check_suite_id Returns workflow runs with the &#x60;check_suite_id&#x60; that you specify. (optional)
      * @param  string $head_sha Only returns workflow runs that are associated with the specified &#x60;head_sha&#x60;. (optional)
@@ -35790,11 +32697,11 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $actor Returns someone&#39;s workflow runs. Use the login for the user who created the &#x60;push&#x60; associated with the check suite or workflow run. (optional)
      * @param  string $branch Returns workflow runs associated with a branch. Use the name of the branch of the &#x60;push&#x60;. (optional)
-     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/enterprise-server@3.12/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
+     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
      * @param  string $status Returns workflow runs with the check run &#x60;status&#x60; or &#x60;conclusion&#x60; that you specify. For example, a conclusion can be &#x60;success&#x60; or a status can be &#x60;in_progress&#x60;. Only GitHub Actions can set a status of &#x60;waiting&#x60;, &#x60;pending&#x60;, or &#x60;requested&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
      * @param  bool $exclude_pull_requests If &#x60;true&#x60; pull requests are omitted from the response (empty array). (optional, default to false)
      * @param  int $check_suite_id Returns workflow runs with the &#x60;check_suite_id&#x60; that you specify. (optional)
      * @param  string $head_sha Only returns workflow runs that are associated with the specified &#x60;head_sha&#x60;. (optional)
@@ -35819,11 +32726,11 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $actor Returns someone&#39;s workflow runs. Use the login for the user who created the &#x60;push&#x60; associated with the check suite or workflow run. (optional)
      * @param  string $branch Returns workflow runs associated with a branch. Use the name of the branch of the &#x60;push&#x60;. (optional)
-     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/enterprise-server@3.12/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
+     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
      * @param  string $status Returns workflow runs with the check run &#x60;status&#x60; or &#x60;conclusion&#x60; that you specify. For example, a conclusion can be &#x60;success&#x60; or a status can be &#x60;in_progress&#x60;. Only GitHub Actions can set a status of &#x60;waiting&#x60;, &#x60;pending&#x60;, or &#x60;requested&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
      * @param  bool $exclude_pull_requests If &#x60;true&#x60; pull requests are omitted from the response (empty array). (optional, default to false)
      * @param  int $check_suite_id Returns workflow runs with the &#x60;check_suite_id&#x60; that you specify. (optional)
      * @param  string $head_sha Only returns workflow runs that are associated with the specified &#x60;head_sha&#x60;. (optional)
@@ -35954,11 +32861,11 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $actor Returns someone&#39;s workflow runs. Use the login for the user who created the &#x60;push&#x60; associated with the check suite or workflow run. (optional)
      * @param  string $branch Returns workflow runs associated with a branch. Use the name of the branch of the &#x60;push&#x60;. (optional)
-     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/enterprise-server@3.12/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
+     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
      * @param  string $status Returns workflow runs with the check run &#x60;status&#x60; or &#x60;conclusion&#x60; that you specify. For example, a conclusion can be &#x60;success&#x60; or a status can be &#x60;in_progress&#x60;. Only GitHub Actions can set a status of &#x60;waiting&#x60;, &#x60;pending&#x60;, or &#x60;requested&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
      * @param  bool $exclude_pull_requests If &#x60;true&#x60; pull requests are omitted from the response (empty array). (optional, default to false)
      * @param  int $check_suite_id Returns workflow runs with the &#x60;check_suite_id&#x60; that you specify. (optional)
      * @param  string $head_sha Only returns workflow runs that are associated with the specified &#x60;head_sha&#x60;. (optional)
@@ -35986,11 +32893,11 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $actor Returns someone&#39;s workflow runs. Use the login for the user who created the &#x60;push&#x60; associated with the check suite or workflow run. (optional)
      * @param  string $branch Returns workflow runs associated with a branch. Use the name of the branch of the &#x60;push&#x60;. (optional)
-     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/enterprise-server@3.12/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
+     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
      * @param  string $status Returns workflow runs with the check run &#x60;status&#x60; or &#x60;conclusion&#x60; that you specify. For example, a conclusion can be &#x60;success&#x60; or a status can be &#x60;in_progress&#x60;. Only GitHub Actions can set a status of &#x60;waiting&#x60;, &#x60;pending&#x60;, or &#x60;requested&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
      * @param  bool $exclude_pull_requests If &#x60;true&#x60; pull requests are omitted from the response (empty array). (optional, default to false)
      * @param  int $check_suite_id Returns workflow runs with the &#x60;check_suite_id&#x60; that you specify. (optional)
      * @param  string $head_sha Only returns workflow runs that are associated with the specified &#x60;head_sha&#x60;. (optional)
@@ -36047,11 +32954,11 @@ class ActionsApi
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  string $actor Returns someone&#39;s workflow runs. Use the login for the user who created the &#x60;push&#x60; associated with the check suite or workflow run. (optional)
      * @param  string $branch Returns workflow runs associated with a branch. Use the name of the branch of the &#x60;push&#x60;. (optional)
-     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/enterprise-server@3.12/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
+     * @param  string $event Returns workflow run triggered by the event you specify. For example, &#x60;push&#x60;, &#x60;pull_request&#x60; or &#x60;issue&#x60;. For more information, see \&quot;[Events that trigger workflows](https://docs.github.com/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows).\&quot; (optional)
      * @param  string $status Returns workflow runs with the check run &#x60;status&#x60; or &#x60;conclusion&#x60; that you specify. For example, a conclusion can be &#x60;success&#x60; or a status can be &#x60;in_progress&#x60;. Only GitHub Actions can set a status of &#x60;waiting&#x60;, &#x60;pending&#x60;, or &#x60;requested&#x60;. (optional)
-     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
-     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.12/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
-     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/enterprise-server@3.12/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
+     * @param  int $per_page The number of results per page (max 100). For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 30)
+     * @param  int $page The page number of the results to fetch. For more information, see \&quot;[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\&quot; (optional, default to 1)
+     * @param  \DateTime $created Returns workflow runs created within the given date-time range. For more information on the syntax, see \&quot;[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates).\&quot; (optional)
      * @param  bool $exclude_pull_requests If &#x60;true&#x60; pull requests are omitted from the response (empty array). (optional, default to false)
      * @param  int $check_suite_id Returns workflow runs with the &#x60;check_suite_id&#x60; that you specify. (optional)
      * @param  string $head_sha Only returns workflow runs that are associated with the specified &#x60;head_sha&#x60;. (optional)
@@ -37384,7 +34291,7 @@ class ActionsApi
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
      */
     public function actionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg($org, $runner_id, string $contentType = self::contentTypes['actionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg'][0])
     {
@@ -37403,7 +34310,7 @@ class ActionsApi
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
      */
     public function actionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrgWithHttpInfo($org, $runner_id, string $contentType = self::contentTypes['actionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg'][0])
     {
@@ -37446,11 +34353,11 @@ class ActionsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -37468,7 +34375,7 @@ class ActionsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -37501,7 +34408,7 @@ class ActionsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -37534,7 +34441,7 @@ class ActionsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -37588,7 +34495,7 @@ class ActionsApi
      */
     public function actionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrgAsyncWithHttpInfo($org, $runner_id, string $contentType = self::contentTypes['actionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
         $request = $this->actionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrgRequest($org, $runner_id, $contentType);
 
         return $this->client
@@ -37747,7 +34654,7 @@ class ActionsApi
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError
      */
     public function actionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo($owner, $repo, $runner_id, string $contentType = self::contentTypes['actionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo'][0])
     {
@@ -37767,7 +34674,7 @@ class ActionsApi
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError, HTTP status code, HTTP response headers (array of strings)
      */
     public function actionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepoWithHttpInfo($owner, $repo, $runner_id, string $contentType = self::contentTypes['actionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo'][0])
     {
@@ -37810,11 +34717,11 @@ class ActionsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -37832,7 +34739,7 @@ class ActionsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -37865,7 +34772,7 @@ class ActionsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -37898,7 +34805,7 @@ class ActionsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -37954,7 +34861,7 @@ class ActionsApi
      */
     public function actionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepoAsyncWithHttpInfo($owner, $repo, $runner_id, string $contentType = self::contentTypes['actionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
         $request = $this->actionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $contentType);
 
         return $this->client
@@ -38129,7 +35036,7 @@ class ActionsApi
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
      */
     public function actionsRemoveCustomLabelFromSelfHostedRunnerForOrg($org, $runner_id, $name, string $contentType = self::contentTypes['actionsRemoveCustomLabelFromSelfHostedRunnerForOrg'][0])
     {
@@ -38149,7 +35056,7 @@ class ActionsApi
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
      */
     public function actionsRemoveCustomLabelFromSelfHostedRunnerForOrgWithHttpInfo($org, $runner_id, $name, string $contentType = self::contentTypes['actionsRemoveCustomLabelFromSelfHostedRunnerForOrg'][0])
     {
@@ -38192,11 +35099,11 @@ class ActionsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -38214,7 +35121,7 @@ class ActionsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -38274,7 +35181,7 @@ class ActionsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -38307,7 +35214,7 @@ class ActionsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -38371,7 +35278,7 @@ class ActionsApi
      */
     public function actionsRemoveCustomLabelFromSelfHostedRunnerForOrgAsyncWithHttpInfo($org, $runner_id, $name, string $contentType = self::contentTypes['actionsRemoveCustomLabelFromSelfHostedRunnerForOrg'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
         $request = $this->actionsRemoveCustomLabelFromSelfHostedRunnerForOrgRequest($org, $runner_id, $name, $contentType);
 
         return $this->client
@@ -38547,7 +35454,7 @@ class ActionsApi
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
      */
     public function actionsRemoveCustomLabelFromSelfHostedRunnerForRepo($owner, $repo, $runner_id, $name, string $contentType = self::contentTypes['actionsRemoveCustomLabelFromSelfHostedRunnerForRepo'][0])
     {
@@ -38568,7 +35475,7 @@ class ActionsApi
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
      */
     public function actionsRemoveCustomLabelFromSelfHostedRunnerForRepoWithHttpInfo($owner, $repo, $runner_id, $name, string $contentType = self::contentTypes['actionsRemoveCustomLabelFromSelfHostedRunnerForRepo'][0])
     {
@@ -38611,11 +35518,11 @@ class ActionsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -38633,7 +35540,7 @@ class ActionsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -38693,7 +35600,7 @@ class ActionsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -38726,7 +35633,7 @@ class ActionsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -38792,7 +35699,7 @@ class ActionsApi
      */
     public function actionsRemoveCustomLabelFromSelfHostedRunnerForRepoAsyncWithHttpInfo($owner, $repo, $runner_id, $name, string $contentType = self::contentTypes['actionsRemoveCustomLabelFromSelfHostedRunnerForRepo'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
         $request = $this->actionsRemoveCustomLabelFromSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $name, $contentType);
 
         return $this->client
@@ -38920,275 +35827,6 @@ class ActionsApi
 
         $headers = $this->headerSelector->selectHeaders(
             ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'DELETE',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg
-     *
-     * Remove repository access to a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $repository_id The unique identifier of the repository. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return void
-     */
-    public function actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg($org, $runner_group_id, $repository_id, string $contentType = self::contentTypes['actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        $this->actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrgWithHttpInfo($org, $runner_group_id, $repository_id, $contentType);
-    }
-
-    /**
-     * Operation actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrgWithHttpInfo
-     *
-     * Remove repository access to a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $repository_id The unique identifier of the repository. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrgWithHttpInfo($org, $runner_group_id, $repository_id, string $contentType = self::contentTypes['actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        $request = $this->actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrgRequest($org, $runner_group_id, $repository_id, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            return [null, $statusCode, $response->getHeaders()];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrgAsync
-     *
-     * Remove repository access to a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $repository_id The unique identifier of the repository. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrgAsync($org, $runner_group_id, $repository_id, string $contentType = self::contentTypes['actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        return $this->actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrgAsyncWithHttpInfo($org, $runner_group_id, $repository_id, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrgAsyncWithHttpInfo
-     *
-     * Remove repository access to a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $repository_id The unique identifier of the repository. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrgAsyncWithHttpInfo($org, $runner_group_id, $repository_id, string $contentType = self::contentTypes['actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        $returnType = '';
-        $request = $this->actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrgRequest($org, $runner_group_id, $repository_id, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    return [null, $response->getStatusCode(), $response->getHeaders()];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $repository_id The unique identifier of the repository. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrgRequest($org, $runner_group_id, $repository_id, string $contentType = self::contentTypes['actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'
-            );
-        }
-
-        // verify the required parameter 'runner_group_id' is set
-        if ($runner_group_id === null || (is_array($runner_group_id) && count($runner_group_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_group_id when calling actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'
-            );
-        }
-
-        // verify the required parameter 'repository_id' is set
-        if ($repository_id === null || (is_array($repository_id) && count($repository_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $repository_id when calling actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/actions/runner-groups/{runner_group_id}/repositories/{repository_id}';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($runner_group_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'runner_group_id' . '}',
-                ObjectSerializer::toPathValue($runner_group_id),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($repository_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'repository_id' . '}',
-                ObjectSerializer::toPathValue($repository_id),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            [],
             $contentType,
             $multipart
         );
@@ -39720,275 +36358,6 @@ class ActionsApi
             $resourcePath = str_replace(
                 '{' . 'repository_id' . '}',
                 ObjectSerializer::toPathValue($repository_id),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            [],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'DELETE',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation actionsRemoveSelfHostedRunnerFromGroupForOrg
-     *
-     * Remove a self-hosted runner from a group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsRemoveSelfHostedRunnerFromGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return void
-     */
-    public function actionsRemoveSelfHostedRunnerFromGroupForOrg($org, $runner_group_id, $runner_id, string $contentType = self::contentTypes['actionsRemoveSelfHostedRunnerFromGroupForOrg'][0])
-    {
-        $this->actionsRemoveSelfHostedRunnerFromGroupForOrgWithHttpInfo($org, $runner_group_id, $runner_id, $contentType);
-    }
-
-    /**
-     * Operation actionsRemoveSelfHostedRunnerFromGroupForOrgWithHttpInfo
-     *
-     * Remove a self-hosted runner from a group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsRemoveSelfHostedRunnerFromGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsRemoveSelfHostedRunnerFromGroupForOrgWithHttpInfo($org, $runner_group_id, $runner_id, string $contentType = self::contentTypes['actionsRemoveSelfHostedRunnerFromGroupForOrg'][0])
-    {
-        $request = $this->actionsRemoveSelfHostedRunnerFromGroupForOrgRequest($org, $runner_group_id, $runner_id, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            return [null, $statusCode, $response->getHeaders()];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsRemoveSelfHostedRunnerFromGroupForOrgAsync
-     *
-     * Remove a self-hosted runner from a group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsRemoveSelfHostedRunnerFromGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsRemoveSelfHostedRunnerFromGroupForOrgAsync($org, $runner_group_id, $runner_id, string $contentType = self::contentTypes['actionsRemoveSelfHostedRunnerFromGroupForOrg'][0])
-    {
-        return $this->actionsRemoveSelfHostedRunnerFromGroupForOrgAsyncWithHttpInfo($org, $runner_group_id, $runner_id, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsRemoveSelfHostedRunnerFromGroupForOrgAsyncWithHttpInfo
-     *
-     * Remove a self-hosted runner from a group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsRemoveSelfHostedRunnerFromGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsRemoveSelfHostedRunnerFromGroupForOrgAsyncWithHttpInfo($org, $runner_group_id, $runner_id, string $contentType = self::contentTypes['actionsRemoveSelfHostedRunnerFromGroupForOrg'][0])
-    {
-        $returnType = '';
-        $request = $this->actionsRemoveSelfHostedRunnerFromGroupForOrgRequest($org, $runner_group_id, $runner_id, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    return [null, $response->getStatusCode(), $response->getHeaders()];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsRemoveSelfHostedRunnerFromGroupForOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsRemoveSelfHostedRunnerFromGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsRemoveSelfHostedRunnerFromGroupForOrgRequest($org, $runner_group_id, $runner_id, string $contentType = self::contentTypes['actionsRemoveSelfHostedRunnerFromGroupForOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsRemoveSelfHostedRunnerFromGroupForOrg'
-            );
-        }
-
-        // verify the required parameter 'runner_group_id' is set
-        if ($runner_group_id === null || (is_array($runner_group_id) && count($runner_group_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_group_id when calling actionsRemoveSelfHostedRunnerFromGroupForOrg'
-            );
-        }
-
-        // verify the required parameter 'runner_id' is set
-        if ($runner_id === null || (is_array($runner_id) && count($runner_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_id when calling actionsRemoveSelfHostedRunnerFromGroupForOrg'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/actions/runner-groups/{runner_group_id}/runners/{runner_id}';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($runner_group_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'runner_group_id' . '}',
-                ObjectSerializer::toPathValue($runner_group_id),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($runner_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'runner_id' . '}',
-                ObjectSerializer::toPathValue($runner_id),
                 $resourcePath
             );
         }
@@ -40702,525 +37071,9 @@ class ActionsApi
     }
 
     /**
-     * Operation actionsSetActionsCacheUsagePolicy
-     *
-     * Set GitHub Actions cache usage policy for a repository
-     *
-     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
-     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository $actions_cache_usage_policy_for_repository actions_cache_usage_policy_for_repository (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetActionsCacheUsagePolicy'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return void
-     */
-    public function actionsSetActionsCacheUsagePolicy($owner, $repo, $actions_cache_usage_policy_for_repository, string $contentType = self::contentTypes['actionsSetActionsCacheUsagePolicy'][0])
-    {
-        $this->actionsSetActionsCacheUsagePolicyWithHttpInfo($owner, $repo, $actions_cache_usage_policy_for_repository, $contentType);
-    }
-
-    /**
-     * Operation actionsSetActionsCacheUsagePolicyWithHttpInfo
-     *
-     * Set GitHub Actions cache usage policy for a repository
-     *
-     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
-     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository $actions_cache_usage_policy_for_repository (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetActionsCacheUsagePolicy'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsSetActionsCacheUsagePolicyWithHttpInfo($owner, $repo, $actions_cache_usage_policy_for_repository, string $contentType = self::contentTypes['actionsSetActionsCacheUsagePolicy'][0])
-    {
-        $request = $this->actionsSetActionsCacheUsagePolicyRequest($owner, $repo, $actions_cache_usage_policy_for_repository, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            return [null, $statusCode, $response->getHeaders()];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsSetActionsCacheUsagePolicyAsync
-     *
-     * Set GitHub Actions cache usage policy for a repository
-     *
-     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
-     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository $actions_cache_usage_policy_for_repository (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetActionsCacheUsagePolicy'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsSetActionsCacheUsagePolicyAsync($owner, $repo, $actions_cache_usage_policy_for_repository, string $contentType = self::contentTypes['actionsSetActionsCacheUsagePolicy'][0])
-    {
-        return $this->actionsSetActionsCacheUsagePolicyAsyncWithHttpInfo($owner, $repo, $actions_cache_usage_policy_for_repository, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsSetActionsCacheUsagePolicyAsyncWithHttpInfo
-     *
-     * Set GitHub Actions cache usage policy for a repository
-     *
-     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
-     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository $actions_cache_usage_policy_for_repository (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetActionsCacheUsagePolicy'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsSetActionsCacheUsagePolicyAsyncWithHttpInfo($owner, $repo, $actions_cache_usage_policy_for_repository, string $contentType = self::contentTypes['actionsSetActionsCacheUsagePolicy'][0])
-    {
-        $returnType = '';
-        $request = $this->actionsSetActionsCacheUsagePolicyRequest($owner, $repo, $actions_cache_usage_policy_for_repository, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    return [null, $response->getStatusCode(), $response->getHeaders()];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsSetActionsCacheUsagePolicy'
-     *
-     * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
-     * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyForRepository $actions_cache_usage_policy_for_repository (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetActionsCacheUsagePolicy'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsSetActionsCacheUsagePolicyRequest($owner, $repo, $actions_cache_usage_policy_for_repository, string $contentType = self::contentTypes['actionsSetActionsCacheUsagePolicy'][0])
-    {
-
-        // verify the required parameter 'owner' is set
-        if ($owner === null || (is_array($owner) && count($owner) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $owner when calling actionsSetActionsCacheUsagePolicy'
-            );
-        }
-
-        // verify the required parameter 'repo' is set
-        if ($repo === null || (is_array($repo) && count($repo) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $repo when calling actionsSetActionsCacheUsagePolicy'
-            );
-        }
-
-        // verify the required parameter 'actions_cache_usage_policy_for_repository' is set
-        if ($actions_cache_usage_policy_for_repository === null || (is_array($actions_cache_usage_policy_for_repository) && count($actions_cache_usage_policy_for_repository) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $actions_cache_usage_policy_for_repository when calling actionsSetActionsCacheUsagePolicy'
-            );
-        }
-
-
-        $resourcePath = '/repos/{owner}/{repo}/actions/cache/usage-policy';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($owner !== null) {
-            $resourcePath = str_replace(
-                '{' . 'owner' . '}',
-                ObjectSerializer::toPathValue($owner),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($repo !== null) {
-            $resourcePath = str_replace(
-                '{' . 'repo' . '}',
-                ObjectSerializer::toPathValue($repo),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            [],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (isset($actions_cache_usage_policy_for_repository)) {
-            if (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_cache_usage_policy_for_repository));
-            } else {
-                $httpBody = $actions_cache_usage_policy_for_repository;
-            }
-        } elseif (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'PATCH',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation actionsSetActionsCacheUsagePolicyForEnterprise
-     *
-     * Set GitHub Actions cache usage policy for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise $actions_cache_usage_policy_enterprise actions_cache_usage_policy_enterprise (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetActionsCacheUsagePolicyForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return void
-     */
-    public function actionsSetActionsCacheUsagePolicyForEnterprise($enterprise, $actions_cache_usage_policy_enterprise, string $contentType = self::contentTypes['actionsSetActionsCacheUsagePolicyForEnterprise'][0])
-    {
-        $this->actionsSetActionsCacheUsagePolicyForEnterpriseWithHttpInfo($enterprise, $actions_cache_usage_policy_enterprise, $contentType);
-    }
-
-    /**
-     * Operation actionsSetActionsCacheUsagePolicyForEnterpriseWithHttpInfo
-     *
-     * Set GitHub Actions cache usage policy for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise $actions_cache_usage_policy_enterprise (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetActionsCacheUsagePolicyForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsSetActionsCacheUsagePolicyForEnterpriseWithHttpInfo($enterprise, $actions_cache_usage_policy_enterprise, string $contentType = self::contentTypes['actionsSetActionsCacheUsagePolicyForEnterprise'][0])
-    {
-        $request = $this->actionsSetActionsCacheUsagePolicyForEnterpriseRequest($enterprise, $actions_cache_usage_policy_enterprise, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            return [null, $statusCode, $response->getHeaders()];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsSetActionsCacheUsagePolicyForEnterpriseAsync
-     *
-     * Set GitHub Actions cache usage policy for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise $actions_cache_usage_policy_enterprise (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetActionsCacheUsagePolicyForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsSetActionsCacheUsagePolicyForEnterpriseAsync($enterprise, $actions_cache_usage_policy_enterprise, string $contentType = self::contentTypes['actionsSetActionsCacheUsagePolicyForEnterprise'][0])
-    {
-        return $this->actionsSetActionsCacheUsagePolicyForEnterpriseAsyncWithHttpInfo($enterprise, $actions_cache_usage_policy_enterprise, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsSetActionsCacheUsagePolicyForEnterpriseAsyncWithHttpInfo
-     *
-     * Set GitHub Actions cache usage policy for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise $actions_cache_usage_policy_enterprise (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetActionsCacheUsagePolicyForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsSetActionsCacheUsagePolicyForEnterpriseAsyncWithHttpInfo($enterprise, $actions_cache_usage_policy_enterprise, string $contentType = self::contentTypes['actionsSetActionsCacheUsagePolicyForEnterprise'][0])
-    {
-        $returnType = '';
-        $request = $this->actionsSetActionsCacheUsagePolicyForEnterpriseRequest($enterprise, $actions_cache_usage_policy_enterprise, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    return [null, $response->getStatusCode(), $response->getHeaders()];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsSetActionsCacheUsagePolicyForEnterprise'
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsCacheUsagePolicyEnterprise $actions_cache_usage_policy_enterprise (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetActionsCacheUsagePolicyForEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsSetActionsCacheUsagePolicyForEnterpriseRequest($enterprise, $actions_cache_usage_policy_enterprise, string $contentType = self::contentTypes['actionsSetActionsCacheUsagePolicyForEnterprise'][0])
-    {
-
-        // verify the required parameter 'enterprise' is set
-        if ($enterprise === null || (is_array($enterprise) && count($enterprise) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $enterprise when calling actionsSetActionsCacheUsagePolicyForEnterprise'
-            );
-        }
-
-        // verify the required parameter 'actions_cache_usage_policy_enterprise' is set
-        if ($actions_cache_usage_policy_enterprise === null || (is_array($actions_cache_usage_policy_enterprise) && count($actions_cache_usage_policy_enterprise) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $actions_cache_usage_policy_enterprise when calling actionsSetActionsCacheUsagePolicyForEnterprise'
-            );
-        }
-
-
-        $resourcePath = '/enterprises/{enterprise}/actions/cache/usage-policy';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($enterprise !== null) {
-            $resourcePath = str_replace(
-                '{' . 'enterprise' . '}',
-                ObjectSerializer::toPathValue($enterprise),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            [],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (isset($actions_cache_usage_policy_enterprise)) {
-            if (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_cache_usage_policy_enterprise));
-            } else {
-                $httpBody = $actions_cache_usage_policy_enterprise;
-            }
-        } elseif (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'PATCH',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
      * Operation actionsSetAllowedActionsOrganization
      *
-     * Set allowed actions for an organization
+     * Set allowed actions and reusable workflows for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SelectedActions $selected_actions selected_actions (optional)
@@ -41238,7 +37091,7 @@ class ActionsApi
     /**
      * Operation actionsSetAllowedActionsOrganizationWithHttpInfo
      *
-     * Set allowed actions for an organization
+     * Set allowed actions and reusable workflows for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SelectedActions $selected_actions (optional)
@@ -41299,7 +37152,7 @@ class ActionsApi
     /**
      * Operation actionsSetAllowedActionsOrganizationAsync
      *
-     * Set allowed actions for an organization
+     * Set allowed actions and reusable workflows for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SelectedActions $selected_actions (optional)
@@ -41321,7 +37174,7 @@ class ActionsApi
     /**
      * Operation actionsSetAllowedActionsOrganizationAsyncWithHttpInfo
      *
-     * Set allowed actions for an organization
+     * Set allowed actions and reusable workflows for an organization
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\SelectedActions $selected_actions (optional)
@@ -41462,7 +37315,7 @@ class ActionsApi
     /**
      * Operation actionsSetAllowedActionsRepository
      *
-     * Set allowed actions for a repository
+     * Set allowed actions and reusable workflows for a repository
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
@@ -41481,7 +37334,7 @@ class ActionsApi
     /**
      * Operation actionsSetAllowedActionsRepositoryWithHttpInfo
      *
-     * Set allowed actions for a repository
+     * Set allowed actions and reusable workflows for a repository
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
@@ -41543,7 +37396,7 @@ class ActionsApi
     /**
      * Operation actionsSetAllowedActionsRepositoryAsync
      *
-     * Set allowed actions for a repository
+     * Set allowed actions and reusable workflows for a repository
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
@@ -41566,7 +37419,7 @@ class ActionsApi
     /**
      * Operation actionsSetAllowedActionsRepositoryAsyncWithHttpInfo
      *
-     * Set allowed actions for a repository
+     * Set allowed actions and reusable workflows for a repository
      *
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
@@ -41728,16 +37581,16 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetCustomLabelsForSelfHostedRunnerForEnterpriseRequest $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest $actions_set_custom_labels_for_self_hosted_runner_for_org_request actions_set_custom_labels_for_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
      */
-    public function actionsSetCustomLabelsForSelfHostedRunnerForOrg($org, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'][0])
+    public function actionsSetCustomLabelsForSelfHostedRunnerForOrg($org, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'][0])
     {
-        list($response) = $this->actionsSetCustomLabelsForSelfHostedRunnerForOrgWithHttpInfo($org, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, $contentType);
+        list($response) = $this->actionsSetCustomLabelsForSelfHostedRunnerForOrgWithHttpInfo($org, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, $contentType);
         return $response;
     }
 
@@ -41748,16 +37601,16 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetCustomLabelsForSelfHostedRunnerForEnterpriseRequest $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest $actions_set_custom_labels_for_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
      */
-    public function actionsSetCustomLabelsForSelfHostedRunnerForOrgWithHttpInfo($org, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'][0])
+    public function actionsSetCustomLabelsForSelfHostedRunnerForOrgWithHttpInfo($org, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'][0])
     {
-        $request = $this->actionsSetCustomLabelsForSelfHostedRunnerForOrgRequest($org, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, $contentType);
+        $request = $this->actionsSetCustomLabelsForSelfHostedRunnerForOrgRequest($org, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -41796,11 +37649,11 @@ class ActionsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -41818,7 +37671,7 @@ class ActionsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -41878,7 +37731,7 @@ class ActionsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -41911,7 +37764,7 @@ class ActionsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -41944,15 +37797,15 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetCustomLabelsForSelfHostedRunnerForEnterpriseRequest $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest $actions_set_custom_labels_for_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsSetCustomLabelsForSelfHostedRunnerForOrgAsync($org, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'][0])
+    public function actionsSetCustomLabelsForSelfHostedRunnerForOrgAsync($org, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'][0])
     {
-        return $this->actionsSetCustomLabelsForSelfHostedRunnerForOrgAsyncWithHttpInfo($org, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, $contentType)
+        return $this->actionsSetCustomLabelsForSelfHostedRunnerForOrgAsyncWithHttpInfo($org, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -41967,16 +37820,16 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetCustomLabelsForSelfHostedRunnerForEnterpriseRequest $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest $actions_set_custom_labels_for_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsSetCustomLabelsForSelfHostedRunnerForOrgAsyncWithHttpInfo($org, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'][0])
+    public function actionsSetCustomLabelsForSelfHostedRunnerForOrgAsyncWithHttpInfo($org, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
-        $request = $this->actionsSetCustomLabelsForSelfHostedRunnerForOrgRequest($org, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
+        $request = $this->actionsSetCustomLabelsForSelfHostedRunnerForOrgRequest($org, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -42019,13 +37872,13 @@ class ActionsApi
      *
      * @param  string $org The organization name. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetCustomLabelsForSelfHostedRunnerForEnterpriseRequest $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest $actions_set_custom_labels_for_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function actionsSetCustomLabelsForSelfHostedRunnerForOrgRequest($org, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'][0])
+    public function actionsSetCustomLabelsForSelfHostedRunnerForOrgRequest($org, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForOrg'][0])
     {
 
         // verify the required parameter 'org' is set
@@ -42042,10 +37895,10 @@ class ActionsApi
             );
         }
 
-        // verify the required parameter 'enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request' is set
-        if ($enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request === null || (is_array($enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request) && count($enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request) === 0)) {
+        // verify the required parameter 'actions_set_custom_labels_for_self_hosted_runner_for_org_request' is set
+        if ($actions_set_custom_labels_for_self_hosted_runner_for_org_request === null || (is_array($actions_set_custom_labels_for_self_hosted_runner_for_org_request) && count($actions_set_custom_labels_for_self_hosted_runner_for_org_request) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request when calling actionsSetCustomLabelsForSelfHostedRunnerForOrg'
+                'Missing the required parameter $actions_set_custom_labels_for_self_hosted_runner_for_org_request when calling actionsSetCustomLabelsForSelfHostedRunnerForOrg'
             );
         }
 
@@ -42084,12 +37937,12 @@ class ActionsApi
         );
 
         // for model (json/xml)
-        if (isset($enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request)) {
+        if (isset($actions_set_custom_labels_for_self_hosted_runner_for_org_request)) {
             if (stripos($headers['Content-Type'], 'application/json') !== false) {
                 # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request));
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_set_custom_labels_for_self_hosted_runner_for_org_request));
             } else {
-                $httpBody = $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request;
+                $httpBody = $actions_set_custom_labels_for_self_hosted_runner_for_org_request;
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -42145,16 +37998,16 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetCustomLabelsForSelfHostedRunnerForEnterpriseRequest $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest $actions_set_custom_labels_for_self_hosted_runner_for_org_request actions_set_custom_labels_for_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple
      */
-    public function actionsSetCustomLabelsForSelfHostedRunnerForRepo($owner, $repo, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'][0])
+    public function actionsSetCustomLabelsForSelfHostedRunnerForRepo($owner, $repo, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'][0])
     {
-        list($response) = $this->actionsSetCustomLabelsForSelfHostedRunnerForRepoWithHttpInfo($owner, $repo, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, $contentType);
+        list($response) = $this->actionsSetCustomLabelsForSelfHostedRunnerForRepoWithHttpInfo($owner, $repo, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, $contentType);
         return $response;
     }
 
@@ -42166,16 +38019,16 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetCustomLabelsForSelfHostedRunnerForEnterpriseRequest $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest $actions_set_custom_labels_for_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'] to see the possible values for this operation
      *
      * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\BasicError|\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ValidationErrorSimple, HTTP status code, HTTP response headers (array of strings)
      */
-    public function actionsSetCustomLabelsForSelfHostedRunnerForRepoWithHttpInfo($owner, $repo, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'][0])
+    public function actionsSetCustomLabelsForSelfHostedRunnerForRepoWithHttpInfo($owner, $repo, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'][0])
     {
-        $request = $this->actionsSetCustomLabelsForSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, $contentType);
+        $request = $this->actionsSetCustomLabelsForSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -42214,11 +38067,11 @@ class ActionsApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' === '\SplFileObject') {
+                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response' !== 'string') {
+                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response' !== 'string') {
                             try {
                                 $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
                             } catch (\JsonException $exception) {
@@ -42236,7 +38089,7 @@ class ActionsApi
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response', []),
+                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -42296,7 +38149,7 @@ class ActionsApi
                     ];
             }
 
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
+            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -42329,7 +38182,7 @@ class ActionsApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response',
+                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -42363,15 +38216,15 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetCustomLabelsForSelfHostedRunnerForEnterpriseRequest $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest $actions_set_custom_labels_for_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsSetCustomLabelsForSelfHostedRunnerForRepoAsync($owner, $repo, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'][0])
+    public function actionsSetCustomLabelsForSelfHostedRunnerForRepoAsync($owner, $repo, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'][0])
     {
-        return $this->actionsSetCustomLabelsForSelfHostedRunnerForRepoAsyncWithHttpInfo($owner, $repo, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, $contentType)
+        return $this->actionsSetCustomLabelsForSelfHostedRunnerForRepoAsyncWithHttpInfo($owner, $repo, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -42387,16 +38240,16 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetCustomLabelsForSelfHostedRunnerForEnterpriseRequest $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest $actions_set_custom_labels_for_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function actionsSetCustomLabelsForSelfHostedRunnerForRepoAsyncWithHttpInfo($owner, $repo, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'][0])
+    public function actionsSetCustomLabelsForSelfHostedRunnerForRepoAsyncWithHttpInfo($owner, $repo, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'][0])
     {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminListLabelsForSelfHostedRunnerForEnterprise200Response';
-        $request = $this->actionsSetCustomLabelsForSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, $contentType);
+        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Response';
+        $request = $this->actionsSetCustomLabelsForSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -42440,13 +38293,13 @@ class ActionsApi
      * @param  string $owner The account owner of the repository. The name is not case sensitive. (required)
      * @param  string $repo The name of the repository without the &#x60;.git&#x60; extension. The name is not case sensitive. (required)
      * @param  int $runner_id Unique identifier of the self-hosted runner. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetCustomLabelsForSelfHostedRunnerForEnterpriseRequest $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request (required)
+     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest $actions_set_custom_labels_for_self_hosted_runner_for_org_request (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function actionsSetCustomLabelsForSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'][0])
+    public function actionsSetCustomLabelsForSelfHostedRunnerForRepoRequest($owner, $repo, $runner_id, $actions_set_custom_labels_for_self_hosted_runner_for_org_request, string $contentType = self::contentTypes['actionsSetCustomLabelsForSelfHostedRunnerForRepo'][0])
     {
 
         // verify the required parameter 'owner' is set
@@ -42470,10 +38323,10 @@ class ActionsApi
             );
         }
 
-        // verify the required parameter 'enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request' is set
-        if ($enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request === null || (is_array($enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request) && count($enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request) === 0)) {
+        // verify the required parameter 'actions_set_custom_labels_for_self_hosted_runner_for_org_request' is set
+        if ($actions_set_custom_labels_for_self_hosted_runner_for_org_request === null || (is_array($actions_set_custom_labels_for_self_hosted_runner_for_org_request) && count($actions_set_custom_labels_for_self_hosted_runner_for_org_request) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request when calling actionsSetCustomLabelsForSelfHostedRunnerForRepo'
+                'Missing the required parameter $actions_set_custom_labels_for_self_hosted_runner_for_org_request when calling actionsSetCustomLabelsForSelfHostedRunnerForRepo'
             );
         }
 
@@ -42520,12 +38373,12 @@ class ActionsApi
         );
 
         // for model (json/xml)
-        if (isset($enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request)) {
+        if (isset($actions_set_custom_labels_for_self_hosted_runner_for_org_request)) {
             if (stripos($headers['Content-Type'], 'application/json') !== false) {
                 # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request));
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_set_custom_labels_for_self_hosted_runner_for_org_request));
             } else {
-                $httpBody = $enterprise_admin_set_custom_labels_for_self_hosted_runner_for_enterprise_request;
+                $httpBody = $actions_set_custom_labels_for_self_hosted_runner_for_org_request;
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -42977,254 +38830,6 @@ class ActionsApi
                 $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_oidc_subject_customization_for_a_repository));
             } else {
                 $httpBody = $actions_oidc_subject_customization_for_a_repository;
-            }
-        } elseif (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'PUT',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise
-     *
-     * Set default workflow permissions for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetDefaultWorkflowPermissions $actions_set_default_workflow_permissions actions_set_default_workflow_permissions (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return void
-     */
-    public function actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise($enterprise, $actions_set_default_workflow_permissions, string $contentType = self::contentTypes['actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'][0])
-    {
-        $this->actionsSetGithubActionsDefaultWorkflowPermissionsEnterpriseWithHttpInfo($enterprise, $actions_set_default_workflow_permissions, $contentType);
-    }
-
-    /**
-     * Operation actionsSetGithubActionsDefaultWorkflowPermissionsEnterpriseWithHttpInfo
-     *
-     * Set default workflow permissions for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetDefaultWorkflowPermissions $actions_set_default_workflow_permissions (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsSetGithubActionsDefaultWorkflowPermissionsEnterpriseWithHttpInfo($enterprise, $actions_set_default_workflow_permissions, string $contentType = self::contentTypes['actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'][0])
-    {
-        $request = $this->actionsSetGithubActionsDefaultWorkflowPermissionsEnterpriseRequest($enterprise, $actions_set_default_workflow_permissions, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            return [null, $statusCode, $response->getHeaders()];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsSetGithubActionsDefaultWorkflowPermissionsEnterpriseAsync
-     *
-     * Set default workflow permissions for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetDefaultWorkflowPermissions $actions_set_default_workflow_permissions (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsSetGithubActionsDefaultWorkflowPermissionsEnterpriseAsync($enterprise, $actions_set_default_workflow_permissions, string $contentType = self::contentTypes['actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'][0])
-    {
-        return $this->actionsSetGithubActionsDefaultWorkflowPermissionsEnterpriseAsyncWithHttpInfo($enterprise, $actions_set_default_workflow_permissions, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsSetGithubActionsDefaultWorkflowPermissionsEnterpriseAsyncWithHttpInfo
-     *
-     * Set default workflow permissions for an enterprise
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetDefaultWorkflowPermissions $actions_set_default_workflow_permissions (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsSetGithubActionsDefaultWorkflowPermissionsEnterpriseAsyncWithHttpInfo($enterprise, $actions_set_default_workflow_permissions, string $contentType = self::contentTypes['actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'][0])
-    {
-        $returnType = '';
-        $request = $this->actionsSetGithubActionsDefaultWorkflowPermissionsEnterpriseRequest($enterprise, $actions_set_default_workflow_permissions, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    return [null, $response->getStatusCode(), $response->getHeaders()];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'
-     *
-     * @param  string $enterprise The slug version of the enterprise name. You can also substitute this value with the enterprise id. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetDefaultWorkflowPermissions $actions_set_default_workflow_permissions (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsSetGithubActionsDefaultWorkflowPermissionsEnterpriseRequest($enterprise, $actions_set_default_workflow_permissions, string $contentType = self::contentTypes['actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'][0])
-    {
-
-        // verify the required parameter 'enterprise' is set
-        if ($enterprise === null || (is_array($enterprise) && count($enterprise) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $enterprise when calling actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'
-            );
-        }
-
-        // verify the required parameter 'actions_set_default_workflow_permissions' is set
-        if ($actions_set_default_workflow_permissions === null || (is_array($actions_set_default_workflow_permissions) && count($actions_set_default_workflow_permissions) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $actions_set_default_workflow_permissions when calling actionsSetGithubActionsDefaultWorkflowPermissionsEnterprise'
-            );
-        }
-
-
-        $resourcePath = '/enterprises/{enterprise}/actions/permissions/workflow';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($enterprise !== null) {
-            $resourcePath = str_replace(
-                '{' . 'enterprise' . '}',
-                ObjectSerializer::toPathValue($enterprise),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            [],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (isset($actions_set_default_workflow_permissions)) {
-            if (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_set_default_workflow_permissions));
-            } else {
-                $httpBody = $actions_set_default_workflow_permissions;
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -44299,274 +39904,6 @@ class ActionsApi
     }
 
     /**
-     * Operation actionsSetRepoAccessToSelfHostedRunnerGroupInOrg
-     *
-     * Set repository access for a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest $actions_set_repo_access_to_self_hosted_runner_group_in_org_request actions_set_repo_access_to_self_hosted_runner_group_in_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return void
-     */
-    public function actionsSetRepoAccessToSelfHostedRunnerGroupInOrg($org, $runner_group_id, $actions_set_repo_access_to_self_hosted_runner_group_in_org_request, string $contentType = self::contentTypes['actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        $this->actionsSetRepoAccessToSelfHostedRunnerGroupInOrgWithHttpInfo($org, $runner_group_id, $actions_set_repo_access_to_self_hosted_runner_group_in_org_request, $contentType);
-    }
-
-    /**
-     * Operation actionsSetRepoAccessToSelfHostedRunnerGroupInOrgWithHttpInfo
-     *
-     * Set repository access for a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest $actions_set_repo_access_to_self_hosted_runner_group_in_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsSetRepoAccessToSelfHostedRunnerGroupInOrgWithHttpInfo($org, $runner_group_id, $actions_set_repo_access_to_self_hosted_runner_group_in_org_request, string $contentType = self::contentTypes['actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        $request = $this->actionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest($org, $runner_group_id, $actions_set_repo_access_to_self_hosted_runner_group_in_org_request, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            return [null, $statusCode, $response->getHeaders()];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsSetRepoAccessToSelfHostedRunnerGroupInOrgAsync
-     *
-     * Set repository access for a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest $actions_set_repo_access_to_self_hosted_runner_group_in_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsSetRepoAccessToSelfHostedRunnerGroupInOrgAsync($org, $runner_group_id, $actions_set_repo_access_to_self_hosted_runner_group_in_org_request, string $contentType = self::contentTypes['actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        return $this->actionsSetRepoAccessToSelfHostedRunnerGroupInOrgAsyncWithHttpInfo($org, $runner_group_id, $actions_set_repo_access_to_self_hosted_runner_group_in_org_request, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsSetRepoAccessToSelfHostedRunnerGroupInOrgAsyncWithHttpInfo
-     *
-     * Set repository access for a self-hosted runner group in an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest $actions_set_repo_access_to_self_hosted_runner_group_in_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsSetRepoAccessToSelfHostedRunnerGroupInOrgAsyncWithHttpInfo($org, $runner_group_id, $actions_set_repo_access_to_self_hosted_runner_group_in_org_request, string $contentType = self::contentTypes['actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-        $returnType = '';
-        $request = $this->actionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest($org, $runner_group_id, $actions_set_repo_access_to_self_hosted_runner_group_in_org_request, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    return [null, $response->getStatusCode(), $response->getHeaders()];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest $actions_set_repo_access_to_self_hosted_runner_group_in_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest($org, $runner_group_id, $actions_set_repo_access_to_self_hosted_runner_group_in_org_request, string $contentType = self::contentTypes['actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'
-            );
-        }
-
-        // verify the required parameter 'runner_group_id' is set
-        if ($runner_group_id === null || (is_array($runner_group_id) && count($runner_group_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_group_id when calling actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'
-            );
-        }
-
-        // verify the required parameter 'actions_set_repo_access_to_self_hosted_runner_group_in_org_request' is set
-        if ($actions_set_repo_access_to_self_hosted_runner_group_in_org_request === null || (is_array($actions_set_repo_access_to_self_hosted_runner_group_in_org_request) && count($actions_set_repo_access_to_self_hosted_runner_group_in_org_request) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $actions_set_repo_access_to_self_hosted_runner_group_in_org_request when calling actionsSetRepoAccessToSelfHostedRunnerGroupInOrg'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/actions/runner-groups/{runner_group_id}/repositories';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($runner_group_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'runner_group_id' . '}',
-                ObjectSerializer::toPathValue($runner_group_id),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            [],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (isset($actions_set_repo_access_to_self_hosted_runner_group_in_org_request)) {
-            if (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_set_repo_access_to_self_hosted_runner_group_in_org_request));
-            } else {
-                $httpBody = $actions_set_repo_access_to_self_hosted_runner_group_in_org_request;
-            }
-        } elseif (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'PUT',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
      * Operation actionsSetSelectedReposForOrgSecret
      *
      * Set selected repositories for an organization secret
@@ -45303,274 +40640,6 @@ class ActionsApi
                 $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_set_selected_repositories_enabled_github_actions_organization_request));
             } else {
                 $httpBody = $actions_set_selected_repositories_enabled_github_actions_organization_request;
-            }
-        } elseif (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'PUT',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation actionsSetSelfHostedRunnersInGroupForOrg
-     *
-     * Set self-hosted runners in a group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetSelfHostedRunnersInGroupForEnterpriseRequest $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetSelfHostedRunnersInGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return void
-     */
-    public function actionsSetSelfHostedRunnersInGroupForOrg($org, $runner_group_id, $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request, string $contentType = self::contentTypes['actionsSetSelfHostedRunnersInGroupForOrg'][0])
-    {
-        $this->actionsSetSelfHostedRunnersInGroupForOrgWithHttpInfo($org, $runner_group_id, $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request, $contentType);
-    }
-
-    /**
-     * Operation actionsSetSelfHostedRunnersInGroupForOrgWithHttpInfo
-     *
-     * Set self-hosted runners in a group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetSelfHostedRunnersInGroupForEnterpriseRequest $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetSelfHostedRunnersInGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsSetSelfHostedRunnersInGroupForOrgWithHttpInfo($org, $runner_group_id, $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request, string $contentType = self::contentTypes['actionsSetSelfHostedRunnersInGroupForOrg'][0])
-    {
-        $request = $this->actionsSetSelfHostedRunnersInGroupForOrgRequest($org, $runner_group_id, $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            return [null, $statusCode, $response->getHeaders()];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsSetSelfHostedRunnersInGroupForOrgAsync
-     *
-     * Set self-hosted runners in a group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetSelfHostedRunnersInGroupForEnterpriseRequest $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetSelfHostedRunnersInGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsSetSelfHostedRunnersInGroupForOrgAsync($org, $runner_group_id, $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request, string $contentType = self::contentTypes['actionsSetSelfHostedRunnersInGroupForOrg'][0])
-    {
-        return $this->actionsSetSelfHostedRunnersInGroupForOrgAsyncWithHttpInfo($org, $runner_group_id, $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsSetSelfHostedRunnersInGroupForOrgAsyncWithHttpInfo
-     *
-     * Set self-hosted runners in a group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetSelfHostedRunnersInGroupForEnterpriseRequest $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetSelfHostedRunnersInGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsSetSelfHostedRunnersInGroupForOrgAsyncWithHttpInfo($org, $runner_group_id, $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request, string $contentType = self::contentTypes['actionsSetSelfHostedRunnersInGroupForOrg'][0])
-    {
-        $returnType = '';
-        $request = $this->actionsSetSelfHostedRunnersInGroupForOrgRequest($org, $runner_group_id, $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    return [null, $response->getStatusCode(), $response->getHeaders()];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsSetSelfHostedRunnersInGroupForOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\EnterpriseAdminSetSelfHostedRunnersInGroupForEnterpriseRequest $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsSetSelfHostedRunnersInGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsSetSelfHostedRunnersInGroupForOrgRequest($org, $runner_group_id, $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request, string $contentType = self::contentTypes['actionsSetSelfHostedRunnersInGroupForOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsSetSelfHostedRunnersInGroupForOrg'
-            );
-        }
-
-        // verify the required parameter 'runner_group_id' is set
-        if ($runner_group_id === null || (is_array($runner_group_id) && count($runner_group_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_group_id when calling actionsSetSelfHostedRunnersInGroupForOrg'
-            );
-        }
-
-        // verify the required parameter 'enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request' is set
-        if ($enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request === null || (is_array($enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request) && count($enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request when calling actionsSetSelfHostedRunnersInGroupForOrg'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/actions/runner-groups/{runner_group_id}/runners';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($runner_group_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'runner_group_id' . '}',
-                ObjectSerializer::toPathValue($runner_group_id),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            [],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (isset($enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request)) {
-            if (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request));
-            } else {
-                $httpBody = $enterprise_admin_set_self_hosted_runners_in_group_for_enterprise_request;
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {
@@ -46703,352 +41772,6 @@ class ActionsApi
                 $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_update_repo_variable_request));
             } else {
                 $httpBody = $actions_update_repo_variable_request;
-            }
-        } elseif (count($formParams) > 0) {
-            if ($multipart) {
-                $multipartContents = [];
-                foreach ($formParams as $formParamName => $formParamValue) {
-                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
-                    foreach ($formParamValueItems as $formParamValueItem) {
-                        $multipartContents[] = [
-                            'name' => $formParamName,
-                            'contents' => $formParamValueItem
-                        ];
-                    }
-                }
-                // for HTTP post (form)
-                $httpBody = new MultipartStream($multipartContents);
-
-            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the form parameters
-                $httpBody = \GuzzleHttp\Utils::jsonEncode($formParams);
-            } else {
-                // for HTTP post (form)
-                $httpBody = ObjectSerializer::buildQuery($formParams);
-            }
-        }
-
-
-        $defaultHeaders = [];
-        if ($this->config->getUserAgent()) {
-            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
-        }
-
-        $headers = array_merge(
-            $defaultHeaders,
-            $headerParams,
-            $headers
-        );
-
-        $operationHost = $this->config->getHost();
-        $query = ObjectSerializer::buildQuery($queryParams);
-        return new Request(
-            'PATCH',
-            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
-            $headers,
-            $httpBody
-        );
-    }
-
-    /**
-     * Operation actionsUpdateSelfHostedRunnerGroupForOrg
-     *
-     * Update a self-hosted runner group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsUpdateSelfHostedRunnerGroupForOrgRequest $actions_update_self_hosted_runner_group_for_org_request actions_update_self_hosted_runner_group_for_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsUpdateSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg
-     */
-    public function actionsUpdateSelfHostedRunnerGroupForOrg($org, $runner_group_id, $actions_update_self_hosted_runner_group_for_org_request, string $contentType = self::contentTypes['actionsUpdateSelfHostedRunnerGroupForOrg'][0])
-    {
-        list($response) = $this->actionsUpdateSelfHostedRunnerGroupForOrgWithHttpInfo($org, $runner_group_id, $actions_update_self_hosted_runner_group_for_org_request, $contentType);
-        return $response;
-    }
-
-    /**
-     * Operation actionsUpdateSelfHostedRunnerGroupForOrgWithHttpInfo
-     *
-     * Update a self-hosted runner group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsUpdateSelfHostedRunnerGroupForOrgRequest $actions_update_self_hosted_runner_group_for_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsUpdateSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\ApiException on non-2xx response or if the response body is not in the expected format
-     * @throws \InvalidArgumentException
-     * @return array of \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function actionsUpdateSelfHostedRunnerGroupForOrgWithHttpInfo($org, $runner_group_id, $actions_update_self_hosted_runner_group_for_org_request, string $contentType = self::contentTypes['actionsUpdateSelfHostedRunnerGroupForOrg'][0])
-    {
-        $request = $this->actionsUpdateSelfHostedRunnerGroupForOrgRequest($org, $runner_group_id, $actions_update_self_hosted_runner_group_for_org_request, $contentType);
-
-        try {
-            $options = $this->createHttpClientOption();
-            try {
-                $response = $this->client->send($request, $options);
-            } catch (RequestException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
-                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
-                );
-            } catch (ConnectException $e) {
-                throw new ApiException(
-                    "[{$e->getCode()}] {$e->getMessage()}",
-                    (int) $e->getCode(),
-                    null,
-                    null
-                );
-            }
-
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            switch($statusCode) {
-                case 200:
-                    if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg' !== 'string') {
-                            try {
-                                $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                            } catch (\JsonException $exception) {
-                                throw new ApiException(
-                                    sprintf(
-                                        'Error JSON decoding server response (%s)',
-                                        $request->getUri()
-                                    ),
-                                    $statusCode,
-                                    $response->getHeaders(),
-                                    $content
-                                );
-                            }
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-            }
-
-            $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg';
-            if ($returnType === '\SplFileObject') {
-                $content = $response->getBody(); //stream goes to serializer
-            } else {
-                $content = (string) $response->getBody();
-                if ($returnType !== 'string') {
-                    try {
-                        $content = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $exception) {
-                        throw new ApiException(
-                            sprintf(
-                                'Error JSON decoding server response (%s)',
-                                $request->getUri()
-                            ),
-                            $statusCode,
-                            $response->getHeaders(),
-                            $content
-                        );
-                    }
-                }
-            }
-
-            return [
-                ObjectSerializer::deserialize($content, $returnType, []),
-                $response->getStatusCode(),
-                $response->getHeaders()
-            ];
-
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
-            }
-            throw $e;
-        }
-    }
-
-    /**
-     * Operation actionsUpdateSelfHostedRunnerGroupForOrgAsync
-     *
-     * Update a self-hosted runner group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsUpdateSelfHostedRunnerGroupForOrgRequest $actions_update_self_hosted_runner_group_for_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsUpdateSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsUpdateSelfHostedRunnerGroupForOrgAsync($org, $runner_group_id, $actions_update_self_hosted_runner_group_for_org_request, string $contentType = self::contentTypes['actionsUpdateSelfHostedRunnerGroupForOrg'][0])
-    {
-        return $this->actionsUpdateSelfHostedRunnerGroupForOrgAsyncWithHttpInfo($org, $runner_group_id, $actions_update_self_hosted_runner_group_for_org_request, $contentType)
-            ->then(
-                function ($response) {
-                    return $response[0];
-                }
-            );
-    }
-
-    /**
-     * Operation actionsUpdateSelfHostedRunnerGroupForOrgAsyncWithHttpInfo
-     *
-     * Update a self-hosted runner group for an organization
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsUpdateSelfHostedRunnerGroupForOrgRequest $actions_update_self_hosted_runner_group_for_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsUpdateSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Promise\PromiseInterface
-     */
-    public function actionsUpdateSelfHostedRunnerGroupForOrgAsyncWithHttpInfo($org, $runner_group_id, $actions_update_self_hosted_runner_group_for_org_request, string $contentType = self::contentTypes['actionsUpdateSelfHostedRunnerGroupForOrg'][0])
-    {
-        $returnType = '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RunnerGroupsOrg';
-        $request = $this->actionsUpdateSelfHostedRunnerGroupForOrgRequest($org, $runner_group_id, $actions_update_self_hosted_runner_group_for_org_request, $contentType);
-
-        return $this->client
-            ->sendAsync($request, $this->createHttpClientOption())
-            ->then(
-                function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
-                },
-                function ($exception) {
-                    $response = $exception->getResponse();
-                    $statusCode = $response->getStatusCode();
-                    throw new ApiException(
-                        sprintf(
-                            '[%d] Error connecting to the API (%s)',
-                            $statusCode,
-                            $exception->getRequest()->getUri()
-                        ),
-                        $statusCode,
-                        $response->getHeaders(),
-                        (string) $response->getBody()
-                    );
-                }
-            );
-    }
-
-    /**
-     * Create request for operation 'actionsUpdateSelfHostedRunnerGroupForOrg'
-     *
-     * @param  string $org The organization name. The name is not case sensitive. (required)
-     * @param  int $runner_group_id Unique identifier of the self-hosted runner group. (required)
-     * @param  \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\ActionsUpdateSelfHostedRunnerGroupForOrgRequest $actions_update_self_hosted_runner_group_for_org_request (required)
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['actionsUpdateSelfHostedRunnerGroupForOrg'] to see the possible values for this operation
-     *
-     * @throws \InvalidArgumentException
-     * @return \GuzzleHttp\Psr7\Request
-     */
-    public function actionsUpdateSelfHostedRunnerGroupForOrgRequest($org, $runner_group_id, $actions_update_self_hosted_runner_group_for_org_request, string $contentType = self::contentTypes['actionsUpdateSelfHostedRunnerGroupForOrg'][0])
-    {
-
-        // verify the required parameter 'org' is set
-        if ($org === null || (is_array($org) && count($org) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $org when calling actionsUpdateSelfHostedRunnerGroupForOrg'
-            );
-        }
-
-        // verify the required parameter 'runner_group_id' is set
-        if ($runner_group_id === null || (is_array($runner_group_id) && count($runner_group_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $runner_group_id when calling actionsUpdateSelfHostedRunnerGroupForOrg'
-            );
-        }
-
-        // verify the required parameter 'actions_update_self_hosted_runner_group_for_org_request' is set
-        if ($actions_update_self_hosted_runner_group_for_org_request === null || (is_array($actions_update_self_hosted_runner_group_for_org_request) && count($actions_update_self_hosted_runner_group_for_org_request) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $actions_update_self_hosted_runner_group_for_org_request when calling actionsUpdateSelfHostedRunnerGroupForOrg'
-            );
-        }
-
-
-        $resourcePath = '/orgs/{org}/actions/runner-groups/{runner_group_id}';
-        $formParams = [];
-        $queryParams = [];
-        $headerParams = [];
-        $httpBody = '';
-        $multipart = false;
-
-
-
-        // path params
-        if ($org !== null) {
-            $resourcePath = str_replace(
-                '{' . 'org' . '}',
-                ObjectSerializer::toPathValue($org),
-                $resourcePath
-            );
-        }
-        // path params
-        if ($runner_group_id !== null) {
-            $resourcePath = str_replace(
-                '{' . 'runner_group_id' . '}',
-                ObjectSerializer::toPathValue($runner_group_id),
-                $resourcePath
-            );
-        }
-
-
-        $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
-            $contentType,
-            $multipart
-        );
-
-        // for model (json/xml)
-        if (isset($actions_update_self_hosted_runner_group_for_org_request)) {
-            if (stripos($headers['Content-Type'], 'application/json') !== false) {
-                # if Content-Type contains "application/json", json_encode the body
-                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($actions_update_self_hosted_runner_group_for_org_request));
-            } else {
-                $httpBody = $actions_update_self_hosted_runner_group_for_org_request;
             }
         } elseif (count($formParams) > 0) {
             if ($multipart) {

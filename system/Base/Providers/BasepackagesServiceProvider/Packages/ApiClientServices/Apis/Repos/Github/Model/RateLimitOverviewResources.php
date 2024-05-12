@@ -65,7 +65,8 @@ class RateLimitOverviewResources implements ModelInterface, ArrayAccess, \JsonSe
         'integration_manifest' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RateLimit',
         'code_scanning_upload' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RateLimit',
         'actions_runner_registration' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RateLimit',
-        'scim' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RateLimit'
+        'scim' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RateLimit',
+        'dependency_snapshots' => '\System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RateLimit'
     ];
 
     /**
@@ -84,7 +85,8 @@ class RateLimitOverviewResources implements ModelInterface, ArrayAccess, \JsonSe
         'integration_manifest' => null,
         'code_scanning_upload' => null,
         'actions_runner_registration' => null,
-        'scim' => null
+        'scim' => null,
+        'dependency_snapshots' => null
     ];
 
     /**
@@ -101,7 +103,8 @@ class RateLimitOverviewResources implements ModelInterface, ArrayAccess, \JsonSe
         'integration_manifest' => false,
         'code_scanning_upload' => false,
         'actions_runner_registration' => false,
-        'scim' => false
+        'scim' => false,
+        'dependency_snapshots' => false
     ];
 
     /**
@@ -198,7 +201,8 @@ class RateLimitOverviewResources implements ModelInterface, ArrayAccess, \JsonSe
         'integration_manifest' => 'integration_manifest',
         'code_scanning_upload' => 'code_scanning_upload',
         'actions_runner_registration' => 'actions_runner_registration',
-        'scim' => 'scim'
+        'scim' => 'scim',
+        'dependency_snapshots' => 'dependency_snapshots'
     ];
 
     /**
@@ -215,7 +219,8 @@ class RateLimitOverviewResources implements ModelInterface, ArrayAccess, \JsonSe
         'integration_manifest' => 'setIntegrationManifest',
         'code_scanning_upload' => 'setCodeScanningUpload',
         'actions_runner_registration' => 'setActionsRunnerRegistration',
-        'scim' => 'setScim'
+        'scim' => 'setScim',
+        'dependency_snapshots' => 'setDependencySnapshots'
     ];
 
     /**
@@ -232,7 +237,8 @@ class RateLimitOverviewResources implements ModelInterface, ArrayAccess, \JsonSe
         'integration_manifest' => 'getIntegrationManifest',
         'code_scanning_upload' => 'getCodeScanningUpload',
         'actions_runner_registration' => 'getActionsRunnerRegistration',
-        'scim' => 'getScim'
+        'scim' => 'getScim',
+        'dependency_snapshots' => 'getDependencySnapshots'
     ];
 
     /**
@@ -301,6 +307,7 @@ class RateLimitOverviewResources implements ModelInterface, ArrayAccess, \JsonSe
         $this->setIfExists('code_scanning_upload', $data ?? [], null);
         $this->setIfExists('actions_runner_registration', $data ?? [], null);
         $this->setIfExists('scim', $data ?? [], null);
+        $this->setIfExists('dependency_snapshots', $data ?? [], null);
     }
 
     /**
@@ -590,6 +597,33 @@ class RateLimitOverviewResources implements ModelInterface, ArrayAccess, \JsonSe
             throw new \InvalidArgumentException('non-nullable scim cannot be null');
         }
         $this->container['scim'] = $scim;
+
+        return $this;
+    }
+
+    /**
+     * Gets dependency_snapshots
+     *
+     * @return \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RateLimit|null
+     */
+    public function getDependencySnapshots()
+    {
+        return $this->container['dependency_snapshots'];
+    }
+
+    /**
+     * Sets dependency_snapshots
+     *
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\RateLimit|null $dependency_snapshots dependency_snapshots
+     *
+     * @return self
+     */
+    public function setDependencySnapshots($dependency_snapshots)
+    {
+        if (is_null($dependency_snapshots)) {
+            throw new \InvalidArgumentException('non-nullable dependency_snapshots cannot be null');
+        }
+        $this->container['dependency_snapshots'] = $dependency_snapshots;
 
         return $this;
     }

@@ -1222,7 +1222,7 @@ class GlobalAdvisory implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets credits
      *
-     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GlobalAdvisoryCreditsInner[] $credits In GitHub Enterprise Server, this field will always be empty because the user metadata of credited users will not be available.
+     * @param \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Github\Model\GlobalAdvisoryCreditsInner[] $credits The users who contributed to the advisory.
      *
      * @return self
      */
