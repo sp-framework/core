@@ -39,8 +39,10 @@ class DevtoolsModules extends BasePackage
 
     public function addModule($data)
     {
-        if (isset($data['module_type']) &&
-            $data['module_type'] === 'components'
+        if (!isset($data['module_type']) ||
+            (isset($data['module_type']) &&
+             ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types')
+            )
         ) {
             $ignoreChars = [' '];
         } else {
@@ -58,8 +60,6 @@ class DevtoolsModules extends BasePackage
         if (!$data) {
             return true;
         }
-
-        $data = $this->checkVersion($data);
 
         $data = $this->checkModuleTypeAndCategory($data);
 
@@ -113,7 +113,7 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
-        if ($data['module_type'] !== 'views') {
+        if ($data['module_type'] !== 'views' && $data['module_type'] !== 'components') {
             $moduleLocation = $this->getNewFilesLocation($data);
 
             $data['class'] = rtrim(str_replace('/', '\\', ucfirst($moduleLocation)), '\\');
@@ -128,9 +128,9 @@ class DevtoolsModules extends BasePackage
         }
 
         try {
-            if ($this->updateModuleJson($data) &&
-                $this->generateNewFiles($data) &&
-                $this->modules->{$data['module_type']}->add($data)
+            if ($this->modules->{$data['module_type']}->add($data) &&
+                $this->updateModuleJson($data) &&
+                $this->generateNewFiles($data)
             ) {
                 if ($data['createrepo'] == true) {
                     if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {//Create public repository as well
@@ -191,8 +191,10 @@ class DevtoolsModules extends BasePackage
 
     public function updateModule($data)
     {
-        if (isset($data['module_type']) &&
-            $data['module_type'] === 'components'
+        if (!isset($data['module_type']) ||
+            (isset($data['module_type']) &&
+             ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types')
+            )
         ) {
             $ignoreChars = [' '];
         } else {
@@ -210,8 +212,6 @@ class DevtoolsModules extends BasePackage
         if (!$data) {
             return true;
         }
-
-        $data = $this->checkVersion($data);
 
         $data = $this->checkModuleTypeAndCategory($data);
 
@@ -249,11 +249,26 @@ class DevtoolsModules extends BasePackage
 
                 $module = array_merge($module, $data);
 
-                if ($this->updateModuleJson($data) &&
-                    $this->modules->{$data['module_type']}->update($module)
+                if ($this->modules->{$data['module_type']}->update($module) &&
+                    $this->updateModuleJson($data)
                 ) {
                     if ($data['module_type'] === 'components') {
                         $this->addUpdateComponentMenu($data);
+                    }
+                    if ($data['module_type'] === 'views') {
+                        $viewsSettings = $this->modules->viewsSettings->getViewsSettingsByViewId($data['id']);
+
+                        if ($viewsSettings) {
+                            foreach ($viewsSettings as $setting) {
+                                if (is_string($data['settings'])) {
+                                    $data['settings'] = $this->helper->decode($data['settings'], true);
+                                }
+
+                                $setting['settings'] = array_replace($setting['settings'], $data['settings']);
+
+                                $this->modules->viewsSettings->updateViewsSettings($setting);
+                            }
+                        }
                     }
 
                     if ($data['createrepo'] == true) {
@@ -2211,7 +2226,7 @@ $file .= '
                 $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
             }
 
-            if ($data['module_type'] === 'components') {
+            if ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types') {
                 $ignoreChars = [' '];
             } else {
                 $ignoreChars = [''];
