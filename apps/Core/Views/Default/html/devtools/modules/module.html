@@ -325,6 +325,10 @@ dataCollectionSection =
                                 if (response.responseData && response.responseData.newRelease && $('#release-details').length > 0) {
                                     $('#release_url').html(response.responseData.newRelease.html_url);
                                     $('#release_url_a').attr('href', response.responseData.newRelease.html_url);
+                                    if (response.responseData && response.responseData.newReleasePublic) {
+                                        $('#release_url_public').html(response.responseData.newReleasePublic.html_url);
+                                        $('#release_url_a_public').attr('href', response.responseData.newReleasePublic.html_url);
+                                    }
                                     $('#release-details').attr('hidden', false);
                                     $('#release-module-details').attr('hidden', true);
                                     $('.addData').attr('hidden', true);
@@ -572,8 +576,8 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}').BazContentSectionWithForm({'task':'validateForm'});
 
                     if ($('#{{componentId}}-{{sectionId}}-alert').length === 0) {
-                        // $('#commit').attr('disabled', true);
-                        // $('#commit').children('i').removeClass('fa-code').addClass('fa-spin fa-cog');
+                        $('#commit').attr('disabled', true);
+                        $('#commit').children('i').removeClass('fa-code').addClass('fa-spin fa-cog');
 
                         var postData = { };
                         postData[$('#security-token').attr('name')] = $('#security-token').val();

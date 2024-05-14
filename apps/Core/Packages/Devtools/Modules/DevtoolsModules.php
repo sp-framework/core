@@ -39,6 +39,14 @@ class DevtoolsModules extends BasePackage
 
     public function addModule($data)
     {
+        if ($data['api_id'] != '0' &&
+            ($data['repo'] === 'https://.../' || $data['repo'] === '')
+        ) {
+            $this->addResponse('Repository is not local, please provide correct module repo url.', 1);
+
+            return false;
+        }
+
         if (!isset($data['module_type']) ||
             (isset($data['module_type']) &&
              ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types')
@@ -197,6 +205,14 @@ class DevtoolsModules extends BasePackage
 
     public function updateModule($data)
     {
+        if ($data['api_id'] != '0' &&
+            ($data['repo'] === 'https://.../' || $data['repo'] === '')
+        ) {
+            $this->addResponse('Repository is not local, please provide correct module repo url.', 1);
+
+            return false;
+        }
+
         if (!isset($data['module_type']) ||
             (isset($data['module_type']) &&
              ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types')
@@ -556,45 +572,62 @@ class DevtoolsModules extends BasePackage
         return $this->helper->encode($defaultDependencies);
     }
 
-    protected function updateModuleJson($data)
+    protected function updateModuleJson($data, $viaGenerateRelease = false)
     {
         $jsonFile = $this->getModuleJsonFileLocation($data);
 
-        $data = $this->jsonData($data, true);
+        if ($viaGenerateRelease) {
+            try {
+                $jsonContent = $this->helper->decode($this->localContent->read($jsonFile), true);
+            } catch (FilesystemException | UnableToWriteFile $exception) {
+                $this->addResponse('Unable to read json content to file: ' . $jsonFile);
 
-        $jsonContent = [];
-        $jsonContent["name"] = $data["name"];
-        if ($data['module_type'] === 'components') {
-            $jsonContent["route"] = $data["route"];
+                return false;
+            }
+
+            $jsonContent['version'] = $data['version'];
+
+            if (count($jsonContent['dependencies']['views']) === 0) {
+                $data['base_view_module_id'] = 0;
+            }
         } else {
-            $jsonContent["display_name"] = $data["display_name"];
-        }
-        $jsonContent["description"] = $data["description"];
-        $jsonContent["module_type"] = $data["module_type"];
-        $jsonContent["app_type"] = $data["app_type"];
-        $jsonContent["category"] = $data["category"];
-        $jsonContent["version"] = $data["version"];
-        $jsonContent["repo"] = $data["repo"];
-        if ($data['module_type'] !== 'views') {
-            $jsonContent["class"] = $data["class"];
-        }
-        $jsonContent["dependencies"] = $data["dependencies"];
-        if ($data['module_type'] === 'components') {
-            $jsonContent["menu"] = $data["menu"];
-        }
+            $data = $this->jsonData($data, true);
 
-        if ($data['module_type'] === 'views') {
-            if (isset($data['base_view_module_id']) &&
-                $data['base_view_module_id'] != '0'
-            ) {
-                $data = $this->mergeViewSettings($data);
+            $jsonContent = [];
+            $jsonContent["name"] = $data["name"];
+            if ($data['module_type'] === 'components') {
+                $jsonContent["route"] = $data["route"];
+            } else {
+                $jsonContent["display_name"] = $data["display_name"];
+            }
+            $jsonContent["description"] = $data["description"];
+            $jsonContent["module_type"] = $data["module_type"];
+            $jsonContent["app_type"] = $data["app_type"];
+            $jsonContent["category"] = $data["category"];
+            $jsonContent["version"] = $data["version"];
+            $jsonContent["repo"] = $data["repo"];
+            if ($data['module_type'] !== 'views') {
+                $jsonContent["class"] = $data["class"];
+            }
+            $jsonContent["dependencies"] = $data["dependencies"];
+            if ($data['module_type'] === 'components') {
+                $jsonContent["menu"] = $data["menu"];
+            }
+
+            if ($data['module_type'] === 'views') {
+                if (isset($data['base_view_module_id']) &&
+                    $data['base_view_module_id'] != '0'
+                ) {
+                    $data = $this->mergeViewSettings($data);
+                }
+            }
+
+            $jsonContent["settings"] = $data["settings"];
+            if ($data['module_type'] === 'components') {
+                $jsonContent["widgets"] = $data["widgets"];
             }
         }
 
-        $jsonContent["settings"] = $data["settings"];
-        if ($data['module_type'] === 'components') {
-            $jsonContent["widgets"] = $data["widgets"];
-        }
         $jsonContent = $this->helper->encode($jsonContent, JSON_UNESCAPED_SLASHES);
 
         $jsonContent = str_replace('\\"', '"', $jsonContent);
@@ -605,10 +638,22 @@ class DevtoolsModules extends BasePackage
 
         try {
             $this->localContent->write($jsonFile, $jsonContent);
+
+            if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {
+                $jsonFile = $this->getNewFilesLocation($data, true);
+
+                $jsonContent = str_replace($data['repo'], $data['repo'] . '-public', $jsonContent);
+
+                $this->localContent->write($jsonFile . 'view.json', $jsonContent);
+            }
         } catch (FilesystemException | UnableToWriteFile $exception) {
             $this->addResponse('Unable to write json content to file: ' . $jsonFile);
 
             return false;
+        }
+
+        if ($viaGenerateRelease) {
+            return $jsonContent;
         }
 
         return true;
@@ -707,7 +752,9 @@ class DevtoolsModules extends BasePackage
 
     protected function getModuleJsonFileLocation(&$data)
     {
-        if ($data['module_type'] === 'components') {
+        if ($data['module_type'] === 'apptypes') {
+            $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/';
+        } else if ($data['module_type'] === 'components') {
             $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Components/';
         } else if ($data['module_type'] === 'packages') {
             if ($data['app_type'] === 'core' &&
@@ -737,7 +784,9 @@ class DevtoolsModules extends BasePackage
                 ucfirst($data['name']) . '/' .
                 substr($data['module_type'], 0, -1) . '.json';
         } else {
-            if ($data['module_type'] === 'components') {
+            if ($data['module_type'] === 'apptypes') {
+                return $moduleLocation . 'Install/type.json';
+            } else if ($data['module_type'] === 'components') {
                 $routeArr = explode('/', $data['route']);
 
                 foreach ($routeArr as &$path) {
@@ -1285,17 +1334,19 @@ $file .= '
             return false;
         }
 
-        $module['repo'] = $this->helper->last(explode('/', $module['repo']));
-
         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'IssueApi';
             $method = 'issueListLabels';
-            $args = [$this->apiClientConfig['org_user'], $module['repo']];
         } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             $collection = 'IssuesApi';
             $method = 'issuesListLabelsForRepo';
-            $args = [$this->apiClientConfig['org_user'], $module['repo']];
         }
+
+        $args =
+            [
+                $this->apiClientConfig['org_user'],
+                strtolower($this->helper->last(explode('/', $module['repo'])))
+            ];
 
         try {
             $labels = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
@@ -1335,8 +1386,6 @@ $file .= '
             return false;
         }
 
-        $module['repo'] = $this->helper->last(explode('/', $module['repo']));
-
         //Get Latest Release (Last One, we need to sync issues since that release)
         $this->getReleases($module, true);
 
@@ -1355,11 +1404,34 @@ $file .= '
         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'IssueApi';
             $method = 'issueListIssues';
-            $args = [$this->apiClientConfig['org_user'], $module['repo'], 'closed', $data['label'], null, null, $data['milestone'], $since];
+            $args =
+                [
+                    $this->apiClientConfig['org_user'],
+                    strtolower($this->helper->last(explode('/', $module['repo']))),
+                    'closed',
+                    $data['label'],
+                    null,
+                    null,
+                    $data['milestone'],
+                    $since
+                ];
         } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             $collection = 'IssuesApi';
             $method = 'issuesListForRepo';
-            $args = [$this->apiClientConfig['org_user'], $module['repo'], $data['milestone'], 'closed', null, null, null, $data['label'], 'created', 'desc', $since];
+            $args =
+                [
+                    $this->apiClientConfig['org_user'],
+                    strtolower($this->helper->last(explode('/', $module['repo']))),
+                    $data['milestone'],
+                    'closed',
+                    null,
+                    null,
+                    null,
+                    $data['label'],
+                    'created',
+                    'desc',
+                    $since
+                ];
         }
 
         $issues = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
@@ -1419,7 +1491,7 @@ $file .= '
         }
 
         if (isset($data['api_id']) && $data['api_id'] == '0') {
-            $this->addResponse('This is local module and not remote module, cannot sync labels.', 1, []);
+            $this->addResponse('This is local module and not remote module, cannot sync.', 1, []);
 
             return false;
         }
@@ -1647,22 +1719,24 @@ $file .= '
             return false;
         }
 
-        $module['repo'] = $this->helper->last(explode('/', $module['repo']));
+        $args =
+            [
+                $this->apiClientConfig['org_user'],
+                strtolower($this->helper->last(explode('/', $module['repo'])))
+            ];
 
         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
             $method = 'repoListBranches';
-            $args = [$this->apiClientConfig['org_user'], $module['repo']];
         } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             $collection = 'GitApi';
             $method = 'gitListMatchingRefs';
 
-            $args =
+            $args = array_merge($args,
                 [
-                    $this->apiClientConfig['org_user'],
-                    $module['repo'],
                     'heads'
-                ];
+                ]
+            );
         }
 
         try {
@@ -1714,17 +1788,19 @@ $file .= '
             return false;
         }
 
-        $module['repo'] = $this->helper->last(explode('/', $module['repo']));
-
         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'IssueApi';
             $method = 'issueGetMilestonesList';
-            $args = [$this->apiClientConfig['org_user'], $module['repo']];
         } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             $collection = 'IssuesApi';
             $method = 'issuesListMilestones';
-            $args = [$this->apiClientConfig['org_user'], $module['repo']];
         }
+
+        $args =
+            [
+                $this->apiClientConfig['org_user'],
+                strtolower($this->helper->last(explode('/', $module['repo'])))
+            ];
 
         try {
             $milestones = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
@@ -1779,83 +1855,203 @@ $file .= '
             $name = $versionData['newVersion'];
         }
 
-        $args = [];
-        $args = array_merge($args,
-            [
-                $this->apiClientConfig['org_user'],
-                strtolower($this->helper->last(explode('/', $module['repo'])))
-            ]
-        );
+        //We first update Json File with the updated version and we push the json file with the new version and
+        //then we generate latest release using the updated json file, else the json file on remote consist of older version
+        //and needs to be manually pushed before release.
+        //NOTE: The API key used should have write permissions to the branch which is used for generating the release.
+        if (!$this->latestRelease ||
+            $this->latestRelease && $this->latestRelease['draft'] == false
+        ) {
+            $module['version'] = $name;
+            $module['branch'] = $data['branch'];
 
-        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
-            if ($this->latestRelease && $this->latestRelease['draft'] == true) {
-                $collection = 'RepositoryApi';
-                $method = 'repoEditRelease';
-                $args = array_merge($args, [$this->latestRelease['id']]);
-            } else {
-                $collection = 'RepositoryApi';
-                $method = 'repoCreateRelease';
+            //Check for any open pull request against the branch we have to create release from.
+            if (!$this->checkPullRequests($module)) {
+                return false;
             }
-        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
-            if ($this->latestRelease && $this->latestRelease['draft'] == true) {
-                $collection = 'ReposApi';
-                $method = 'reposUpdateRelease';
-                $args = array_merge($args, [$this->latestRelease['id']]);
+
+            if ($data['module_type'] === 'apptypes') {
+                $module['module_type'] = 'apptypes';
+            }
+
+            $module['commit_message'] = 'Update json file version for release ' . $module['version'];
+
+            if ($data['module_type'] === 'bundles') {
+                $this->commitBundleJson($module);
             } else {
-                $collection = 'ReposApi';
-                $method = 'reposCreateRelease';
+                $jsonContent = $this->updateModuleJson($module, true);
+
+                if (!$jsonContent) {
+                    return false;
+                }
+
+                $reposArr = [$module['repo']];
+
+                $fileLocation = explode('/Install/', $this->getModuleJsonFileLocation($module));
+
+                if ($data['module_type'] === 'views') {
+                    $fileLocation = explode('/Default/', $this->getModuleJsonFileLocation($module));
+
+                    array_push($reposArr, $module['repo'] . '-public');
+                }
+
+                foreach ($reposArr as $repo) {
+                    //Check for json file on remote
+                    if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                        \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Gitea\ObjectSerializer::setUrlEncoding(false);
+
+                        $collection = 'RepositoryApi';
+                        $method = 'repoGetContents';
+                    } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                        $collection = 'ReposApi';
+                        $method = 'reposGetContent';
+                    }
+
+                    try {
+                        $file = $this->apiClient->useMethod(
+                            $collection,
+                            $method,
+                            [
+                                $this->apiClientConfig['org_user'],
+                                strtolower($this->helper->last(explode('/', $repo))),
+                                $data['module_type'] === 'views' ? $fileLocation[1] : 'Install/' . $fileLocation[1],
+                                $module['branch']
+                            ]
+                        )->getResponse(true);
+                    } catch (\throwable $e) {
+                        $this->addResponse($e->getMessage(), 1);
+
+                        return;
+                    }
+
+                    $base64EncodedJsonContent = base64_encode($jsonContent);
+
+                    if (str_replace(["\n", "\r"], '', $file['content']) !== $base64EncodedJsonContent) {
+                        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                            $collection = 'RepositoryApi';
+                            $method = 'repoUpdateFile';
+                        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                            $collection = 'ReposApi';
+                            $method = 'reposCreateOrUpdateFileContents';
+                        }
+
+                        $args =
+                            [
+                                $this->apiClientConfig['org_user'],
+                                strtolower($this->helper->last(explode('/', $repo))),
+                                $data['module_type'] === 'views' ? $fileLocation[1] : 'Install/' . $fileLocation[1],
+                                [
+                                    'message'   => $module['commit_message'],
+                                    'content'   => $base64EncodedJsonContent,
+                                    'branch'    => $module['branch'],
+                                    'sha'       => $file['sha']
+                                ]
+                            ];
+
+                        try {
+                            $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+                        } catch (\throwable $e) {
+                            $this->addResponse($e->getMessage(), 1);
+
+                            return;
+                        }
+                    }
+                }
             }
         }
 
-        $args = array_merge($args,
-            [
+        //Now we generate release after updating the json file.
+        $reposArr = [$module['repo']];
+
+        if ($data['module_type'] === 'views') {
+            array_push($reposArr, $module['repo'] . '-public');
+        }
+
+        $releaseData = [];
+
+        foreach ($reposArr as $repo) {
+            $args = [];
+            $args = array_merge($args,
                 [
-                    'body'              => $data['release_notes'],
-                    'draft'             => (isset($data['mark-as-draft']) && $data['mark-as-draft'] == 'true') ? true : false,
-                    'name'              => $name,
-                    'prerelease'        => $prerelease,
-                    'tag_name'          => $name,
-                    'target_commitish'  => $data['branch']
+                    $this->apiClientConfig['org_user'],
+                    strtolower($this->helper->last(explode('/', $repo)))
                 ]
-            ]
-        );
+            );
 
-        try {
-            $newRelease = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
-
-            if ($newRelease) {
-                $module['version'] = $name;
-
-                if ($data['module_type'] === 'apptypes') {
-                    $this->apps->types->updateAppType($module);
+            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                if ($this->latestRelease && $this->latestRelease['draft'] == true) {
+                    $collection = 'RepositoryApi';
+                    $method = 'repoEditRelease';
+                    $args = array_merge($args, [$this->latestRelease['id']]);
                 } else {
-                    $this->modules->{$data['module_type']}->update($module);
+                    $collection = 'RepositoryApi';
+                    $method = 'repoCreateRelease';
                 }
+            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                if ($this->latestRelease && $this->latestRelease['draft'] == true) {
+                    $collection = 'ReposApi';
+                    $method = 'reposUpdateRelease';
+                    $args = array_merge($args, [$this->latestRelease['id']]);
+                } else {
+                    $collection = 'ReposApi';
+                    $method = 'reposCreateRelease';
+                }
+            }
 
-                $releaseData = ['newRelease' => $newRelease];
+            $args = array_merge($args,
+                [
+                    [
+                        'body'              => $data['release_notes'],
+                        'draft'             => (isset($data['mark-as-draft']) && $data['mark-as-draft'] == 'true') ? true : false,
+                        'name'              => $name,
+                        'prerelease'        => $prerelease,
+                        'tag_name'          => $name,
+                        'target_commitish'  => $module['branch']
+                    ]
+                ]
+            );
 
-                if (isset($data['mark-as-draft']) && $data['mark-as-draft'] == 'true') {
-                    $newMilestone = $this->createReleaseMilestone($versionData, $data, $module);
+            try {
+                $newRelease = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
 
-                    if ($newMilestone) {
-                        $releaseData = array_merge($releaseData, $newMilestone);
+                if ($newRelease) {
+                    if ($data['module_type'] === 'apptypes') {
+                        $this->apps->types->updateAppType($module);
+                    } else {
+                        $this->modules->{$data['module_type']}->update($module);
+                    }
+
+                    if ($data['module_type'] === 'views' && str_contains($repo, '-public')) {
+                        $releaseData = array_merge($releaseData, ['newReleasePublic' => $newRelease]);
+                    } else {
+                        $releaseData = array_merge($releaseData, ['newRelease' => $newRelease]);
+                    }
+
+                    if (isset($data['mark-as-draft']) && $data['mark-as-draft'] == 'true') {
+                        $newMilestone = $this->createReleaseMilestone($versionData, $data, $module, $repo);
+
+                        if ($newMilestone) {
+                            $releaseData = array_merge($releaseData, $newMilestone);
+                        }
                     }
                 }
+            } catch (\throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
 
-                $this->addResponse('Generated New Release!', 0, $releaseData);
-
-                return true;
+                return;
             }
-        } catch (\throwable $e) {
-            $this->addResponse($e->getMessage(), 1);
+        }
 
-            return;
+        if (count($releaseData) > 0 && isset($releaseData['newRelease'])) {
+            $this->addResponse('Generated New Release!', 0, $releaseData);
+
+            return true;
         }
 
         $this->addResponse('Error generating new release', 1);
     }
 
-    protected function createReleaseMilestone($versionData, $data, $module)
+    protected function createReleaseMilestone($versionData, $data, $module, $repo)
     {
         $currentMilestones = $this->syncMilestones($data);
 
@@ -1881,7 +2077,7 @@ $file .= '
             $args =
                 [
                     $this->apiClientConfig['org_user'],
-                    strtolower($this->helper->last(explode('/', $module['repo']))),
+                    strtolower($this->helper->last(explode('/', $repo))),
                     [
                         'title'         => $versionData['newVersion'],
                         'state'         => 'open',
@@ -1913,7 +2109,12 @@ $file .= '
             return false;
         }
 
-        $bundle['createrepo'] = $data['createrepo'];
+        $bundle['createrepo'] = false;
+
+        if (isset($data['createrepo'])) {
+            $bundle['createrepo'] = $data['createrepo'];
+        }
+
         $bundle['commit_message'] = $data['commit_message'];
 
         if (!$this->initApi($bundle)) {
@@ -1935,8 +2136,6 @@ $file .= '
             }
         }
 
-        $bundle['repo'] = $this->helper->last(explode('/', $bundle['repo']));
-
         //Check for bundle.json file
         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
@@ -1952,9 +2151,9 @@ $file .= '
                 $method,
                 [
                     $this->apiClientConfig['org_user'],
-                    strtolower($bundle['repo']),
+                    strtolower($this->helper->last(explode('/', $bundle['repo']))),
                     'bundle.json',
-                    'dev'
+                    $data['branch'] ?? 'dev'
                 ]
             )->getResponse(true);
         } catch (\throwable $e) {
@@ -1971,6 +2170,7 @@ $file .= '
         $jsonContent["module_type"] = $bundle["module_type"];
         $jsonContent["app_type"] = $bundle["app_type"];
         $jsonContent["repo"] = $bundle["repo"];
+        $jsonContent["version"] = $data["version"] ?? $bundle["version"];
         if (is_string($bundle["bundle_modules"])) {
             $bundle["bundle_modules"] = $this->helper->decode($bundle["bundle_modules"], true);
         }
@@ -1997,12 +2197,12 @@ $file .= '
             $args =
                 [
                     $this->apiClientConfig['org_user'],
-                    strtolower($bundle['repo']),
+                    strtolower($this->helper->last(explode('/', $bundle['repo']))),
                     'bundle.json',
                     [
                         'message'   => $bundle['commit_message'],
                         'content'   => $base64EncodedJsonContent,
-                        'branch'    => 'dev'
+                        'branch'    => $data['branch'] ?? 'dev'
                     ]
                 ];
         } else {
@@ -2019,19 +2219,19 @@ $file .= '
             $args =
                 [
                     $this->apiClientConfig['org_user'],
-                    strtolower($bundle['repo']),
+                    strtolower($this->helper->last(explode('/', $bundle['repo']))),
                     'bundle.json',
                     [
                         'message'   => $bundle['commit_message'],
                         'content'   => $base64EncodedJsonContent,
                         'sha'       => $file['sha'],
-                        'branch'    => 'dev'
+                        'branch'    => $data['branch'] ?? 'dev'
                     ]
                 ];
         }
 
         try {
-            $file = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+            $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
         } catch (\throwable $e) {
             $this->addResponse($e->getMessage(), 1);
 
@@ -2049,8 +2249,6 @@ $file .= '
             return true;
         }
 
-        $data['repo'] = $this->helper->last(explode('/', $data['repo']));
-
         //Check Repo if exists
         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'RepositoryApi';
@@ -2067,7 +2265,7 @@ $file .= '
                     $method,
                     [
                         $this->apiClientConfig['org_user'],
-                        strtolower($data['repo'])
+                        strtolower($this->helper->last(explode('/', $data['repo'])))
                     ]
                 )->getResponse(true);
         } catch (\throwable $e) {
@@ -2095,37 +2293,34 @@ $file .= '
 
         $data['repo'] = $this->helper->last(explode('/', $data['repo']));
 
+        $repoArgs =
+            [
+                "name"              => $data['repo'],
+                "description"       => $data['repo'],
+                "auto_init"         => true,
+                "private"           => false
+            ];
+
         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
             $collection = 'OrganizationApi';
             $method = 'createOrgRepo';
-
-            $args =
-                [
-                    $this->apiClientConfig['org_user'],
-                    [
-                        "name"              => $data['repo'],
-                        "description"       => $data['repo'],
-                        "auto_init"         => true,
-                        "private"           => false
-                    ]
-                ];
         } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
             $collection = 'ReposApi';
             $method = 'reposCreateInOrg';
 
-            $args =
+            $repoArgs = array_merge($repoArgs,
                 [
-                    $this->apiClientConfig['org_user'],
-                    [
-                        "name"              => $data['repo'],
-                        "description"       => $data['repo'],
-                        "auto_init"         => true,
-                        "has_issues"        => true,
-                        "has_projects"      => true,
-                        "private"           => false
-                    ]
-                ];
+                    "has_issues"        => true,
+                    "has_projects"      => true
+                ]
+            );
         }
+
+        $args =
+            [
+                $this->apiClientConfig['org_user'],
+                $repoArgs
+            ];
 
         try {
             $newRepo = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
@@ -2142,6 +2337,68 @@ $file .= '
         }
 
         return false;
+    }
+
+    protected function checkPullRequests($data)
+    {
+        if (!$this->initApi($data)) {
+            $this->addResponse('Could not initialize the API assigned to this module.', 1);
+
+            return false;
+        }
+
+        $reposArr = [$data['repo']];
+
+        if ($data['module_type'] === 'views') {
+            array_push($reposArr, $data['repo'] . '-public');
+        }
+
+        $pendingPullRequest = false;
+
+        foreach ($reposArr as $repo) {
+            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                $collection = 'RepositoryApi';
+                $method = 'repoListPullRequests';
+            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                $collection = 'PullsApi';
+                $method = 'pullsList';
+            }
+
+            $args =
+                [
+                    $this->apiClientConfig['org_user'],
+                    strtolower($this->helper->last(explode('/', $repo))),
+                    'open'
+                ];
+
+            try {
+                $pullRequests = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+                if ($pullRequests) {
+                    foreach ($pullRequests as $pullRequest) {
+                        if (isset($pullRequest['base']['ref']) &&
+                            $pullRequest['base']['ref'] === $data['branch']
+                        ) {
+                            $pendingPullRequest = true;
+
+                            break;
+                        }
+                    }
+                }
+            } catch (\throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+
+            if ($pendingPullRequest) {
+                $this->addResponse('Branch ' . $data['branch'] . ' has a pull request pending for repo ' . $repo . '. Please merge before generating release.', 1);
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected function createRepoDevBranch($data)

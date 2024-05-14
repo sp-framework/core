@@ -44,6 +44,18 @@ class ObjectSerializer
     /** @var string */
     private static $dateTimeFormat = \DateTime::ATOM;
 
+    protected static $urlEncoding = true;
+
+    public static function setUrlEncoding(bool $encoding)
+    {
+        self::$urlEncoding = $encoding;
+    }
+
+    public static function getUrlEncoding()
+    {
+        return self::$urlEncoding;
+    }
+
     /**
      * Change the date format
      *
@@ -154,7 +166,11 @@ class ObjectSerializer
      */
     public static function toPathValue($value)
     {
-        return rawurlencode(self::toString($value));
+        if (self::$urlEncoding) {
+            return rawurlencode(self::toString($value));
+        }
+
+        return self::toString($value);
     }
 
     /**

@@ -1,3 +1,4 @@
+{% set createRepoDisabled = true %}
 {% if module['id'] is defined %}
     {% set moduleId = module['id'] %}
     {% set moduleName = module['name'] %}
@@ -12,6 +13,9 @@
     {% set moduleApp_type = module['app_type'] %}
     {% set moduleCategory = module['category'] %}
     {% set moduleApiId = module['module_details']['api_id'] %}
+    {% if moduleApiId != 0 %}
+        {% set createRepoDisabled = false %}
+    {% endif %}
     {% set moduleVersion = module['module_details']['version'] %}
     {% set moduleRepo = module['repo'] %}
     {% if type !== 'views' %}
@@ -392,7 +396,7 @@
                 'fieldId'                        : 'createrepo',
                 'fieldLabel'                     : 'Create New Repo?',
                 'fieldHelp'                      : true,
-                'fieldDisabled'                  : true,
+                'fieldDisabled'                  : createRepoDisabled,
                 'fieldHelpTooltipContent'        : 'Create new repository if it does not exist on remote?',
                 'fieldType'                      : 'checkbox',
                 'fieldCheckboxType'              : 'primary',
