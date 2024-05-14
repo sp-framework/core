@@ -49,7 +49,7 @@
                                 'icon'      : 'circle-plus',
                                 'iconColor' : 'success',
                                 'disabled'  : true,
-                                'url'       : links.url('system/api/q/repository/true/id/0')
+                                'url'       : links.url('system/api/client/services')
                             ],
                         'repo-update' :
                             [
@@ -58,7 +58,7 @@
                                 'icon'      : 'edit',
                                 'iconColor' : 'warning',
                                 'disabled'  : true,
-                                'url'       : links.url('system/api/q/repository/true/id/')
+                                'url'       : links.url('system/api/client/services/q/id/')
                             ],
                         'repo-sync' :
                             [
@@ -654,7 +654,7 @@ dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-add', 'success', false);
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update', 'warning', false);
                 $('#{{componentId}}-{{sectionId}}-modules-repo-update').attr(
-                    'href', '{{links.url("system/api/q/repository/true/id/' + selected[0].data.apiid + '")}}'
+                    'href', '{{links.url("system/api/client/services/q/id/' + selected[0].data.apiid + '")}}'
                 );
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync', 'primary', false);
             }
@@ -1314,8 +1314,8 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
 
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
-    postData['repoId'] = val;
-    postData['getRepositoryModules'] = true;
+    postData['api_id'] = val;
+    postData['get_repository_modules'] = true;
 
     $.post('{{links.url("modules/sync")}}', postData, function(response) {
         dataCollectionSectionForm['vars']['sync'] = false;
@@ -1419,7 +1419,7 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
 
             $('#{{componentId}}-{{sectionId}}-modules').children('ul').show();
         }
-
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync', 'primary', false);
         $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
     }, 'json');
 }

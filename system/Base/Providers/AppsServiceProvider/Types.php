@@ -42,6 +42,17 @@ class Types extends BasePackage
         return false;
     }
 
+    public function getAppTypeByRepo($repo)
+    {
+        foreach($this->types as $type) {
+            if ($type['repo'] === strtolower($repo)) {
+                return $type;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @notification(name=update)
      * notification_allowed_methods(email, sms)//Example

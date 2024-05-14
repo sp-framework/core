@@ -133,127 +133,90 @@ class ModulesComponent extends BaseComponent
 	 */
 	public function syncAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			if (isset($this->postData()['repoId'])) {
-				$counter = null;
+		if ($this->modules->manager->syncRemoteWithLocal($this->postData())) {
+			$counter = $this->modules->manager->packagesData->counter;
+			$modulesTree = $this->modules->manager->packagesData->responseData;
 
-				if ($this->modules->manager->syncRemoteWithLocal($this->postData()['repoId'], $this->postData()['getRepositoryModules'])) {
+			$this->addResponse(
+				$this->modules->manager->packagesData->responseMessage,
+				$this->modules->manager->packagesData->responseCode,
+				array_merge($modulesTree, ['counter' => $counter, 'modules_html' => $this->generateTree($modulesTree)])
+			);
 
-					$counter = $this->modules->manager->packagesData->counter;
-					$modulesTree = $this->modules->manager->packagesData->responseData;
-
-					$this->addResponse(
-						$this->modules->manager->packagesData->responseMessage,
-						$this->modules->manager->packagesData->responseCode,
-						array_merge($modulesTree, ['counter' => $counter, 'modules_html' => $this->generateTree($modulesTree)])
-					);
-
-					return true;
-				}
-
-				$this->addResponse(
-					$this->modules->manager->packagesData->responseMessage,
-					$this->modules->manager->packagesData->responseCode
-				);
-			} else {
-				$this->addResponse('Repo id not provided', 1);
-			}
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
+			return true;
 		}
+
+		$this->addResponse(
+			$this->modules->manager->packagesData->responseMessage,
+			$this->modules->manager->packagesData->responseCode
+		);
 	}
 
 	public function getModuleInfoAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			if (isset($this->postData()['module_type']) && isset($this->postData()['module_id'])) {
-				$this->modules->manager->getModuleInfo($this->postData());
+		if (isset($this->postData()['module_type']) && isset($this->postData()['module_id'])) {
+			$this->modules->manager->getModuleInfo($this->postData());
 
-				$this->addResponse(
-					$this->modules->manager->packagesData->responseMessage,
-					$this->modules->manager->packagesData->responseCode,
-					$this->modules->manager->packagesData->responseData,
-				);
-			} else {
-				$this->addResponse('Please provide module type and module id', 1);
-			}
+			$this->addResponse(
+				$this->modules->manager->packagesData->responseMessage,
+				$this->modules->manager->packagesData->responseCode,
+				$this->modules->manager->packagesData->responseData,
+			);
 		} else {
-			$this->addResponse('Method Not Allowed', 1);
+			$this->addResponse('Please provide module type and module id', 1);
 		}
 	}
 
 	public function getRepositoryModulesAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			if (isset($this->postData()['api_id'])) {
-				$this->modules->manager->getRepositoryModules($this->postData());
+		if (isset($this->postData()['api_id'])) {
+			$this->modules->manager->getRepositoryModules($this->postData());
 
-				$modulesTree = $this->modules->manager->packagesData->responseData;
+			$modulesTree = $this->modules->manager->packagesData->responseData;
 
-				$responseData = array_merge($modulesTree, ['modules_html' => $this->generateTree($modulesTree)]);
+			$responseData = array_merge($modulesTree, ['modules_html' => $this->generateTree($modulesTree)]);
 
-				$this->addResponse(
-					$this->modules->manager->packagesData->responseMessage,
-					$this->modules->manager->packagesData->responseCode,
-					$responseData
-				);
-			} else {
-				$this->addResponse('Please provide module type and module id', 1);
-			}
+			$this->addResponse(
+				$this->modules->manager->packagesData->responseMessage,
+				$this->modules->manager->packagesData->responseCode,
+				$responseData
+			);
 		} else {
-			$this->addResponse('Method Not Allowed', 1);
+			$this->addResponse('Please provide module type and module id', 1);
 		}
 	}
 
 	public function processQueueAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			$this->modules->installer->init($this->postData()['process'])->runProcess($this->postData());
+		$this->modules->installer->init($this->postData()['process'])->runProcess($this->postData());
 
-			$this->addResponse(
-				$this->modules->installer->packagesData->responseMessage,
-				$this->modules->installer->packagesData->responseCode
-			);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
-		}
+		$this->addResponse(
+			$this->modules->installer->packagesData->responseMessage,
+			$this->modules->installer->packagesData->responseCode
+		);
 	}
 
 	public function saveModuleSettingsAction()
 	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
+		$this->requestIsPost();
 
-			if (isset($this->postData()['module_id']) && isset($this->postData()['module_type'])) {
-				$this->modules->manager->saveModuleSettings($this->postData());
+		if (isset($this->postData()['module_id']) && isset($this->postData()['module_type'])) {
+			$this->modules->manager->saveModuleSettings($this->postData());
 
-				$this->addResponse(
-					$this->modules->manager->packagesData->responseMessage,
-					$this->modules->manager->packagesData->responseCode
-				);
-			} else {
-				$this->addResponse('Please provide module type and module id', 1);
-			}
+			$this->addResponse(
+				$this->modules->manager->packagesData->responseMessage,
+				$this->modules->manager->packagesData->responseCode
+			);
 		} else {
-			$this->addResponse('Method Not Allowed', 1);
+			$this->addResponse('Please provide module type and module id', 1);
 		}
 	}
 
