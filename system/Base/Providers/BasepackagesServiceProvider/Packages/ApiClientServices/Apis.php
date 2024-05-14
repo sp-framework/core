@@ -5,6 +5,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientSe
 use GuzzleHttp\TransferStats;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\ApiClientServices;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\ApisHeaderSelector;
 
 class Apis extends BasePackage
 {
@@ -19,6 +20,8 @@ class Apis extends BasePackage
     protected $serviceClass;
 
     protected $response;
+
+    protected $headers = null;
 
     protected $httpOptions = [
         'debug'           => false,
@@ -121,7 +124,7 @@ class Apis extends BasePackage
         try {
             $class = $this->serviceClass . $collection;
 
-            $collectionClass = new $class($this->remoteWebContent, $this->config);
+            $collectionClass = new $class($this->remoteWebContent, $this->config, $this->headers);
 
             $this->response = call_user_func_array([$collectionClass, $method], $methodArgs);
 
@@ -174,5 +177,10 @@ class Apis extends BasePackage
     public function getConfig()
     {
         return $this->config;
+    }
+
+    public function setHeaders(array $accept = [], string $contentType = '', bool $isMultipart = false)
+    {
+        $this->headers = (new ApisHeaderSelector)->selectHeaders($accept, $contentType, $isMultipart);
     }
 }
