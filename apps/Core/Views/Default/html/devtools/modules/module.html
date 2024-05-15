@@ -3214,6 +3214,15 @@ dataCollectionSection =
             },
             onSubmitResponse: function(response) {
                 if (response.responseData && response.responseData.newRepo && $('#repo-details').length > 0) {
+                    if (response.responseData.newRepo == false) {
+                        return true;
+                    }
+                    if ((response.responseData.newRepo.base && response.responseData.newRepo.base == false) ||
+                        (response.responseData.newRepo.public && response.responseData.newRepo.public == false)
+                    ) {
+                        return true;
+                    }
+
                     var newRepo;
                     var appType = BazHelpers.capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
                     var moduleType = $('#{{componentId}}-{{sectionId}}-module_type').val();
@@ -3249,7 +3258,7 @@ dataCollectionSection =
                         newRepo  = response.responseData.newRepo;
                     }
 
-                    if (newRepo.html_url.includes('github')) {
+                    if (newRepo.html_url && newRepo.html_url.includes('github')) {
                         devLink = '/tree/dev';
                     }
                     $('#path').html(path);

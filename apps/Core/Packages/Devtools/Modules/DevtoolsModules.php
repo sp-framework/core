@@ -572,7 +572,7 @@ class DevtoolsModules extends BasePackage
         return $this->helper->encode($defaultDependencies);
     }
 
-    protected function updateModuleJson($data, $viaGenerateRelease = false)
+    protected function updateModuleJson($data, $viaGenerateRelease = false, $viewPublic = false)
     {
         $jsonFile = $this->getModuleJsonFileLocation($data);
 
@@ -590,6 +590,8 @@ class DevtoolsModules extends BasePackage
             if (count($jsonContent['dependencies']['views']) === 0) {
                 $data['base_view_module_id'] = 0;
             }
+
+            $repo = $jsonContent['repo'];
         } else {
             $data = $this->jsonData($data, true);
 
@@ -639,10 +641,12 @@ class DevtoolsModules extends BasePackage
         try {
             $this->localContent->write($jsonFile, $jsonContent);
 
-            if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {
+            if ($viewPublic) {
                 $jsonFile = $this->getNewFilesLocation($data, true);
 
-                $jsonContent = str_replace($data['repo'], $data['repo'] . '-public', $jsonContent);
+                if (!str_contains($data['repo'], '-public')) {
+                    $jsonContent = str_replace($data['repo'], $data['repo'] . '-public', $jsonContent);
+                }
 
                 $this->localContent->write($jsonFile . 'view.json', $jsonContent);
             }
@@ -840,7 +844,7 @@ class DevtoolsModules extends BasePackage
         return true;
     }
 
-    protected function getNewFilesLocation($data, $public = false)
+    protected function getNewFilesLocation($data, $viewPublic = false)
     {
         if ($data['module_type'] === 'components') {
             $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Components/';
@@ -864,7 +868,7 @@ class DevtoolsModules extends BasePackage
         } else if ($data['module_type'] === 'views') {
             $moduleLocation = 'apps/' . ucfirst($data['app_type']) . '/Views/';
 
-            if ($public) {
+            if ($viewPublic) {
                 $moduleLocation = 'public/' . $data['app_type'] . '/' . strtolower($data['name']) . '/';
 
                 return $moduleLocation;
@@ -1879,23 +1883,25 @@ $file .= '
             if ($data['module_type'] === 'bundles') {
                 $this->commitBundleJson($module);
             } else {
-                $jsonContent = $this->updateModuleJson($module, true);
-
-                if (!$jsonContent) {
-                    return false;
-                }
-
                 $reposArr = [$module['repo']];
 
                 $fileLocation = explode('/Install/', $this->getModuleJsonFileLocation($module));
 
-                if ($data['module_type'] === 'views') {
-                    $fileLocation = explode('/Default/', $this->getModuleJsonFileLocation($module));
-
+                if ($data['module_type'] === 'views' && isset($data['base_view_module_id']) && $data['base_view_module_id'] == 0) {
                     array_push($reposArr, $module['repo'] . '-public');
                 }
 
                 foreach ($reposArr as $repo) {
+                    if (str_contains($repo, '-public')) {
+                        $jsonContent = $this->updateModuleJson($module, true, true);
+                    } else {
+                        $jsonContent = $this->updateModuleJson($module, true);
+                    }
+
+                    if (!$jsonContent) {
+                        return false;
+                    }
+
                     //Check for json file on remote
                     if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
                         \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Gitea\ObjectSerializer::setUrlEncoding(false);
@@ -1914,7 +1920,7 @@ $file .= '
                             [
                                 $this->apiClientConfig['org_user'],
                                 strtolower($this->helper->last(explode('/', $repo))),
-                                $data['module_type'] === 'views' ? $fileLocation[1] : 'Install/' . $fileLocation[1],
+                                $data['module_type'] === 'views' ? 'view.json' : 'Install/' . $fileLocation[1],
                                 $module['branch']
                             ]
                         )->getResponse(true);
@@ -1926,7 +1932,9 @@ $file .= '
 
                     $base64EncodedJsonContent = base64_encode($jsonContent);
 
-                    if (str_replace(["\n", "\r"], '', $file['content']) !== $base64EncodedJsonContent) {
+                    if (str_replace(["\n", "\r"], '', $file['content']) !== $base64EncodedJsonContent ||
+                        $module['version'] === '0.0.0'
+                    ) {
                         if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
                             $collection = 'RepositoryApi';
                             $method = 'repoUpdateFile';
@@ -1939,7 +1947,7 @@ $file .= '
                             [
                                 $this->apiClientConfig['org_user'],
                                 strtolower($this->helper->last(explode('/', $repo))),
-                                $data['module_type'] === 'views' ? $fileLocation[1] : 'Install/' . $fileLocation[1],
+                                $data['module_type'] === 'views' ? 'view.json' : 'Install/' . $fileLocation[1],
                                 [
                                     'message'   => $module['commit_message'],
                                     'content'   => $base64EncodedJsonContent,
@@ -1963,7 +1971,7 @@ $file .= '
         //Now we generate release after updating the json file.
         $reposArr = [$module['repo']];
 
-        if ($data['module_type'] === 'views') {
+        if ($data['module_type'] === 'views' && isset($data['base_view_module_id']) && $data['base_view_module_id'] == 0) {
             array_push($reposArr, $module['repo'] . '-public');
         }
 
@@ -2349,7 +2357,7 @@ $file .= '
 
         $reposArr = [$data['repo']];
 
-        if ($data['module_type'] === 'views') {
+        if ($data['module_type'] === 'views' && isset($data['base_view_module_id']) && $data['base_view_module_id'] == 0) {
             array_push($reposArr, $data['repo'] . '-public');
         }
 
