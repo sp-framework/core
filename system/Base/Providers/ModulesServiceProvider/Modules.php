@@ -4,6 +4,7 @@ namespace System\Base\Providers\ModulesServiceProvider;
 
 use System\Base\Providers\ModulesServiceProvider\Installer;
 use System\Base\Providers\ModulesServiceProvider\Manager;
+use System\Base\Providers\ModulesServiceProvider\Queues;
 use System\Base\Providers\ModulesServiceProvider\Modules\Bundles;
 use System\Base\Providers\ModulesServiceProvider\Modules\Components;
 use System\Base\Providers\ModulesServiceProvider\Modules\Middlewares;
@@ -31,6 +32,8 @@ class Modules
 	protected $manager;
 
 	protected $installer;
+
+	protected $queues;
 
 	public function __construct()
 	{
@@ -108,5 +111,12 @@ class Modules
 		$this->installer = (new Installer())->init();
 
 		return $this->installer;
+	}
+
+	protected function initQueues()
+	{
+		$this->queues = (new Queues())->init();
+
+		return $this->queues;
 	}
 }

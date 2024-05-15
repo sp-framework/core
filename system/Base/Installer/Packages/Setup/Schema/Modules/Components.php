@@ -222,7 +222,8 @@ class Components
 					new Index(
 						'column_UNIQUE',
 						[
-							'class'
+							'class',
+							'api_id'
 						],
 						'UNIQUE'
 					)

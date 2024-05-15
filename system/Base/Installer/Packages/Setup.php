@@ -79,6 +79,7 @@ use System\Base\Installer\Packages\Setup\Schema\Modules\Bundles;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Components;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
+use System\Base\Installer\Packages\Setup\Schema\Modules\Queues;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views\Settings;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api as SPApi;
@@ -146,6 +147,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\Bas
 use System\Base\Providers\CoreServiceProvider\Model\ServiceProviderCore;
 use System\Base\Providers\DatabaseServiceProvider\Ff;
 use System\Base\Providers\DomainsServiceProvider\Model\ServiceProviderDomains;
+use System\Base\Providers\ModulesServiceProvider\Model\ServiceProviderModulesQueues;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesBundles;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesComponents;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesMiddlewares;
@@ -494,6 +496,10 @@ class Setup
 			'service_provider_domains' 					=> [
 					'schema'	=> new Domains,
 					'model'		=> new ServiceProviderDomains,
+				],
+			'service_provider_modules_queues'			=> [
+					'schema'	=> new Queues,
+					'model'		=> new ServiceProviderModulesQueues,
 				],
 			'modules_bundles' 							=> [
 					'schema'	=> new Bundles,

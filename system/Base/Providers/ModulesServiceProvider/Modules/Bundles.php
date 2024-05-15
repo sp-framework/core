@@ -17,4 +17,15 @@ class Bundles extends BasePackage
 
         return $this;
     }
+
+    public function getBundleByRepo($repo)
+    {
+        foreach($this->bundles as $bundle) {
+            if ($bundle['repo'] == $repo) {
+                return $bundle;
+            }
+        }
+
+        return false;
+    }
 }

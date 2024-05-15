@@ -134,7 +134,8 @@ class Bundles
                         'column_UNIQUE',
                         [
                             'name',
-                            'app_type'
+                            'app_type',
+                            'api_id'
                         ],
                         'UNIQUE'
                     )

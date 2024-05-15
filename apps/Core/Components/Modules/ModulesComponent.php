@@ -12,6 +12,14 @@ class ModulesComponent extends BaseComponent
 	public function viewAction()
 	{
 		$this->view->modules = $this->modules->manager->getRepositoryModules();
+
+		$queue = $this->modules->queues->getActiveQueue();
+
+		if (is_string($queue['tasks'])) {
+			$queue['tasks'] = $this->helper->decode($queue['tasks'], true);
+		}
+
+		$this->view->queue = $queue;
 	}
 
 	/**
@@ -190,6 +198,19 @@ class ModulesComponent extends BaseComponent
 		} else {
 			$this->addResponse('Please provide module type and module id', 1);
 		}
+	}
+
+	public function modifyQueueAction()
+	{
+		$this->requestIsPost();
+
+		$this->modules->queues->modifyQueue($this->postData());
+
+		$this->addResponse(
+			$this->modules->queues->packagesData->responseMessage,
+			$this->modules->queues->packagesData->responseCode,
+			$this->modules->queues->packagesData->responseData ?? []
+		);
 	}
 
 	public function processQueueAction()

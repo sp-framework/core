@@ -26,6 +26,8 @@ class ApiClientServices extends BasePackage
 
     public function init()
     {
+        $this->packageName = 'apiClientServices';
+
         $this->setModelToUse(BasepackagesApiClientServices::class);
 
         if (!$this->apiCategories) {
@@ -80,7 +82,7 @@ class ApiClientServices extends BasePackage
         $apis = array_merge($basepackagesApis, $apis);
 
         if ($apis && is_array($apis) && count($apis) > 0) {
-            foreach ($apis as $apiKey => $api) {
+            foreach ($apis as $api) {
                 $api['class'] = explode('\\', $api['class']);
 
                 $category = strtolower($api['class'][$this->helper->lastKey($api['class']) - 2]);
@@ -380,14 +382,14 @@ class ApiClientServices extends BasePackage
         $apis = array_merge($basepackagesApis, $apis);
 
         if ($apis && is_array($apis) && count($apis) > 0) {
-            foreach ($apis as $apiKey => $api) {
+            foreach ($apis as $api) {
                 $api['class'] = explode('\\', $api['class']);
 
                 $apiCategory = strtolower($api['class'][$this->helper->lastKey($api['class']) - 2]);
                 $apiProvider = strtolower($api['class'][$this->helper->lastKey($api['class']) - 1]);
 
-                if ($category === $apiCategory &&
-                    $provider === $apiProvider
+                if (strtolower($category) === $apiCategory &&
+                    strtolower($provider) === $apiProvider
                 ) {
                     return implode('\\', $api['class']);
                 }

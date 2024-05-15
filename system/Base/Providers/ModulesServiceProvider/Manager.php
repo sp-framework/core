@@ -30,8 +30,6 @@ class Manager extends BasePackage
 
     protected $views;
 
-    public $installer;
-
     public function init()
     {
         return $this;
@@ -74,6 +72,8 @@ class Manager extends BasePackage
             $module = $this->modules->middlewares->getMiddlewareById($data['module_id']);
         } else if ($data['module_type'] === 'views') {
             $module = $this->modules->views->getViewById($data['module_id']);
+        } else if ($data['module_type'] === 'bundles') {
+            //
         }
 
         if (isset($module) && is_array($module)) {
@@ -87,17 +87,15 @@ class Manager extends BasePackage
                 unset($module['settings']);
             }
 
-            // $moduleUpdatedBy = $module['updated_by'];
-
-            // if ($module['installed'] == '1') {
-            //     if ($module['updated_by'] == 0) {
-            //         $module['updated_by'] = 'System';
-            //     } else {
-            //         $module['updated_by'] = $this->basepackages->accounts->getById($module['updated_by'])['email'];
-            //     }
-            // } else {
-            //     $module['updated_by'] = 'System';
-            // }
+            if ($module['installed'] == '1') {
+                if ($module['updated_by'] == 0) {
+                    $module['updated_by'] = 'System';
+                } else {
+                    $module['updated_by'] = $this->basepackages->accounts->getById($module['updated_by'])['email'];
+                }
+            } else {
+                $module['updated_by'] = 'System';
+            }
 
             if (isset($data['sync']) && $data['sync'] == true) {
                 $module = $this->updateModuleRepoDetails($module);
@@ -130,23 +128,25 @@ class Manager extends BasePackage
     public function updateModuleRepoDetails($module)
     {
         if ($module['app_type'] === 'core') {
-            $repoNameArr = ['core'];
+            $repo = 'core';
         } else {
-            $repoNameArr = explode('/', $module['repo']);
+            $repo = strtolower($this->helper->last(explode('/', $module['repo'])));
         }
 
         try {
-            if (!$this->initApi($module['api_id'])) {
+            if (!$this->initApi($module)) {
                 return false;
             }
 
             if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
                 $collection = 'RepositoryApi';
                 $method = 'repoGet';
-                $args = [$this->apiClientConfig['org_user'], $this->helper->last($repoNameArr)];
             } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
-                //For github
+                $collection = 'ReposApi';
+                $method = 'reposGet';
             }
+
+            $args = [$this->apiClientConfig['org_user'], $repo];
 
             $responseArr = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
 
@@ -187,7 +187,9 @@ class Manager extends BasePackage
 
         $apis = $this->basepackages->apiClientServices->init()->getAll()->apiClientServices;
 
-        if (count($apis) === 0) {
+        if (!$apis ||
+            ($apis && count($apis) === 0)
+        ) {
             $this->addResponse('No API configured', 1);
 
             return false;
@@ -195,7 +197,7 @@ class Manager extends BasePackage
 
         foreach ($apis as $api) {
             if ($api['category'] === 'repos') {
-                $this->apiClient = $this->basepackages->apiClientServices->useApi($api['id'], true);
+                $this->apiClient = $this->basepackages->apiClientServices->useApi($api['id']);
                 $this->apiClientConfig = $this->apiClient->getApiConfig();
 
                 $sortedModules[$api['id']] = [];
@@ -349,6 +351,7 @@ class Manager extends BasePackage
                 return true;
             }
         } catch (ClientException | \throwable $e) {
+            trace([$e]);
             $this->addResponse($e->getMessage(), 1);
 
             return false;
@@ -416,9 +419,13 @@ class Manager extends BasePackage
                 }
 
                 if (!$this->getRemoteModuleJson($names[1], $module)) {
+                    $this->addResponse('Unable to retrieve json file for module ' . $module['name'], 1);
+
                     return false;
                 }
             }
+
+            $this->addResponse('Sync complete');
 
             return true;
         }
@@ -433,7 +440,13 @@ class Manager extends BasePackage
         if ($moduleType === 'apptypes') {
             $jsonFileName = 'Install/type.json';
         } else {
-            if ($moduleType === 'views') {//remove "s" from the name
+            if ($moduleType === 'views' || $moduleType === 'bundles') {//remove "s" from the name
+                if ($moduleType === 'views' &&
+                    str_contains($module['name'], '-public')
+                ) {//We dont import and install -public repo.
+                    return true;
+                }
+
                 $jsonFileName = substr($moduleType, 0, -1) . '.json';
             } else {
                 $jsonFileName = 'Install/' . substr($moduleType, 0, -1) . '.json';
@@ -462,7 +475,11 @@ class Manager extends BasePackage
             $jsonFile = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
 
             if ($jsonFile) {
-                $this->remoteModulesJson[$module['name']] = base64_decode($jsonFile['content']);
+                if (!isset($this->remoteModulesJson[$moduleType])) {
+                    $this->remoteModulesJson[$moduleType] = [];
+                }
+
+                $this->remoteModulesJson[$moduleType][$module['name']] = $this->helper->decode(base64_decode($jsonFile['content']), true);
             }
 
             if (!$onlyJson) {
@@ -504,7 +521,11 @@ class Manager extends BasePackage
                         $counter['updates']['count'] = 0;
                     }
 
-                    $this->modules->$remoteModulesType->update($updateRemotePackage);
+                    if ($remoteModulesType === 'apptypes') {
+                        $this->apps->types->update($updateRemotePackage);
+                    } else {
+                        $this->modules->{$remoteModulesType}->update($updateRemotePackage);
+                    }
 
                     if ($updateRemotePackage['installed'] == '1') {
                         $counter['updates']['count'] = $counter['updates']['count'] + 1;
@@ -524,31 +545,9 @@ class Manager extends BasePackage
                     $repo_details = $registerRemotePackage['repo_details'];
                     $version = $registerRemotePackage['repo_details']['latestRelease']['tag_name'];
 
-                    $registerRemotePackage = $this->remoteModulesJson[$registerRemotePackage['name']];
+                    $registerRemotePackage = $this->remoteModulesJson[$remoteModulesType][$registerRemotePackage['name']];
                     $registerRemotePackage['repo_details'] = $repo_details;
                     $registerRemotePackage['version'] = $version;
-
-                    if (!$this->apps->types->getAppTypeByType($registerRemotePackage['app_type'])) {
-                        if (!checkCtype($registerRemotePackage['app_type'], 'alpha')) {
-                            $this->addResponse('App Type for package ' . $registerRemotePackage['name'] . ' contains illegal characters.', 1);
-
-                            return false;
-                        }
-
-                        try {
-                            $this->apps->types->add(
-                                [
-                                    'name'          => ucfirst($registerRemotePackage['app_type']),
-                                    'app_type'      => $registerRemotePackage['app_type'],
-                                    'description'   => $registerRemotePackage['app_type']
-                                ]
-                            );
-                        } catch (\Exception $e) {
-                            $this->addResponse($e->getMessage(), 1);
-
-                            return false;
-                        }
-                    }
 
                     $registerRemotePackage['settings'] =
                         isset($registerRemotePackage['settings']) ?
@@ -567,7 +566,31 @@ class Manager extends BasePackage
 
                     $registerRemotePackage['api_id'] = $this->apiClientConfig['id'];
 
-                    $this->modules->$remoteModulesType->add($registerRemotePackage);
+                    if ($remoteModulesType === 'apptypes') {
+                        $this->apps->types->add($registerRemotePackage);
+                    } else {
+                        if ($registerRemotePackage['module_type'] === 'views') {
+                            if (count($registerRemotePackage['dependencies']['views']) === 0 &&
+                                (!isset($registerRemotePackage['base_view_module_id']) ||
+                                 (isset($registerRemotePackage['base_view_module_id']) && $registerRemotePackage['base_view_module_id'] === null)
+                                )
+                            ) {
+                                $registerRemotePackage['base_view_module_id'] = 0;
+                            } else if (count($registerRemotePackage['dependencies']['views']) === 1) {
+                                $baseView = $this->modules->views->getViewByRepo($registerRemotePackage['dependencies']['views'][0]['repo']);
+
+                                if ($baseView) {//Add Baseview ID here or during installation.
+                                    $registerRemotePackage['base_view_module_id'] = $baseView['id'];
+                                } else {
+                                    $registerRemotePackage['base_view_module_id'] = 0;
+                                }
+                            } else {
+                                $registerRemotePackage['base_view_module_id'] = 0;
+                            }
+                        }
+
+                        $this->modules->{$remoteModulesType}->add($registerRemotePackage);
+                    }
 
                     $counter['new']['count'] = $counter['new']['count'] + 1;
                 }
@@ -602,6 +625,8 @@ class Manager extends BasePackage
                 $localModule = $this->modules->middlewares->getMiddlewareByRepo($repoUrl);
             } else if ($remoteModulesType === 'views') {
                 $localModule = $this->modules->views->getViewByRepo($repoUrl);
+            } else if ($remoteModulesType === 'bundles') {
+                $localModule = $this->modules->bundles->getBundleByRepo($repoUrl);
             }
 
             if ($localModule) {
@@ -612,8 +637,8 @@ class Manager extends BasePackage
 
                 if ($moduleNeedsUpgrade) {
                     if ($this->getRemoteModuleJson($remoteModulesType, $localModule, true)) {
-                        if (isset($this->remoteModulesJson[$remoteModule['name']])) {
-                            $localModule = array_merge($localModule, $this->remoteModulesJson[$remoteModule['name']]);
+                        if (isset($this->remoteModulesJson[$remoteModulesType][$remoteModule['name']])) {
+                            $localModule = array_merge($localModule, $this->remoteModulesJson[$remoteModulesType][$remoteModule['name']]);
                         }
                     }
 
@@ -659,7 +684,7 @@ class Manager extends BasePackage
             ];
 
         $latestRelease = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
-        trace([$latestRelease]);
+
         if (!$latestRelease) {
             return false;
         }

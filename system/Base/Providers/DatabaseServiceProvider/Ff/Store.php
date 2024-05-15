@@ -1537,6 +1537,11 @@ class Store
         $counters = IoHelper::getFileContent($this->storePath . '_cnt.sdb');
         $counters = json_decode($counters, true);
 
+        if (!$counters) {
+            $counters["totalEntries"] = 0;
+            $counters["lastId"] = 0;
+        }
+
         $newId = ((int) $counters['lastId']) + 1;
         while (file_exists($dataPath . "$newId.json") === true) {
             $newId++;
