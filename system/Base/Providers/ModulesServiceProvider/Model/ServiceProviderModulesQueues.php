@@ -21,4 +21,6 @@ class ServiceProviderModulesQueues extends BaseModel
     public $tasks;
 
     public $tasks_result;
+
+    public $tasks_count;
 }

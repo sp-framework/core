@@ -80,25 +80,32 @@ class Queues extends BasePackage
 
             $this->addResponse('Queue cleared', 0, ['queue' => $queue]);
         } else if ($data['task'] === 'cancel') {
-            if (!isset($queue['tasks'][$data['task']][$data['moduleType']]) ||
-                !in_array($data['id'], $queue['tasks'][$data['task']][$data['moduleType']])
-            ) {
-                $this->addResponse('Id not in queue', 1);
+            $tasksToCheck = ['install', 'update', 'uninstall', 'remove'];
 
-                return false;
+            $found = false;
+            foreach ($tasksToCheck as $taskToCheck) {
+                if (isset($queue['tasks'][$taskToCheck][$data['moduleType']])) {
+                    $key = array_search($data['id'], $queue['tasks'][$taskToCheck][$data['moduleType']]);
+
+                    if ($key !== null) {
+                        unset($queue['tasks'][$taskToCheck][$data['moduleType']][$key]);
+
+                        if (count($queue['tasks'][$taskToCheck][$data['moduleType']]) === 0) {
+                            unset($queue['tasks'][$taskToCheck][$data['moduleType']]);
+                        }
+
+                        $found = true;
+
+                        break;
+                    }
+                }
             }
 
-            $key = array_search($data['id'], $queue['tasks'][$data['task']][$data['moduleType']]);
+            if ($found) {
+                $queue['tasks_count'] = $this->getTasksCount($queue);
 
-            if ($key !== null) {
-                unset($queue['tasks'][$data['task']][$data['moduleType']][$key]);
+                $this->addResponse('Removed from queue', 0, ['queue' => $queue]);
             }
-
-            if (count($queue['tasks'][$data['task']][$data['moduleType']]) === 0) {
-                unset($queue['tasks'][$data['task']][$data['moduleType']]);
-            }
-
-            $this->addResponse('Removed from queue', 0, ['queue' => $queue]);
         } else {
             if (!isset($queue['tasks'][$data['task']][$data['moduleType']])) {
                 $queue['tasks'][$data['task']][$data['moduleType']] = [$data['id']];
@@ -132,8 +139,11 @@ class Queues extends BasePackage
                 }
             }
 
+            $queue['tasks_count'] = $this->getTasksCount($queue);
+
             $this->addResponse('Added to queue', 0, ['queue' => $queue]);
         }
+
 
         if ($this->update($queue)) {
             return true;
@@ -142,5 +152,20 @@ class Queues extends BasePackage
         $this->addResponse('Error updating queue', 1);
 
         return false;
+    }
+
+    protected function getTasksCount($queue)
+    {
+        $counter = 0;
+
+        foreach ($queue['tasks'] as $tasks) {
+            if (count($tasks) > 0) {
+                foreach ($tasks as $moduleType) {
+                    $counter = $counter + count($moduleType);
+                }
+            }
+        }
+
+        return $counter;
     }
 }

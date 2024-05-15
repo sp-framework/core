@@ -230,20 +230,13 @@
         )}}
     </div>
 </div>
-{% set queueCounter = 0 %}
-{% for tasks in queue['tasks'] %}
-    {% if tasks|length > 0 %}
-        {% for moduleType in tasks %}
-            {% set queueCounter = queueCounter + moduleType|length %}
-        {% endfor %}
-    {% endif %}
-{% endfor %}
 <div class="row">
     <div class="col">
         <span class="text-uppercase">Queue:
-            <span style="top: -2px;position: relative;" class="badge badge-info" id="queue-counter">{{queueCounter}}</span>
+            <span style="top: -2px;position: relative;" class="badge badge-info" id="queue-counter">{{queue['tasks_count']}}</span>
         </span>
     </div>
+    {% set queue = json_encode(queue, 16) %}
     <div class="col">
         {{adminltetags.useTag('buttons',
             [
@@ -276,7 +269,7 @@
 </div>
 {% set modules = json_encode(modules, 16) %}
 <script>
-/*global PNotify BazProgress Swal BazContentFields */
+/*global PNotify BazProgress Swal BazContentFields BazHelpers */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -356,18 +349,12 @@ dataCollectionSectionForm['vars']['update_available'] = 0;
 dataCollectionSectionForm['vars']['new_available'] = 0;
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modules}}');
 dataCollectionSectionForm['vars']['module'] = { };
-dataCollectionSectionForm['vars']['queue'] = { };
-dataCollectionSectionForm['vars']['queue']['count'] = 0;
-dataCollectionSectionForm['vars']['queue']['ids'] = { };
-dataCollectionSectionForm['vars']['queue']['ids']['install'] = { };
-dataCollectionSectionForm['vars']['queue']['ids']['uninstall'] = { };
-dataCollectionSectionForm['vars']['queue']['ids']['update'] = { };
-dataCollectionSectionForm['vars']['queue']['ids']['remove'] = { };
-dataCollectionSectionForm['vars']['queue']['data'] = { };
-dataCollectionSectionForm['vars']['queue']['data']['install'] = { };
-dataCollectionSectionForm['vars']['queue']['data']['uninstall'] = { };
-dataCollectionSectionForm['vars']['queue']['data']['update'] = { };
-dataCollectionSectionForm['vars']['queue']['data']['remove'] = { };
+dataCollectionSectionForm['vars']['queue'] = JSON.parse('{{queue}}');
+dataCollectionSectionForm['vars']['queue_data'] = { };
+dataCollectionSectionForm['vars']['queue_data']['install'] = { };
+dataCollectionSectionForm['vars']['queue_data']['uninstall'] = { };
+dataCollectionSectionForm['vars']['queue_data']['update'] = { };
+dataCollectionSectionForm['vars']['queue_data']['remove'] = { };
 dataCollectionSectionForm['vars']['initJstree'] = false;
 dataCollectionSectionForm['vars']['searchInfo'] = '';
 
@@ -534,8 +521,15 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
 
         var updateAvailable = false;
         var nT, nD, index;
+        var orgInstall = install;
+        var orgUninstall = uninstall;
+        var orgRemove = remove;
 
         $(allNodes).each(function(i, node) {
+            install = orgInstall;
+            uninstall = orgUninstall;
+            remove = orgRemove;
+
             if (node.id.startsWith('j')) {
                 if (node.data.type === 'repo') {
                     $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-cloud-arrow-down text-primary');
@@ -548,13 +542,13 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
             nT =
                 dataCollectionSectionForm['vars']['modules'][nD.apiid]['childs'][nD.apptype]['childs'][nD.moduletype]['childs'][nD.modulecategory]['childs'][node.id]['name'];
 
-            if (dataCollectionSectionForm['vars']['queue']['count'] > 0) {
+            if (dataCollectionSectionForm['vars']['queue']['tasks_count'] > 0) {
                 var tasks = ['install', 'update', 'uninstall', 'remove'];
 
                 $(tasks).each(function(i, task) {
-                    if (Object.keys(dataCollectionSectionForm['vars']['queue']['ids'][task]).length > 0) {
-                        if (dataCollectionSectionForm['vars']['queue']['ids'][task][nD.moduletype] &&
-                            dataCollectionSectionForm['vars']['queue']['ids'][task][nD.moduletype].includes(nD.id.toString())
+                    if (Object.keys(dataCollectionSectionForm['vars']['queue']['tasks'][task]).length > 0) {
+                        if (dataCollectionSectionForm['vars']['queue']['tasks'][task][nD.moduletype] &&
+                            BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks'][task][nD.moduletype], nD.id) > -1
                         ) {
                             if (task === 'install') {
                                 install = true;
@@ -566,10 +560,11 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
                                 remove = true;
                                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove', 'danger', false);
                             }
+
+                            return;
                         }
                     }
                 });
-
                 dataCollectionSectionForm['funcs']['initQueueButtons']();
             } else {
                 dataCollectionSectionForm['funcs']['initQueueButtons'](false);
@@ -583,6 +578,7 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
                     dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', 'warning', false);
                 } else {
                     $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-square-plus text-info');
+
                     if (nD.isnew && nD.isnew == 1) {
                         $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(
                             node,
@@ -627,16 +623,14 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
                     $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-warning');
                     $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (Update Available)');
 
-                    if (dataCollectionSectionForm['vars']['queue']['ids']['update'][nD.moduletype] &&
-                        dataCollectionSectionForm['vars']['queue']['ids']['update'][nD.moduletype].includes(nD.id.toString())
+                    if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][nD.moduletype] &&
+                        BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][nD.moduletype], nD.id) > -1
                     ) {
-                        index = dataCollectionSectionForm['vars']['queue']['ids']['update'][nD.moduletype].indexOf(nD.id.toString());
+                        index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][nD.moduletype], nD.id)
 
-                        if (index > -1) {
-                            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-info');
-                            $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Update)');
-                            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update', 'warning', false);
-                        }
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-info');
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Update)');
+                        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update', 'warning', false);
                     }
                 }
             }
@@ -658,7 +652,7 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
             $('#{{componentId}}-{{sectionId}}-modules').jstree().search('new');
         }
 
-        if (dataCollectionSectionForm['vars']['queue']['count'] > 0) {
+        if (dataCollectionSectionForm['vars']['queue']['tasks_count'] > 0) {
             dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
             dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-clear', 'primary', false);
         }
@@ -905,16 +899,16 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
 
     if (moduleInfo.installed == '1') {
         if (moduleInfo.update_available == '1') {
-            if (dataCollectionSectionForm['vars']['queue']['ids']['update'][moduleInfo.module_type] &&
-                dataCollectionSectionForm['vars']['queue']['ids']['update'][moduleInfo.module_type].includes(moduleInfo.id)
+            if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type] &&
+                dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type].includes(moduleInfo.id)
             ) {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
             } else {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'remove', 'repo-sync']);
             }
         } else {
-            if (dataCollectionSectionForm['vars']['queue']['ids']['install'][moduleInfo.module_type] &&
-                dataCollectionSectionForm['vars']['queue']['ids']['install'][moduleInfo.module_type].includes(moduleInfo.id)
+            if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
+                dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type].includes(moduleInfo.id)
             ) {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
             } else {
@@ -922,8 +916,8 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
             }
         }
     } else {
-        if (dataCollectionSectionForm['vars']['queue']['ids']['install'][moduleData.module_type]) {
-            index = dataCollectionSectionForm['vars']['queue']['ids']['install'][moduleData.module_type].indexOf(moduleData.id);
+        if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleData.module_type]) {
+            index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleData.module_type], moduleData.id);
         }
 
         if (index !== 'undefined' && index > -1) {
@@ -939,8 +933,8 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
         if (moduleInfo['name'] !== 'Core') {
             dataCollectionSectionForm['funcs']['moduleinfo'](['info'], []);
         } else {
-            if (dataCollectionSectionForm['vars']['queue']['ids']['update'][moduleData.module_type]) {
-                index = dataCollectionSectionForm['vars']['queue']['ids']['update'][moduleData.module_type].indexOf(moduleData.id);
+            if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type]) {
+                index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type], moduleData.id);
             }
 
             if (index !== 'undefined' && index > -1) {
@@ -1052,25 +1046,20 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
 
             var index;
 
-            if (!dataCollectionSectionForm['vars']['queue']['ids'][task][moduleType]) {
-                dataCollectionSectionForm['vars']['queue']['ids'][task][moduleType] = [];
-            }
-            if (!dataCollectionSectionForm['vars']['queue']['data'][task][moduleType]) {
-                dataCollectionSectionForm['vars']['queue']['data'][task][moduleType] = { };
+            if (response.responseData.queue) {
+                dataCollectionSectionForm['vars']['queue']['tasks'] = response.responseData.queue.tasks;
+                dataCollectionSectionForm['vars']['queue']['tasks_count'] = response.responseData.queue.tasks_count;
             }
 
-            if (dataCollectionSectionForm['vars']['queue']['ids'][task][moduleType] &&
-                dataCollectionSectionForm['vars']['queue']['ids'][task][moduleType].includes(id)
-            ) {
-                return;
+            if (task !== 'cancel') {
+                if (!dataCollectionSectionForm['vars']['queue_data'][task][moduleType]) {
+                    dataCollectionSectionForm['vars']['queue_data'][task][moduleType] = { };
+                }
+
+                dataCollectionSectionForm['vars']['queue_data'][task][moduleType][id] = dataCollectionSectionForm['vars']['module'];
             }
 
-            dataCollectionSectionForm['vars']['queue']['ids'][task][moduleType].push(id);
-            dataCollectionSectionForm['vars']['queue']['data'][task][moduleType][id] = dataCollectionSectionForm['vars']['module'];
-
-            dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] + 1;
-
-            $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
+            $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['tasks_count']);
 
             if (task === 'install') {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
@@ -1146,23 +1135,23 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
 }
 dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
     var moduleHtml = '';
-    for (var q in dataCollectionSectionForm['vars']['queue']['ids']) {
+    for (var q in dataCollectionSectionForm['vars']['queue']['tasks']) {
         var count = 0;
 
         if (q === 'install' || q === 'uninstall' || q === 'update' || q === 'remove') {
-            if (Object.keys(dataCollectionSectionForm['vars']['queue']['ids'][q]).length > 0) {
-                for (var installTypes in dataCollectionSectionForm['vars']['queue']['ids'][q]) {
-                    if (dataCollectionSectionForm['vars']['queue']['ids'][q][installTypes].length > 0) {
-                        count = count + dataCollectionSectionForm['vars']['queue']['ids'][q][installTypes].length;
+            if (Object.keys(dataCollectionSectionForm['vars']['queue']['tasks'][q]).length > 0) {
+                for (var installTypes in dataCollectionSectionForm['vars']['queue']['tasks'][q]) {
+                    if (dataCollectionSectionForm['vars']['queue']['tasks'][q][installTypes].length > 0) {
+                        count = count + dataCollectionSectionForm['vars']['queue']['tasks'][q][installTypes].length;
 
-                        $(dataCollectionSectionForm['vars']['queue']['ids'][q][installTypes]).each(function(i, id) {
-                            var name = dataCollectionSectionForm['vars']['queue']['data'][q][installTypes][id]['name'];
-                            var moduleType = dataCollectionSectionForm['vars']['queue']['data'][q][installTypes][id]['module_type'];
-                            var repo = dataCollectionSectionForm['vars']['queue']['data'][q][installTypes][id]['repo'];
+                        $(dataCollectionSectionForm['vars']['queue']['tasks'][q][installTypes]).each(function(i, id) {
+                            var name = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['name'];
+                            var moduleType = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['module_type'];
+                            var repo = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['repo'];
                             var color = 'info';
 
-                            if (dataCollectionSectionForm['vars']['queue']['data'][q][installTypes][id]['display_name']) {
-                                name = dataCollectionSectionForm['vars']['queue']['data'][q][installTypes][id]['display_name'];
+                            if (dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['display_name']) {
+                                name = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['display_name'];
                             }
 
                             if (q === 'update') {
@@ -1195,7 +1184,7 @@ dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
 }
 dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id = false, moduleType = false) {
     var index;
-
+    //This should be done via modifyQueue
     if (clearAll) {
         dataCollectionSectionForm['vars']['sync'] = false;
         dataCollectionSectionForm['vars']['initJstree'] = false;
@@ -1204,17 +1193,11 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id
         dataCollectionSectionForm['vars']['update_available'] = 0;
         dataCollectionSectionForm['vars']['new_available'] = 0;
         dataCollectionSectionForm['vars']['queue'] = { };
-        dataCollectionSectionForm['vars']['queue']['count'] = 0;
-        dataCollectionSectionForm['vars']['queue']['ids'] = { };
-        dataCollectionSectionForm['vars']['queue']['ids']['install'] = { };
-        dataCollectionSectionForm['vars']['queue']['ids']['uninstall'] = { };
-        dataCollectionSectionForm['vars']['queue']['ids']['update'] = { };
-        dataCollectionSectionForm['vars']['queue']['ids']['remove'] = { };
-        dataCollectionSectionForm['vars']['queue']['data'] = { };
-        dataCollectionSectionForm['vars']['queue']['data']['install'] = { };
-        dataCollectionSectionForm['vars']['queue']['data']['uninstall'] = { };
-        dataCollectionSectionForm['vars']['queue']['data']['update'] = { };
-        dataCollectionSectionForm['vars']['queue']['data']['remove'] = { };
+        dataCollectionSectionForm['vars']['queue_data'] = { };
+        dataCollectionSectionForm['vars']['queue_data']['install'] = { };
+        dataCollectionSectionForm['vars']['queue_data']['uninstall'] = { };
+        dataCollectionSectionForm['vars']['queue_data']['update'] = { };
+        dataCollectionSectionForm['vars']['queue_data']['remove'] = { };
         dataCollectionSectionForm['vars']['searchInfo'] = '';
         dataCollectionSectionForm['funcs']['initQueueButtons'](false);
         dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](null, false, false, false, true);
@@ -1233,33 +1216,33 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id
             var disableFilterIcons = [];
 
             $(actionTypes).each(function(i, actionType) {
-                if (dataCollectionSectionForm['vars']['queue']['ids'][actionType][moduleType]) {
-                    if (dataCollectionSectionForm['vars']['queue']['ids'][actionType][moduleType].includes(id)) {
-                        index = dataCollectionSectionForm['vars']['queue']['ids'][actionType][moduleType].indexOf(id);
+                if (dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType]) {
+                    if (dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType].includes(id)) {
+                        index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType], id);
 
                         if (index > -1) {
-                            dataCollectionSectionForm['vars']['queue']['ids'][actionType][moduleType].splice(index, 1);
+                            dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType].splice(index, 1);
 
                             foundIn = actionType;
                         }
                     }
 
-                    if (dataCollectionSectionForm['vars']['queue']['ids'][actionType][moduleType].length === 0) {
-                        delete dataCollectionSectionForm['vars']['queue']['ids'][actionType][moduleType];
+                    if (dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType].length === 0) {
+                        delete dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType];
                     }
 
-                    if (Object.keys(dataCollectionSectionForm['vars']['queue']['ids'][actionType]).length === 0) {
+                    if (Object.keys(dataCollectionSectionForm['vars']['queue']['tasks'][actionType]).length === 0) {
                         disableFilterIcons.push(actionType);
                     }
                 }
 
-                if (dataCollectionSectionForm['vars']['queue']['data'][actionType][moduleType] &&
-                    dataCollectionSectionForm['vars']['queue']['data'][actionType][moduleType][id]
+                if (dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType] &&
+                    dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType][id]
                 ) {
-                    delete dataCollectionSectionForm['vars']['queue']['data'][actionType][moduleType][id];
+                    delete dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType][id];
 
-                    if (Object.keys(dataCollectionSectionForm['vars']['queue']['data'][actionType][moduleType]).length === 0) {
-                        delete dataCollectionSectionForm['vars']['queue']['data'][actionType][moduleType];
+                    if (Object.keys(dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType]).length === 0) {
+                        delete dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType];
                     }
                 }
             });
@@ -1311,7 +1294,7 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function(clearAll = false, id
 dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
-    postData['queue'] = dataCollectionSectionForm['vars']['queue']['ids'];
+    postData['queue'] = dataCollectionSectionForm['vars']['queue']['tasks'];
     postData['process'] = 'runprecheck';
     if (task === 'process') {
         postData['process'] = 'runprocess';

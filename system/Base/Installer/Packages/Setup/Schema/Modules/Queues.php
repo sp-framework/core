@@ -71,6 +71,13 @@ class Queues
                             'notNull' => false,
                         ]
                     ),
+                    new Column(
+                        'tasks_count',
+                        [
+                            'type'    => Column::TYPE_SMALLINTEGER,
+                            'notNull' => false,
+                        ]
+                    ),
                 ]
             ];
     }

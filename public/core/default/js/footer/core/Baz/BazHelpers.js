@@ -137,6 +137,15 @@ var BazHelpers = function() {
         return true;
     }
 
+    //find object key by value
+    function getKeyByValue(objectOrArray, value) {
+        if (typeof objectOrArray === 'object') {
+            return Object.keys(objectOrArray).find(key => objectOrArray[key] == value);
+        } else if (Array.isArray(objectOrArray)) {
+            return objectOrArray.indexOf(value);
+        }
+    }
+
     function bazHelpersConstructor() {
         // if something needs to be constructed
         return null;
@@ -569,6 +578,10 @@ var BazHelpers = function() {
 
         BazHelpers.isEmpty = function(obj) {
             return isEmpty(obj);
+        }
+
+        BazHelpers.getKeyByValue = function(objectOrArray, value) {
+            return getKeyByValue(objectOrArray, value);
         }
 
         BazHelpers.interval = function(func, intervalLength, options = { }) {
