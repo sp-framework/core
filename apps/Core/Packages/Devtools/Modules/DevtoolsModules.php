@@ -1531,6 +1531,12 @@ $file .= '
     {
         if (isset($data['bump']) && $data['bump'] === 'custom') {
             return false;
+        } else if (!isset($data['bump']) ||
+                   (isset($data['bump']) && $data['bump'] === '')
+        ) {
+            $this->addResponse('Bump version to what?', 1);
+
+            return false;
         }
 
         if (!isset($data['repo'])) {
@@ -1587,6 +1593,16 @@ $file .= '
                     $moduleVersion = $moduleVersion . '-' . $module['preReleasePrefix'];
                 }
 
+                $parsedVersion = Version::parse($moduleVersion);
+
+                $parsedVersionString = null;
+
+                if (isset($module['preReleasePrefix'])) {
+                    $parsedVersion = $parsedVersion->getNextPreReleaseVersion();
+                }
+
+                $parsedVersionString = $parsedVersion->__toString();
+
                 if (isset($module['buildMetaPrefix'])) {
                     $module['buildMetaPrefix'] = explode('.', $module['buildMetaPrefix']);
 
@@ -1595,33 +1611,13 @@ $file .= '
                             $prefix = time();
                         }
                     });
-                    $moduleVersion = $moduleVersion . '+' . implode('.', $module['buildMetaPrefix']);
-                }
-            }
-
-            $parsedVersion = Version::parse($moduleVersion);
-
-            $parsedVersionString = null;
-
-            if (isset($module['preReleasePrefix']) || isset($module['buildMetaPrefix'])) {
-                if (isset($module['preReleasePrefix'])) {
-                    $parsedVersion = $parsedVersion->getNextPreReleaseVersion();
-                }
-
-                $parsedVersionString = $parsedVersion->__toString();
-
-                if (isset($module['buildMetaPrefix'])) {
-                    if (is_array($module['buildMetaPrefix'])) {
-                        $parsedVersionString = $parsedVersionString . '+' . implode('.', $module['buildMetaPrefix']);
-                    } else {
-                        $parsedVersionString = $parsedVersionString . '+' . $module['buildMetaPrefix'];
-                    }
+                    $parsedVersionString = $parsedVersionString . '+' . implode('.', $module['buildMetaPrefix']);
                 }
             }
 
             $this->addResponse('No version found on remote repository.', 1, ['release' => $parsedVersionString ?? $moduleVersion]);
 
-            return $parsedVersionString ?? $moduleVersion;
+            return ['release' => $parsedVersionString ?? $moduleVersion];
         }
 
         if (isset($module['module_type']) && $module['module_type'] === 'core') {
@@ -1646,24 +1642,26 @@ $file .= '
             return false;
         }
 
-        $version = Version::parse($currentVersion);
-
         if (isset($module['preReleasePrefix']) || isset($module['buildMetaPrefix'])) {
-            if (isset($module['preReleasePrefix'])) {
-                $newVersion = $version->getNextPreReleaseVersion();
-            } else {
-                $newVersion = $version;
+            $moduleVersion = $currentVersion;
 
-                if ($newVersion->getBuildMeta()) {
-                    $newVersionWithBuildMeta = $newVersion->__toString();
-                    $newVersionWithBuildMeta = explode('+', $newVersionWithBuildMeta);
-                    $newVersion = Version::parse($newVersionWithBuildMeta[0]);
-                }
+            if (isset($module['preReleasePrefix']) && !isset($module['buildMetaPrefix'])) {
+                $moduleVersion = explode('+', $moduleVersion)[0];
             }
 
-            $newVersion = $newVersion->__toString();
+            $parsedVersion = Version::parse($moduleVersion);
 
-            if (isset($module['buildMetaPrefix'])) {
+            if (!$parsedVersion->isPreRelease() && isset($module['preReleasePrefix'])) {
+                $parsedVersion = Version::parse($parsedVersion->__toString() . '-' . $module['preReleasePrefix']);
+            }
+
+            if (isset($module['preReleasePrefix']) && isset($module['buildMetaPrefix'])) {
+                $parsedVersion = $parsedVersion->getNextPreReleaseVersion();
+            }
+
+            $newVersion = $parsedVersion->__toString();
+
+            if (!$parsedVersion->getBuildMeta() && isset($module['buildMetaPrefix'])) {
                 $module['buildMetaPrefix'] = explode('.', $module['buildMetaPrefix']);
 
                 array_walk($module['buildMetaPrefix'], function(&$prefix) {
@@ -1672,10 +1670,30 @@ $file .= '
                     }
                 });
                 $newVersion = $newVersion . '+' . implode('.', $module['buildMetaPrefix']);
+            } else if ($parsedVersion->getBuildMeta() &&
+                       isset($module['buildMetaPrefix']) &&
+                       str_contains($module['buildMetaPrefix'], 'now')
+            ) {
+                $module['buildMetaPrefix'] = explode('.', $module['buildMetaPrefix']);
+
+                $newVersion = explode('+', $newVersion)[0];
+
+                array_walk($module['buildMetaPrefix'], function(&$prefix) {
+                    if ($prefix === 'now') {
+                        $prefix = time();
+                    }
+                });
+
+                $newVersion = $newVersion . '+' . implode('.', $module['buildMetaPrefix']);
             }
         } else {
-            $bump = 'getNext' . ucfirst($module['bump']) . 'Version';
-            $newVersion = $version->$bump();
+            $version = Version::parse($currentVersion);
+            if ($version->isPreRelease()) {
+                $newVersion = $version->withoutSuffixes();
+            } else {
+                $bump = 'getNext' . ucfirst($module['bump']) . 'Version';
+                $newVersion = $version->$bump();
+            }
             $newVersion = $newVersion->__toString();
         }
 
@@ -1857,6 +1875,8 @@ $file .= '
         $name = $module['version'];
         if (isset($versionData['newVersion'])) {
             $name = $versionData['newVersion'];
+        } else if (isset($versionData['release'])) {
+            $name = $versionData['release'];
         }
 
         //We first update Json File with the updated version and we push the json file with the new version and
@@ -2014,7 +2034,7 @@ $file .= '
                         'name'              => $name,
                         'prerelease'        => $prerelease,
                         'tag_name'          => $name,
-                        'target_commitish'  => $module['branch']
+                        'target_commitish'  => $data['branch']
                     ]
                 ]
             );
@@ -2061,13 +2081,19 @@ $file .= '
 
     protected function createReleaseMilestone($versionData, $data, $module, $repo)
     {
+        if (isset($versionData['newVersion'])) {
+            $version = $versionData['newVersion'];
+        } else if (isset($versionData['release'])) {
+            $version = $versionData['release'];
+        }
+
         $currentMilestones = $this->syncMilestones($data);
 
         $found = false;
 
         if ($currentMilestones && isset($currentMilestones['milestones'])) {
             array_walk($currentMilestones['milestones'], function($label) use(&$found, $versionData) {
-                if ($label['name'] === $versionData['newVersion']) {
+                if ($label['name'] === $version) {
                     $found = true;
                 }
             });
@@ -2087,9 +2113,9 @@ $file .= '
                     $this->apiClientConfig['org_user'],
                     strtolower($this->helper->last(explode('/', $repo))),
                     [
-                        'title'         => $versionData['newVersion'],
+                        'title'         => $version,
                         'state'         => 'open',
-                        'description'   => 'Tracking milestone for version ' . $versionData['newVersion']
+                        'description'   => 'Tracking milestone for version ' . $version
                     ]
                 ];
         }

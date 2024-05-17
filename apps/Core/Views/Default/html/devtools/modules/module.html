@@ -128,16 +128,22 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
                             $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
                         } else if (bump === 'preRelease') {
                             $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
                             $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
                             $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
                         } else if (bump === 'preReleaseBuildMeta') {
                             $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
                             $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
                             $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
                         } else {
                             $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
                             $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
@@ -163,6 +169,7 @@ dataCollectionSection =
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
                     postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                    postData['force-mark-prerelease'] = $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked;
                     postData['bump'] = bump;
 
                     if (bump === 'preRelease') {
@@ -204,12 +211,14 @@ dataCollectionSection =
                             $('#security-token').val(response.token);
                         }
 
+                        var color = 'primary';
+                        var newVersionColor = 'primary';
+
                         if (response.responseCode == 0 ||
                             response.responseCode == -1 ||
                             response.responseCode == 2 ||
                             response.responseCode == 3
                         ) {
-                            var color = 'primary';
                             if (response.responseCode == -1) {
                                 PNotify.notice({'text': 'Local version is lower than remote version!'});
                                 color = 'warning';
@@ -223,22 +232,24 @@ dataCollectionSection =
                                 $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-success').addClass('bg-info');
                             }
 
-                            var newVersionColor = 'primary';
                             if (color === 'info' || $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === true) {
                                 newVersionColor = 'info';
                             }
 
                             if (response.responseData && response.responseData.currentVersion && response.responseData.newVersion) {
                                 $('#release-version-text').html(
-                                    '<h4><span class="text-' + color + '">' + response.responseData.currentVersion + '</span> ' +
+                                    '<span class="text-' + color + '">' + response.responseData.currentVersion + '</span> ' +
                                     '<i class="text-success fa-solid fa-arrow-right"></i> ' +
-                                    '<span class="text-' + newVersionColor + '" id="next-release-text">' + response.responseData.newVersion + '</span></h4>'
+                                    '<span class="text-' + newVersionColor + '" id="next-release-text">' + response.responseData.newVersion + '</span>'
                                 );
                             }
                         } else {
+                            if (color === 'info' || $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === true) {
+                                newVersionColor = 'info';
+                            }
                             if (response.responseData && response.responseData.release) {
                                 $('#release-version-text').html(
-                                    '<h4><span class="text-primary">' + response.responseData.release + '</span></h4>'
+                                    '<span class="text-' + newVersionColor + '">' + response.responseData.release + '</span>'
                                 );
                             } else {
                                 $('#release-version-text').html(
@@ -248,19 +259,34 @@ dataCollectionSection =
 
                             PNotify.error({'text': response.responseMessage});
                         }
+
+                        if (response.responseData && response.responseData.versionIsDraft && response.responseData.versionIsDraft == true) {
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-release-type').attr('disabled', true);
+                        }
                     }, 'json');
                 });
 
                 $('#{{componentId}}-{{sectionId}}-mark-as-draft').change(function() {
                     if ($('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === true) {
                         $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-success').addClass('bg-info');
-                        if ($('#next-release-text').hasClass('text-primary')) {
+                        if ($('#next-release-text').length > 0 &&
+                            $('#next-release-text').hasClass('text-primary')
+                        ) {
                             $('#next-release-text').removeClass('text-primary').addClass('text-info');
+                        } else if ($('#release-version-text span').hasClass('text-primary')) {
+                            $('#release-version-text span').removeClass('text-primary').addClass('text-info');
                         }
                     } else if ($('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === false) {
                         $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-info').addClass('bg-success');
-                        if ($('#next-release-text').hasClass('text-info')) {
+                        if ($('#next-release-text').length > 0 &&
+                            $('#next-release-text').hasClass('text-info')
+                        ) {
                             $('#next-release-text').removeClass('text-info').addClass('text-primary');
+                        } else if ($('#release-version-text span').hasClass('text-info')) {
+                            $('#release-version-text span').removeClass('text-info').addClass('text-primary');
                         }
                     }
                 });
