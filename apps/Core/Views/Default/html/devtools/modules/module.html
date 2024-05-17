@@ -1365,6 +1365,7 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
     }
 }
 if (dataCollectionSectionForm['vars']['module_type'] !== 'views' &&
+    dataCollectionSectionForm['vars']['module_type'] !== 'core' &&
     !dataCollectionSectionForm['vars']['moduleDependencies']['external']
 ) {
     dataCollectionSectionForm['vars']['moduleDependencies']['external'] = { };
@@ -2927,6 +2928,12 @@ dataCollectionSection =
                   '#{{componentId}}-{{sectionId}}-dependencies-external-add').click(function(e) {
                     e.preventDefault();
 
+                    if ($('#{{componentId}}-{{sectionId}}-dependencies-external-version').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val('^0');
+                    } else if (!$('#{{componentId}}-{{sectionId}}-dependencies-external-version').val().startsWith('^')) {
+                        $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val('^' + $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val());
+                    }
+
                     var found = false;
                     if (label === 'core') {
                         dataCollectionSectionForm['vars']['moduleDependencies'][label] = { };
@@ -2939,14 +2946,22 @@ dataCollectionSection =
                         dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['version'] = moduleData['version'];
                         dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['repo'] = moduleData['repo'];
                     } else if (label === 'external') {
-                        if (dataCollectionSectionForm['vars']['moduleDependencies']['external'].length === 0) {
-                            dataCollectionSectionForm['vars']['moduleDependencies']['external'] = { };
+                        if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
+                            if (!dataCollectionSectionForm['vars']['moduleDependencies']['composer']) {
+                                dataCollectionSectionForm['vars']['moduleDependencies']['composer'] = { };
+                            }
+                            if (!dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require']) {
+                                dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require'] = { };
+                            }
+                            dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]
+                                = $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val();
+                        } else {
+                            if (dataCollectionSectionForm['vars']['moduleDependencies']['external'].length === 0) {
+                                dataCollectionSectionForm['vars']['moduleDependencies']['external'] = { };
+                            }
+                            dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]
+                                = $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val();
                         }
-
-                        dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]
-                            = $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val();
-
-                        reset();
                     } else {
                         for (var modules in dataCollectionSectionForm['vars']['moduleDependencies']) {
                             if (label === modules) {
@@ -3000,7 +3015,15 @@ dataCollectionSection =
                     } else if (label === 'apptypes') {
                         dataCollectionSectionForm['vars']['moduleDependencies']['apptype'] = { };
                     } else if (label === 'external') {
-                        delete dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()];
+                        if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
+                            if (dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]) {
+                                delete dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()];
+                            }
+                        } else {
+                            if (dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]) {
+                                delete dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()];
+                            }
+                        }
                     } else {
                         for (var modules in dataCollectionSectionForm['vars']['moduleDependencies']) {
                             if (label === modules) {

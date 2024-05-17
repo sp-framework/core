@@ -1,4 +1,3 @@
-
 {
 	"name" : "Core",
 	"display_name" : "Bazaari Core",
@@ -58,7 +57,8 @@
 				"opis/json-schema" : "^2.3",
 				"league/flysystem-sftp-v3" : "^3.23",
 				"lasserafn/php-initial-avatar-generator" : "^4.3",
-				"wp-cli/php-cli-tools" : "^0.11.22"
+				"wp-cli/php-cli-tools" : "^0.11.22",
+				"react/event-loop" : "1.5.0"
 			},
 			"config" : 
 			{
@@ -85,8 +85,7 @@
 					}
 				}
 			}
-		},
-		"external" : []
+		}
 	},
 	"settings" : 
 	{
