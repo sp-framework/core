@@ -73,7 +73,7 @@ class Manager extends BasePackage
         } else if ($data['module_type'] === 'views') {
             $module = $this->modules->views->getViewById($data['module_id']);
         } else if ($data['module_type'] === 'bundles') {
-            //
+            $module = $this->modules->bundles->getBundleById($data['module_id']);
         }
 
         if (isset($module) && is_array($module)) {
@@ -87,7 +87,9 @@ class Manager extends BasePackage
                 unset($module['settings']);
             }
 
-            if ($module['installed'] == '1') {
+            if (isset($module['installed']) &&
+                $module['installed'] == '1'
+            ) {
                 if ($module['updated_by'] == 0) {
                     $module['updated_by'] = 'System';
                 } else {
@@ -213,11 +215,13 @@ class Manager extends BasePackage
             $localModules['middlewares'] = $this->modules->middlewares->init(true)->getMiddlewaresByApiId($data['api_id']);
             $localModules['packages'] = $this->modules->packages->init(true)->getPackagesByApiId($data['api_id']);
             $localModules['views'] = $this->modules->views->init(true)->getViewsByApiId($data['api_id']);
+            $localModules['bundles'] = $this->modules->bundles->init(true)->getBundlesByApiId($data['api_id']);
         } else {
             $localModules['components'] = $this->modules->components->init(true)->components;
             $localModules['middlewares'] = $this->modules->middlewares->init(true)->middlewares;
             $localModules['packages'] = $this->modules->packages->init(true)->packages;
             $localModules['views'] = $this->modules->views->init(true)->views;
+            $localModules['bundles'] = $this->modules->bundles->init(true)->bundles;
         }
 
         foreach ($localModules as $moduleType => $modulesArr) {
@@ -235,7 +239,9 @@ class Manager extends BasePackage
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['data']['type'] = 'module';
                     }
 
-                    if (!isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']])) {
+                    if (isset($moduleArr['category']) &&
+                        !isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']])
+                    ) {
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']] = [];
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['name'] = $moduleArr['category'];
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['data']['type'] = 'category';
@@ -249,12 +255,14 @@ class Manager extends BasePackage
                     $module['data']['apiid'] = $moduleArr['api_id'];
                     $module['data']['apptype'] = $moduleArr['app_type'];
                     $module['data']['moduletype'] = $moduleArr['module_type'];
-                    $module['data']['modulecategory'] = $moduleArr['category'];
+                    $module['data']['modulecategory'] = $moduleArr['category'] ?? '-';
                     $module['data']['moduleid'] = $moduleArr['module_type'] . '-' . $moduleArr['id'];
-                    $module['data']['installed'] = $moduleArr['installed'];
+                    $module['data']['installed'] = $moduleArr['installed'] ?? 0;
                     $module['data']['update_available'] = $moduleArr['update_available'];
                     $module['data']['isnew'] = '0';
-                    if ($moduleArr['installed'] == '0') {
+                    if (($moduleArr['module_type'] !== 'bundles' && $moduleArr['installed'] == '0') ||
+                        $moduleArr['module_type'] === 'bundles'
+                    ) {
                         if (isset($moduleArr['updated_on']) &&
                             ($moduleArr['updated_on'] !== null || $moduleArr['updated_on'] !== '')
                         ) {
@@ -271,7 +279,11 @@ class Manager extends BasePackage
                         }
                     }
 
-                    $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$module['data']['moduleid']] = $module;
+                    if (isset($moduleArr['category'])) {
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$module['data']['moduleid']] = $module;
+                    } else {
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$module['data']['moduleid']] = $module;
+                    }
                 }
             }
         }

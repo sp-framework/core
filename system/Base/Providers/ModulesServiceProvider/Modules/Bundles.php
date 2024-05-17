@@ -28,4 +28,28 @@ class Bundles extends BasePackage
 
         return false;
     }
+
+    public function getBundleById($id)
+    {
+        foreach($this->bundles as $bundle) {
+            if ($bundle['id'] == $id) {
+                return $bundle;
+            }
+        }
+
+        return false;
+    }
+
+    public function getBundlesByApiId($apiId)
+    {
+        $bundles = [];
+
+        foreach($this->bundles as $bundle) {
+            if ($bundle['api_id'] == $apiId) {
+                array_push($bundles, $bundle);
+            }
+        }
+
+        return $bundles;
+    }
 }

@@ -78,6 +78,8 @@ class Queues extends BasePackage
             $queue['tasks']['uninstall'] = [];
             $queue['tasks']['remove']    = [];
 
+            $queue['tasks_count'] = 0;
+
             $this->addResponse('Queue cleared', 0, ['queue' => $queue]);
         } else if ($data['task'] === 'cancel') {
             $tasksToCheck = ['install', 'update', 'uninstall', 'remove'];
@@ -87,7 +89,7 @@ class Queues extends BasePackage
                 if (isset($queue['tasks'][$taskToCheck][$data['moduleType']])) {
                     $key = array_search($data['id'], $queue['tasks'][$taskToCheck][$data['moduleType']]);
 
-                    if ($key !== null) {
+                    if ($key !== false) {
                         unset($queue['tasks'][$taskToCheck][$data['moduleType']][$key]);
 
                         if (count($queue['tasks'][$taskToCheck][$data['moduleType']]) === 0) {
@@ -129,7 +131,7 @@ class Queues extends BasePackage
                 if (isset($queue['tasks'][$taskToCheck][$data['moduleType']])) {
                     $key = array_search($data['id'], $queue['tasks'][$taskToCheck][$data['moduleType']]);
 
-                    if ($key !== null) {
+                    if ($key !== false) {
                         unset($queue['tasks'][$taskToCheck][$data['moduleType']][$key]);
 
                         if (count($queue['tasks'][$taskToCheck][$data['moduleType']]) === 0) {
@@ -143,7 +145,6 @@ class Queues extends BasePackage
 
             $this->addResponse('Added to queue', 0, ['queue' => $queue]);
         }
-
 
         if ($this->update($queue)) {
             return true;
