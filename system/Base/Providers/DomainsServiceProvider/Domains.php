@@ -66,6 +66,16 @@ class Domains extends BasePackage
 			(isset($data['dns_record']) && $data['dns_record'] === '')
 		) {
 			$data['dns_record'] = $this->validateDomain($data['name']);
+
+			if (count($data['dns_record']) > 0) {
+				if (isset($data['dns_record']['internal']) && $data['dns_record']['internal'] === true) {
+					$data['isInternal'] = '1';
+				} else {
+					$data['isInternal'] = '0';
+				}
+			} else {
+				$$data['isInternal'] = '1';
+			}
 		}
 
 		if (isset($data['exclusive_to_default_app']) && $data['exclusive_to_default_app'] == '1') {
@@ -127,6 +137,16 @@ class Domains extends BasePackage
 			(isset($data['dns_record']) && $data['dns_record'] === '')
 		) {
 			$data['dns_record'] = $this->validateDomain($data['name']);
+
+			if (count($data['dns_record']) > 0) {
+				if (isset($data['dns_record']['internal']) && $data['dns_record']['internal'] === true) {
+					$data['isInternal'] = '1';
+				} else {
+					$data['isInternal'] = '0';
+				}
+			} else {
+				$$data['isInternal'] = '1';
+			}
 		}
 
 		if (isset($data['exclusive_to_default_app']) && $data['exclusive_to_default_app'] == '1') {

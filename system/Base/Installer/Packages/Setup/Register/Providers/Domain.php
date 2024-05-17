@@ -31,7 +31,12 @@ class Domain
 		$record = $this->validateDomain($this->request->getHttpHost());
 
 		if (count($record) > 0) {
-			$isInternal = isset($record['internal']) ? $record['internal'] : '1';
+			if (isset($record['internal']) && $record['internal'] === true) {
+				$isInternal = '1';
+			} else {
+				$isInternal = '0';
+			}
+
 			$record = $helper->encode($record);
 		} else {
 			$isInternal = '1';
