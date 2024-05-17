@@ -600,14 +600,27 @@
                                     "password"              : $('#password').val(),
                                     "drop"                  : $('#drop')[0].checked,
                                 });
-                            if ($('#create').length > 0 && $('#create')[0].checked === true) {
+                            if (($('#create').length > 0 && $('#create')[0].checked === true) ||
+                                ($('#create-grant').length > 0 && $('#create-grant')[0].checked === true)
+                            ) {
                                 data = $.extend(data,
                                 {
                                     "create-username"       : $('#create-username').val(),
-                                    "create-password"       : $('#create-password').val(),
-                                    "create-db"             : $('#create')[0].checked,
-                                    "create-user"           : $('#create-grant')[0].checked
+                                    "create-password"       : $('#create-password').val()
                                 });
+                                if ($('#create').length > 0 && $('#create')[0].checked === true) {
+                                    data = $.extend(data,
+                                    {
+                                        "create-db"             : $('#create')[0].checked
+                                    });
+                                }
+
+                                if ($('#create-grant').length > 0 && $('#create-grant')[0].checked === true) {
+                                    data = $.extend(data,
+                                    {
+                                        "create-user"           : $('#create-grant')[0].checked
+                                    });
+                                }
                             }
                         } else {
                             data = $.extend(data,
@@ -692,6 +705,10 @@
                                 }
                                 $('#submit, #update').attr('disabled', false);
                                 $('#submit-spinner, #update-spinner').attr('hidden', true);
+                            }
+                        }).done(function(data, statusText, xhr){
+                            if (xhr.status === 302) {
+                                location.reload();
                             }
                         });
                     <?php if (!$onlyUpdateDb) { ?>

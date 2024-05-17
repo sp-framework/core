@@ -234,27 +234,18 @@ Class Setup
 		if ($this->request->isPost() && !isset($this->postData['session'])) {
 			if (isset($this->postData['dev']) && $this->postData['dev'] != 'true') {
 				$passStrength = $this->checkPwStrength($this->postData['pass']);
-				$passwordStrength = $this->checkPwStrength($this->postData['password']);
 
-				if ($passStrength !== false && $passwordStrength !== false) {
-					if ($passStrength <= 2 || $passwordStrength <= 2) {
-						if ($passStrength <= 2) {
-							$this->view->responseCode = 1;
+				if ($passStrength !== false && $passStrength <= 2) {
+					$this->view->responseCode = 1;
 
-							$this->view->responseMessage = 'User Password strength is weak!';
-						} else if ($passwordStrength <= 2 && !$this->setupPackage->checkUser(true)) {
-							$this->view->responseCode = 1;
+					$this->view->responseMessage = 'User Password strength is weak!';
 
-							$this->view->responseMessage = 'DB Password strength is weak!';
-						}
+					$this->progress->resetProgress();
 
-						$this->progress->resetProgress();
+					if ($this->response->isSent() !== true) {
+						$this->response->setJsonContent($this->view->getParamsToView());
 
-						if ($this->response->isSent() !== true) {
-							$this->response->setJsonContent($this->view->getParamsToView());
-
-							return $this->response->send();
-						}
+						return $this->response->send();
 					}
 				}
 			} else if (isset($this->postData['dev']) && $this->postData['dev'] == 'true') {
@@ -280,36 +271,35 @@ Class Setup
 					return;
 				}
 
-				$checkDb = true;
-				$checkUser = true;
+				$createNewDb = true;
+				$createNewUser = true;
 
 				if (!isset($this->postData['create-db']) ||
 					(isset($this->postData['create-db']) && $this->postData['create-db'] == 'false')
 				) {
 					$this->progress->unregisterMethods(['createNewDb']);
-					$checkDb = false;
+					$createNewDb = false;
 				}
 
 				if (!isset($this->postData['create-user']) ||
 					(isset($this->postData['create-user']) && $this->postData['create-user'] == 'false')
 				) {
-					$this->progress->unregisterMethods(['checkUser']);
-					$checkUser = false;
+					$this->progress->unregisterMethods(['createNewUser']);
+					$createNewUser = false;
 				}
 
-				if ($checkDb || $checkUser) {
+				if ($createNewDb || $createNewUser) {
 					if (isset($this->postData['create-username']) &&
 						isset($this->postData['create-password'])
 					) {
 						$this->progress->preCheckComplete();
 
 						try {
-							if ($checkDb) {
+							if ($createNewDb) {
 								$this->setupPackage->createNewDb();
 							}
-
-							if ($checkUser) {
-								$this->setupPackage->checkUser();
+							if ($createNewUser) {
+								$this->setupPackage->createNewUser();
 							}
 
 							unset($this->postData['create-username']);
@@ -529,7 +519,7 @@ Class Setup
 					'text'		=> 'Creating new database...'
 				],
 				[
-					'method'	=> 'checkUser',
+					'method'	=> 'createNewUser',
 					'text'		=> 'Checking database user...'
 				],
 				[

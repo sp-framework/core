@@ -1195,7 +1195,7 @@ class Setup
 		return true;
 	}
 
-	protected function checkUser($dontCreate = false)
+	protected function createNewUser()
 	{
 		$checkUser = $this->executeSQL("SELECT * FROM `user` WHERE `User` LIKE ?", [$this->postData['username']]);
 
@@ -1204,8 +1204,10 @@ class Setup
 				throw new \Exception('User ' . $this->postData['username'] . ' does not exist. Please enable create new user/database.');
 			}
 
-			if ($dontCreate) {//We check if user dont exists for password strength
-				return false;
+			$passStrength = $this->checkPwStrength($this->postData['password']);
+
+			if ($passStrength !== false && $passStrength <= 2) {
+				throw new \Exception('DB Password strength is weak!');
 			}
 
 			$this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH mysql_native_password BY ?;", [$this->postData['username'], $this->postData['password']]);
@@ -1238,5 +1240,18 @@ class Setup
 		}
 
 		return true;
+	}
+
+	protected function checkPwStrength(string $pass)
+	{
+		$checkingTool = new \ZxcvbnPhp\Zxcvbn();
+
+		$result = $checkingTool->passwordStrength($pass);
+
+		if ($result && is_array($result) && isset($result['score'])) {
+			return $result['score'];
+		}
+
+		return false;
 	}
 }
