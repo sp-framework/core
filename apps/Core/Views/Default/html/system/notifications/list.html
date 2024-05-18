@@ -1,0 +1,381 @@
+{% if auth.account()['profile']['settings']['notifications']['mute'] is defined %}
+    {% if auth.account()['profile']['settings']['notifications']['mute'] == true %}
+        {% set muteEnabled = true %}
+        {% set unmuteEnabled = false %}
+    {% elseif auth.account()['profile']['settings']['notifications']['mute'] == false %}
+        {% set muteEnabled = false %}
+        {% set unmuteEnabled = true %}
+    {% else %}
+        {% set muteEnabled = false %}
+        {% set unmuteEnabled = true %}
+    {% endif %}
+{% else %}
+    {% set muteEnabled = false %}
+    {% set unmuteEnabled = true %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                 : table['component'],
+        'componentName'             : componentName,
+        'componentId'               : componentId,
+        'parentComponentId'         : parent,
+        'sectionId'                 : 'listing',
+        'contentType'               : 'sectionWithListing',
+        'cardHeader'                : true,
+        'cardType'                  : 'primary',
+        'cardIcon'                  : 'bell',
+        'cardTitle'                 : componentName,
+        'cardAdditionalClass'       : 'rounded-0',
+        'cardShowTools'             : ['maximize'],
+        'dtFilter'                  : true,
+        'dtFilterShowQuickFilter'   : true,
+        'dtFilterButtons'           : ['edit', 'delete', 'add', 'clone', 'reset'],
+        'dtFilters'                 : table['filters'],
+        'dtFilterColumns'           : table['filterColumns'],
+        'dtFixedHeader'             : true,
+        'dtTable'                   : table,
+        'dtColumns'                 : table['columns'],
+        'dtPostUrl'                 : table['postUrl'],
+        'dtPostUrlParams'           : table['postUrlParams'],
+        'dtOrder'                   : [[0, 'desc']],
+        'dtStriped'                 : true,
+        'dtStateSave'               : false,
+        'dtSelect'                  : true,
+        'dtSelectStyle'             : 'multiple',
+        'dtSelectAll'               : true,
+        'dtBordered'                : false,
+        'dtHideIdColumn'            : true,
+        'dtNoOfColumnsToShow'       : 8,
+        'dtTableCompact'            : true,
+        'dtPrimaryButtons'          :
+            {
+                'componentId'                       : componentId,
+                'sectionId'                         : 'listing',
+                'buttonType'                        : 'DropdownSplitButtons',
+                'dropdownButtonId'                  : 'mark',
+                'dropdownButtonTitle'               : 'Mark selected',
+                'dropdownButtonIcon'                : 'cog fa-spin',
+                'dropdownButtonIconHidden'          : true,
+                'dropdownButtonAdditionalClass'     : 'text-uppercase',
+                'dropdownButtonDisabled'            : true,
+                'buttonPosition'                    : 'right',
+                'dropdownAlign'                     : 'right',
+                'buttons'                           :
+                    {
+                        'mark-read' : {
+                            'title'                 : 'Read',
+                            'icon'                  : 'eye',
+                            'additionalClass'       : 'text-info'
+                        },
+                        'mark-archive' : {
+                            'title'                 : 'Archive',
+                            'icon'                  : 'save',
+                            'additionalClass'       : 'text-primary'
+                        },
+                        'mark-remove' : {
+                            'title'                 : 'Remove',
+                            'icon'                  : 'trash',
+                            'additionalClass'       : 'text-danger'
+                        }
+                    }
+            },
+        'dtSecondaryButtons'      :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'subscriptions' : {
+                            'title'                   : 'Subscriptions',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/users/profile')
+                        },
+                        'mute' : {
+                            'title'                   : 'mute',
+                            'size'                    : 'sm',
+                            'type'                    : 'warning',
+                            'icon'                    : 'bell-slash',
+                            'position'                : 'right',
+                            'hidden'                  : muteEnabled,
+                            'url'                     : links.url('system/notifications/changestate')
+                        },
+                        'unmute' : {
+                            'title'                   : 'unmute',
+                            'size'                    : 'sm',
+                            'type'                    : 'success',
+                            'icon'                    : 'bell',
+                            'position'                : 'right',
+                            'hidden'                  : unmuteEnabled,
+                            'url'                     : links.url('system/notifications/changestate')
+                        }
+                    }
+            },
+        'dtZeroRecords'         : 'No new notifications.'
+    ]
+)}}
+<script>
+/* globals Swal PNotify BazCore BazNotifications */
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
+    initFuncs();
+    mark();
+    BazCore.bazContent();
+}
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterRedraw"] = function() {
+    initFuncs();
+    mark();
+    BazCore.bazContent();
+}
+
+function mark() {
+    $('#{{componentId}}-listing-mark').attr('disabled', true);
+
+    var selected, count, ids, url, task, selectedFilter;
+
+    $('#{{componentId}}-listing-mark-read, #{{componentId}}-listing-mark-archive, #{{componentId}}-listing-mark-remove').off();
+    $('#{{componentId}}-listing-mark-read, #{{componentId}}-listing-mark-archive, #{{componentId}}-listing-mark-remove').click(function(e) {
+        e.preventDefault();
+
+        $('#{{componentId}}-listing-mark').attr('disabled', true);
+        $('#{{componentId}}-listing-mark').children('i').attr('hidden', false);
+
+        if ($(this)[0].id === '{{componentId}}-listing-mark-read') {
+            url = '{{links.url("system/notifications/markRead")}}'
+            task = 'read';
+        } else if ($(this)[0].id === '{{componentId}}-listing-mark-archive') {
+            url = '{{links.url("system/notifications/markArchive")}}'
+            task = 'archive';
+        } else if ($(this)[0].id === '{{componentId}}-listing-mark-remove') {
+            url = '{{links.url("system/notifications/remove")}}'
+            task = 'remove';
+        }
+
+        var dataToSend = { };
+        dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+        dataToSend['bulk'] = true;
+        dataToSend['ids'] = ids;
+        dataToSend['task'] = task;
+
+        if (task === 'remove') {
+            Swal.fire({
+                title                       : '<span class="text-danger"> Delete selected notifications?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Delete',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-danger text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : false,
+                allowEscapeKey              : false,
+                didOpen                      : function() {
+                    window.dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    runAjax(url, dataToSend);
+                }
+            });
+        } else {
+            runAjax(url, dataToSend);
+        }
+    });
+
+    function runAjax(url, dataToSend) {
+        $.ajax({
+            url         : url,
+            method      : 'post',
+            dataType    : 'json',
+            data        : dataToSend,
+            success     : function(response) {
+                if (response.responseCode === 0) {
+                    window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                    BazNotifications.getNotificationsCount();
+                } else {
+                    PNotify.error({
+                        title           : response.responseMessage,
+                    });
+                    $('#{{componentId}}-listing-mark').attr('disabled', false);
+                }
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
+                }
+                $('#{{componentId}}-listing-mark').children('i').attr('hidden', true);
+            }
+        });
+    }
+
+    window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["datatable"].on('select deselect', function(e, dt, type, indexes) {
+        if (type === 'row') {
+            selected = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["datatable"].rows({selected:true});
+            count = selected.count();
+            ids = selected.data().pluck('id').toArray();
+
+            if (count === 0) {
+                $('#{{componentId}}-listing-mark').attr('disabled', true);
+            } else {
+                $('#{{componentId}}-listing-mark').attr('disabled', false);
+                selectedFilter = $('#{{componentId}}-listing-filter-filters option:selected').data('name');
+
+                if (selectedFilter === "Show All Unread Notifications") {
+                    $('#{{componentId}}-listing-mark-read, #{{componentId}}-listing-mark-archive, #{{componentId}}-listing-mark-remove').removeClass('disabled text-muted');
+                } else if (selectedFilter === "Show All Read Notifications") {
+                    $('#{{componentId}}-listing-mark-read').addClass('disabled text-muted');
+                    $('#{{componentId}}-listing-mark-archive, #{{componentId}}-listing-mark-remove').removeClass('disabled text-muted');
+                } else if (selectedFilter === "Show All Archived Notifications") {
+                    $('#{{componentId}}-listing-mark-read, #{{componentId}}-listing-mark-archive').addClass('disabled text-muted');
+                    $('#{{componentId}}-listing-mark-remove').removeClass('disabled text-muted');
+                } else {
+                    $('#{{componentId}}-listing-mark-read, #{{componentId}}-listing-mark-archive, #{{componentId}}-listing-mark-remove').removeClass('disabled text-muted');
+                }
+            }
+        }
+    });
+}
+
+function initFuncs() {
+    $('.rowMarkRead').each(function(index,row) {
+        $(row).off();
+        $(row).click(function(e) {
+            e.preventDefault();
+
+            var thisButton = this;
+            var url = $(this).attr('href');
+
+            var dataToSend = { };
+            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+
+            $.ajax({
+                url         : url,
+                method      : 'post',
+                dataType    : 'json',
+                data        : dataToSend,
+                success     : function(response) {
+                    if (response.responseCode === 0) {
+                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                        BazNotifications.getNotificationsCount();
+                    } else {
+                        PNotify.error({
+                            title           : response.responseMessage,
+                        });
+                    }
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                }
+            });
+        });
+    });
+
+    $('.rowArchive').each(function(index,row) {
+        $(row).off();
+        $(row).click(function(e) {
+            e.preventDefault();
+
+            var thisButton = this;
+            var url = $(this).attr('href');
+
+            var dataToSend = { };
+            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+
+            $.ajax({
+                url         : url,
+                method      : 'post',
+                dataType    : 'json',
+                data        : dataToSend,
+                success     : function(response) {
+                    if (response.responseCode === 0) {
+                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                        BazNotifications.getNotificationsCount();
+                    } else {
+                        PNotify.error({
+                            title           : response.responseMessage,
+                        });
+                    }
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                }
+            });
+        });
+    });
+
+    $('.rowAccess').each(function(index,row) {
+        $(this).addClass('contentAjaxLink');
+    });
+
+    window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['afterRowRemove'] =
+        function() {
+            BazNotifications.getNotificationsCount();
+        }
+}
+
+$('#{{componentId}}-listing-mute').click(function(e) {
+    e.preventDefault();
+
+    var thisButton = this;
+    var url = $(this).attr('href');
+
+    var dataToSend = { };
+    dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+    dataToSend['changestate'] = 1;
+
+    $.post(url, dataToSend, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            $(thisButton).attr('hidden', true);
+            $('#{{componentId}}-listing-unmute').attr('hidden', false);
+            $('#notifications-button').children('i').removeClass('fa-bell').addClass('fa-bell-slash');
+        } else {
+            PNotify.error({
+                title           : response.responseMessage,
+            });
+        }
+    }, 'json');
+});
+
+$('#{{componentId}}-listing-unmute').click(function(e) {
+    e.preventDefault();
+
+    var thisButton = this;
+    var url = $(this).attr('href');
+
+    var dataToSend = { };
+    dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+    dataToSend['changestate'] = 0;
+
+    $.post(url, dataToSend, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            $(thisButton).attr('hidden', true);
+            $('#{{componentId}}-listing-mute').attr('hidden', false);
+            $('#notifications-button').children('i').removeClass('fa-bell-slash').addClass('fa-bell');
+            BazNotifications.getNotificationsCount();
+        } else {
+            PNotify.error({
+                title           : response.responseMessage,
+            });
+        }
+    }, 'json');
+});
+</script>

@@ -2,11 +2,10 @@
 
 namespace System\Base\Providers\LoggerServiceProvider\Email;
 
-use Phalcon\Helper\Json;
 use Phalcon\Logger\Adapter\AbstractAdapter;
 use Phalcon\Logger\Item;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailException;
 use System\Base\Providers\EmailServiceProvider\Email;
-use System\Base\Providers\EmailServiceProvider\EmailException;
 
 class Adapter extends AbstractAdapter
 {
@@ -14,23 +13,27 @@ class Adapter extends AbstractAdapter
 
     protected $logsConfig;
 
+    protected $helper;
+
     protected $messages = [];
 
-    public function __construct($email, $logsConfig)
+    public function __construct($email, $logsConfig, $helper)
     {
         $this->email = $email;
 
         $this->logsConfig = $logsConfig;
+
+        $this->helper = $helper;
     }
 
     public function process(Item $item): void
     {
-        if ($item->getType() === 0) {
-            $this->messages['emergency'] = Json::decode($this->formatter->format($item), true);
-        } else if ($item->getType() === 1) {
-            $this->messages['critical'] = Json::decode($this->formatter->format($item), true);
-        } else if ($item->getType() === 2) {
-            $this->messages['alert'] = Json::decode($this->formatter->format($item), true);
+        if ($item->getLevel() === 0) {
+            $this->messages['emergency'] = $this->helper->decode($this->formatter->format($item), true);
+        } else if ($item->getLevel() === 1) {
+            $this->messages['critical'] = $this->helper->decode($this->formatter->format($item), true);
+        } else if ($item->getLevel() === 2) {
+            $this->messages['alert'] = $this->helper->decode($this->formatter->format($item), true);
         }
     }
 
@@ -41,12 +44,11 @@ class Adapter extends AbstractAdapter
 
     public function sendEmail()
     {
-        if (!$this->logsConfig->enabled) {
+        if (!$this->logsConfig->emergencyLogsEmail) {
             throw new EmailException('Email not enabled');
         }
 
-        if ($this->logsConfig->emergencyEmails !== '') {
-
+        if ($this->logsConfig->emergencyLogsEmailAddresses !== '') {
             if ($this->email->setup()) {
                 $emailSettings = $this->email->getEmailSettings();
 
@@ -55,11 +57,11 @@ class Adapter extends AbstractAdapter
                     $emailSettings['username']
                 );
 
-                foreach (explode(',', $this->logsConfig->emergencyEmails) as $key => $emailAddress) {
+                foreach (explode(',', $this->logsConfig->emergencyLogsEmailAddresses) as $key => $emailAddress) {
                     $this->email->setRecipientTo(trim($emailAddress), trim($emailAddress));
                 }
 
-                $this->email->setSubject('System generated errors. Need attention!');
+                $this->email->setSubject('System generated an critical error. Need immediate attention!');
 
                 $this->email->setBody($this->buildMessageBody());
 
@@ -68,10 +70,12 @@ class Adapter extends AbstractAdapter
                 if ($sendNewEmail !== true) {
                     throw new EmailException($sendNewEmail);
                 }
+
+                $this->messages['emailSent'] = true;
             }
-        } else {
-            throw new EmailException('Email enabled but, missing emergency emails recipients.');
         }
+
+        return $this->messages;
     }
 
     protected function buildMessageBody()

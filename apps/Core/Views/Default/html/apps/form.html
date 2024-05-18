@@ -1,0 +1,198 @@
+<div class="row vdivide">
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'form-fields',
+                'fieldLabel'                                : 'Form Fields',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Form Fields',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : [],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeToggleAllChildren'              : false,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : false,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false
+            ]
+        )}}
+    </div>
+    {% set ipFilterTabHidden = true %}
+    {% set authTabHidden = true %}
+    {% for middleware in middlewares %}
+        {% if middleware['name'] == 'IpFilter' and middleware['enabled'] == true %}
+            {% set ipFilterTabHidden = false %}
+        {% endif %}
+        {% if middleware['name'] == 'Auth' and middleware['enabled'] == true %}
+            {% set authTabHidden = false %}
+        {% endif %}
+    {% endfor %}
+    <div class="col">
+        <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                        [
+                            'info'   :
+                            [
+                                'tabTitle'          : 'Info',
+                                'tabInclude'        : 'apps/wizard/register/form'
+                            ],
+                            'modules'   :
+                            [
+                                'tabTitle'          : 'Modules',
+                                'tabInclude'        : 'apps/wizard/modules/form'
+                            ],
+                            'security'   :
+                            [
+                                'tabTitle'          : 'Security',
+                                'tabInclude'        : 'apps/wizard/security/form',
+                                'tabHidden'         : authTabHidden
+                            ],
+                            'filters'   :
+                            [
+                                'tabTitle'          : 'IP Filters',
+                                'tabInclude'        : 'apps/wizard/filters/form',
+                                'tabHidden'         : ipFilterTabHidden
+                            ]
+                        ]
+                    ]
+                )}}
+            </fieldset>
+        </form>
+    </div>
+</div>
+<script>
+/* globals Sortable PNotify Swal */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                              : { },
+        '{{componentId}}-{{sectionId}}-name'                            : { },
+        '{{componentId}}-{{sectionId}}-app_type'                        : {
+            'placeholder'   : 'SELECT APP TYPE'
+        },
+        '{{componentId}}-{{sectionId}}-route'                           : { },
+        '{{componentId}}-{{sectionId}}-description'                     : { },
+        '{{componentId}}-{{sectionId}}-registration_allowed'            : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-registration_allowed').click(function() {
+                    if ($(this)[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}}-approve_accounts_manually').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-approve_accounts_manually').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-approve_accounts_manually')[0].checked = false;
+                        $('#{{componentId}}-{{sectionId}}-registration_role_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-registration_role_id').val(null).trigger('change');
+                    }
+                });
+
+                $("#{{componentId}}-{{sectionId}}-middleware-Auth").click(function() {
+                    if ($(this).is(':checked') === true) {
+                        $("a.nav-link:contains('Permissions')").parent('li').attr('hidden', false);
+                        $("#{{componentId}}-{{sectionId}}-tabs-permissions").attr('hidden', false);
+                    } else {
+                        $("a.nav-link:contains('Permissions')").parent('li').attr('hidden', true);
+                        $("#{{componentId}}-{{sectionId}}-tabs-permissions").attr('hidden', true);
+                        $("#{{componentId}}-{{sectionId}}-middleware-Auth").prop('checked', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-approve_accounts_manually'       : { },
+        '{{componentId}}-{{sectionId}}-registration_role_id'            : {
+            'placeholder'   : 'SELECT REGISTRATION ROLE'
+        },
+        '{{componentId}}-{{sectionId}}-guest_role_id'                   : {
+            'placeholder'   : 'SELECT GUEST ROLE'
+        },
+        '{{componentId}}-{{sectionId}}-can_login_role_ids'              : {
+            'placeholder'   : 'SELECT ROLES'
+        },
+        '{{componentId}}-{{sectionId}}-enforce_2fa'                     : { },
+        '{{componentId}}-{{sectionId}}-form'                            : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider, :hidden',
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                        : 'required',
+                '{{componentId}}-{{sectionId}}-route'                       : 'required',
+                '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
+                '{{componentId}}-{{sectionId}}-registration_role_id'        : 'required',
+                '{{componentId}}-{{sectionId}}-guest_role_id'               : 'required',
+                '{{componentId}}-{{sectionId}}-default_component'           : 'required',
+                '{{componentId}}-{{sectionId}}-errors_component'            : 'required',
+                '{{componentId}}-{{sectionId}}-default_dashboard'           : 'required',
+                '{{componentId}}-{{sectionId}}-api_grant_type'              : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter app name',
+                '{{componentId}}-{{sectionId}}-route'                   : 'Please enter app route',
+                '{{componentId}}-{{sectionId}}-app_type'                : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-registration_role_id'    : 'Please select registration role',
+                '{{componentId}}-{{sectionId}}-guest_role_id'           : 'Please select guest role',
+                '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
+                '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',
+                '{{componentId}}-{{sectionId}}-default_dashboard'       : 'Please select default dashboard',
+                '{{componentId}}-{{sectionId}}-api_grant_type'          : 'Please select Api Grant type'
+            },
+            onSubmit: function() {
+                if (dataCollectionSection['dataToSubmit']['api_access'] === 'apion') {
+                    dataCollectionSection['dataToSubmit']['api_access'] = 1;
+                } else {
+                    dataCollectionSection['dataToSubmit']['api_access'] = 0;
+                }
+
+                return true;
+            }
+        }
+    });
+</script>

@@ -1,0 +1,403 @@
+{% if storage['id'] is defined %}
+    {% set storageId = storage['id'] %}
+    {% set storageName = storage['name'] %}
+    {% set storageDescription = storage['description'] %}
+    {% set storagePermission = storage['permission'] %}
+    {% set storageAllowedImageMimeTypes = storage['allowed_image_mime_types'] %}
+    {% set storageAllowedImageSizes = storage['allowed_image_sizes'] %}
+    {% set storageImagesPath = storage['images_path'] %}
+    {% set storageCachePath = storage['cache_path'] %}
+    {% set storageMaxImageSize = storage['max_image_size'] %}
+    {% set storageDefaultImageQuality = storage['default_image_quality'] %}
+    {% set storageMaxImageFileSize = storage['max_image_file_size'] %}
+    {% set storageAllowedFileMimeTypes = storage['allowed_file_mime_types'] %}
+    {% set storageDataPath = storage['data_path'] %}
+    {% set storageMaxDataFileSize = storage['max_data_file_size'] %}
+{% else %}
+    {% set storageId = '' %}
+    {% set storageName = '' %}
+    {% set storageDescription = '' %}
+    {% set storagePermission = 'public' %}
+    {% set storageAllowedImageMimeTypes = [] %}
+    {% set storageAllowedImageSizes = [] %}
+    {% set storageImagesPath = 'images' %}
+    {% set storageCachePath = 'cache' %}
+    {% set storageMaxImageSize = '2000' %}
+    {% set storageDefaultImageQuality = '100' %}
+    {% set storageMaxImageFileSize = '10485760' %}
+    {% set storageAllowedFileMimeTypes = [] %}
+    {% set storageDataPath = 'data' %}
+    {% set storageMaxDataFileSize = '10485760' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        {% include 'storages/types/common.html' %}
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'permission',
+                        'fieldLabel'                     : 'Storage Permission',
+                        'fieldType'                      : 'radio',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select storage permissions. Files stored in public space are accessible via the internet without any authentication (if configured). Private space provides app level and user level security. Example: Product images can be kept on a public space and internal document can be kept on a private space.',
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioButtons'              :
+                            [
+                                'public' :
+                                    [
+                                        'title'                           : 'Public',
+                                        'type'                            : 'warning',
+                                        'dataValue'                       : 'public'
+                                    ],
+                                'private' :
+                                    [
+                                        'title'                           : 'Private',
+                                        'type'                            : 'success',
+                                        'dataValue'                       : 'private'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : storagePermission
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'allowed_image_mime_types',
+                        'fieldLabel'                            : 'Allowed Image Types',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Allowed Image Types',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Multiple'              : true,
+                        'fieldDataSelect2Options'               : allowedImageMimeTypes,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : storageAllowedImageMimeTypes
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'allowed_image_sizes',
+                        'fieldLabel'                            : 'Allowed Image Sizes (Width)',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Allowed Image Sizes (Width)',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Multiple'              : true,
+                        'fieldDataSelect2Options'               : allowedImageSizes,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : storageAllowedImageSizes
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'images_path',
+                        'fieldLabel'                     : 'Images Path',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Images path. Change only if required',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : storageImagesPath
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'cache_path',
+                        'fieldLabel'                     : 'Cache Path',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Cache Path. Change only if required',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : storageCachePath
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'max_image_size',
+                        'fieldLabel'                     : 'Max Image Size',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Max Image size, does not exceed 2000px in width.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldInputTypeTextFilter'       : 'positiveIntMax',
+                        'fieldDataInputMinNumber'        : 1,
+                        'fieldDataInputMaxNumber'        : 2000,
+                        'fieldValue'                     : storageMaxImageSize
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'default_image_quality',
+                        'fieldLabel'                     : 'Default Image Quality',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Default Image Quality. Images are converted to this quality on upload',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldInputTypeTextFilter'       : 'positiveIntMax',
+                        'fieldDataInputMinNumber'        : 1,
+                        'fieldDataInputMaxNumber'        : 100,
+                        'fieldValue'                     : storageDefaultImageQuality
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'max_image_file_size',
+                        'fieldLabel'                     : 'Max Image File Size (Bytes)',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Max Data File Size in bytes. 1 MegaByte = 1048576 Bytes. Note: Maxbytes information is received from php.ini file or from .user.ini file in the public folder. Current setting is ' ~ settingSize,
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldInputTypeTextFilter'       : 'positiveIntMax',
+                        'fieldDataInputMinNumber'        : 1,
+                        'fieldDataInputMaxNumber'        : maxBytes,
+                        'fieldValue'                     : storageMaxImageFileSize
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'allowed_file_mime_types',
+                        'fieldLabel'                            : 'Allowed File Types',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Allowed File Types',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Multiple'              : true,
+                        'fieldDataSelect2Options'               : allowedFileMimeTypes,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : storageAllowedFileMimeTypes
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'data_path',
+                        'fieldLabel'                     : 'Data Path',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Data Path. Change only if required',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : storageDataPath
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'max_data_file_size',
+                        'fieldLabel'                     : 'Max Data File Size (Bytes)',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Max Data File Size in bytes. 1 MegaByte = 1048576 Bytes. Note: Maxbytes information is received from php.ini file or from .user.ini file in the public folder. Current setting is ' ~ settingSize,
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldInputTypeTextFilter'       : 'positiveIntMax',
+                        'fieldDataInputMinNumber'        : 1,
+                        'fieldDataInputMaxNumber'        : maxBytes,
+                        'fieldValue'                     : storageMaxDataFileSize
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-type'                                    : { },
+        '{{componentId}}-{{sectionId}}-description'                             : { },
+        '{{componentId}}-{{sectionId}}-permission'                              : { },
+        '{{componentId}}-{{sectionId}}-allowed_image_mime_types'                : {
+            'placeholder'   : 'SELECT ALLOWED IMAGE TYPES'
+        },
+        '{{componentId}}-{{sectionId}}-allowed_image_sizes'                     : {
+            'placeholder'   : 'SELECT ALLOWED IMAGE SIZES'
+        },
+        '{{componentId}}-{{sectionId}}-images_path'                             : { },
+        '{{componentId}}-{{sectionId}}-cache_path'                              : { },
+        '{{componentId}}-{{sectionId}}-max_image_size'                          : { },
+        '{{componentId}}-{{sectionId}}-default_image_quality'                   : { },
+        '{{componentId}}-{{sectionId}}-max_image_file_size'                     : { },
+        '{{componentId}}-{{sectionId}}-allowed_file_mime_types'                 : {
+            'placeholder'   : 'SELECT ALLOWED FILE TYPES'
+        },
+        '{{componentId}}-{{sectionId}}-data_path'                               : { },
+        '{{componentId}}-{{sectionId}}-max_data_file_size'                      : { },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                        : 'required',
+                '{{componentId}}-{{sectionId}}-type'                        : 'required',
+                '{{componentId}}-{{sectionId}}-domain_id'                   : 'required',
+                '{{componentId}}-{{sectionId}}-app_id'                      : 'required',
+                '{{componentId}}-{{sectionId}}-allowed_image_mime_types'    : 'required',
+                '{{componentId}}-{{sectionId}}-allowed_image_sizes'         : 'required',
+                '{{componentId}}-{{sectionId}}-images_path'                 : 'required',
+                '{{componentId}}-{{sectionId}}-cache_path'                  : 'required',
+                '{{componentId}}-{{sectionId}}-max_image_size'              : 'required',
+                '{{componentId}}-{{sectionId}}-default_image_quality'       : 'required',
+                '{{componentId}}-{{sectionId}}-max_image_file_size'         : 'required',
+                '{{componentId}}-{{sectionId}}-allowed_file_mime_types'     : 'required',
+                '{{componentId}}-{{sectionId}}-data_path'                   : 'required',
+                '{{componentId}}-{{sectionId}}-max_data_file_size'          : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                        : 'Please enter storage name',
+                '{{componentId}}-{{sectionId}}-type'                        : 'Please enter storage type',
+                '{{componentId}}-{{sectionId}}-domain_id'                   : 'Please select a domain',
+                '{{componentId}}-{{sectionId}}-app_id'                      : 'Please select an app',
+                '{{componentId}}-{{sectionId}}-allowed_image_mime_types'    : 'Please select image types',
+                '{{componentId}}-{{sectionId}}-allowed_image_sizes'         : 'Please select image sizes',
+                '{{componentId}}-{{sectionId}}-images_path'                 : 'Please enter images path',
+                '{{componentId}}-{{sectionId}}-cache_path'                  : 'Please enter images cache path',
+                '{{componentId}}-{{sectionId}}-max_image_size'              : 'Please enter max image size',
+                '{{componentId}}-{{sectionId}}-default_image_quality'       : 'Please enter default image quality',
+                '{{componentId}}-{{sectionId}}-max_image_file_size'         : 'Please enter max image file size',
+                '{{componentId}}-{{sectionId}}-allowed_file_mime_types'     : 'Please select file types',
+                '{{componentId}}-{{sectionId}}-data_path'                   : 'Please enter file path',
+                '{{componentId}}-{{sectionId}}-max_data_file_size'          : 'Please enter max file size'
+            }
+        }
+    });
+</script>

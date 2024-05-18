@@ -1,0 +1,3346 @@
+{% if newrelease is defined and newrelease === true %}
+    <div id="release-module-details">
+        <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {% include 'modules/module/release.html' %}
+            </fieldset>
+        </form>
+    </div>
+    <div id="release-details" hidden>
+        {% include 'modules/releasedetails.html' %}
+    </div>
+    {% set moduleId = module['id'] %}
+    <script>
+/* globals PNotify BazContentLoader Pace BazCore */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['moduleId'] = '{{moduleId}}';
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-module_type'                             : { },
+        '{{componentId}}-{{sectionId}}-api_id'                                  : { },
+        '{{componentId}}-{{sectionId}}-version'                                 : { },
+        '{{componentId}}-{{sectionId}}-repo'                                    : { },
+        '{{componentId}}-{{sectionId}}-release-notes'                           : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-import-issues').off();
+                $('#{{componentId}}-{{sectionId}}-import-issues').click(function(e) {
+                    $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-list-check').addClass('fa-spin fa-cog');
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                    postData['milestone'] = $('#{{componentId}}-{{sectionId}}-milestone').val();
+                    if (postData['milestone'] === '' || postData['milestone'] === '0') {
+                        PNotify.error({'text': 'Select milestone to import issues.'});
+
+                        return;
+                    }
+                    if ($('#{{componentId}}-{{sectionId}}-label').val()) {
+                        postData['label'] = $('#{{componentId}}-{{sectionId}}-label').select2('data')[0].text;
+                    }
+
+                    $.post('{{links.url("devtools/modules/getMilestoneLabelIssues")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.issues) {
+                                var html = $('#{{componentId}}-{{sectionId}}-release-notes').trumbowyg('html');
+
+                                html += '<h6>RESOLVED ISSUES (' + $('#{{componentId}}-{{sectionId}}-milestone').text() + ')';
+
+                                if ($('#{{componentId}}-{{sectionId}}-label').val()) {
+                                    html += ' (' + $('#{{componentId}}-{{sectionId}}-label').select2('data')[0].text + ')';
+                                }
+
+                                html += ':</h6>';
+
+                                $(response.responseData.issues).each(function(i, issues) {
+                                    html += '<span>#' + issues['number'] + ' : ' + issues['title'] + '</span><br>';
+                                })
+
+                                $('#{{componentId}}-{{sectionId}}-release-notes').trumbowyg('html', html);
+                            }
+                            PNotify.success({'text': 'Got ' + response.responseData.issues.length + ' issues.'});
+                        } else {
+                            PNotify.error({'text': response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-spin fa-cog').addClass('fa-list-check');
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-release-type'                            : {
+            placeholder: 'SELECT NEW RELEASE TYPE',
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-release-type').on('select2:select', function(e) {
+                    var bump = e.params.data.id;
+
+                    if (bump === 'custom') {
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-custom-version').attr('disabled', false);
+                            $('#semver').attr('hidden', true);
+                            $('#custom').attr('hidden', false);
+                            $('#{{componentId}}-{{sectionId}}-get-next-release').attr('disabled', true);
+                    } else {
+                        $('#semver').attr('hidden', false);
+                        $('#custom').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-custom-version').val('');
+
+                        if (bump === 'buildMeta') {
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
+                        } else if (bump === 'preRelease') {
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
+                        } else if (bump === 'preReleaseBuildMeta') {
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-get-next-release').attr('disabled', false);
+                    }
+                    $('#release-version-text').html('');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-get-next-release').off();
+                $('#{{componentId}}-{{sectionId}}-get-next-release').click(function(e) {
+                    e.preventDefault();
+                    var bump = $('#{{componentId}}-{{sectionId}}-release-type').val();
+
+                    if (bump === 'custom') {
+                        return;
+                    }
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                    postData['force-mark-prerelease'] = $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked;
+                    postData['bump'] = bump;
+
+                    if (bump === 'preRelease') {
+                        postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
+                        if (postData['preReleasePrefix'] === '') {
+                            PNotify.error({'text': 'Provide pre-release prefix.'});
+                            return;
+                        }
+                    } else if (bump === 'buildMeta') {
+                        postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
+                        if (postData['buildMetaPrefix'] === '') {
+                            PNotify.error({'text': 'Provide build meta prefix.'});
+                            return;
+                        }
+                    } else if (bump === 'preReleaseBuildMeta') {
+                        postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
+                        postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
+                        if (postData['preReleasePrefix'] === '') {
+                            PNotify.error({'text': 'Provide pre-release prefix.'});
+                            return;
+                        }
+                        if (postData['buildMetaPrefix'] === '') {
+                            PNotify.error({'text': 'Provide build meta prefix.'});
+                            return;
+                        }
+                    }
+                    $('#release-version-text').html(
+                        '<div class="row">' +
+                        '    <div class="col text-lg">' +
+                        '        <i class="fa fa-cog fa-spin"></i> Loading...' +
+                        '    </div>' +
+                        '</div>'
+                    );
+
+
+                    $.post('{{links.url("devtools/modules/bumpVersion")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        var color = 'primary';
+                        var newVersionColor = 'primary';
+
+                        if (response.responseCode == 0 ||
+                            response.responseCode == -1 ||
+                            response.responseCode == 2 ||
+                            response.responseCode == 3
+                        ) {
+                            if (response.responseCode == -1) {
+                                PNotify.notice({'text': 'Local version is lower than remote version!'});
+                                color = 'warning';
+                            } else if (response.responseCode == 2) {
+                                PNotify.error({'text': 'Local Version is greater than remote version!'});
+                                color = 'danger';
+                            } else if (response.responseCode == 3) {
+                                PNotify.info({'text': 'Remote release is set as draft!'});
+                                color = 'info';
+                                $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked = true;
+                                $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-success').addClass('bg-info');
+                            }
+
+                            if (color === 'info' || $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === true) {
+                                newVersionColor = 'info';
+                            }
+
+                            if (response.responseData && response.responseData.currentVersion && response.responseData.newVersion) {
+                                $('#release-version-text').html(
+                                    '<span class="text-' + color + '">' + response.responseData.currentVersion + '</span> ' +
+                                    '<i class="text-success fa-solid fa-arrow-right"></i> ' +
+                                    '<span class="text-' + newVersionColor + '" id="next-release-text">' + response.responseData.newVersion + '</span>'
+                                );
+                            }
+                        } else {
+                            if (color === 'info' || $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === true) {
+                                newVersionColor = 'info';
+                            }
+                            if (response.responseData && response.responseData.release) {
+                                $('#release-version-text').html(
+                                    '<span class="text-' + newVersionColor + '">' + response.responseData.release + '</span>'
+                                );
+                            } else {
+                                $('#release-version-text').html(
+                                    '<span class="text-danger">ERROR LOADING RELEASE INFORMATION!</span>'
+                                );
+                            }
+
+                            PNotify.error({'text': response.responseMessage});
+                        }
+
+                        if (response.responseData && response.responseData.versionIsDraft && response.responseData.versionIsDraft == true) {
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-release-type').attr('disabled', true);
+                        }
+                    }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-mark-as-draft').change(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-success').addClass('bg-info');
+                        if ($('#next-release-text').length > 0 &&
+                            $('#next-release-text').hasClass('text-primary')
+                        ) {
+                            $('#next-release-text').removeClass('text-primary').addClass('text-info');
+                        } else if ($('#release-version-text span').hasClass('text-primary')) {
+                            $('#release-version-text span').removeClass('text-primary').addClass('text-info');
+                        }
+                    } else if ($('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked === false) {
+                        $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-info').addClass('bg-success');
+                        if ($('#next-release-text').length > 0 &&
+                            $('#next-release-text').hasClass('text-info')
+                        ) {
+                            $('#next-release-text').removeClass('text-info').addClass('text-primary');
+                        } else if ($('#release-version-text span').hasClass('text-info')) {
+                            $('#release-version-text span').removeClass('text-info').addClass('text-primary');
+                        }
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-release-version'                         : {
+            afterInit : function() {
+                $('#generate').off();
+                $('#generate').click(function(e) {
+                    e.preventDefault();
+
+                    $('#{{componentId}}-{{sectionId}}').BazContentSectionWithForm({'task':'validateForm'});
+
+                    if ($('#{{componentId}}-{{sectionId}}-alert').length === 0) {
+                        $('#generate').attr('disabled', true);
+                        $('#generate').children('i').removeClass('fa-wand-sparkles').addClass('fa-spin fa-cog');
+
+                        var postData = { };
+                        postData['bump'] = $('#{{componentId}}-{{sectionId}}-release-type').val();
+                        if (postData['bump'] === 'preRelease') {
+                            postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
+                            if (postData['preReleasePrefix'] === '') {
+                                PNotify.error({'text': 'Provide pre-release prefix.'});
+                                return;
+                            }
+                        } else if (postData['bump'] === 'buildMeta') {
+                            postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
+                            if (postData['buildMetaPrefix'] === '') {
+                                PNotify.error({'text': 'Provide build meta prefix.'});
+                                return;
+                            }
+                        } else if (postData['bump'] === 'preReleaseBuildMeta') {
+                            postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
+                            postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
+                            if (postData['preReleasePrefix'] === '') {
+                                PNotify.error({'text': 'Provide pre-release prefix.'});
+                                return;
+                            }
+                            if (postData['buildMetaPrefix'] === '') {
+                                PNotify.error({'text': 'Provide build meta prefix.'});
+                                return;
+                            }
+                        }
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                        postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                        postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
+                        postData['branch'] = $('#{{componentId}}-{{sectionId}}-branch').val();
+                        postData['release_notes'] = $('#{{componentId}}-{{sectionId}}-release-notes').trumbowyg('html');
+                        postData['force-mark-prerelease'] = $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked;
+                        postData['mark-as-draft'] = $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked;
+
+                        $.post('{{links.url("devtools/modules/generateRelease")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+
+                            if (response.responseCode == 0) {
+                                PNotify.success({'text': response.responseMessage});
+
+                                if (response.responseData && response.responseData.newRelease && $('#release-details').length > 0) {
+                                    $('#release_url').html(response.responseData.newRelease.html_url);
+                                    $('#release_url_a').attr('href', response.responseData.newRelease.html_url);
+                                    if (response.responseData && response.responseData.newReleasePublic) {
+                                        $('#release_url_public').html(response.responseData.newReleasePublic.html_url);
+                                        $('#release_url_a_public').attr('href', response.responseData.newReleasePublic.html_url);
+                                    }
+                                    $('#release-details').attr('hidden', false);
+                                    $('#release-module-details').attr('hidden', true);
+                                    $('.addData').attr('hidden', true);
+                                    $('.updateData').attr('hidden', true);
+                                    $('.cancelForm').attr('hidden', true);
+                                    $('.closeForm').attr('hidden', false);
+                                }
+
+                                $('#generate').attr('hidden', true);
+                            } else {
+                                PNotify.error({'text': response.responseMessage});
+
+                                $('#generate').attr('disabled', false);
+                            }
+
+                            $('#generate').children('i').removeClass('fa-spin fa-cog').addClass('fa-wand-sparkles');
+                        }, 'json');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-pre-release-prefix'                      : { },
+        '{{componentId}}-{{sectionId}}-build-meta-prefix'                       : { },
+        '{{componentId}}-{{sectionId}}-custom-version'                          : { },
+        '{{componentId}}-{{sectionId}}-branch'                                  : {
+            placeholder : "SELECT BRANCH",
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-sync-branches').off();
+                $('#{{componentId}}-{{sectionId}}-sync-branches').click(function(e) {
+                    e.preventDefault();
+
+                    $('#{{componentId}}-{{sectionId}}-sync-branches').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-sync-branches').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+
+                    $.post('{{links.url("devtools/modules/syncBranches")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.branches) {
+                                $('#{{componentId}}-{{sectionId}}-branch').empty().trigger('change');
+                                for (var branch in response.responseData.branches) {
+                                    var newOption
+                                        = new Option(
+                                            response.responseData.branches[branch]['name'],
+                                            response.responseData.branches[branch]['name'], false, false
+                                        );
+
+                                    $('#{{componentId}}-{{sectionId}}-branch').append(newOption).trigger('change');
+                                }
+                            }
+                            PNotify.success({'text': 'Synced ' + response.responseData.branches.length + ' branches.'});
+                        } else {
+                            PNotify.error({'text': response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-sync-branches').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-sync-branches').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-milestone'                               : {
+            placeholder : "SELECT MILESTONE TO IMPORT ISSUES",
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-sync-milestones').off();
+                $('#{{componentId}}-{{sectionId}}-sync-milestones').click(function(e) {
+                    e.preventDefault();
+
+                    $('#{{componentId}}-{{sectionId}}-sync-milestones').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-sync-milestones').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+
+                    $.post('{{links.url("devtools/modules/syncMilestones")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.milestones) {
+                                $('#{{componentId}}-{{sectionId}}-milestone').empty().trigger('change');
+                                for (var milestone in response.responseData.milestones) {
+                                    var newOption
+                                        = new Option(
+                                            response.responseData.milestones[milestone]['title'],
+                                            response.responseData.milestones[milestone]['number'], false, false
+                                        );
+
+                                    $('#{{componentId}}-{{sectionId}}-milestone').append(newOption).trigger('change');
+                                }
+                            }
+                            PNotify.success({'text': 'Synced ' + response.responseData.milestones.length + ' milestones.'});
+                        } else {
+                            PNotify.error({'text': response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-sync-milestones').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-sync-milestones').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-force-mark-prerelease'                   : { },
+        '{{componentId}}-{{sectionId}}-mark-as-draft'                           : { },
+        '{{componentId}}-{{sectionId}}-label'                                   : {
+            placeholder : "SELECT LABEL TO IMPORT ISSUES",
+            allowClear: true,
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-sync-label').off();
+                $('#{{componentId}}-{{sectionId}}-sync-label').click(function(e) {
+                    e.preventDefault();
+                    $('#{{componentId}}-{{sectionId}}-sync-label').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-sync-label').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+                    $('#{{componentId}}-{{sectionId}}-label').empty().trigger('change');
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+
+                    $.post('{{links.url("devtools/modules/syncLabels")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.labels) {
+                                for (var label in response.responseData.labels) {
+                                    var newOption
+                                        = new Option(
+                                            response.responseData.labels[label]['name'],
+                                            response.responseData.labels[label]['id'], false, false
+                                        );
+
+                                    $('#{{componentId}}-{{sectionId}}-label').append(newOption).trigger('change');
+                                }
+                            }
+                            PNotify.success({'text': 'Synced ' + response.responseData.labels.length + ' label.'});
+                        } else {
+                            PNotify.error({'text': response.responseMessage});
+                        }
+                        $('#{{componentId}}-{{sectionId}}-sync-label').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-sync-label').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-id'                              : 'required',
+                '{{componentId}}-{{sectionId}}-type'                            : 'required',
+                '{{componentId}}-{{sectionId}}-name'                            : 'required',
+                '{{componentId}}-{{sectionId}}-version'                         : 'required',
+                '{{componentId}}-{{sectionId}}-repo'                            : 'required',
+                '{{componentId}}-{{sectionId}}-release-type'                    : 'required',
+                '{{componentId}}-{{sectionId}}-branch'                          : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-id'                              : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-type'                            : 'Please select module type',
+                '{{componentId}}-{{sectionId}}-name'                            : 'Please enter module name',
+                '{{componentId}}-{{sectionId}}-version'                         : 'Please enter version',
+                '{{componentId}}-{{sectionId}}-repo'                            : 'Please enter repo',
+                '{{componentId}}-{{sectionId}}-release-type'                    : 'Please select release type',
+                '{{componentId}}-{{sectionId}}-branch'                          : 'Please select a branch'
+            }
+        }
+    });
+</script>
+{% else %}
+    <div id="module-details">
+        {% if type === 'bundles' %}
+            {% if bundlesjson is defined and bundlesjson === true %}
+                <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+                    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                        {% include 'modules/bundle/json.html' %}
+                    </fieldset>
+                </form>
+                {% set moduleId = bundle['id'] %}
+                <script>
+/* globals PNotify BazContentLoader Pace BazCore */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['bundleModules'] = JSON.parse('{{bundleModules}}');
+dataCollectionSectionForm['vars']['bundleId'] = '{{bundleId}}';
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-api_id'                                  : {
+            'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY'
+        },
+        '{{componentId}}-{{sectionId}}-repo'                                    : { },
+        '{{componentId}}-{{sectionId}}-createrepo'                              : { },
+        '{{componentId}}-{{sectionId}}-commit_message'                          : { },
+        '{{componentId}}-{{sectionId}}-bundle_modules'                          : {
+            'afterInit'     : function() {
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-bundle_modules')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['bundleModules'], null, 4));
+                }
+
+                prettyfyJson();
+
+                $('#commit').off();
+                $('#commit').click(function(e) {
+                    e.preventDefault();
+
+                    $('#{{componentId}}-{{sectionId}}').BazContentSectionWithForm({'task':'validateForm'});
+
+                    if ($('#{{componentId}}-{{sectionId}}-alert').length === 0) {
+                        $('#commit').attr('disabled', true);
+                        $('#commit').children('i').removeClass('fa-code').addClass('fa-spin fa-cog');
+
+                        var postData = { };
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                        postData['createrepo'] = $('#{{componentId}}-{{sectionId}}-createrepo')[0].checked;
+                        postData['commit_message'] = $('#{{componentId}}-{{sectionId}}-commit_message').val();
+
+                        $.post('{{links.url("devtools/modules/commitBundleJson")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+
+                            if (response.responseCode == 0) {
+                                PNotify.success({'text': response.responseMessage});
+
+                                BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-cancelForm'), {
+                                    ajaxBefore                      : function () {
+                                                                        Pace.restart();
+                                                                        $("#baz-content").empty();
+                                                                        $("#loader").attr('hidden', false);
+                                                                    },
+                                    ajaxFinished                    : function () {
+                                                                        BazCore.updateBreadcrumb();
+                                                                        $("#loader").attr('hidden', true);
+                                                                    },
+                                    ajaxError                       : function () {
+                                                                        $("#loader").attr('hidden', true);
+                                                                        BazCore.updateBreadcrumb();
+                                                                    }
+                                });
+                            } else {
+                                PNotify.error({'text': response.responseMessage});
+
+                                $('#commit').attr('disabled', false);
+                            }
+
+                        }, 'json');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-api_id'                          : 'required',
+                '{{componentId}}-{{sectionId}}-repo'                            : 'required',
+                '{{componentId}}-{{sectionId}}-commit_message'                  : 'required',
+                '{{componentId}}-{{sectionId}}-bundle_modules'                  : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-api_id'                          : 'Please select Remote Repo',
+                '{{componentId}}-{{sectionId}}-repo'                            : 'Please enter repo',
+                '{{componentId}}-{{sectionId}}-commit_message'                  : 'Please enter commit message',
+                '{{componentId}}-{{sectionId}}-bundle_modules'                  : 'Please enter bundle modules',
+            }
+        }
+    });
+    //For some reason when you save this file, you have to save module.js as well else sp-linter does not update this file.
+</script>
+            {% else %}
+                {% set tabsData =
+                    [
+                        'info'   :
+                        [
+                            'tabTitle'          : 'Info',
+                            'tabInclude'        : 'modules/bundle/info'
+                        ],
+                        'description'   :
+                        [
+                            'tabTitle'          : 'Description',
+                            'tabInclude'        : 'modules/bundle/description'
+                        ],
+                        'modules'   :
+                            [
+                                'tabTitle'          : 'Modules',
+                                'tabInclude'        : 'modules/bundle/modules'
+                            ]
+                    ]
+                %}
+                <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+                    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                        {{adminltetags.useTag('tabs',
+                            [
+                                'component'                     : component,
+                                'componentName'                 : componentName,
+                                'componentId'                   : componentId,
+                                'sectionId'                     : 'main',
+                                'tabsId'                        : 'tabs',
+                                'tabsStyle'                     : 'card-outline-tabs',
+                                'tabsData'                      : tabsData
+                            ]
+                        )}}
+                    </fieldset>
+                </form>
+                {% if bundle['id'] is defined %}
+                    {% set bundleId = bundle['id'] %}
+                    {% set bundleModules = bundle['bundle_modules'] %}
+                {% else %}
+                    {% set bundleId = '0' %}
+                {% endif %}
+                <script>
+/* globals PNotify BazHelpers */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
+dataCollectionSectionForm['vars']['bundleModules'] = JSON.parse('{{bundleModules}}');
+dataCollectionSectionForm['vars']['bundleId'] = '{{bundleId}}';
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-type'                                    : { },
+        '{{componentId}}-{{sectionId}}-app_type'                                : {
+            'placeholder'   : 'SELECT APP TYPE OR CREATE NEW'
+        },
+        '{{componentId}}-{{sectionId}}-module_type'                             : {
+            'placeholder'   : 'SELECT MODULE TYPE'
+        },
+        '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-description'                             : {
+            afterInit: function() {
+                $("#{{componentId}}-{{sectionId}}-description").closest(".trumbowyg-box").css("min-height", "400px");
+                $("#{{componentId}}-{{sectionId}}-description").prev(".trumbowyg-editor").css("min-height", "400px");
+                $("#{{componentId}}-{{sectionId}}-description").css("min-height", "400px");
+            }
+        },
+        '{{componentId}}-{{sectionId}}-api_id'                                  : {
+            'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
+            afterInit: function() {
+                var repourl = $('#{{componentId}}-{{sectionId}}-repo').val();
+
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function(e) {
+                    var id = e.params.data.id;
+                    repourl = $(e.params.data.element).data('url');
+
+                    if (repourl !== 'https://.../') {
+                        $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-createrepo')[0].checked = false;
+                        $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', true);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-version'                                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-check-version').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['version'] = $('#{{componentId}}-{{sectionId}}-version').val();
+
+                    if (postData['version'] === '') {
+                        PNotify.error('Please enter version.');
+
+                        return;
+                    }
+
+                    $.post('{{links.url("devtools/modules/checkVersion")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-repo'                                    : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-repo-url').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
+                    postData['app_type'] = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                    postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+
+                    if (postData['api_id'] === '') {
+                        PNotify.error('Please select api.');
+                        return;
+                    }
+
+                    if (postData['app_type'] === '') {
+                        PNotify.error('Please select app type.');
+                        return;
+                    }
+                    if (postData['module_type'] === '') {
+                        PNotify.error('Please select module type.');
+                        return;
+                    }
+                    if (postData['module_type'] === 'components') {
+                        if (postData['route'] === '') {
+                            PNotify.error('Please enter route.');
+                            return;
+                        }
+                    } else {
+                        if (postData['name'] === '') {
+                            PNotify.error('Please enter name.');
+                            return;
+                        }
+                        if (postData['category'] === '') {
+                            PNotify.error('Please select category.');
+                            return;
+                        }
+                    }
+
+                    $.post('{{links.url("devtools/modules/generateModuleRepoUrl")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+
+                            if (response.responseData.repo) {
+                                $('#{{componentId}}-{{sectionId}}-repo').val(response.responseData.repo);
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-createrepo'                              : { },
+        '{{componentId}}-{{sectionId}}-modules'                                 : {
+            'placeholder'   : 'SELECT MODULE',
+            'allowClear'    : true
+        },
+        '{{componentId}}-{{sectionId}}-modules-modulename'                      : { },
+        '{{componentId}}-{{sectionId}}-modules-moduleversion'                   : { },
+        '{{componentId}}-{{sectionId}}-modules-modulerepo'                      : { },
+        '{{componentId}}-{{sectionId}}-bundle_modules'                          : {
+            'afterInit'     : function() {
+                var id, label, moduleData;
+                $('#{{componentId}}-{{sectionId}}-modules-external, ' +
+                  '#{{componentId}}-{{sectionId}}-modules-external-version'
+                ).on('keyup', function() {
+                    if ($(this).val() !== '') {
+                        label = 'external';
+                        $('#{{componentId}}-{{sectionId}}-modules').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-modules-external-add, ' +
+                          '#{{componentId}}-{{sectionId}}-modules-external-remove').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-modules').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-modules-external-add, ' +
+                          '#{{componentId}}-{{sectionId}}-modules-external-remove').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-modules').on('select2:clear', function(e) {
+                    reset();
+                });
+
+                $('#{{componentId}}-{{sectionId}}-modules').on('select2:select', function(e) {
+                    id = e.params.data.id;
+                    label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
+
+                    moduleData = dataCollectionSectionForm['vars']['modules'][label][id];
+                    $('#{{componentId}}-{{sectionId}}-modules-modulename').val(moduleData['name']);
+                    $('#{{componentId}}-{{sectionId}}-modules-moduleversion').val(moduleData['version']);
+                    $('#{{componentId}}-{{sectionId}}-modules-modulerepo').val(moduleData['repo']);
+
+                    $('#{{componentId}}-{{sectionId}}-modules-add, ' +
+                      '#{{componentId}}-{{sectionId}}-modules-remove').attr('disabled', false);
+
+                    $('#{{componentId}}-{{sectionId}}-modules-external, ' +
+                      '#{{componentId}}-{{sectionId}}-modules-external-version').attr('disabled', true);
+
+                    $('#selected-module-information').attr('hidden', false);
+                });
+
+                function reset() {
+                    $('#{{componentId}}-{{sectionId}}-modules-add, ' +
+                      '#{{componentId}}-{{sectionId}}-modules-external-add, ' +
+                      '#{{componentId}}-{{sectionId}}-modules-external-remove, ' +
+                      '#{{componentId}}-{{sectionId}}-modules-remove').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-modules-external, ' +
+                      '#{{componentId}}-{{sectionId}}-modules-external-version, ' +
+                      '#{{componentId}}-{{sectionId}}-modules').attr('disabled', false);
+
+                    $('#{{componentId}}-{{sectionId}}-modules-modulename').val('');
+                    $('#{{componentId}}-{{sectionId}}-modules-moduleversion').val('');
+                    $('#{{componentId}}-{{sectionId}}-modules-modulerepo').val('');
+                    $('#{{componentId}}-{{sectionId}}-modules-external').val('');
+                    $('#{{componentId}}-{{sectionId}}-modules-external-version').val('');
+                    $('#{{componentId}}-{{sectionId}}-modules').val(0).trigger('change');
+
+                    $('#selected-module-information').attr('hidden', true);
+                }
+
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-bundle_modules')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['bundleModules'], null, 4));
+                }
+
+                $('#{{componentId}}-{{sectionId}}-modules-add, ' +
+                  '#{{componentId}}-{{sectionId}}-modules-external-add').click(function(e) {
+                    e.preventDefault();
+
+                    var found = false;
+
+                    if (label === 'core' || label === 'apptypes') {
+                        if (label === 'apptypes') {
+                            label = 'apptype';
+                        }
+                        dataCollectionSectionForm['vars']['bundleModules'][label] = { };
+                        dataCollectionSectionForm['vars']['bundleModules'][label]['name'] = moduleData['name'];
+                        dataCollectionSectionForm['vars']['bundleModules'][label]['version'] = moduleData['version'];
+                        dataCollectionSectionForm['vars']['bundleModules'][label]['repo'] = moduleData['repo'];
+
+                    } else if (label === 'external') {
+                        if (dataCollectionSectionForm['vars']['bundleModules']['external'].length === 0) {
+                            dataCollectionSectionForm['vars']['bundleModules']['external'] = { };
+                        }
+
+                        dataCollectionSectionForm['vars']['bundleModules'][label][$('#{{componentId}}-{{sectionId}}-modules-external').val()]
+                            = $('#{{componentId}}-{{sectionId}}-modules-external-version').val();
+
+                        reset();
+                    } else {
+                        for (var modules in dataCollectionSectionForm['vars']['bundleModules']) {
+                            if (label === modules) {
+                                $.each(dataCollectionSectionForm['vars']['bundleModules'][modules], function(index, mod) {
+                                    if (mod['name'] === moduleData['name']) {
+                                        found = true;
+                                    }
+                                });
+
+                                if (!found) {
+                                    var moduleToPush = { };
+                                    moduleToPush['name'] = moduleData['name'];
+                                    moduleToPush['version'] = moduleData['version'];
+                                    moduleToPush['repo'] = moduleData['repo'];
+
+
+                                    dataCollectionSectionForm['vars']['bundleModules'][modules].push(moduleToPush);
+                                }
+                            }
+                        }
+                    }
+
+                    reset();
+                    prettyfyJson();
+                });
+
+                $('#{{componentId}}-{{sectionId}}-modules-remove, ' +
+                  '#{{componentId}}-{{sectionId}}-modules-external-remove').click(function(e) {
+                    e.preventDefault();
+
+                    var found = false;
+                    var foundIndex;
+
+                    if (label === 'core' || label === 'apptypes') {
+                        if (label === 'apptypes') {
+                            label = 'apptype';
+                        }
+                        dataCollectionSectionForm['vars']['bundleModules'][label] = { };
+                    } else if (label === 'external') {
+                        delete dataCollectionSectionForm['vars']['bundleModules'][label][$('#{{componentId}}-{{sectionId}}-modules-external').val()];
+                    } else {
+                        for (var modules in dataCollectionSectionForm['vars']['bundleModules']) {
+                            if (label === modules) {
+                                $.each(dataCollectionSectionForm['vars']['bundleModules'][modules], function(index, mod) {
+                                    if (mod['name'] === moduleData['name']) {
+                                        found = true;
+                                        foundIndex = index;
+                                    }
+                                });
+
+                                if (found) {
+                                    dataCollectionSectionForm['vars']['bundleModules'][modules].splice(foundIndex);
+                                }
+                            }
+                        }
+                    }
+
+                    reset();
+                    prettyfyJson();
+                });
+
+                prettyfyJson();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-modules-external'                        : { },
+        '{{componentId}}-{{sectionId}}-modules-external-version'                : { },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-app_type'                        : 'required',
+                '{{componentId}}-{{sectionId}}-module_type'                     : 'required',
+                '{{componentId}}-{{sectionId}}-name'                            : 'required',
+                '{{componentId}}-{{sectionId}}-api_id'                          : 'required',
+                '{{componentId}}-{{sectionId}}-repo'                            : 'required',
+                '{{componentId}}-{{sectionId}}-bundle_modules'                  : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-app_type'                        : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-module_type'                     : 'Please select module type',
+                '{{componentId}}-{{sectionId}}-name'                            : 'Please enter module name',
+                '{{componentId}}-{{sectionId}}-api_id'                          : 'Please select Remote Repo',
+                '{{componentId}}-{{sectionId}}-repo'                            : 'Please enter repo',
+                '{{componentId}}-{{sectionId}}-bundle_modules'                  : 'Please enter bundle modules',
+            },
+            onSubmitResponse: function(response) {
+                if (response.responseData && response.responseData.bundle && response.responseData.newRepo && $('#repo-details').length > 0) {
+                    var link = "{{links.url('devtools/modules/q/bundles/true/bundlesjson/true/id/')}}" + response.responseData.bundle.id;
+                    var devLink = '/src/branch/dev';
+
+                    if (response.responseData.newRepo.html_url.includes('github')) {
+                        devLink = '/tree/dev';
+                    }
+
+                    $('#bundle_url').html(link);
+                    $('#bundle_url_a').attr('href', link);
+
+                    $('#bundlerepo_url_dev').html(response.responseData.newRepo.html_url + devLink);
+                    $('#bundlerepo_url_dev_a').attr('href', response.responseData.newRepo.html_url + devLink);
+
+                    $('#repo-details').attr('hidden', false);
+                    $('#module-details').attr('hidden', true);
+                    $('.addData').attr('hidden', true);
+                    $('.updateData').attr('hidden', true);
+                    $('.cancelForm').attr('hidden', true);
+                    $('.closeForm').attr('hidden', false);
+
+                    return false;
+                }
+
+                return true;
+            }
+        }
+    });
+</script>
+            {% endif %}
+        {% elseif type === 'apptypes' %}
+            <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+                <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                    {% include 'modules/apptypes.html' %}
+                </fieldset>
+            </form>
+            <script>
+/* globals PNotify BazHelpers */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-is_clone'                                : { },
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-app_type'                                : { },
+        '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-description'                             : { },
+        '{{componentId}}-{{sectionId}}-api_id'                                  : {
+            'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
+            afterInit: function() {
+                var repourl = $('#{{componentId}}-{{sectionId}}-repo').val();
+
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function(e) {
+                    var id = e.params.data.id;
+                    repourl = $(e.params.data.element).data('url');
+
+                    if (repourl !== 'https://.../') {
+                        $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-createrepo')[0].checked = false;
+                        $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', true);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-version'                                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-check-version').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['version'] = $('#{{componentId}}-{{sectionId}}-version').val();
+
+                    if (postData['version'] === '') {
+                        PNotify.error('Please enter version.');
+
+                        return;
+                    }
+
+                    $.post('{{links.url("devtools/modules/checkVersion")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-repo'                                    : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-repo-url').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
+                    postData['app_type'] = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                    postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                    postData['module_type'] = 'apps_types';
+
+                    if (postData['api_id'] === '') {
+                        PNotify.error('Please select api.');
+                        return;
+                    }
+
+                    if (postData['app_type'] === '') {
+                        PNotify.error('Please select app type.');
+                        return;
+                    }
+                    if (postData['module_type'] === '') {
+                        PNotify.error('Please select module type.');
+                        return;
+                    }
+
+                    $.post('{{links.url("devtools/modules/generateModuleRepoUrl")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+
+                            if (response.responseData.repo) {
+                                $('#{{componentId}}-{{sectionId}}-repo').val(response.responseData.repo);
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-createrepo'                              : { },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                            : 'required',
+                '{{componentId}}-{{sectionId}}-app_type'                        : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-app_type'                        : 'Please enter app type',
+                '{{componentId}}-{{sectionId}}-name'                            : 'Please enter app type name',
+            },
+            onSubmitResponse: function(response) {
+                if (response.responseData && response.responseData.newRepo && $('#repo-details').length > 0) {
+                    $('#path').html(BazHelpers.capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val()));
+                    $('#repo_url').html(response.responseData.newRepo.clone_url);
+                    $('#repo_url_dev').html(response.responseData.newRepo.html_url);
+                    $('#repo_url_dev_a').attr('href', response.responseData.newRepo.html_url + '/src/branch/dev');
+
+                    $('#repo-details').attr('hidden', false);
+                    $('#module-details').attr('hidden', true);
+                    $('.addData').attr('hidden', true);
+                    $('.cancelForm').attr('hidden', true);
+                    $('.closeForm').attr('hidden', false);
+
+                    return false;
+                }
+
+                return true;
+            }
+        }
+    });
+</script>
+        {% else %}
+            {% set tabsData =
+                [
+                    'info'   :
+                    [
+                        'tabTitle'          : 'Info',
+                        'tabInclude'        : 'modules/module/info'
+                    ],
+                    'description'   :
+                    [
+                        'tabTitle'          : 'Description',
+                        'tabInclude'        : 'modules/module/description'
+                    ]
+                ]
+            %}
+            {% if module is defined and module['module_type'] === 'components' or type === 'components' %}
+                {% set tabsData = array_merge(tabsData,
+                    [
+                        'menu'   :
+                        [
+                            'tabTitle'          : 'Menu',
+                            'tabInclude'        : 'modules/module/menu'
+                        ]
+                    ],
+                    [
+                        'widgets'   :
+                        [
+                            'tabTitle'          : 'Widgets',
+                            'tabInclude'        : 'modules/module/widgets'
+                        ]
+                    ])
+                %}
+            {% endif %}
+            {% set tabsData = array_merge(tabsData,
+                [
+                    'settings'   :
+                    [
+                        'tabTitle'          : 'Settings',
+                        'tabInclude'        : 'modules/module/settings'
+                    ]
+                ],
+                [
+                    'dependencies'   :
+                        [
+                            'tabTitle'          : 'Dependencies',
+                            'tabInclude'        : 'modules/module/dependencies'
+                        ]
+                ])
+            %}
+            <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+                <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                    {{adminltetags.useTag('tabs',
+                        [
+                            'component'                     : component,
+                            'componentName'                 : componentName,
+                            'componentId'                   : componentId,
+                            'sectionId'                     : 'main',
+                            'tabsId'                        : 'tabs',
+                            'tabsStyle'                     : 'card-outline-tabs',
+                            'tabsData'                      : tabsData
+                        ]
+                    )}}
+                </fieldset>
+            </form>
+            {% if module['id'] is defined %}
+                {% set moduleId = module['id'] %}
+            {% else %}
+                {% set moduleId = '0' %}
+            {% endif %}
+            {% set subView = false %}
+            {% if subview is defined and subview === true %}
+                {% set subView = true %}
+            {% endif %}
+            <script>
+/* globals PNotify BazHelpers */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['module_type'] = '{{type}}';
+dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
+dataCollectionSectionForm['vars']['moduleDependencies'] = JSON.parse('{{moduleDependencies}}');
+dataCollectionSectionForm['vars']['moduleId'] = '{{moduleId}}';
+dataCollectionSectionForm['vars']['moduleWidgets'] = JSON.parse('{{moduleWidgets}}');
+
+if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
+    dataCollectionSectionForm['vars']['moduleSettings'] = { };
+    if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
+        dataCollectionSectionForm['vars']['subview'] = '{{subView}}';
+
+        dataCollectionSectionForm['vars']['moduleSettings']['head'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer'] = { };
+
+        if (dataCollectionSectionForm['vars']['subview'] == false) {
+            dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = false;
+            dataCollectionSectionForm['vars']['moduleSettings']['layouts'] = { };
+            dataCollectionSectionForm['vars']['moduleSettings']['tags'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['branding'] = { };
+            dataCollectionSectionForm['vars']['moduleSettings']['branding']['small'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['branding']['large'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['title'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta'] = { };
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright'] = { };
+            dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site'] = '';
+            dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear'] = '';
+        }
+
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['script'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['dev'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['script'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod'] = { };
+    }
+} else {
+    dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
+    if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
+        dataCollectionSectionForm['vars']['subview'] = '{{subView}}';
+    }
+}
+if (dataCollectionSectionForm['vars']['module_type'] !== 'views' &&
+    dataCollectionSectionForm['vars']['module_type'] !== 'core' &&
+    !dataCollectionSectionForm['vars']['moduleDependencies']['external']
+) {
+    dataCollectionSectionForm['vars']['moduleDependencies']['external'] = { };
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-is_clone'                                : { },
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-type'                                    : { },
+        '{{componentId}}-{{sectionId}}-app_type'                                : {
+            'placeholder'   : 'SELECT APP TYPE OR CREATE NEW'
+        },
+        '{{componentId}}-{{sectionId}}-module_type'                             : {
+            'placeholder'   : 'SELECT MODULE TYPE'
+        },
+        '{{componentId}}-{{sectionId}}-category'                                : {
+            'placeholder'   : 'SELECT CATEGORY OR CREATE NEW'
+        },
+        '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-display_name'                            : { },
+        '{{componentId}}-{{sectionId}}-route'                                   : { },
+        '{{componentId}}-{{sectionId}}-description'                             : {
+            afterInit: function() {
+                $("#{{componentId}}-{{sectionId}}-description").closest(".trumbowyg-box").css("min-height", "400px");
+                $("#{{componentId}}-{{sectionId}}-description").prev(".trumbowyg-editor").css("min-height", "400px");
+                $("#{{componentId}}-{{sectionId}}-description").css("min-height", "400px");
+            }
+        },
+        '{{componentId}}-{{sectionId}}-api_id'                                  : {
+            'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
+            afterInit: function() {
+                var repourl = $('#{{componentId}}-{{sectionId}}-repo').val();
+
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function(e) {
+                    var id = e.params.data.id;
+                    repourl = $(e.params.data.element).data('url');
+
+                    if (repourl !== 'https://.../') {
+                        $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-createrepo')[0].checked = false;
+                        $('#{{componentId}}-{{sectionId}}-createrepo').attr('disabled', true);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-version'                                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-check-version').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['version'] = $('#{{componentId}}-{{sectionId}}-version').val();
+
+                    if (postData['version'] === '') {
+                        PNotify.error('Please enter version.');
+
+                        return;
+                    }
+
+                    $.post('{{links.url("devtools/modules/checkVersion")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-repo'                                    : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-repo-url').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
+                    postData['app_type'] = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                    postData['category'] = $('#{{componentId}}-{{sectionId}}-category').val();
+                    if (postData['module_type'] === 'components') {
+                        postData['route'] = $('#{{componentId}}-{{sectionId}}-route').val();
+                    } else {
+                        postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                    }
+
+                    if (postData['api_id'] === '') {
+                        PNotify.error('Please select repository.');
+                        return;
+                    }
+
+                    if (postData['app_type'] === '') {
+                        PNotify.error('Please select app type.');
+                        return;
+                    }
+                    if (postData['module_type'] === '') {
+                        PNotify.error('Please select module type.');
+                        return;
+                    }
+                    if (postData['module_type'] === 'components') {
+                        if (postData['route'] === '') {
+                            PNotify.error('Please enter route.');
+                            return;
+                        }
+                    } else {
+                        if (postData['name'] === '') {
+                            PNotify.error('Please enter name.');
+                            return;
+                        }
+                        if (postData['category'] === '') {
+                            PNotify.error('Please select category.');
+                            return;
+                        }
+                    }
+
+                    if (dataCollectionSectionForm['vars']['subview'] == true &&
+                        ($('#{{componentId}}-{{sectionId}}-base_view_module_id').val() === '' ||
+                         $('#{{componentId}}-{{sectionId}}-base_view_module_id').val() == '0')
+                    ) {
+                        PNotify.error('View dependency for this subview not set.');
+                        return;
+                    }
+
+                    if (dataCollectionSectionForm['vars']['subview'] == true) {
+                        postData['base_view_module_id'] = $('#{{componentId}}-{{sectionId}}-base_view_module_id').val();
+                        postData['subview'] = true;
+                    }
+
+                    $.post('{{links.url("devtools/modules/generateModuleRepoUrl")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+
+                            if (response.responseData.repo) {
+                                $('#{{componentId}}-{{sectionId}}-repo').val(response.responseData.repo);
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-createrepo'                              : { },
+        '{{componentId}}-{{sectionId}}-class'                                   : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-module-class').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['app_type'] = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                    postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                    if (postData['module_type'] === 'components') {
+                        postData['route'] = $('#{{componentId}}-{{sectionId}}-route').val();
+                    } else if (postData['module_type'] === 'packages') {
+                        postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                        postData['category'] = $('#{{componentId}}-{{sectionId}}-category').val();
+                    } else if (postData['module_type'] === 'middlewares') {
+                        postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                    }
+
+                    if (postData['app_type'] === '') {
+                        PNotify.error('Please select app type.');
+                        return;
+                    }
+                    if (postData['module_type'] === '') {
+                        PNotify.error('Please select module type.');
+                        return;
+                    }
+                    if (postData['module_type'] === 'components') {
+                        if (postData['route'] === '') {
+                            PNotify.error('Please enter route.');
+                            return;
+                        }
+                    } else if (postData['module_type'] === 'packages') {
+                        if (postData['name'] === '') {
+                            PNotify.error('Please enter name.');
+                            return;
+                        }
+                        if (postData['category'] === '') {
+                            PNotify.error('Please select category.');
+                            return;
+                        }
+                    } else if (postData['module_type'] === 'middlewares') {
+                        if (postData['name'] === '') {
+                            PNotify.error('Please enter name.');
+                            return;
+                        }
+                    }
+
+                    $.post('{{links.url("devtools/modules/generateModuleClass")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success(response.responseMessage);
+
+                            if (response.responseData.class) {
+                                $('#{{componentId}}-{{sectionId}}-class').val(response.responseData.class);
+                            }
+                        } else {
+                            PNotify.error(response.responseMessage);
+                        }
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-settings'                                : {
+            'afterInit'     : function() {
+                if (dataCollectionSectionForm['vars']['moduleSettings'].length === 0) {
+                    dataCollectionSectionForm['vars']['moduleSettings'] = { };
+                }
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-settings')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleSettings'], null, 4));
+                }
+
+                //Components - Mandatory, NeedAuth, ImportExportPackage
+                if (dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] !== 'undefined') {
+                    if (dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] === true) {
+                        $("#forAppType").prop('checked', true);
+                    } else if (typeof dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] === 'object') {
+                        $("#forApp").prop('checked', true);
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps").attr('disabled', false);
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps")
+                            .val(Object.keys(dataCollectionSectionForm['vars']['moduleSettings']['mandatory']).join(','));
+                    }
+                } else {
+                    $("#mandatory-no").prop('checked', true);
+                }
+
+                $('#{{componentId}}-{{sectionId}}-mandatory').off();
+                $('#{{componentId}}-{{sectionId}}-mandatory').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'mandatory-no') {
+                        if (dataCollectionSectionForm['vars']['moduleSettings']['mandatory']) {
+                            delete dataCollectionSectionForm['vars']['moduleSettings']['mandatory'];
+                        }
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps").attr('disabled', true);
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps").val('');
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'forAppType') {
+                        dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = true;
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps").attr('disabled', true);
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps").val('');
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'forApp') {
+                        dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] = { };
+                        $("#{{componentId}}-{{sectionId}}-mandatory-apps").attr('disabled', false);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-need-auth').off();
+                $('#{{componentId}}-{{sectionId}}-need-auth').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'need-auth-default') {
+                        if (dataCollectionSectionForm['vars']['moduleSettings']['needAuth']) {
+                            delete dataCollectionSectionForm['vars']['moduleSettings']['needAuth'];
+                        }
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'need-auth-yes') {
+                        dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] = true;
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'need-auth-mandatory') {
+                        dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] = 'mandatory';
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'need-auth-disabled') {
+                        dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] = 'disabled';
+                    }
+                });
+
+                if (dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] !== 'undefined') {
+                    if (dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] === true) {
+                        $("#need-auth-yes").prop('checked', true);
+                    } else if (dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] === 'mandatory') {
+                        $("#need-auth-mandatory").prop('checked', true);
+                    } else if (dataCollectionSectionForm['vars']['moduleSettings']['needAuth'] === 'disabled') {
+                        $("#need-auth-disabled").prop('checked', true);
+                    }
+                } else {
+                    $("#need-auth-default").prop('checked', true);
+                }
+
+                $('#{{componentId}}-{{sectionId}}-settings-packages').on('select2:select', function(e) {
+                    if ($(e.params.data.element).data('importexportpackage')) {
+                        dataCollectionSectionForm['vars']['moduleSettings']['importExportPackage'] = $(e.params.data.element).data('importexportpackage');
+                    }
+                });
+                $('#{{componentId}}-{{sectionId}}-settings-packages').on('select2:clear', function(e) {
+                    delete dataCollectionSectionForm['vars']['moduleSettings']['importExportPackage'];
+                });
+                if (dataCollectionSectionForm['vars']['moduleSettings']['importExportPackage']) {
+                    $('#{{componentId}}-{{sectionId}}-settings-packages').find("option").each(function(i, option) {
+                        if ($(option).data('importexportpackage') === dataCollectionSectionForm['vars']['moduleSettings']['importExportPackage']) {
+                            $('#{{componentId}}-{{sectionId}}-settings-packages').val($(option).data('value')).trigger('change');
+                        }
+                    });
+                }
+
+                //Packages - Export, Import, ImportAddMethod, ImportUpdateMethod
+                $('#{{componentId}}-{{sectionId}}-settings-components').on('select2:select', function(e) {
+                    if ($(e.params.data.element).data('route')) {
+                        dataCollectionSectionForm['vars']['moduleSettings']['componentRoute'] = $(e.params.data.element).data('route');
+                    }
+                });
+                $('#{{componentId}}-{{sectionId}}-settings-components').on('select2:clear', function(e) {
+                    delete dataCollectionSectionForm['vars']['moduleSettings']['componentRoute'];
+                });
+                if (dataCollectionSectionForm['vars']['moduleSettings']['componentRoute']) {
+                    $('#{{componentId}}-{{sectionId}}-settings-components').find("option").each(function(i, option) {
+                        if ($(option).data('route') === dataCollectionSectionForm['vars']['moduleSettings']['componentRoute']) {
+                            $('#{{componentId}}-{{sectionId}}-settings-components').val($(option).data('value')).trigger('change');
+                        }
+                    });
+                }
+                if (dataCollectionSectionForm['vars']['moduleSettings']['import'] !== 'undefined' &&
+                    dataCollectionSectionForm['vars']['moduleSettings']['import'] == true
+                ) {
+                    $('#{{componentId}}-{{sectionId}}-import')[0].checked = true;
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-import-add-method, ' +
+                      '#{{componentId}}-{{sectionId}}-import-update-method').attr('disabled', true);
+                }
+                if (dataCollectionSectionForm['vars']['moduleSettings']['export'] !== 'undefined' &&
+                    dataCollectionSectionForm['vars']['moduleSettings']['export'] == true
+                ) {
+                    $('#{{componentId}}-{{sectionId}}-export')[0].checked = true;
+                }
+                if (dataCollectionSectionForm['vars']['moduleSettings']['importAddMethod']) {
+                    $('#{{componentId}}-{{sectionId}}-import-add-method').val(dataCollectionSectionForm['vars']['moduleSettings']['importAddMethod']);
+                }
+                if (dataCollectionSectionForm['vars']['moduleSettings']['importUpdateMethod']) {
+                    $('#{{componentId}}-{{sectionId}}-import-update-method').val(dataCollectionSectionForm['vars']['moduleSettings']['importUpdateMethod']);
+                }
+                $('#{{componentId}}-{{sectionId}}-import').off();
+                $('#{{componentId}}-{{sectionId}}-import').click(function() {
+                    if ($(this)[0].checked === true) {
+                        dataCollectionSectionForm['vars']['moduleSettings']['import'] = true;
+                        $('#{{componentId}}-{{sectionId}}-import-add-method, ' +
+                          '#{{componentId}}-{{sectionId}}-import-update-method').attr('disabled', false);
+                    } else {
+                        delete dataCollectionSectionForm['vars']['moduleSettings']['import'];
+                        delete dataCollectionSectionForm['vars']['moduleSettings']['importAddMethod'];
+                        delete dataCollectionSectionForm['vars']['moduleSettings']['importUpdateMethod'];
+                        $('#{{componentId}}-{{sectionId}}-import-add-method, ' +
+                          '#{{componentId}}-{{sectionId}}-import-update-method').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-import-add-method, ' +
+                          '#{{componentId}}-{{sectionId}}-import-update-method').val('');
+                    }
+                });
+                $('#{{componentId}}-{{sectionId}}-export').off();
+                $('#{{componentId}}-{{sectionId}}-export').click(function() {
+                    if ($(this)[0].checked === true) {
+                        dataCollectionSectionForm['vars']['moduleSettings']['export'] = true;
+                    } else {
+                        delete dataCollectionSectionForm['vars']['moduleSettings']['export'];
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-generate-settings').off();
+                $('#{{componentId}}-{{sectionId}}-generate-settings').click(function() {
+                    if ($($('#{{componentId}}-{{sectionId}}-module_type').find(':selected')[0]).val() === 'components' ||
+                        $($('#{{componentId}}-{{sectionId}}-module_type').find(':selected')[0]).val() === 'middlewares'
+                    ) {
+                        if (typeof dataCollectionSectionForm['vars']['moduleSettings']['mandatory'] === 'object') {
+                            if ($('#{{componentId}}-{{sectionId}}-mandatory-apps').val() === '') {
+                                $('#{{componentId}}-{{sectionId}}-mandatory-apps').addClass('is-invalid');
+                                $('#{{componentId}}-{{sectionId}}-mandatory-apps').focus(function() {
+                                    $(this).removeClass('is-invalid');
+                                });
+                            } else {
+                                var apps = $('#{{componentId}}-{{sectionId}}-mandatory-apps').val().split(',');
+
+                                $(apps).each(function(i, app) {
+                                    dataCollectionSectionForm['vars']['moduleSettings']['mandatory'][app.trim()] = true;
+                                });
+                                prettyfyJson();
+                            }
+                        } else {
+                            prettyfyJson();
+                        }
+                    } else if ($($('#{{componentId}}-{{sectionId}}-module_type').find(':selected')[0]).val() === 'packages') {
+                        if ($('#{{componentId}}-{{sectionId}}-import')[0].checked === true) {
+                            if ($('#{{componentId}}-{{sectionId}}-import-add-method').val() === '') {
+                                $('#{{componentId}}-{{sectionId}}-import-add-method').addClass('is-invalid');
+                                $('#{{componentId}}-{{sectionId}}-import-add-method').focus(function() {
+                                    $(this).removeClass('is-invalid');
+                                });
+                            } else if ($('#{{componentId}}-{{sectionId}}-import-update-method').val() === '') {
+                                $('#{{componentId}}-{{sectionId}}-import-update-method').addClass('is-invalid');
+                                $('#{{componentId}}-{{sectionId}}-import-update-method').focus(function() {
+                                    $(this).removeClass('is-invalid');
+                                });
+                            } else {
+                                dataCollectionSectionForm['vars']['moduleSettings']['importAddMethod']
+                                    = $('#{{componentId}}-{{sectionId}}-import-add-method').val();
+                                dataCollectionSectionForm['vars']['moduleSettings']['importUpdateMethod']
+                                    = $('#{{componentId}}-{{sectionId}}-import-update-method').val();
+                                prettyfyJson();
+                            }
+                        } else {
+                            prettyfyJson();
+                        }
+                    }
+                });
+                prettyfyJson();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-menu'                                    : { },
+        '{{componentId}}-{{sectionId}}-menu_id'                                 : { },
+        '{{componentId}}-{{sectionId}}-apps'                                    : { },
+        '{{componentId}}-{{sectionId}}-settings-components'                     : {
+            'placeholder'   : 'SELECT COMPONENT',
+            'allowClear'    : true
+        },
+        '{{componentId}}-{{sectionId}}-mandatory'                               : { },
+        '{{componentId}}-{{sectionId}}-mandatory-apps'                          : { },
+        '{{componentId}}-{{sectionId}}-need-auth'                               : { },
+        '{{componentId}}-{{sectionId}}-settings-packages'                       : {
+            'placeholder'   : 'SELECT PACKAGE',
+            'allowClear'    : true
+        },
+        '{{componentId}}-{{sectionId}}-widget-name'                             : { },
+        '{{componentId}}-{{sectionId}}-widget-method'                           : { },
+        '{{componentId}}-{{sectionId}}-multiple'                                : { },
+        '{{componentId}}-{{sectionId}}-max-multiple'                            : { },
+        '{{componentId}}-{{sectionId}}-widget-settings'                         : { },
+        '{{componentId}}-{{sectionId}}-widgets'                                 : {
+            afterInit: function() {
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-widgets')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleWidgets'], null, 4));
+                }
+                prettyfyJson();
+
+                function reset() {
+                    $('#{{componentId}}-{{sectionId}}-widget-name').val('');
+                    $('#{{componentId}}-{{sectionId}}-widget-method').val('');
+                    $("#multiple-no").prop('checked', true);
+                    $('#{{componentId}}-{{sectionId}}-max-multiple').val('');
+                    $('#{{componentId}}-{{sectionId}}-max-multiple').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-widget-settings').val('');
+                }
+
+                $('#{{componentId}}-{{sectionId}}-multiple').off();
+                $('#{{componentId}}-{{sectionId}}-multiple').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'multiple-yes') {
+                        $('#{{componentId}}-{{sectionId}}-max-multiple').attr('disabled', false);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'multiple-no') {
+                        $('#{{componentId}}-{{sectionId}}-max-multiple').val('');
+                        $('#{{componentId}}-{{sectionId}}-max-multiple').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-widget-add, ' +
+                  '#{{componentId}}-{{sectionId}}-widget-remove').click(function(e) {
+                    e.preventDefault();
+
+                    if ($('#{{componentId}}-{{sectionId}}-widget-name').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-widget-name').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-widget-name').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-widget-method').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-widget-method').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-widget-method').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-max-multiple').attr('disabled') !== 'disabled' &&
+                               $('#{{componentId}}-{{sectionId}}-max-multiple').val() === ''
+                    ) {
+                        $('#{{componentId}}-{{sectionId}}-max-multiple').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-max-multiple').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else {
+                        if (dataCollectionSectionForm['vars']['moduleWidgets'].length > 0) {
+                            $(dataCollectionSectionForm['vars']['moduleWidgets']).each(function(index, widget) {
+                                if (widget['method'] === $('#{{componentId}}-{{sectionId}}-widget-method').val()) {
+                                    dataCollectionSectionForm['vars']['moduleWidgets'].splice(index);
+                                }
+                            });
+
+                            if ($(this)[0].id !== '{{componentId}}-{{sectionId}}-widget-remove') {
+                                addWidget();
+                            }
+                        } else {
+                            if ($(this)[0].id !== '{{componentId}}-{{sectionId}}-widget-remove') {
+                                addWidget();
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+
+                    reset();
+                    prettyfyJson();
+                });
+
+                function addWidget() {
+                    var multiple = false;
+                    var settings = { };
+
+                    if ($('#{{componentId}}-{{sectionId}}-multiple').find('input[type=radio]:checked').data('value') == 'multiple-yes') {
+                        multiple = true;
+                    }
+
+                    if ($('#{{componentId}}-{{sectionId}}-widget-settings').val() !== '') {
+                        settings = $('#{{componentId}}-{{sectionId}}-widget-settings').val();
+                    }
+
+                    dataCollectionSectionForm['vars']['moduleWidgets'].push(
+                        {
+                            'name'          : $('#{{componentId}}-{{sectionId}}-widget-name').val(),
+                            'method'        : $('#{{componentId}}-{{sectionId}}-widget-method').val(),
+                            'multiple'      : multiple,
+                            'max_multiple'  : $('#{{componentId}}-{{sectionId}}-max-multiple').val(),
+                            'settings'      : settings
+                        }
+                    );
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-settings-keys'                           : {
+            placeholder: "SELECT SETTING TO MODIFY OR ADD",
+            afterInit: function() {
+                var keys, subKeys = [], mainKeys = [];
+
+                if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
+                    subKeys =
+                    [
+                        {
+                            'head-link-href-assets-dev' : {
+                                'id'    : 'head-link-href-assets-dev',
+                                'text'  : 'Head CSS Links (Dev)'
+                            }
+                        },
+                        {
+                            'head-link-href-assets-prod' : {
+                                'id'    : 'head-link-href-assets-prod',
+                                'text'  : 'Head CSS Links (Production)'
+                            }
+                        },
+                        {
+                            'head-script-src-assets-dev' : {
+                                'id'    : 'head-script-src-assets-dev',
+                                'text'  : 'Head Java Scripts Source (Dev)'
+                            }
+                        },
+                        {
+                            'head-script-src-assets-prod' : {
+                                'id'    : 'head-script-src-assets-prod',
+                                'text'  : 'Head Java Scripts Source (Production)'
+                            }
+                        },
+                        {
+                            'footer-script-src-assets-dev' : {
+                                'id'    : 'footer-script-src-assets-dev',
+                                'text'  : 'Footer Java Scripts Source (Dev)'
+                            }
+                        },
+                        {
+                            'footer-script-src-assets-prod' : {
+                                'id'    : 'footer-script-src-assets-prod',
+                                'text'  : 'Footer Java Scripts Source (Production)'
+                            }
+                        }
+                    ];
+
+                    if (dataCollectionSectionForm['vars']['subview'] == false) {
+                        mainKeys =
+                        [
+                            {
+                                'mandatory' : {
+                                    'id'    : 'mandatory',
+                                    'text'  : 'View Mandatory'
+                                }
+                            },
+                            {
+                                'layouts' : {
+                                    'id'    : 'layouts',
+                                    'text'  : 'Layouts'
+                                }
+                            },
+                            {
+                                'tags' : {
+                                    'id'    : 'tags',
+                                    'text'  : 'HTML Tags'
+                                }
+                            },
+                            {
+                                'branding' : {
+                                    'id'    : 'branding',
+                                    'text'  : 'View Branding (logo)'
+                                }
+                            },
+                            {
+                                'head-title' : {
+                                    'id'    : 'head-title',
+                                    'text'  : 'Site Title'
+                                }
+                            },
+                            {
+                                'head-meta-author' : {
+                                    'id'    : 'head-meta-author',
+                                    'text'  : 'Head Meta Author'
+                                }
+                            },
+                            {
+                                'head-meta-charset' : {
+                                    'id'    : 'head-meta-charset',
+                                    'text'  : 'Head Meta Charset'
+                                }
+                            },
+                            {
+                                'head-meta-keywords' : {
+                                    'id'    : 'head-meta-keywords',
+                                    'text'  : 'Head Meta Keywords'
+                                }
+                            },
+                            {
+                                'head-meta-viewport' : {
+                                    'id'    : 'head-meta-viewport',
+                                    'text'  : 'Head Meta Viewport'
+                                }
+                            },
+                            {
+                                'head-meta-description' : {
+                                    'id'    : 'head-meta-description',
+                                    'text'  : 'Head Meta Description'
+                                }
+                            },
+                            {
+                                'footer-copyright-name' : {
+                                    'id'    : 'footer-copyright-name',
+                                    'text'  : 'Footer Copyright Name'
+                                }
+                            },
+                            {
+                                'footer-copyright-site' : {
+                                    'id'    : 'footer-copyright-site',
+                                    'text'  : 'Footer Copyright Website'
+                                }
+                            },
+                            {
+                                'footer-copyright-fromYear' : {
+                                    'id'    : 'footer-copyright-fromYear',
+                                    'text'  : 'Footer Copyright From Year'
+                                }
+                            }
+                        ];
+                    }
+
+                    keys = mainKeys.concat(subKeys);
+                } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
+                    keys =
+                    [
+                        {
+                            'dev' : {
+                                'id'        : 'dev',
+                                'text'      : 'Development Mode?'
+                            }
+                        },
+                        {
+                            'debug' : {
+                                'id'        : 'debug',
+                                'text'      : 'Debug Enabled?'
+                            }
+                        },
+                        {
+                            'auto_off_debug' : {
+                                'id'        : 'auto_off_debug',
+                                'text'      : 'Auto Off Debug'
+                            }
+                        },
+                        {
+                            'databasetype' : {
+                                'id'        : 'databasetype',
+                                'text'      : 'Database Type'
+                            }
+                        },
+                        {
+                            'cache-enabled' : {
+                                'id'        : 'cache-enabled',
+                                'text'      : 'Cache Enabled?'
+                            }
+                        },
+                        {
+                            'cache-timeout' : {
+                                'id'        : 'cache-timeout',
+                                'text'      : 'Cache Timeout'
+                            }
+                        },
+                        {
+                            'cache-service' : {
+                                'id'        : 'cache-service',
+                                'text'      : 'Cache Service'
+                            }
+                        },
+                        {
+                            'security-sso' : {
+                                'id'        : 'security-sso',
+                                'text'      : 'Single Sign On'
+                            }
+                        },
+                        {
+                            'security-passwordWorkFactor' : {
+                                'id'        : 'security-passwordWorkFactor',
+                                'text'      : 'Password Work Factor'
+                            }
+                        },
+                        {
+                            'security-cookiesWorkFactor' : {
+                                'id'        : 'security-cookiesWorkFactor',
+                                'text'      : 'Cookies Work Factor'
+                            }
+                        },
+                        {
+                            'logs-enabled' : {
+                                'id'        : 'logs-enabled',
+                                'text'      : 'Logs Enabled?'
+                            }
+                        },
+                        {
+                            'logs-exceptions' : {
+                                'id'        : 'logs-exceptions',
+                                'text'      : 'Exception Logs Enabled?'
+                            }
+                        },
+                        {
+                            'logs-level' : {
+                                'id'        : 'logs-level',
+                                'text'      : 'Logs Level'
+                            }
+                        },
+                        {
+                            'logs-service' : {
+                                'id'        : 'logs-service',
+                                'text'      : 'Logs Service'
+                            }
+                        },
+                        {
+                            'logs-emergencyLogsEmail' : {
+                                'id'        : 'logs-emergencyLogsEmail',
+                                'text'      : 'Emergency Logs Email Enabled?'
+                            }
+                        },
+                        {
+                            'logs-emergencyLogsEmailAddresses' : {
+                                'id'        : 'logs-emergencyLogsEmailAddresses',
+                                'text'      : 'Emergency Logs Email Addresses'
+                            }
+                        },
+                        {
+                            'websocket-protocol' : {
+                                'id'        : 'websocket-protocol',
+                                'text'      : 'Websocket Protocol'
+                            }
+                        },
+                        {
+                            'websocket-host' : {
+                                'id'        : 'websocket-host',
+                                'text'      : 'Websocket Host'
+                            }
+                        },
+                        {
+                            'websocket-port' : {
+                                'id'        : 'websocket-port',
+                                'text'      : 'Websocket Port'
+                            }
+                        }
+                    ];
+                }
+
+                $(keys).each(function(e, key) {
+                    for (var keyId in key) {
+                        var newOption = new Option(key[keyId].text, key[keyId].id, false, false);
+                        $('#{{componentId}}-{{sectionId}}-settings-keys').append(newOption).trigger('change');
+                    }
+                });
+
+                var key, settings, fieldType, type;
+
+                $('#{{componentId}}-{{sectionId}}-settings-keys').on('select2:select', function(e) {
+                    $('#settings-text').attr('hidden', true);
+                    $('#settings-textarea').attr('hidden', true);
+                    $('#settings-select').attr('hidden', true);
+
+                    key = e.params.data.id;
+
+                    if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
+                        switch (key) {
+                            case 'mandatory' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['mandatory']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['mandatory'];
+                                }
+
+                                break;
+                            case 'layouts' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['layouts']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['layouts'];
+                                }
+
+                                break;
+                            case 'tags' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['tags']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['tags'];
+                                }
+
+                                break;
+                            case 'branding' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['branding']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['branding'];
+                                }
+
+                                break;
+                            case 'head-title' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['title']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['title'];
+                                }
+
+                                break;
+                            case 'head-meta-author' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author'];
+                                }
+
+                                break;
+                            case 'head-meta-charset' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset'];
+                                }
+
+                                break;
+                            case 'head-meta-keywords' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords'];
+                                }
+
+                                break;
+                            case 'head-meta-viewport' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport'];
+                                }
+
+                                break;
+                            case 'head-meta-description' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description'];
+                                }
+
+                                break;
+                            case 'head-link-href-assets-dev' :
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev'];
+                                }
+
+                                break;
+                            case 'head-link-href-assets-prod' :
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod'];
+                                }
+
+                                break;
+                            case 'head-script-src-assets-dev' :
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['dev']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['dev'];
+                                }
+
+                                break;
+                            case 'head-script-src-assets-prod' :
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod'];
+                                }
+
+                                break;
+                            case 'footer-copyright-name' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name'];
+                                }
+
+                                break;
+                            case 'footer-copyright-site' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site'];
+                                }
+
+                                break;
+                            case 'footer-copyright-fromYear' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear'];
+                                }
+
+                                break;
+                            case 'footer-script-src-assets-dev' :
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev'];
+                                }
+
+                                break;
+                            case 'footer-script-src-assets-prod' :
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod'];
+                                }
+
+                                break;
+                            }
+                    } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
+                        switch (key) {
+                            case 'dev' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['dev']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['dev'];
+                                }
+
+                                break;
+                            case 'debug' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['debug']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['debug'];
+                                }
+
+                                break;
+                            case 'auto_off_debug' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['auto_off_debug']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['auto_off_debug'];
+                                }
+
+                                break;
+                            case 'databasetype' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['databasetype']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['databasetype'];
+                                }
+
+                                break;
+                            case 'cache-enabled' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['cache']['enabled']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['cache']['enabled'];
+                                }
+
+                                break;
+                            case 'cache-timeout' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['cache']['timeout']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['cache']['timeout'];
+                                }
+
+                                break;
+                            case 'cache-service' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['cache']['service']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['cache']['service'];
+                                }
+
+                                break;
+                            case 'security-sso' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['security']['sso']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['security']['sso'];
+                                }
+
+                                break;
+                            case 'security-passwordWorkFactor' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['security']['passwordWorkFactor']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['security']['passwordWorkFactor'];
+                                }
+
+                                break;
+                            case 'security-cookiesWorkFactor' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['security']['cookiesWorkFactor']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['security']['cookiesWorkFactor'];
+                                }
+
+                                break;
+                            case 'logs-enabled' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['logs']['enabled']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['logs']['enabled'];
+                                }
+
+                                break;
+                            case 'logs-exceptions' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['logs']['exceptions']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['logs']['exceptions'];
+                                }
+
+                                break;
+                            case 'logs-level' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['logs']['level']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['logs']['level'];
+                                }
+
+                                break;
+                            case 'logs-service' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['logs']['service']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['logs']['service'];
+                                }
+
+                                break;
+                            case 'logs-emergencyLogsEmail' :
+                                type = 'boolean';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['logs']['emergencyLogsEmail']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['logs']['emergencyLogsEmail'];
+                                }
+
+                                break;
+                            case 'logs-emergencyLogsEmailAddresses' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['logs']['emergencyLogsEmailAddresses']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['logs']['emergencyLogsEmailAddresses'];
+                                }
+
+                                break;
+                            case 'websocket-protocol' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['websocket']['protocol']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['websocket']['protocol'];
+                                }
+
+                                break;
+                            case 'websocket-host' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['websocket']['host']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['websocket']['host'];
+                                }
+
+                                break;
+                            case 'websocket-port' :
+                                type = 'text';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['websocket']['port']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['websocket']['port'];
+                                }
+
+                                break;
+                        }
+                    }
+
+                    if (type === 'text' || type === 'boolean') {
+                        $('#{{componentId}}-{{sectionId}}-settings-text').val(settings);
+
+                        fieldType = 'text';
+                    } else if (type === 'textarea') {
+                        $('#{{componentId}}-{{sectionId}}-settings-textarea').val(settings);
+                        fieldType = 'textarea';
+                    } else if (type === 'array') {
+                        $('#{{componentId}}-{{sectionId}}-settings-textarea').val(JSON.stringify(settings, null, 4));
+
+                        fieldType = 'textarea';
+                    }
+
+                    $('#settings-' + fieldType).attr('hidden', false);
+                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', false);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-cancel').off();
+                $('#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
+                    e.preventDefault();
+
+                    $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val('');
+                    $('#settings-' + fieldType).attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-settings-keys').val(0).trigger('change');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-save').off();
+                $('#{{componentId}}-{{sectionId}}-save').click(function(e) {
+                    e.preventDefault();
+
+                    if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
+                        switch (key) {
+                            case 'mandatory' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['mandatory']
+                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'layouts' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['layouts']
+                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'tags' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['tags']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'branding' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['branding']
+                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'head-title' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['title']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'head-meta-author' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'head-meta-charset' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['charset']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'head-meta-keywords' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['keywords']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'head-meta-viewport' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['viewport']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'head-meta-description' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['description']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'head-link-href-assets-dev' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev']
+                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'head-link-href-assets-prod' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod']
+                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'head-script-src-assets-dev' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['dev']
+                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'head-script-src-assets-prod' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets']['prod']
+                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'footer-copyright-name' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['name']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'footer-copyright-site' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['site']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'footer-copyright-fromYear' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['copyright']['fromYear']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'footer-script-src-assets-dev' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['dev']
+                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'footer-script-src-assets-prod' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['footer']['script']['src']['assets']['prod']
+                                    = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                        }
+                    } else if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
+                        switch (key) {
+                            case 'dev' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['dev']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'debug' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['debug']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'auto_off_debug' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['auto_off_debug']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'databasetype' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['databasetype']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'cache-enabled' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['cache']['enabled']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'cache-timeout' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['cache']['timeout']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'cache-service' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['cache']['service']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'security-sso' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['security']['sso']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'security-passwordWorkFactor' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['security']['passwordWorkFactor']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'security-cookiesWorkFactor' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['security']['cookiesWorkFactor']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'logs-enabled' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['logs']['enabled']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'logs-exceptions' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['logs']['exceptions']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'logs-level' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['logs']['level']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'logs-service' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['logs']['service']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'logs-emergencyLogsEmail' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['logs']['emergencyLogsEmail']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'logs-emergencyLogsEmailAddresses' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['logs']['emergencyLogsEmailAddresses']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'websocket-protocol' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['websocket']['protocol']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'websocket-host' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['websocket']['host']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                            case 'websocket-port' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['websocket']['port']
+                                    = $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val();
+
+                                break;
+                        }
+                    }
+
+                    $('#{{componentId}}-{{sectionId}}-settings')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleSettings'], null, 4));
+
+                    $('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val('');
+                    $('#settings-' + fieldType).attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-save').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-cancel').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-settings-keys').val(0).trigger('change');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-settings-text'                           : { },
+        '{{componentId}}-{{sectionId}}-settings-textarea'                       : { },
+        '{{componentId}}-{{sectionId}}-import'                                  : { },
+        '{{componentId}}-{{sectionId}}-import-add-method'                       : { },
+        '{{componentId}}-{{sectionId}}-import-update-method'                    : { },
+        '{{componentId}}-{{sectionId}}-export'                                  : { },
+        '{{componentId}}-{{sectionId}}-dependencies-modules'                    : {
+            'placeholder'   : 'SELECT MODULE',
+            'allowClear'    : true
+        },
+        '{{componentId}}-{{sectionId}}-dependencies-modulename'                 : { },
+        '{{componentId}}-{{sectionId}}-dependencies-moduleversion'              : { },
+        '{{componentId}}-{{sectionId}}-dependencies-modulerepo'                 : { },
+        '{{componentId}}-{{sectionId}}-dependencies'                            : {
+            'afterInit'     : function() {
+                var id, label, moduleData;
+                $('#{{componentId}}-{{sectionId}}-dependencies-external, ' +
+                  '#{{componentId}}-{{sectionId}}-dependencies-external-version'
+                ).on('keyup', function() {
+                    if ($(this).val() !== '') {
+                        label = 'external';
+                        $('#{{componentId}}-{{sectionId}}-dependencies-modules').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-dependencies-external-add, ' +
+                          '#{{componentId}}-{{sectionId}}-dependencies-external-remove').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-dependencies-modules').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-dependencies-external-add, ' +
+                          '#{{componentId}}-{{sectionId}}-dependencies-external-remove').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-dependencies-modules').on('select2:clear', function(e) {
+                    reset();
+                });
+
+                $('#{{componentId}}-{{sectionId}}-dependencies-modules').on('select2:select', function(e) {
+                    id = e.params.data.id;
+                    label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
+
+                    moduleData = dataCollectionSectionForm['vars']['modules'][label][id];
+                    $('#{{componentId}}-{{sectionId}}-dependencies-modulename').val(moduleData['name']);
+                    $('#{{componentId}}-{{sectionId}}-dependencies-moduleversion').val(moduleData['version']);
+                    $('#{{componentId}}-{{sectionId}}-dependencies-modulerepo').val(moduleData['repo']);
+
+                    $('#{{componentId}}-{{sectionId}}-dependencies-add, ' +
+                      '#{{componentId}}-{{sectionId}}-dependencies-remove').attr('disabled', false);
+
+                    $('#{{componentId}}-{{sectionId}}-dependencies-external, ' +
+                      '#{{componentId}}-{{sectionId}}-dependencies-external-version').attr('disabled', true);
+
+                    $('#selected-module-information').attr('hidden', false);
+                });
+
+                function reset() {
+                    $('#{{componentId}}-{{sectionId}}-dependencies-add, ' +
+                      '#{{componentId}}-{{sectionId}}-dependencies-external-add, ' +
+                      '#{{componentId}}-{{sectionId}}-dependencies-external-remove, ' +
+                      '#{{componentId}}-{{sectionId}}-dependencies-remove').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-dependencies-external, ' +
+                      '#{{componentId}}-{{sectionId}}-dependencies-external-version, ' +
+                      '#{{componentId}}-{{sectionId}}-dependencies-modules').attr('disabled', false);
+
+                    $('#{{componentId}}-{{sectionId}}-dependencies-modulename').val('');
+                    $('#{{componentId}}-{{sectionId}}-dependencies-moduleversion').val('');
+                    $('#{{componentId}}-{{sectionId}}-dependencies-modulerepo').val('');
+                    $('#{{componentId}}-{{sectionId}}-dependencies-external').val('');
+                    $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val('');
+                    $('#{{componentId}}-{{sectionId}}-dependencies-modules').val(0).trigger('change');
+
+                    $('#selected-module-information').attr('hidden', true);
+                }
+
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-dependencies')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleDependencies'], null, 4));
+                }
+
+                $('#{{componentId}}-{{sectionId}}-dependencies-add, ' +
+                  '#{{componentId}}-{{sectionId}}-dependencies-external-add').click(function(e) {
+                    e.preventDefault();
+
+                    if ($('#{{componentId}}-{{sectionId}}-dependencies-external-version').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val('^0');
+                    } else if (!$('#{{componentId}}-{{sectionId}}-dependencies-external-version').val().startsWith('^')) {
+                        $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val('^' + $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val());
+                    }
+
+                    var found = false;
+                    if (label === 'core') {
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label] = { };
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label]['name'] = moduleData['name'];
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label]['version'] = moduleData['version'];
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label]['repo'] = moduleData['repo'];
+                    } else if (label === 'apptypes') {
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype'] = { };
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['name'] = moduleData['name'];
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['version'] = moduleData['version'];
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['repo'] = moduleData['repo'];
+                    } else if (label === 'external') {
+                        if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
+                            if (!dataCollectionSectionForm['vars']['moduleDependencies']['composer']) {
+                                dataCollectionSectionForm['vars']['moduleDependencies']['composer'] = { };
+                            }
+                            if (!dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require']) {
+                                dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require'] = { };
+                            }
+                            dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]
+                                = $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val();
+                        } else {
+                            if (dataCollectionSectionForm['vars']['moduleDependencies']['external'].length === 0) {
+                                dataCollectionSectionForm['vars']['moduleDependencies']['external'] = { };
+                            }
+                            dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]
+                                = $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val();
+                        }
+                    } else {
+                        for (var modules in dataCollectionSectionForm['vars']['moduleDependencies']) {
+                            if (label === modules) {
+                                $.each(dataCollectionSectionForm['vars']['moduleDependencies'][modules], function(index, mod) {
+                                    if (mod['name'] === moduleData['name']) {
+                                        found = true;
+                                    }
+                                });
+
+                                if (!found) {
+                                    if (modules === 'views' && dataCollectionSectionForm['vars']['module_type'] === 'views') {
+                                        if (dataCollectionSectionForm['vars']['modules'][modules][moduleData['id']]['base_view_module_id'] != '0') {
+                                            PNotify.error({'text': 'Only base view modules can be a view dependency'});
+
+                                            reset();
+
+                                            return false;
+                                        }
+
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module_id').val(moduleData['id']);
+
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked = false;
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module').attr('disabled', true);
+                                    }
+
+                                    var moduleToPush = { };
+                                    moduleToPush['name'] = moduleData['name'];
+                                    moduleToPush['version'] = moduleData['version'];
+                                    moduleToPush['repo'] = moduleData['repo'];
+
+
+                                    dataCollectionSectionForm['vars']['moduleDependencies'][modules].push(moduleToPush);
+                                }
+                            }
+                        }
+                    }
+
+                    reset();
+                    prettyfyJson();
+                });
+
+                $('#{{componentId}}-{{sectionId}}-dependencies-remove, ' +
+                  '#{{componentId}}-{{sectionId}}-dependencies-external-remove').click(function(e) {
+                    e.preventDefault();
+
+                    var found = false;
+                    var foundIndex;
+
+                    if (label === 'core') {
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label] = { };
+                    } else if (label === 'apptypes') {
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype'] = { };
+                    } else if (label === 'external') {
+                        if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
+                            if (dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]) {
+                                delete dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()];
+                            }
+                        } else {
+                            if (dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]) {
+                                delete dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()];
+                            }
+                        }
+                    } else {
+                        for (var modules in dataCollectionSectionForm['vars']['moduleDependencies']) {
+                            if (label === modules) {
+                                $.each(dataCollectionSectionForm['vars']['moduleDependencies'][modules], function(index, mod) {
+                                    if (mod['name'] === moduleData['name']) {
+                                        found = true;
+                                        foundIndex = index;
+                                    }
+                                });
+
+                                if (found) {
+                                    if (modules === 'views') {
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module_id').val('0');
+
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked = true;
+                                        $('#{{componentId}}-{{sectionId}}-base_view_module').attr('disabled', false);
+                                    }
+                                    dataCollectionSectionForm['vars']['moduleDependencies'][modules].splice(foundIndex);
+                                }
+                            }
+                        }
+                    }
+
+                    reset();
+                    prettyfyJson();
+                });
+
+                prettyfyJson();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-dependencies-external'                   : { },
+        '{{componentId}}-{{sectionId}}-base_view_module_id'                     : { },
+        '{{componentId}}-{{sectionId}}-base_view_module'                        : { },
+        '{{componentId}}-{{sectionId}}-dependencies-external-version'           : { },
+        '{{componentId}}-{{sectionId}}-release-notes'                           : { },
+        '{{componentId}}-{{sectionId}}-release-version'                         : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-release-version-major, ' +
+                  '#{{componentId}}-{{sectionId}}-release-version-minor, ' +
+                  '#{{componentId}}-{{sectionId}}-release-version-patch'
+                ).off();
+
+                $('#{{componentId}}-{{sectionId}}-release-version-major, ' +
+                  '#{{componentId}}-{{sectionId}}-release-version-minor, ' +
+                  '#{{componentId}}-{{sectionId}}-release-version-patch'
+                ).click(function(e) {
+                    e.preventDefault();
+
+                    var id = $(this)[0].id;
+                    var bump;
+
+                    if (id === '{{componentId}}-{{sectionId}}-release-version-major') {
+                        bump = 'major';
+                    } else if (id === '{{componentId}}-{{sectionId}}-release-version-minor') {
+                        bump = 'minor';
+                    } else if (id === '{{componentId}}-{{sectionId}}-release-version-patch') {
+                        bump = 'patch';
+                    }
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['type'] = '{{type}}';
+                    postData['bump'] = bump;
+
+                    $.post('{{links.url("devtools/modules/bumpVersion")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.version) {
+                                $('#{{componentId}}-{{sectionId}}-release-version').val(response.responseData.version);
+                            }
+
+                            PNotify.success({'text': 'Bumped to version ' + response.responseData.version});
+                        } else {
+                            PNotify.error({'text': response.responseMessage});
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-labels'                                  : {
+            placeholder : "SELECT LABELS TO IMPORT RESOLVED ISSUES",
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-sync-labels').off();
+                $('#{{componentId}}-{{sectionId}}-sync-labels').click(function(e) {
+                    e.preventDefault();
+                        $('#{{componentId}}-{{sectionId}}-sync-labels').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-sync-labels').children('i').addClass('fa-spin');
+                        $('#{{componentId}}-{{sectionId}}-labels').empty().trigger('change');
+
+                        var postData = { };
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
+                        postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+
+                        $.post('{{links.url("devtools/modules/syncLabels")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+
+                            if (response.responseCode == 0) {
+                                if (response.responseData && response.responseData.labels) {
+                                    for (var label in response.responseData.labels) {
+                                        var newOption
+                                            = new Option(
+                                                response.responseData.labels[label]['name'],
+                                                response.responseData.labels[label]['id'], false, false
+                                            );
+
+                                        $('#{{componentId}}-{{sectionId}}-labels').append(newOption).trigger('change');
+                                    }
+                                }
+                                PNotify.success({'text': 'Synced ' + response.responseData.labels.length + ' labels.'});
+                            } else {
+                                PNotify.error({'text': response.responseMessage});
+                            }
+                            $('#{{componentId}}-{{sectionId}}-sync-labels').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-sync-labels').children('i').removeClass('fa-spin');
+                        }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-import-issues').off();
+                $('#{{componentId}}-{{sectionId}}-import-issues').click(function(e) {
+                    var selectedLabels = $('#{{componentId}}-{{sectionId}}-labels').select2('data');
+                    var labelsArr = [];
+                    if (selectedLabels.length === 0) {
+                        PNotify.error({'text': 'Please select labels to import issues'});
+
+                        return;
+                    }
+
+                    $(selectedLabels).each(function(i, labels) {
+                        for (var label in labels) {
+                            if (labels[label]['text']) {
+                                labelsArr.push(labels[label]['text']);
+                            }
+                        }
+                    });
+
+                    $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-list-check').addClass('fa-spin fa-cog');
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-api_id').val();
+                    postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
+                    postData['labels'] = labelsArr;
+
+                    $.post('{{links.url("devtools/modules/getLabelIssues")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.issues) {
+                                var html = $('#{{componentId}}-{{sectionId}}-release-notes').trumbowyg('html');
+
+                                html += '<p>Resolved Issues (' + labelsArr.join() + '):</p>';
+
+                                $(response.responseData.issues).each(function(i, issues) {
+                                    html += '<p>' + issues['number'] + ' : ' + issues['title'] + '</p>';
+                                })
+
+                                $('#{{componentId}}-{{sectionId}}-release-notes').trumbowyg('html', html);
+                            }
+                            PNotify.success({'text': 'Got ' + response.responseData.issues.length + ' issues.'});
+                        } else {
+                            PNotify.error({'text': response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-spin fa-cog').addClass('fa-list-check');
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-app_type'                        : 'required',
+                '{{componentId}}-{{sectionId}}-module_type'                     : 'required',
+                '{{componentId}}-{{sectionId}}-category'                        : 'required',
+                '{{componentId}}-{{sectionId}}-name'                            : 'required',
+                '{{componentId}}-{{sectionId}}-display_name'                    : 'required',
+                '{{componentId}}-{{sectionId}}-route'                           : 'required',
+                '{{componentId}}-{{sectionId}}-api_id'                          : 'required',
+                '{{componentId}}-{{sectionId}}-version'                         : 'required',
+                '{{componentId}}-{{sectionId}}-repo'                            : 'required',
+                '{{componentId}}-{{sectionId}}-class'                           : 'required',
+                '{{componentId}}-{{sectionId}}-menu_id'                         : 'required',
+                '{{componentId}}-{{sectionId}}-menu'                            : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-app_type'                        : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-module_type'                     : 'Please select module type',
+                '{{componentId}}-{{sectionId}}-category'                        : 'Please select category',
+                '{{componentId}}-{{sectionId}}-name'                            : 'Please enter module name',
+                '{{componentId}}-{{sectionId}}-display_name'                    : 'Please enter module display name',
+                '{{componentId}}-{{sectionId}}-route'                           : 'Please enter route',
+                '{{componentId}}-{{sectionId}}-api_id'                          : 'Please select Repository',
+                '{{componentId}}-{{sectionId}}-version'                         : 'Please enter version',
+                '{{componentId}}-{{sectionId}}-repo'                            : 'Please enter repo',
+                '{{componentId}}-{{sectionId}}-class'                           : 'Please enter class',
+                '{{componentId}}-{{sectionId}}-menu_id'                         : 'Please enter menu_id',
+                '{{componentId}}-{{sectionId}}-menu'                            : 'Please enter menu'
+            },
+            onSubmitResponse: function(response) {
+                if (response.responseData && response.responseData.newRepo && $('#repo-details').length > 0) {
+                    if (response.responseData.newRepo == false) {
+                        return true;
+                    }
+                    if ((response.responseData.newRepo.base && response.responseData.newRepo.base == false) ||
+                        (response.responseData.newRepo.public && response.responseData.newRepo.public == false)
+                    ) {
+                        return true;
+                    }
+
+                    var newRepo;
+                    var appType = BazHelpers.capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val());
+                    var moduleType = $('#{{componentId}}-{{sectionId}}-module_type').val();
+                    var path = appType + '/' + BazHelpers.capitalizeFirstLetter(moduleType) + '/';
+                    var pathPublic = $('#{{componentId}}-{{sectionId}}-app_type').val().toLowerCase() + '/';
+                    var devLink = '/src/branch/dev';
+
+                    if (moduleType === 'components') {
+                        var routeArr = [];
+
+                        $($('#{{componentId}}-{{sectionId}}-route').val().split('/')).each(function(i, route) {
+                            routeArr.push(BazHelpers.capitalizeFirstLetter(route));
+                        });
+
+                        path += routeArr.join('/');
+                    } else {
+                        if (moduleType === 'views') {
+                            if (dataCollectionSectionForm['vars']['subview']) {
+                                path += dataCollectionSectionForm['vars']['moduleDependencies']['views'][0]['name'] + '/html/';
+                                path += $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
+                            } else {
+                                path += $('#{{componentId}}-{{sectionId}}-name').val();
+                            }
+                            pathPublic += $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
+                        } else {
+                            var nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
+                            path += nameArr.join('/');
+                        }
+                    }
+                    if (response.responseData.newRepo.base) {
+                        newRepo  = response.responseData.newRepo.base;
+                    } else {
+                        newRepo  = response.responseData.newRepo;
+                    }
+
+                    if (newRepo.html_url && newRepo.html_url.includes('github')) {
+                        devLink = '/tree/dev';
+                    }
+                    $('#path').html(path);
+                    $('#repo_url').html(newRepo.clone_url);
+                    $('#repo_url_dev').html(newRepo.html_url + devLink);
+                    $('#repo_url_dev_a').attr('href', newRepo.html_url + devLink);
+
+                    if (response.responseData.newRepo.public && $('#views-public').length > 0) {
+                        $('#path_public').html(pathPublic);
+                        $('#repo_url_public').html(response.responseData.newRepo.public.clone_url);
+                        $('#repo_url_dev_public').html(response.responseData.newRepo.public.html_url + devLink);
+                        $('#repo_url_dev_a_public').attr('href', response.responseData.newRepo.public.html_url + devLink);
+                        $('#views-public').attr('hidden', false);
+                    }
+
+                    $('#repo-details').attr('hidden', false);
+                    $('#module-details').attr('hidden', true);
+                    $('.addData').attr('hidden', true);
+                    $('.updateData').attr('hidden', true);
+                    $('.cancelForm').attr('hidden', true);
+                    $('.closeForm').attr('hidden', false);
+
+                    return false;
+                }
+
+                return true;
+            }
+        }
+    });
+</script>
+        {% endif %}
+    </div>
+    <div id="repo-details" hidden>
+        {% include 'modules/repodetails.html' %}
+    </div>
+{% endif %}

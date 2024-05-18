@@ -16,6 +16,8 @@ class Error
 
 	protected $response;
 
+	protected $auth;
+
 	protected $exception;
 
 	protected $appDebug;
@@ -24,7 +26,7 @@ class Error
 
 	protected $newException = null;
 
-	public function __construct($appInfo, $config, $logger, $request, $response)
+	public function __construct($appInfo, $config, $logger, $request, $response, $auth)
 	{
 		$this->appInfo = $appInfo;
 
@@ -35,6 +37,8 @@ class Error
 		$this->request = $request;
 
 		$this->response = $response;
+
+		$this->auth = $auth;
 	}
 
 	public function init()
@@ -50,27 +54,33 @@ class Error
 		return $this;
 	}
 
-	public function handle(\Exception $exception)
+	public function handle(\throwable $exception)
 	{
 		$this->exception = $exception;
 
 		$this->class = (new \ReflectionClass($this->exception))->getShortName();
 
 		if ($this->config->logs->enabled) {
-			if ($this->config->logs->email &&
-				($this->class === 'Exception' || !$this->emailClass($this->class))
-			) {
-				$this->emailMessage();
-			}
-
 			$this->logMessage();
 		}
 
 		if ($this->config->logs->exceptions) {
-			$this->logger->logExceptions->debug($exception);
+			$this->logger->logExceptions->critical($exception);
+
+			if ($this->config->logs->emergencyLogsEmail &&
+				($this->class === 'Exception' || !$this->emailClass($this->class))
+			) {
+				$emailMessage = $this->emailMessage('emergency');
+
+				if (isset($emailMessage['emailSent']) && $emailMessage['emailSent'] === true) {
+					echo 'Critical Error! Email to administrator was sent. Please follow up with your administrator/developer with the following information.';
+				} else {
+					echo 'Critical Error! Email to administrator failed. Please provide the following information to your developer or system administrator.';
+				}
+			}
 
 			if (!$this->appDebug) {
-				echo 'Exception: Please check exceptions log for more details.';
+				echo $this->buildMessageNoDebug($emailMessage);
 
 				return;
 			}
@@ -81,7 +91,7 @@ class Error
 			return;
 		}
 
-		$customHandler = $this->customHandler($this->class);
+		$customHandler = $this->customHandler();
 
 		if (!$customHandler) {
 			if ($this->appDebug) {
@@ -136,15 +146,17 @@ class Error
 		}
 	}
 
-	protected function emailMessage()
+	protected function emailMessage($type = 'alert')
 	{
 		try {
-			$this->logger->commitEmail($this->buildMessage(true, false));
+			return $this->logger->commitEmail($this->buildMessage(true, false), $type);
 
 		} catch (\Exception $exception) {
 			$this->newException = $exception;
 
 			$this->class = 'EmailException';
+
+			return false;
 		}
 	}
 
@@ -221,5 +233,59 @@ class Error
 					</tr>
 				</tbody>
 			</table>';
+	}
+
+	protected function buildMessageNoDebug($message)
+	{
+		if (isset($message['emergency'])) {
+			$color = "#fe0000";
+			$message = $message['emergency'];
+		} else if (isset($message['critical'])) {
+			$color = "#ffcc67";
+			$message = $message['critical'];
+		} else if (isset($message['alert'])) {
+			$color = "#f8ff00";
+			$message = $message['alert'];
+		}
+
+		$userId = 0;
+
+		if ($this->auth->account()) {
+			$userId = $this->auth->account()['id'];
+		}
+
+		return '<style type="text/css">
+				.tg' . $message['type'] . ' {border-collapse:collapse;border-spacing:0;width:100%;}
+				.tg' . $message['type'] . ' td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+				  overflow:hidden;padding:10px 5px;word-break:normal;}
+				.tg' . $message['type'] . ' th{border-color:black;background-color:' . $color . '; border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+				  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+				.tg' . $message['type'] . ' .tg-6kns{border-color:#333333;text-align:center;vertical-align:top}
+				.tg' . $message['type'] . ' .tg-orf0{font-family:"Arial Black", Gadget, sans-serif !important;;text-align:left;vertical-align:top}
+				.tg' . $message['type'] . ' .tg-0lax{text-align:left;vertical-align:top}
+			</style>
+			<br><br>
+			<table class="tg' . $message['type'] . '">
+				<thead>
+				<tr>
+					<th class="tg-6kns">
+						<span style="font-weight:bold; text-align:center;">' .
+							strtoupper($message['typeName']) .
+						'</span>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						User ID: ' . $userId .
+						' App ID: ' . $this->appInfo['id'] .
+						' Session ID: ' . $message['session'] .
+						' Connection ID: ' . $message['connection'] .
+						' Client IP:' . $message['client_ip'] .
+						' Timestamp: ' . $message['timestamp'] .
+					'</td>
+				</tr>
+			</tbody>';
 	}
 }

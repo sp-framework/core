@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Modules;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Middlewares
 {
@@ -45,6 +46,14 @@ class Middlewares
 						]
 					),
 					new Column(
+						'module_type',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 50,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'app_type',
 						[
 							'type'    => Column::TYPE_VARCHAR,
@@ -61,18 +70,10 @@ class Middlewares
 						]
 					),
 					new Column(
-						'sub_category',
-						[
-							'type'    => Column::TYPE_VARCHAR,
-							'size'	  => 50,
-							'notNull' => true,
-						]
-					),
-					new Column(
 						'version',
 						[
 							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 15,
+							'size'    => 100,
 							'notNull' => true,
 						]
 					),
@@ -88,14 +89,28 @@ class Middlewares
 						'class',
 						[
 							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 2048,
+							'size'    => 512,
 							'notNull' => true,
 						]
 					),
 					new Column(
 						'settings',
 						[
-							'type'    => Column::TYPE_TEXT,
+							'type'    => Column::TYPE_JSON,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'user_settings',
+						[
+							'type'    => Column::TYPE_JSON,
+							'notNull' => false,
+						]
+					),
+					new Column(
+						'dependencies',
+						[
+							'type'    => Column::TYPE_JSON,
 							'notNull' => true,
 						]
 					),
@@ -117,8 +132,15 @@ class Middlewares
 					new Column(
 						'files',
 						[
-							'type'    => Column::TYPE_TEXT,
+							'type'    => Column::TYPE_MEDIUMTEXT,
 							'notNull' => false,
+						]
+					),
+					new Column(
+						'api_id',
+						[
+							'type'    => Column::TYPE_INTEGER,
+							'notNull' => true,
 						]
 					),
 					new Column(
@@ -151,7 +173,41 @@ class Middlewares
 							'notNull' => true,
 							'default' => 'CURRENT_TIMESTAMP',
 						]
+					),
+					new Column(
+						'level_of_update',
+						[
+							'type'    => Column::TYPE_INTEGER,
+							'notNull' => false,
+						]
+					),
+					new Column(
+						'auto_update',
+						[
+							'type'    => Column::TYPE_BOOLEAN,
+							'notNull' => false,
+						]
+					),
+					new Column(
+						'repo_details',
+						[
+							'type'    => Column::TYPE_JSON,
+							'notNull' => false,
+						]
 					)
+				],
+				'indexes' => [
+					new Index(
+						'column_UNIQUE',
+						[
+							'class',
+							'api_id'
+						],
+						'UNIQUE'
+					)
+				],
+				'options' => [
+					'TABLE_COLLATION' => 'utf8mb4_general_ci'
 				]
 			];
 	}

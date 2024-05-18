@@ -1,0 +1,171 @@
+{% if account['id'] is defined %}
+    {% set accountId = account['id'] %}
+    {% set accountStatus = account['status'] %}
+    {% set accountEmail = account['email'] %}
+    {% set accountUsername = account['username'] %}
+    {% set accountFirstName = account['profile']['first_name'] %}
+    {% set accountLastName = account['profile']['last_name'] %}
+{% else %}
+    {% set accountId = '' %}
+    {% set accountStatus = '' %}
+    {% set accountEmail = '' %}
+    {% set accountUsername = '' %}
+    {% set accountFirstName = '' %}
+    {% set accountLastName = '' %}
+{% endif %}
+{% if accountStatus == '1' %}
+    {% set accountStatusChecked = true %}
+{% else %}
+    {% set accountStatusChecked = false %}
+{% endif %}
+{% if accountId == '1' %}
+    {% set accountStatusChecked = true %}
+    {% set accountStatusDisabled = true %}
+{% else %}
+    {% set accountStatusDisabled = false %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'id',
+                'fieldLabel'                     : 'ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : accountId
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'status',
+                'fieldLabel'                     : 'Enabled?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Check to enable account.',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : accountStatusChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazScan'                   : true,
+                'fieldDisabled'                  : accountStatusDisabled,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'email',
+                'fieldLabel'                     : 'Email',
+                'fieldType'                      : 'input',
+                'fieldInputType'                 : 'email',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Account Email Address',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 100,
+                'fieldValue'                     : accountEmail
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'username',
+                'fieldLabel'                     : 'Username',
+                'fieldType'                      : 'input',
+                'fieldInputType'                 : 'username',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Account Username Address',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : accountUsername
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'first_name',
+                'fieldLabel'                     : 'First Name',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'First Name',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : accountFirstName
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'last_name',
+                'fieldLabel'                     : 'Last Name',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Last Name',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : accountLastName
+            ]
+        )}}
+    </div>
+</div>

@@ -10,19 +10,27 @@ class ModulesViews extends BaseModel
 
     public $name;
 
+    public $display_name;
+
     public $description;
+
+    public $module_type;
 
     public $app_type;
 
     public $category;
 
-    public $sub_category;
-
     public $version;
+
+    public $view_modules_version;
+
+    public $base_view_module_id;
 
     public $repo;
 
     public $settings;
+
+    public $user_settings;
 
     public $dependencies;
 
@@ -32,6 +40,8 @@ class ModulesViews extends BaseModel
 
     public $files;
 
+    public $api_id;
+
     public $update_available;
 
     public $update_version;
@@ -39,4 +49,10 @@ class ModulesViews extends BaseModel
     public $updated_by;
 
     public $updated_on;
+
+    public $level_of_update;
+
+    public $auto_update;
+
+    public $repo_details;
 }

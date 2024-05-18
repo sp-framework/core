@@ -1,0 +1,56 @@
+{% set editDisabled = true %}
+{% set editHidden = true %}
+{% set saveDisabled = true %}
+{% set saveHidden = true %}
+{% set addDisabled = true %}
+{% set addHidden = true %}
+{% if auth.account() %}
+    {% if dashboard['created_by'] == auth.account()['id'] %}
+        {% set addDisabled = false %}
+        {% set addHidden = false %}
+    {% endif %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : sectionId,
+            'buttonType'                    : 'button',
+            'buttons'                       :
+                    [
+                        'add-widgets' : [
+                            'title'                   : 'Add Widgets',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'position'                : 'right',
+                            'icon'                    : 'plus',
+                            'disabled'                : addDisabled,
+                            'hidden'                  : addHidden
+                        ],
+                        'edit-widgets' : [
+                            'title'                   : 'Edit Widgets',
+                            'size'                    : 'xs',
+                            'type'                    : 'warning',
+                            'position'                : 'right',
+                            'icon'                    : 'edit',
+                            'disabled'                : editDisabled,
+                            'hidden'                  : editHidden
+                        ],
+                        'save-widgets' : [
+                            'title'                   : 'Save',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'position'                : 'right',
+                            'icon'                    : 'save',
+                            'disabled'                : saveDisabled,
+                            'hidden'                  : saveHidden
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>

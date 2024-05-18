@@ -23,14 +23,14 @@ class EmailQueue
                     new Column(
                         'app_id',
                         [
-                            'type'    => Column::TYPE_TINYINTEGER,
+                            'type'    => Column::TYPE_INTEGER,
                             'notNull' => true,
                         ]
                     ),
                     new Column(
                         'domain_id',
                         [
-                            'type'    => Column::TYPE_TINYINTEGER,
+                            'type'    => Column::TYPE_INTEGER,
                             'notNull' => true,
                         ]
                     ),

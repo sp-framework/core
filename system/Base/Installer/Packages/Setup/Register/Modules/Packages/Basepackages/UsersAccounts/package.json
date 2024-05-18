@@ -1,0 +1,30 @@
+{
+    "name"          : "UsersAccounts",
+    "display_name"  : "Users Accounts",
+    "description"   : "Basepackage Users Accounts",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "basepackages",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Users\\Accounts",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "settings"      : {
+        "componentRoute": "system/users/accounts",
+        "import": true,
+        "export": true,
+        "importAddMethod": "addAccount",
+        "importUpdateMethod": "updateAccount"
+    }
+}

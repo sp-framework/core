@@ -1,0 +1,396 @@
+<script>
+/*global BazCore */
+BazCore.header({
+    loadHeaderAt : 'login'
+});
+</script>
+<div class="pace-loading-text ml-1 fixed-top text-orange" hidden>
+    <span>Loading... </span>
+    <span></span>
+</div>
+<div id="{{componentId}}" class="login-box">
+    <div class="card m-0">
+        <div class="card-body login-card-body">
+            <div class="login-logo">
+                <img src="{{links.images(assets.get('branding').getCodes()[3].getContent())}}" data-rjs="3" alt="Bazaari Logo" style="height:{{assets.get('branding').getCodes()[5].getContent()}}px">
+            </div>
+            <div id="{{componentId}}-regular" hidden>
+                {% if api is defined %}
+                    <p class="login-box-msg text-sm font-weight-bold">Register new client for API {{api['name']}}</p>
+                {% else %}
+                    <p class="login-box-msg text-sm font-weight-bold">Register new account for application {{appName|lower}}</p>
+                {% endif %}
+                <div id="{{componentId}}-form">
+                    {% if api is not defined %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'componentId'                           : componentId,
+                                'sectionId'                             : 'form',
+                                'fieldId'                               : 'first_name',
+                                'fieldLabel'                            : false,
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'text',
+                                'fieldPlaceholder'                      : 'First Name',
+                                'fieldGroupPostAddonIcon'               : 'user'
+                            ]
+                        )}}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'componentId'                           : componentId,
+                                'sectionId'                             : 'form',
+                                'fieldId'                               : 'last_name',
+                                'fieldLabel'                            : false,
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'text',
+                                'fieldPlaceholder'                      : 'Last Name',
+                                'fieldGroupPostAddonIcon'               : 'user'
+                            ]
+                        )}}
+                    {% endif %}
+                    {{adminltetags.useTag('fields',
+                        [
+                            'componentId'                           : componentId,
+                            'sectionId'                             : 'form',
+                            'fieldId'                               : 'email',
+                            'fieldLabel'                            : false,
+                            'fieldType'                             : 'input',
+                            'fieldInputType'                        : 'text',
+                            'fieldPlaceholder'                      : 'Email',
+                            'fieldGroupPostAddonIcon'               : 'envelope'
+                        ]
+                    )}}
+                    {% if api is defined %}
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                {{adminltetags.useTag('fields',
+                                    [
+                                        'componentId'                           : componentId,
+                                        'sectionId'                             : 'form',
+                                        'fieldId'                               : 'device_id',
+                                        'fieldLabel'                            : false,
+                                        'fieldType'                             : 'checkbox',
+                                        'fieldCheckboxType'                     : 'success',
+                                        'fieldCheckboxLabel'                    : 'Is Device?',
+                                        'fieldCheckboxAdditionClass'            : 'text-sm text-uppercase'
+                                    ]
+                                )}}
+                            </div>
+                            <div class="col d-none">
+                                {{adminltetags.useTag('fields',
+                                    [
+                                        'componentId'                           : componentId,
+                                        'sectionId'                             : 'form',
+                                        'fieldId'                               : 'forceRegen',
+                                        'fieldLabel'                            : false,
+                                        'fieldType'                             : 'checkbox',
+                                        'fieldCheckboxType'                     : 'success',
+                                        'fieldCheckboxLabel'                    : 'Force Revoke & Regenerate?',
+                                        'fieldCheckboxAdditionClass'            : 'text-sm text-uppercase'
+                                    ]
+                                )}}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="row mt-2">
+                        {% if api is not defined %}
+                            <div class="col mt-2">
+                                <a class="text-info" href="{{links.url('auth')}}">
+                                    <span>Back to login</span>
+                                </a>
+                            </div>
+                        {% endif %}
+                        <div class="col">
+                            <button id="{{componentId}}-form-register" type="button" class="btn btn-info float-right">
+                                <i class="fa fa-cog fa-spin login-spinner" hidden></i>
+                                <span class="text-uppercase">Register</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% include 'auth/footer.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% if api is defined %}
+    {% set api = json_encode(api, 16) %}
+{% else %}
+    {% set api = json_encode([]) %}
+{% endif %}
+{% if client is defined %}
+    {% set client = json_encode(client, 16) %}
+{% else %}
+    {% set client = json_encode([]) %}
+{% endif %}
+<script>
+/*global BazCore */
+$(document).ready(function() {
+    var isRegister, isApi, api, client, refresh;
+    $('#{{componentId}}-regular').attr('hidden', false).addClass('animated fadeIn');
+
+    if ($('#{{componentId}}-form-register').length > 0) {
+        isRegister = true;
+        isApi = false;
+
+        api = JSON.parse('{{api}}');
+        if (Object.keys(api).length > 0 && api.id) {
+            isApi = true;
+        }
+
+        if (isApi) {
+            $('#{{componentId}}-form-email').focus();
+        } else {
+            $('#{{componentId}}-form-first_name').focus();
+        }
+
+        BazCore.footer({
+            loadFooterAt : 'register'
+        });
+    } else {
+        isRegister = false;
+        isApi = false;
+        api = JSON.parse('{{api}}');
+        client = JSON.parse('{{client}}');
+        refresh = '{{refresh}}';
+
+        BazCore.footer({
+            loadFooterAt : 'authorize'
+        });
+    }
+
+    // Slideshow
+    $('body').vegas({
+        delay: 300000,
+        timer: false,
+        shuffle: true,
+        slides: [
+        { src: '{{links.images("/vegas/2.4.4/images/wp1.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp2.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp3.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp4.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp5.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp6.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp7.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp8.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp9.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp10.jpg")}}' }
+        ],
+        overlay: '{{links.images("/vegas/2.4.4/overlays/01.png")}}'
+    });
+
+    var url, thisButton;
+    var postData = { };
+    function getAjaxUrlData() {
+        $('.login-spinner').attr('hidden', false);
+
+        postData = { };
+        if (isRegister) {
+            $('#{{componentId}}-form-register').attr('disabled', true);
+            postData['email'] = $('#{{componentId}}-form-email').val().trim();
+
+            if (!isApi) {
+                url = '{{links.url("register/registerNewAccount")}}';
+                postData['first_name'] = $('#{{componentId}}-form-first_name').val().trim();
+                postData['last_name'] = $('#{{componentId}}-form-last_name').val().trim();
+            } else if (isApi) {
+                url = '{{links.url("register/apiAddNewClient")}}';
+                postData['api_id'] = api['id'];
+                postData['device_id'] = '0';
+                if ($('#{{componentId}}-form-device_id')[0].checked === true) {
+                    postData['device_id'] = '1';
+                }
+                if ($('#{{componentId}}-form-forceRegen')[0].checked === true) {
+                    postData['forceRegen'] = '1';
+                }
+            }
+        } else if ((typeof client === 'object' && Object.keys(client).length > 0) ||
+                   refresh == true
+        ) {
+            url = '{{links.url("register/apiClient")}}';
+            postData['client_id'] = $('#{{componentId}}-form-client_id').val().trim();
+            postData['client_secret'] = $('#{{componentId}}-form-client_secret').val().trim();
+            if (refresh != true) {
+                postData['grant_type'] = 'authorization_code';
+                postData['redirect_uri'] = $('#{{componentId}}-form-redirect_uri').val().trim();
+                postData['code'] = $('#{{componentId}}-form-code').val().trim();
+            } else {
+                postData['grant_type'] = 'refresh_token';
+                postData['refresh'] = true;
+                postData['refresh_token'] = $('#{{componentId}}-form-refresh_token_input').val().trim();
+            }
+        } else {
+            window.location = api['authorization_url'];
+        }
+
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+    }
+
+    if (isRegister) {
+        $('#{{componentId}}-form-register')
+            .click(function(e) {
+                e.preventDefault();
+                thisButton = this;
+                getAjaxUrlData();
+                runAjax();
+            });
+    } else {
+        if ($('#{{componentId}}-form-authorize').length > 0) {
+            $('#{{componentId}}-form-authorize')
+                .click(function(e) {
+                    e.preventDefault();
+                    thisButton = this;
+                    getAjaxUrlData();
+                });
+        } else if ($('#{{componentId}}-form-request').length > 0) {
+            $('#{{componentId}}-form-request')
+                .click(function(e) {
+                    e.preventDefault();
+                    thisButton = this;
+                    getAjaxUrlData();
+                    runAjax();
+                });
+        }
+    }
+
+    function runAjax() {
+        $.ajax({
+            url             : url,
+            data            : postData,
+            method          : 'post',
+            dataType        : 'json',
+            beforeSend      : function() {
+                                $("#{{componentId}}-form :input").prop("disabled", true);
+                            },
+            error           : function(response) {
+                                if (response.getResponseHeader('redirect_url')) {
+                                    window.location = response.getResponseHeader('redirect_url');
+                                }
+                                $('.login-box-msg').text('Error! Please contact administrator.');
+                                failed(response);
+                            },
+            success         : function(response) {
+                                if (response.responseCode == '0') {
+                                    $('.login-box-msg').text(response.responseMessage);
+                                    $('.login-box-msg').removeClass('text-danger').addClass('text-success font-weight-bold');
+                                    success(response);
+                                } else if (response.responseCode == '1') {
+                                    $('.login-box-msg').text(response.responseMessage);
+                                    if (isApi) {
+                                        if (response.responseMessage.includes('force')) {
+                                            $('#{{componentId}}-form-forceRegen').parents('.col').removeClass('d-none');
+                                        }
+                                    }
+                                    failed(response);
+                                }
+
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+                            }
+        });
+    }
+
+    function failed(response) {
+        if (typeof client === 'object' && Object.keys(client).length > 0) {
+            $('#{{componentId}}-form-client_id').attr('disabled', false);
+            $('#{{componentId}}-form-client_secret').attr('disabled', false);
+            $('.login-spinner').attr('hidden', true);
+            $('#{{componentId}}-form-request').attr('disabled', false);
+            $('#{{componentId}}-form-client_id').focus();
+            $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+            setTimeout(function () {
+                $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+
+                $('.login-box-msg').text('Client authorized for ' + api['name']);
+
+                $('.login-box-msg').addClass('animated fadeIn');
+            }, 5000);
+        } else {
+            if (response.redirectUrl) {
+                window.location = response.redirectUrl;
+            }
+            $('.login-spinner').attr('hidden', true);
+            $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+            $('#{{componentId}}-form :input').prop('disabled', false);
+            $('#{{componentId}}-form :input').not('.token').val('');
+            if (isApi) {
+                $('#{{componentId}}-form-email').focus();
+                $('#{{componentId}}-form-device_id')[0].checked = false;
+            } else {
+                $('#{{componentId}}-form-first_name').focus();
+            }
+
+            $('#{{componentId}}-form-register').attr('disabled', false);
+
+            setTimeout(function () {
+                $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+
+                if (isApi) {
+                    $('.login-box-msg').text('Register new client for API ' + api['name']);
+                } else {
+                    $('.login-box-msg').text('Register new account for application {{appName|lower}}');
+                }
+
+                $('.login-box-msg').addClass('animated fadeIn');
+            }, 5000);
+        }
+    }
+
+    function success(response) {
+        if (!isApi) {
+            if (typeof client === 'object' && Object.keys(client).length > 0) {
+                if (response.responseData) {
+                    $('#codes').removeClass('d-none');
+                    $('#code').addClass('d-none');
+                    $('#client-info-input').addClass('d-none');
+                    $('.login-spinner').attr('hidden', true);
+                    $('#{{componentId}}-form-request').attr('hidden', true);
+                    $('#{{componentId}}-form-client_id, #{{componentId}}-form-client_secret').attr('disabled', true);
+                    $('#{{componentId}}-form-expires_in').val(response.responseData.expires_in);
+                    $('#{{componentId}}-form-token_type').val(response.responseData.token_type);
+                    $('#{{componentId}}-form-access_token').val(response.responseData.access_token);
+                    $('#{{componentId}}-form-refresh_token').val(response.responseData.refresh_token);
+                }
+            } else if (refresh == true) {
+                    $('#codes').removeClass('d-none');
+                    $('#client-info-input').addClass('d-none');
+                    $('#refresh-token-input').addClass('d-none');
+                    $('.login-spinner').attr('hidden', true);
+                    $('#{{componentId}}-form-request').attr('hidden', true);
+                    $('#{{componentId}}-form-client_id, #{{componentId}}-form-client_secret').attr('disabled', true);
+                    $('#{{componentId}}-form-request_token_input').attr('disabled', true);
+                    $('#{{componentId}}-form-expires_in').val(response.responseData.expires_in);
+                    $('#{{componentId}}-form-token_type').val(response.responseData.token_type);
+                    $('#{{componentId}}-form-access_token').val(response.responseData.access_token);
+                    $('#{{componentId}}-form-refresh_token').val(response.responseData.refresh_token);
+            } else {
+                setTimeout(function() {
+                    $('.login-spinner').attr('hidden', true);
+
+                    if (response.redirectUrl) {
+                        window.location = response.redirectUrl;
+                    } else {
+                        window.location = '/{{appRoute}}/';
+                    }
+                }, 1500);
+            }
+        } else {
+            $('.login-spinner').attr('hidden', true);
+            $('.login-box-msg').removeClass('fadeIn').addClass('text-success animated fadeIn');
+            $('#{{componentId}}-form :input').prop('disabled', false);
+            $('#{{componentId}}-form :input').not('.token').val('');
+            $('#{{componentId}}-form-email').focus();
+            $('#{{componentId}}-form-device_id')[0].checked = false;
+            $('#{{componentId}}-form-forceRegen')[0].checked = false;
+            $('#{{componentId}}-form-forceRegen').parents('.col').addClass('d-none');
+
+            setTimeout(function () {
+                $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+                $('.login-box-msg').text('Register new client for API ' + api['name']);
+                $('.login-box-msg').addClass('animated fadeIn');
+            }, 5000);
+        }
+    }
+});
+</script>

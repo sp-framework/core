@@ -73,10 +73,36 @@ class ExceptionHandlers extends BaseComponent
 		return redirect('/auth/login');
 	}
 
+	public function handleInvalidDataException($exception)
+	{
+		$this->addResponse($exception->getMessage(), 1);
+
+		if (str_contains($exception->getMessage(), "The data must match the 'json' format.")) {
+			$this->addResponse("Json data provided is incorrect.", 1);
+		}
+
+		return $this->sendJson();
+	}
+
+	public function handleIOException($exception)
+	{
+		$this->addResponse($exception->getMessage(), 1);
+
+		if (str_contains($exception->getMessage(), "Duplicate entry")) {
+			$this->addResponse("Entry with same data already exists.", 1);
+		}
+
+		return $this->sendJson();
+	}
+
 	private function setViewsDir($partial)
 	{
 		$this->view->setViewsDir(base_path($this->baseErrorDir));
 
-		return $this->view->partial($partial);
+		return $this->view->partial($partial,
+			[
+				'route' => $this->apps->getAppInfo()['route']
+			]
+		);
 	}
 }

@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMenus;
 
@@ -23,26 +22,27 @@ class Menus extends BasePackage
 
     public function buildMenusForApp($appId)
     {
-        $cachedMenu = $this->cacheTools->getCache('menus');
-
-        if ($cachedMenu) {
-            return $cachedMenu;
-        }
-
         $menus = $this->getMenusForApp($appId);
+
+        $buildMenu = $this->buildMenus($menus);
+
+        return $buildMenu;
+    }
+
+    public function buildMenus($menus = null)
+    {
+        if ($menus === null) {
+            $menus = $this->menus;
+        }
 
         $buildMenu = [];
 
         foreach (msort($menus, 'sequence') as $key => $menu) {
-            $menu = Json::decode($menu['menu'], true);
+            $menu = $this->helper->decode($menu['menu'], true);
 
             if ($menu) {
                 $buildMenu = array_replace_recursive($buildMenu, $menu);
             }
-        }
-
-        if ($this->config->cache->enabled) {
-            $this->cacheTools->setCache('menus_' . $appId, $buildMenu);
         }
 
         return $buildMenu;
@@ -53,7 +53,7 @@ class Menus extends BasePackage
         $menus = [];
 
         foreach($this->menus as $menu) {
-            $menu['apps'] = Json::decode($menu['apps'], true);
+            $menu['apps'] = $this->helper->decode($menu['apps'], true);
 
             if (count($menu['apps']) > 0) {
                 if (isset($menu['apps'][$appId]) &&
@@ -68,32 +68,104 @@ class Menus extends BasePackage
         return $menus;
     }
 
+    public function getMenusForAppType($appType)
+    {
+        $menus = [];
+
+        foreach($this->menus as $menu) {
+            if ($menu['app_type'] === $appType) {
+                $menus[$menu['id']] = $menu;
+            }
+        }
+
+        return $this->buildMenus($menus);
+    }
 
     public function updateMenus($data)
     {
-        $menus = Json::decode($data['menus'], true);
+        $menus = $this->helper->decode($data['menus'], true);
 
         if (count($menus) > 0) {
             foreach ($menus as $menuId => $value) {
                 $menu = $this->getById($menuId);
 
-                $menu['apps'] = Json::decode($menu['apps'], true);
+                $menu['apps'] = $this->helper->decode($menu['apps'], true);
 
                 $menu['apps'] = array_replace($menu['apps'], $value);
 
-                $menu['apps'] = Json::encode($menu['apps']);
+                $menu['apps'] = $this->helper->encode($menu['apps']);
 
-                $menu['menu'] = Json::decode($menu['menu'], true);
-                $menu['menu'] = Json::encode($menu['menu'], JSON_UNESCAPED_SLASHES);
+                $menu['menu'] = $this->helper->decode($menu['menu'], true);
+                $menu['menu'] = $this->helper->encode($menu['menu'], JSON_UNESCAPED_SLASHES);
 
                 $this->update($menu);
             }
         }
 
-        if ($this->cacheTools->getCache('menus')) {
-            $this->cacheTools->deleteCache('menus');
+        $this->init(true);
+    }
+
+    public function addMenu($appType, array $menu)
+    {
+        if (isset($menu['seq'])) {
+            $sequence = $menu['seq'];
+            unset($menu['seq']);
+        } else {
+            $sequence = 99;
         }
 
-        $this->basepackages->menus->init(true);
+        $menu = $this->addSequence($menu, $sequence);
+
+        $insertMenu = $this->add([
+                'menu'                  => $this->helper->encode($menu),
+                'apps'                  => $this->helper->encode([]),
+                'app_type'              => $appType,
+                'sequence'              => $sequence
+            ]
+        );
+
+        if ($insertMenu) {
+            return $this->packagesData->last;
+        } else {
+            return null;
+        }
+    }
+
+    public function updateMenu($id, $appType, array $menu)
+    {
+        if (isset($menu['seq'])) {
+            $sequence = $menu['seq'];
+            unset($menu['seq']);
+        } else {
+            $sequence = 99;
+        }
+
+        $menu = $this->addSequence($menu, $sequence);
+
+        $this->update([
+                'id'                    => $id,
+                'menu'                  => $this->helper->encode($menu),
+                'apps'                  => $this->helper->encode([]),
+                'app_type'              => $appType,
+                'sequence'              => $sequence
+            ]
+        );
+
+        return true;
+    }
+
+    protected function addSequence($menu, $sequence)
+    {
+        foreach ($menu as $key => &$value) {
+            if (!isset($value['seq'])) {
+                $value['seq'] = $sequence;
+            }
+
+            if (isset($value['childs'])) {
+                $value['childs'] = $this->addSequence($value['childs'], $sequence);
+            }
+        }
+
+        return $menu;
     }
 }

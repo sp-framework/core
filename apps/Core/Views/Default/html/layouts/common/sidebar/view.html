@@ -1,0 +1,10 @@
+<aside class="main-sidebar elevation-4 sidebar-dark-info">
+    <a href="{{links.url('home')}}" class="brand-link contentAjaxLink">
+        <img src="{{links.images(assets.get('branding').getCodes()[0].getContent())}}" data-rjs="3" alt="Bazaari Logo" class="brand-image" style="height:{{assets.get('branding').getCodes()[2].getContent()}}px">
+        <span class="brand-text font-weight-light">{{appRoute|upper}}</span>
+    </a>
+    <div class="sidebar">
+        {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/menu/search') %}
+        {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/menu/view') %}
+    </div>
+</aside>

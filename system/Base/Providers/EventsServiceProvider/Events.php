@@ -36,5 +36,10 @@ class Events
             'dispatch:beforeExecuteRoute',
             new MiddlewaresServiceProvider()
         );
+
+        $this->events->attach(
+            'dispatch:afterExecuteRoute',
+            new MiddlewaresServiceProvider()
+        );
     }
 }

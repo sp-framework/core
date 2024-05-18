@@ -1,0 +1,12 @@
+                <div class="login-footer text-sm text-center">
+                    <strong>Copyright &copy;
+                        {% if assets.get('footer').getCodes()[0] is defined %}
+                            {{assets.get('footer').getCodes()[0].getContent() ~ ' -'|default('')}}
+                            {{date("Y")}}
+                        {% endif %}
+                        <br>
+                        {% if assets.get('footer').getCodes()[1] is defined and assets.get('footer').getCodes()[2] is defined %}
+                            <a target="_blank" href="{{assets.get('footer').getCodes()[1].getContent()}}" class="text-teal">{{assets.get('footer').getCodes()[2].getContent()}}</a>
+                        {% endif %}
+                    </strong> All rights reserved.
+                </div>

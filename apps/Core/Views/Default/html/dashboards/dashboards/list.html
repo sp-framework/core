@@ -1,0 +1,67 @@
+{{adminltetags.useTag('fields',
+    [
+        'component'                         : component,
+        'componentName'                     : componentName,
+        'componentId'                       : componentId,
+        'sectionId'                         : sectionId,
+        'parentComponentId'                 : parent,
+        'fieldId'                           : 'dashboards',
+        'fieldLabel'                        : false,
+        'fieldType'                         : 'input',
+        'fieldAdditionalClass'              : 'mb-1',
+        'fieldGroupPreAddonIcon'            : 'dashboard',
+        'fieldGroupPostAddonButtons'        :
+            [
+                'sync'   : [
+                    'title'                   : false,
+                    'type'                    : 'primary',
+                    'tooltipTitle'            : 'Share',
+                    'icon'                    : 'share',
+                    'noMargin'                : true,
+                    'disabled'                : true,
+                    'buttonAdditionalClass'   : 'rounded-0',
+                    'position'                : 'right'
+                ],
+                'edit'   : [
+                    'title'                   : false,
+                    'type'                    : 'warning',
+                    'icon'                    : 'edit',
+                    'noMargin'                : true,
+                    'disabled'                : true,
+                    'url'                     : links.url('dashboards/q/id/0'),
+                    'buttonAdditionalClass'   : 'rounded-0 text-white contentAjaxLink disabled',
+                    'position'                : 'right'
+                ],
+                'delete'   : [
+                    'title'                   : false,
+                    'type'                    : 'danger',
+                    'icon'                    : 'trash',
+                    'noMargin'                : true,
+                    'disabled'                : true,
+                    'buttonAdditionalClass'   : 'rounded-0',
+                    'position'                : 'right'
+                ],
+                'add'   : [
+                    'title'                   : false,
+                    'type'                    : 'success',
+                    'icon'                    : 'plus',
+                    'noMargin'                : true,
+                    'url'                     : links.url('dashboards/q/id/0'),
+                    'buttonAdditionalClass'   : 'rounded-0 contentAjaxLink',
+                    'position'                : 'right'
+                ]
+            ],
+        'fieldInputType'                      : 'select',
+        'fieldHelp'                           : false,
+        'fieldDataSelectOptions'              : dashboards,
+        'fieldDataSelectOptionsArray'         : true,
+        'fieldDataSelectOptionsKey'           : 'id',
+        'fieldDataSelectOptionsValue'         : 'name',
+        'fieldDataSelectOptionsSelected'      : dashboard['id'],
+        'fieldDataSelectOptionsZero'          : true,
+        'fieldDataSelectOptionsZeroTitle'     : 'Select dashboard'
+    ]
+)}}
+<script>
+
+</script>

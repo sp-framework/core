@@ -1,0 +1,389 @@
+{% set defaultDashboardHidden = 'hidden' %}
+{% if app['id'] is defined %}
+    {% set appId = app['id'] %}
+    {% set appName = app['name'] %}
+    {% set appRoute = app['route'] %}
+    {% set appType = app['app_type'] %}
+    {% set appTypeDisabled = true %}
+    {% set appDescription = app['description'] %}
+    {% set registrationEnabled = false %}
+    {% for middleware in middlewares %}
+        {% if middleware['name'] === 'Auth' %}
+            {% if middleware['enabled'] == 1 %}
+                {% set registrationEnabled = false %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    {% if app['registration_allowed'] == true %}
+        {% set registrationAllowed = true %}
+        {% set registrationApproveAccountsManuallyDisabled = false %}
+        {% set registrationRoleDisabled = false %}
+    {% else %}
+        {% set registrationAllowed = false %}
+        {% set registrationApproveAccountsManuallyDisabled = true %}
+        {% set registrationRoleDisabled = true %}
+    {% endif %}
+    {% set recoverPassword = false %}
+    {% if app['recover_password'] == true %}
+        {% set recoverPassword = true %}
+    {% endif %}
+    {% set approveAccountsManually = false %}
+    {% if app['approve_accounts_manually'] == true %}
+        {% set approveAccountsManually = true %}
+    {% endif %}
+    {% set enforce2FA = false %}
+    {% if app['enforce_2fa'] == true %}
+        {% set enforce2FA = true %}
+    {% endif %}
+
+    {% set appRegistrationRoleId = app['registration_role_id'] %}
+    {% set appGuestRoleId = app['guest_role_id'] %}
+    {% set appCanLoginRoleIds = app['can_login_role_ids'] %}
+    {% set appAcceptableUsernames = app['acceptable_usernames'] %}
+    {% set appIncorrectLoginAttemptBlockIp = app['incorrect_login_attempt_block_ip'] %}
+    {% set appIpFilterDefaultAction = app['ip_filter_default_action'] %}
+    {% set wizard = false %}
+    {% if appType == 'core' or appType == 'dash' %}
+        {% set defaultDashboardHidden = '' %}
+    {% endif %}
+    {% if app['settings']['defaultDashboard'] is defined %}
+        {% set defaultDashboard = app['settings']['defaultDashboard'] %}
+    {% endif %}
+{% else %}
+    {% set appId = '' %}
+    {% set appName = '' %}
+    {% set appRoute = '' %}
+    {% set appType = '' %}
+    {% set appTypeDisabled = false %}
+    {% set appDescription = '' %}
+    {% set registrationAllowed = '' %}
+    {% set registrationRoleDisabled = true %}
+    {% set appRegistrationRoleId = '' %}
+    {% set appGuestRoleId = '' %}
+    {% set appCanLoginRoleIds = [] %}
+    {% set appAcceptableUsernames = '' %}
+    {% set appIncorrectLoginAttemptBlockIp = '' %}
+    {% set appIpFilterDefaultAction = '1' %}
+    {% set wizard = true %}
+    {% set defaultDashboard = '' %}
+{% endif %}
+{% if wizard === true %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+{% endif %}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'App ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'App ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : appId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'App Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'App Name Example: Dashboard',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : appName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'route',
+                        'fieldLabel'                     : 'App Route',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'App Route Example: mysite.com/dashboard/ "dashboard" is the route to access this app.',
+                        'fieldRequired'                  : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : appRoute
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'app_type',
+                        'fieldLabel'                           : 'App Type',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'App type.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : types,
+                        'fieldDataSelect2OptionsKey'           : 'app_type',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : appType
+                    ]
+                )}}
+            </div>
+            <div class="col" id="default_dashboard" {{defaultDashboardHidden}}>
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'default_dashboard',
+                        'fieldLabel'                           : 'Default Dashboard',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Default dashboard for this app.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : dashboards,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : defaultDashboard
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'description',
+                        'fieldLabel'                     : 'App Description',
+                        'fieldType'                      : 'textarea',
+                        'fieldDataMaxLength'             : 1024,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Description of the app',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : appDescription
+                    ]
+                )}}
+            </div>
+        </div>
+{% if wizard === true %}
+    </fieldset>
+</form>
+{% endif %}
+<script>
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-name'                                : { },
+        '{{componentId}}-{{sectionId}}-app_type'                            : {
+            'placeholder'   : 'SELECT APP TYPE'
+        },
+        '{{componentId}}-{{sectionId}}-default_dashboard'                   : {
+            'placeholder'   : 'SELECT DEFAULT DASHBOARD',
+            afterInit       : function() {
+                $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function (e) {
+                    var data = e.params.data;
+
+                    if (data.id === 'dash' || data.id === 'core') {
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', false);
+                        $('#default_dashboard').attr('hidden', false);
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').on('select2:select', function() {
+                            window.dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['formValidator'].valid();
+                        });
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', true);
+                        $('#default_dashboard').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-route'                               : { },
+        '{{componentId}}-{{sectionId}}-description'                         : { },
+        '{{componentId}}-{{sectionId}}-registration_allowed'                : { },
+        '{{componentId}}-{{sectionId}}-recover_password'                    : { },
+        '{{componentId}}-{{sectionId}}-registration_role_id'                : {
+            'placeholder'   : 'SELECT REGISTRATION ROLE',
+        },
+        '{{componentId}}-{{sectionId}}-guest_role_id'                       : {
+            'placeholder'   : 'SELECT GUEST ROLE',
+        },
+        '{{componentId}}-{{sectionId}}-can_login_role_ids'                  : {
+            'placeholder'   : 'SELECT ROLES'
+        },
+        '{{componentId}}-{{sectionId}}-acceptable_usernames'                : {
+            'placeholder'   : 'SELECT OR ENTER NEW PREFIX'
+        },
+        '{{componentId}}-{{sectionId}}-form'                            : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                        : 'required',
+                '{{componentId}}-{{sectionId}}-route'                       : 'required',
+                '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
+                '{{componentId}}-{{sectionId}}-registration_role_id'        : 'required',
+                '{{componentId}}-{{sectionId}}-guest_role_id'               : 'required',
+                '{{componentId}}-{{sectionId}}-default_component'           : 'required',
+                '{{componentId}}-{{sectionId}}-errors_component'            : 'required',
+                '{{componentId}}-{{sectionId}}-default_dashboard'           : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter app name',
+                '{{componentId}}-{{sectionId}}-route'                   : 'Please enter app route',
+                '{{componentId}}-{{sectionId}}-app_type'                : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-registration_role_id'    : 'Please select registration role',
+                '{{componentId}}-{{sectionId}}-guest_role_id'           : 'Please select guest role',
+                '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
+                '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',
+                '{{componentId}}-{{sectionId}}-default_dashboard'       : 'Please select default dashboard'
+            }
+        }
+    });
+</script>
+{% if wizard is defined and wizard is true %}
+    <script>
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+$(document).ready(function() {
+    dataCollectionSection['steps']['1']['onNext'] =
+        function(resolve, reject) {
+            var registerFormId;
+
+            if ($('#{{componentId}}-{{sectionId}}-id').val() != '') {
+                registerFormId = $('#{{componentId}}-{{sectionId}}-id').val();
+            } else {
+                registerFormId = window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"]['1']['responseData']['id'];
+            }
+
+            $('#' + window['dataCollection']['env']['appRoute'] + '-{{componentName}}-allow-main-id').val(registerFormId);//Assign ID to allow
+
+            var step = window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]['currentStep'] + 1;
+
+            var div = '{{wizardComponentId}}-wizard-' + step + '-data';
+
+            $.get('{{links.url("apps")}}/q/modules/true/id/' + registerFormId, function(response, status, xhr) {
+                if (response) {
+                    if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
+                        $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
+                        $('#security-token').val(xhr.getResponseHeader('token'));
+                    }
+                    $('#' + div + ' .card-body').empty().html(response);
+                    return resolve(true);
+                }
+
+                 return resolve(false);
+            }).done(function(response) {
+                if (response) {
+                    window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"][step]['type'] = 'form';
+                    window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"][step]['validate'] = true;
+
+                    window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"][step]['componentId'] = $('#' + div).find('.component')[0].id;
+                    window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"][step]['sectionId'] = $('#' + div).find('.sectionWithForm')[0].id;
+
+                    $('#' + $('#' + div).find('.sectionWithForm')[0].id + '-id').val(registerFormId);
+                    $('#{{wizardComponentId}}-modules-main').BazContentSectionWithForm();
+                }
+            });
+        }
+});
+</script>
+{% endif %}

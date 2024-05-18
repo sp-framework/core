@@ -1,0 +1,22 @@
+<div class="content-wrapper">
+    <div class="content-header mb-2">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/content/header/breadcrumb/view') %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row m-2" id="loader" hidden>
+        <div class="col">
+            <div class="fa-2x">
+                <i class="fa fa-cog fa-spin"></i> Loading...
+            </div>
+        </div>
+    </div>
+    <div id="baz-content" class="container-fluid">
+        {{content()}}
+    </div>
+    {# {% include('common/errors/error') %} #}
+</div>

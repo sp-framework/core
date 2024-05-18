@@ -1,0 +1,27 @@
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId ~ '-allow',
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : false,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'exchange-alt',
+        'cardTitle'                     : '',
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'apps/wizard/allow/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : 0,
+            'addActionUrl'                  : 'apps/add',
+            'addSuccessRedirectUrl'         : 'apps',
+            'updateActionUrl'               : 'apps/update',
+            'updateSuccessRedirectUrl'      : 'apps',
+            'cancelActionUrl'               : 'apps',
+            'closeActionUrl'                : 'apps'
+        ]
+    ]
+)}}

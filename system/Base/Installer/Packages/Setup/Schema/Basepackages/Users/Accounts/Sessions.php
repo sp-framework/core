@@ -50,6 +50,7 @@ class Sessions
                         'column_UNIQUE',
                         [
                             'session_id',
+                            'app'
                         ],
                         'UNIQUE'
                     )

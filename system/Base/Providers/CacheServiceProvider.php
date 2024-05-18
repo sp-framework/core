@@ -6,14 +6,17 @@ use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
 use System\Base\Providers\CacheServiceProvider\ApcuCache;
 use System\Base\Providers\CacheServiceProvider\CacheTools;
+use System\Base\Providers\CacheServiceProvider\Caching;
+use System\Base\Providers\CacheServiceProvider\ModelsMetadataCache;
 use System\Base\Providers\CacheServiceProvider\OpCache;
 use System\Base\Providers\CacheServiceProvider\StreamCache;
-use System\Base\Providers\CacheServiceProvider\ModelsMetadataCache;
 
 class CacheServiceProvider implements ServiceProviderInterface
 {
     public function register(DiInterface $container) : void
     {
+        $caches = [];
+
         $container->setShared(
             'streamCache',
             function () use ($container) {
@@ -21,33 +24,57 @@ class CacheServiceProvider implements ServiceProviderInterface
                 return (new StreamCache($cacheConfig))->init();
             }
         );
+        $caches['streamCache'] = $container->getShared('streamCache');
 
-        $container->setShared(
-            'apcuCache',
-            function () use ($container) {
-                $cacheConfig = $container->getShared('config')->cache;
-                return (new ApcuCache($cacheConfig))->init();
-            }
-        );
+        if (extension_loaded('apcu')) {
+            $container->setShared(
+                'apcuCache',
+                function () use ($container) {
+                    $cacheConfig = $container->getShared('config')->cache;
+                    return (new ApcuCache($cacheConfig))->init();
+                }
+            );
+        } else {
+            $container->setShared(
+                'apcuCache',
+                function () {
+                    return false;
+                }
+            );
+        }
+        $caches['apcuCache'] = $container->getShared('apcuCache');
 
-        $container->setShared(
-            'opCache',
-            function () use ($container) {
-                $cacheConfig = $container->getShared('config')->cache;
-                return (new OpCache($cacheConfig))->init();
-            }
-        );
+        if (extension_loaded('Zend OPcache')) {
+            $container->setShared(
+                'opCache',
+                function () {
+                    return (new OpCache())->init();
+                }
+            );
+        } else {
+            $container->setShared(
+                'opCache',
+                function () {
+                    return false;
+                }
+            );
+        }
 
         $container->setShared(
             'cacheTools',
-            function () use ($container) {
+            function () use ($container, $caches) {
                 $cacheConfig = $container->getShared('config')->cache;
-                $caches = [];
-                $caches['streamCache'] = $container->getShared('streamCache');
-                $caches['apcuCache'] = $container->getShared('apcuCache');
-                $caches['opCache'] = $container->getShared('opCache');
                 $localContent = $container->getShared('localContent');
-                return new CacheTools($cacheConfig, $caches, $localContent);
+                $opCache = $container->getShared('opCache');
+                return new CacheTools($cacheConfig, $caches, $localContent, $opCache);
+            }
+        );
+
+        $container->setShared(
+            'caching',
+            function () use ($container, $caches) {
+                $cacheConfig = $container->getShared('config')->cache;
+                return new Caching($cacheConfig, $caches);
             }
         );
 

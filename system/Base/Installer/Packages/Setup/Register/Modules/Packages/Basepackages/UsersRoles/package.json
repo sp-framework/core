@@ -1,0 +1,30 @@
+{
+    "name"          : "UsersRoles",
+    "display_name"  : "Users Roles",
+    "description"   : "Basepackage Users Roles",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "basepackages",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Users\\Roles",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "settings"      : {
+        "componentRoute": "system/users/roles",
+        "import": true,
+        "export": true,
+        "importAddMethod": "addRole",
+        "importUpdateMethod": "updateRole"
+    }
+}

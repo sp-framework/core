@@ -12,15 +12,13 @@ class ModulesComponents extends BaseModel
 
     public $route;
 
-    public $alias;
-
     public $description;
+
+    public $module_type;
 
     public $app_type;
 
     public $category;
-
-    public $subcategory;
 
     public $version;
 
@@ -29,6 +27,10 @@ class ModulesComponents extends BaseModel
     public $class;
 
     public $settings;
+
+    public $user_settings;
+
+    public $widgets;
 
     public $dependencies;
 
@@ -42,6 +44,8 @@ class ModulesComponents extends BaseModel
 
     public $files;
 
+    public $api_id;
+
     public $update_available;
 
     public $update_version;
@@ -49,4 +53,10 @@ class ModulesComponents extends BaseModel
     public $updated_by;
 
     public $updated_on;
+
+    public $level_of_update;
+
+    public $auto_update;
+
+    public $repo_details;
 }

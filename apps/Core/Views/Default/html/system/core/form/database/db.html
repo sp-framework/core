@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('tabs',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : 'main',
+                'tabsId'                        : 'db',
+                'tabsStyle'                     : 'card-outline-tabs',
+                'tabsData'                      :
+                    [
+                        'backup'   :
+                        [
+                            'tabTitle'          : 'Backup',
+                            'tabInclude'        : 'core/form/database/db/backup'
+                        ],
+                        'restore'   :
+                        [
+                            'tabTitle'          : 'Restore',
+                            'tabInclude'        : 'core/form/database/db/restore'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>

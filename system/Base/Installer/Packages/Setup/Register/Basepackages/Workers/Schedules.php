@@ -2,26 +2,30 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Workers;
 
-use Phalcon\Helper\Json;
-
 class Schedules
 {
-    public function register($db)
+    public function register($db, $ff, $helper)
     {
-        $schedulesArr = $this->systemSchedules();
+        $schedulesArr = $this->systemSchedules($helper);
 
         foreach ($schedulesArr as $key => $schedule) {
-            $db->insertAsDict(
-                'basepackages_workers_schedules',
-                $schedule
-            );
+            if ($db) {
+                $db->insertAsDict('basepackages_workers_schedules', $schedule);
+            }
+
+            if ($ff) {
+                $scheduleStore = $ff->store('basepackages_workers_schedules');
+
+                $scheduleStore->updateOrInsert($schedule);
+            }
         }
     }
 
-    protected function systemSchedules()
+    protected function systemSchedules($helper)
     {
         $descriptions =
             [
+                'everyxseconds'             => 'Task with this schedule will run every X seconds of the minute.',
                 'everyminute'               => 'Task with this schedule will run every minute.',
                 'everyxminutes'             => 'Task with this schedule will run every X minutes from the moment it starts.',
                 'hourly'                    => 'Task with this schedule will run every hour. If minutes are specified the task will run X minutes past the hour.',
@@ -36,6 +40,24 @@ class Schedules
 
         $schedulesArr = [];
 
+        //Every 15 Seconds
+        $schedule =
+            [
+                'type'      => 'everyxseconds',
+                'params'    =>
+                    [
+                        'seconds'   => ['0','15','30','45']
+                    ]
+            ];
+        $scheduleEntry =
+            [
+                'name'          => 'Every 15 Seconds',
+                'description'   => $descriptions['everyxseconds'],
+                'type'          => 0,
+                'schedule'      => $helper->encode($schedule)
+            ];
+        array_push($schedulesArr, $scheduleEntry);
+
         //EveryMinute
         $schedule =
             [
@@ -46,7 +68,7 @@ class Schedules
                 'name'          => 'Every Minute',
                 'description'   => $descriptions['everyminute'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -64,7 +86,7 @@ class Schedules
                 'name'          => 'Every 15 Minutes',
                 'description'   => $descriptions['everyxminutes'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -82,7 +104,7 @@ class Schedules
                 'name'          => 'Every 30 Minutes',
                 'description'   => $descriptions['everyxminutes'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -102,7 +124,7 @@ class Schedules
                 'name'          => 'Business hours (Every Minute 08:00 - 17:00)',
                 'description'   => $descriptions['businesshours'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -120,7 +142,7 @@ class Schedules
                 'name'          => 'Every Hour',
                 'description'   => $descriptions['hourly'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -139,7 +161,7 @@ class Schedules
                 'name'          => 'Everyday',
                 'description'   => $descriptions['daily'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -158,7 +180,7 @@ class Schedules
                 'name'          => 'Everyday 6th Hour',
                 'description'   => $descriptions['daily6'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -177,7 +199,7 @@ class Schedules
                 'name'          => 'Everyday 12th Hour',
                 'description'   => $descriptions['daily12'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -196,7 +218,7 @@ class Schedules
                 'name'          => 'Everyday 18th Hour',
                 'description'   => $descriptions['daily18'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 
@@ -217,7 +239,7 @@ class Schedules
                 'name'          => 'Every Month (Day 1)',
                 'description'   => $descriptions['monthly'],
                 'type'          => 0,
-                'schedule'      => Json::encode($schedule)
+                'schedule'      => $helper->encode($schedule)
             ];
         array_push($schedulesArr, $scheduleEntry);
 

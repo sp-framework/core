@@ -28,17 +28,16 @@ class CanLogin
                         ]
                     ),
                     new Column(
-                        'app',
+                        'app_id',
                         [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 50,
+                            'type'          => Column::TYPE_INTEGER,
                             'notNull'       => true,
                         ]
                     ),
                     new Column(
                         'allowed',
                         [
-                            'type'          => Column::TYPE_BOOLEAN,
+                            'type'          => Column::TYPE_TINYINTEGER,
                             'notNull'       => true,
                         ]
                     )

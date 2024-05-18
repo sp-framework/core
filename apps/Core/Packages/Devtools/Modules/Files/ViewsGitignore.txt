@@ -1,0 +1,8 @@
+#Ignore everything else in the html folder to avoid adding subview. Change file content as needed
+html/*
+#Only include the following. Change file content as needed
+!html/
+!html/layouts/
+!html/common/
+!README.md
+!view.json

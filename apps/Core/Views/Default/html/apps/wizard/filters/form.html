@@ -1,0 +1,478 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'incorrect_login_attempt_block_ip',
+                'fieldLabel'                            : 'Incorrect Login Attempt Block IP',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Block IP after # of incorrect login attempts. 0 is for not blocking. Note: Authentication middleware should be enabled for this to work.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : appIncorrectLoginAttemptBlockIp
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'ip_filter_default_action',
+                'fieldLabel'                     : 'Ip Filter default action',
+                'fieldType'                      : 'radio',
+                'fieldRadioPlacementType'        : "horizontal",
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select default action if there are no rules configured. Default is set to allow everyone to access the app. Use Allow all option if you want to block IP and then allow everyone else. Use Block all option if you want to allow IP and then block everyone else.',
+                'fieldRequired'                  : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioButtons'              :
+                    [
+                        'allow' :
+                            [
+                                'title'                           : 'Allow All',
+                                'type'                            : 'success',
+                                'dataValue'                       : '1'
+                            ],
+                        'block' :
+                            [
+                                'title'                           : 'Block All',
+                                'type'                            : 'danger',
+                                'dataValue'                       : '0'
+                            ]
+                    ],
+                'fieldRadioChecked'              : appIpFilterDefaultAction
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col" id="ip-filters-add">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'ip_address',
+                'fieldLabel'                            : 'New Filter',
+                'fieldPlaceholder'                      : 'IP Address',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Enter IP V4 or IP V6 address. Adding network mask/prefix is allowed using forward slash. Example: 10.10.10.0/8 for network and 10.10.10.10 for IP host filter rule. 2001:db8:abcd:0012::0/96 for network and 2001:0DB8:ABCD:0012:::FFFF:FFFF for IP host filter rule.',
+                'fieldRequired'                         : false,
+                'fieldDisabled'                         : true,
+                'fieldGroupPreAddonDropdown'            : true,
+                'fieldGroupPreAddonDropdownButtonTitle' : 'SELECT FILTER TYPE',
+                'fieldGroupPreAddonDropdownButtonListTitle':
+                    [
+                        'allow' : 'Allow',
+                        'block' : 'Block'
+                    ]
+                ,
+                'fieldGroupPostAddonButtons'            :
+                    [
+                        'add'        : [
+                            'title'                   : 'Add',
+                            'type'                    : 'primary',
+                            'noMargin'                : true,
+                            'disabled'                : true,
+                            'buttonAdditionalClass'   : 'rounded-0 text-white',
+                            'position'                : 'right',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true
+                        ]
+                    ],
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldDataInputMaxLength'               : 100,
+                'fieldValue'                            : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'filters',
+                'fieldLabel'                     : 'Filters',
+                'fieldType'                      : 'html',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Current filters applied to the system for this app. Block filters are matched first and then allow filters.',
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {% include 'apps/tables/filters' with
+            [
+                'component'             : component,
+                'componentId'           : componentId,
+                'parent'                : parent,
+                'sectionId'             : sectionId
+            ]
+        %}
+    </div>
+</div>
+<script>
+/* globals PNotify Swal dataCollection */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                              : { },
+        '{{componentId}}-{{sectionId}}-incorrect_login_attempt_block_ip': { },
+        '{{componentId}}-{{sectionId}}-ip_filter_default_action'        : { },
+        '{{componentId}}-{{sectionId}}-ip_address'                      : { },
+        '{{componentId}}-{{sectionId}}-filters'                         : {
+            afterInit: function() {
+                $("#ip-filters-add a").click(function(e) {
+                    e.preventDefault();
+
+                    $("#{{componentId}}-{{sectionId}}-ip_address").attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button span').text($(this).text().toUpperCase());
+                });
+
+                $("#{{componentId}}-{{sectionId}}-ip_address").keyup(function() {
+                    if ($("#{{componentId}}-{{sectionId}}-ip_address").val() === '') {
+                        $("#{{componentId}}-{{sectionId}}-add").attr('disabled', true);
+                    } else {
+                        $("#{{componentId}}-{{sectionId}}-add").attr('disabled', false);
+                    }
+                });
+
+                $("#{{componentId}}-{{sectionId}}-add").click(function(e) {
+                    e.preventDefault();
+
+                    $(this).attr('disabled', true);
+                    $("#{{componentId}}-{{sectionId}}-ip_address").attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button').attr("disabled", true);
+                    $("#{{componentId}}-{{sectionId}}-add").children("i").attr('hidden', false);
+
+                    var url = "{{links.url('apps/addFilter')}}";
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
+                    postData['ip_address'] = $("#{{componentId}}-{{sectionId}}-ip_address").val();
+                    postData['filter_type'] = $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button span').text().toLowerCase();
+
+                    $.post(url, postData, function(response) {
+                        $("#{{componentId}}-{{sectionId}}-add").children("i").attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button').attr("disabled", false);
+
+                        if (response.responseCode != 0) {
+                            PNotify.error({
+                                title   : response.responseMessage
+                            });
+
+                            if (response.responseCode === 3) {
+                                dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].search(postData['ip_address']).draw();
+                            }
+
+                            $("#{{componentId}}-{{sectionId}}-ip_address").attr('disabled', false);
+                            $("#{{componentId}}-{{sectionId}}-add").attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button').attr("disabled", false);
+
+                            return;
+                        }
+
+                        PNotify.success({
+                            title   : 'Filter added.'
+                        });
+
+                        dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+
+                        $("#{{componentId}}-{{sectionId}}-ip_address").val('');
+                        $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button span').text('SELECT FILTER TYPE');
+                    }, "json");
+                });
+
+                $(document).ready(function() {
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
+
+                    var dom =
+                    '<"row mb-1"<"col-md-3 col-xs-12"B><"col-md-3 col-xs-12"l><"col-md-3 col-xs-12"f><"col-md-3 col-xs-12"p>>' +
+                    '<"row mb-1"<"col"tr>>' +
+                    '<"row"<"col-md-6 col-xs-12"i><"col-md-6 col-xs-12"p>>';
+
+                    if (!$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-filters-table')) {
+                        dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'] =
+                        $('#{{componentId}}-{{sectionId}}-filters-table').DataTable({
+                                "responsive": true,
+                                "columns": [
+                                    { data : 'id', visible: false,},
+                                    { data : 'ip_address'},
+                                    { data : 'address_type'},
+                                    { data : 'filter_type'},
+                                    { data : 'added_by'},
+                                    { data : 'hit_count'},
+                                    { data : 'incorrect_attempts'},
+                                    { data : 'actions', orderable: false },
+                                ],
+                                "rowId" : 'id',
+                                "dom": dom,
+                                "buttons": [
+                                    {
+                                        text: function() {
+                                            return '<i class="fas fa-sync-alt fa-fw"></i>'
+                                        },
+                                        className: 'btn-sm',
+                                        action: function ( e, dt, node, config ) {
+                                            dt.ajax.reload();
+                                        }
+                                    }
+                                ],
+                                "ajax": {
+                                    "url" : "{{links.url('apps/getFilters')}}",
+                                    "type": "POST",
+                                    "data": postData,
+                                    "dataSrc" : function (json) {
+                                        var return_data = new Array();
+
+                                        for(var i=0;i< json.data.length; i++) {
+                                            if (json.data[i]['incorrect_attempts'] === null) {
+                                                json.data[i]['incorrect_attempts'] = "-";
+                                            }
+
+                                            if (json.data[i]['hits'] === null) {
+                                                json.data[i]['hits'] = "-";
+                                            }
+
+                                            if (json.data[i]['address_type'] === 'host') {
+                                                json.data[i]['address_type'] = '<span class="badge badge-primary text-uppercase">Host</span>';
+                                            } else if (json.data[i]['address_type'] === 'network') {
+                                                json.data[i]['address_type'] = '<span class="badge badge-primary text-uppercase">Network</span>';
+                                            }
+
+                                            json.data[i]['actions'] = '<a href="#" class="text-danger remove-filter" ' +
+                                                'data-toggle="tooltip" data-placement="left" title="Remove Filter"' +
+                                                'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-trash"></i></a>';
+
+                                            if (json.data[i]['filter_type'] === 'monitor') {
+                                                json.data[i]['actions'] = '<a href="#" class="text-danger remove-filter" ' +
+                                                    'data-toggle="tooltip" data-placement="left" title="Remove Filter"' +
+                                                    'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-trash"></i></a>' +
+                                                    '<a href="#" class="text-danger block-filter ml-1" ' +
+                                                    'data-toggle="tooltip" data-placement="left" title="Block IP"' +
+                                                    'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-times-circle"></i></a>';
+                                            }
+
+                                            if (json.data[i]['filter_type'] === 'allow') {
+                                                json.data[i]['filter_type'] = '<span class="badge badge-success text-uppercase">Allow</span>';
+                                            } else if (json.data[i]['filter_type'] === 'block') {
+                                                json.data[i]['filter_type'] = '<span class="badge badge-danger text-uppercase">Block</span>';
+                                            } else if (json.data[i]['filter_type'] === 'monitor') {
+                                                json.data[i]['filter_type'] = '<span class="badge badge-warning text-uppercase">Monitor</span>';
+                                            }
+
+                                            return_data.push(json.data[i]);
+                                        }
+
+                                        return return_data;
+                                    }
+                                }
+                            }
+                        );
+
+                        dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].on( 'draw', function () {
+                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].columns.adjust().responsive.recalc();
+
+                            $('.remove-filter .block-filter').off();
+
+                            $('.remove-filter').click(function(e) {
+                                e.preventDefault();
+
+                                Swal.fire({
+                                    title                       : '<span class="text-danger"> Remove Filter?</span>',
+                                    icon                        : 'question',
+                                    background                  : 'rgba(0,0,0,.8)',
+                                    backdrop                    : 'rgba(0,0,0,.6)',
+                                    buttonsStyling              : false,
+                                    confirmButtonText           : 'Remove',
+                                    customClass                 : {
+                                        'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                                        'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                                    },
+                                    showCancelButton            : true,
+                                    keydownListenerCapture      : true,
+                                    allowOutsideClick           : true,
+                                    allowEscapeKey              : true,
+                                    didOpen                     : function() {
+                                        dataCollection.env.sounds.swalSound.play();
+                                    }
+                                }).then((result) => {
+                                    if (result.value) {
+
+                                        var url = "{{links.url('apps/removeFilter')}}";
+                                        var postData = { };
+                                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                        postData["id"] = $(this).data('id');
+
+                                        $.post(url, postData, function(response) {
+                                            if (response.responseCode != 0) {
+                                                PNotify.error({
+                                                    title   : response.responseMessage
+                                                });
+
+                                                return;
+                                            }
+
+                                            PNotify.success({
+                                                title   : 'Filter removed.'
+                                            });
+
+                                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+                                        }, "json");
+                                    }
+                                });
+                            });
+
+                            $('.block-filter').click(function(e) {
+                                e.preventDefault();
+
+                                Swal.fire({
+                                    title                       : '<span class="text-danger"> Block IP?</span>',
+                                    icon                        : 'question',
+                                    background                  : 'rgba(0,0,0,.8)',
+                                    backdrop                    : 'rgba(0,0,0,.6)',
+                                    buttonsStyling              : false,
+                                    confirmButtonText           : 'Block',
+                                    customClass                 : {
+                                        'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                                        'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                                    },
+                                    showCancelButton            : true,
+                                    keydownListenerCapture      : true,
+                                    allowOutsideClick           : true,
+                                    allowEscapeKey              : true,
+                                    didOpen                     : function() {
+                                        dataCollection.env.sounds.swalSound.play();
+                                    }
+                                }).then((result) => {
+                                    var url = "{{links.url('apps/blockMonitorFilter')}}";
+                                    var postData = { };
+                                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                    postData["id"] = $(this).data('id');
+
+                                    $.post(url, postData, function(response) {
+                                        if (response.responseCode != 0) {
+                                            PNotify.error({
+                                                title   : response.responseMessage
+                                            });
+
+                                            return;
+                                        }
+
+                                        PNotify.success({
+                                            title   : 'IP Blocked.'
+                                        });
+
+                                        dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+                                    }, "json");
+                                });
+                            });
+                        });
+                    }
+                });
+
+                $("#{{componentId}}-{{sectionId}}-middleware-IpFilter").click(function() {
+                    if ($(this).is(':checked') === true) {
+                        $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', false);
+                        $("#{{componentId}}-{{sectionId}}-tabs-filters").attr('hidden', false);
+                    } else {
+                        Swal.fire({
+                            title                       : '<span class="text-danger"> This will reset all app filters. Are you sure?</span>',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Yes',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                dataCollection.env.sounds.swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                $("a.nav-link:contains('IP Filters')").parent('li').attr('hidden', true);
+                                    var url = "{{links.url('apps/resetAppFilters')}}";
+                                    var postData = { };
+                                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                    postData["app_id"] = $("#{{componentId}}-{{sectionId}}-id").val();
+
+                                    $.post(url, postData, function(response) {
+                                        if (response.responseCode != 0) {
+                                            PNotify.error({
+                                                title   : response.responseMessage
+                                            });
+
+                                            return;
+                                        }
+
+                                        $('#{{componentId}}-{{sectionId}}-incorrect_login_attempt_block_ip').val(0);
+                                        $('#allow').prop('checked', true);
+
+                                        dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+                                    }, "json");
+                            } else {
+                                $("#{{componentId}}-{{sectionId}}-middleware-IpFilter").prop('checked', true);
+                            }
+                        });
+                    }
+                });
+            }
+        },
+    });
+</script>

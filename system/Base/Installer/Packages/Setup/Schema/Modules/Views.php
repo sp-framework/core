@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Modules;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Views
 {
@@ -45,6 +46,14 @@ class Views
 						]
 					),
 					new Column(
+						'module_type',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 50,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'app_type',
 						[
 							'type'    => Column::TYPE_VARCHAR,
@@ -61,18 +70,25 @@ class Views
 						]
 					),
 					new Column(
-						'sub_category',
+						'version',
 						[
 							'type'    => Column::TYPE_VARCHAR,
-							'size'	  => 50,
+							'size'    => 100,
 							'notNull' => true,
 						]
 					),
 					new Column(
-						'version',
+						'view_modules_version',
 						[
 							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 15,
+							'size'    => 20,
+							'notNull' => false,
+						]
+					),
+					new Column(
+						'base_view_module_id',
+						[
+							'type'    => Column::TYPE_SMALLINTEGER,
 							'notNull' => true,
 						]
 					),
@@ -87,8 +103,15 @@ class Views
 					new Column(
 						'settings',
 						[
-							'type'    => Column::TYPE_TEXT,
+							'type'    => Column::TYPE_JSON,
 							'notNull' => true,
+						]
+					),
+					new Column(
+						'user_settings',
+						[
+							'type'    => Column::TYPE_JSON,
+							'notNull' => false,
 						]
 					),
 					new Column(
@@ -121,6 +144,13 @@ class Views
 						]
 					),
 					new Column(
+						'api_id',
+						[
+							'type'    => Column::TYPE_INTEGER,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'update_available',
 						[
 							'type'    => Column::TYPE_TINYINTEGER,
@@ -150,7 +180,42 @@ class Views
 							'notNull' => true,
 							'default' => 'CURRENT_TIMESTAMP',
 						]
+					),
+					new Column(
+						'level_of_update',
+						[
+							'type'    => Column::TYPE_INTEGER,
+							'notNull' => false,
+						]
+					),
+					new Column(
+						'auto_update',
+						[
+							'type'    => Column::TYPE_BOOLEAN,
+							'notNull' => false,
+						]
+					),
+					new Column(
+						'repo_details',
+						[
+							'type'    => Column::TYPE_JSON,
+							'notNull' => false,
+						]
 					)
+				],
+				'indexes' => [
+					new Index(
+						'column_UNIQUE',
+						[
+							'name',
+							'app_type',
+							'api_id'
+						],
+						'UNIQUE'
+					)
+				],
+				'options' => [
+					'TABLE_COLLATION' => 'utf8mb4_general_ci'
 				]
 			];
 	}

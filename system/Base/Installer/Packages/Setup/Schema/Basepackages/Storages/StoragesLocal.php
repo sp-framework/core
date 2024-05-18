@@ -75,9 +75,16 @@ class StoragesLocal
                         ]
                     ),
                     new Column(
+                        'is_pointer',
+                        [
+                            'type'    => Column::TYPE_BOOLEAN,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
                         'orphan',
                         [
-                            'type'    => Column::TYPE_TINYINTEGER,
+                            'type'    => Column::TYPE_BOOLEAN,
                             'notNull' => true,
                         ]
                     ),

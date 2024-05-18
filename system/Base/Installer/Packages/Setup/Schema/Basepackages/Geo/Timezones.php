@@ -39,8 +39,7 @@ class Timezones
                 new Column(
                     'gmt_offset',
                     [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
+                        'type'          => Column::TYPE_INTEGER,
                         'notNull'       => false
                     ]
                 ),
@@ -55,8 +54,7 @@ class Timezones
                 new Column(
                     'gmt_offset_dst',
                     [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
+                        'type'          => Column::TYPE_INTEGER,
                         'notNull'       => false
                     ]
                 ),

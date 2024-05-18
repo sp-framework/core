@@ -1,0 +1,107 @@
+<small class="text-danger">Note: Client secret is only shown at the time of key generation. Please copy and save it somewhere safe.</small><br><br>
+{% if passwordApis is defined and passwordApis|length > 0 %}
+    {% for api in passwordApis %}
+        {% if api['client_keys_generation_allowed'] == false %}
+            {% continue %}
+        {% endif %}
+        {% set clientId[api['id']] = '' %}
+        {% set clientSecret[api['id']] = '' %}
+        {% set clientIdHidden[api['id']] = true %}
+        {% set clientSecretHidden[api['id']] = true %}
+        {% set reGenerateHidden[api['id']] = true %}
+        {% set generateHidden[api['id']] = false %}
+        {% set clientSecretInputFieldType[api['id']] = 'text' %}
+        {% if account['api_clients'] is defined and account['api_clients']|length > 0 %}
+            {% for client in account['api_clients'] %}
+                {% if client['api_id'] === api['id'] %}
+                    {% set clientId[api['id']] = client['client_id'] %}
+                    {% set clientSecret[api['id']] = client['client_secret'] %}
+                    {% set reGenerateHidden[api['id']] = true %}
+                    {% set generateHidden[api['id']] = false %}
+                    {% if clientId[api['id']] !== '' and clientSecret[api['id']] !== '' %}
+                        {% set clientIdHidden[api['id']] = false %}
+                        {% set clientSecretHidden[api['id']] = false %}
+                        {% set clientSecretInputFieldType[api['id']] = 'password' %}
+                        {% set reGenerateHidden[api['id']] = false %}
+                        {% set generateHidden[api['id']] = true %}
+                        {% break %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        <div class="row">
+            <div class="col">
+                {% set buttons = [] %}
+                {% set buttons["generate-api-client-keys-" ~ api['id']] =
+                            ['title'                   : 'Generate API Client Keys for ' ~ api['name'],
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'hidden'                  : generateHidden[api['id']]]
+                %}
+                {% set buttons["regenerate-api-client-keys-" ~ api['id']] =
+                            ['title'                   : 'Revoke & Regenerate API Client Keys for ' ~ api['name'],
+                            'size'                    : 'sm',
+                            'type'                    : 'danger',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'hidden'                  : reGenerateHidden[api['id']]]
+                %}
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                 : component,
+                        'componentName'             : componentName,
+                        'componentId'               : componentId,
+                        'sectionId'                 : sectionId,
+                        'buttonType'                : 'button',
+                        'buttonLabel'               : 'Generate/Regenerate API Client Keys ' ~ api['name'],
+                        'buttons'                   : buttons
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'api_client_id_' ~ api['id'],
+                        'fieldLabel'                            : 'Client ID ' ~ api['name'],
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Client ID for API authentication.',
+                        'fieldDisabled'                         : true,
+                        'fieldHidden'                           : clientIdHidden[api['id']],
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldValue'                            : clientId[api['id']]
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'api_client_secret_' ~ api['id'],
+                        'fieldLabel'                            : 'Client Secret ' ~ api['name'],
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Client Secret for API authentication.',
+                        'fieldDisabled'                         : true,
+                        'fieldInputType'                        : clientSecretInputFieldType[api['id']],
+                        'fieldHidden'                           : clientSecretHidden[api['id']],
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldValue'                            : clientSecret[api['id']]
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+    {% endfor %}
+{% endif %}

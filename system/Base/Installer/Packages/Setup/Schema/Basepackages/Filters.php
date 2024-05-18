@@ -31,7 +31,7 @@ class Filters
                 new Column(
                     'component_id',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
+                        'type'    => Column::TYPE_SMALLINTEGER,
                         'size'    => 1,
                         'notNull' => true,
                     ]

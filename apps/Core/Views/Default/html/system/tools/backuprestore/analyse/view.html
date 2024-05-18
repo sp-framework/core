@@ -1,0 +1,36 @@
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'analysis',
+        'contentType'                   : 'section',
+        'cardHeader'                    : false,
+        'cardFooter'                    : false,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'floppy-disk',
+        'cardTitle'                     : 'Backup/Restore',
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyContent'               :
+            '
+<div class="row text-center m-2" id="' ~ componentId ~ '-analysis-analyse-error" hidden>
+    <div class="col">
+        <h6><i class="fa fa-fw fa-info-circle text-danger"></i> Error loading analysis. Please contact administrator.</h6>
+    </div>
+</div>
+<div class="row text-center" id="' ~ componentId ~ '-analysis-analyse-loader">
+    <div class="col">
+        <div class="fa-2x">
+            <i class="fa fa-cog fa-spin"></i> Loading analysis...
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div id="' ~ componentId ~ '-analysis-analyse-info" hidden></div>
+    </div>
+</div>
+            '
+    ]
+)}}

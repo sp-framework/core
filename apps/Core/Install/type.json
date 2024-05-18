@@ -1,0 +1,7 @@
+{
+    "name": "Core",
+    "app_type": "core",
+    "description": "Core apps type for core modules.",
+    "repo": "https://.../",
+    "version": "0.0.0"
+}

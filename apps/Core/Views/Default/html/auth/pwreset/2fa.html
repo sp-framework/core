@@ -1,0 +1,64 @@
+{% set fieldGroupPreAddonButtonHidden = false %}
+{% if canUse2fa|length === 1 %}
+    {% set fieldGroupPreAddonButtonHidden = true %}
+{% endif %}
+{% set emailHidden = '' %}
+{% if in_array('otp', canUse2fa) %}
+    <div class="col" id="twofa-otp">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : 'form',
+                'fieldId'                               : 'twofa-otp',
+                'fieldLabel'                            : false,
+                'fieldPlaceholder'                      : '2FA OTP Code',
+                'fieldType'                             : 'input',
+                'fieldInputType'                        : 'text',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldPlaceholder'                      : '2FA OTP Code',
+                'fieldGroupPreAddonButtonId'            : 'switch_to_email',
+                'fieldGroupPreAddonButtonValue'         : '<i class="fas fa-fw fa-repeat"></i>',
+                'fieldGroupPreAddonButtonTooltipTitle'  : 'Switch to 2FA (Email)',
+                'fieldGroupPreAddonButtonHidden'        : fieldGroupPreAddonButtonHidden,
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldHidden'                           : false,
+                'fieldDataInputMinLength'               : 4,
+                'fieldDataInputMaxLength'               : 8
+            ]
+        )}}
+    </div>
+    {% set emailHidden = 'd-none' %}
+{% endif %}
+{% if in_array('email', canUse2fa) %}
+    <div class="col {{emailHidden}}" id="twofa-email">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : 'form',
+                'fieldId'                               : 'twofa-email',
+                'fieldLabel'                            : false,
+                'fieldPlaceholder'                      : '2FA Email Code',
+                'fieldType'                             : 'input',
+                'fieldInputType'                        : 'text',
+                'fieldPlaceholder'                      : '2FA Email Code',
+                'fieldGroupPostAddonButtonId'           : 'email_code',
+                'fieldGroupPostAddonButtonValue'        : '<i class="fas fa-fw fa-paper-plane"></i>',
+                'fieldGroupPostAddonButtonTooltipTitle' : 'Email new Code',
+                'fieldGroupPreAddonButtonId'            : 'switch_to_otp',
+                'fieldGroupPreAddonButtonValue'         : '<i class="fas fa-fw fa-repeat"></i>',
+                'fieldGroupPreAddonButtonTooltipTitle'  : 'Switch to 2FA (OTP)',
+                'fieldGroupPreAddonButtonHidden'        : fieldGroupPreAddonButtonHidden,
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldDataInputMinLength'               : 4,
+                'fieldDataInputMaxLength'               : 12,
+                'fieldInputInfoText'                    : true
+            ]
+        )}}
+    </div>
+{% endif %}

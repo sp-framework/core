@@ -1,0 +1,24 @@
+{
+    "name"          : "Adminltetags",
+    "display_name"  : "AdminLTE HTML Helper Tags",
+    "description"   : "Package to generate AdminLTE framework html tags",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "viewtags",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "Apps\\Core\\Packages\\Adminltetags\\Adminltetags",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "settings"      : { }
+}

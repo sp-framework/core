@@ -12,9 +12,9 @@ class BasepackagesStoragesLocal extends BaseModel
 
     public $uuid;
 
-    public $signed_images;
-
     public $uuid_location;
+
+    public $links;
 
     public $org_file_name;
 
@@ -22,7 +22,9 @@ class BasepackagesStoragesLocal extends BaseModel
 
     public $type;
 
-    public $status;
+    public $is_pointer;
+
+    public $orphan;
 
     public $created_by;
 

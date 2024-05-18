@@ -1,0 +1,16 @@
+{% if api['id'] is defined %}
+    {% set apiId = api['id'] %}
+    {% set title = 'API:' ~ api['category'] ~ ':' ~ api['provider'] ~ ' - ' ~ api['name'] %}
+{% else %}
+    {% set apiId = '' %}
+    {% if api['repository'] is defined and api['repository'] === true %}
+        {% set title = 'New API:' ~ api['category'] %}
+    {% else %}
+        {% set title = 'New API:' ~ api['category'] ~ ':' ~ api['provider'] %}
+    {% endif %}
+{% endif %}
+{% if api['repository'] is defined and api['repository'] === true %}
+    {{view.getPartial('../../modules/repositories/view')}}
+{% else %}
+    {{view.getPartial('services/apis/' ~ api['category'] ~ '/' ~ api['provider']|lower ~ '/view')}}
+{% endif %}

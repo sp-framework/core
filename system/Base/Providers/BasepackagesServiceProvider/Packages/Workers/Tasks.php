@@ -4,7 +4,6 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
 use Carbon\Carbon;
 use League\Flysystem\StorageAttributes;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersTasks;
 
@@ -14,13 +13,13 @@ class Tasks extends BasePackage
 
     protected $packageName = 'tasks';
 
-    protected $functionsDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Workers/Functions/';
+    protected $callsDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Workers/Calls/';
 
     public $tasks;
 
     public function getFunctionsDir()
     {
-        return $this->functionsDir;
+        return $this->callsDir;
     }
 
     public function init(bool $resetCache = false)
@@ -30,27 +29,27 @@ class Tasks extends BasePackage
         return $this;
     }
 
-    public function getAllFunctions()
+    public function getAllCalls()
     {
-        $functionsArr =
-            $this->localContent->listContents($this->functionsDir, true)
+        $callsArr =
+            $this->localContent->listContents($this->callsDir, true)
             ->filter(fn (StorageAttributes $attributes) => $attributes->isFile())
             ->map(fn (StorageAttributes $attributes) => $attributes->path())
             ->toArray();
 
-        $functions = [];
+        $calls = [];
 
-        if (count($functionsArr) > 0) {
-            foreach ($functionsArr as $key => $function) {
-                $function = ucfirst($function);
-                $function = str_replace('/', '\\', $function);
-                $function = str_replace('.php', '', $function);
+        if (count($callsArr) > 0) {
+            foreach ($callsArr as $key => $call) {
+                $call = ucfirst($call);
+                $call = str_replace('/', '\\', $call);
+                $call = str_replace('.php', '', $call);
 
                 try {
-                    $function = new $function();
+                    $call = new $call();
 
-                    $functions[$function->packageName]['func'] = $function->packageName;
-                    $functions[$function->packageName]['name'] = $function->funcName;
+                    $calls[$call->packageName]['func'] = $call->packageName;
+                    $calls[$call->packageName]['name'] = $call->funcName;
 
                 } catch (\throwable $e) {
 
@@ -62,7 +61,7 @@ class Tasks extends BasePackage
             }
         }
 
-        return $functions;
+        return $calls;
     }
 
     public function addTask(array $data)
@@ -79,8 +78,6 @@ class Tasks extends BasePackage
 
         $data['status'] = 0;
         $data['type'] = 1;//1 for user and 0 for system
-        $data['previous_run'] = 0;
-        $data['next_run'] = 0;
 
         if ($this->add($data)) {
             $this->addResponse('Added new task ' . $data['name']);
@@ -140,6 +137,11 @@ class Tasks extends BasePackage
         $time = Carbon::now();
 
         if (isset($data['cancel']) && $data['cancel'] == 'true') {
+            if ($this->config->databasetype === 'hybrid' &&
+                $task['call'] === 'processdbsync'
+            ) {
+                $this->ff->setSync(false);
+            }
             $task['force_next_run'] = null;
             $task['status'] = '1';
             $task['next_run'] = '-';
@@ -155,8 +157,12 @@ class Tasks extends BasePackage
             } else {
                 $this->addResponse($task['name'] . ' scheduled with worker for next run.');
             }
+
+            return true;
         } else {
             $this->addResponse('Error scheduling task with worker.', 1);
+
+            return false;
         }
     }
 
@@ -177,7 +183,7 @@ class Tasks extends BasePackage
 
             if ($task['force_next_run'] == 1) {
                 $task['org_schedule_id'] = $task['schedule_id'];
-                $task['schedule_id'] = 1;//Make it minute so it can be picked by the scheduler for next run
+                $task['schedule_id'] = 2;//Make it minute so it can be picked by the scheduler for next run
                 array_push($taskArr, $task);
             } else if ($task['enabled'] == 1 && $task['status'] != 2) {//Enabled and not running
                 array_push($taskArr, $task);
@@ -198,7 +204,7 @@ class Tasks extends BasePackage
         $taskArr = [];
 
         foreach ($this->tasks as $taskKey => $task) {
-            if ($task['status'] == 2) {
+            if ($task['status'] == 2 && $task['exec_type'] === 'call') {
                 array_push($taskArr, $task);
             }
         }
@@ -206,23 +212,38 @@ class Tasks extends BasePackage
         return $taskArr;
     }
 
-    public function findByParameter($parameterValue, $parameterKey = null, $function = null)
+    public function findByCallArgs($argValue, $argKey = null, $function = null)
     {
         if (!$this->tasks) {
             $this->init();
         }
 
         foreach ($this->tasks as $taskKey => $task) {
-            if ($function && $task['function'] !== $function) {
+            if ($function && $task['call'] !== $function) {
                 continue;
             }
 
-            if (is_string($task['parameters']) && $task['parameters'] !== '') {
-                $task['parameters'] = Json::decode($task['parameters'], true);
+            if (is_string($task['call_args']) && $task['call_args'] !== '') {
+                $task['call_args'] = $this->helper->decode($task['call_args'], true);
 
-                if (recursive_array_search($parameterValue, $task['parameters'], $parameterKey)) {
+                if (recursive_array_search($argValue, $task['call_args'], $argKey)) {
                     return $task;
                 }
+            }
+        }
+
+        return false;
+    }
+
+    public function findByCall($function)
+    {
+        if (!$this->tasks) {
+            $this->init();
+        }
+
+        foreach ($this->tasks as $taskKey => $task) {
+            if ($task['call'] === $function) {
+                return $task;
             }
         }
 

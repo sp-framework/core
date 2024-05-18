@@ -2,18 +2,26 @@
 
 namespace System\Base\Providers\ConfigServiceProvider;
 
-use Phalcon\Config as PhalconConfig;
 use Phalcon\Config\Adapter\Grouped;
+use Phalcon\Config\Config as PhalconConfig;
 use System\Base\Installer\Components\Setup;
 
 class Config
 {
     protected $configs = [];
 
+    protected $session;
+
+    protected $request;
+
     protected $configsFolder;
 
-    public function __construct()
+    public function __construct($session, $request)
     {
+        $this->session = $session;
+
+        $this->request = $request;
+
         $this->configsFolder = base_path('system/Configs/');
 
         $this->scanDirForConfigs();
@@ -21,10 +29,16 @@ class Config
 
     public function getConfigs()
     {
-        if (isset($this->getGroupedConfigs()->toArray()['debug'])) {
-            return new PhalconConfig($this->getGroupedConfigs()->toArray());
+        $configs = $this->getGroupedConfigs()->toArray();
+
+        $configsObj = new PhalconConfig($configs);
+
+        if (isset($configs['setup']) && $configs['setup'] === false &&
+            !isset($this->request->getPost()['session'])
+        ) {
+            return $configsObj;
         } else {
-            $this->runSetup();
+            return $this->runSetup($configsObj);
         }
     }
 
@@ -46,11 +60,32 @@ class Config
         }
     }
 
-    protected function runSetup()
+    protected function runSetup($configsObj)
     {
+        if (PHP_SAPI === 'cli') {
+            if ($configsObj->setup === true) {
+                return $configsObj;
+            }
+
+            sleep(10);
+            exit();
+        }
+
         require_once base_path('system/Base/Installer/Components/Setup.php');
 
-        (new Setup())->run();
+        if (isset($this->request->getPost()['session']) &&
+            isset($this->request->getPost()['composer'])
+        ) {
+            (new Setup($this->session, $configsObj))->run();
+        } else if (isset($this->request->getPost()['session']) &&
+                   isset($this->request->getPost()['onlyUpdateDb'])
+        ) {
+            (new Setup($this->session, $configsObj, true))->run();
+        } else if (isset($this->request->getPost()['session'])) {
+            (new Setup($this->session, $configsObj))->run();
+        } else {
+            (new Setup($this->session, $configsObj))->run();
+        }
 
         exit;
     }

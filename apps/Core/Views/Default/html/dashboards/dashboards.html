@@ -1,0 +1,474 @@
+<div class="row">
+    <div id="{{componentId}}-{{sectionId}}-dashboards-list" class="col">
+        {% include 'dashboards/dashboards/list.html' %}
+    </div>
+    <div id="{{componentId}}-{{sectionId}}-widgets-buttons" class="col">
+        {% include 'dashboards/widgets/buttons.html' %}
+    </div>
+</div>
+<hr class="mt-1 m-0">
+<div class="row text-center" id="{{componentId}}-{{sectionId}}-dashboard-loader">
+    <div class="col">
+        <div class="fa-2x">
+            <i class="fa fa-cog fa-spin"></i> Loading...
+        </div>
+    </div>
+</div>
+<div class="row text-center mt-4" id="{{componentId}}-{{sectionId}}-no-widgets" hidden>
+    <div class="col">
+        <h6><i class="fa fa-fw fa-info-circle text-info"></i> No widgets added to this dashboard.</h6>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="grid-stack"></div>
+    </div>
+</div>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'widgets-modal',
+            'modalBodyInclude'          : 'dashboards/widgets/view',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-grip"></i> WIDGETS',
+            'modalFooterButtons'        :
+                [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                        [
+                            'modal-button-add' : [
+                                'title'                   : 'Add',
+                                'type'                    : 'primary',
+                                'position'                : 'right',
+                                'disabled'                : true,
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true
+                            ]
+                        ]
+                ]
+        ]
+    )}}
+</div>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'share-modal',
+            'modalBodyInclude'          : 'dashboards/dashboards/share',
+            'modalSize'                 : 'lg',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-share"></i> SHARE DASHBOARD'
+        ]
+    )}}
+</div>
+<script>
+/* globals showPaginate GridStack Swal */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-available_widgets'], {
+        afterInit: function() {
+            var swalSound = window['dataCollection'].env.sounds.swalSound;
+            var grid;
+
+            function initGrid(removeDom = true) {
+                if (dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid']) {
+                    dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid'].destroy(removeDom);
+                }
+
+                grid = dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid'] = GridStack.init({
+                    'draggable'     : {
+                        'handle'    : '[data-card-widget="move"]'
+                    },
+                    'margin'        : '5px',
+                    'animate'       : false
+                });
+            }
+
+            initGrid();
+
+            grid.on('added', function(e, items) {
+                //eslint-disable-next-line
+                console.log(items);
+                items.forEach(function(item) {
+                    populateGridData(item);
+                });
+            });
+
+            function fixHeight(item) {
+                var itemHeight = $(item.el).find('.card')[0].offsetHeight + 20;//20 for padding
+
+                grid.cellHeight(itemHeight);
+            }
+
+            $('body').off('widgetUpdate');
+            $('body').on('widgetUpdate', function(e, data) {
+                data.items.forEach(function(item) {
+                    populateGridData(item);
+                });
+            });
+
+            grid.on('resizestart', function(e, el) {
+                $(el).find('.card-header').attr('hidden', true);
+            });
+
+            grid.on('resizestop', function(e, el) {
+                $(el).find('.card-header').attr('hidden', false);
+            });
+
+            function populateGridStructure() {
+                var postData = { };
+                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                postData['dashboard_id'] = $('#{{componentId}}-{{sectionId}}-dashboards').select2().val();
+
+                $.post('{{links.url("dashboards/getWidgetContent")}}', postData, function(response) {
+                    if (response.tokenKey && response.token) {
+                        $("#security-token").attr("name", response.tokenKey);
+                        $("#security-token").val(response.token);
+                    }
+
+                    if (response.responseCode === 0) {
+                        if (response.responseData && response.responseData.widgetsData) {
+                            for (var widget in response.responseData.widgetsData) {
+                                addWidgetToGrid(response.responseData.widgetsData[widget]);
+                            }
+
+                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
+                            grid.enableMove(false);
+                            grid.enableResize(false);
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
+                            showPaginate('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
+                        }
+                    } else if (response.responseCode === 1) {
+                        showPaginate('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
+                    } else if (response.responseCode === 2) {
+                        showPaginate('error', {'text' : response.responseMessage});
+                        $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
+                    }
+                    $('#{{componentId}}-{{sectionId}}-dashboard-loader').attr('hidden', true);
+
+                    initRemoveButtons();
+                }, 'json');
+            }
+            populateGridStructure();
+
+            function populateGridData(item) {
+                item.el.dataset.method = item.method;//Add method for later use.
+                $(item.el).find('.card-body').html(
+                    '<div class="row text-center">' +
+                        '<div class="col">' +
+                            '<i class="fa fa-cog fa-spin"></i> Loading...' +
+                        '</div>' +
+                    '</div>'
+                );
+
+                var url = '{{links.url("dashboards/q/widgets/content/id/' + item.id + '/did/' + item.dashboard_id + '/wid/' + item.widget_id + '")}}';
+                $(item.el).find('.card-body').load(url, null, function (response, status, xhr) {
+                    if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
+                        $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
+                        $('#security-token').val(xhr.getResponseHeader('token'));
+                    }
+                    fixHeight(item);
+                });
+            }
+
+
+            function initRemoveButtons() {
+                $('.btn-tool-widgetRemove').off();
+                $('.btn-tool-widgetRemove').click(function() {
+                    Swal.fire({
+                        title                       : '<span class="text-danger"> Remove widget from dashboard?</span>',
+                        icon                        : 'question',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Remove',
+                        customClass                 : {
+                            'confirmButton'             : 'btn btn-danger text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        didOpen                     : function() {
+                            swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                            var gridWidget = $(this).parents('.grid-stack-item')[0];
+
+                            var postData = { };
+                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+                            postData['id'] = $(this).parents('.grid-stack-item').attr('gs-id');
+                            postData['dashboard_id'] = $('#{{componentId}}-{{sectionId}}-dashboards').select2().val();
+
+                            $.post('{{links.url("dashboards/removeWidgetFromDashboard")}}', postData, function(response) {
+                                if (response.tokenKey && response.token) {
+                                    $("#security-token").attr("name", response.tokenKey);
+                                    $("#security-token").val(response.token);
+                                }
+
+                                if (response.responseCode === 0) {
+                                    showPaginate('success', {'text' : response.responseMessage});
+
+                                    if ($(gridWidget).data('method')) {
+                                        var widgetJstreeId =  $('li').find('[data-method="' + $(gridWidget).data('method') + '"]')[0].id;
+                                        $('#{{componentId}}-{{sectionId}}-available_widgets').jstree().enable_node(widgetJstreeId);
+                                    }
+
+                                    grid.removeWidget(gridWidget);
+                                    $('body').trigger('widgetRemove', {'gridWidget' : gridWidget});
+
+                                    grid.compact();
+
+                                    if (grid.save().length === 0) {
+                                        $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
+                                        $('#{{componentId}}-{{sectionId}}-save-widgets').attr('hidden', true);
+                                        $('#{{componentId}}-{{sectionId}}-save-widgets').attr('disabled', true);
+                                        $('#{{componentId}}-{{sectionId}}-add-widgets').attr('disabled', false);
+                                        $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
+                                        $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
+                                    }
+                                }
+                            }, 'json');
+                        }
+                    });
+                });
+
+                $('.btn-tool-settings').off();
+                $('.btn-tool-settings').click(function() {
+                    $(this).parents('.card').first().find('.widgets-setting-modal').modal('show');
+                });
+            }
+
+            function addWidgetToGrid(widgetsData) {
+                var newWidget = { };
+                newWidget['id'] = widgetsData['id'];
+                newWidget['content'] = widgetsData['widget']['content'];
+                newWidget['w'] = 3;//25% of the screen
+                newWidget['minW'] = 3;//25% of the screen
+                newWidget['method'] = widgetsData['widget']['method'];
+                newWidget['widget_id'] = widgetsData['widget']['id'];
+                newWidget['dashboard_id'] = widgetsData['dashboard_id'];
+
+                if (widgetsData['settings']['w']) {
+                    newWidget['w'] = widgetsData['settings']['w'];
+                }
+                if (widgetsData['settings']['minW']) {
+                    newWidget['minW'] = widgetsData['settings']['minW'];
+                }
+                if (widgetsData['settings']['maxW']) {
+                    newWidget['maxW'] = widgetsData['settings']['maxW'];
+                }
+                if (widgetsData['settings']['h']) {
+                    newWidget['h'] = widgetsData['settings']['h'];
+                }
+                if (widgetsData['settings']['minH']) {
+                    newWidget['minH'] = widgetsData['settings']['minH'];
+                }
+                if (widgetsData['settings']['maxH']) {
+                    newWidget['maxH'] = widgetsData['settings']['maxH'];
+                }
+
+                grid.addWidget(newWidget);
+                dataCollectionComponent['{{componentId}}-{{sectionId}}'][widgetsData['widget']['method']] = { };
+                initRemoveButtons();
+
+                //Disable so that we dont add duplicates unless multiple is set to 1.
+                if (widgetsData['widget']['multiple'] && widgetsData['widget']['multiple'] == '0') {
+                    var widgetJstreeId =  $('li').find('[data-id="' + widgetsData['widget_id'] + '"]')[0].id;
+                    $('#{{componentId}}-{{sectionId}}-available_widgets').jstree().disable_node(widgetJstreeId);
+                }
+            }
+
+            $('#{{componentId}}-{{sectionId}}-available_widgets').on('select_node.jstree', function (e, data) {
+                if (data.node.children.length !== 0) {
+                    $('#{{componentId}}-{{sectionId}}-available_widgets').jstree().deselect_node(data.node.id, true);
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-widget-no-widgets').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-widget-error').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-widget-loader').attr('hidden', false);
+                    var url = '{{links.url("dashboards/q/widgets/info/id/' + data.node.data.id + '")}}';
+
+                    $('#{{componentId}}-{{sectionId}}-widget-info').load(url, null, function (response, status, xhr) {
+                        if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
+                            $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
+                            $('#security-token').val(xhr.getResponseHeader('token'));
+                        }
+
+                        if (status === 'success') {
+                            $('#{{componentId}}-{{sectionId}}-widget-loader').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-widget-info').attr('hidden', false);
+                            $('#{{componentId}}-{{sectionId}}-modal-button-add').attr('disabled', false);
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-widget-error').attr('hidden', false);
+                            $('#{{componentId}}-{{sectionId}}-modal-button-add').attr('disabled', true);
+                        }
+                    });
+                }
+            });
+
+            $('#{{componentId}}-{{sectionId}}-modal-button-add').click(function(e) {
+                e.preventDefault();
+
+                var selectedWidget = $('#{{componentId}}-{{sectionId}}-available_widgets').jstree().get_selected(true);
+
+                if (selectedWidget.length === 1) {
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['widget_id'] = selectedWidget[0].data.id;
+                    postData['dashboard_id'] = $('#{{componentId}}-{{sectionId}}-dashboards').select2().val();
+                    postData['component_id'] = selectedWidget[0].data.component_id;
+                    postData['method'] = selectedWidget[0].data.method;
+                    postData['sequence'] = 0;
+                    postData['settings'] = JSON.stringify([]);
+
+                    $.post('{{links.url("dashboards/addWidgetToDashboard")}}', postData, function(response) {
+                        $('#{{componentId}}-{{sectionId}}-modal-button-add').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-modal-button-add').children('i').attr('hidden', true);
+
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+
+                        if (response.responseCode === 0) {
+                            showPaginate('success', {'text' : response.responseMessage});
+
+                            addWidgetToGrid(response.responseData);
+                            $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
+                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
+
+                            $('#{{componentId}}-{{sectionId}}-modal-button-add').attr('disabled', true);
+                            grid.enableMove(false);
+                            grid.enableResize(false);
+                            $('#{{componentId}}-{{sectionId}}-available_widgets').jstree().deselect_all();
+                            $('#{{componentId}}-{{sectionId}}-widget-info').empty();
+                            $('#{{componentId}}-{{sectionId}}-widget-no-widgets').attr('hidden', false);
+                        } else {
+                            showPaginate('error', {'text' : response.responseMessage});
+                        }
+                    }, 'json');
+                } else {
+                    showPaginate('error', {
+                        'title' : 'Please select 1 widget to add.'
+                    });
+                }
+            });
+
+            $('#{{componentId}}-{{sectionId}}-add-widgets').click(function(e) {
+                e.preventDefault();
+
+                $('#{{componentId}}-{{sectionId}}-widgets-modal').modal('show');
+            });
+
+            $('#{{componentId}}-{{sectionId}}-edit-widgets').click(function(e) {
+                e.preventDefault();
+
+                $('.grid-stack').find('.card-header').each(function(i, cardHeader) {
+                    $(cardHeader).attr('hidden', false);
+                });
+
+                $('.grid-stack').find('.card-body').each(function(i, cardBody) {
+                    // $(cardBody).addClass('widget-overlay');
+                });
+
+                $(this).attr('hidden', true);
+                $(this).attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-save-widgets').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-save-widgets').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-add-widgets').attr('disabled', true);
+                grid.enableMove(true);
+                grid.enableResize(true);
+            });
+
+            $('#{{componentId}}-{{sectionId}}-save-widgets').click(function(e) {
+                e.preventDefault();
+
+                $('.grid-stack').find('.card-header').each(function(i, cardHeader) {
+                    $(cardHeader).attr('hidden', true);
+                });
+
+                $('.grid-stack').find('.card-body').each(function(i, cardBody) {
+                    // $(cardBody).removeClass('widget-overlay');
+                });
+
+                $(this).attr('hidden', true);
+                $(this).attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-add-widgets').attr('disabled', false);
+                grid.enableMove(false);
+                grid.enableResize(false);
+                grid.compact();
+
+                if (grid.save().length === 0) {
+                    $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
+                    $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
+                } else {
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['dashboard_id'] = $('#{{componentId}}-{{sectionId}}-dashboards').select2().val();
+                    postData['widgets'] = grid.save(false, false);
+
+                    $.post('{{links.url("dashboards/updateWidgetToDashboard")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+
+                        if (response.responseCode === 0) {
+                            showPaginate('success', {'text' : response.responseMessage});
+                        } else if (response.responseCode === 1) {
+                            showPaginate('error', {'text' : response.responseMessage});
+                        }
+                    }, 'json');
+                }
+            });
+
+            $('#{{componentId}}-{{sectionId}}-widgets-modal').on('hidden.bs.modal', function (e) {
+                $('#{{componentId}}-{{sectionId}}-available_widgets').jstree().deselect_all();
+                $('#{{componentId}}-{{sectionId}}-widget-info').empty();
+                $('#{{componentId}}-{{sectionId}}-widget-no-widgets').attr('hidden', false);
+            });
+        }
+    });
+</script>

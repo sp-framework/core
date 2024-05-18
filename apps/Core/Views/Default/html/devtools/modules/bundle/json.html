@@ -1,0 +1,153 @@
+{% set bundleId = bundle['id'] %}
+{% set bundleName = bundle['name'] %}
+{% set bundleDescription = bundle['description'] %}
+{% set bundleApp_type = bundle['app_type'] %}
+{% set bundleModule_type = 'bundles' %}
+{% set bundleApiId = bundle['api_id'] %}
+{% set bundleRepo = bundle['repo'] %}
+<div class="row" hidden>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'id',
+                'fieldLabel'                     : 'Bundle ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Bundle ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : bundleId
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'api_id',
+                'fieldLabel'                           : 'Remote Repo?',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select repo if the bundle will be available on a repo. Note: Bundles are only available via Repo.',
+                'fieldRequired'                        : true,
+                'fieldDisabled'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2Options'              : apis,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsSelected'      : bundleApiId
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'repo',
+                'fieldLabel'                     : 'Bundle repo',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Bundle repo.',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldValue'                     : bundleRepo
+            ]
+        )}}
+    </div>
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'createrepo',
+                'fieldLabel'                     : 'Create New Repo?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Create new repository if it does not exist on remote?',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : false,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'commit_message',
+                'fieldLabel'                     : 'Commit Message',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Commit Message',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 512,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'bundle_modules',
+                'fieldLabel'                     : 'Bundle Modules',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Bundle Modules',
+                'fieldBazScan'                   : true,
+                'fieldDisabled'                  : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldTextareaRows'              : 15,
+                'fieldValue'                     : bundleModules
+            ]
+        )}}
+    </div>
+</div>

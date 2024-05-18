@@ -23,9 +23,33 @@ class BasepackagesUsersAccountsSecurity extends BaseModel
 
     public $force_pwreset;
 
-    public $two_fa_status;
+    public $twofa_otp_status;
 
-    public $two_fa_secret;
+    public $twofa_otp_secret;
+
+    public $twofa_otp_hotp_counter;
+
+    public $twofa_email_code;
+
+    public $twofa_email_code_sent_on;
+
+    public $password_history;
+
+    public $password_set_on;
+
+    public $force_pwreset_after;
+
+    public $forgotten_request;
+
+    public $forgotten_request_session_id;
+
+    public $forgotten_request_ip;
+
+    public $forgotten_request_agent;
+
+    public $forgotten_request_code;
+
+    public $forgotten_request_sent_on;
 
     public function initialize()
     {

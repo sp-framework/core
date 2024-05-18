@@ -1,0 +1,522 @@
+{% set twofaEmailDivHidden = 'hidden' %}
+{% set twofaOtpDivHidden = 'hidden' %}
+{% set coreSettingsSecurity2fa = 'twofaoff' %}
+{% set pwresetNeed2faDisabled = true %}
+{% set core2faUsing = [] %}
+{% set twofaUsingDisabled = true %}
+{% set twofaOtpLogo = '' %}
+{% set core2faEmailCodeTimeout = '60' %}
+{% set core2faEmailCodeLength = '4' %}
+{% set twofaOtp = 'totp' %}
+{% set twofaOtpDisabled = true %}
+{% set twofaOtpSecretSize = '8' %}
+{% set twofaOtpTotpTimeout = '30' %}
+{% set twofaOtpTotpWindow = '0' %}
+{% set twofaOtpTotpSettingsDiv = 'hidden' %}
+{% set twofaOtpHotpCounter = '0' %}
+{% set twofaOtpHotpWindow = '0' %}
+{% set twofaOtpHotpSettingsDiv = 'hidden' %}
+{% set twofaOtpLabel = '' %}
+{% set twofaOtpIssuer = '' %}
+{% if twofaAlgorithms['sha1'] is defined %}
+    {% set twofaOtpAlgorithm = 'sha1' %}
+{% else %}
+    {% set twofaOtpAlgorithm = '' %}
+{% endif %}
+{% set twofaOtpDigitsLength = '6' %}
+
+{% if core['settings']['security']['twofa'] is defined and core['settings']['security']['twofa'] == 'true' %}
+    {% set coreSettingsSecurity2fa = 'twofaon' %}
+    {% set twofaUsingDisabled = false %}
+    {% set pwresetNeed2faDisabled = false %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaUsing'] is defined %}
+    {% set core2faUsing = core['settings']['security']['twofaSettings']['twofaUsing'] %}
+{% endif %}
+{% if core2faUsing|length > 0 and in_array('email', core2faUsing) %}
+    {% set twofaEmailDivHidden = '' %}
+{% endif %}
+{% if core2faUsing|length > 0 and in_array('otp', core2faUsing) %}
+    {% set twofaOtpDivHidden = '' %}
+{% endif %}
+
+{% if core['settings']['security']['twofaSettings']['twofaOtp'] is defined %}
+    {% set twofaOtp = core['settings']['security']['twofaSettings']['twofaOtp'] %}
+{% endif %}
+{% if twofaOtp == 'totp' %}
+    {% set twofaOtpTotpSettingsDiv = '' %}
+{% elseif twofaOtp == 'hotp' %}
+    {% set twofaOtpHotpSettingsDiv = '' %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaEmailCodeTimeout'] is defined %}
+    {% set core2faEmailCodeTimeout = core['settings']['security']['twofaSettings']['twofaEmailCodeTimeout'] %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaEmailCodeLength'] is defined %}
+    {% set core2faEmailCodeLength = core['settings']['security']['twofaSettings']['twofaEmailCodeLength'] %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaOtpLogo'] is defined %}
+    {% set twofaOtpLogo = core['settings']['security']['twofaSettings']['twofaOtpLogo'] %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaOtpSecretSize'] is defined %}
+    {% set twofaOtpSecretSize = core['settings']['security']['twofaSettings']['twofaOtpSecretSize'] %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaOtpTotpTimeout'] is defined %}
+    {% set twofaOtpTotpTimeout = core['settings']['security']['twofaSettings']['twofaOtpTotpTimeout'] %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaOtpTotpWindow'] is defined %}
+    {% set twofaOtpTotpWindow = core['settings']['security']['twofaSettings']['twofaOtpTotpWindow'] %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaOtpHotpCounter'] is defined %}
+    {% set twofaOtpHotpCounter = core['settings']['security']['twofaSettings']['twofaOtpHotpCounter'] %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaOtpHotpWindow'] is defined %}
+    {% set twofaOtpHotpWindow = core['settings']['security']['twofaSettings']['twofaOtpHotpWindow'] %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaOtpLabel'] is defined %}
+    {% set twofaOtpLabel = core['settings']['security']['twofaSettings']['twofaOtpLabel'] %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaOtpIssuer'] is defined %}
+    {% set twofaOtpIssuer = core['settings']['security']['twofaSettings']['twofaOtpIssuer'] %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaOtpAlgorithm'] is defined %}
+    {% set twofaOtpAlgorithm = core['settings']['security']['twofaSettings']['twofaOtpAlgorithm'] %}
+{% endif %}
+{% if core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'] is defined %}
+    {% set twofaOtpDigitsLength = core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'] %}
+{% endif %}
+{% set pwresetNeed2faChecked = false %}
+{% if core['settings']['security']['twofaSettings']['twofaPwresetNeed2fa'] is defined and core['settings']['security']['twofaSettings']['twofaPwresetNeed2fa'] == 1 %}
+    {% set pwresetNeed2faChecked = true %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'twofa',
+                'fieldLabel'                     : '2 Factor Authentication',
+                'fieldType'                      : 'radio',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Switch on to configure 2 factor authentication across the platform.',
+                'fieldRequired'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioButtons'              :
+                    [
+                        'twofaoff' :
+                            [
+                                'title'                           : 'OFF',
+                                'type'                            : 'secondary',
+                                'dataValue'                       : 'twofaoff'
+                            ],
+                        'twofaon' :
+                            [
+                                'title'                           : 'ON',
+                                'type'                            : 'primary',
+                                'dataValue'                       : 'twofaon'
+                            ]
+                    ],
+                'fieldRadioChecked'              : coreSettingsSecurity2fa
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'twofa_pwreset_need_2fa',
+                'fieldLabel'                     : 'Password reset needs 2FA',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Check to enforce 2fa during password reset. Works if email service is enabled or user has enabled 2fa.',
+                'fieldRequired'                  : false,
+                'fieldDisabled'                  : pwresetNeed2faDisabled,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : pwresetNeed2faChecked,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'twofa_using',
+                'fieldLabel'                            : 'Enforce 2FA Using?',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select which method(s) 2FA should be used. Example: Email, TOTP, SMS',
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : twofaUsingDisabled,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldDataSelect2Multiple'              : true,
+                'fieldDataSelect2Options'               : twofaUsingOptions,
+                'fieldDataSelect2OptionsKey'            : 'type',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : core2faUsing
+            ]
+        )}}
+    </div>
+</div>
+<div id="twofa-email-div" {{twofaEmailDivHidden}}>
+    <hr>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'twofa_email_code_timeout',
+                    'fieldLabel'                            : 'Email Code Timeout (seconds)',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Timeout of the email code that is sent to the user. After the timeout, user has to generate a new code.',
+                    'fieldInputTypeTextFilter'              : 'positiveInt',
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : false,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataInputMinNumber'               : 60,
+                    'fieldDataInputMaxNumber'               : 3600,
+                    'fieldDataInputMaxLength'               : 4,
+                    'fieldValue'                            : core2faEmailCodeTimeout
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'twofa_email_code_length',
+                    'fieldLabel'                            : 'Email Code Length',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Length of the email code that is sent to the user.',
+                    'fieldInputTypeTextFilter'              : 'positiveInt',
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : false,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldBazPostOnUpdate'                  : true,
+                    'fieldDataInputMinNumber'               : 4,
+                    'fieldDataInputMaxNumber'               : 12,
+                    'fieldDataInputMaxLength'               : 2,
+                    'fieldValue'                            : core2faEmailCodeLength
+                ]
+            )}}
+        </div>
+    </div>
+</div>
+<div id="twofa-otp-div" {{twofaOtpDivHidden}}>
+    <hr>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'twofa_otp_logo',
+                        'fieldLabel'                     : 'Logo',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Some mobile app supports logo that you can upload here.',
+                        'fieldType'                      : 'files/croppie',
+                        'fieldCroppieFormat'             : 'png',
+                        'fieldValue'                     : twofaOtpLogo,
+                        'imageType'                      : 'logo',
+                        'upload'                         : true,
+                        'logoLink'                       : logoLink
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="col">
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'twofa_otp',
+                            'fieldLabel'                     : '2 Factor Authentication Method',
+                            'fieldType'                      : 'radio',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Choose which 2 factor authentication method to use.',
+                            'fieldRequired'                  : true,
+                            'fieldBazJstreeSearch'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldBazScan'                   : true,
+                            'fieldRadioPlacementType'        : 'horizontal',
+                            'fieldRadioButtons'              :
+                                [
+                                    'totp' :
+                                        [
+                                            'title'                           : 'TOTP',
+                                            'type'                            : 'primary',
+                                            'dataValue'                       : 'totp'
+                                        ],
+                                    'hotp' :
+                                        [
+                                            'title'                           : 'HOTP',
+                                            'type'                            : 'primary',
+                                            'dataValue'                       : 'hotp'
+                                        ]
+                                ],
+                            'fieldRadioChecked'              : twofaOtp
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'twofa_otp_secret_size',
+                            'fieldLabel'                            : 'Otp Secret Size',
+                            'fieldType'                             : 'input',
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'Size of OTP secret.',
+                            'fieldInputTypeTextFilter'              : 'positiveInt',
+                            'fieldRequired'                         : true,
+                            'fieldBazScan'                          : true,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldDataInputMinNumber'               : 8,
+                            'fieldDataInputMaxNumber'               : 64,
+                            'fieldDataInputMaxLength'               : 2,
+                            'fieldValue'                            : twofaOtpSecretSize
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row" id="twofa-otp-totp-settings-div" {{twofaOtpTotpSettingsDiv}}>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'twofa_otp_totp_timeout',
+                            'fieldLabel'                            : 'Totp Code Timeout (seconds)',
+                            'fieldType'                             : 'input',
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'Timeout of the totp code.',
+                            'fieldInputTypeTextFilter'              : 'positiveInt',
+                            'fieldRequired'                         : true,
+                            'fieldBazScan'                          : true,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldDataInputMinNumber'               : 30,
+                            'fieldDataInputMaxNumber'               : 300,
+                            'fieldDataInputMaxLength'               : 3,
+                            'fieldValue'                            : twofaOtpTotpTimeout
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'twofa_otp_totp_window',
+                            'fieldLabel'                            : 'Totp Window (seconds)',
+                            'fieldType'                             : 'input',
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'Window is an additional time of seconds that the code will be checked against. Example: Window 10 will check current time -10 seconds. Note: this timeout has to be lower than TOTP timeout.',
+                            'fieldInputTypeTextFilter'              : 'positiveInt',
+                            'fieldRequired'                         : false,
+                            'fieldBazScan'                          : true,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldDataInputMinNumber'               : 0,
+                            'fieldDataInputMaxNumber'               : 30,
+                            'fieldDataInputMaxLength'               : 2,
+                            'fieldValue'                            : twofaOtpTotpWindow
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row" id="twofa-otp-hotp-settings-div" {{twofaOtpHotpSettingsDiv}}>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'twofa_otp_hotp_counter',
+                            'fieldLabel'                            : 'Hotp Counter',
+                            'fieldType'                             : 'input',
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'Counter of the hotp code.',
+                            'fieldInputTypeTextFilter'              : 'positiveInt',
+                            'fieldRequired'                         : true,
+                            'fieldBazScan'                          : true,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldDataInputMinNumber'               : 0,
+                            'fieldDataInputMaxNumber'               : 1000,
+                            'fieldDataInputMaxLength'               : 4,
+                            'fieldValue'                            : twofaOtpHotpCounter
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'twofa_otp_hotp_window',
+                            'fieldLabel'                            : 'Hotp Window (count)',
+                            'fieldType'                             : 'input',
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'Window is an additional counts of counter that the code will be checked against. Example: Window 10 will check current counter value -10 previous counter values.',
+                            'fieldInputTypeTextFilter'              : 'positiveInt',
+                            'fieldRequired'                         : false,
+                            'fieldBazScan'                          : true,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldDataInputMinNumber'               : 0,
+                            'fieldDataInputMaxNumber'               : 30,
+                            'fieldDataInputMaxLength'               : 2,
+                            'fieldValue'                            : twofaOtpHotpWindow
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'twofa_otp_label',
+                            'fieldLabel'                            : 'OTP Label',
+                            'fieldType'                             : 'input',
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'OTP label to show on the authenticator app.',
+                            'fieldRequired'                         : true,
+                            'fieldDisabled'                         : false,
+                            'fieldBazScan'                          : true,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldDataInputMinLength'               : 1,
+                            'fieldDataInputMaxLength'               : 50,
+                            'fieldValue'                            : twofaOtpLabel
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'twofa_otp_issuer',
+                            'fieldLabel'                            : 'Otp Issuer',
+                            'fieldType'                             : 'input',
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'OTP issuer to show on the authenticator app.',
+                            'fieldRequired'                         : true,
+                            'fieldDisabled'                         : false,
+                            'fieldBazScan'                          : true,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldDataInputMinLength'               : 1,
+                            'fieldDataInputMaxLength'               : 50,
+                            'fieldValue'                            : twofaOtpIssuer
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'twofa_otp_algorithm',
+                            'fieldLabel'                            : 'OTP Hash Algorithm',
+                            'fieldType'                             : 'select2',
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'Select which algorithm to use for OTP. Note: Some authenticator applications dont use some algorithm. Check with app documentation before selecting this.',
+                            'fieldBazScan'                          : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldRequired'                         : true,
+                            'fieldDisabled'                         : false,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldDataSelect2Options'               : twofaAlgorithms,
+                            'fieldDataSelect2OptionsKey'            : 'id',
+                            'fieldDataSelect2OptionsValue'          : 'name',
+                            'fieldDataSelect2OptionsArray'          : true,
+                            'fieldDataSelect2OptionsSelected'       : twofaOtpAlgorithm
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'twofa_otp_digits_length',
+                            'fieldLabel'                            : 'OTP digits length',
+                            'fieldType'                             : 'input',
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'Number of digits to use for this OTP.',
+                            'fieldInputTypeTextFilter'              : 'positiveInt',
+                            'fieldRequired'                         : true,
+                            'fieldDisabled'                         : false,
+                            'fieldBazScan'                          : true,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldDataInputMinNumber'               : 4,
+                            'fieldDataInputMaxNumber'               : 8,
+                            'fieldDataInputMaxLength'               : 1,
+                            'fieldValue'                            : twofaOtpDigitsLength
+                        ]
+                    )}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

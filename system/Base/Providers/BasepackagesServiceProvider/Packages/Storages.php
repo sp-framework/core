@@ -3,7 +3,6 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use Apps\Ecom\Admin\Packages\Channels\Channels;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesStorages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages\Local;
@@ -61,12 +60,12 @@ class Storages extends BasePackage
 
     protected function extractSelectData(array $data)
     {
-        $data['allowed_image_mime_types'] = Json::decode($data['allowed_image_mime_types'], true);
-        $data['allowed_image_mime_types'] = Json::encode($data['allowed_image_mime_types']['data']);
-        $data['allowed_image_sizes'] = Json::decode($data['allowed_image_sizes'], true);
-        $data['allowed_image_sizes'] = Json::encode($data['allowed_image_sizes']['data']);
-        $data['allowed_file_mime_types'] = Json::decode($data['allowed_file_mime_types'], true);
-        $data['allowed_file_mime_types'] = Json::encode($data['allowed_file_mime_types']['data']);
+        $data['allowed_image_mime_types'] = $this->helper->decode($data['allowed_image_mime_types'], true);
+        $data['allowed_image_mime_types'] = $this->helper->encode($data['allowed_image_mime_types']['data']);
+        $data['allowed_image_sizes'] = $this->helper->decode($data['allowed_image_sizes'], true);
+        $data['allowed_image_sizes'] = $this->helper->encode($data['allowed_image_sizes']['data']);
+        $data['allowed_file_mime_types'] = $this->helper->decode($data['allowed_file_mime_types'], true);
+        $data['allowed_file_mime_types'] = $this->helper->encode($data['allowed_file_mime_types']['data']);
 
         return $data;
     }
@@ -97,24 +96,28 @@ class Storages extends BasePackage
 
     public function getAppStorages()
     {
-        if (isset($this->storages) && count($this->storages) > 0) {
-            foreach ($this->storages as $key => $storage) {
-                if ($storage['allowed_image_mime_types']) {
-                    $storage['allowed_image_mime_types'] = Json::decode($storage['allowed_image_mime_types']);
-                }
-                if ($storage['allowed_image_sizes']) {
-                    $storage['allowed_image_sizes'] = Json::decode($storage['allowed_image_sizes']);
-                }
-                if ($storage['allowed_file_mime_types']) {
-                    $storage['allowed_file_mime_types'] = Json::decode($storage['allowed_file_mime_types']);
-                }
-                $storages[$storage['permission']] = $storage;
-            }
+        $domain = $this->domains->domain;
 
-            return $storages;
+        $app = $this->apps->getAppInfo();
+
+        if (isset($domain['apps'][$app['id']]['publicStorage']) && $domain['apps'][$app['id']]['publicStorage'] !== '') {
+            $storages['public'] = $this->getById($domain['apps'][$app['id']]['publicStorage']);
+        }
+        if (isset($domain['apps'][$app['id']]['privateStorage']) && $domain['apps'][$app['id']]['privateStorage'] !== '') {
+            $storages['private'] = $this->getById($domain['apps'][$app['id']]['privateStorage']);
         }
 
-        return false;
+        if (count($storages) === 0) {
+            return false;
+        }
+
+        foreach ($storages as $key => $storage) {
+            $storage = $this->jsonData($storage, true);
+
+            $appStorages[$storage['permission']] = $storage;
+        }
+
+        return $appStorages;
     }
 
     public function getFile(array $getData)
@@ -127,7 +130,26 @@ class Storages extends BasePackage
             $public = false;
         }
 
-        return $this->initStorage($public)->get($getData);
+        return $this->initStorage($public)->getFile($getData);
+    }
+
+    public function getFiles(array $getData)
+    {
+        if (!isset($getData['params'])) {
+            $this->addResponse('Please provide parameter.', 1);
+
+            return false;
+        }
+
+        if (isset($getData['storagetype']) && $getData['storagetype'] === 'public') {
+            $public = true;
+        } else if (isset($getData['storagetype']) && $getData['storagetype'] === 'private') {
+            $public = false;
+        } else {
+            $public = false;
+        }
+
+        return $this->initStorage($public)->getFiles($getData['params']);
     }
 
     public function getFileById($id, $public = true)
@@ -148,46 +170,50 @@ class Storages extends BasePackage
         return false;
     }
 
-    public function storeFile($type = null, $directory = null, $file = null, $fileName = null, $size = null, $mimeType = null)
+    public function storeFile($type = null, $directory = null, $file = null, $fileName = null, $size = null, $mimeType = null, $addToDbOnly = false)
     {
         $this->initStorage($this->checkPublic($type));
 
         if ($this->storage) {
-            if ($this->storage->store($directory, $file, $fileName, $size, $mimeType)) {
-                $storageData = $this->storage->packagesData->storageData;
+            if ($this->storage->store($directory, $file, $fileName, $size, $mimeType, $addToDbOnly)) {
+                $storageData = $this->storage->packagesData->responseData['storageData'];
 
-                $fileInfo = $this->storage->getFileInfo($storageData['uuid']);
+                if ($addToDbOnly) {
+                    $this->packagesData->responseMessage = 'File pointer added!';
+                } else {
+                    $fileInfo = $this->storage->getFileInfo($storageData['uuid']);
 
-                if (isset($fileInfo[0])) {
-                    $fileType = $fileInfo[0]['type'];
-                }
+                    if (isset($fileInfo[0])) {
+                        $fileType = $fileInfo[0]['type'];
+                    }
 
-                if (in_array($fileType, $this->storage->storage['allowed_image_mime_types'])) {
-                    if (isset($this->request->getPost()['getpubliclinks'])) {
-                        $widths = explode(',', $this->request->getPost()['getpubliclinks']);
+                    if (in_array($fileType, $this->storage->storage['allowed_image_mime_types'])) {
+                        if (isset($this->request->getPost()['getpubliclinks'])) {
+                            $widths = explode(',', $this->request->getPost()['getpubliclinks']);
 
-                        $storageData['publicLinks'] = [];
+                            $storageData['publicLinks'] = [];
 
-                        foreach ($widths as $width) {
-                            $width = trim($width);
+                            foreach ($widths as $width) {
+                                $width = trim($width);
 
-                            array_push($storageData['publicLinks'], $this->getPublicLink($storageData['uuid'], (int) $width));
+                                array_push($storageData['publicLinks'], $this->getPublicLink($storageData['uuid'], (int) $width));
+                            }
                         }
+
+                        $this->packagesData->responseMessage = 'Files Uploaded!';
+
+                    } else if (in_array($fileType, $this->storage->storage['allowed_file_mime_types'])) {
+                        if (isset($this->request->getPost()['getpubliclinks'])) {
+                            $storageData['publicLinks'] = [];
+
+                            array_push($storageData['publicLinks'], $this->getPublicLink($storageData['uuid'], null));
+                        }
+
+                        $this->packagesData->responseMessage = 'Files Uploaded!';
                     }
-
-                    $this->packagesData->responseMessage = 'Files Uploaded!';
-
-                } else if (in_array($fileType, $this->storage->storage['allowed_file_mime_types'])) {
-                    if (isset($this->request->getPost()['getpubliclinks'])) {
-                        $storageData['publicLinks'] = [];
-
-                        array_push($storageData['publicLinks'], $this->getPublicLink($storageData['uuid'], null));
-                    }
-
-                    $this->packagesData->responseMessage = 'Files Uploaded!';
                 }
 
-                $this->packagesData->storageData = $storageData;
+                $this->packagesData->responseData = $storageData;
 
                 $this->packagesData->responseCode = $this->storage->packagesData->responseCode;
 
@@ -226,10 +252,10 @@ class Storages extends BasePackage
 
             $channel = $channels->getById($this->request->getPost()['channel']);
 
-            $channel['settings'] = Json::decode($channel['settings'], true);
+            $channel['settings'] = $this->helper->decode($channel['settings'], true);
 
             $domain = $this->domains->getById($channel['settings']['domain_id']);
-            $domain['apps'] = Json::decode($domain['apps'], true);
+            $domain['apps'] = $this->helper->decode($domain['apps'], true);
 
             $app = $this->apps->getById($channel['settings']['app_id']);
 
@@ -243,7 +269,7 @@ class Storages extends BasePackage
             $domain = $this->domains->getById(1);
 
             if (!is_array($domain['apps']) && $domain['apps'] !== '') {
-                $domain['apps'] = Json::decode($domain['apps'], true);
+                $domain['apps'] = $this->helper->decode($domain['apps'], true);
             }
         }
 
@@ -307,8 +333,8 @@ class Storages extends BasePackage
         return $this->initStorage()->getPublicLink($uuid, $width);
     }
 
-    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null)
+    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null, $orgFileName = null, $like = false)
     {
-        return $this->initStorage()->changeOrphanStatus($newUUID, $oldUUID, $array, $status);
+        return $this->initStorage()->changeOrphanStatus($newUUID, $oldUUID, $array, $status, $orgFileName, $like);
     }
 }

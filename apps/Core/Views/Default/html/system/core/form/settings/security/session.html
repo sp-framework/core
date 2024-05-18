@@ -1,0 +1,43 @@
+{% set coreSettingsSSO = 'ssooff' %}
+{% if core['settings']['security']['sso'] == 'true' %}
+    {% set coreSettingsSSO = 'ssoon' %}
+{% endif %}
+<div class="row">
+    <div class="col-md-6">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'single_sign_on',
+                'fieldLabel'                     : 'Single Sign On',
+                'fieldType'                      : 'radio',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'If single sign on is set to ON, users can carry forward their session between apps. If is set to OFF, user will have to login in each app.',
+                'fieldRequired'                  : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true,
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioButtons'              :
+                    [
+                        'ssooff' :
+                            [
+                                'title'                           : 'OFF',
+                                'type'                            : 'secondary',
+                                'dataValue'                       : 'ssooff'
+                            ],
+                        'ssoon' :
+                            [
+                                'title'                           : 'ON',
+                                'type'                            : 'primary',
+                                'dataValue'                       : 'ssoon'
+                            ]
+                    ],
+                'fieldRadioChecked'              : coreSettingsSSO
+            ]
+        )}}
+    </div>
+</div>
+<hr>

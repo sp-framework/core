@@ -1,0 +1,402 @@
+{% set apptypesURL = links.url('devtools/modules/q/module/true/type/apptypes/id/0') %}
+{% set componentsURL = links.url('devtools/modules/q/module/true/type/components/id/0') %}
+{% set packagesURL = links.url('devtools/modules/q/module/true/type/packages/id/0') %}
+{% set middlewaresURL = links.url('devtools/modules/q/module/true/type/middlewares/id/0') %}
+{% set viewsURL = links.url('devtools/modules/q/module/true/type/views/id/0') %}
+{% set subViewsURL = links.url('devtools/modules/q/module/true/type/views/subview/true/id/0') %}
+{% set bundlesURL = links.url('devtools/modules/q/bundles/true/id/0') %}
+{% if includecoremodules is defined and includecoremodules === true %}
+    {% set componentsURL = componentsURL ~ '/includecoremodules/true' %}
+    {% set packagesURL = packagesURL ~ '/includecoremodules/true' %}
+    {% set middlewaresURL = middlewaresURL ~ '/includecoremodules/true' %}
+    {% set viewsURL = viewsURL ~ '/includecoremodules/true' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {% set includeCoreModulesChecked = false %}
+        {% if includecoremodules is defined and includecoremodules == true %}
+            {% set includeCoreModulesChecked = true %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'include_core_modules',
+                'fieldLabel'                     : 'Include Core Modules?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Include Core modules in the list of modules?',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'info',
+                'fieldCheckboxChecked'           : includeCoreModulesChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'componentId'                       : componentId,
+                'sectionId'                         : sectionId,
+                'buttonType'                        : 'DropdownSplitButtons',
+                'buttonLabel'                       : false,
+                'dropdownButtonId'                  : 'main',
+                'dropdownButtonTitle'               : 'Add new',
+                'dropdownButtonIcon'                : 'plus',
+                'dropdownButtonAdditionalClass'     : 'text-uppercase',
+                'dropdownAlign'                     : 'right',
+                'buttonPosition'                    : 'right',
+                'buttons'                           :
+                    {
+                        'apptypes' : {
+                            'title'                   : 'App Type',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : apptypesURL
+                        },
+                        'components' : {
+                            'title'                   : 'Component',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : componentsURL
+                        },
+                        'packages' : {
+                            'title'                   : 'Package',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : packagesURL
+                        },
+                        'middlewares' : {
+                            'title'                   : 'Middleware',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : middlewaresURL
+                        },
+                        'views' : {
+                            'title'                   : 'View',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : viewsURL
+                        },
+                        'subviews' : {
+                            'title'                   : 'Sub View',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : subViewsURL
+                        },
+                        'divider' : 'divider',
+                        'bundles' : {
+                            'title'                   : 'Modules Bundle',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : bundlesURL
+                        }
+                    }
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'modules',
+                'fieldLabel'                           : 'Select Module',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Module',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2Options'              : modules,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'display_name:app_type|name:app_type',
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        'modules-link'    : [
+                            'title'                   : 'link',
+                            'size'                    : 'xs',
+                            'disabled'                : true,
+                            'hidden'                  : true,
+                            'url'                     : '#'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'componentId'           : componentId,
+                'sectionId'             : sectionId,
+                'buttonType'            : 'button',
+                'buttons'               :
+                    [
+                        'edit-module' : [
+                            'title'                   : 'Edit Module',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'edit',
+                            'position'                : 'left',
+                            'disabled'                : true
+                        ],
+                        'clone-module' : [
+                            'title'                   : 'Clone Module',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'copy',
+                            'position'                : 'left',
+                            'disabled'                : true
+                        ],
+                        'remove-module' : [
+                            'title'                   : 'Remove Module',
+                            'size'                    : 'xs',
+                            'type'                    : 'danger',
+                            'icon'                    : 'trash',
+                            'position'                : 'left',
+                            'disabled'                : true
+                        ],
+                        'generate-new-release' : [
+                            'title'                   : 'Generate New Release',
+                            'size'                    : 'xs',
+                            'type'                    : 'success',
+                            'position'                : 'right',
+                            'icon'                    : 'wand-magic-sparkles',
+                            'disabled'                : true
+                        ],
+                        'commit-bundle-json' : [
+                            'title'                   : 'Commit Bundle Json to repo',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'position'                : 'left',
+                            'icon'                    : 'code',
+                            'disabled'                : true
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<script>
+/* globals BazContentLoader Pace BazCore PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+dataCollectionSectionForm['funcs'] = { };
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-include_core_modules'                : { },
+        '{{componentId}}-{{sectionId}}-modules'                             : {
+            'placeholder'   : 'SELECT MODULE TO EDIT',
+            'afterInit'     : function() {
+                var id, label;
+                $('#{{componentId}}-{{sectionId}}-modules').on('select2:select', function(e) {
+                    id = e.params.data.id;
+                    label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
+
+                    $('#{{componentId}}-{{sectionId}}-edit-module, #{{componentId}}-{{sectionId}}-remove-module').attr('disabled', false);
+
+                    if (label !== 'bundles' && label !== 'apptypes') {
+                        $('#{{componentId}}-{{sectionId}}-clone-module').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-commit-bundle-json').attr('disabled', true);
+                    } else if (label === 'bundles' || label === 'apptypes') {
+                        $('#{{componentId}}-{{sectionId}}-clone-module').attr('disabled', true);
+                        if (label === 'bundles') {
+                            $('#{{componentId}}-{{sectionId}}-commit-bundle-json').attr('disabled', false);
+                        }
+                    }
+
+                    if (label === 'core') {
+                        $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-clone-module, #{{componentId}}-{{sectionId}}-remove-module').attr('disabled', true);
+                    } else if (label !== 'core') {
+                        if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === false) {
+                            $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', false);
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', true);
+                        }
+                    }
+                    // if (label === 'bundles') {
+                    //     $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', true);
+                    // }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-include_core_modules').click(function() {
+                    if ($(this)[0].checked === true) {
+                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+                    } else {
+                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-edit-module').off();
+                $('#{{componentId}}-{{sectionId}}-edit-module').click(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true);
+                    } else {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-clone-module').off();
+                $('#{{componentId}}-{{sectionId}}-clone-module').click(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true, false, true);
+                    } else {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, false, true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-remove-module').off();
+                $('#{{componentId}}-{{sectionId}}-remove-module').click(function() {
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = id;
+                    postData['module_type'] = label;
+
+                    $.post('{{links.url("devtools/modules/remove")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            PNotify.success({'text': response.responseMessage});
+                            if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                                dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                            }
+                        } else {
+                            PNotify.error({'text': response.responseMessage});
+                        }
+                    }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-generate-new-release').off();
+                $('#{{componentId}}-{{sectionId}}-generate-new-release').click(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true, true);
+                    } else {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-commit-bundle-json').off();
+                $('#{{componentId}}-{{sectionId}}-commit-bundle-json').click(function() {
+                    dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, false, false, true);
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                                : {
+            rules: {
+            },
+            messages: {
+            }
+        }
+    });
+
+dataCollectionSectionForm['funcs']['loadAjax'] =
+    function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false, bundlesjson = false) {
+        if (id && label) {
+            if (label === 'bundles' && !newrelease) {
+                dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/bundles/true/id/' + id + '")}}';
+                if (bundlesjson) {
+                    dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/bundles/true/bundlesjson/true/id/' + id + '")}}';
+                }
+            } else {
+                if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {
+                    dataCollectionSectionForm['vars']['url'] = '{{links.url("module/true/type/' + label + '/id/' + id + '")}}';
+                } else {
+                    dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/module/true/type/' + label + '/id/' + id + '")}}';
+                }
+                if (includecoremodules) {
+                    dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/includecoremodules/true';
+                }
+                if (newrelease) {
+                    dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/newrelease/true';
+                }
+                if (clone) {
+                    dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/clone/true';
+                }
+            }
+        } else if (includecoremodules) {
+            if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {
+                dataCollectionSectionForm['vars']['url'] = '{{links.url("/includecoremodules/true")}}';
+            } else {
+                dataCollectionSectionForm['vars']['url'] = '{{links.url("/devtools/modules/q/includecoremodules/true")}}';
+            }
+        } else {
+            dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+        }
+
+        if (dataCollectionSectionForm['vars']['url'].charAt(0) !== 'h' &&
+            dataCollectionSectionForm['vars']['url'].charAt(0) !== '/'
+        ) {
+           dataCollectionSectionForm['vars']['url'] = '/' + dataCollectionSectionForm['vars']['url'];
+        }
+
+        $('#{{componentId}}-{{sectionId}}-modules-link').attr('href', dataCollectionSectionForm['vars']['url']);
+
+        BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-modules-link'), {
+            ajaxBefore                      : function () {
+                                                Pace.restart();
+                                                $("#baz-content").empty();
+                                                $("#loader").attr('hidden', false);
+                                            },
+            ajaxFinished                    : function () {
+                                                BazCore.updateBreadcrumb();
+                                                $("#loader").attr('hidden', true);
+                                            },
+            ajaxError                       : function () {
+                                                $("#loader").attr('hidden', true);
+                                                BazCore.updateBreadcrumb();
+                                            }
+        });
+    }
+</script>

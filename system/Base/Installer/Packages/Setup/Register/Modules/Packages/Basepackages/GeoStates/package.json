@@ -1,0 +1,24 @@
+{
+    "name"          : "GeoStates",
+    "display_name"  : "Geo States",
+    "description"   : "Basepackage Geo States",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "basepackages",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Geo\\GeoStates",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "settings"      : {"componentRoute":"system/geo/states"}
+}

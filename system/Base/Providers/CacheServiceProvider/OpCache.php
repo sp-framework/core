@@ -4,48 +4,128 @@ namespace System\Base\Providers\CacheServiceProvider;
 
 class OpCache
 {
-    protected $cache;
+    protected $storagePath = 'var/storage/cache/opcache/';
 
-    protected $cacheConfig;
+    protected $directory = 'tmp';
 
-    public function __construct($cacheConfig)
+    public function __construct()
     {
-        $this->cacheConfig = $cacheConfig;
     }
 
     public function init()
     {
-        if ($this->cacheConfig) {
-            //https://medium.com/@dylanwenzlau/500x-faster-caching-than-redis-memcache-apc-in-php-hhvm-dcd26e8447ad
-            //
-            //Tried and tested, works great.
+        $this->checkCachePath();
 
-            return false;
+        //Opcache Configuration
 
-            function cache_set($key, $val) {
-                $val = var_export($val, true);
-                $val = str_replace('stdClass::__set_state', '(object)', $val);
+        return $this;
+    }
 
-                // Write to temp file first to ensure atomicity
-                $tmp = "/var/storage/cache/$key." . uniqid('', true) . '.tmp';
-                file_put_contents($tmp, '<?php $val = ' . $val . ';', LOCK_EX);
-                rename($tmp, "/var/storage/cache/$key");
-            }
+    public function getCache($key, $directory = null)
+    {
+        $this->setDirectory($directory);
 
-            function cache_get($key) {
-                include "/var/storage/cache/$key";
-                return isset($val) ? $val : false;
-            }
-
-            $data = array_fill(0, 1000000, ‘hi’); // your app data here
-            cache_set('my_key', $data);
-            apc_store('my_key', $data);
-            $t = microtime(true);
-            $data = cache_get('my_key');
-            var_dump(microtime(true) - $t);
-
-        } else {
+        try {
+            include base_path($this->storagePath . $this->directory . '/' . $key);
+        } catch (\throwable $e) {
             return false;
         }
+
+        return isset($value) ? $value : false;
+    }
+
+    public function setCache($key, $value, $directory = null)
+    {
+        $this->setDirectory($directory);
+
+        $value = var_export($value, true);
+
+        $value = str_replace('stdClass::__set_state', '(object)', $value);
+
+        file_put_contents(base_path($this->storagePath . $this->directory . '/' . $key), '<?php $value = ' . $value . ';', LOCK_EX);
+
+        return $this->getCache($key, $directory);
+    }
+
+    public function removeCache($key = null, $directory = null)
+    {
+        $this->setDirectory($directory);
+
+        if ($key) {
+            if (opcache_is_script_cached(base_path($this->storagePath . $this->directory . '/' . $key))) {
+                if (!opcache_invalidate(base_path($this->storagePath . $this->directory . '/' . $key), true)) {
+                    return false;
+                }
+            }
+
+            try {
+                if (!unlink(base_path($this->storagePath . $this->directory . '/' . $key))) {
+                    return false;
+                }
+            } catch (\throwable $e) {
+                return false;
+            }
+
+            return true;
+        } else {
+            if (!opcache_reset()) {
+                return false;
+            }
+
+            try {
+                if ($directory) {
+                    $files = scanAllDir(base_path($this->storagePath . $this->directory . '/'));
+                } else {
+                    $files = scanAllDir(base_path($this->storagePath));
+                }
+
+                foreach ($files as $file) {
+                    deleteFiles(base_path($this->storagePath . $this->directory . '/' . $file));
+                }
+            } catch (\throwable $e) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    public function resetCache($key = null, $value = null, $directory = null)
+    {
+        $this->setDirectory($directory);
+
+        if ($key && $value) {
+            if ($this->removeCache($key)) {
+                return $this->setCache($key, $value);
+            }
+        } else {
+            return $this->removeCache($directory);
+        }
+    }
+
+    protected function checkCachePath($directory = null)
+    {
+        if ($directory) {
+            $path = $this->storagePath . $directory;
+        } else {
+            $path = $this->storagePath;
+        }
+
+        if (!is_dir(base_path($path))) {
+            if (!mkdir(base_path($path), 0777, true)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function setDirectory($directory = null)
+    {
+        if ($directory) {
+            $this->directory = $directory;
+        }
+
+        $this->checkCachePath($this->directory);
     }
 }

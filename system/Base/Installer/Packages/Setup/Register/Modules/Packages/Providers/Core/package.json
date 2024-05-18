@@ -1,12 +1,139 @@
 {
-    "name"          : "Core",
-    "display_name"  : "Core",
-    "description"   : "Basepackage Core",
-    "app_type"      : "dash",
-    "category"      : "system",
-    "sub_category"  : "tools",
-    "version"       : "0.0.1",
-    "repo"          : "https://.../",
-    "class"         : "System\\Base\\Providers\\CoreServiceProvider\\Core",
-    "settings"      : { }
+	"name" : "Core",
+	"display_name" : "Bazaari Core",
+	"description" : "Bazaari Framework Core Module",
+	"module_type" : "packages",
+	"app_type" : "core",
+	"category" : "providers",
+	"version" : "0.0.0",
+	"repo" : "https://dev.bazaari.com.au/sp-core/core",
+	"class" : "System\\Base\\Providers\\CoreServiceProvider\\Core",
+	"dependencies" : 
+	{
+		"composer" : 
+		{
+			"require" : 
+			{
+				"composer/composer" : "^2.7",
+				"cweagans/composer-patches" : "^1.7",
+				"league/flysystem" : "^3.24",
+				"phpmailer/phpmailer" : "^6.9",
+				"guzzlehttp/guzzle" : "^7.8",
+				"thecodingmachine/safe" : "^2.5",
+				"symfony/translation-contracts" : "^3.4",
+				"symfony/translation" : "^7.0",
+				"symfony/polyfill-php80" : "^1.29",
+				"symfony/polyfill-mbstring" : "^1.29",
+				"symfony/deprecation-contracts" : "^3.4",
+				"spomky-labs/otphp" : "^11.2",
+				"ralouphie/getallheaders" : "^3.0",
+				"psr/http-message" : "^2.0",
+				"psr/http-client" : "^1.0",
+				"picqer/php-barcode-generator" : "^2.4",
+				"paragonie/constant_time_encoding" : "^2.6",
+				"nesbot/carbon" : "^3.0",
+				"league/mime-type-detection" : "^1.15",
+				"khanamiryan/qrcode-detector-decoder" : "^2.0",
+				"guzzlehttp/psr7" : "^2.6",
+				"guzzlehttp/promises" : "^2.0",
+				"endroid/qr-code" : "^5.0",
+				"dasprid/enum" : "^1.0",
+				"beberlei/assert" : "^3.3",
+				"bacon/bacon-qr-code" : "^2.0",
+				"cboden/ratchet" : "^0.4.4",
+				"react/zmq" : "^0.4.0",
+				"peppeocchi/php-cron-scheduler" : "^4.0",
+				"php-imap/php-imap" : "^5.0",
+				"league/csv" : "^9.15",
+				"paquettg/php-html-parser" : "^2.2",
+				"ifsnop/mysqldump-php" : "^2.12",
+				"spatie/flysystem-dropbox" : "^3.0",
+				"bjeavons/zxcvbn-php" : "^1.3",
+				"bluelibraries/dns" : "^1.1",
+				"league/oauth2-server" : "^8.5",
+				"league/oauth2-github" : "^3.1",
+				"league/oauth2-client" : "^2.7",
+				"z4kn4fein/php-semver" : "^2.0",
+				"opis/json-schema" : "^2.3",
+				"league/flysystem-sftp-v3" : "^3.23",
+				"lasserafn/php-initial-avatar-generator" : "^4.3",
+				"wp-cli/php-cli-tools" : "^0.11.22",
+				"react/event-loop" : "1.5.0"
+			},
+			"config" : 
+			{
+				"allow-plugins" : 
+				{
+					"cweagans/composer-patches" : true
+				}
+			},
+			"extra" : 
+			{
+				"patches" : 
+				{
+					"react/socket" : 
+					{
+						"phpv8.3 support" : "external/patches/react_socket_connection.patch"
+					},
+					"cboden/ratchet" : 
+					{
+						"phpv8.3 support" : "external/patches/cboden_ratchet_ioconnection.patch"
+					},
+					"league/oauth2-server" : 
+					{
+						"extract client_id" : "external/patches/oauth2_server_bearertokenvalidator.patch"
+					}
+				}
+			}
+		}
+	},
+	"settings" : 
+	{
+		"dev" : false,
+		"debug" : false,
+		"auto_off_debug" : 0,
+		"databasetype" : "hybrid",
+		"dbs" : [],
+		"ffs" : 
+		{
+			"sp" : 
+			{
+				"ffname" : "sp",
+				"active" : true,
+				"databaseDir" : "sp/"
+			}
+		},
+		"cache" : 
+		{
+			"enabled" : false,
+			"timeout" : 60,
+			"service" : "streamCache"
+		},
+		"security" : 
+		{
+			"sso" : false,
+			"passwordWorkFactor" : 8,
+			"cookiesWorkFactor" : 4,
+			"passwordPolicy" : false
+		},
+		"logs" : 
+		{
+			"enabled" : false,
+			"exceptions" : false,
+			"level" : "DEBUG",
+			"service" : "streamLogs",
+			"emergencyLogsEmail" : false,
+			"emergencyLogsEmailAddresses" : ""
+		},
+		"websocket" : 
+		{
+			"protocol" : "tcp",
+			"host" : "localhost",
+			"port" : 5555
+		},
+		"timeout" : 
+		{
+			"cookies" : 86400
+		}
+	}
 }

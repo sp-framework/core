@@ -70,7 +70,7 @@ class EmailServices
                         'password',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 50,
+                            'size'    => 1024,
                             'notNull' => false,
                         ]
                     ),

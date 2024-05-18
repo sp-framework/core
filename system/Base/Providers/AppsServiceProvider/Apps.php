@@ -2,28 +2,35 @@
 
 namespace System\Base\Providers\AppsServiceProvider;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\AppsServiceProvider\Apps\Types;
-use System\Base\Providers\AppsServiceProvider\Model\Apps as AppsModel;
+use System\Base\Providers\AppsServiceProvider\Exceptions\AppNotFoundException;
+use System\Base\Providers\AppsServiceProvider\IpFilter;
+use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
+use System\Base\Providers\AppsServiceProvider\Types;
 
 class Apps extends BasePackage
 {
-	protected $modelToUse = AppsModel::class;
+	protected $modelToUse = ServiceProviderApps::class;
 
 	protected $packageName = 'apps';
+
+	protected $packageNameS = 'app';
 
 	public $apps;
 
 	public $types;
 
+	public $ipFilter;
+
 	protected $reservedRoutes;
 
 	protected $appInfo = null;
 
+	public $isMurl = false;
+
 	public function init(bool $resetCache = false)
 	{
-		$this->types = $this->getAppTypes();
+		$this->types = (new Types)->init($resetCache);
 
 		$this->reservedRoutes = $this->getReservedRoutes();
 
@@ -31,23 +38,34 @@ class Apps extends BasePackage
 
 		$this->app = $this->getAppInfo();
 
+		$this->ipFilter = (new IpFilter())->init($this, $this->app);
+
 		return $this;
 	}
 
-	public function getAppInfo()
+	public function getAppInfo($route = null)
 	{
 		if (PHP_SAPI === 'cli') {
-			$this->appInfo = $this->getRouteApp('admin');
+			if (isset($this->appInfo) && $this->appInfo) {
+				return $this->appInfo;
+			}
+
+			$this->appInfo = $this->getAppByRoute($route);
+
+			$this->ipFilter = (new IpFilter())->init($this, $this->appInfo);
+
+			return;
 		}
 
-		if (isset($this->appInfo)) {
+		if (isset($this->appInfo) && $this->appInfo) {
 			return $this->appInfo;
 		} else {
 			if ($this->checkAppRegistration($this->getAppRoute())) {
 				return $this->appInfo;
 			}
 		}
-		return null;
+
+		throw new AppNotFoundException();
 	}
 
 	protected function getAppRoute()
@@ -60,22 +78,66 @@ class Apps extends BasePackage
 
 		if ($uri[0] === '/') {
 			if ($domain) {
-				return $this->getIdApp($domain['default_app_id'])['route'];
+				return $this->getAppById($domain['default_app_id'])['route'];
 			}
 			return null;
 		} else {
 			if (isset($domain['exclusive_to_default_app']) &&
 				$domain['exclusive_to_default_app'] == 1
 			) {
-				return $this->getIdApp($domain['default_app_id'])['route'];
+				return $this->getAppById($domain['default_app_id'])['route'];
 			}
-			return explode('/', $uri[0])[1];
+
+			$uri = explode("/", trim($uri[0], '/'));
+
+			if ($this->api->isApi()) {
+				$apiUri = $uri;
+				if ($apiUri[0] === 'api') {
+					unset($apiUri[0]);
+				}
+
+				$apiUri = array_values($apiUri);
+
+				if ($this->api->isApiCheckVia === 'pub') {
+					if (isset($apiUri[0]) &&
+						$apiUri[0] === 'pub'
+					) {
+						unset($apiUri[0]);
+					}
+				}
+
+				$apiUri = array_values($apiUri);
+			}
+
+			if ((isset($apiUri) && count($apiUri) === 1) ||
+				count($uri) === 1
+			) {//Check for Murl
+				if (isset($apiUri)) {
+					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, trim($apiUri[0], '/'), $domain['id']);
+				} else {
+					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, trim($uri[0], '/'), $domain['id']);
+				}
+
+				if ($this->isMurl) {
+					return $this->getAppById($this->isMurl['app_id'])['route'];
+				}
+			}
+
+			if ($uri[0] === 'api' && $uri[1] === 'pub') {
+				return $uri[2];
+			} else if ($uri[0] === 'api') {
+				return $uri[1];
+			} else if ($uri[0] === 'pub') {
+				return $uri[1];
+			}
+
+			return $uri[0];
 		}
 	}
 
 	protected function checkAppRegistration($route)
 	{
-		$app = $this->getRouteApp($route);
+		$app = $this->getAppByRoute($route);
 
 		if ($app) {
 			$this->appInfo = $app;
@@ -86,7 +148,7 @@ class Apps extends BasePackage
 		}
 	}
 
-	public function getIdApp($id)
+	public function getAppById($id)
 	{
 		foreach($this->apps as $app) {
 			if ($app['id'] == $id) {
@@ -97,7 +159,7 @@ class Apps extends BasePackage
 		return false;
 	}
 
-	public function getNamedApp($name)
+	public function getAppByName($name)
 	{
 		foreach($this->apps as $app) {
 			if (strtolower($app['name']) === strtolower($name)) {
@@ -108,21 +170,14 @@ class Apps extends BasePackage
 		return false;
 	}
 
-	public function getRouteApp($route)
+	public function getAppByRoute($route)
 	{
-		foreach($this->apps as $app) {
-			if (strtolower($app['route']) == strtolower($route)) {
-				return $app;
-			}
+		if (!$route) {
+			return false;
 		}
 
-		return false;
-	}
-
-	public function getDefaultApp()
-	{
 		foreach($this->apps as $app) {
-			if ($app['is_default'] == '1') {
+			if (strtolower($app['route']) == strtolower($route)) {
 				return $app;
 			}
 		}
@@ -141,7 +196,7 @@ class Apps extends BasePackage
 			return;
 		}
 
-		if ($this->getRouteApp($data['route'])) {
+		if ($this->getAppByRoute($data['route'])) {
 			$this->addResponse('App route ' . strtolower($data['route']) . ' is used by another app. Please use different route.', 1, []);
 
 			return false;
@@ -149,8 +204,13 @@ class Apps extends BasePackage
 
 		$data['default_component'] = 0;
 		$data['errors_component'] = 0;
-		$data['can_login_role_ids'] = Json::decode($data['can_login_role_ids'], true);
-		$data['can_login_role_ids'] = Json::encode($data['can_login_role_ids']['data']);
+		$data['ip_filter_default_action'] = 0;
+		$data['can_login_role_ids'] = $this->helper->encode(['1']);
+		$data['acceptable_usernames'] = $this->helper->encode(['email']);
+
+		if (isset($data['default_dashboard']) && $data['default_dashboard']) {
+			$data['settings']['defaultDashboard'] = $data['default_dashboard'];
+		}
 
 		if ($this->add($data)) {
 
@@ -171,20 +231,83 @@ class Apps extends BasePackage
 	 */
 	public function updateApp(array $data)
 	{
+		if (isset($data['domains'])) {//Coming via app wizard.
+			$domains = $this->helper->decode($data['domains'], true);
+
+			if (isset($domains['data'])) {
+				$domains = $domains['data'];
+			}
+
+			foreach ($domains as $domain) {
+				$domain = $this->domains->getDomainById($domain);
+
+				if (is_string($domain['apps'])) {
+					$domain['apps'] = $this->helper->decode($domain['apps'], true);
+				}
+
+				$domain['apps'][$data['id']]['allowed'] = true;
+				$domain['apps'][$data['id']]['api'] = false;
+				$domain['apps'][$data['id']]['view'] = $data['view'];
+				$domain['apps'][$data['id']]['email_service'] = $data['email'];
+				$domain['apps'][$data['id']]['publicStorage'] = $data['public'];
+				$domain['apps'][$data['id']]['privateStorage'] = $data['private'];
+
+				//add new viewsettings
+				$viewSettingsData = [];
+				$viewSettingsData['view_id'] = $data['view'];
+				$viewSettingsData['domain_id'] = $domain['id'];
+				$viewSettingsData['app_id'] = $data['id'];
+				$viewSettingsData['via_app'] = true;
+
+				$this->domains->updateDomain($domain);
+				$this->modules->viewsSettings->addViewsSettings($viewSettingsData);
+			}
+
+			return true;
+		}
+
 		$app = $this->getById($data['id']);
+
+		if (isset($data['default_dashboard']) && $data['default_dashboard']) {
+			$data['settings']['defaultDashboard'] = $data['default_dashboard'];
+		}
 
 		$app = array_merge($app, $data);
 
-		unset($app['route']);
+		if (isset($app['reset_structure']) && $app['reset_structure'] == '1') {
+			$app['menu_structure'] = null;
+		}
 
 		if (isset($app['can_login_role_ids'])) {
-			$app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
+			if (is_string($app['can_login_role_ids'])) {
+				$app['can_login_role_ids'] = $this->helper->decode($app['can_login_role_ids'], true);
+			}
 
 			if (isset($app['can_login_role_ids']['data'])) {
-				$app['can_login_role_ids'] = Json::encode($app['can_login_role_ids']['data']);
+				$app['can_login_role_ids'] = $this->helper->encode($app['can_login_role_ids']['data']);
 			} else {
-				$app['can_login_role_ids'] = Json::encode($app['can_login_role_ids']);
+				$app['can_login_role_ids'] = $this->helper->encode($app['can_login_role_ids']);
 			}
+		}
+
+		if (isset($app['views']) && $app['views'] !== '') {
+			$views = $this->helper->decode($app['views'], true);
+
+			foreach ($views as $viewId => $view) {
+				if ($view === false) {
+					$viewInfo = $this->modules->views->getViewById($viewId);
+
+					$domainCheckAppsSettings = $this->domains->checkAppsSettings($app['id'], 'view', $viewId);
+
+					if ($domainCheckAppsSettings) {
+						$this->addResponse('View ' . $viewInfo['display_name'] . ' is being used by Domain ' . $domainCheckAppsSettings['name'], 1);
+
+						return false;
+					}
+				}
+			}
+
+			$this->modules->views->updateViews($app);
 		}
 
 		if (isset($app['components'])) {
@@ -199,8 +322,18 @@ class Apps extends BasePackage
 			$this->modules->middlewares->updateMiddlewares($app);
 		}
 
-		if (isset($app['views'])) {
-			$this->modules->views->updateViews($app);
+		if ($app['acceptable_usernames']) {
+			if (is_string($app['acceptable_usernames'])) {
+				$app['acceptable_usernames'] = $this->helper->decode($app['acceptable_usernames'], true);
+			}
+
+			if (isset($app['acceptable_usernames']['data'])) {
+				$app['acceptable_usernames'] = $this->helper->encode($app['acceptable_usernames']['data']);
+			} else {
+				$app['acceptable_usernames'] = $this->helper->encode($app['acceptable_usernames']);
+			}
+		} else {
+			$app['acceptable_usernames'] = $this->helper->encode(['email']);
 		}
 
 		if ($this->update($app)) {
@@ -216,7 +349,7 @@ class Apps extends BasePackage
 
 	protected function checkType($data)
 	{
-		$typesArr = $this->types;
+		$typesArr = $this->types->types;
 
 		foreach ($typesArr as $key => $type) {
 			if (strtolower($data['route']) === $type['app_type'] ||
@@ -239,7 +372,7 @@ class Apps extends BasePackage
 	public function removeApp(array $data)
 	{
 		if ($data['id'] == 1) {
-			$this->addResponse('Cannot remove Admin App. Error removing app.', 1);
+			$this->addResponse('Cannot remove core app!', 1);
 
 			return false;
 		}
@@ -261,39 +394,33 @@ class Apps extends BasePackage
 
 	protected function getReservedRoutes()
 	{
-		return
+		$reservedRoutes =
 			[
-				'admin', 'dash', 'ecom', 'pos', 'cms', 'api', 'pusher', 'messenger'
+				'core', 'api', 'pub', 'pusher', 'messenger'
 			];
+
+		foreach ($this->types->types as $type) {
+			if (!in_array($type['app_type'], $reservedRoutes)) {
+				array_push($reservedRoutes, strtolower($type['app_type']));
+			}
+		}
+
+		return $reservedRoutes;
 	}
 
-	public function getAppTypes()
+	public function getAcceptableUsernamesForAppId()
 	{
 		return
 			[
-				'1'   =>
+				'email'   =>
 					[
-						'app_type'      => 'dash',
-						'name'          => 'Dashboard',
-						'description'   => 'Dashboard. Can run modules that require a dashboard, like Admin, Cpanel or Dashboard.',
+						'type'      	=> 'email',
+						'name'          => 'Email'
 					],
-				'2'    =>
+				'username'    =>
 					[
-						'app_type'      => 'ecom',
-						'name'          => 'E-Commerce E-Shop',
-						'description'   => 'Online product catalogue and checkout system.',
-					],
-				'3'    =>
-					[
-						'app_type'      => 'pos',
-						'name'          => 'Point of Sales System',
-						'description'   => 'In-store checkout system.',
-					],
-				'4'    =>
-					[
-						'app_type'      => 'cms',
-						'name'          => 'Content Management System',
-						'description'   => 'App to display any web content. Like a blog.',
+						'type'      	=> 'username',
+						'name'          => 'Username',
 					]
 			];
 	}

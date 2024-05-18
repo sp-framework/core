@@ -14,11 +14,11 @@ class ModulesMiddlewares extends BaseModel
 
     public $description;
 
+    public $module_type;
+
     public $app_type;
 
     public $category;
-
-    public $subcategory;
 
     public $version;
 
@@ -28,11 +28,17 @@ class ModulesMiddlewares extends BaseModel
 
     public $settings;
 
+    public $user_settings;
+
+    public $dependencies;
+
     public $apps;
 
     public $installed;
 
     public $files;
+
+    public $api_id;
 
     public $update_available;
 
@@ -41,4 +47,10 @@ class ModulesMiddlewares extends BaseModel
     public $updated_by;
 
     public $updated_on;
+
+    public $level_of_update;
+
+    public $auto_update;
+
+    public $repo_details;
 }

@@ -2,9 +2,9 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Email;
 
-use Phalcon\Validation\Validator\Between;
-use Phalcon\Validation\Validator\Email;
-use Phalcon\Validation\Validator\PresenceOf;
+use Phalcon\Filter\Validation\Validator\Between;
+use Phalcon\Filter\Validation\Validator\Email;
+use Phalcon\Filter\Validation\Validator\PresenceOf;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Email\BasepackagesEmailServices;
 
@@ -104,9 +104,22 @@ class EmailServices extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=error)
+     * @notification_allowed_methods(email, sms)
+     */
+    public function errorEmailService($messageTitle = null, $messageDetails = null, $id = null)
+    {
+        if (!$messageTitle) {
+            $messageTitle = 'Email Service has errors, contact administrator!';
+        }
+
+        $this->addToNotification('error', $messageTitle, $messageDetails, 'EmailServices', $id);
+    }
+
     protected function validateServiceData(array $data)
     {
-        $this->validation->add('from_address', PresenceOf::class, ["message" => "Enter valid from email address."]);
+        $this->validation->init()->add('from_address', PresenceOf::class, ["message" => "Enter valid from email address."]);
         $this->validation->add('from_address', Email::class, ["message" => "Enter valid from email address."]);
         $this->validation->add('port', Between::class,
             [

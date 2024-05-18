@@ -2,19 +2,22 @@
 
 namespace System\Base\Providers\ViewServiceProvider;
 
-use Phalcon\Tag as PhalconTag;
+use Phalcon\Html\TagFactory as PhalconTag;
 
 class Tag
 {
     protected $tag;
 
-    public function __construct()
+    protected $escaper;
+
+    public function __construct($escaper)
     {
+        $this->escaper = $escaper;
     }
 
     public function init()
     {
-        $this->tag = new PhalconTag;
+        $this->tag = new PhalconTag($this->escaper);
 
         return $this->tag;
     }

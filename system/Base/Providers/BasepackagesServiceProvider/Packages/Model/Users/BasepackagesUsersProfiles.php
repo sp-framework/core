@@ -12,15 +12,19 @@ class BasepackagesUsersProfiles extends BaseModel
 
     public $id;
 
+    public $account_id;
+
     public $portrait;
 
-    public $account_id;
+    public $initials_avatar;
 
     public $first_name;
 
     public $last_name;
 
     public $full_name;
+
+    public $contact_address_id;
 
     public $contact_phone;
 
@@ -30,13 +34,15 @@ class BasepackagesUsersProfiles extends BaseModel
 
     public $contact_fax;
 
-    public $contact_secondary_email;
+    public $secondary_email;
 
     public $cc_emails_to_secondary_email;
 
     public $contact_other;
 
     public $contact_notes;
+
+    public $settings;
 
     public function initialize()
     {

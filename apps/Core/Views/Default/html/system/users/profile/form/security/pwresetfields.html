@@ -1,0 +1,73 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'current_password',
+                'fieldLabel'                            : 'Current Password',
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'input',
+                'fieldInputType'                        : 'password',
+                'fieldInputPasswordToggleVisibility'    : true,
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false
+            ]
+        )}}
+    </div>
+    {% set strengthMeter = false %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] is defined and coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] == 'simple' %}
+        {% set strengthMeter = true %}
+    {% endif %}
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'new_password',
+                'fieldLabel'                            : 'New Password',
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'input',
+                'fieldInputType'                        : 'password',
+                'fieldInputPasswordToggleVisibility'    : true,
+                'fieldInputPasswordGenerate'            : true,
+                'fieldInputPasswordStrengthMeter'       : strengthMeter,
+                'fieldInputInfoText'                    : true,
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldAdditionalClass'                  : 'mb-0'
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'confirm_password',
+                'fieldLabel'                            : 'Confirm Password',
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'input',
+                'fieldInputType'                        : 'password',
+                'fieldInputPasswordToggleVisibility'    : true,
+                'fieldBazScan'                          : true,
+                'fieldRequired'                         : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false
+            ]
+        )}}
+    </div>
+    {% if coreSettings['security']['twofa'] is defined and coreSettings['security']['twofa'] == 'true' and coreSettings['security']['twofaSettings']['twofaPwresetNeed2fa'] is defined and coreSettings['security']['twofaSettings']['twofaPwresetNeed2fa'] == true and canUse2fa is defined and canUse2fa|length > 0 %}
+        {% include 'profile/form/security/pwreset2fa.html' %}
+    {% endif %}
+</div>

@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Users;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersRoles;
 
@@ -28,14 +27,12 @@ class Roles extends BasePackage
      */
     public function addRole(array $data)
     {
+        $data = $this->removeMS($data);
+
         if ($this->add($data)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' role';
+            $this->addResponse('Added ' . $data['name'] . ' role');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding new role.';
+            $this->addResponse('Error adding new role.', 1);
         }
     }
 
@@ -46,15 +43,46 @@ class Roles extends BasePackage
      */
     public function updateRole(array $data)
     {
-        if ($this->update($data)) {
-            $this->packagesData->responseCode = 0;
+        if (!$this->checkForSystemRole($data['id'])) {
+            $this->addResponse('Cannot update system role.', 1);
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' role';
-        } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating role.';
+            return false;
         }
+
+        $data = $this->removeMS($data);
+
+        if ($this->update($data)) {
+            $this->addResponse('Updated ' . $data['name'] . ' role');
+        } else {
+            $this->addResponse('Error updating role.', 1);
+        }
+    }
+
+    protected function removeMS($data)
+    {
+        if (!isset($data['id']) ||
+            (isset($data['id']) && $data['id'] != '1')
+        ) {
+            if (isset($data['permissions']) && $data['permissions'] !== '') {
+                $data['permissions'] = $this->helper->decode($data['permissions'], true);
+
+                foreach ($data['permissions'] as $app => &$components) {
+                    if (is_array($components) && count($components) > 0) {
+                        foreach ($components as &$component) {
+                            if (isset($component['msview'])) {
+                                $component['msview'] = 0;
+                            }
+                            if (isset($component['msupdate'])) {
+                                $component['msupdate'] = 0;
+                            }
+                        }
+                    }
+                }
+                $data['permissions'] = $this->helper->encode($data['permissions']);
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -64,31 +92,60 @@ class Roles extends BasePackage
      */
     public function removeRole(array $data)
     {
-        if (isset($data['id']) && $data['id'] != 1) {
-            $roleObj = $this->getFirst('id', $data['id']);
+        if (!$this->checkForSystemRole($data['id'])) {
+            $this->addResponse('Cannot remove system role.', 1);
 
-            if ($roleObj->getAccounts() && $roleObj->getAccounts()->count() > 0) {
-                $this->packagesData->responseCode = 1;
+            return false;
+        }
 
-                $this->packagesData->responseMessage = 'Role has accounts assigned to it. Cannot removes role.';
+        if (isset($data['id'])) {
+            $hasAccounts = false;
+
+            if ($this->config->databasetype === 'db') {
+                $roleObj = $this->getFirst('id', $data['id']);
+
+                if ($roleObj->getAccounts() && $roleObj->getAccounts()->count() > 0) {
+                    $hasAccounts = true;
+                }
+            } else {
+                $this->setFFRelations(true);
+
+                $role = $this->getById($data['id']);
+
+                if (isset($role['accounts']) && is_array($role['accounts']) && count($role['accounts']) > 0) {
+                    $hasAccounts = true;
+                }
+            }
+
+            if ($hasAccounts) {
+                $this->addResponse('Role has accounts assigned to it. Cannot removes role.', 1);
 
                 return false;
             }
 
             if ($this->remove($data['id'], true, false)) {
-                $this->packagesData->responseCode = 0;
-
-                $this->packagesData->responseMessage = 'Removed role';
+                $this->addResponse('Removed role');
             } else {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Error removing role.';
+                $this->addResponse('Error removing role.', 1);
             }
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Cannot remove default role.';
+            $this->addResponse('Error removing role.', 1);
         }
+    }
+
+    protected function checkForSystemRole(int $rid)
+    {
+        $role = $this->getById($rid);
+
+        if ($role) {
+            if ($role['type'] == 0) {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function generateViewData(int $rid = null)
@@ -98,7 +155,7 @@ class Roles extends BasePackage
         $appsArr = $this->apps->apps;
 
         foreach ($appsArr as $appKey => $app) {
-            $componentsArr = $this->modules->components->getComponentsForApp($app['id']);
+            $componentsArr = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
 
             if (count($componentsArr) > 0) {
                 $components[strtolower($app['id'])] =
@@ -110,7 +167,7 @@ class Roles extends BasePackage
                     $reflector = $this->annotations->get($component['class']);
                     $methods = $reflector->getMethodsAnnotations();
 
-                    if ($methods) {
+                    if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                         $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
                         $components[strtolower($app['id'])]['childs'][$key]['title'] = $component['name'];
                     }
@@ -134,28 +191,39 @@ class Roles extends BasePackage
             $role = $this->getById($rid);
 
             if ($role) {
-                if ($role['permissions'] && $role['permissions'] !== '') {
-                    $permissionsArr = Json::decode($role['permissions'], true);
+                if ($role['permissions'] && is_string($role['permissions']) && $role['permissions'] !== '') {
+                    $permissionsArr = $this->helper->decode($role['permissions'], true);
+                } else if ($role['permissions'] && is_array($role['permissions'])) {
+                    $permissionsArr = $role['permissions'];
                 } else {
                     $permissionsArr = [];
                 }
+
                 $permissions = [];
 
                 foreach ($appsArr as $appKey => $app) {
-                    $componentsArr = $this->modules->components->getComponentsForApp($app['id']);
+                    $componentsArr = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
+
                     foreach ($componentsArr as $key => $component) {
                         if ($component['class'] && $component['class'] !== '') {
                             $reflector = $this->annotations->get($component['class']);
                             $methods = $reflector->getMethodsAnnotations();
 
-                            if ($methods) {
+                            if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                                 foreach ($methods as $annotation) {
-                                    $action = $annotation->getAll('acl')[0]->getArguments();
-                                    $acls[$action['name']] = $action['name'];
-                                    if (isset($permissionsArr[$app['id']][$component['id']])) {
-                                        $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
-                                    } else {
-                                        $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                    if ($annotation->getAll('acl')) {
+                                        $action = $annotation->getAll('acl')[0]->getArguments();
+                                        if ($rid && $rid != 1 &&
+                                            ($action['name'] === 'msview' || $action['name'] === 'msupdate')
+                                        ) {
+                                            continue;
+                                        }
+                                        $acls[$action['name']] = $action['name'];
+                                        if (isset($permissionsArr[$app['id']][$component['id']])) {
+                                            $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
+                                        } else {
+                                            $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                        }
                                     }
                                 }
                             }
@@ -163,9 +231,9 @@ class Roles extends BasePackage
                     }
                 }
 
-                $this->packagesData->acls = Json::encode($acls);
+                $this->packagesData->acls = $this->helper->encode($acls);
 
-                $role['permissions'] = Json::encode($permissions);
+                $role['permissions'] = $this->helper->encode($permissions);
 
                 $this->packagesData->role = $role;
             } else {
@@ -181,26 +249,29 @@ class Roles extends BasePackage
             $permissions = [];
 
             foreach ($appsArr as $appKey => $app) {
-                $componentsArr = $this->modules->components->getComponentsForApp($app['id']);
+                $componentsArr = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
+
                 foreach ($componentsArr as $key => $component) {
                     //Build ACL Columns
                     if ($component['class'] && $component['class'] !== '') {
                         $reflector = $this->annotations->get($component['class']);
                         $methods = $reflector->getMethodsAnnotations();
 
-                        if ($methods) {
+                        if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                             foreach ($methods as $annotation) {
-                                $action = $annotation->getAll('acl')[0]->getArguments();
-                                $acls[$action['name']] = $action['name'];
-                                $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                if ($annotation->getAll('acl')) {
+                                    $action = $annotation->getAll('acl')[0]->getArguments();
+                                    $acls[$action['name']] = $action['name'];
+                                    $permissions[$app['id']][$component['id']][$action['name']] = 0;
+                                }
                             }
                         }
                     }
                 }
             }
 
-            $this->packagesData->acls = Json::encode($acls);
-            $role['permissions'] = Json::encode($permissions);
+            $this->packagesData->acls = $this->helper->encode($acls);
+            $role['permissions'] = $this->helper->encode($permissions);
             $this->packagesData->role = $role;
         }
 
@@ -213,16 +284,19 @@ class Roles extends BasePackage
 
     public function searchRole(string $roleQueryString)
     {
-
-        $searchRoles =
-            $this->getByParams(
+        if ($this->config->databasetype === 'db') {
+            $conditions =
                 [
                     'conditions'    => 'name LIKE :aName:',
                     'bind'          => [
                         'aName'     => '%' . $roleQueryString . '%'
                     ]
-                ]
-            );
+                ];
+        } else {
+            $conditions = ['name', 'LIKE', '%' . $roleQueryString . '%'];
+        }
+
+        $searchRoles = $this->getByParams($conditions);
 
         if (count($searchRoles) > 0) {
             $roles = [];

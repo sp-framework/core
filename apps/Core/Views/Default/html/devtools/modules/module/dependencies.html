@@ -1,0 +1,288 @@
+{% if module['id'] is defined %}
+    {% set dependencies = module['dependencies'] %}
+    {% set moduleDependencies = module['dependencies'] %}
+{% else %}
+    {% set dependencies = moduleDependencies %}
+{% endif %}
+<div class="row vdivide">
+    {% if type !== 'core' %}
+        <div class="col">
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                            : component,
+                            'componentName'                        : componentName,
+                            'componentId'                          : componentId,
+                            'sectionId'                            : sectionId,
+                            'fieldId'                              : 'dependencies-modules',
+                            'fieldLabel'                           : 'Select Module',
+                            'fieldType'                            : 'select2',
+                            'fieldHelp'                            : true,
+                            'fieldHelpTooltipContent'              : 'Module',
+                            'fieldRequired'                        : true,
+                            'fieldBazScan'                         : true,
+                            'fieldDataSelect2Options'              : modules,
+                            'fieldDataSelect2OptionsKey'           : 'id',
+                            'fieldDataSelect2OptionsValue'         : 'display_name|name',
+                            'fieldDataSelect2OptionsSelected'      : ''
+                        ]
+                    )}}
+                </div>
+                {% if type === 'views' %}
+                    <div class="col">
+                        {% set baseViewChecked = false %}
+                        {% set baseViewDisabled = true %}
+                        {% set baseViewModuleId = '0' %}
+                        {% if module['module_details']['base_view_module_id'] is defined %}
+                            {% if module['module_details']['base_view_module_id'] == '0' %}
+                                {% set baseViewChecked = true %}
+                                {% set baseViewDisabled = false %}
+                            {% endif %}
+                            {% set baseViewModuleId = module['module_details']['base_view_module_id'] %}
+                        {% endif %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'base_view_module_id',
+                                'fieldLabel'                     : 'base view module',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : '',
+                                'fieldRequired'                  : true,
+                                'fieldHidden'                    : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 50,
+                                'fieldValue'                     : baseViewModuleId
+                            ]
+                        )}}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'base_view_module',
+                                'fieldLabel'                     : 'Base View Module?',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'View modules have a base view module, example: View module "Default" will be base for View module "home". View module home will require dependency of View module default.',
+                                'fieldRequired'                  : false,
+                                'fieldDisabled'                  : baseViewDisabled,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxChecked'           : baseViewChecked,
+                                'fieldCheckboxType'              : 'primary',
+                                'fieldBazJstreeSearch'           : false,
+                                'fieldBazScan'                   : true
+                            ]
+                        )}}
+                    </div>
+                {% endif %}
+            </div>
+            <div id="selected-module-information" hidden>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'dependencies-modulename',
+                                'fieldLabel'                     : 'Module Name',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'component Name Example: Dashboard',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 50,
+                                'fieldValue'                     : ''
+                            ]
+                        )}}
+                    </div>
+                    <div class="col-md-4">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'dependencies-moduleversion',
+                                'fieldLabel'                     : 'module version',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'module version.',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 1024,
+                                'fieldValue'                     : ''
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'dependencies-modulerepo',
+                                'fieldLabel'                     : 'module repo',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'module repo.',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 1024,
+                                'fieldValue'                     : ''
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'buttonType'                    : 'button',
+                            'buttons'                       :
+                                [
+                                    'dependencies-remove'    : [
+                                        'title'                   : 'Remove',
+                                        'size'                    : 'xs',
+                                        'disabled'                : true,
+                                        'type'                    : 'danger',
+                                        'icon'                    : 'trash'
+                                    ],
+                                    'dependencies-add'    : [
+                                        'title'                   : 'Add',
+                                        'size'                    : 'xs',
+                                        'disabled'                : true,
+                                        'type'                    : 'primary',
+                                        'icon'                    : 'plus',
+                                        'position'                : 'right'
+                                    ]
+                                ]
+                        ]
+                    )}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if type !== 'views' %}
+        <div class="col">
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'dependencies-external',
+                            'fieldLabel'                     : 'External Package Name',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'External package Name Example: composer/composer',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 100,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+                <div class="col-md-4">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'dependencies-external-version',
+                            'fieldLabel'                     : 'Version',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'External package version Example: 2.5',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 15,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'buttonType'                    : 'button',
+                            'buttons'                       :
+                                [
+                                    'dependencies-external-remove'    : [
+                                        'title'                   : 'Remove',
+                                        'size'                    : 'xs',
+                                        'disabled'                : true,
+                                        'type'                    : 'danger',
+                                        'icon'                    : 'trash'
+                                    ],
+                                    'dependencies-external-add'    : [
+                                        'title'                   : 'Add',
+                                        'size'                    : 'xs',
+                                        'disabled'                : true,
+                                        'type'                    : 'primary',
+                                        'icon'                    : 'plus',
+                                        'position'                : 'right'
+                                    ]
+                                ]
+                        ]
+                    )}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'dependencies',
+                'fieldLabel'                     : 'Dependencies',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Dependencies',
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldTextareaRows'              : 15,
+                'fieldValue'                     : dependencies
+            ]
+        )}}
+    </div>
+</div>

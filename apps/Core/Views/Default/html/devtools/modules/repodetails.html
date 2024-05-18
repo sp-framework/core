@@ -1,0 +1,45 @@
+<div class="row">
+    <div class="col">
+        <h5 class="text-uppercase text-center">New repository created at remote location</h5>
+        {% if type === 'bundles' %}
+            <label class="text-uppercase">Instructions on how to upload bundle information to repository</label>
+            <div class="jumbotron p-2">
+                <p>Click here to commit bundle json file to the repository: <a id="bundle_url_a" href="#" target="_blank"><strong><span id="bundle_url"></span></strong></a></p>
+                <p>Repository link: <a id="bundlerepo_url_dev_a" href="#" target="_blank"><strong><span id="bundlerepo_url_dev"></span></strong></a></p>
+            </div>
+        {% else %}
+            <label class="text-uppercase">Instructions on how to initialize local repository and upload code</label>
+            <div class="jumbotron p-2">
+                <p>Open terminal and execute the following command:</p>
+                <p>cd {{base_path('apps')}}/<span id="path"></span>/</p>
+                <p>git init</p>
+                <p>git remote add origin <span id="repo_url"></span></p>
+                <p>git pull</p>
+                <p>git checkout dev</p>
+                <p>git add *</p>
+                <p>git commit -m "Initial Commit"</p>
+                <p>git push -u origin dev</p>
+                <p></p>
+                <p>Once push is complete, you can browse the pushed code at : <a id="repo_url_dev_a" href="#" target="_blank"><strong><span id="repo_url_dev"></span></strong></a></p>
+                {% if type === 'views' %}
+                    <hr>
+                    <div id="views-public" hidden>
+                        <p>Open terminal and execute the following command:</p>
+                        <p>cd {{base_path('public')}}/<span id="path_public"></span>/</p>
+                        <p>git init</p>
+                        <p>git remote add origin <span id="repo_url_public"></span></p>
+                        <p>git pull</p>
+                        <p>git checkout dev</p>
+                        <p>git add *</p>
+                        <p>git commit -m "Initial Commit"</p>
+                        <p>git push -u origin dev</p>
+                        <p></p>
+                        <p>Once push is complete, you can browse the pushed code at : <a id="repo_url_dev_a_public" href="#" target="_blank"><strong><span id="repo_url_dev_public"></span></strong></a></p>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+

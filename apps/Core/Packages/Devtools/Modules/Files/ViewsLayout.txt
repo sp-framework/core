@@ -1,0 +1,35 @@
+<!-- htmlhint tag-pair:false -->
+{{assets.get('doctype').getCodes()[0].getContent()}}
+<html lang="en">
+    <head>
+        {% for meta in assets.get('meta').getCodes() %}
+            {% if meta.getType() === 'charset' %}
+                <meta charset="{{meta.getContent()}}">
+            {% else %}
+                <meta name="{{meta.getType()}}" content="{{meta.getContent()}}">
+            {% endif %}
+        {% endfor %}
+        {{assets.get('title').getCodes()[0].getContent()}}
+        {{assets.outputCss('headLinks')}}
+        {{assets.outputJs('headJs')}}
+    </head>
+    <body>
+        {{content()}}
+        <footer>
+            <div class="row">
+                <div class="col">
+                    <strong>Copyright &copy;
+                        {% if assets.get('footer').getCodes()[0] is defined %}
+                            {{assets.get('footer').getCodes()[0].getContent() ~ ' -'|default('')}}
+                            {{date("Y")}}
+                        {% endif %}
+                        {% if assets.get('footer').getCodes()[1] is defined and assets.get('footer').getCodes()[2] is defined %}
+                            <a target="_blank" href="{{assets.get('footer').getCodes()[1].getContent()}}">{{assets.get('footer').getCodes()[2].getContent()}}</a>
+                        {% endif %}
+                    </strong> All rights reserved.
+                    {{assets.outputJs('footerJs')}}
+                </div>
+            </div>
+        </footer>
+    </body>
+</html>

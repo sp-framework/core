@@ -1,0 +1,238 @@
+{% set moduleApp_typeDisabled = false %}
+{% set createRepoDisabled = true %}
+{% if module['id'] is defined %}
+    {% set moduleId = module['id'] %}
+    {% set moduleName = module['name'] %}
+    {% set moduleApp_type = module['app_type'] %}
+    {% set moduleDescription = module['description'] %}
+    {% set moduleApiId = module['module_details']['api_id'] %}
+    {% set moduleVersion = module['module_details']['version'] %}
+    {% set moduleRepo = module['repo'] %}
+    {% set moduleApp_typeDisabled = true %}
+    {% set createRepoDisabled = false %}
+{% else %}
+    {% set moduleId = '' %}
+    {% set moduleName = '' %}
+    {% set moduleApp_type = '' %}
+    {% set moduleDescription = '' %}
+    {% set moduleApiId = '0' %}
+    {% set moduleVersion = '0.0.0' %}
+    {% set moduleRepo = 'https://.../' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'id',
+                'fieldLabel'                     : 'Module ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : moduleId
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'app_type',
+                'fieldLabel'                           : 'App Type',
+                'fieldType'                            : 'input',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'App Type : core, blog, ecom, finance, etc',
+                'fieldRequired'                        : true,
+                'fieldDisabled'                        : moduleApp_typeDisabled,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldBazScan'                         : true,
+                'fieldDataInputMinLength'              : 1,
+                'fieldDataInputMaxLength'              : 50,
+                'fieldValue'                           : moduleApp_type
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'name',
+                'fieldLabel'                     : 'App Type Name',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'App Type name : Core, Blogging, ECommerce, Finance, etc',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleName
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'description',
+                'fieldLabel'                     : 'Description',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 1024,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Description',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldTextareaRows'              : 2,
+                'fieldValue'                     : moduleDescription
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'api_id',
+                'fieldLabel'                           : 'Local/Remote Repo?',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select repo if the module will be available on a repo. If not, choose local and you can pass zip file to the end user.',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2Options'              : apis,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsSelected'      : moduleApiId
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'version',
+                'fieldLabel'                     : 'Module version',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module version. New modules start with 0.0.0(Major.Minor.Patch). We use semantic version system.',
+                'fieldRequired'                  : true,
+                'fieldInputToggleEdit'           : true,
+                'fieldGroupPreAddonButtons'      :
+                    [
+                        'check-version'   : [
+                            'title'                   : false,
+                            'icon'                    : 'check',
+                            'noMargin'                : true,
+                            'buttonAdditionalClass'   : 'rounded-0 text-white',
+                            'position'                : 'right'
+                        ]
+                    ],
+                'fieldDisabled'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 50,
+                'fieldValue'                     : moduleVersion
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'repo',
+                'fieldLabel'                     : 'Module repo',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Module repo.',
+                'fieldRequired'                  : true,
+                'fieldInputToggleEdit'           : true,
+                'fieldDisabled'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldGroupPreAddonButtons'          :
+                    [
+                        'generate-repo-url'   : [
+                            'title'                   : false,
+                            'icon'                    : 'wand-magic-sparkles',
+                            'noMargin'                : true,
+                            'buttonAdditionalClass'   : 'rounded-0 text-white',
+                            'position'                : 'right'
+                        ]
+                    ],
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldValue'                     : moduleRepo
+            ]
+        )}}
+    </div>
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'createrepo',
+                'fieldLabel'                     : 'Create New Repo?',
+                'fieldHelp'                      : true,
+                'fieldDisabled'                  : createRepoDisabled,
+                'fieldHelpTooltipContent'        : 'Create new repository if it does not exist on remote?',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : false,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>

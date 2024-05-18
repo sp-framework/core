@@ -1,0 +1,617 @@
+<form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        {% if viewssettings['id'] is defined %}
+            {% set viewsSettingsId = viewssettings['id'] %}
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'domain_id',
+                            'fieldLabel'                     : 'Select Domain',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select Domain.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDisabled'                  : true,
+                            'fieldDataSelect2Options'        : domains,
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': viewssettings['domain_id']
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'app_id',
+                            'fieldLabel'                     : 'Select App',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select App.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDisabled'                  : true,
+                            'fieldDataSelect2Options'        : apps,
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': viewssettings['app_id']
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'view_id',
+                            'fieldLabel'                     : 'Select View',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select View.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDisabled'                  : true,
+                            'fieldDataSelect2Options'        : views,
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'display_name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': viewssettings['view_id']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <hr>
+            {% if viewssettings['settings']['branding'] is defined and viewssettings['settings']['branding']|length > 0 %}
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'branding',
+                                'fieldLabel'                            : 'Branding',
+                                'fieldLabelLegend'                      : true,
+                                'fieldHidden'                           : false,
+                                'fieldType'                             : 'html',
+                                'fieldBazScan'                          : false,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : false,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldHtmlContent'                      : ''
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    {% for brandKey, brand in viewssettings['settings']['branding'] %}
+                        {% if brand['maxWidth'] is not defined %}
+                            {% set brand['maxWidth'] = 0 %}
+                        {% endif %}
+                        {% if brand['maxHeight'] is not defined %}
+                            {% set brand['maxHeight'] = 0 %}
+                        {% endif %}
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : brandKey,
+                                    'fieldLabel'                     : brandKey ~ ' logo',
+                                    'fieldType'                      : 'files/croppie',
+                                    'fieldValue'                     : brand['brand'],
+                                    'imageType'                      : 'logo',
+                                    'storageType'                    : 'public',
+                                    'uploadDirectory'                : 'public/' ~ viewssettings['app_type'] ~ '/' ~ viewssettings['view_name'] ~ '/images/assets',
+                                    'isPointer'                      : true,
+                                    'upload'                         : true,
+                                    'remove'                         : true,
+                                    'maxWidth'                       : brand['maxWidth'],
+                                    'maxHeight'                      : brand['maxHeight'],
+                                    'logoLink'                       : brand['brand']
+                                ]
+                            )}}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <hr>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'header',
+                            'fieldLabel'                            : 'Header',
+                            'fieldLabelLegend'                      : true,
+                            'fieldHidden'                           : false,
+                            'fieldType'                             : 'html',
+                            'fieldBazScan'                          : false,
+                            'fieldBazPostOnCreate'                  : false,
+                            'fieldBazPostOnUpdate'                  : false,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldHtmlContent'                      : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'head_title',
+                            'fieldLabel'                     : 'Title Tag',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Website Title Tag',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldValue'                     : viewssettings['settings']['head']['title']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'head_meta_keywords',
+                            'fieldLabel'                     : 'Site Keywords',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 4096,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Enter site keywords.',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 4096,
+                            'fieldTextareaRows'              : 5,
+                            'fieldValue'                     : viewssettings['settings']['head']['meta']['keywords']
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'head_meta_description',
+                            'fieldLabel'                     : 'Site Description',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 4096,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Enter site description.',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 4096,
+                            'fieldTextareaRows'              : 5,
+                            'fieldValue'                     : viewssettings['settings']['head']['meta']['description']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'footer',
+                            'fieldLabel'                            : 'Footer',
+                            'fieldLabelLegend'                      : true,
+                            'fieldHidden'                           : false,
+                            'fieldType'                             : 'html',
+                            'fieldBazScan'                          : false,
+                            'fieldBazPostOnCreate'                  : false,
+                            'fieldBazPostOnUpdate'                  : false,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldHtmlContent'                      : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'copyright_name',
+                            'fieldLabel'                     : 'Copyright Name',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Website Copyright Name',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 100,
+                            'fieldValue'                     : viewssettings['settings']['footer']['copyright']['name']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'copyright_site',
+                            'fieldLabel'                     : 'Copyright Site',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Website Copyright Site',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 512,
+                            'fieldValue'                     : viewssettings['settings']['footer']['copyright']['site']
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'copyright_fromYear',
+                            'fieldLabel'                     : 'Copyright From Year',
+                            'fieldType'                      : 'input',
+                            'fieldInputTypeTextFilter'       : 'positiveInt',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Website Copyright From Year',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 4,
+                            'fieldValue'                     : viewssettings['settings']['footer']['copyright']['fromYear']
+                        ]
+                    )}}
+                </div>
+            </div>
+        {% else %}
+            {% set viewsSettings = viewssettings %}
+            {% set viewsSettingsId = '' %}
+            {{adminltetags.useTag('buttons',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'buttonType'                    : 'button',
+                    'buttons'                       :
+                        [
+                            'settings-link'    : [
+                                'title'                   : 'link',
+                                'size'                    : 'xs',
+                                'disabled'                : true,
+                                'hidden'                  : true,
+                                'url'                     : '#'
+                            ]
+                        ]
+                ]
+            )}}
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'domain_id',
+                            'fieldLabel'                     : 'Select Domain',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select Domain.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDataSelect2Options'        : domains,
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': ''
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'app_id',
+                            'fieldLabel'                     : 'Select App',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select App.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDisabled'                  : true,
+                            'fieldDataSelect2Options'        : apps,
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': ''
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'view_id',
+                            'fieldLabel'                     : 'Select View',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select View.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDisabled'                  : true,
+                            'fieldDataSelect2Options'        : [],
+                            'fieldDataSelect2OptionsKey'     : 'id',
+                            'fieldDataSelect2OptionsValue'   : 'display_name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': ''
+                        ]
+                    )}}
+                </div>
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'view settings ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'view settings ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : viewsSettingsId
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+{% set apps = json_encode(apps) %}
+<script>
+/* globals PNotify BazContentLoader Pace BazCore */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['apps'] = JSON.parse('{{apps}}');
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-domain_id'                               : {
+            placeholder: "SELECT DOMAIN",
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-domain_id').on("select2:select", function(e) {
+                    if (e.params.data.id != '0') {
+                        dataCollectionSectionForm['vars']['domain_id'] = e.params.data.id;
+                        $('#{{componentId}}-{{sectionId}}-app_id').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-app_id'                                  : {
+            placeholder: "SELECT APP",
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-app_id').on("select2:select", function(e) {
+                    if (e.params.data.id != '0') {
+                        dataCollectionSectionForm['vars']['app_id'] = e.params.data.id;
+
+                        if (dataCollectionSectionForm['vars']['apps'][e.params.data.id] &&
+                            dataCollectionSectionForm['vars']['apps'][e.params.data.id]['views']
+                        ) {
+                            for (var view in dataCollectionSectionForm['vars']['apps'][e.params.data.id]['views']) {
+                                var newOption
+                                    = new Option(
+                                        dataCollectionSectionForm['vars']['apps'][e.params.data.id]['views'][view].name,
+                                        dataCollectionSectionForm['vars']['apps'][e.params.data.id]['views'][view].id, false, false
+                                    );
+
+                                $('#{{componentId}}-{{sectionId}}-view_id').empty().append(newOption).trigger('change');
+                            }
+                        }
+                        $('#{{componentId}}-{{sectionId}}-view_id').val(0).trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-view_id').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-view_id'                                 : {
+            placeholder: "SELECT VIEW",
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-view_id').on("select2:select", function(e) {
+                    dataCollectionSectionForm['vars']['view_id'] = e.params.data.id;
+                    if (e.params.data.id != '0') {
+                        var postData = { };
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['domain_id'] = dataCollectionSectionForm['vars']['domain_id'];
+                        postData['app_id'] = dataCollectionSectionForm['vars']['app_id'];
+                        postData['view_id'] = dataCollectionSectionForm['vars']['view_id'];
+
+                        $.post('{{links.url("viewssettings/getViewsSettingsByViewIdDomainIdAndAppId")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+
+                            if (response.responseCode == 1) {
+                                PNotify.error({'text': response.responseMessage});
+
+                                $('#{{componentId}}-{{sectionId}}-domain_id').val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-app_id').val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-app_id').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-view_id').val(0).trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-view_id').empty().trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-view_id').attr('disabled', true);
+                            } else {
+                                if (dataCollectionSectionForm['vars']['viewsSettingsId'] == '') {
+                                    $('#{{componentId}}-{{sectionId}}-defaults').attr('disabled', false);
+                                    $('#{{componentId}}-{{sectionId}}-defaults').attr('hidden', false);
+                                }
+
+                                dataCollectionSectionForm['funcs']['loadAjax'](
+                                    $('#{{componentId}}-{{sectionId}}-domain_id').val(),
+                                    $('#{{componentId}}-{{sectionId}}-app_id').val(),
+                                    $('#{{componentId}}-{{sectionId}}-view_id').val()
+                                );
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-head_title'                              : { },
+        '{{componentId}}-{{sectionId}}-head_meta_keywords'                      : { },
+        '{{componentId}}-{{sectionId}}-head_meta_description'                   : { },
+        '{{componentId}}-{{sectionId}}-copyright_name'                          : { },
+        '{{componentId}}-{{sectionId}}-copyright_site'                          : { },
+        '{{componentId}}-{{sectionId}}-copyright_fromYear'                      : { },
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-domain_id'                            : 'required',
+                '{{componentId}}-{{sectionId}}-app_id'                               : 'required',
+                '{{componentId}}-{{sectionId}}-view_id'                              : 'required',
+                '{{componentId}}-{{sectionId}}-head_title'                           : 'required',
+                '{{componentId}}-{{sectionId}}-head_meta_keywords'                   : 'required',
+                '{{componentId}}-{{sectionId}}-head_meta_description'                : 'required',
+                '{{componentId}}-{{sectionId}}-copyright_name'                       : 'required',
+                '{{componentId}}-{{sectionId}}-copyright_site'                       : 'required',
+                '{{componentId}}-{{sectionId}}-copyright_fromYear'                   : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-domain_id'                            : 'Please select domain',
+                '{{componentId}}-{{sectionId}}-app_id'                               : 'Please select app',
+                '{{componentId}}-{{sectionId}}-view_id'                              : 'Please select view',
+                '{{componentId}}-{{sectionId}}-head_title'                           : 'Please enter title',
+                '{{componentId}}-{{sectionId}}-head_meta_keywords'                   : 'Please enter keywords',
+                '{{componentId}}-{{sectionId}}-head_meta_description'                : 'Please enter description',
+                '{{componentId}}-{{sectionId}}-copyright_name'                       : 'Please enter copyright name',
+                '{{componentId}}-{{sectionId}}-copyright_site'                       : 'Please enter copyright site',
+                '{{componentId}}-{{sectionId}}-copyright_fromYear'                   : 'Please enter copyright from year',
+            }
+        }
+    });
+
+dataCollectionSectionForm['funcs'] = { };
+dataCollectionSectionForm['funcs']['loadAjax'] = function(domainId, appId, viewId) {
+    dataCollectionSectionForm['vars']['url'] = '{{links.url("viewssettings/q/id/0/domainid/' + domainId + '/appid/' + appId + '/viewid/' + viewId + '")}}';
+
+    $('#{{componentId}}-{{sectionId}}-settings-link').attr('href', dataCollectionSectionForm['vars']['url']);
+
+    BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-settings-link'), {
+        ajaxBefore                      : function () {
+                                            Pace.restart();
+                                            $("#baz-content").empty();
+                                            $("#loader").attr('hidden', false);
+                                        },
+        ajaxFinished                    : function () {
+                                            BazCore.updateBreadcrumb();
+                                            $("#loader").attr('hidden', true);
+                                        },
+        ajaxError                       : function () {
+                                            $("#loader").attr('hidden', true);
+                                            BazCore.updateBreadcrumb();
+                                        }
+    });
+}
+</script>

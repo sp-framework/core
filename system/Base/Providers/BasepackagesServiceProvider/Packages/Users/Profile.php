@@ -2,12 +2,12 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Users;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
+use LasseRafn\InitialAvatarGenerator\InitialAvatar;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
 
 class Profile extends BasePackage
 {
@@ -42,34 +42,51 @@ class Profile extends BasePackage
 
     public function getProfile(int $accountId)
     {
-        $profileObj = $this->getFirst('account_id', $accountId);
+        if ($this->config->databasetype === 'db') {
+            $profileObj = $this->getFirst('account_id', $accountId);
 
-        if ($profileObj) {
-            $profile = $profileObj->toArray();
+            if ($profileObj) {
+                $profile = $profileObj->toArray();
 
-            if ($profile['settings'] &&
-                !is_array($profile['settings']) &&
-                $profile['settings'] !== ''
-            ) {
-                $profile['settings'] = Json::decode($profile['settings'], true);
-            } else {
-                $profile['settings'] = [];
+                if ($profile['settings'] &&
+                    !is_array($profile['settings']) &&
+                    $profile['settings'] !== ''
+                ) {
+                    $profile['settings'] = $this->helper->decode($profile['settings'], true);
+                } else {
+                    $profile['settings'] = [];
+                }
+
+                $addressObj = $profileObj->getAddress();
+
+                $profile['address'] = [];
+
+                if ($addressObj) {
+                    $profile['address'] = $addressObj->toArray();
+                }
+
+                if (isset($this->auth)) {
+                    $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
+                }
+
+                return $profile;
             }
+        } else {
+            $this->setFFRelations(true);
+            $this->setFFRelationsConditions(['address' => ['package_name', '=', 'profile']]);
 
-            $addressObj = $profileObj->getAddress();
+            $profile = $this->getFirst('account_id', $accountId, false, true, null, [], true);
 
-            $profile['address'] = [];
+            if ($profile) {
+                if (isset($this->auth)) {
+                    $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role']['id'])['name'];
+                }
 
-            if ($addressObj) {
-                $profile['address'] = $addressObj->toArray();
+                return $profile;
             }
-
-            if (isset($this->auth)) {
-                $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
-            }
-
-            return $profile;
         }
+
+        return false;
     }
 
     /**
@@ -84,6 +101,7 @@ class Profile extends BasePackage
 
         $data['account_id'] = $accountId;
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
+        $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
         $data['contact_phone'] = '0';
         $data['contact_mobile'] = '0';
 
@@ -103,6 +121,15 @@ class Profile extends BasePackage
     {
         $profile = $this->getProfile($data['id']);
 
+        if (isset($data['first_name']) && isset($data['last_name'])) {
+            if (($data['first_name'] !== $profile['first_name'] ||
+                $data['last_name'] !== $profile['last_name']) ||
+                !$profile['initials_avatar']
+            ) {
+                $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
+            }
+        }
+
         unset($data['id']);
 
         $profile = array_merge($profile, $data);
@@ -119,7 +146,7 @@ class Profile extends BasePackage
         }
 
         if (is_array($profile['settings'])) {
-            $profile['settings'] = Json::encode($profile['settings']);
+            $profile['settings'] = $this->helper->encode($profile['settings']);
         }
 
         if ($this->update($profile)) {
@@ -136,12 +163,19 @@ class Profile extends BasePackage
         }
 
         if (isset($data['subscriptions']) && $data['subscriptions'] !== '') {
-            $data['subscriptions'] = Json::decode($data['subscriptions'], true);
+            $data['subscriptions'] = $this->helper->decode($data['subscriptions'], true);
             $this->modules->packages->updateNotificationSubscriptions($data['subscriptions']);
             unset($data['subscriptions']);
         }
 
         $profile = $this->getProfile($this->auth->account()['id']);
+
+        if (($data['first_name'] !== $profile['first_name'] ||
+            $data['last_name'] !== $profile['last_name']) ||
+            !$profile['initials_avatar']
+        ) {
+            $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
+        }
 
         $profile = array_merge($profile, $data);
 
@@ -160,7 +194,6 @@ class Profile extends BasePackage
             $address['address_id'] = $profile['address']['id'];
 
             $this->basepackages->addressbook->mergeAndUpdate($address);
-
         } else {
             $address = $profile;
 
@@ -168,13 +201,17 @@ class Profile extends BasePackage
 
             $address['package_row_id'] = $profile['id'];
 
+            if (isset($address['id'])) {
+                unset($address['id']);
+            }
+
             $this->basepackages->addressbook->addAddress($address);
         }
 
         $portrait = $this->getProfile($this->auth->account()['id'])['portrait'];
 
         if (is_array($profile['settings'])) {
-            $profile['settings'] = Json::encode($profile['settings']);
+            $profile['settings'] = $this->helper->encode($profile['settings']);
         }
 
         if ($this->update($profile)) {
@@ -188,9 +225,9 @@ class Profile extends BasePackage
 
     public function generateAvatar(string $regenerateUsingFile = null, string $gender = 'M')
     {
-        $this->maleAvatarDir = 'public/dash/default/images/avatar/male/';
+        $this->maleAvatarDir = 'public/core/default/images/avatar/male/';
 
-        $this->femaleAvatarDir = 'public/dash/default/images/avatar/female/';
+        $this->femaleAvatarDir = 'public/core/default/images/avatar/female/';
 
         $avatarImageArr = [];
 
@@ -207,7 +244,7 @@ class Profile extends BasePackage
             $counterFileNames = [];
 
             foreach ($this->avatarProperties as $avatarPropertyKey => $avatarPropertyValue) {
-                $dirContents = $this->localContent->listContents($avatarDir.'/'.$avatarPropertyValue, true);
+                $dirContents = $this->localContent->listContents($avatarDir.$avatarPropertyValue, true);
 
                 $files = [];
                 foreach ($dirContents as $content) {
@@ -281,15 +318,23 @@ class Profile extends BasePackage
 
     public function generateViewData()
     {
-        $accountObj = $this->basepackages->accounts->getFirst('id', $this->auth->account()['id']);
+        $this->packagesData->profile = $this->getProfile($this->auth->account()['id']);
 
-        $canLoginArr = $accountObj->canlogin->toArray();
+        if ($this->config->databasetype === 'db') {
+            $accountObj = $this->basepackages->accounts->getFirst('id', $this->auth->account()['id']);
 
-        $account = $accountObj->toArray();
+            $canLoginArr = $accountObj->canlogin->toArray();
+
+            $account = $accountObj->toArray();
+        } else {
+            $account = $this->basepackages->accounts->getAccountById($this->auth->account()['id']);
+
+            $canLoginArr = $account['canlogin'];
+        }
 
         if ($canLoginArr > 0) {
             foreach ($canLoginArr as $key => $value) {
-                $account['can_login'][$value['app']] = $value['allowed'];
+                $account['can_login'][$value['app_id']] = $value['allowed'];
             }
         } else {
             $account['can_login'] = [];
@@ -309,8 +354,8 @@ class Profile extends BasePackage
         $appsArr = $this->apps->apps;
 
         foreach ($appsArr as $appKey => $app) {
-            if (isset($account['can_login'][$app['route']])) {
-                $packagesArr = $this->modules->packages->getPackagesForApp($app['id']);
+            if (isset($account['can_login'][$app['id']])) {
+                $packagesArr = $this->modules->packages->getPackagesForAppId($app['id']);
 
                 if (count($packagesArr) > 0) {
                     $packages[$app['id']] =
@@ -343,9 +388,9 @@ class Profile extends BasePackage
         $notifications = [];
 
         foreach ($appsArr as $appKey => $app) {
-            if (isset($account['can_login'][$app['route']])) {
+            if (isset($account['can_login'][$app['id']])) {
 
-                $packagesArr = $this->modules->packages->getPackagesForApp($app['id']);
+                $packagesArr = $this->modules->packages->getPackagesForAppId($app['id']);
 
                 foreach ($packagesArr as $key => $package) {
                     if ($package['class'] && $package['class'] !== '') {
@@ -353,7 +398,7 @@ class Profile extends BasePackage
                             !is_array($package['notification_subscriptions']) &&
                             $package['notification_subscriptions'] !== ''
                         ) {
-                            $package['notification_subscriptions'] = Json::decode($package['notification_subscriptions'], true);
+                            $package['notification_subscriptions'] = $this->helper->decode($package['notification_subscriptions'], true);
                         }
 
                         $reflector = $this->annotations->get($package['class']);
@@ -412,32 +457,52 @@ class Profile extends BasePackage
             }
         }
 
-        $this->packagesData->subscriptions = Json::encode($subscriptions);
+        $this->packagesData->subscriptions = $this->helper->encode($subscriptions);
 
-        $this->packagesData->notifications = Json::encode($notifications);
+        $this->packagesData->notifications = $this->helper->encode($notifications);
 
         //We grab agents instead of sessions so we can clear stale agents as well as sessions. Number of agents can be more then sessions and each agent will have its session ID.
         $this->packagesData->sessions = [];
 
         $agentsModel = new BasepackagesUsersAccountsAgents;
+        $identifiersModel = new BasepackagesUsersAccountsIdentifiers;
 
-        $agentsObj = $agentsModel->findByaccount_id($this->auth->account()['id']);
+        if ($this->config->databasetype === 'db') {
+            $agentsObj = $agentsModel->findByaccount_id($this->auth->account()['id']);
 
-        if ($agentsObj) {
-            $agents = $agentsObj->toArray();
+            if ($agentsObj) {
+                $agents = $agentsObj->toArray();
+
+                if (count($agents) > 0) {
+                    foreach ($agents as &$agent) {
+                        if ($identifiersModel::findBysession_id($agent['session_id'])) {
+                            $agent['remember'] = true;
+                        }
+                    }
+                }
+
+            }
+        } else {
+            $agentsStore = $this->ff->store($agentsModel->getSource());
+
+            $agents = $agentsStore->findAll();
 
             if (count($agents) > 0) {
-                $identifiersModel = new BasepackagesUsersAccountsIdentifiers;
+                $identifiersStore = $this->ff->store($identifiersModel->getSource());
 
                 foreach ($agents as &$agent) {
-                    if ($identifiersModel::findBysession_id($agent['session_id'])) {
+                    if ($identifiersStore->findOneBy(['session_id', '=', $agent['session_id']])) {
                         $agent['remember'] = true;
                     }
                 }
             }
-
-            $this->packagesData->sessions = $agents;
         }
+
+        $this->packagesData->sessions = $agents;
+
+        $this->packagesData->coreSettings = $this->core->core['settings'];
+
+        $this->packagesData->canUse2fa = $this->auth->canUse2fa();
 
         return true;
     }
@@ -512,5 +577,15 @@ class Profile extends BasePackage
         }
 
         $this->addResponse('Could not add to members users', 1);
+    }
+
+    protected function generateInitialsAvatar($profileData)
+    {
+        $avatar = new InitialAvatar();
+
+        $avatars['small'] = base64_encode($avatar->name($profileData['first_name'] . ' ' . $profileData['last_name'])->autoColor()->height(30)->width(30)->generate()->stream('png', 100));
+        $avatars['large'] = base64_encode($avatar->name($profileData['first_name'] . ' ' . $profileData['last_name'])->autoColor()->height(200)->width(200)->generate()->stream('png', 100));
+
+        return $avatars;
     }
 }

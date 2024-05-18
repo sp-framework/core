@@ -1,0 +1,342 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'apps_dir',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Backup apps directory?',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxLabel'             : 'BACKUP APPS DIRECTORY',
+                'fieldCheckboxChecked'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'systems_dir',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Backup systems directory?',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxLabel'             : 'BACKUP SYSTEMS DIRECTORY',
+                'fieldCheckboxChecked'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'public_dir',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Backup public directory?',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxLabel'             : 'BACKUP PUBLIC DIRECTORY',
+                'fieldCheckboxChecked'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'private_dir',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Backup private directory?',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxLabel'             : 'BACKUP PRIVATE DIRECTORY',
+                'fieldCheckboxChecked'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'external_dir',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Backup external (third party) directory? It includes only composer files. If you want to backup whole vendor folder, select Backup External Vendor Directory option as well.',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxLabel'             : 'BACKUP EXTERNAL DIRECTORY',
+                'fieldCheckboxChecked'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'html_compiled',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Compiled Templates Directory? Note: This can be regenerated.',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'warning',
+                'fieldCheckboxChecked'           : false,
+                'fieldCheckboxLabel'             : 'COMPILED HTML DIRECTORY',
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'var_dir',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Backup var (variable) directory? This directory contains logs, cache, session information. Information that will be regenerated by the system again.',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'warning',
+                'fieldCheckboxChecked'           : false,
+                'fieldCheckboxLabel'             : 'VAR DIRECTORY',
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'external_vendor_dir',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Backup external (third party) vendor directory? Note: External code can be restored using composer.',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'warning',
+                'fieldCheckboxLabel'             : 'BACKUP EXTERNAL VENDOR DIRECTORY',
+                'fieldCheckboxChecked'           : false,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'old_backups',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Old backup files? This will increase the total size of the backup depending on how many backups you have taken before.',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'danger',
+                'fieldCheckboxChecked'           : false,
+                'fieldCheckboxLabel'             : 'OLD BACKUP FILES',
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'database',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Backup database?',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : true,
+                'fieldCheckboxLabel'             : 'DATABASE',
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'keys',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Security and DB keys?',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'danger',
+                'fieldCheckboxChecked'           : true,
+                'fieldDisabled'                  : true,
+                'fieldCheckboxLabel'             : 'SECURITY AND DB KEYS',
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'password_protect',
+                'fieldLabel'                            : 'Password Protect',
+                'fieldType'                             : 'input',
+                'fieldInputType'                        : 'password',
+                'fieldInputPasswordToggleVisibility'    : true,
+                'fieldInputPasswordGenerate'            : true,
+                'fieldInputPasswordStrengthMeter'       : true,
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'We will password protect the zip file if password is provided. Password protection is a must in case of Security and DB keys. During restore, you need to enter this password, else restore will fail. Please keep this password safe.',
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldAdditionalClass'                  : 'mb-0'
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'notes',
+                'fieldLabel'                     : 'Backup Notes',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 2048,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Backup Notes',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataInputMaxLength'        : 2048,
+                'fieldTextareaRows'              : 2,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<hr class="mt-0">
+<div id="backup-progress" class="mb-3" hidden></div>
+<div class="row">
+    <div class="col text-center">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                     : 'button',
+                'buttons'                        :
+                    [
+                        'backup'    : [
+                            'title'                   : 'Generate Backup',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>

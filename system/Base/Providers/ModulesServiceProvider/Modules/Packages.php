@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesPackages;
 
@@ -19,10 +18,18 @@ class Packages extends BasePackage
 		return $this;
 	}
 
-	public function getNamedPackageForApp($name, $appId)
+	public function getPackageByNameForAppId($name, $appId = null)
 	{
+		if (!$appId) {
+			$appId = isset($this->apps->getAppInfo()['id']) ? $this->apps->getAppInfo()['id'] : false;
+
+			if (!$appId) {
+				return false;
+			}
+		}
+
 		foreach($this->packages as $package) {
-			$package['apps'] = Json::decode($package['apps'], true);
+			$package['apps'] = $this->helper->decode($package['apps'], true);
 
 			if (isset($package['apps'][$appId])) {
 				if (strtolower($package['name']) === strtolower($name) &&
@@ -36,7 +43,88 @@ class Packages extends BasePackage
 		return false;
 	}
 
-	public function getNamedPackageForRepo($name, $repo)
+	public function getPackageByClassForAppId($class, $appId = null)
+	{
+		if (!$appId) {
+			$appId = isset($this->apps->getAppInfo()['id']) ? $this->apps->getAppInfo()['id'] : false;
+
+			if (!$appId) {
+				return false;
+			}
+		}
+
+		foreach($this->packages as $package) {
+			$package['apps'] = $this->helper->decode($package['apps'], true);
+
+			if ($package['class'] !== $class) {
+				continue;
+			}
+
+			if (isset($package['apps'][$appId])) {
+				if (isset($package['apps'][$appId]['enabled']) &&
+					$package['apps'][$appId]['enabled'] === true
+				) {
+					return $package;
+				}
+			}
+		}
+
+		return false;
+	}
+
+
+	public function getPackagesByApiId($apiId)
+	{
+		$packages = [];
+
+		foreach($this->packages as $package) {
+			if ($package['api_id'] == $apiId) {
+				array_push($packages, $package);
+			}
+		}
+
+		return $packages;
+	}
+
+	public function getPackageByRepo($repo)
+	{
+		foreach($this->packages as $package) {
+			if ($package['repo'] == $repo) {
+				return $package;
+			}
+		}
+
+		return false;
+	}
+
+	public function getPackageByAppTypeAndRepoAndClass($appType, $repo, $class)
+	{
+		foreach($this->packages as $package) {
+			if ($package['app_type'] === $appType &&
+				$package['repo'] === $repo &&
+				trim($class, '\\') === trim($package['class'], '\\')
+			) {
+				return $package;
+			}
+		}
+
+		return false;
+	}
+
+	public function getPackageByAppTypeAndName($appType, $name)
+	{
+		foreach($this->packages as $package) {
+			if ($package['app_type'] === $appType &&
+				$package['name'] === $name
+			) {
+				return $package;
+			}
+		}
+
+		return false;
+	}
+
+	public function getPackageByNameForRepo($name, $repo)
 	{
 		foreach($this->packages as $package) {
 			if (strtolower($package['name']) === strtolower($name) &&
@@ -49,7 +137,7 @@ class Packages extends BasePackage
 		return false;
 	}
 
-	public function getIdPackage($id)
+	public function getPackageById($id)
 	{
 		foreach($this->packages as $package) {
 			if ($package['id'] == $id) {
@@ -60,7 +148,7 @@ class Packages extends BasePackage
 		return false;
 	}
 
-	public function getNamePackage($name)
+	public function getPackageByName($name)
 	{
 		foreach($this->packages as $package) {
 			if (strtolower($package['name']) === strtolower($name)) {
@@ -71,12 +159,12 @@ class Packages extends BasePackage
 		return false;
 	}
 
-	public function getPackagesForCategoryAndSubcategory($category, $subCategory)
+	public function getPackagesForCategory($category)
 	{
 		$packages = [];
 
 		foreach($this->packages as $package) {
-			if ($package['category'] === $category && $package['sub_category'] === $subCategory) {
+			if ($package['category'] === $category) {
 				$packages[$package['id']] = $package;
 			}
 		}
@@ -84,12 +172,12 @@ class Packages extends BasePackage
 		return $packages;
 	}
 
-	public function getPackagesForAppType(string $type)
+	public function getPackagesForAppType($appType)
 	{
 		$packages = [];
 
 		foreach($this->packages as $package) {
-			if ($package['app_type'] === $type) {
+			if ($package['app_type'] === $appType) {
 				$packages[$package['id']] = $package;
 			}
 		}
@@ -97,12 +185,12 @@ class Packages extends BasePackage
 		return $packages;
 	}
 
-	public function getPackagesForApp($appId)
+	public function getPackagesForAppId($appId)
 	{
 		$packages = [];
 
 		foreach($this->packages as $package) {
-			$package['apps'] = Json::decode($package['apps'], true);
+			$package['apps'] = $this->helper->decode($package['apps'], true);
 
 			if (isset($package['apps'][$appId]['enabled']) &&
 				$package['apps'][$appId]['enabled'] == 'true'
@@ -123,7 +211,7 @@ class Packages extends BasePackage
 		}
 	}
 
-	public function updatePackage(array $data)
+	public function updatePackages(array $data)
 	{
 		if ($this->update($data)) {
 			$this->addResponse('Updated ' . $data['name'] . ' package');
@@ -164,7 +252,7 @@ class Packages extends BasePackage
 		foreach ($this->packages as $packageKey => $package) {
 			if ($package['class'] && $package['class'] !== '') {
 				if ($package['notification_subscriptions'] && $package['notification_subscriptions'] !== '') {
-					$package['notification_subscriptions'] = Json::decode($package['notification_subscriptions'], true);
+					$package['notification_subscriptions'] = $this->helper->decode($package['notification_subscriptions'], true);
 
 					foreach ($appsArr as $appKey => $app) {
 						if (isset($subscriptions[$app['id']][$package['id']])) {
@@ -274,10 +362,53 @@ class Packages extends BasePackage
 						}
 					}
 				}
-				$package['notification_subscriptions'] = Json::encode($package['notification_subscriptions']);
+				$package['notification_subscriptions'] = $this->helper->encode($package['notification_subscriptions']);
 
 				$this->update($package);
 			}
 		}
+	}
+
+	public function msupdate(array $data)//module settings update
+	{
+		$package = $this->getById($data['id']);
+
+		if (is_string($package['settings'])) {
+			$package['settings'] = $this->helper->decode($package['settings'], true);
+		}
+
+		foreach ($data as $key => $settingsData) {
+			if ($key !== 'id' &&
+				$key !== 'module_type' &&
+				$settingsData !== $this->security->getRequestToken()
+			) {
+				if (isset($package['settings'][$key])) {
+					$settingsData = $this->helper->decode($settingsData, true);
+
+					$package['settings'][$key] = $settingsData;
+				}
+			}
+		}
+
+		try {
+			$packageReflection = new \ReflectionClass($package['class']);
+			$packageSettingsProperty = $packageReflection->getProperty('settings');
+			$settingsClass = $packageSettingsProperty->getValue(new $package['class']);
+
+			$settingsClass = new $settingsClass;
+			if (method_exists($settingsClass, 'beforeUpdate')) {
+				$settingsClass->beforeUpdate($this, $package, $data);
+			}
+
+			$this->update($package);
+
+			if (method_exists($settingsClass, 'afterUpdate')) {
+				$settingsClass->afterUpdate($this, $package, $data);
+			}
+		} catch (\Exception $e) {
+			throw $e;
+		}
+
+		return true;
 	}
 }

@@ -4,6 +4,10 @@ namespace System\Base\Providers\BasepackagesServiceProvider;
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ActivityLogs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\AddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\ApiClientServices;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\BackupRestore;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Barcodes;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Dashboards;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\Email;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailQueue;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServices;
@@ -14,14 +18,20 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ImportExport;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Messenger;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Murls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Progress;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Pusher;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Qrcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Templates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profile;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Utils;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Widgets;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
 class Basepackages
@@ -69,6 +79,26 @@ class Basepackages
 	protected $importexport;
 
 	protected $templates;
+
+	protected $dashboards;
+
+	protected $widgets;
+
+	protected $progress;
+
+	protected $apiClientServices;
+
+	protected $messenger;
+
+	protected $barcodes;
+
+	protected $qrcodes;
+
+	protected $backuprestore;
+
+	protected $utils;
+
+	protected $murls;
 
 	public function __construct()
 	{
@@ -230,5 +260,75 @@ class Basepackages
 		$this->templates = (new Templates())->init();
 
 		return $this->templates;
+	}
+
+	protected function initDashboards()
+	{
+		$this->templates = (new Dashboards())->init();
+
+		return $this->templates;
+	}
+
+	protected function initWidgets()
+	{
+		$this->templates = (new Widgets())->init();
+
+		return $this->templates;
+	}
+
+	protected function initProgress()
+	{
+		$this->progress = (new Progress())->init();
+
+		return $this->progress;
+	}
+
+	protected function initApiClientServices()
+	{
+		$this->apiClientServices = (new ApiClientServices())->init();
+
+		return $this->apiClientServices;
+	}
+
+	protected function initMessenger()
+	{
+		$this->messenger = (new Messenger())->init();
+
+		return $this->messenger;
+	}
+
+	protected function initBarcodes()
+	{
+		$this->barcodes = (new Barcodes())->init();
+
+		return $this->barcodes;
+	}
+
+	protected function initQrcodes()
+	{
+		$this->qrcodes = (new Qrcodes())->init();
+
+		return $this->qrcodes;
+	}
+
+	protected function initBackupRestore()
+	{
+		$this->backuprestore = (new BackupRestore())->init();
+
+		return $this->backuprestore;
+	}
+
+	protected function initUtils()
+	{
+		$this->utils = (new Utils())->init();
+
+		return $this->utils;
+	}
+
+	protected function initMurls()
+	{
+		$this->murls = (new Murls())->init();
+
+		return $this->murls;
 	}
 }

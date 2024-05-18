@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
 
@@ -18,10 +17,10 @@ class Notes extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $notesSettings = $this->modules->packages->getNamePackage($this->packageName);
+        $notesSettings = $this->modules->packages->getPackageByName($this->packageName);
 
         if ($notesSettings) {
-            $this->notesSettings = Json::decode($notesSettings['settings'], true);
+            $this->notesSettings = $this->helper->decode($notesSettings['settings'], true);
 
             if (!isset($this->notesSettings['noteTypes'])) {
                 $this->notesSettings['noteTypes'] = $this->setNotesTypes;
@@ -95,10 +94,10 @@ class Notes extends BasePackage
 
                 if (isset($data['note_app_visibility']) && $data['note_app_visibility'] !== '') {
                     if (is_array($data['note_app_visibility'])) {
-                        $note['note_app_visibility'] = Json::encode($data['note_app_visibility']['data']);
+                        $note['note_app_visibility'] = $this->helper->encode($data['note_app_visibility']['data']);
                     } else {
-                        $data['note_app_visibility'] = Json::decode($data['note_app_visibility'], true);
-                        $note['note_app_visibility'] = Json::encode($data['note_app_visibility']['data']);
+                        $data['note_app_visibility'] = $this->helper->decode($data['note_app_visibility'], true);
+                        $note['note_app_visibility'] = $this->helper->encode($data['note_app_visibility']['data']);
                     }
                 }
 
@@ -130,14 +129,14 @@ class Notes extends BasePackage
 
                 if (isset($data['note_attachments']) && $data['note_attachments'] !== '') {
                     if (!is_array($data['note_attachments'])) {
-                        $data['note_attachments'] = Json::decode($data['note_attachments'], true);
+                        $data['note_attachments'] = $this->helper->decode($data['note_attachments'], true);
                     }
 
                     foreach ($data['note_attachments'] as $attachmentKey => $attachment) {
                         $this->basepackages->storages->changeOrphanStatus($attachment);
                     }
 
-                    $note['note_attachments'] = Json::encode($data['note_attachments']);
+                    $note['note_attachments'] = $this->helper->encode($data['note_attachments']);
                 }
 
                 if ($this->add($note, false)) {
@@ -215,24 +214,24 @@ class Notes extends BasePackage
                     $note['note_app_visibility'] !== '' &&
                     $note['note_app_visibility'] !== '[]'
                 ) {
-                    $note['note_app_visibility'] = Json::decode($note['note_app_visibility'], true);
+                    $note['note_app_visibility'] = $this->helper->decode($note['note_app_visibility'], true);
 
                     if (is_array($note['note_app_visibility']) && count($note['note_app_visibility']) > 0) {
                         foreach ($note['note_app_visibility'] as $appKey => $app) {
-                            $appInfo = $this->apps->getIdApp($app);
+                            $appInfo = $this->apps->getAppById($app);
                             $note['note_app_visibility'][$appKey] = $appInfo['name'];
                         }
                     }
                 }
 
                 if ($note['note_attachments'] && $note['note_attachments'] !== '') {
-                    $note['note_attachments'] = Json::decode($note['note_attachments'], true);
+                    $note['note_attachments'] = $this->helper->decode($note['note_attachments'], true);
                     if (is_array($note['note_attachments']) && count($note['note_attachments']) > 0) {
                         foreach ($note['note_attachments'] as $attachmentKey => $attachment) {
                             $attachmentInfo = $this->basepackages->storages->getFileInfo($attachment);
                             if ($attachmentInfo) {
                                 if ($attachmentInfo['links']) {
-                                    $attachmentInfo['links'] = Json::decode($attachmentInfo['links'], true);
+                                    $attachmentInfo['links'] = $this->helper->decode($attachmentInfo['links'], true);
                                 }
                                 $note['note_attachments'][$attachmentKey] = $attachmentInfo;
                             }

@@ -15,6 +15,8 @@ class BasepackagesUsersRoles extends BaseModel
 
     public $description;
 
+    public $type;
+
     public $permissions;
 
     public function initialize()

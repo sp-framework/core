@@ -11,21 +11,43 @@ class Pdo
 
 namespace System\Base\Providers\DatabaseServiceProvider;
 
-use Phalcon\Db\Adapter\PdoFactory;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 
 class Pdo
 {
 	protected $dbConfig;
 
-	public function __construct($dbConfig)
+	protected $session;
+
+	public function __construct($dbConfig, $session)
 	{
 		$this->dbConfig = $dbConfig;
+
+		$this->session = $session;
 	}
 
 	public function init()
 	{
-		return new Mysql($this->dbConfig->toArray());
+		if ($this->checkDbConfig()) {
+			try {
+				return new Mysql($this->dbConfig->toArray());
+			} catch (\PDOException $e) {
+				throw $e;
+			}
+		}
+	}
+
+	public function checkDbConfig()
+	{
+		if (!$this->dbConfig->host 		||
+			!$this->dbConfig->dbname 	||
+			!$this->dbConfig->username	||
+			!$this->dbConfig->password 	||
+			!$this->dbConfig->port
+		) {
+			$this->runSetup();
+		}
+		return true;
 	}
 }';
 

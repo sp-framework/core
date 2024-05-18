@@ -2,41 +2,55 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
-use Phalcon\Helper\Json;
-
 class Middleware
 {
-	public function register($db, $middlewareFile, $installedFiles)
+	public function register($db, $ff, $middlewareFile, $helper)
 	{
 		if ($middlewareFile['name'] === 'Auth') {
-			$apps = Json::encode(['1' => ['enabled' => true, 'sequence' => 1]]);
+			$apps = $helper->encode(['1' => ['enabled' => true, 'sequence' => 1]]);
 		} else if ($middlewareFile['name'] === 'Acl') {
-			$apps = Json::encode(['1' => ['enabled' => true, 'sequence' => 2]]);
+			$apps = $helper->encode(['1' => ['enabled' => true, 'sequence' => 2]]);
 		} else {
-			$apps = Json::encode(['1' => ['enabled' => false, 'sequence' => 0]]);
+			$apps = $helper->encode(['1' => ['enabled' => false, 'sequence' => 0]]);
 		}
 
-		return $db->insertAsDict(
-			'modules_middlewares',
+		$middleware =
 			[
 				'name' 					=> $middlewareFile['name'],
 				'display_name' 			=> $middlewareFile['display_name'],
 				'description' 			=> $middlewareFile['description'],
+				'module_type'			=> $middlewareFile['module_type'],
 				'app_type' 				=> $middlewareFile['app_type'],
 				'category'  			=> $middlewareFile['category'],
-				'sub_category'  		=> $middlewareFile['sub_category'],
 				'version'				=> $middlewareFile['version'],
 				'repo'		 			=> $middlewareFile['repo'],
 				'class'					=> $middlewareFile['class'],
 				'settings'				=>
 					isset($middlewareFile['settings']) ?
-					Json::encode($middlewareFile['settings']) :
-					null,
+					$helper->encode($middlewareFile['settings']) :
+					$helper->encode([]),
+				'dependencies'		 	=>
+					isset($middlewareFile['dependencies']) ?
+					$helper->encode($middlewareFile['dependencies']) :
+					$helper->encode([]),
 				'apps'					=> $apps,
+				'api_id'				=> 1,
 				'installed'				=> 1,
-				'files'					=> Json::encode($installedFiles),
+				'files'					=>
+					isset($middlewareFile['files']) ?
+					$helper->encode($middlewareFile['files']) :
+					$helper->encode([]),
 				'updated_by'			=> 0
-			]
-		);
+			];
+
+		if ($db) {
+			$db->insertAsDict('modules_middlewares', $middleware);
+		}
+
+		if ($ff) {
+			$middlewareStore = $ff->store('modules_middlewares');
+
+			$middlewareStore->updateOrInsert($middleware);
+		}
 	}
 }

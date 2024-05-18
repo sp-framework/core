@@ -1,0 +1,27 @@
+{
+    "name"          : "ModulesManager",
+    "display_name"  : "Modules Manager",
+    "description"   : "Package for managing modules",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "providers",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\ModulesServiceProvider\\Manager",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "settings"      : {
+        "componentRoute":"modules",
+        "api_clients" : []
+    }
+}

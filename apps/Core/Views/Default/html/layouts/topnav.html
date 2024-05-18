@@ -1,0 +1,104 @@
+<!-- htmlhint tag-pair:false -->
+{{assets.get('doctype').getCodes()[0].getContent()}}
+<html lang="en">
+    <head>
+        {% for meta in assets.get('meta').getCodes() %}
+            {% if meta.getType() === 'charset' %}
+                <meta charset="{{meta.getContent()}}">
+            {% else %}
+                <meta name="{{meta.getType()}}" content="{{meta.getContent()}}">
+            {% endif %}
+        {% endfor %}
+        {{assets.get('title').getCodes()[0].getContent()}}
+        {{assets.outputCss('headLinks')}}
+        {{assets.outputJs('headJs')}}
+    </head>
+    <body id="body" class="layout-top-nav text-sm">
+        {% if response.getHeaders().get('currentId') !== false %}
+            {% set currentId = response.getHeaders().get('currentId') %}
+        {% else %}
+            {% set currentId = null %}
+        {% endif %}
+        <script>
+/* globals dataCollection */
+if (!window.dataCollection) {
+    window.name = 'Bazaari';
+    //For all data collection. Section Data collection, has list of fields, whole section HTML, section fields data
+    window.dataCollection = { };
+    dataCollection = window.dataCollection;
+    dataCollection.env = { };
+    dataCollection.env.devmode = '{{config.dev}}';
+    dataCollection.env.coreVer = '{{core.getVersion()}}';
+    dataCollection.env.wizard = false;
+    dataCollection.env.breadcrumb = '{{breadcrumb}}';
+    //Paths
+    dataCollection.env.httpScheme = '{{request.getScheme()}}';
+    dataCollection.env.httpHost = '{{request.getHttpHost()}}';
+    dataCollection.env.rootPath = '{{request.getScheme()}}' + '://' + '{{request.getHttpHost()}}' + '/';
+    var exclusive = "{{domains.domain['exclusive_to_default_app']}}";
+    if (exclusive == '1') {
+        dataCollection.env.appRoute = "";
+    } else {
+        dataCollection.env.appRoute = "{{apps.getAppInfo()['route']}}";
+    }
+    dataCollection.env.websocketAppRoute = "{{apps.getAppInfo()['route']}}";
+    dataCollection.env.jsPath =
+        dataCollection.env.rootPath +
+        "{{apps.getAppInfo()['app_type']}}" + '/' +
+        "{{strtolower(modules.views.getViewInfo()['name'])}}" + '/' + 'js/';
+    dataCollection.env.cssPath =
+        dataCollection.env.rootPath +
+        "{{apps.getAppInfo()['app_type']}}" + '/' +
+        "{{strtolower(modules.views.getViewInfo()['name'])}}" + '/' + 'css/';
+    dataCollection.env.imagesPath =
+        dataCollection.env.rootPath +
+        "{{apps.getAppInfo()['app_type']}}" + '/' +
+        "{{strtolower(modules.views.getViewInfo()['name'])}}" + '/' + 'images/';
+    dataCollection.env.soundPath =
+        dataCollection.env.rootPath +
+        "{{apps.getAppInfo()['app_type']}}" + '/' +
+        "{{strtolower(modules.views.getViewInfo()['name'])}}" + '/' + 'sounds/';
+
+    dataCollection.env.sounds = { };
+    dataCollection.env.sounds.pnotifySound = new Audio(dataCollection.env.soundPath + 'pnotify.mp3');
+    dataCollection.env.sounds.swalSound = new Audio(dataCollection.env.soundPath + 'swal.mp3');
+    dataCollection.env.sounds.notificationSound = new Audio(dataCollection.env.soundPath + 'notification.mp3');
+    dataCollection.env.sounds.messengerSound = new Audio(dataCollection.env.soundPath + 'messenger.mp3');
+
+    dataCollection.env.notifications = { };
+    dataCollection.env.account = { };
+
+    dataCollection.env.fontsPath =
+        dataCollection.env.rootPath +
+        "{{apps.getAppInfo()['app_type']}}" + '/' +
+        "{{strtolower(modules.views.getViewInfo()['name'])}}" + '/' + 'fonts/';
+    dataCollection.env.libsLoaded = false;
+    var uri = window.location.href.replace(dataCollection.env.rootPath, '');
+    var splitUri = uri.split('/q/');
+    dataCollection.env.currentRoute = '/' + splitUri[0];
+    if (splitUri[1]) {
+        dataCollection.env.currentQuery = splitUri[1];
+    } else {
+        dataCollection.env.currentQuery = '';
+    }
+
+    dataCollection.env.currentId = "{{currentId}}";
+}
+</script>
+        {% if config.debug === true %}
+            <script>
+if (localStorage.getItem('bazDevMode') === null) {
+    localStorage.setItem('bazDevMode', null);
+}
+</script>
+        {% endif %}
+        <div class="wrapper">
+            {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/header/view') %}
+            {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/content/view') %}
+            {% if modules.components.getComponentByClassForAppId('Messenger', apps.getAppInfo()['id']) %}
+                {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/messenger/view') %}
+            {% endif %}
+            {% include(modules.views.getPhalconViewPath() ~ 'layouts/common/footer/view') %}
+        </div>
+    </body>
+</html>

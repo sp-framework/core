@@ -2,11 +2,23 @@
     "name"          : "Templates",
     "display_name"  : "Templates",
     "description"   : "Basepackage Templates",
-    "app_type"      : "dash",
-    "category"      : "system",
-    "sub_category"  : "tools",
-    "version"       : "0.0.1",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "basepackages",
+    "version"       : "0.0.0",
     "repo"          : "https://.../",
     "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Templates",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
     "settings"      : {"componentRoute":"system/templates"}
 }

@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\LoggerServiceProvider;
 
-use Phalcon\Logger as PhalconLogger;
+use Phalcon\Logger\Logger as PhalconLogger;
 use Phalcon\Logger\Adapter\Noop;
 use Phalcon\Logger\Adapter\Stream;
 use Phalcon\Logger\Formatter\Json;
@@ -27,13 +27,15 @@ class Logger
 
     protected $request;
 
+    protected $helper;
+
     protected $email;
 
     protected $customFormatter;
 
     protected $oneDbEntry = true;//True to make only 1 DB Entry
 
-    public function __construct($logsConfig, $session, $connection, $request, $email)
+    public function __construct($logsConfig, $session, $connection, $request, $helper, $email = null)
     {
         $this->logsConfig = $logsConfig;
 
@@ -44,6 +46,8 @@ class Logger
         $this->request = $request;
 
         $this->email = $email;
+
+        $this->helper = $helper;
     }
 
     public function init()
@@ -56,61 +60,77 @@ class Logger
 
         $this->customFormatter =
             new CustomFormat(
-                'c',
+                $this->request->getClientAddress(),
                 $this->session->getId(),
                 $this->connection->getId(),
-                $this->request->getClientAddress()
+                $this->helper,
+                'c',
             );
 
         $streamAdapter = new Stream($savePath . 'exceptions.log');
         $streamAdapter->setFormatter($this->customFormatter);
 
-        $this->logExceptions = new PhalconLogger(
-            'messages',
-            ['stream'        => $streamAdapter]
-        );
+        if ($this->logsConfig->exceptions) {
+            $this->logExceptions = new PhalconLogger(
+                'messages',
+                ['exceptions'        => $streamAdapter]
+            );
 
-        $this->logExceptions->getAdapter('stream')->begin();
+            $this->logExceptions->setLogLevel($this->logExceptions::ALERT);
+
+            $this->logExceptions->getAdapter('exceptions')->begin();
+        }
 
         if ($this->logsConfig->enabled) {
-            if ($this->logsConfig->service === 'streamLogs') {
-                $streamAdapter = new Stream($savePath . 'debug.log');
+            if (PHP_SAPI === 'cli') {
+                $streamAdapter = new Stream($savePath . 'cli.log');
                 $streamAdapter->setFormatter($this->customFormatter);
 
                 $this->log = new PhalconLogger(
                     'messages',
-                    ['stream'        => $streamAdapter]
+                    ['cli'        => $streamAdapter]
                 );
 
-                $this->log->getAdapter('stream')->begin();
+                $this->log->getAdapter('cli')->begin();
+            } else {
+                if ($this->logsConfig->service === 'streamLogs') {
+                    $streamAdapter = new Stream($savePath . 'debug.log');
+                    $streamAdapter->setFormatter($this->customFormatter);
 
-            } else if ($this->logsConfig->service === 'dbLogs') {
+                    $this->log = new PhalconLogger(
+                        'messages',
+                        ['logs'        => $streamAdapter]
+                    );
 
-                $dbAdapter = new DbAdapter($this->oneDbEntry);
-                $dbAdapter->setFormatter($this->customFormatter);
+                    $this->log->getAdapter('logs')->begin();
 
-                $this->log = new PhalconLogger(
-                    'messages',
-                    ['db'            => $dbAdapter]
-                );
+                } else if ($this->logsConfig->service === 'dbLogs') {
 
-                $this->log->getAdapter('db')->begin();
+                    $dbAdapter = new DbAdapter($this->oneDbEntry, $this->helper);
+                    $dbAdapter->setFormatter($this->customFormatter);
+
+                    $this->log = new PhalconLogger(
+                        'messages',
+                        ['db'            => $dbAdapter]
+                    );
+
+                    $this->log->getAdapter('db')->begin();
+                }
+
+                $this->setLogLevel();
+
+                if ($this->email && $this->logsConfig->emergencyLogsEmail) {
+                    $emailAdapter = new EmailAdapter($this->email, $this->logsConfig, $this->helper);
+                    $emailAdapter->setFormatter($this->customFormatter);
+
+                    $this->logEmail = new PhalconLogger(
+                        'messages',
+                        ['email'         => $emailAdapter]
+                    );
+
+                    $this->logEmail->getAdapter('email')->begin();
+                }
             }
-
-            $this->setLogLevel();
-
-            if ($this->logsConfig->email) {
-                $emailAdapter = new EmailAdapter($this->email, $this->logsConfig);
-                $emailAdapter->setFormatter($this->customFormatter);
-
-                $this->logEmail = new PhalconLogger(
-                    'messages',
-                    ['email'         => $emailAdapter]
-                );
-
-                $this->logEmail->getAdapter('email')->begin();
-            }
-
         } else {
             //Blackhole
             $noopAdapter = new Noop();
@@ -139,47 +159,54 @@ class Logger
 
     public function commit()
     {
-        if ($this->logsConfig->enabled) {
+        if ($this->logsConfig->exceptions) {
             if ($this->logsConfig->service === 'streamLogs') {
-
-                if ($this->log->getAdapter('stream')->inTransaction()) {
-                    $this->log->getAdapter('stream')->commit();
+                if ($this->logExceptions->getAdapter('exceptions')->inTransaction()) {
+                    $this->logExceptions->getAdapter('exceptions')->commit();
                 }
+            }
+        }
 
-            } else if ($this->logsConfig->service === 'dbLogs') {
-
-                if ($this->oneDbEntry) {
-
-                    if ($this->log->getAdapter('db')->inTransaction()) {
-                        $this->log->getAdapter('db')->commit();
-                        $this->log->getAdapter('db')->addToDb();
+        if ($this->logsConfig->enabled) {
+            if (PHP_SAPI === 'cli') {
+                if ($this->log->getAdapter('cli')->inTransaction()) {
+                    $this->log->getAdapter('cli')->commit();
+                }
+            } else {
+                if ($this->logsConfig->service === 'streamLogs') {
+                    if ($this->log->getAdapter('logs')->inTransaction()) {
+                        $this->log->getAdapter('logs')->commit();
                     }
-                } else {
-
-                    if ($this->log->getAdapter('db')->inTransaction()) {
-                        $this->log->getAdapter('db')->commit();
+                } else if ($this->logsConfig->service === 'dbLogs') {
+                    if ($this->oneDbEntry) {
+                        if ($this->log->getAdapter('db')->inTransaction()) {
+                            $this->log->getAdapter('db')->commit();
+                            $this->log->getAdapter('db')->addToDb();
+                        }
+                    } else {
+                        if ($this->log->getAdapter('db')->inTransaction()) {
+                            $this->log->getAdapter('db')->commit();
+                        }
                     }
                 }
             }
         }
+
+        $this->commitEmail();
     }
 
-    public function commitEmail($message = null)
+    public function commitEmail($message = null, $type = 'alert')
     {
-        if ($this->logsConfig->enabled) {
-            if ($this->logsConfig->email) {
-                if ($message) {
-                    $this->logEmail->emergency($message);
-                }
-
-                if ($this->logEmail->getAdapter('email')->inTransaction()) {
-                    $this->logEmail->getAdapter('email')->commit();
-                }
-
-                $this->logEmail->getAdapter('email')->sendEmail();
+        if ($this->email && $this->logsConfig->emergencyLogsEmail) {
+            if ($message) {
+                $this->logEmail->$type($message);
             }
-        } else {
-            return 'logging is disabled';
+
+            if ($this->logEmail->getAdapter('email')->inTransaction()) {
+                $this->logEmail->getAdapter('email')->commit();
+            }
+
+            return $this->logEmail->getAdapter('email')->sendEmail();
         }
     }
 
@@ -217,5 +244,48 @@ class Logger
                 $this->log->setLogLevel($this->log::INFO);
                 break;
         }
+    }
+
+    public function getLogLevels()
+    {
+        return
+            [
+                [
+                    'id'    => 'EMERGENCY',
+                    'name'  => 'EMERGENCY'
+                ],
+                [
+                    'id'    => 'CRITICAL',
+                    'name'  => 'CRITICAL'
+                ],
+                [
+                    'id'    => 'ALERT',
+                    'name'  => 'ALERT'
+                ],
+                [
+                    'id'    => 'ERROR',
+                    'name'  => 'ERROR'
+                ],
+                [
+                    'id'    => 'WARNING',
+                    'name'  => 'WARNING'
+                ],
+                [
+                    'id'    => 'NOTICE',
+                    'name'  => 'NOTICE'
+                ],
+                [
+                    'id'    => 'INFO',
+                    'name'  => 'INFO'
+                ],
+                [
+                    'id'    => 'DEBUG',
+                    'name'  => 'DEBUG'
+                ],
+                [
+                    'id'    => 'CUSTOM',
+                    'name'  => 'CUSTOM'
+                ],
+            ];
     }
 }

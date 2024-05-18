@@ -1,0 +1,201 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'geo',
+                'fieldLabel'                     : 'Download and extract Geo Locations Data',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Download & Extract from github repository',
+                'fieldRequired'                  : false,
+                'fieldDisabled'                  : false,
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'timezone',
+                'fieldLabel'                     : 'Download and extract Timezone Data',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Download & Extract Timezone data from wikipedia',
+                'fieldRequired'                  : false,
+                'fieldCheckboxChecked'           : true,
+                'fieldCheckboxType'              : 'primary',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'ip',
+                'fieldLabel'                     : 'Download and extract Geo Locations IP Data',
+                'fieldType'                      : 'checkbox',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Download & Extract from IP 2 Location',
+                'fieldRequired'                  : false,
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'token',
+                'fieldLabel'                     : 'IP2Location Token',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Get Ip to location token from ip2location.com',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                     : 'button',
+                'buttons'                        :
+                    {
+                        'download-extract' : {
+                            'title'                   : 'Process',
+                            'size'                    : 'sm',
+                            'type'                    : 'success',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'url'                     : links.url('devtools/extractgeodata/process')
+                        }
+                    }
+            ]
+        )}}
+    </div>
+</div>
+<br>
+<div id="download-progress" hidden></div>
+<script>
+/* globals BazProgress PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-geo'                                      : { },
+        '{{componentId}}-{{sectionId}}-timezone'                                 : { },
+        '{{componentId}}-{{sectionId}}-token'                                    : { },
+        '{{componentId}}-{{sectionId}}-ip'                                       : {
+            afterInit : function() {
+                BazProgress.buildProgressBar($('#download-progress'), false, false, true);
+
+                $('#{{componentId}}-{{sectionId}}-download-extract').click(function(e) {
+                    e.preventDefault();
+                    // $(this).addClass('disabled');
+                    // $('#{{componentId}}-{{sectionId}}-download-extract').children().attr('hidden', false);
+
+                    var url = $(this).attr('href');
+                    var postData = { };
+
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['geo'] = $('#{{componentId}}-{{sectionId}}-geo')[0].checked;
+                    postData['timezone'] = $('#{{componentId}}-{{sectionId}}-timezone')[0].checked;
+                    postData['ip'] = $('#{{componentId}}-{{sectionId}}-ip')[0].checked;
+                    postData['token'] = $('#{{componentId}}-{{sectionId}}-token').val();
+
+                    if (postData['ip'] == true && postData['token'] === '') {
+                        $('#{{componentId}}-{{sectionId}}-token').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-token').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+
+                        return;
+                    }
+
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success({
+                                'title' : response.responseMessage
+                            });
+                            $('#{{componentId}}-{{sectionId}}-download-extract').removeClass('disabled');
+                            $('#{{componentId}}-{{sectionId}}-download-extract').siblings().removeClass('d-none');
+
+                        } else {
+                            PNotify.error({
+                                'title' : response.responseMessage
+                            });
+                            $('#{{componentId}}-{{sectionId}}-download-extract').removeClass('disabled');
+                            $('#{{componentId}}-{{sectionId}}-download-extract').children().attr('hidden', true);
+
+                        }
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+    });
+</script>

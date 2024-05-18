@@ -1,0 +1,120 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'views',
+                'fieldLabel'                     : 'Views',
+                'fieldType'                      : 'html',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Views are templates of an app. Multiple views can be enabled. Views are attached to app via domain configuration.',
+                'fieldRequired'                  : false,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
+</div>
+{% if views is defined and views|length > 0 %}
+    <div class="row">
+        <div class="col">
+            {% set viewIds = [] %}
+            {% include 'apps/tables/modules' with
+                [
+                    'component'             : component,
+                    'componentId'           : componentId,
+                    'parent'                : parent,
+                    'sectionId'             : sectionId,
+                    'moduleType'            : 'view',
+                    'mandatoryModules'      : mandatoryViews,
+                    'modules'               : views
+                ]
+            %}
+            {% for view in views %}
+                {% set viewIds[componentId ~ '-' ~ sectionId ~ '-view-' ~ view['id']] = view['id'] %}
+            {% endfor %}
+            {% set viewIds = json_encode(viewIds, 16) %}
+        </div>
+    </div>
+{% else %}
+    <label>No views available for this app type. Go to <a href="{{links.url('modules')}}" class="contentAjaxLink">modules</a> and download views.</label>
+    {% set viewIds = json_encode([]) %}
+{% endif %}
+<script>
+/* globals Sortable */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-views'                           : {
+            afterInit: function() {
+                var viewIds = { };
+                viewIds = JSON.parse('{{viewIds}}');
+
+                if (Object.keys(viewIds).length === 0) {//if not able to parse json properly during wizard
+                    $('#{{componentId}}-{{sectionId}}-view-table input').each(function(index, input) {
+                        if ($(input).data('type') === 'view') {
+                            viewIds[$(input)[0].id] = $(input).data('id');
+                        }
+                    });
+
+                    if (Object.keys(viewIds).length > 0) {
+                        initCheckboxes();
+                    }
+                } else if (Object.keys(viewIds).length > 0) {
+                    initCheckboxes();
+                }
+
+                function initCheckboxes() {
+                    window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['views'] = { };
+
+                    for (var viewCheckbox in viewIds) {
+                        $('#' + viewCheckbox).click(function() {
+                            var id = $(this)[0].id;
+                            extractViewCheckboxData(id);
+                        });
+                        extractViewCheckboxData(viewCheckbox);
+                    }
+                }
+
+                function extractViewCheckboxData(viewCheckbox) {
+                    var viewId = $('#' + viewCheckbox).data('id');
+
+                    if ($('#' + viewCheckbox)[0].checked === true) {
+                        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['views'][$('#' + viewCheckbox).data('id')] = true;
+                    } else {
+                        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['views'][$('#' + viewCheckbox).data('id')] = false;
+                    }
+                }
+            }
+        }
+    });
+</script>

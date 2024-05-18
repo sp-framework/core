@@ -1,0 +1,47 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('tabs',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : 'main',
+                'tabsId'                        : 'settings',
+                'tabsStyle'                     : 'card-outline-tabs',
+                'tabsData'                      :
+                    [
+                        'debugging'   :
+                        [
+                            'tabTitle'          : 'Debugging',
+                            'tabInclude'        : 'core/form/settings/debugging'
+                        ],
+                        'caching'   :
+                        [
+                            'tabTitle'          : 'Caching',
+                            'tabInclude'        : 'core/form/settings/caching'
+                        ],
+                        'security'   :
+                        [
+                            'tabTitle'          : 'Security',
+                            'tabInclude'        : 'core/form/settings/security'
+                        ],
+                        'logging'   :
+                        [
+                            'tabTitle'          : 'Logging',
+                            'tabInclude'        : 'core/form/settings/logging'
+                        ],
+                        'websocket'   :
+                        [
+                            'tabTitle'          : 'Web Socket',
+                            'tabInclude'        : 'core/form/settings/websocket'
+                        ],
+                        'timeout'   :
+                        [
+                            'tabTitle'          : 'Timeout',
+                            'tabInclude'        : 'core/form/settings/timeout'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>

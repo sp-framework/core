@@ -1,0 +1,42 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('tabs',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : 'main',
+                'tabsId'                        : 'settings',
+                'tabsStyle'                     : 'card-outline-tabs',
+                'tabsData'                      :
+                    [
+                        'encryption'   :
+                        [
+                            'tabTitle'          : 'Encryption',
+                            'tabInclude'        : 'core/form/settings/security/encryption'
+                        ],
+                        'session'   :
+                        [
+                            'tabTitle'          : 'Session',
+                            'tabInclude'        : 'core/form/settings/security/session'
+                        ],
+                        'password'   :
+                        [
+                            'tabTitle'          : 'Password',
+                            'tabInclude'        : 'core/form/settings/security/password'
+                        ],
+                        'twofa'   :
+                        [
+                            'tabTitle'          : '2 Factor Authentication',
+                            'tabInclude'        : 'core/form/settings/security/twofa'
+                        ],
+                        'agent'   :
+                        [
+                            'tabTitle'          : 'Agent',
+                            'tabInclude'        : 'core/form/settings/security/agent'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>

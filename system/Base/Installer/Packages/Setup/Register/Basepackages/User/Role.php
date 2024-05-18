@@ -2,25 +2,60 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\User;
 
-use Phalcon\Helper\Json;
-
 class Role
 {
-    public function register($db)
+    protected $helper;
+
+    public function registerCoreRole($db, $ff, $helper)
     {
-        $insertAdminRole = $db->insertAsDict(
-            'basepackages_users_roles',
+        $role =
             [
                 'name'              => 'System Administrators',
                 'description'       => 'System Administrators Role',
-                'permissions'       => Json::encode([])
-            ]
-        );
+                'type'              => 0,
+                'permissions'       => $helper->encode([])
+            ];
 
-        if ($insertAdminRole) {
-            return $db->lastInsertId();
-        } else {
-            return null;
+        if ($db) {
+            $db->insertAsDict('basepackages_users_roles', $role);
+        }
+
+        if ($ff) {
+            $roleStore = $ff->store('basepackages_users_roles');
+
+            $roleStore->updateOrInsert($role);
+        }
+    }
+
+    public function registerRegisteredUserAndGuestRoles($db, $ff, $helper)
+    {
+        $registered =
+            [
+                'name'              => 'Registered Users',
+                'description'       => 'Registered Users Role',
+                'type'              => 1,
+                'permissions'       => $helper->encode([])
+            ];
+
+        $guest =
+            [
+                'name'              => 'Guests',
+                'description'       => 'Guests Role',
+                'type'              => 1,
+                'permissions'       => $helper->encode([])
+            ];
+
+
+        if ($db) {
+            $db->insertAsDict('basepackages_users_roles', $registered);
+            $db->insertAsDict('basepackages_users_roles', $guest);
+        }
+
+        if ($ff) {
+            $roleStore = $ff->store('basepackages_users_roles');
+
+            $roleStore->updateOrInsert($registered);
+            $roleStore->updateOrInsert($guest);
         }
     }
 }

@@ -1,0 +1,24 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'description',
+                'fieldLabel'                     : 'Module Description',
+                'fieldType'                      : 'trumbowyg',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Description of the module',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldValue'                     : moduleDescription
+            ]
+        )}}
+    </div>
+</div>

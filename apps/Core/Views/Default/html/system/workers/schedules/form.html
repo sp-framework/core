@@ -1,0 +1,972 @@
+{% if schedule['id'] is defined %}
+    {% set scheduleId = schedule['id'] %}
+    {% set scheduleName = schedule['name'] %}
+    {% set scheduleDescription = schedule['description'] %}
+    {% set scheduleType = schedule['type'] %}
+    {% set scheduleScheduleType = schedule['schedule']['type'] %}
+{% else %}
+    {% set scheduleId = '' %}
+    {% set scheduleName = '' %}
+    {% set scheduleDescription = '' %}
+    {% set scheduleType = '1' %}
+    {% set scheduleScheduleType = 'everyxseconds' %}
+{% endif %}
+
+{% set everyxsecondsHidden = 'hidden' %}
+{% set everyxSeconds = '00,15,30,45' %}
+
+{% set everyminuteHidden = 'hidden' %}
+
+{% set everyxminutesHidden = 'hidden' %}
+{% set everyxminutesMinutes = '2' %}
+
+{% set everyxminutesbetweenHidden = 'hidden' %}
+{% set everyxminutesbetweenMinutes = '1' %}
+{% set everyxminutesbetweenStart = '00:00' %}
+{% set everyxminutesbetweenEnd = '00:00' %}
+
+{% set hourlyHidden = 'hidden' %}
+{% set hourlyMinutes = '00' %}
+
+{% set dailyHidden = 'hidden' %}
+{% set dailyHours = '00' %}
+{% set dailyMinutes = '00' %}
+
+{% set weeklyHidden = 'hidden' %}
+{% set weeklyDays = ['0','1','2','3','4','5','6'] %}
+{% set weeklyHours = '00' %}
+{% set weeklyMinutes = '00' %}
+
+{% set monthlyHidden = 'hidden' %}
+{% set monthlyMonths = ['1','2','3','4','5','6','7','8','9','10','11','12'] %}
+{% set monthlyDay = '1' %}
+{% set monthlyHours = '00' %}
+{% set monthlyMinutes = '00' %}
+
+{% if scheduleScheduleType === 'everyxseconds' %}
+    {% set everyxsecondsHidden = '' %}
+    {% if schedule['id'] is defined %}
+        {% set everyxSeconds = schedule['schedule']['params']['seconds'] %}
+    {% endif %}
+{% elseif scheduleScheduleType === 'everyminute' %}
+    {% set everyminuteHidden = '' %}
+{% elseif scheduleScheduleType === 'everyxminutes' %}
+    {% set everyxminutesHidden = '' %}
+    {% if schedule['id'] is defined %}
+        {% set everyxminutesMinutes = schedule['schedule']['params']['minutes'] %}
+    {% endif %}
+{% elseif scheduleScheduleType === 'everyxminutesbetween' %}
+    {% set everyxminutesbetweenHidden = '' %}
+    {% if schedule['id'] is defined %}
+        {% set everyxminutesbetweenMinutes = schedule['schedule']['params']['minutes'] %}
+        {% set everyxminutesbetweenStart = schedule['schedule']['params']['start'] %}
+        {% set everyxminutesbetweenEnd = schedule['schedule']['params']['end'] %}
+    {% endif %}
+{% elseif scheduleScheduleType === 'hourly' %}
+    {% set hourlyHidden = '' %}
+    {% if schedule['id'] is defined %}
+        {% set hourlyMinutes = schedule['schedule']['params']['hourly_minutes'] %}
+    {% endif %}
+{% elseif scheduleScheduleType === 'daily' %}
+    {% set dailyHidden = '' %}
+    {% if schedule['id'] is defined %}
+        {% set dailyHours = schedule['schedule']['params']['daily_hours'] %}
+        {% set dailyMinutes = schedule['schedule']['params']['daily_minutes'] %}
+    {% endif %}
+{% elseif scheduleScheduleType === 'weekly' %}
+    {% set weeklyHidden = '' %}
+    {% if schedule['id'] is defined %}
+        {% set weeklyDays = schedule['schedule']['params']['weekly_days'] %}
+        {% set weeklyHours = schedule['schedule']['params']['weekly_hours'] %}
+        {% set weeklyMinutes = schedule['schedule']['params']['weekly_minutes'] %}
+    {% endif %}
+{% elseif scheduleScheduleType === 'monthly' %}
+    {% set monthlyHidden = '' %}
+    {% if schedule['id'] is defined %}
+        {% set monthlyMonths = schedule['schedule']['params']['monthly_months'] %}
+        {% set monthlyDay = schedule['schedule']['params']['monthly_day'] %}
+        {% set monthlyHours = schedule['schedule']['params']['monthly_hours'] %}
+        {% set monthlyMinutes = schedule['schedule']['params']['monthly_minutes'] %}
+    {% endif %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Schedule ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : scheduleId
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'type',
+                        'fieldLabel'                     : 'Type',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Schedule Type',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : scheduleType
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Name Example: Every Hour',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : scheduleName
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'description',
+                        'fieldLabel'                     : 'Description',
+                        'fieldType'                      : 'textarea',
+                        'fieldDataMaxLength'             : 1024,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Description',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : scheduleDescription
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row vdivide">
+            <div class="col-md-3">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'schedule',
+                        'fieldLabel'                     : 'Schedule',
+                        'fieldType'                      : 'radio',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select repository provider.',
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioButtons'              :
+                            [
+                                'everyxseconds' :
+                                    [
+                                        'title'          : 'Every X Seconds of a Minute',
+                                        'type'           : 'danger',
+                                        'dataValue'      : 'everyxseconds'
+                                    ],
+                                'everyminute' :
+                                    [
+                                        'title'          : 'Every Minute',
+                                        'type'           : 'danger',
+                                        'dataValue'      : 'everyminute'
+                                    ],
+                                'everyxminutes' :
+                                    [
+                                        'title'          : 'Every X Minutes',
+                                        'type'           : 'warning',
+                                        'dataValue'      : 'everyxminutes'
+                                    ],
+                                'everyxminutesbetween' :
+                                    [
+                                        'title'          : 'Every X Minutes Between',
+                                        'type'           : 'warning',
+                                        'dataValue'      : 'everyxminutesbetween'
+                                    ],
+                                'hourly' :
+                                    [
+                                        'title'          : 'Hourly',
+                                        'type'           : 'info',
+                                        'dataValue'      : 'hourly'
+                                    ],
+                                'daily' :
+                                    [
+                                        'title'          : 'Daily',
+                                        'type'           : 'info',
+                                        'dataValue'      : 'daily'
+                                    ],
+                                'weekly' :
+                                    [
+                                        'title'          : 'Weekly',
+                                        'type'           : 'info',
+                                        'dataValue'      : 'weekly'
+                                    ],
+                                'monthly' :
+                                    [
+                                        'title'          : 'Monthly',
+                                        'type'           : 'info',
+                                        'dataValue'      : 'monthly'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : scheduleScheduleType
+                    ]
+                )}}
+            </div>
+            <div class="col schedules" id="{{componentId}}-{{sectionId}}-everyxseconds" {{everyxsecondsHidden}}>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'everyxseconds',
+                                'fieldLabel'                            : 'Seconds',
+                                'fieldType'                             : 'input',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Seconds of the minute. Example: If you want to run a script/function every 10th and 20th second, enter 10,20 in the field.',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldValue'                            : everyxSeconds
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="callout callout-danger">
+                    <h5>Every X Seconds of the minute</h5>
+                    <p>Task with this schedule will run every <span class="text-warning" id="{{componentId}}-{{sectionId}}-everyxminutes-span">{{everyxSeconds}}</span> seconds of the minute.</p>
+                </div>
+            </div>
+            <div class="col schedules" id="{{componentId}}-{{sectionId}}-everyminute" {{everyminuteHidden}}>
+                <div class="callout callout-danger">
+                    <h5>Every Minute</h5>
+                    <p>Task with this schedule will run every minute.</p>
+                </div>
+            </div>
+            <div class="col schedules" id="{{componentId}}-{{sectionId}}-everyxminutes" {{everyxminutesHidden}}>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'everyxminutes_minutes',
+                                'fieldLabel'                            : 'Minutes',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Minutes between 2 and 1339 (24 Hours)',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldDataInputMinNumber'               : 2,
+                                'fieldDataInputMaxNumber'               : 1339,
+                                'fieldValue'                            : everyxminutesMinutes
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="callout callout-warning">
+                    <h5>Every X Minutes</h5>
+                    <p>Task with this schedule will run every <span class="text-warning" id="{{componentId}}-{{sectionId}}-everyxminutes-span">{{everyxminutesMinutes}}</span> minutes from the moment it starts.</p>
+                </div>
+            </div>
+            <div class="col schedules" id="{{componentId}}-{{sectionId}}-everyxminutes-between" {{everyxminutesbetweenHidden}}>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'everyxminutesbetween_minutes',
+                                'fieldLabel'                            : 'Minutes',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Minutes between 0 and 59 (1 Hour)',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldDataInputMinNumber'               : 0,
+                                'fieldDataInputMaxNumber'               : 59,
+                                'fieldValue'                            : everyxminutesbetweenMinutes
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'everyxminutesbetween_start',
+                                'fieldLabel'                            : 'Between Start Time',
+                                'fieldType'                             : 'flatpickr',
+                                'fieldFlatpickrClearButton'             : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Between Start Time',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldValue'                            : everyxminutesbetweenStart
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'everyxminutesbetween_end',
+                                'fieldLabel'                            : 'Between End Time',
+                                'fieldType'                             : 'flatpickr',
+                                'fieldFlatpickrClearButton'             : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Between End Time',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldValue'                            : everyxminutesbetweenEnd
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="callout callout-warning">
+                    <h5>Every X Minutes Between</h5>
+                    <p>Task with this schedule will run every <span class="text-warning" id="{{componentId}}-{{sectionId}}-everyxminutesbetween-span">{{everyxminutesbetweenMinutes}}</span> minutes between <span class="text-warning" id="{{componentId}}-{{sectionId}}-everyxminutesbetween_start-span">{{everyxminutesbetweenStart}}</span> and <span class="text-warning" id="{{componentId}}-{{sectionId}}-everyxminutesbetween_end-span">{{everyxminutesbetweenEnd}}</span>.</p>
+                </div>
+            </div>
+            <div class="col schedules" id="{{componentId}}-{{sectionId}}-hourly" {{hourlyHidden}}>
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'hourly_minutes',
+                        'fieldLabel'                            : 'Minutes',
+                        'fieldType'                             : 'input',
+                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Minutes between 0 and 59',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldDataInputMinNumber'               : 0,
+                        'fieldDataInputMaxNumber'               : 59,
+                        'fieldValue'                            : hourlyMinutes
+                    ]
+                )}}
+                <div class="callout callout-info">
+                    <h5>Hourly</h5>
+                    <p>Task with this schedule will run every hour. If minutes are specified the task will run <span class="text-info" id="{{componentId}}-{{sectionId}}-hourly-span">00</span> minutes past the hour.</p>
+                </div>
+            </div>
+            <div class="col schedules" id="{{componentId}}-{{sectionId}}-daily" {{dailyHidden}}>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'daily_hours',
+                                'fieldLabel'                            : 'Hours',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Hours between 0 and 23',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldDataInputMinNumber'               : 0,
+                                'fieldDataInputMaxNumber'               : 23,
+                                'fieldValue'                            : dailyHours
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'daily_minutes',
+                                'fieldLabel'                            : 'Minutes',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Minutes between 0 and 59',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldDataInputMinNumber'               : 0,
+                                'fieldDataInputMaxNumber'               : 59,
+                                'fieldValue'                            : dailyMinutes
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="callout callout-info">
+                    <h5>Daily</h5>
+                    <p>Task with this schedule will run every day. If hour and minutes are specified the task will run daily at <span class="text-info" id="{{componentId}}-{{sectionId}}-hourly-hour-span">{{dailyHours}}</span>:<span class="text-info" id="{{componentId}}-{{sectionId}}-hourly-minutes-span">{{dailyMinutes}}</span> hour.</p>
+                </div>
+            </div>
+            <div class="col schedules" id="{{componentId}}-{{sectionId}}-weekly" {{weeklyHidden}}>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'weekly_days',
+                                'fieldLabel'                            : 'Days',
+                                'fieldType'                             : 'select2',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Days of the week.',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataSelect2Multiple'              : true,
+                                'fieldDataSelect2Options'               : weekdays,
+                                'fieldDataSelect2OptionsKey'            : 'id',
+                                'fieldDataSelect2OptionsValue'          : 'name',
+                                'fieldDataSelect2OptionsArray'          : true,
+                                'fieldDataSelect2OptionsSelected'       : weeklyDays
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'weekly_hours',
+                                'fieldLabel'                            : 'Hours',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Hours between 0 and 23',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldDataInputMinNumber'               : 0,
+                                'fieldDataInputMaxNumber'               : 23,
+                                'fieldValue'                            : weeklyHours
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'weekly_minutes',
+                                'fieldLabel'                            : 'Minutes',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Minutes between 0 and 59',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldDataInputMinNumber'               : 0,
+                                'fieldDataInputMaxNumber'               : 59,
+                                'fieldValue'                            : weeklyMinutes
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="callout callout-info">
+                    <h5>Weekly</h5>
+                    <p>Task with this schedule will run on <span class="text-info" id="{{componentId}}-{{sectionId}}-weekly-days-span">Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday</span> at <span class="text-info" id="{{componentId}}-{{sectionId}}-weekly-hour-span">{{weeklyHours}}</span>:<span class="text-info" id="{{componentId}}-{{sectionId}}-weekly-minutes-span">{{weeklyMinutes}}</span> hour.</p>
+                </div>
+            </div>
+            <div class="col schedules" id="{{componentId}}-{{sectionId}}-monthly" {{monthlyHidden}}>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'monthly_months',
+                                'fieldLabel'                            : 'Months',
+                                'fieldType'                             : 'select2',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Months of the year.',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataSelect2Multiple'              : true,
+                                'fieldDataSelect2Options'               : months,
+                                'fieldDataSelect2OptionsKey'            : 'id',
+                                'fieldDataSelect2OptionsValue'          : 'name',
+                                'fieldDataSelect2OptionsArray'          : true,
+                                'fieldDataSelect2OptionsSelected'       : monthlyMonths
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'monthly_day',
+                                'fieldLabel'                            : 'Day',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Day between 1 and 31',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldDataInputMinNumber'               : 1,
+                                'fieldDataInputMaxNumber'               : 31,
+                                'fieldValue'                            : monthlyDay
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'monthly_hours',
+                                'fieldLabel'                            : 'Hours',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Hours between 0 and 23',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldDataInputMinNumber'               : 0,
+                                'fieldDataInputMaxNumber'               : 23,
+                                'fieldValue'                            : monthlyHours
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'monthly_minutes',
+                                'fieldLabel'                            : 'Minutes',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Minutes between 0 and 59',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldDataInputMinNumber'               : 0,
+                                'fieldDataInputMaxNumber'               : 59,
+                                'fieldValue'                            : monthlyMinutes
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="callout callout-info">
+                    <h5>Monthly</h5>
+                    <p>Task with this schedule will run in <span class="text-info" id="{{componentId}}-{{sectionId}}-monthly-months-span">January, February, March, April, May, June, July, August, September, October, November, December</span> on day <span class="text-info" id="{{componentId}}-{{sectionId}}-monthly-day-span"> 1 </span> of the month at <span class="text-info" id="{{componentId}}-{{sectionId}}-monthly-hour-span">00</span>:<span class="text-info" id="{{componentId}}-{{sectionId}}-monthly-minutes-span">00</span> hour.</p>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-description'                             : { },
+        '{{componentId}}-{{sectionId}}-type'                                    : { },
+        '{{componentId}}-{{sectionId}}-everyxseconds'                           : { },
+        '{{componentId}}-{{sectionId}}-everyxminutes_minutes'                   : { },
+        '{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes'            : { },
+        '{{componentId}}-{{sectionId}}-everyxminutesbetween_start'              : {
+            enableTime          : true,
+            noCalendar          : true,
+            dateFormat          : "H:i",
+            altFormat           : "H:i",
+            time_24hr           : true,
+            minuteIncrement     : 1,
+            defaultDate         : "{{everyxminutesbetweenStart}}",
+            onChange            : function(selectedDates, dateStr, instance) {
+                window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-everyxminutesbetween_end']
+                    .flatpickr.setDate(dateStr, true, "H:i");
+                window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-everyxminutesbetween_end']
+                    .flatpickr.set("minTime", dateStr);
+                $('#{{componentId}}-{{sectionId}}-everyxminutesbetween_start-span').html(dateStr);
+            }
+        },
+        '{{componentId}}-{{sectionId}}-everyxminutesbetween_end'                : {
+            enableTime          : true,
+            noCalendar          : true,
+            dateFormat          : "H:i",
+            altFormat           : "H:i",
+            time_24hr           : true,
+            minuteIncrement     : 1,
+            defaultDate         : "{{everyxminutesbetweenEnd}}",
+            onChange            : function(selectedDates, dateStr, instance) {
+                $('#{{componentId}}-{{sectionId}}-everyxminutesbetween_end-span').html(dateStr);
+            }
+        },
+        '{{componentId}}-{{sectionId}}-hourly_minutes'                          : { },
+        '{{componentId}}-{{sectionId}}-daily_hours'                             : { },
+        '{{componentId}}-{{sectionId}}-daily_minutes'                           : { },
+        '{{componentId}}-{{sectionId}}-weekly_days'                             : {
+            placeholder: 'SELECT DAYS'
+        },
+        '{{componentId}}-{{sectionId}}-weekly_hours'                            : { },
+        '{{componentId}}-{{sectionId}}-weekly_minutes'                          : { },
+        '{{componentId}}-{{sectionId}}-monthly_months'                          : {
+            placeholder: 'SELECT MONTHS'
+        },
+        '{{componentId}}-{{sectionId}}-monthly_day'                             : { },
+        '{{componentId}}-{{sectionId}}-monthly_hours'                           : { },
+        '{{componentId}}-{{sectionId}}-monthly_minutes'                         : { },
+        '{{componentId}}-{{sectionId}}-schedule'                                : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-schedule').click(function() {
+                    initSchedules();
+                });
+
+                function initSchedules() {
+                    if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'everyxseconds') {
+                        $('.schedules').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-everyxseconds').attr('hidden', false);
+
+                        $('#{{componentId}}-{{sectionId}}-everyxseconds').on('input propertychange', function() {
+                            if ($('#{{componentId}}-{{sectionId}}-everyxseconds').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-everyxseconds-span').html('X');
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-everyxseconds-span').html($('#{{componentId}}-{{sectionId}}-everyxseconds').val());
+                            }
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'everyminute') {
+                        $('.schedules').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-everyminute').attr('hidden', false);
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'everyxminutes') {
+                        $('.schedules').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-everyxminutes').attr('hidden', false);
+
+                        $('#{{componentId}}-{{sectionId}}-everyxminutes_minutes').on('input propertychange', function() {
+                            if ($('#{{componentId}}-{{sectionId}}-everyxminutes_minutes').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-everyxminutes-span').html('X');
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-everyxminutes-span').html($('#{{componentId}}-{{sectionId}}-everyxminutes_minutes').val());
+                            }
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'everyxminutesbetween') {
+                        $('.schedules').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-everyxminutes-between').attr('hidden', false);
+
+                        $('#{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes').on('input propertychange', function() {
+                            if ($('#{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-everyxminutesbetween-span').html('X');
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-everyxminutesbetween-span').html($('#{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes').val());
+                            }
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'hourly') {
+                        $('.schedules').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-hourly').attr('hidden', false);
+
+                        $('#{{componentId}}-{{sectionId}}-hourly_minutes').on('input propertychange', function() {
+                            if ($('#{{componentId}}-{{sectionId}}-hourly_minutes').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-hourly-span').html('X');
+                            } else {
+                                if ($('#{{componentId}}-{{sectionId}}-hourly_minutes').val() == 0) {
+                                    $('#{{componentId}}-{{sectionId}}-hourly-span').html('X');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-hourly-span').html($('#{{componentId}}-{{sectionId}}-hourly_minutes').val());
+                                }
+                            }
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'daily') {
+                        $('.schedules').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-daily').attr('hidden', false);
+
+                        $('#{{componentId}}-{{sectionId}}-daily_hours, #{{componentId}}-{{sectionId}}-daily_minutes').on('input propertychange', function() {
+                            if ($('#{{componentId}}-{{sectionId}}-daily_hours').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-hourly-hour-span').html('00');
+                            } else {
+                                if ($('#{{componentId}}-{{sectionId}}-daily_hours').val() == 0) {
+                                    $('#{{componentId}}-{{sectionId}}-hourly-hour-span').html('00');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-hourly-hour-span').html($('#{{componentId}}-{{sectionId}}-daily_hours').val());
+                                }
+                            }
+
+                            if ($('#{{componentId}}-{{sectionId}}-daily_minutes').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-hourly-minutes-span').html('00');
+                            } else {
+                                if ($('#{{componentId}}-{{sectionId}}-daily_minutes').val() == 0) {
+                                    $('#{{componentId}}-{{sectionId}}-hourly-minutes-span').html('00');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-hourly-minutes-span').html($('#{{componentId}}-{{sectionId}}-daily_minutes').val());
+                                }
+                            }
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'weekly') {
+                        $('.schedules').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-weekly').attr('hidden', false);
+
+                        $('#{{componentId}}-{{sectionId}}-weekly_days').change('select2:change', function(e) {
+                            var selectedDays = $('#{{componentId}}-{{sectionId}}-weekly_days').val();
+                            var days = [];
+
+                            $('#{{componentId}}-{{sectionId}}-weekly_days').children('option').each(function(index, day) {
+                                if (selectedDays.includes($(day).val())) {
+                                    days.push($(day).text());
+                                }
+                            });
+
+                            $('#{{componentId}}-{{sectionId}}-weekly-days-span').html(days.join(', '));
+                        });
+
+                        $('#{{componentId}}-{{sectionId}}-weekly_hours, #{{componentId}}-{{sectionId}}-weekly_minutes').on('input propertychange', function() {
+                            if ($('#{{componentId}}-{{sectionId}}-weekly_hours').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-weekly-hour-span').html('00');
+                            } else {
+                                if ($('#{{componentId}}-{{sectionId}}-weekly_hours').val() == 0) {
+                                    $('#{{componentId}}-{{sectionId}}-weekly-hour-span').html('00');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-weekly-hour-span').html($('#{{componentId}}-{{sectionId}}-weekly_hours').val());
+                                }
+                            }
+
+                            if ($('#{{componentId}}-{{sectionId}}-weekly_minutes').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-weekly-minutes-span').html('00');
+                            } else {
+                                if ($('#{{componentId}}-{{sectionId}}-weekly_minutes').val() == 0) {
+                                    $('#{{componentId}}-{{sectionId}}-weekly-minutes-span').html('00');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-weekly-minutes-span').html($('#{{componentId}}-{{sectionId}}-weekly_minutes').val());
+                                }
+                            }
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'monthly') {
+                        $('.schedules').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-monthly').attr('hidden', false);
+
+                        $('#{{componentId}}-{{sectionId}}-monthly_months').change('select2:change', function(e) {
+                            var selectedMonths = $('#{{componentId}}-{{sectionId}}-monthly_months').val();
+                            var months = [];
+
+                            $('#{{componentId}}-{{sectionId}}-monthly_months').children('option').each(function(index, month) {
+                                if (selectedMonths.includes($(month).val())) {
+                                    months.push($(month).text());
+                                }
+                            });
+                            $('#{{componentId}}-{{sectionId}}-monthly-months-span').html(months.join(', '));
+                        });
+
+                        $('#{{componentId}}-{{sectionId}}-monthly_day, #{{componentId}}-{{sectionId}}-monthly_hours, #{{componentId}}-{{sectionId}}-monthly_minutes').on('input propertychange', function() {
+                            if ($('#{{componentId}}-{{sectionId}}-monthly_day').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-monthly-day-span').html('X');
+                            } else {
+                                if ($('#{{componentId}}-{{sectionId}}-monthly_day').val() == 0) {
+                                    $('#{{componentId}}-{{sectionId}}-monthly-day-span').html('X');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-monthly-day-span').html($('#{{componentId}}-{{sectionId}}-monthly_day').val());
+                                }
+                            }
+
+                            if ($('#{{componentId}}-{{sectionId}}-monthly_hours').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-monthly-hour-span').html('00');
+                            } else {
+                                if ($('#{{componentId}}-{{sectionId}}-monthly_hours').val() == 0) {
+                                    $('#{{componentId}}-{{sectionId}}-monthly-hour-span').html('00');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-monthly-hour-span').html($('#{{componentId}}-{{sectionId}}-monthly_hours').val());
+                                }
+                            }
+
+                            if ($('#{{componentId}}-{{sectionId}}-monthly_minutes').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-monthly-minutes-span').html('00');
+                            } else {
+                                if ($('#{{componentId}}-{{sectionId}}-monthly_minutes').val() == 0) {
+                                    $('#{{componentId}}-{{sectionId}}-monthly-minutes-span').html('00');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-monthly-minutes-span').html($('#{{componentId}}-{{sectionId}}-monthly_minutes').val());
+                                }
+                            }
+                        });
+                    }
+                }
+
+                initSchedules();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            ignore      : ':submit, :reset, :image, :hidden, .ignore, .cr-slider',
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                            : 'required',
+                '{{componentId}}-{{sectionId}}-everyxseconds'                   : 'required',
+                '{{componentId}}-{{sectionId}}-everyxminutes_minutes'           : 'required',
+                '{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes'    : 'required',
+                '{{componentId}}-{{sectionId}}-everyxminutesbetween_start'      : 'required',
+                '{{componentId}}-{{sectionId}}-everyxminutesbetween_end'        : 'required',
+                '{{componentId}}-{{sectionId}}-hourly_minutes'                  : 'required',
+                '{{componentId}}-{{sectionId}}-daily_hours'                     : 'required',
+                '{{componentId}}-{{sectionId}}-daily_minutes'                   : 'required',
+                '{{componentId}}-{{sectionId}}-weekly_days'                     : 'required',
+                '{{componentId}}-{{sectionId}}-weekly_hours'                    : 'required',
+                '{{componentId}}-{{sectionId}}-weekly_minutes'                  : 'required',
+                '{{componentId}}-{{sectionId}}-monthly_months'                  : 'required',
+                '{{componentId}}-{{sectionId}}-monthly_day'                     : 'required',
+                '{{componentId}}-{{sectionId}}-monthly_hours'                   : 'required',
+                '{{componentId}}-{{sectionId}}-monthly_minutes'                 : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                            : 'Please enter schedule name',
+                '{{componentId}}-{{sectionId}}-everyxseconds'                   : 'Please enter seconds (comma separated)',
+                '{{componentId}}-{{sectionId}}-everyxminutes_minutes'           : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes'    : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-everyxminutesbetween_start'      : 'Please select start time',
+                '{{componentId}}-{{sectionId}}-everyxminutesbetween_end'        : 'Please select end time',
+                '{{componentId}}-{{sectionId}}-hourly_minutes'                  : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-daily_hours'                     : 'Please enter hours',
+                '{{componentId}}-{{sectionId}}-daily_minutes'                   : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-weekly_days'                     : 'Please select days',
+                '{{componentId}}-{{sectionId}}-weekly_hours'                    : 'Please enter hours',
+                '{{componentId}}-{{sectionId}}-weekly_minutes'                  : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-monthly_months'                  : 'Please select months',
+                '{{componentId}}-{{sectionId}}-monthly_day'                     : 'Please enter day',
+                '{{componentId}}-{{sectionId}}-monthly_hours'                   : 'Please enter hours',
+                '{{componentId}}-{{sectionId}}-monthly_minutes'                 : 'Please enter minutes',
+            }
+        }
+    });
+</script>

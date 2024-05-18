@@ -1,0 +1,49 @@
+{% if viewssettings['id'] is defined %}
+    {% set viewssettingsId = viewssettings['id'] %}
+    {% if viewssettings['name'] is defined %}
+        {% set title = 'Views Settings (' ~ viewssettings['name'] ~ ')' %}
+    {% else %}
+        {% set title = 'Views Settings (' ~ viewssettings['id'] ~ ')' %}
+    {% endif %}
+    {% if viewssettings['id'] == 0 %}
+        {% set viewssettingsId = '' %}
+    {% endif %}
+    {% set formButtons =
+        [
+            'updateButtonId'                : viewssettingsId,
+            'addActionUrl'                  : 'viewssettings/add',
+            'addSuccessRedirectUrl'         : 'viewssettings',
+            'updateActionUrl'               : 'viewssettings/update',
+            'updateSuccessRedirectUrl'      : 'viewssettings',
+            'cancelActionUrl'               : 'viewssettings',
+            'closeActionUrl'                : 'viewssettings'
+        ]
+    %}
+{% else %}
+    {% set viewssettingsId = '' %}
+    {% set title = 'New Views Settings' %}
+    {% set formButtons =
+        [
+            'cancelActionUrl'               : 'viewssettings',
+            'closeActionUrl'                : 'viewssettings'
+        ]
+    %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'eye',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'viewssettings/form',
+        'formButtons'                   : formButtons
+    ]
+)}}

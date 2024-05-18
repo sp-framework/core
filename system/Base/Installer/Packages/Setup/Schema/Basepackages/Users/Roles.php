@@ -38,9 +38,16 @@ class Roles
                         ]
                     ),
                     new Column(
+                        'type',//0 for system and 1 for user.
+                        [
+                            'type'    => Column::TYPE_BOOLEAN,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
                         'permissions',
                         [
-                            'type'    => Column::TYPE_TEXT,
+                            'type'    => Column::TYPE_JSON,
                             'notNull' => true,
                         ]
                     )

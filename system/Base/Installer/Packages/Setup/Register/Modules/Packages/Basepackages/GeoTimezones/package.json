@@ -1,0 +1,24 @@
+{
+    "name"          : "GeoTimezones",
+    "display_name"  : "Geo Timezones",
+    "description"   : "Basepackage Geo Timezones",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "basepackages",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Geo\\GeoTimezones",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "settings"      : {"componentRoute":"system/geo/timezones"}
+}

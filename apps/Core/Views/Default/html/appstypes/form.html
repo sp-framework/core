@@ -1,0 +1,150 @@
+{% if appsType['id'] is defined %}
+    <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+        <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'id',
+                            'fieldLabel'                     : 'Apps Type ID',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Apps Type ID',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldHidden'                    : true,
+                            'fieldDisabled'                  : true,
+                            'fieldValue'                     : appsType['id']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'name',
+                            'fieldLabel'                     : 'Apps Type Name',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Apps Type Name Example: Core',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 50,
+                            'fieldValue'                     : appsType['name']
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'app_type',
+                            'fieldLabel'                     : 'Apps Type',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Apps Type Example: core',
+                            'fieldRequired'                  : true,
+                            'fieldDisabled'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 50,
+                            'fieldValue'                     : appsType['app_type']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'description',
+                            'fieldLabel'                     : 'Description',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 1024,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Description',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazJstreeSearch'           : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 1024,
+                            'fieldTextareaRows'              : 2,
+                            'fieldValue'                     : appsType['description']
+                        ]
+                    )}}
+                </div>
+            </div>
+        </fieldset>
+    </form>
+    <script>
+/* globals Sortable */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                              : { },
+        '{{componentId}}-{{sectionId}}-name'                            : { },
+        '{{componentId}}-{{sectionId}}-app_type'                        : { },
+        '{{componentId}}-{{sectionId}}-description'                     : { },
+        '{{componentId}}-{{sectionId}}-form'                            : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                        : 'required',
+                '{{componentId}}-{{sectionId}}-route'                       : 'required',
+                '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter app name',
+                '{{componentId}}-{{sectionId}}-route'                   : 'Please enter app route',
+                '{{componentId}}-{{sectionId}}-app_type'                : 'Please enter app type',
+            }
+        }
+    });
+</script>
+{% endif %}

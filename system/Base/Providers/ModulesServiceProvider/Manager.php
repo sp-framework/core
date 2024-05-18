@@ -2,17 +2,22 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
+use Carbon\Carbon;
+use GuzzleHttp\Exception\ClientException;
 use System\Base\BasePackage;
+use System\Base\Providers\ModulesServiceProvider\Installer;
+use System\Base\Providers\ModulesServiceProvider\Settings;
+use z4kn4fein\SemVer\Version;
 
 class Manager extends BasePackage
 {
-    protected $repository;
+    protected $apiClient;
 
-    protected $localModules = [];
+    protected $apiClientConfig;
 
     protected $remoteModules = [];
+
+    protected $remoteModulesJson = [];
 
     protected $modulesData = [];
 
@@ -26,686 +31,611 @@ class Manager extends BasePackage
 
     protected $views;
 
-    public function syncRemoteWithLocal($id)
+    protected $settings = Settings::class;
+
+    public function init()
     {
-        $repository = $this->modules->repositories->getById($id);
+        return $this;
+    }
 
-        if ($repository['auth_token'] == 1 && (!$repository['password'] || $repository['password']=== '')) {
-
-            $this->addResponse('Password missing, cannot sync', 1);
-
-            return;
-        } else if ($repository['auth_token'] == 2 && (!$repository['token'] || $repository['token'] === '')) {
-
-            $this->addResponse('Token missing, cannot sync', 1);
-
-            return;
+    public function saveModuleSettings($data)
+    {
+        if ($data['module_type'] === 'components') {
+            $module = $this->modules->components->getComponentById($data['module_id']);
+        } else if ($data['module_type'] === 'packages') {
+            $module = $this->modules->packages->getPackageById($data['module_id']);
+        } else if ($data['module_type'] === 'middlewares') {
+            $module = $this->modules->middlewares->getMiddlewareById($data['module_id']);
+        } else if ($data['module_type'] === 'views') {
+            $module = $this->modules->views->getViewById($data['module_id']);
         }
 
-        $repository = $this->decryptPassToken($repository);
 
-        $this->repository = $repository;
+        if ($module) {
+            if ($module['app_type'] === 'core' && strtolower($module['name']) !== 'core') {
+                $this->addResponse('Core package settings cannot be updated. Change settings via Core module.', 1);
 
-        var_dump($this->getModulesData(null, true));
-        //populate localModules so that we can compare with remoteModules
-        // $this->getModulesData(null, true);
+                return false;
+            }
 
-        if ($this->getRemoteModules() === true && $this->updateRemoteModulesToDB() === true) {
+            $module = array_merge($module, $data);
 
-            //generate localModules with updated Data
-            // $this->getModulesData(null, true, true);
-            $this->packagesData->responseCode = 0;
+            try {
+                $this->modules->{$data['module_type']}->update($module);
+            } catch (\Exception $e) {
+                $this->logger->log->debug($e->getMessage());
 
-            $this->packagesData->responseMessage = 'Synced successfully';
+                $this->addResponse('Can update settings, contact administrator.', 1);
+            }
 
-            return true;
+            $this->addResponse('Settings updated.');
+        }
+    }
+
+    public function getModuleInfo($data)
+    {
+        if ($data['module_type'] === 'components') {
+            $module = $this->modules->components->getComponentById($data['module_id']);
+        } else if ($data['module_type'] === 'packages') {
+            $module = $this->modules->packages->getPackageById($data['module_id']);
+        } else if ($data['module_type'] === 'middlewares') {
+            $module = $this->modules->middlewares->getMiddlewareById($data['module_id']);
+        } else if ($data['module_type'] === 'views') {
+            $module = $this->modules->views->getViewById($data['module_id']);
+        } else if ($data['module_type'] === 'bundles') {
+            $module = $this->modules->bundles->getBundleById($data['module_id']);
+        }
+
+        if (isset($module) && is_array($module)) {
+            if (array_key_exists('notification_subscriptions', $module)) {
+                unset($module['notification_subscriptions']);
+            }
+            if (array_key_exists('files', $module)) {
+                unset($module['files']);
+            }
+            if (array_key_exists('settings', $module)) {
+                unset($module['settings']);
+            }
+
+            if (isset($module['installed']) &&
+                $module['installed'] == '1'
+            ) {
+                if ($module['updated_by'] == 0) {
+                    $module['updated_by'] = 'System';
+                } else {
+                    $module['updated_by'] = $this->basepackages->accounts->getById($module['updated_by'])['email'];
+                }
+            } else {
+                $module['updated_by'] = 'System';
+            }
+
+            if (isset($data['sync']) && $data['sync'] == true) {
+                $module = $this->updateModuleRepoDetails($module);
+
+                if (!$module) {
+                    return false;
+                }
+            }
+
+            if ($module['repo_details']) {
+                if (is_string($module['repo_details'])) {
+                    try {
+                        $module['repo_details'] = $this->helper->decode($module['repo_details'], true);
+                    } catch (\Exception $e) {
+                        $module['repo_details'] = null;
+                    }
+                }
+            }
+
+            $this->addResponse('Module information success.',0, ['module' => $module]);
+
+            return $module;
+        } else {
+           $this->addResponse('Module information failed.', 1, []);
         }
 
         return false;
     }
 
-    public function getModulesData($filter = null, $inclCore = false, $getFresh = false)
+    public function updateModuleRepoDetails($module)
     {
-        $this->getLocalModules($filter, $inclCore, $getFresh);
+        if ($module['app_type'] === 'core') {
+            $repo = 'core';
+        } else {
+            $repo = strtolower($this->helper->last(explode('/', $module['repo'])));
+        }
 
-        $this->packagesData->responseCode = 0;
+        try {
+            if (!$this->initApi($module)) {
+                return false;
+            }
 
-        $this->packagesData->modulesData = $this->localModules;
+            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                $collection = 'RepositoryApi';
+                $method = 'repoGet';
+            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                $collection = 'ReposApi';
+                $method = 'reposGet';
+            }
+
+            $args = [$this->apiClientConfig['org_user'], $repo];
+
+            $responseArr = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+            if ($responseArr) {
+                if (is_string($module['repo_details'])) {
+                    $module['repo_details'] = $this->helper->decode($module['repo_details'], true);
+                }
+
+                $module['repo_details']['details'] = $responseArr;
+
+                $this->remoteModules[$module['module_type']] = [$responseArr];
+
+                $latestRelease = $this->moduleNeedsUpgrade($responseArr, $module);
+
+                if ($latestRelease) {
+                    $module['repo_details']['latestRelease'] = $latestRelease;
+                    $module['update_available'] = '1';
+                    $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                }
+
+                $this->modules->{$module['module_type']}->update($module);
+            } else {
+                $module['repo_details'] = false;
+            }
+        } catch (ClientException | \throwable $e) {
+            $this->addResponse($e->getMessage(), 2, ['module' => $module]);
+
+            return false;
+        }
+
+        return $module;
+    }
+
+    public function getRepositoryModules($data = [])
+    {
+        $localModules = [];
+        $sortedModules = [];
+
+        $apis = $this->basepackages->apiClientServices->init()->getAll()->apiClientServices;
+
+        if (!$apis ||
+            ($apis && count($apis) === 0)
+        ) {
+            $this->addResponse('No API configured', 1);
+
+            return false;
+        }
+
+        foreach ($apis as $api) {
+            if ($api['in_use'] == 0) {
+                continue;
+            }
+
+            if (is_string($api['used_by'])) {
+                $api['used_by'] = $this->helper->decode($api['used_by'], true);
+            }
+
+            if (!in_array('modules', $api['used_by'])) {
+                continue;
+            }
+
+            if ($api['category'] === 'repos') {
+                $this->apiClient = $this->basepackages->apiClientServices->useApi($api['id']);
+                $this->apiClientConfig = $this->apiClient->getApiConfig();
+
+                $sortedModules[$api['id']] = [];
+                $sortedModules[$api['id']]['childs'] = [];
+                $sortedModules[$api['id']]['name'] = $this->apiClientConfig['name'];
+                $sortedModules[$api['id']]['data']['type'] = 'repo';
+                $sortedModules[$api['id']]['data']['apiid'] = $this->apiClientConfig['id'];
+            }
+        }
+
+        if (count($sortedModules) === 0) {
+            $this->addResponse('Ok', 0, ['modules' => $sortedModules]);
+
+            return $sortedModules;
+        }
+
+        if (isset($data['api_id'])) {
+            $localModules['components'] = $this->modules->components->init(true)->getComponentsByApiId($data['api_id']);
+            $localModules['middlewares'] = $this->modules->middlewares->init(true)->getMiddlewaresByApiId($data['api_id']);
+            $localModules['packages'] = $this->modules->packages->init(true)->getPackagesByApiId($data['api_id']);
+            $localModules['views'] = $this->modules->views->init(true)->getViewsByApiId($data['api_id']);
+            $localModules['bundles'] = $this->modules->bundles->init(true)->getBundlesByApiId($data['api_id']);
+        } else {
+            $localModules['components'] = $this->modules->components->init(true)->components;
+            $localModules['middlewares'] = $this->modules->middlewares->init(true)->middlewares;
+            $localModules['packages'] = $this->modules->packages->init(true)->packages;
+            $localModules['views'] = $this->modules->views->init(true)->views;
+            $localModules['bundles'] = $this->modules->bundles->init(true)->bundles;
+        }
+
+        foreach ($localModules as $moduleType => $modulesArr) {
+            if (count($modulesArr) > 0) {
+                foreach ($modulesArr as $moduleArr) {
+                    if (!isset($sortedModules[$moduleArr['api_id']])) {
+                        continue;
+                    }
+
+                    if (!isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']])) {
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']] = [];
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['name'] = $moduleArr['app_type'];
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['data']['type'] = 'app';
+                    }
+
+                    if (!isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']])) {
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']] = [];
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['name'] = $moduleArr['module_type'];
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['data']['type'] = 'module';
+                    }
+
+                    if (isset($moduleArr['category']) &&
+                        !isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']])
+                    ) {
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']] = [];
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['name'] = $moduleArr['category'];
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['data']['type'] = 'category';
+                    }
+
+                    $module['id'] = $moduleArr['id'];
+                    $module['name'] = $moduleArr['name'];
+                    if (isset($moduleArr['display_name'])) {
+                        $module['name'] = $moduleArr['display_name'];
+                    }
+                    $module['data']['apiid'] = $moduleArr['api_id'];
+                    $module['data']['apptype'] = $moduleArr['app_type'];
+                    $module['data']['moduletype'] = $moduleArr['module_type'];
+                    $module['data']['modulecategory'] = $moduleArr['category'] ?? '-';
+                    $module['data']['moduleid'] = $moduleArr['module_type'] . '-' . $moduleArr['id'];
+                    $module['data']['installed'] = $moduleArr['installed'] ?? 0;
+                    $module['data']['update_available'] = $moduleArr['update_available'];
+                    $module['data']['isnew'] = '0';
+                    if (($moduleArr['module_type'] !== 'bundles' && $moduleArr['installed'] == '0') ||
+                        $moduleArr['module_type'] === 'bundles'
+                    ) {
+                        if (isset($moduleArr['updated_on']) &&
+                            ($moduleArr['updated_on'] !== null || $moduleArr['updated_on'] !== '')
+                        ) {
+                            try {
+                                $updatedOn = Carbon::parse($moduleArr['updated_on']);
+                                $days = $updatedOn->diffInDays(Carbon::now());
+
+                                if ($days < 7) {
+                                    $module['data']['isnew'] = '1';
+                                }
+                            } catch (\throwable $e) {
+                                $module['data']['isnew'] = '0';
+                            }
+                        }
+                    }
+
+                    if (isset($moduleArr['category'])) {
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$module['data']['moduleid']] = $module;
+                    } else {
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$module['data']['moduleid']] = $module;
+                    }
+                }
+            }
+        }
+
+        $this->addResponse('Ok', 0, ['modules' => $sortedModules]);
+
+        return $sortedModules;
+    }
+
+    protected function initApi($data)
+    {
+        if ($this->apiClient && $this->apiClientConfig) {
+            return true;
+        }
+
+        if (!isset($data['api_id'])) {
+            $this->addResponse('API information not provided', 1, []);
+
+            return false;
+        }
+
+        if (isset($data['api_id']) && $data['api_id'] == '0') {
+            $this->addResponse('This is local module and not remote module, cannot sync.', 1, []);
+
+            return false;
+        }
+
+        $this->apiClient = $this->basepackages->apiClientServices->useApi($data['api_id'], true);
+        $this->apiClientConfig = $this->apiClient->getApiConfig();
+
+        if ($this->apiClientConfig['auth_type'] === 'auth' &&
+            ((!$this->apiClientConfig['username'] || $this->apiClientConfig['username'] === '') &&
+            (!$this->apiClientConfig['password'] || $this->apiClientConfig['password'] === ''))
+        ) {
+            $this->addResponse('Username/Password missing, cannot sync', 1);
+
+            return false;
+        } else if ($this->apiClientConfig['auth_type'] === 'access_token' &&
+                  (!$this->apiClientConfig['access_token'] || $this->apiClientConfig['access_token'] === '')
+        ) {
+            $this->addResponse('Access token missing, cannot sync', 1);
+
+            return false;
+        } else if ($this->apiClientConfig['auth_type'] === 'autho' &&
+                  (!$this->apiClientConfig['authorization'] || $this->apiClientConfig['authorization'] === '')
+        ) {
+            $this->addResponse('Authorization token missing, cannot sync', 1);
+
+            return false;
+        }
 
         return true;
     }
 
-    public function getLocalModules($filter = null, $inclCore = false, $getFresh = false)
+    public function syncRemoteWithLocal($data)
     {
-        $this->packagesData->appInfo = $this->app;
+        if (!isset($data['api_id'])) {
+            $this->addResponse('Please select repository', 1);
 
-        if ($getFresh) {
-            $this->core = $this->modules->core->init(true)->core;
-        } else {
-            $this->core = $this->modules->core->core;
-        }
-
-        if ($filter === 'core') {
-            $this->localModules['core'][$this->core[0]['id']] = $this->core[0];
             return;
         }
 
-        if ($inclCore) {
-            $this->localModules['core'][$this->core[0]['id']] = $this->core[0];
+        if (!$this->initApi($data)) {
+            return false;
         }
 
-        $this->applyFilters($filter, $getFresh);
-
-        if (count($this->components) > 0) {
-            foreach ($this->components as $componentKey => $component) {
-                $this->localModules['components'][$component['id']] = $component;
-                $this->localModules['components'][$component['id']]['settings']
-                    = Json::decode($component['settings'], true);
-                $this->localModules['components'][$component['id']]['dependencies']
-                    = Json::decode($component['dependencies'], true);
-
-                if ($component['installed'] == 0) {
-                    $updatedOnDate = new \DateTime($component['updated_on']);
-                    $now = new \DateTime('now');
-                    $diff = date_diff($updatedOnDate, $now);
-                    if ($diff->h < 24) {
-                        $this->localModules['components'][$component['id']]['new'] = true;
-                    }
+        try {
+            if ($this->getRemoteModules() === true && $this->updateRemoteModulesToDB() === true) {
+                if (isset($data['get_repository_modules']) &&
+                    $data['get_repository_modules'] == 'true'
+                ) {
+                    $this->getRepositoryModules();
+                } else {
+                    $this->getRepositoryModules(['api_id' => $this->apiClientConfig['id']]);
                 }
+
+                return true;
             }
-        } else {
-            $this->localModules['components'] = [];
+        } catch (ClientException | \throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
         }
 
-        if (count($this->packages) > 0) {
-            foreach ($this->packages as $packagesKey => $packages) {
-                $this->localModules['packages'][$packages['id']] = $packages;
-                $this->localModules['packages'][$packages['id']]['settings']
-                    = Json::decode($packages['settings'], true);
-
-                if ($packages['installed'] == 0) {
-                    $updatedOnDate = new \DateTime($packages['updated_on']);
-                    $now = new \DateTime('now');
-                    $diff = date_diff($updatedOnDate, $now);
-                    if ($diff->h < 24) {
-                        $this->localModules['packages'][$packages['id']]['new'] = true;
-                    }
-                }
-            }
-        } else {
-            $this->localModules['packages'] = [];
-        }
-
-        if (count($this->middlewares) > 0) {
-            foreach ($this->middlewares as $middlewareKey => $middleware) {
-                $this->localModules['middlewares'][$middleware['id']] = $middleware;
-                $this->localModules['middlewares'][$middleware['id']]['settings']
-                    = Json::decode($middleware['settings'], true);
-
-                if ($middleware['installed'] == 0) {
-                    $updatedOnDate = new \DateTime($middleware['updated_on']);
-                    $now = new \DateTime('now');
-                    $diff = date_diff($updatedOnDate, $now);
-                    if ($diff->h < 24) {
-                        $this->localModules['middlewares'][$middleware['id']]['new'] = true;
-                    }
-                }
-            }
-        } else {
-            $this->localModules['middlewares'] = [];
-        }
-
-        if (count($this->views) > 0) {
-            foreach ($this->views as $viewKey => $view) {
-                $this->localModules['views'][$view['id']] = $view;
-                $this->localModules['views'][$view['id']]['settings']
-                    = Json::decode($view['settings'], true);
-                $this->localModules['views'][$view['id']]['dependencies']
-                    = Json::decode($view['dependencies'], true);
-
-                if ($middleware['installed'] == 0) {
-                    $updatedOnDate = new \DateTime($view['updated_on']);
-                    $now = new \DateTime('now');
-                    $diff = date_diff($updatedOnDate, $now);
-                    if ($diff->h < 24) {
-                        $this->localModules['views'][$view['id']]['new'] = true;
-                    }
-                }
-            }
-        } else {
-            $this->localModules['views'] = [];
-        }
-
-        $this->packagesData->responseCode = 0;
-
-        $this->packagesData->modulesData = $this->localModules;
-    }
-
-    protected function applyFilters($filter = null, $getFresh = false)
-    {
-        if ($filter) {
-            $app = $this->apps->getById($filter);
-
-            if ($getFresh) {
-                $this->components =
-                    $this->modules->components->init(true)
-                    // ->getComponentsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getComponentsForAppType($app['app_type']);
-
-                $this->packages =
-                    $this->modules->packages->init(true)
-                    // ->getPackagesForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getPackagesForAppType($app['app_type']);
-
-                $this->middlewares =
-                    $this->modules->middlewares->init(true)
-                    // ->getMiddlewaresForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getMiddlewaresForAppType($app['app_type']);
-
-                $this->views =
-                    $this->modules->views->init(true)
-                    // ->getViewsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getViewsForAppType($app['app_type']);
-            } else {
-                $this->components =
-                    $this->modules->components
-                    // ->getComponentsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getComponentsForAppType($app['app_type']);
-
-                $this->packages =
-                    $this->modules->packages
-                    // ->getPackagesForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getPackagesForAppType($app['app_type']);
-
-                $this->middlewares =
-                    $this->modules->middlewares
-                    // ->getMiddlewaresForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getMiddlewaresForAppType($app['app_type']);
-
-                $this->views =
-                    $this->modules->views
-                    // ->getViewsForCategoryAndSubcategory($app['category'], $app['sub_category']);
-                    ->getViewsForAppType($app['app_type']);
-            }
-        } else {
-            $this->components = $this->modules->components->components;
-
-            $this->packages = $this->modules->packages->packages;
-
-            $this->middlewares = $this->modules->middlewares->middlewares;
-
-            $this->views = $this->modules->views->views;
-        }
+        return false;
     }
 
     protected function getRemoteModules()
     {
-        $repoUrl = $this->repository['repo_url'];
-
-        if ($this->repository['repo_provider'] === '1') {//Gitea
-            $headers =
-                [
-                    'headers'   =>
-                        [
-                            'accept'    =>  'app/json'
-                        ]
-                ];
-            $siteUrl = $this->repository['site_url'];
-
-            $branch = '/raw/branch/' . $this->repository['branch'] . '/';
-        } else if ($this->repository['repo_provider'] === '2') {//Github
-            $headers =
-                [
-                    'headers'   =>
-                        [
-                            'accept'    =>  'app/vnd.github.mercy-preview+json'
-                        ]
-                ];
-            $siteUrl = $this->repository['site_url'];//https://raw.githubusercontent.com/
-
-            $branch = '/' . $this->repository['branch'] . '/';
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+            $collection = 'OrganizationApi';
+            $method = 'orgListRepos';
+            $args = [$this->apiClientConfig['org_user']];
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+            $collection = 'ReposApi';
+            $method = 'reposListForOrg';
+            $args = [$this->apiClientConfig['org_user']];
         }
-
-        if ($this->repository['auth_token'] === '1') {//Auth
-            $headers['auth'] =
-                [
-                    $this->repository['username'],
-                    $this->repository['password']
-                ];
-
-        } else if ($this->repository['auth_token'] === '2') {//Token
-            if ($this->repository['repo_provider'] === '1') {//Gitea
-
-               $headers['headers']['Authorization'] = 'token ' . $this->repository['token'];
-
-            } else if ($this->repository['repo_provider'] === '2') {//Github
-                //
-            }
-        }
-        // https://docs.guzzlephp.org/en/stable/request-options.html#verify-option
-        // We need to download the CS certificate from Firefox and load it in the php.ini file.
-        $headers['verify'] = false;
 
         try {
-            $body = Json::decode($this->remoteContent->get($repoUrl, $headers)->getBody()->getContents());
+            $modulesArr = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+        } catch (\throwable | ClientException $e) {
+            $this->addResponse($e->getMessage(), 1);
 
-        } catch (ClientException $e) {
-            $body = null;
-
-            $this->packagesData->responseCode = 1;
-
-            if ($e->getResponse()->getStatusCode() === 403) {
-                $this->packagesData->responseMessage = 'Add username and password to repository.<br>' . $e->getMessage();
-            } else {
-                $this->packagesData->responseMessage = $e->getMessage();
+            if ($e->getCode() === 401) {
+                $this->addResponse('API Authentication failed!', 1);
             }
-
-            return false;
-        } catch (ConnectException $e) {
-
-            $body = null;
-
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $e->getMessage();
 
             return false;
         }
-        if ($body) {
-            foreach ($body as $key => $value) {
 
-                $names = explode('-', $value->name);
+        if ($modulesArr) {
+            foreach ($modulesArr as $key => $module) {
+                $names = explode('-', $module['name']);
 
-                if (count($names) > 0) {
-                    if (count($names) === 1 && $names[0] === 'core') {
-                        $url = $siteUrl . $value->full_name . $branch . 'core.json';
+                if ($names[0] === 'core') {
+                    $this->remoteModules['packages'] = [$module];
 
-                        try {
-                            $this->remoteModules['core'][$value->name] =
-                                Json::decode(
-                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
-                                    , true
-                                );
-                        } catch (\Exception $e) {
-                            $this->packagesData->responseCode = 1;
+                    return true;
+                }
 
-                            $this->packagesData->responseMessage =
-                                'Syncing ' . $value->name . ' resulted in error ' .
-                                $e->getResponse()->getStatusCode() .
-                                '. Sync Halted! Please contact remote administrator or developer.';
+                if (strtolower($this->apiClientConfig['provider']) === 'github') {//Github does not have release_counter set
+                    $collection = 'ReposApi';
+                    $method = 'reposListReleases';
+                    $args =
+                        [
+                            $this->apiClientConfig['org_user'],
+                            strtolower($module['name'])
+                        ];
 
-                            $this->logger->log->debug($e->getMessage());
-
-                            return false;
-                        }
-
-                    } else if ($names[2] === 'component') {
-
-                        $path = $this->getNamesPathString($names);
-
-                        $url =
-                            $siteUrl . $value->full_name . $branch . $path . 'Install/' . 'component.json';
-
-                        try {
-                            $this->remoteModules['components'][$value->name] =
-                                Json::decode(
-                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
-                                    , true
-                                );
-
-                        } catch (\Exception $e) {
-                            $this->packagesData->responseCode = 1;
-
-                            $this->packagesData->responseMessage =
-                                'Syncing component ' . $value->name . ' resulted in error ' .
-                                $e->getResponse()->getStatusCode() .
-                                '. Sync Halted! Please contact remote administrator or developer.';
-
-                            $this->logger->log->debug($e->getMessage());
-
-                            return false;
-                        }
-
-                    } else if ($names[2] === 'package') {
-
-                        $path = $this->getNamesPathString($names);
-
-                        $url =
-                            $siteUrl . $value->full_name . $branch . $path . 'Install/' . 'package.json';
-
-                        try {
-                            $this->remoteModules['packages'][$value->name] =
-                                Json::decode(
-                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
-                                    , true
-                                );
-
-                        } catch (\Exception $e) {
-                            $this->packagesData->responseCode = 1;
-
-                            $this->packagesData->responseMessage =
-                                'Syncing package ' . $value->name . ' resulted in error ' .
-                                $e->getResponse()->getStatusCode() .
-                                '. Sync Halted! Please contact remote administrator or developer.';
-
-                            $this->logger->log->debug($e->getMessage());
-
-                            return false;
-                        }
-
-                    } else if ($names[2] === 'middleware') {
-
-                        $path = $this->getNamesPathString($names);
-
-                        $url =
-                            $siteUrl . $value->full_name . $branch . $path . 'Install/' . 'middleware.json';
-
-                        try {
-                            $this->remoteModules['middlewares'][$value->name] =
-                                Json::decode(
-                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
-                                    , true
-                                );
-
-                        } catch (\Exception $e) {
-                            $this->packagesData->responseCode = 1;
-
-                            $this->packagesData->responseMessage =
-                                'Syncing middleware ' . $value->name . ' resulted in error ' .
-                                $e->getResponse()->getStatusCode() .
-                                '. Sync Halted! Please contact remote administrator or developer.';
-
-                            $this->logger->log->debug($e->getMessage());
-
-                            return false;
-                        }
-
-                    } else if ($names[2] === 'view') {
-
-                        $path = $this->getNamesPathString($names);
-
-                        $url =
-                            $siteUrl . $value->full_name . $branch . $path .'view.json';
-
-                        try {
-                            $this->remoteModules['views'][$value->name] =
-                                Json::decode(
-                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
-                                    , true
-                                );
-                        } catch (\Exception $e) {
-                            $this->packagesData->responseCode = 1;
-
-                            $this->packagesData->responseMessage =
-                                'Syncing view ' . $value->name . ' resulted in error ' .
-                                $e->getResponse()->getStatusCode() .
-                                '. Sync Halted! Please contact remote administrator or developer.';
-
-                            $this->logger->log->debug($e->getMessage());
-
-                            return false;
-                        }
+                    try {
+                        $module['release_counter'] = count($this->apiClient->useMethod($collection, $method, $args)->getResponse(true));
+                    } catch (\throwable $e) {
+                        $module['release_counter'] = 0;
                     }
                 }
+
+                if ($module['release_counter'] == 0) {
+                    continue;//Dont add as there are no releases.
+                }
+
+                if (count($names) === 1) {//Only Core and Apptype has no module type set
+                    $names[1] = 'apptypes';
+                }
+
+                if (!$this->getRemoteModuleJson($names[1], $module)) {
+                    $this->addResponse('Unable to retrieve json file for module ' . $module['name'], 1);
+
+                    return false;
+                }
             }
+
+            $this->addResponse('Sync complete');
+
+            return true;
+        }
+
+        $this->addResponse('Unable to Sync with remote server', 1);
+
+        return false;
+    }
+
+    protected function getRemoteModuleJson($moduleType, $module, $onlyJson = false)
+    {
+        if ($moduleType === 'apptypes') {
+            $jsonFileName = 'Install/type.json';
+        } else {
+            if ($moduleType === 'views' || $moduleType === 'bundles') {//remove "s" from the name
+                if ($moduleType === 'views' &&
+                    str_contains($module['name'], '-public')
+                ) {//We dont import and install -public repo.
+                    return true;
+                }
+
+                $jsonFileName = substr($moduleType, 0, -1) . '.json';
+            } else {
+                $jsonFileName = 'Install/' . substr($moduleType, 0, -1) . '.json';
+            }
+        }
+
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+            \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\Repos\Gitea\ObjectSerializer::setUrlEncoding(false);
+
+            $collection = 'RepositoryApi';
+            $method = 'repoGetContents';
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+            $collection = 'ReposApi';
+            $method = 'reposGetContent';
+        }
+
+        $args =
+            [
+                $this->apiClientConfig['org_user'],
+                $module['name'],
+                $jsonFileName,
+                $this->apiClientConfig['branch']
+            ];
+
+        try {
+            $jsonFile = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+            if ($jsonFile) {
+                if (!isset($this->remoteModulesJson[$moduleType])) {
+                    $this->remoteModulesJson[$moduleType] = [];
+                }
+
+                $this->remoteModulesJson[$moduleType][$module['name']] = $this->helper->decode(base64_decode($jsonFile['content']), true);
+            }
+
+            if (!$onlyJson) {
+                if (isset($this->remoteModules[$moduleType])) {
+                    array_push($this->remoteModules[$moduleType], $module);
+                } else {
+                    $this->remoteModules[$moduleType] = [$module];
+                }
+            }
+        } catch (ClientException | \throwable $e) {
+            $this->logger->log->debug(
+                'Reading module ' . $module['name'] . ' JSON file resulted in error. ' .
+                $e->getMessage()
+            );
+
+            //We dont so anything here with respect to return. If the json file is not there, we consider the module to be unavailable
         }
 
         return true;
-    }
-
-    protected function getNamesPathString($names)
-    {
-        unset($names[0]);
-        unset($names[1]);
-        unset($names[2]);
-
-        $path = '';
-
-        foreach ($names as $name) {
-            $path .= ucfirst($name) . '/';
-        }
-
-        return $path;
     }
 
     protected function updateRemoteModulesToDB()
     {
         $counter = [];
-        $counter['register'] = 0;
-        $counter['update'] = 0;
+
+        if ($this->remoteModules && count($this->remoteModules) === 0) {
+            return true;
+        }
 
         foreach ($this->remoteModules as $remoteModulesType => $remoteModules) {
-            if ($remoteModulesType === 'core') {
+            $remotePackages = $this->findRemoteInLocal($remoteModules, $remoteModulesType);
 
-                $remoteCore = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
+            if (count($remotePackages['updates']) > 0) {
+                foreach ($remotePackages['updates'] as $updateRemotePackageKey => $updateRemotePackage) {
+                    if (!isset($counter['updates'])) {
+                        $counter['updates'] = [];
+                        $counter['updates']['api']['id'] = $this->apiClientConfig['id'];
+                        $counter['updates']['api']['name'] = $this->apiClientConfig['name'];
+                        $counter['updates']['count'] = 0;
+                    }
 
-                if (count($remoteCore['update']) > 0) {
-                    foreach ($remoteCore['update'] as $updateRemoteCoreKey => $updateRemoteCore) {
-                        $this->modules->core->update($updateRemoteCore);
-                        $counter['update'] = $counter['update'] + 1;
+                    if ($remoteModulesType === 'apptypes') {
+                        $this->apps->types->update($updateRemotePackage);
+                    } else {
+                        $this->modules->{$remoteModulesType}->update($updateRemotePackage);
+                    }
+
+                    if ($updateRemotePackage['installed'] == '1') {
+                        $counter['updates']['count'] = $counter['updates']['count'] + 1;
                     }
                 }
             }
 
-            if ($remoteModulesType === 'components') {
-
-                if (count($this->localModules[$remoteModulesType]) > 0) {
-                    $remoteComponents = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
-                } else {
-                    $remoteComponents['update'] = [];
-                    $remoteComponents['register'] = $remoteModules;
-                }
-
-                if (count($remoteComponents['update']) > 0) {
-                    foreach ($remoteComponents['update'] as $updateRemoteComponentKey => $updateRemoteComponent) {
-
-                        $updateRemoteComponent['settings'] =
-                            isset($updateRemoteComponent['settings']) ?
-                            Json::encode($updateRemoteComponent['settings']) :
-                            Json::encode([]);
-
-                        $updateRemoteComponent['dependencies'] =
-                            isset($updateRemoteComponent['dependencies']) ?
-                            Json::encode($updateRemoteComponent['dependencies']) :
-                            Json::encode([]);
-
-                        $this->modules->components->update($updateRemoteComponent);
-
-                        $counter['update'] = $counter['update'] + 1;
+            if (count($remotePackages['new']) > 0) {
+                foreach ($remotePackages['new'] as $registerRemotePackageKey => $registerRemotePackage) {
+                    if (!isset($counter['new'])) {
+                        $counter['new'] = [];
+                        $counter['new']['api']['id'] = $this->apiClientConfig['id'];
+                        $counter['new']['api']['name'] = $this->apiClientConfig['name'];
+                        $counter['new']['count'] = 0;
                     }
-                }
 
-                if (count($remoteComponents['register']) > 0) {
-                    foreach ($remoteComponents['register'] as $registerRemoteComponentKey => $registerRemoteComponent) {
-                        $registerRemoteComponent['dependencies'] =
-                            isset($registerRemoteComponent['dependencies']) ?
-                            Json::encode($registerRemoteComponent['dependencies']) :
-                            Json::encode([]);
+                    $repo_details = $registerRemotePackage['repo_details'];
+                    $version = $registerRemotePackage['repo_details']['latestRelease']['tag_name'];
 
-                        if ($registerRemoteComponent['menu']) {
-                            if (isset($registerRemoteComponent['menu']['seq'])) {
-                                $sequence = $registerRemoteComponent['menu']['seq'];
-                                unset($registerRemoteComponent['menu']['seq']);
+                    $registerRemotePackage = $this->remoteModulesJson[$remoteModulesType][$registerRemotePackage['name']];
+                    $registerRemotePackage['repo_details'] = $repo_details;
+                    $registerRemotePackage['version'] = $version;
+
+                    $registerRemotePackage['settings'] =
+                        isset($registerRemotePackage['settings']) ?
+                        $this->helper->encode($registerRemotePackage['settings']) :
+                        $this->helper->encode([]);
+
+                    $registerRemotePackage['apps'] = $this->helper->encode([]);
+
+                    $registerRemotePackage['installed'] = 0;
+
+                    if ($this->auth->account()) {
+                        $registerRemotePackage['updated_by'] = $this->auth->account()['id'];
+                    } else {
+                        $registerRemotePackage['updated_by'] = 0;
+                    }
+
+                    $registerRemotePackage['api_id'] = $this->apiClientConfig['id'];
+
+                    if ($remoteModulesType === 'apptypes') {
+                        $this->apps->types->add($registerRemotePackage);
+                    } else {
+                        if ($registerRemotePackage['module_type'] === 'views') {
+                            if (count($registerRemotePackage['dependencies']['views']) === 0 &&
+                                (!isset($registerRemotePackage['base_view_module_id']) ||
+                                 (isset($registerRemotePackage['base_view_module_id']) && $registerRemotePackage['base_view_module_id'] === null)
+                                )
+                            ) {
+                                $registerRemotePackage['base_view_module_id'] = 0;
+                            } else if (count($registerRemotePackage['dependencies']['views']) === 1) {
+                                $baseView = $this->modules->views->getViewByRepo($registerRemotePackage['dependencies']['views'][0]['repo']);
+
+                                if ($baseView) {//Add Baseview ID here or during installation.
+                                    $registerRemotePackage['base_view_module_id'] = $baseView['id'];
+                                } else {
+                                    $registerRemotePackage['base_view_module_id'] = 0;
+                                }
                             } else {
-                                $sequence = 99;
+                                $registerRemotePackage['base_view_module_id'] = 0;
                             }
-                            $menu['menu'] = Json::encode($registerRemoteComponent['menu']);
-                            $menu['sequence'] = $sequence;
-                            $menu['apps'] = Json::encode([]);
-
-                            $this->basepackages->menus->add($menu);
-
-                            $registerRemoteComponent['menu_id'] = $this->basepackages->menus->packagesData->last['id'];
-
-                            $this->basepackages->menus->init(true);//Reset Cache
-
-                            $registerRemoteComponent['menu'] = Json::encode($registerRemoteComponent['menu']);
-                        } else {
-                            $registerRemoteComponent['menu'] = false;
                         }
 
-                        $registerRemoteComponent['settings'] =
-                            isset($registerRemoteComponent['settings']) ?
-                            Json::encode($registerRemoteComponent['settings']) :
-                            Json::encode([]);
-
-                        $registerRemoteComponent['apps'] =
-                            Json::encode([]);
-
-                        $registerRemoteComponent['installed'] = 0;
-
-                        if ($this->auth->account()) {
-                            $registerRemoteComponent['updated_by'] = $this->auth->account()['id'];
-                        } else {
-                            $registerRemoteComponent['updated_by'] = 0;
-                        }
-
-                        $this->modules->components->add($registerRemoteComponent);
-
-                        $counter['register'] = $counter['register'] + 1;
+                        $this->modules->{$remoteModulesType}->add($registerRemotePackage);
                     }
-                }
-            }
 
-            if ($remoteModulesType === 'packages') {
-
-                if (count($this->localModules[$remoteModulesType]) > 0) {
-                    $remotePackages = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
-                } else {
-                    $remotePackages['update'] = [];
-                    $remotePackages['register'] = $remoteModules;
-                }
-
-                if (count($remotePackages['update']) > 0) {
-                    foreach ($remotePackages['update'] as $updateRemotePackageKey => $updateRemotePackage) {
-
-                        $updateRemotePackage['settings'] =
-                            isset($updateRemotePackage['settings']) ?
-                            Json::encode($updateRemotePackage['settings']) :
-                            Json::encode([]);
-
-                        $this->modules->packages->update($updateRemotePackage);
-
-                        $counter['update'] = $counter['update'] + 1;
-                    }
-                }
-
-                if (count($remotePackages['register']) > 0) {
-                    foreach ($remotePackages['register'] as $registerRemotePackageKey => $registerRemotePackage) {
-
-                        $registerRemotePackage['settings'] =
-                            isset($registerRemotePackage['settings']) ?
-                            Json::encode($registerRemotePackage['settings']) :
-                            Json::encode([]);
-
-                        $registerRemotePackage['apps'] = Json::encode([]);
-
-                        $registerRemotePackage['installed'] = 0;
-
-                        if ($this->auth->account()) {
-                            $registerRemotePackage['updated_by'] = $this->auth->account()['id'];
-                        } else {
-                            $registerRemotePackage['updated_by'] = 0;
-                        }
-
-                        $this->modules->packages->add($registerRemotePackage);
-
-                        $counter['register'] = $counter['register'] + 1;
-                    }
-                }
-            }
-
-            if ($remoteModulesType === 'middlewares') {
-
-                if (count($this->localModules[$remoteModulesType]) > 0) {
-                    $remoteMiddlewares = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
-                } else {
-                    $remoteMiddlewares['update'] = [];
-                    $remoteMiddlewares['register'] = $remoteModules;
-                }
-
-                if (count($remoteMiddlewares['update']) > 0) {
-                    foreach ($remoteMiddlewares['update'] as $updateRemoteMiddlewareKey => $updateRemoteMiddleware) {
-
-                        $updateRemoteMiddleware['settings'] =
-                            isset($updateRemoteMiddleware['settings']) ?
-                            Json::encode($updateRemoteMiddleware['settings']) :
-                            Json::encode([]);
-
-                        $this->modules->middlewares->update($updateRemoteMiddleware);
-
-                        $counter['update'] = $counter['update'] + 1;
-                    }
-                }
-
-                if (count($remoteMiddlewares['register']) > 0) {
-                    foreach ($remoteMiddlewares['register'] as $registerRemoteMiddlewareKey => $registerRemoteMiddleware) {
-
-                        $registerRemoteMiddleware['settings'] =
-                            isset($registerRemoteMiddleware['settings']) ?
-                            Json::encode($registerRemoteMiddleware['settings']) :
-                            Json::encode([]);
-
-                        $registerRemoteMiddleware['apps'] = Json::encode([]);
-
-                        $registerRemoteMiddleware['installed'] = 0;
-
-                        if ($this->auth->account()) {
-                            $registerRemoteMiddleware['updated_by'] = $this->auth->account()['id'];
-                        } else {
-                            $registerRemoteMiddleware['updated_by'] = 0;
-                        }
-
-                        $this->modules->middlewares->add($registerRemoteMiddleware);
-
-                        $counter['register'] = $counter['register'] + 1;
-                    }
-                }
-            }
-
-            if ($remoteModulesType === 'views') {
-
-                if (count($this->localModules[$remoteModulesType]) > 0) {
-                    $remoteViews = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
-                } else {
-                    $remoteViews['update'] = [];
-                    $remoteViews['register'] = $remoteModules;
-                }
-
-                if (count($remoteViews['update']) > 0) {
-                    foreach ($remoteViews['update'] as $updateRemoteViewKey => $updateRemoteView) {
-                        $this->modules->views->update($updateRemoteView);
-                        $counter['update'] = $counter['update'] + 1;
-                    }
-                }
-
-                if (count($remoteViews['register']) > 0) {
-                    foreach ($remoteViews['register'] as $registerRemoteViewKey => $registerRemoteView) {
-                        $registerRemoteView['dependencies'] =
-                            isset($registerRemoteView['dependencies']) ?
-                            Json::encode($registerRemoteView['dependencies']) :
-                            Json::encode([]);
-
-                        $registerRemoteView['settings'] =
-                            isset($registerRemoteView['settings']) ?
-                            Json::encode($registerRemoteView['settings']) :
-                            Json::encode([]);
-
-                        $registerRemoteView['apps'] =
-                            Json::encode([]);
-
-                        $registerRemoteView['installed'] = 0;
-
-                        if ($this->auth->account()) {
-                            $registerRemoteView['updated_by'] = $this->auth->account()['id'];
-                        } else {
-                            $registerRemoteView['updated_by'] = 0;
-                        }
-
-                        $this->modules->views->add($registerRemoteView);
-
-                        $counter['register'] = $counter['register'] + 1;
-                    }
+                    $counter['new']['count'] = $counter['new']['count'] + 1;
                 }
             }
         }
@@ -715,93 +645,200 @@ class Manager extends BasePackage
         return true;
     }
 
-    protected function findRemoteInLocal($remoteModules, $localModules)
+    protected function findRemoteInLocal($remoteModules, $remoteModulesType)
     {
         $modules = [];
-        $modules['update'] = [];
+        $modules['updates'] = [];
+        $modules['new'] = [];
 
         foreach ($remoteModules as $remoteModuleKey => $remoteModule) {
-            foreach ($localModules as $localModuleKey => $localModule) {
+            if (isset($remoteModule['repo'])) {
+                $repoUrl = $remoteModule['repo'];
+            } else if (isset($remoteModule['html_url'])) {
+                $repoUrl = $remoteModule['html_url'];
+            }
 
-                if ($localModule['repo'] === $remoteModule['repo']) {
+            if ($remoteModulesType === 'apptypes') {
+                $localModule = $this->apps->types->getAppTypeByRepo($repoUrl);
+            } else if ($remoteModulesType === 'components') {
+                $localModule = $this->modules->components->getComponentByRepo($repoUrl);
+            } else if ($remoteModulesType === 'packages') {
+                $localModule = $this->modules->packages->getPackageByRepo($repoUrl);
+            } else if ($remoteModulesType === 'middlewares') {
+                $localModule = $this->modules->middlewares->getMiddlewareByRepo($repoUrl);
+            } else if ($remoteModulesType === 'views') {
+                $localModule = $this->modules->views->getViewByRepo($repoUrl);
+            } else if ($remoteModulesType === 'bundles') {
+                $localModule = $this->modules->bundles->getBundleByRepo($repoUrl);
+            }
 
-                    if ($this->moduleNeedsUpgrade($localModule, $remoteModule)) {
+            if ($localModule) {
+                $localModule['repo_details'] = [];
+                $localModule['repo_details']['details'] = $remoteModule;
 
-                        // if ($localModule['installed'] === '0') {
+                $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($remoteModule, $localModule);
 
-                        //     $localModule['version'] = $remoteModule['version'];
-                        // } else if ($localModule['installed'] === '1') {
-
-                        //     $localModule['update_available'] = '1';
-
-                        //     $localModule['update_version'] = $remoteModule['version'];
-                        // }
-
-                        if (isset($localModule['settings'])) {
-                            $localModule['settings'] = Json::encode($localModule['settings']);
-                        } else {
-                            $localModule['settings'] = null;
+                if ($moduleNeedsUpgrade) {
+                    if ($this->getRemoteModuleJson($remoteModulesType, $localModule, true)) {
+                        if (isset($this->remoteModulesJson[$remoteModulesType][$remoteModule['name']])) {
+                            $localModule = array_merge($localModule, $this->remoteModulesJson[$remoteModulesType][$remoteModule['name']]);
                         }
-
-                        if (isset($localModule['dependencies'])) {
-                            $localModule['dependencies'] = Json::encode($remoteModule['dependencies']);
-                        } else {
-                            $localModule['dependencies'] = null;
-                        }
-
-                        $modules['update'][$localModuleKey] = $localModule;
-
-                        unset($remoteModules[$remoteModuleKey]);
                     }
+
+                    $localModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
+                    if ($localModule['installed'] == '0') {
+                        $localModule['version'] = $moduleNeedsUpgrade['name'];
+                    } else if ($localModule['installed'] == '1') {
+                        $localModule['update_available'] = '1';
+                        $localModule['update_version'] = $moduleNeedsUpgrade['name'];
+                    }
+
+                    $modules['updates'][$localModule['id']] = $localModule;
 
                     unset($remoteModules[$remoteModuleKey]);
                 }
+            } else {
+                $remoteModule['repo_details'] = [];
+                $remoteModule['repo_details']['details'] = $remoteModule;
+                $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($remoteModule);
+                $remoteModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
+
+                $modules['new'][$remoteModuleKey] = $remoteModule;
             }
         }
-
-        $modules['register'] = $remoteModules;
 
         return $modules;
     }
 
-    protected function moduleNeedsUpgrade($localModule, $remoteModule)
+    protected function moduleNeedsUpgrade($remoteModule, $localModule = null, $returnLatestReleaseOnly = false)
     {
-        if ($localModule['version'] !== $remoteModule['version'] &&
-            $localModule['update_version'] !== $remoteModule['version']
-           ) {
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoGetLatestRelease';
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+            $collection = 'ReposApi';
+            $method = 'reposGetLatestRelease';
+        }
 
-            $installedModuleVersion = explode('.', $localModule['version']);
+        $args =
+            [
+                $this->apiClientConfig['org_user'],
+                $remoteModule['name']
+            ];
 
-            $newModuleVersion = explode('.', $remoteModule['version']);
+        $latestRelease = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
 
-            if ($newModuleVersion[0] > $installedModuleVersion[0]) {
+        if (!$latestRelease) {
+            return false;
+        }
 
-                return true;
+        if ($returnLatestReleaseOnly) {
+            return $latestRelease;
+        }
 
-            } else if ($newModuleVersion[0] === $installedModuleVersion[0] &&
-                       $newModuleVersion[1] > $installedModuleVersion[1]
-                      ) {
+        if ($localModule) {
+            if (array_key_exists('level_of_update', $localModule) && $localModule['level_of_update'] !== null) {
+                $localVersion = Version::parse($localModule['version']);
+                $latestReleaseVersion = Version::parse($latestRelease['tag_name']);
 
-                return true;
-
-            } else if ($newModuleVersion[0] === $installedModuleVersion[0] &&
-                       $newModuleVersion[1] === $installedModuleVersion[1] &&
-                       $newModuleVersion[2] > $installedModuleVersion[2]
+                if ($localModule['level_of_update'] == '1') {//Only Major
+                    if ((int) $latestReleaseVersion->getMajor() > (int) $localVersion->getMajor()) {
+                        return $latestRelease;
+                    }
+                } else if ($localModule['level_of_update'] == '2') {//Major & Minor
+                    if ((int) $latestReleaseVersion->getMinor() > (int) $localVersion->getMinor() ||
+                        (int) $latestReleaseVersion->getMajor() > (int) $localVersion->getMajor()
                     ) {
+                        return $latestRelease;
+                    }
+                } else if ($localModule['level_of_update'] == '3') {//Major & Minor & Patch
+                    if ((int) $latestReleaseVersion->getMajor() > (int) $localVersion->getMajor() ||
+                        (int) $latestReleaseVersion->getPatch() > (int) $localVersion->getPatch() ||
+                        (int) $latestReleaseVersion->getMinor() > (int) $localVersion->getMinor()
+                    ) {
+                        return $latestRelease;
+                    }
+                }
 
-                return true;
+                return false;
+            } else {
+                if (Version::greaterThan($latestRelease['tag_name'], $localModule['version'])) {
+                    return $latestRelease;
+                }
             }
+        } else {
+            return $latestRelease;
         }
     }
 
-    protected function decryptPassToken(array $data)
+    // protected function getNamesPathString($names)
+    // {
+    //     unset($names[0]);
+    //     unset($names[1]);
+    //     unset($names[2]);
+    //     unset($names[3]);
+
+    //     $path = '';
+
+    //     foreach ($names as $name) {
+    //         $path .= ucfirst($name) . '/';
+    //     }
+
+    //     return $path;
+    // }
+    //
+
+    public function getAvailableApis($getAll = false, $returnApis = true)
     {
-        if ($data['auth_token'] == 1) {
-            $data['password'] = $this->crypt->decryptBase64($data['password'], $this->secTools->getSigKey());
-        } else if ($data['auth_token'] == 2) {
-            $data['token'] = $this->crypt->decryptBase64($data['token'], $this->secTools->getSigKey());
+        $apisArr = [];
+
+        if (!$getAll) {
+            $package = $this->getPackage();
+            if (isset($package['settings']) &&
+                isset($package['settings']['api_clients']) &&
+                is_array($package['settings']['api_clients']) &&
+                count($package['settings']['api_clients']) > 0
+            ) {
+                foreach ($package['settings']['api_clients'] as $key => $clientId) {
+                    $client = $this->basepackages->apiClientServices->getApiById($clientId);
+
+                    if ($client) {
+                        array_push($apisArr, $client);
+                    }
+                }
+            }
+        } else {
+            $apisArr = $this->basepackages->apiClientServices->getAll()->apiClientServices;
         }
 
-        return $data;
+        if (count($apisArr) > 0) {
+            foreach ($apisArr as $api) {
+                if ($api['category'] === 'repos') {
+                    $useApi = $this->basepackages->apiClientServices->useApi([
+                            'config' =>
+                                [
+                                    'id'           => $api['id'],
+                                    'category'     => $api['category'],
+                                    'provider'     => $api['provider'],
+                                    'checkOnly'    => true//Set this to check if the API exists and can be instantiated.
+                                ]
+                        ]);
+
+                    if ($useApi) {
+                        $apiConfig = $useApi->getApiConfig();
+
+                        $apis[$api['id']]['id'] = $apiConfig['id'];
+                        $apis[$api['id']]['name'] = $apiConfig['name'];
+                        $apis[$api['id']]['data']['url'] = $apiConfig['repo_url'];
+                    }
+                }
+            }
+        }
+
+        if ($returnApis) {
+            return $apis;
+        }
+
+        return $apisArr;
     }
 }

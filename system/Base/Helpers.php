@@ -6,6 +6,132 @@ if (!function_exists('base_path')) {
     }
 }
 
+if (!function_exists('trace')) {
+    function trace(array $varsToDump = [], $exit = true, $args = false, $object = false, $file = true, $line = true, $class = true, $function = true) {
+        $backtrace = debug_backtrace();
+
+        $traces = [];
+
+        foreach ($backtrace as $key => $trace) {
+            if ($file && isset($trace['file'])) {
+                $traces[$key]['file'] = $trace['file'];
+            }
+            if ($line && isset($trace['line'])) {
+                $traces[$key]['line'] = $trace['line'];
+            }
+            if ($class && isset($trace['class'])) {
+                $traces[$key]['class'] = $trace['class'];
+            }
+            if ($function && isset($trace['function'])) {
+                $traces[$key]['function'] = $trace['function'];
+            }
+            if ($args && isset($trace['args'])) {
+                $traces[$key]['args'] = $trace['args'];
+            }
+            if ($object && isset($trace['object'])) {
+                $traces[$key]['object'] = $trace['object'];
+            }
+        }
+
+        $reversedTraces = array_reverse($traces);
+        $lastTrace = $reversedTraces[array_key_last($reversedTraces)];
+
+        echo 'Trace called at line: <strong>' . $lastTrace['line'] . '</strong> on file: <strong>' . $lastTrace['file'] . '</strong>';
+
+        if ($object) {
+            if (class_exists(\Symfony\Component\VarDumper\VarDumper::class)) {
+                if (count($varsToDump) > 0) {
+                    foreach ($varsToDump as $var) {
+                        dump($var);
+                    }
+                }
+                dump($reversedTraces);
+            } else {
+                if (count($varsToDump) > 0) {
+                    foreach ($varsToDump as $var) {
+                        var_dump($var);
+                    }
+                }
+                var_dump($reversedTraces);
+            }
+        } else {
+            if (count($varsToDump) > 0) {
+                foreach ($varsToDump as $var) {
+                    var_dump($var);
+                }
+            }
+            var_dump($reversedTraces);
+        }
+
+        if ($exit) {
+            exit;
+        }
+    }
+}
+
+if (!function_exists('toBytes')) {
+    function toBytes($from) {
+        $type = substr($from, -1);
+        $size = (int) substr($from, 0, -1);
+
+        if ($type === 'G') {
+            return $size * 1073741824;
+        } else if ($type === 'M') {
+            return $size * 1048576;
+        }
+    }
+}
+
+if (!function_exists('json_decode_recursive')) {
+    function json_decode_recursive(&$value, $key) {
+        if ($value !== null) {
+            $value_decoded = json_decode($value, true);
+        }
+
+        if (isset($value_decoded)) {
+            $value = $value_decoded;
+        }
+    }
+}
+
+if (!function_exists('scanAllDir')) {
+    function scanAllDir($dir) {
+        $result = [];
+
+        foreach(scandir($dir) as $filename) {
+            if ($filename[0] === '.') continue;
+
+            $filePath = $dir . '/' . $filename;
+
+            if (is_dir($filePath)) {
+                foreach (scanAllDir($filePath) as $childFilename) {
+                    $result[] = $filename . '/' . $childFilename;
+                }
+            } else {
+                $result[] = $filename;
+            }
+        }
+
+        return $result;
+    }
+}
+
+if (!function_exists('deleteFiles')) {
+    function deleteFiles($target) {
+        if (is_dir($target)) {
+            $files = glob($target . '*', GLOB_MARK);
+
+            foreach ($files as $file ) {
+                deleteFiles( $file );
+            }
+
+            rmdir($target);
+        } else {
+            unlink($target);
+        }
+    }
+}
+
 if (!function_exists('flatten_array')) {
     function flatten_array(array $items) {
         return iterator_to_array(
@@ -13,6 +139,23 @@ if (!function_exists('flatten_array')) {
                  new \RecursiveArrayIterator($items)
              ), false
          );
+    }
+}
+
+if (!function_exists('true_flatten')) {
+    function true_flatten(array $array, array $parents = [])
+    {
+        $return = [];
+        foreach ($array as $k => $value) {
+            $p = empty($parents) ? [$k] : [...$parents, $k];
+            if (is_array($value)) {
+                $return = [...$return, ...true_flatten($value, $p)];
+            } else {
+                $return[implode('_', $p)] = $value;
+            }
+        }
+
+        return $return;
     }
 }
 
@@ -68,12 +211,12 @@ if (!function_exists('xmlToArray')) {
 }
 
 if (!function_exists('checkCtype')) {
-    function checkCtype($str, $ctype = 'alum', $ignoreChars = null) {
+    function checkCtype($str, $ctype = 'alnum', $ignoreChars = null) {
         if (!$ignoreChars) {
             $ignoreChars = [' ', '&amp;', '&', ',', ':', ';'];
         }
 
-        if ($ctype === 'alum') {
+        if ($ctype === 'alnum') {
             if (ctype_alnum(trim(str_replace($ignoreChars, '' , $str)))) {
                 return trim(str_replace($ignoreChars, '' , $str));
             }

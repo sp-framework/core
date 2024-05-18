@@ -1,0 +1,422 @@
+{% if module['id'] is defined %}
+    {% set settings = module['settings'] %}
+    {% set moduleSettings = module['settings'] %}
+{% else %}
+    {% set settings = moduleSettings %}
+{% endif %}
+{% if type === 'components' or type === 'middlewares' %}
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'mandatory',
+                    'fieldLabel'                     : 'Component Mandatory',
+                    'fieldType'                      : 'radio',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Component is mandatory for app. If set to "For App Type", component cannot be disabled. If set to "For app", component cannot be disabled in that app.',
+                    'fieldRequired'                  : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldBazScan'                   : true,
+                    'fieldRadioPlacementType'        : 'horizontal',
+                    'fieldRadioButtons'              :
+                        [
+                            'mandatory-no' :
+                                [
+                                    'title'                           : 'NO',
+                                    'dataValue'                       : 'mandatory-no'
+                                ],
+                            'forAppType' :
+                                [
+                                    'title'                           : 'FOR APP TYPE',
+                                    'dataValue'                       : 'forAppType'
+                                ],
+                            'forApp' :
+                                [
+                                    'title'                           : 'FOR APP',
+                                    'dataValue'                       : 'forApp'
+                                ]
+                        ],
+                    'fieldRadioChecked'              : 'mandatory-no'
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'mandatory-apps',
+                    'fieldLabel'                            : 'Mandatory On Apps',
+                    'fieldType'                             : 'input',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Add app names. Comma Separated',
+                    'fieldRequired'                         : true,
+                    'fieldDisabled'                         : true,
+                    'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldDataInputMaxLength'               : 100,
+                    'fieldValue'                            : ''
+                ]
+            )}}
+        </div>
+    </div>
+    {% if type === 'components' %}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'need-auth',
+                        'fieldLabel'                     : 'Component Needs Authentication',
+                        'fieldType'                      : 'radio',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Component required user to be authenticated for access.',
+                        'fieldRequired'                  : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioPlacementType'        : 'horizontal',
+                        'fieldRadioButtons'              :
+                            [
+                                'need-auth-default' :
+                                    [
+                                        'title'                           : 'DEFAULT (APP CONTROLLED)',
+                                        'dataValue'                       : 'need-auth-default'
+                                    ],
+                                'need-auth-yes' :
+                                    [
+                                        'title'                           : 'YES',
+                                        'dataValue'                       : 'need-auth-yes'
+                                    ],
+                                'need-auth-mandatory' :
+                                    [
+                                        'title'                           : 'MANDATORY',
+                                        'dataValue'                       : 'need-auth-mandatory'
+                                    ],
+                                'need-auth-disabled' :
+                                    [
+                                        'title'                           : 'DISABLED',
+                                        'dataValue'                       : 'need-auth-disabled'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : 'need-auth-default'
+                    ]
+                )}}
+            </div>
+        </div>
+        {% set modulesPackages = [] %}
+        {% if modules['packages']['childs']|length > 0 %}
+            {% for packageKey, package in modules['packages']['childs'] %}
+                {% set modulesPackages['childs'][packageKey]['id'] = package['id'] %}
+                {% set modulesPackages['childs'][packageKey]['name'] = package['name'] %}
+                {% set modulesPackages['childs'][packageKey]['data']['type'] = 'packages' %}
+                {% set modulesPackages['childs'][packageKey]['data']['importexportpackage'] = package['name'] %}
+            {% endfor %}
+        {% endif %}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'settings-packages',
+                        'fieldLabel'                           : 'Select Import Export Package',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Module',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldDataSelect2Options'              : modulesPackages,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsSelected'      : ''
+                    ]
+                )}}
+            </div>
+        </div>
+    {% endif %}
+{% elseif type === 'packages' %}
+    {% set modulesComponents = [] %}
+    {% if modules['components']['childs']|length > 0 %}
+        {% for componentKey, component in modules['components']['childs'] %}
+            {% set modulesComponents['childs'][componentKey]['id'] = component['id'] %}
+            {% set modulesComponents['childs'][componentKey]['name'] = component['name'] %}
+            {% set modulesComponents['childs'][componentKey]['data']['type'] = 'components' %}
+            {% set modulesComponents['childs'][componentKey]['data']['route'] = component['route'] %}
+        {% endfor %}
+    {% endif %}
+    <div class="row">
+        <div class="col-md-6">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                            : component,
+                    'componentName'                        : componentName,
+                    'componentId'                          : componentId,
+                    'sectionId'                            : sectionId,
+                    'fieldId'                              : 'settings-components',
+                    'fieldLabel'                           : 'Select Component Route',
+                    'fieldType'                            : 'select2',
+                    'fieldHelp'                            : true,
+                    'fieldHelpTooltipContent'              : 'Module',
+                    'fieldRequired'                        : true,
+                    'fieldBazScan'                         : true,
+                    'fieldDataSelect2Options'              : modulesComponents,
+                    'fieldDataSelect2OptionsKey'           : 'id',
+                    'fieldDataSelect2OptionsValue'         : 'name',
+                    'fieldDataSelect2OptionsSelected'      : ''
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'import',
+                    'fieldLabel'                     : 'Can Import?',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Select if users can import data into this package using import/export tool.',
+                    'fieldRequired'                  : false,
+                    'fieldType'                      : 'checkbox',
+                    'fieldCheckboxChecked'           : '',
+                    'fieldCheckboxType'              : 'primary',
+                    'fieldBazJstreeSearch'           : false,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'export',
+                    'fieldLabel'                     : 'Can Export?',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Select if users can export data from this package using import/export tool.',
+                    'fieldRequired'                  : false,
+                    'fieldType'                      : 'checkbox',
+                    'fieldCheckboxChecked'           : '',
+                    'fieldCheckboxType'              : 'primary',
+                    'fieldBazJstreeSearch'           : false,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row" id="{{componentId}}-{{sectionId}}-import-settings">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'import-add-method',
+                    'fieldLabel'                     : 'Import Add Method',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Method that is used to add data into the db. example: addAccount from UsersAccount package.',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldDataInputMinLength'        : 1,
+                    'fieldDataInputMaxLength'        : 50,
+                    'fieldValue'                     : ''
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'import-update-method',
+                    'fieldLabel'                     : 'Import Update method',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Method that is used to update data into the db. example: updateAccount from UsersAccount package.',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldDataInputMinLength'        : 1,
+                    'fieldDataInputMaxLength'        : 50,
+                    'fieldValue'                     : ''
+                ]
+            )}}
+        </div>
+    </div>
+{% elseif type === 'views' or type === 'core' %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'settings-keys',
+                'fieldLabel'                           : 'Select Setting',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select setting that you want to modify or add.',
+                'fieldRequired'                        : true,
+                'fieldBazScan'                         : true,
+                'fieldDataSelect2Options'              : [],
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row" id="settings-text" hidden>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'settings-text',
+                'fieldLabel'                     : 'Settings Value',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Enter settings value and save.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row" id="settings-textarea" hidden>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'settings-textarea',
+                'fieldLabel'                     : 'Settings Value',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Enter settings value and save.',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldTextareaRows'              : 5,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        'save'    : [
+                            'title'                   : 'Save',
+                            'size'                    : 'xs',
+                            'disabled'                : true,
+                            'position'                : 'right',
+                            'type'                    : 'primary',
+                            'icon'                    : 'floppy-disk'
+                        ],
+                        'cancel'    : [
+                            'title'                   : 'Cancel',
+                            'size'                    : 'xs',
+                            'disabled'                : true,
+                            'position'                : 'right',
+                            'type'                    : 'secondary'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+{% endif %}
+{% if type === 'components' or type === 'middlewares' or type === 'packages' %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'componentId'           : componentId,
+                'sectionId'             : sectionId,
+                'buttonType'            : 'button',
+                'buttons'               :
+                    [
+                        'generate-settings' : [
+                            'title'                   : 'Generate Settings',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'position'                : 'right'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'settings',
+                'fieldLabel'                     : 'Module Settings',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Settings of the module. JSON Format',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldTextareaRows'              : 15,
+                'fieldValue'                     : settings
+            ]
+        )}}
+    </div>
+</div>

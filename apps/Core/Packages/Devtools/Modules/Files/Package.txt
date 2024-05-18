@@ -1,0 +1,61 @@
+<?php
+
+"NAMESPACE"
+
+use System\Base\BasePackage;
+
+class "PACKAGENAME" extends BasePackage
+{
+    //protected $modelToUse = ::class;
+
+    protected $packageName = '"PACKAGENAMELC"';
+
+    public $"PACKAGENAMELC";
+
+    public function get"PACKAGENAME"ById($id)
+    {
+        $"PACKAGENAMELC" = $this->getById($id);
+
+        if ($"PACKAGENAMELC") {
+            //
+            $this->addResponse('Success');
+
+            return;
+        }
+
+        $this->addResponse('Error', 1);
+    }
+
+    public function add"PACKAGENAME"($data)
+    {
+        //
+    }
+
+    public function update"PACKAGENAME"($data)
+    {
+        $"PACKAGENAMELC" = $this->getById($id);
+
+        if ($"PACKAGENAMELC") {
+            //
+            $this->addResponse('Success');
+
+            return;
+        }
+
+        $this->addResponse('Error', 1);
+    }
+
+    public function remove"PACKAGENAME"($data)
+    {
+        $"PACKAGENAMELC" = $this->getById($id);
+
+        if ($"PACKAGENAMELC") {
+            //
+            $this->addResponse('Success');
+
+            return;
+        }
+
+        $this->addResponse('Error', 1);
+    }
+}

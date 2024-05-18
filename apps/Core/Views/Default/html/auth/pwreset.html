@@ -1,0 +1,751 @@
+<script>
+/*global BazCore */
+BazCore.header({
+    loadHeaderAt : 'login'
+});
+</script>
+{% set boxWidth = '' %}
+{% if coreSettings['security']['passwordPolicy'] is defined and coreSettings['security']['passwordPolicySettings'] is defined and coreSettings['security']['passwordPolicy'] == 'true' %}
+    {% set boxWidth = 'style="width: 80%"' %}
+{% endif %}
+<div id="{{componentId}}" class="login-box" {{boxWidth}}>
+    <div class="card m-0">
+        <div class="card-body login-card-body">
+            <div class="login-logo">
+                <img src="{{links.images(assets.get('branding').getCodes()[3].getContent())}}" data-rjs="3" alt="Bazaari Logo">
+            </div>
+            <div id="{{componentId}}-regular" hidden>
+                <p class="login-box-msg text-sm font-weight-bold">Password Reset</p>
+                {% if coreSettings['security']['passwordPolicy'] is defined and coreSettings['security']['passwordPolicySettings'] is defined and coreSettings['security']['passwordPolicy'] == 'true' %}
+                    {% set previousPasswordsText = '' %}
+                    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] > 0 %}
+                        {% set previousPasswordsText =
+                            '<div class="col">
+                                <span class="text-info mr-1 policy passwordPolicyBlockPreviousPasswords">
+                                    <i class="fa fas fa-exclamation-circle"></i>
+                                </span>
+                                <span class="mb-1">Number of previous password you cannot use : <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] ~ '</strong></span>
+                            </div>'
+                        %}
+                    {% endif %}
+                    <div class="row">
+                        <div class="col">
+                            Enter your new password as per these policies or press the magic wand to generated new password. Password should meet all the policies.<br><br>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                             : component,
+                                    'componentName'                         : componentName,
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : 'form',
+                                    'fieldId'                               : 'pwreset-policies',
+                                    'fieldLabel'                            : 'Password Reset Policies',
+                                    'fieldLabelLegend'                      : false,
+                                    'fieldHidden'                           : false,
+                                    'fieldType'                             : 'html',
+                                    'fieldBazScan'                          : false,
+                                    'fieldBazPostOnCreate'                  : false,
+                                    'fieldBazPostOnUpdate'                  : false,
+                                    'fieldBazJstreeSearch'                  : true,
+                                    'fieldHtmlContent'                      : '<div class="row">' ~ previousPasswordsText ~ '</div>'
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] is defined  %}
+                        {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'simple' %}
+                            {% include 'auth/pwreset/simple.html' %}
+                        {% elseif coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'complex' %}
+                            {% include 'auth/pwreset/complex.html' %}
+                        {% endif %}
+                    {% else %}
+                        {% include 'auth/pwreset/simple.html' %}
+                    {% endif %}
+                {% endif %}
+                <div id="{{componentId}}-form">
+                    {% include 'auth/pwreset/fields.html' %}
+                    <div class="row mt-2">
+                        <div class="col">
+                            <button id="{{componentId}}-form-reset" type="button" class="btn btn-info float-right">
+                                <i class="fa fa-cog fa-spin login-spinner" hidden></i>
+                                <span class="text-uppercase">Reset</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% include 'auth/footer.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+/*global BazCore PNotify */
+$(document).ready(function(){
+
+    $('#{{componentId}}-regular').attr('hidden', false).addClass('animated fadeIn');
+    if ($('#{{componentId}}-form-user')) {
+        $('#{{componentId}}-form-user').focus();
+    }
+
+    BazCore.footer({
+        loadFooterAt : 'auth'
+    });
+
+    // Slideshow
+    $('body').vegas({
+        delay: 300000,
+        timer: false,
+        shuffle: true,
+        slides: [
+        { src: '{{links.images("/vegas/2.4.4/images/wp1.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp2.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp3.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp4.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp5.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp6.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp7.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp8.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp9.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp10.jpg")}}' }
+        ],
+        overlay: '{{links.images("/vegas/2.4.4/overlays/01.png")}}'
+    });
+
+    var url, thisButton, countDownTimer;
+    var postData = { };
+    function getAjaxUrlData(thisButton) {
+        $('#{{componentId}}-form-auth, ' +
+          '#{{componentId}}-form-forgot, ' +
+          '#{{componentId}}-form-reset, ' +
+          '#{{componentId}}-form-twofa-email-email_code, ' +
+          '#{{componentId}}-form-agent-verification-email_code, ' +
+          '#{{componentId}}-form-verify').attr('disabled', true);
+        $('#' + thisButton.id).attr('disabled', true);
+
+        if (thisButton.id !== '{{componentId}}-form-twofa-email-email_code' &&
+            thisButton.id !== '{{componentId}}-form-agent-verification-email_code'
+        ) {
+            $('.login-spinner').attr('hidden', false);
+        }
+
+        if ($('#{{componentId}}-form-auth').length > 0) {
+            if ($('#twofa-email').hasClass('d-none') === false) {
+                if (thisButton.id === '{{componentId}}-form-twofa-email-email_code') {
+                    url = '{{links.url("auth/sendtwofaemail")}}';
+                    postData = {
+                        'user'      : $('#{{componentId}}-form-user').val().trim(),
+                        'pass'      : $('#{{componentId}}-form-pass').val().trim()
+                    };
+                    clearInterval(countDownTimer);
+                } else {
+                    url = '{{links.url("auth/login")}}';
+                    postData = {
+                        'user'          : $('#{{componentId}}-form-user').val().trim(),
+                        'pass'          : $('#{{componentId}}-form-pass').val().trim(),
+                        'code'          : $('#{{componentId}}-form-twofa-email').val().trim(),
+                        'remember'      : $('#{{componentId}}-form-remember')[0].checked,
+                        'twofa_using'   : 'email'
+                    };
+                }
+            } else if ($('#twofa-otp').hasClass('d-none') === false) {
+                url = '{{links.url("auth/login")}}';
+                postData = {
+                    'user'          : $('#{{componentId}}-form-user').val().trim(),
+                    'pass'          : $('#{{componentId}}-form-pass').val().trim(),
+                    'code'          : $('#{{componentId}}-form-twofa-otp').val().trim(),
+                    'remember'      : $('#{{componentId}}-form-remember')[0].checked,
+                    'twofa_using'   : 'otp'
+                };
+            } else {
+                url = '{{links.url("auth/login")}}';
+                postData = {
+                    'user'          : $('#{{componentId}}-form-user').val().trim(),
+                    'pass'          : $('#{{componentId}}-form-pass').val().trim(),
+                    'remember'      : $('#{{componentId}}-form-remember')[0].checked
+                };
+            }
+        } else if ($('#{{componentId}}-form-forgot').length > 0) {
+            url = '{{links.url("auth/forgot")}}';
+            postData = {
+                'user'      : $('#{{componentId}}-form-user').val().trim()
+            };
+        } else if ($('#{{componentId}}-form-reset').length > 0) {
+            if ($('#twofa-email').length > 0 && $('#twofa-email').hasClass('d-none') === false) {
+                if (thisButton.id === '{{componentId}}-form-twofa-email-email_code') {
+                    url = '{{links.url("auth/sendtwofaemail")}}';
+                    postData = {
+                        'user'      : $('#{{componentId}}-form-user').val().trim(),
+                        'pass'      : $('#{{componentId}}-form-current_password').val().trim()
+                    };
+                    clearInterval(countDownTimer);
+                } else {
+                    url = '{{links.url("auth/pwreset")}}';
+                    postData = {
+                        'user'              : $('#{{componentId}}-form-user').val().trim(),
+                        'pass'              : $('#{{componentId}}-form-current_password').val().trim(),
+                        'newpass'           : $('#{{componentId}}-form-new_password').val().trim(),
+                        'confirmnewpass'    : $('#{{componentId}}-form-confirm_password').val().trim(),
+                        'code'              : $('#{{componentId}}-form-twofa-email').val().trim(),
+                        'twofa_using'       : 'email'
+                    };
+                }
+            } else if ($('#twofa-otp').length > 0 && $('#twofa-otp').hasClass('d-none') === false) {
+                url = '{{links.url("auth/pwreset")}}';
+                postData = {
+                    'user'              : $('#{{componentId}}-form-user').val().trim(),
+                    'pass'              : $('#{{componentId}}-form-current_password').val().trim(),
+                    'newpass'           : $('#{{componentId}}-form-new_password').val().trim(),
+                    'confirmnewpass'    : $('#{{componentId}}-form-confirm_password').val().trim(),
+                    'code'              : $('#{{componentId}}-form-twofa-otp').val().trim(),
+                    'twofa_using'       : 'otp'
+                };
+            } else {
+                url = '{{links.url("auth/pwreset")}}';
+                postData = {
+                    'user'              : $('#{{componentId}}-form-user').val().trim(),
+                    'pass'              : $('#{{componentId}}-form-current_password').val().trim(),
+                    'newpass'           : $('#{{componentId}}-form-new_password').val().trim(),
+                    'confirmnewpass'    : $('#{{componentId}}-form-confirm_password').val().trim()
+                };
+            }
+
+            if ($('.policy').length > 0) {
+                $('.policy').removeClass(function (index, className) {
+                    return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                }).addClass('text-info');
+                $('.policy').children('i').removeClass(function (index, className) {
+                    return (className.match (/(^|\s)fa-\S+/g) || []).join(' ');
+                }).addClass('fa-exclamation-circle');
+            }
+        } else if ($('#{{componentId}}-form-verify').length > 0) {
+            if (thisButton.id === '{{componentId}}-form-agent-verification-email_code') {
+                url = '{{links.url("auth/sendVerification")}}';
+            } else if (thisButton.id === '{{componentId}}-form-verify') {
+                postData = {
+                    'code'          : $('#{{componentId}}-form-agent-verification').val().trim()
+                };
+                url = '{{links.url("auth/verify")}}';
+            }
+        } else if ($('#{{componentId}}-form-generate-code').length > 0) {
+            url = '{{links.url("auth/enableTwoFaOtp")}}';
+            postData = {
+                'user'              : $('#{{componentId}}-form-user').val().trim(),
+                'pass'              : $('#{{componentId}}-form-pass').val().trim()
+            };
+        }
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+    }
+
+    $('#{{componentId}}-form-auth, ' +
+      '#{{componentId}}-form-forgot, ' +
+      '#{{componentId}}-form-reset, ' +
+      '#{{componentId}}-form-twofa-email-email_code, ' +
+      '#{{componentId}}-form-agent-verification-email_code, ' +
+      '#{{componentId}}-form-generate-code, ' +
+      '#{{componentId}}-form-verify').click(function(e) {
+            e.preventDefault();
+            thisButton = this;
+            getAjaxUrlData(thisButton);
+            runAjax();
+        });
+
+    //Register Enter
+    if ($('#{{componentId}}-form-auth').length > 0) {
+        registerSendOnEnter($('#{{componentId}}-form-auth'));
+    } else if ($('#{{componentId}}-form-forgot').length > 0) {
+        registerSendOnEnter($('#{{componentId}}-form-forgot'));
+    } else if ($('#{{componentId}}-form-reset').length > 0) {
+        registerSendOnEnter($('#{{componentId}}-form-reset'));
+    } else if ($('#{{componentId}}-form-verify').length > 0) {
+        registerSendOnEnter($('#{{componentId}}-form-verify'));
+    }
+    function registerSendOnEnter(registerButton) {
+        $('body').keyup(function(e) {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                getAjaxUrlData(registerButton);
+                runAjax();
+            }
+        });
+    }
+
+    function runAjax() {
+        $.ajax({
+            url             : url,
+            data            : postData,
+            method          : 'post',
+            dataType        : 'json',
+            beforeSend      : function() {
+                                    $("#{{componentId}}-form :input").prop("disabled", true);
+                                },
+            error           : function(response) {
+                                    if (response.getResponseHeader('redirect_url')) {
+                                        window.location = response.getResponseHeader('redirect_url');
+                                    }
+                                    $('.login-box-msg').text('Error! Please contact administrator.');
+                                    failed();
+                                },
+            success         : function(response) {
+                                if (response.responseCode == '0') {
+                                    $('.login-box-msg').text(response.responseMessage);
+                                    if (response) {
+                                        success(response);
+                                    } else {
+                                        success();
+                                    }
+                                } else if (response.responseCode == '1') {
+                                    $('.login-box-msg').text(response.responseMessage);
+                                    if (response) {
+                                        failed(response);
+                                    } else {
+                                        failed();
+                                    }
+                                } else if (response.responseCode == '2') {
+                                    $('.login-box-msg').text(response.responseMessage);
+                                    failed();
+                                } else if (response.responseCode == '3') {
+                                    $('.login-box-msg').text(response.responseMessage);
+                                    if (response) {
+                                        twoFa(response);
+                                    } else {
+                                        twoFa();
+                                    }
+                                }
+
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+                            }
+        });
+    }
+
+    function failed(response) {
+        if (response && response.redirectUrl) {
+            window.location = response.redirectUrl;
+            return;
+        }
+        if ($('#{{componentId}}-form-auth').length > 0) {
+            $('.login-spinner').attr('hidden', true);
+            $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+            $('#{{componentId}}-form :input').prop('disabled', false);
+            if ($('#twofa-email').hasClass('d-none') === false) {
+                $('#{{componentId}}-form-twofa-email').val('');
+                if (response.responseData) {
+                    setEmailTimer(response.responseData.code_sent_on, response.responseData.email_timeout);
+                }
+            } else {
+                $('#{{componentId}}-form :input').not('.token').val('');
+                $('#{{componentId}}-form-user').focus();
+                $('#{{componentId}}-form-auth').attr('disabled', false);
+                $('#{{componentId}}-form-twofa-otp').parents('.form-group').addClass('d-none');
+            }
+        } else if ($('#{{componentId}}-form-forgot').length > 0) {
+            $('.login-spinner').attr('hidden', true);
+            $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+            $('#{{componentId}}-form :input').prop('disabled', false);
+        } else if ($('#{{componentId}}-form-reset').length > 0) {
+            $('.login-spinner').attr('hidden', true);
+            $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+            $('#{{componentId}}-form :input').prop('disabled', false);
+            if ($('#twofa-email').hasClass('d-none') === false) {
+                $('#{{componentId}}-form-twofa-email').val('');
+                if (response.responseData) {
+                    setEmailTimer(response.responseData.code_sent_on, response.responseData.email_timeout);
+                }
+            }
+            if ($('.policy').length > 0) {
+                if (response.responseData && response.responseData.passwordPolicyErrors) {
+                    if (Object.keys(response.responseData.passwordPolicyErrors).length > 0) {
+                        for (var passwordPolicyError in response.responseData.passwordPolicyErrors) {
+                            if (response.responseData.passwordPolicyErrors[passwordPolicyError] == false) {
+                                $('.' + passwordPolicyError).removeClass(function (index, className) {
+                                    return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                                }).addClass('text-success');
+                                $('.' + passwordPolicyError).children('i').removeClass(function (index, className) {
+                                    return (className.match (/(^|\s)fa-\S+/g) || []).join(' ');
+                                }).addClass('fa-check-circle');
+                            } else if (response.responseData.passwordPolicyErrors[passwordPolicyError] == true) {
+                                $('.' + passwordPolicyError).removeClass(function (index, className) {
+                                    return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                                }).addClass('text-danger');
+                                $('.' + passwordPolicyError).children('i').removeClass(function (index, className) {
+                                    return (className.match (/(^|\s)fa-\S+/g) || []).join(' ');
+                                }).addClass('fa-times-circle');
+                            }
+                        }
+                    }
+                }
+            }
+        } else if ($('#{{componentId}}-form-verify').length > 0) {
+            $('.login-spinner').attr('hidden', true);
+            $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+            $('#{{componentId}}-form :input').prop('disabled', false);
+            $('#{{componentId}}-form :input').not('.token').val('');
+            if (response.responseData) {
+                setEmailTimer(response.responseData.code_sent_on, response.responseData.email_timeout);
+            }
+        }
+        setTimeout(function () {
+            $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+
+            if ($('#{{componentId}}-form-auth').length > 0) {
+                $('.login-box-msg').text('Login to start {{appRoute}} session');
+            } else if ($('#{{componentId}}-form-verify').length > 0) {
+                $('.login-box-msg').text('New browser or location detected');
+            } else if ($('#{{componentId}}-form-forgot').length > 0) {
+                $('.login-box-msg').text('Forgot Password');
+            } else if ($('#{{componentId}}-form-reset').length > 0) {
+                $('.login-box-msg').text('Reset Password');
+            } else if ($('#{{componentId}}-form-generate-code').length > 0) {
+                $('.login-box-msg').text('App requires 2 factor authentication. Setup now to login.');
+            }
+
+            $('.login-box-msg').addClass('animated fadeIn');
+        }, 5000);
+    }
+
+    function twoFa(response) {
+        $('.login-spinner').attr('hidden', true);
+        $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+
+        if (response.responseData['allowed_methods'].includes('otp')) {
+            $('#{{componentId}}-form :input').prop('disabled', false);
+            $('#{{componentId}}-form-twofa-otp').parents('.form-group').removeClass('d-none');
+            $('#twofa-otp').removeClass('d-none');
+            $('#{{componentId}}-form-twofa-otp').focus();
+        } else if (response.responseData['allowed_methods'].includes('email')) {
+            $('#{{componentId}}-form :input').prop('disabled', false);
+            $('#{{componentId}}-form-twofa-email').parents('.form-group').removeClass('d-none');
+            $('#twofa-email').removeClass('d-none');
+        }
+
+        setTimeout(function () {
+            $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+
+            if ($('#{{componentId}}-form-auth').length > 0) {
+                $('.login-box-msg').text('Login to start {{appRoute}} session');
+            } else if ($('#{{componentId}}-form-forgot').length > 0) {
+                $('.login-box-msg').text('Forgot Password');
+            } else if ($('#{{componentId}}-form-reset').length > 0) {
+                $('.login-box-msg').text('Reset Password');
+            }
+
+            $('.login-box-msg').addClass('animated fadeIn');
+        }, 5000);
+    }
+
+    function success(response) {
+        $('.login-spinner').attr('hidden', true);
+        $('.login-box-msg').removeClass('text-danger').addClass('text-success font-weight-bold');
+
+        if ($('#{{componentId}}-form-auth').length > 0) {
+            if ($('#twofa-email').hasClass('d-none') === false) {
+                if (response.responseMessage && response.responseMessage.includes('Authenticated')) {
+                    if (response && response.redirectUrl) {
+                        window.location = response.redirectUrl;
+                        return;
+                    } else {
+                        window.location = '/{{appRoute}}/';
+                        return;
+                    }
+                } else {
+                    $('#{{componentId}}-form :input').prop('disabled', false);
+                    $('#{{componentId}}-form-twofa-email').val('');
+                    setTimeout(function () {
+                        $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+                        $('.login-box-msg').text('Login to start {{appRoute}} session');
+                        $('.login-box-msg').addClass('animated fadeIn');
+                    }, 5000);
+                    setEmailTimer(null, response.responseData.email_timeout);
+                }
+            } else {
+                if (response && response.redirectUrl) {
+                    window.location = response.redirectUrl;
+                    return;
+                } else {
+                    window.location = '/{{appRoute}}/';
+                    return;
+                }
+            }
+        } else if ($('#{{componentId}}-form-forgot').length > 0) {
+            if (response.responseCode == '1') {
+                $('.login-spinner').attr('hidden', true);
+                $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+                $('#{{componentId}}-form :input').prop('disabled', false);
+            }
+        } else if ($('#{{componentId}}-form-generate-code').length > 0) {
+            $('#{{componentId}}-form-regenerate-code').attr('disabled', false);
+            $('#{{componentId}}-form-verifycode').attr('disabled', false);
+            $('#credentials-div').attr('hidden', true);
+            $('#generate-div').attr('hidden', true);
+            $('#regenerate-div').attr('hidden', false);
+            $('#twofa-qrcode').empty().append(
+                '<img src="' + response.qrcode + '" />'
+            );
+            $('#twofa-details').attr('hidden', false);
+            $('#twofa-secret').empty().append(response.secret);
+            $('#{{componentId}}-form-verifycode').off();
+            $('#{{componentId}}-form-verifycode').on('input propertychange', function() {
+                if ($(this).val().length === 6) {
+                    $('#{{componentId}}-form-verify').attr('disabled', false);
+                } else {
+                    $('#{{componentId}}-form-verify').attr('disabled', true);
+                }
+            });
+
+            $('#{{componentId}}-form-regenerate-code').off();
+            $('#{{componentId}}-form-regenerate-code').click(function(e) {
+                e.preventDefault();
+
+                $(this).attr('disabled', true);
+                $(this).children('i').attr('hidden', false);
+
+                var postData = { };
+                postData['user'] = $('#{{componentId}}-form-user').val().trim();
+                postData['pass'] = $('#{{componentId}}-form-pass').val().trim();
+                postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                var url = '{{links.url("auth/enableTwoFaOtp")}}';
+
+                $.post(url, postData, function(response) {
+                    if (response.responseCode === 0) {
+                        $('#twofa-qrcode').empty().append(
+                            '<img src="' + response.qrcode + '" />'
+                        );
+                        $('#twofa-secret').empty().append(response.secret);
+                    } else {
+                        $('.login-box-msg').removeClass('text-success').addClass('text-danger font-weight-bold');
+                        $('.login-box-msg').text(response.responseMessage);
+                    }
+
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+
+                    $('#{{componentId}}-form-regenerate-code').attr('disabled', false);
+                    $('#{{componentId}}-form-regenerate-code').children('i').attr('hidden', true);
+
+                }, 'json');
+            });
+
+            $('#{{componentId}}-form-verify').off();
+            $('#{{componentId}}-form-verify').click(function(e) {
+                e.preventDefault();
+
+                $(this).attr('disabled', true);
+                $(this).children('i').attr('hidden', false);
+
+                var postData = { };
+                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                postData['code'] = $('#{{componentId}}-form-verifycode').val().trim();
+                postData['user'] = $('#{{componentId}}-form-user').val().trim();
+                postData['pass'] = $('#{{componentId}}-form-pass').val().trim();
+
+                var url = '{{links.url("auth/verifytwofaotp")}}';
+
+                $.post(url, postData, function(response) {
+                    if (response.responseCode === 0) {
+                        $('.login-box-msg').text(response.responseMessage);
+                        $('.login-box-msg').removeClass('text-danger').addClass('text-success font-weight-bold');
+
+                        $('#login-div').attr('hidden', false);
+
+                        if (response.redirectUrl) {
+                            $('#login').attr('href', response.redirectUrl);
+                        } else {
+                            $('#login').attr('href', '/{{appRoute}}/');
+                        }
+                    } else {
+                        $('.login-box-msg').removeClass('text-success').addClass('text-danger font-weight-bold');
+                        $('.login-box-msg').text(response.responseMessage);
+                    }
+
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+
+                    $('#{{componentId}}-form-verify').attr('disabled', false);
+                    $('#{{componentId}}-form-verify').children('i').attr('hidden', true);
+
+                }, 'json');
+            });
+        } else if ($('#{{componentId}}-form-reset').length > 0) {
+            if ($('#twofa-email').hasClass('d-none') === false) {
+                if (response.responseMessage && response.responseMessage.includes('Password changed')) {
+                    if (response && response.redirectUrl) {
+                        window.location = response.redirectUrl;
+                        return;
+                    } else {
+                        window.location = '/{{appRoute}}/';
+                        return;
+                    }
+                } else {
+                    $('#{{componentId}}-form :input').prop('disabled', false);
+                    $('#{{componentId}}-form-twofa-email').val('');
+                    setTimeout(function () {
+                        $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+                        $('.login-box-msg').text('Login to start {{appRoute}} session');
+                        $('.login-box-msg').addClass('animated fadeIn');
+                    }, 5000);
+                    setEmailTimer(null, response.responseData.email_timeout);
+                }
+            } else {
+                if (response && response.redirectUrl) {
+                    window.location = response.redirectUrl;
+
+                    return;
+                } else {
+                    window.location = '/{{appRoute}}/';
+
+                    return;
+                }
+            }
+        } else if ($('#{{componentId}}-form-verify').length > 0) {
+            if (thisButton.id === '{{componentId}}-form-agent-verification-email_code') {
+                setEmailTimer(null, response.responseData.email_timeout);
+                $('#{{componentId}}-form-agent-verification').attr('disabled', false);
+                $('#{{componentId}}-form-verify').attr('disabled', false);
+                setTimeout(function () {
+                    $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+                    $('.login-box-msg').text('Enter email verification code and hit verify');
+                    $('.login-box-msg').addClass('animated fadeIn');
+                }, 2000);
+            } else if (thisButton.id === '{{componentId}}-form-verify') {
+                if (response && response.redirectUrl) {
+                    window.location = response.redirectUrl;
+                } else {
+                    window.location = '/{{appRoute}}/';
+                }
+            }
+        }
+    }
+
+    function setEmailTimer(oldsenttime = null, emailtimeout = 60) {
+        if ($('#{{componentId}}-form-twofa-email-email_code').length > 0) {
+            $('#{{componentId}}-form-twofa-email-email_code').attr('disabled', true);
+            $('#{{componentId}}-form-twofa-email-small-text').html('');
+        } else if ($('#{{componentId}}-form-agent-verification-email_code').length > 0) {
+            $('#{{componentId}}-form-agent-verification-email_code').attr('disabled', true);
+            $('#{{componentId}}-form-agent-verification-small-text').html('');
+        }
+        var expiryTimer;
+
+        if (oldsenttime) {
+            expiryTimer = (oldsenttime * 1000) + (emailtimeout * 1000);
+        } else {
+            expiryTimer = new Date().getTime() + (emailtimeout * 1000);
+        }
+
+        countDownTimer = setInterval(() => {
+            var seconds, now, tillExpiry;
+
+            now = new Date().getTime();
+            tillExpiry = expiryTimer - now;
+            seconds = Math.floor((tillExpiry % (emailtimeout * 1000)) / 1000);
+
+            if ($('#{{componentId}}-form-twofa-email-email_code').length > 0) {
+                $('#{{componentId}}-form-twofa-email-small-text').html('Code sent valid for ' + seconds + 's...');
+            } else if ($('#{{componentId}}-form-agent-verification-email_code').length > 0) {
+                $('#{{componentId}}-form-agent-verification-small-text').html('Code sent valid for ' + seconds + 's...');
+            }
+
+            if (tillExpiry < 0) {
+                clearInterval(countDownTimer);
+                if ($('#{{componentId}}-form-twofa-email-email_code').length > 0) {
+                    $('#{{componentId}}-form-twofa-email-email_code').attr('disabled', false);
+                    $('#{{componentId}}-form-twofa-email-small-text').html('');
+                } else if ($('#{{componentId}}-form-agent-verification-email_code').length > 0) {
+                    $('#{{componentId}}-form-agent-verification-email_code').attr('disabled', false);
+                    $('#{{componentId}}-form-agent-verification-small-text').html('');
+                }
+            }
+        }, 1000);
+    }
+
+    $('#{{componentId}}-form-current_password-visibility, ' +
+      '#{{componentId}}-form-new_password-visibility, ' +
+      '#{{componentId}}-form-confirm_password-visibility').click(function(e) {
+        e.preventDefault();
+
+        var id = $(this)[0].id;
+
+        if (id === '{{componentId}}-form-current_password-visibility') {
+            if ($('#{{componentId}}-form-current_password').attr('type') === 'password') {
+                $('#{{componentId}}-form-current_password').attr('type', 'text');
+                $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+            } else if ($('#{{componentId}}-form-current_password').attr('type') === 'text') {
+                $('#{{componentId}}-form-current_password').attr('type', 'password');
+                $('#' + id).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        } else if (id === '{{componentId}}-form-new_password-visibility') {
+            if ($('#{{componentId}}-form-new_password').attr('type') === 'password') {
+                $('#{{componentId}}-form-new_password').attr('type', 'text');
+                $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+            } else if ($('#{{componentId}}-form-new_password').attr('type') === 'text') {
+                $('#{{componentId}}-form-new_password').attr('type', 'password');
+                $('#' + id).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        } else if (id === '{{componentId}}-form-confirm_password-visibility') {
+            if ($('#{{componentId}}-form-confirm_password').attr('type') === 'password') {
+                $('#{{componentId}}-form-confirm_password').attr('type', 'text');
+                $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+            } else if ($('#{{componentId}}-form-confirm_password').attr('type') === 'text') {
+                $('#{{componentId}}-form-confirm_password').attr('type', 'password');
+                $('#' + id).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        }
+    });
+
+    $('#{{componentId}}-form-strength-meter').strengthMeter({
+        "url" : '{{links.url("auth/checkPwStrength")}}'
+    });
+
+    $('#{{componentId}}-form-new_password-password_generate').click(function(e) {
+        e.preventDefault();
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+        $.post('{{links.url("auth/generatePw")}}', postData, function(response) {
+            if (response.responseCode == 0) {
+                if (response.responseData) {
+                    $('#{{componentId}}-form-new_password').val(response.responseData).trigger('change');
+                    $('#{{componentId}}-form-confirm_password').val(response.responseData);
+                    $('#{{componentId}}-form-new_password, #{{componentId}}-form-confirm_password').attr('type', 'text');
+                    $('#{{componentId}}-form-new_password-visibility, #{{componentId}}-form-confirm_password-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            } else {
+                PNotify.error(response.responseMessage);
+            }
+            if (response.tokenKey && response.token) {
+                $("#security-token").attr("name", response.tokenKey);
+                $("#security-token").val(response.token);
+            }
+
+            $('#{{componentId}}-form-new_password, #{{componentId}}-form-confirm_password').keyup(function() {
+                if ($(this).val() === '') {
+                    $('#{{componentId}}-form-confirm_password').val('');
+                    $(this).attr('type', 'password');
+                }
+            });
+        }, 'json');
+    });
+
+    $('#{{componentId}}-form-twofa-otp-switch_to_email').click(function() {
+        $('#{{componentId}}-form-twofa-otp').val('');
+        $('#twofa-otp').addClass('d-none');
+        $('#twofa-email').removeClass('d-none');
+    });
+    $('#{{componentId}}-form-twofa-email-switch_to_otp').click(function() {
+        $('#{{componentId}}-form-twofa-email').val('');
+        $('#twofa-otp').removeClass('d-none');
+        $('#twofa-email').addClass('d-none');
+    });
+});
+</script>

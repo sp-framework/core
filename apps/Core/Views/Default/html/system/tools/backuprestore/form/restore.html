@@ -1,0 +1,91 @@
+<div class="row vdivide mb-2">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'fieldId'                       : 'backup_upload_restore',
+                'fieldType'                     : 'files/dropzone',
+                'fieldLabel'                    : false,
+                'fieldDropzoneLabel'            : 'Upload Backup',
+                'fieldRequired'                 : false,
+                'fieldHelp'                     : true,
+                'fieldHelpTooltipContent'       : 'Max: 1. Upload backup file. Acceptable extension .zip. File should be downloaded from this system for restore to work properly and file must include backupInfo.json that was generated at the time of backup.',
+                'fieldAdditionalClass'          : 'mb-1',
+                'fieldBazScan'                  : true,
+                'fieldBazPostOnCreate'          : false,
+                'fieldBazPostOnUpdate'          : false,
+                'attachments'                   : [],
+                'maxAttachments'                : 1,
+                'noPreview'                     : true,
+                'uploadDirectory'               : '.backups',
+                'isBackupFile'                  : true,
+                'storage'                       : storage,
+                'setOrphan'                     : false,
+                'upload'                        : true,
+                'allowedFileMimeType'           : 'application/zip'
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'backups',
+                'fieldLabel'                     : 'Select Backup To Restore',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select backup that you want to restore. If there is none in the list, you can upload a backup file.',
+                'fieldBazScan'                   : true,
+                'fieldRequired'                  : true,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataSelect2Options'        : dbStorageFiles,
+                'fieldDataSelect2OptionsKey'     : 'uuid',
+                'fieldDataSelect2OptionsValue'   : 'org_file_name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col text-center">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                     : 'button',
+                'buttons'                        :
+                    [
+                        'remove'    : [
+                            'title'                   : 'remove',
+                            'size'                    : 'xs',
+                            'disabled'                : true,
+                            'type'                    : 'danger',
+                            'icon'                    : 'times'
+                        ],
+                        'download'    : [
+                            'title'                   : 'download',
+                            'size'                    : 'xs',
+                            'disabled'                : true,
+                            'icon'                    : 'download',
+                            'url'                     : '#'
+                        ],
+                        'analyse'    : [
+                            'title'                   : 'Analyse & Restore',
+                            'size'                    : 'xs',
+                            'disabled'                : true,
+                            'icon'                    : 'file-zipper'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>

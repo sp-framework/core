@@ -2,34 +2,48 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
-use Phalcon\Helper\Json;
-
 class Package
 {
-	public function register($db, $packageFile, $installedFiles)
+	public function register($db, $ff, $packageFile, $helper)
 	{
-		return $db->insertAsDict(
-			'modules_packages',
+		$package =
 			[
 				'name' 					=> $packageFile['name'],
 				'display_name'			=> $packageFile['display_name'],
 				'description' 			=> $packageFile['description'],
+				'module_type'	 		=> $packageFile['module_type'],
 				'app_type'		 		=> $packageFile['app_type'],
 				'category'				=> $packageFile['category'],
-				'sub_category'			=> $packageFile['sub_category'],
 				'version'				=> $packageFile['version'],
 				'repo'					=> $packageFile['repo'],
 				'class'					=> $packageFile['class'],
 				'settings'				=>
 					isset($packageFile['settings']) ?
-					Json::encode($packageFile['settings']) :
-					null,
+					$helper->encode($packageFile['settings']) :
+					$helper->encode([]),
+				'dependencies'		 	=>
+					isset($packageFile['dependencies']) ?
+					$helper->encode($packageFile['dependencies']) :
+					$helper->encode([]),
 				'apps'					=>
-					Json::encode(['1'=>['enabled'=>true]]),
+					$helper->encode(['1'=>['enabled'=>true]]),
+				'api_id'				=> 1,
 				'installed'				=> 1,
-				'files'					=> Json::encode($installedFiles),
+				'files'					=>
+					isset($packageFile['files']) ?
+					$helper->encode($packageFile['files']) :
+					$helper->encode([]),
 				'updated_by'			=> 0
-			]
-		);
+			];
+
+		if ($db) {
+			$db->insertAsDict('modules_packages', $package);
+		}
+
+		if ($ff) {
+			$packageStore = $ff->store('modules_packages');
+
+			$packageStore->updateOrInsert($package);
+		}
 	}
 }

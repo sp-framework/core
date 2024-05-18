@@ -1,0 +1,502 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'pwreset',
+                'fieldLabel'                            : 'Password Reset',
+                'fieldLabelLegend'                      : true,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldHtmlContent'                      : ''
+            ]
+        )}}
+    </div>
+</div>
+{% if coreSettings['security']['passwordPolicy'] is defined and coreSettings['security']['passwordPolicySettings'] is defined and coreSettings['security']['passwordPolicy'] == 'true' %}
+    {% set previousPasswordsText = '' %}
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] > 0 %}
+        {% set previousPasswordsText =
+            '<div class="col">
+                <span class="text-info mr-1 policy passwordPolicyBlockPreviousPasswords">
+                    <i class="fa fas fa-exclamation-circle"></i>
+                </span>
+                <span class="mb-1">Number of previous password you cannot use : <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicyBlockPreviousPasswords'] ~ '</strong></span>
+            </div>'
+        %}
+    {% endif %}
+    <div class="row">
+        <div class="col">
+            Enter your new password as per these policies or press the magic wand to generated new password. Password should meet all the policies.<br><br>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'pwreset-policies',
+                    'fieldLabel'                            : 'Password Reset Policies',
+                    'fieldLabelLegend'                      : false,
+                    'fieldHidden'                           : false,
+                    'fieldType'                             : 'html',
+                    'fieldBazScan'                          : false,
+                    'fieldBazPostOnCreate'                  : false,
+                    'fieldBazPostOnUpdate'                  : false,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldHtmlContent'                      : '<div class="row">' ~ previousPasswordsText ~ '</div>'
+                ]
+            )}}
+        </div>
+    </div>
+    {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] is defined  %}
+        {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'simple' %}
+            {% include 'profile/form/security/pwresetsimple.html' %}
+        {% elseif coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'complex' %}
+            {% include 'profile/form/security/pwresetcomplex.html' %}
+        {% endif %}
+    {% else %}
+        {% include 'profile/form/security/pwresetsimple.html' %}
+    {% endif %}
+{% endif %}
+{% include 'profile/form/security/pwresetfields.html' %}
+<br>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                 : component,
+                'componentName'             : componentName,
+                'componentId'               : componentId,
+                'sectionId'                 : sectionId,
+                'buttonType'                : 'button',
+                'buttons'                   :
+                    {
+                        'pwreset-button' : {
+                            'title'                   : 'Reset',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'position'                : 'right'
+                        }
+                    }
+            ]
+        )}}
+    </div>
+</div>
+{% set otpHidden = 'hidden' %}
+{% if in_array('otp', canUse2fa) %}
+    {% set otpHidden = '' %}
+{% endif %}
+<div {{otpHidden}}>
+    <hr>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'twofa',
+                    'fieldLabel'                            : 'Two Factor Authentication OTP',
+                    'fieldLabelLegend'                      : true,
+                    'fieldHidden'                           : false,
+                    'fieldType'                             : 'html',
+                    'fieldBazScan'                          : false,
+                    'fieldBazPostOnCreate'                  : false,
+                    'fieldBazPostOnUpdate'                  : false,
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldHtmlContent'                      : 'Two Factor Authentication (2FA) OTP is an extended method of authentication which uses an authenticator app like Google Authenticator or Authy.'
+                ]
+            )}}
+        </div>
+    </div>
+    {% if account['security']['twofa_otp_status'] == '1' %}
+        {% set disableHidden = false %}
+        {% set enableHidden = true %}
+    {% else %}
+        {% set disableHidden = true %}
+        {% set enableHidden = false %}
+    {% endif %}
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('buttons',
+                [
+                    'component'                 : component,
+                    'componentName'             : componentName,
+                    'componentId'               : componentId,
+                    'sectionId'                 : sectionId,
+                    'buttonType'                : 'button',
+                    'buttons'                   :
+                        {
+                            'enable-twofa-otp-button'   : {
+                                'title'                   : 'Enable Two Factor Authentication (OTP)',
+                                'size'                    : 'sm',
+                                'type'                    : 'primary',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true,
+                                'hidden'                  : enableHidden
+                            },
+                            'disable-twofa-otp-button'  : {
+                                'title'                   : 'Disable Two Factor Authentication (OTP)',
+                                'size'                    : 'sm',
+                                'type'                    : 'danger',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true,
+                                'hidden'                  : disableHidden
+                            }
+                        }
+                ]
+            )}}
+        </div>
+    </div>
+    <br>
+    <div id="twofa-otp-details" class="row vdivide" hidden>
+        <div class="col-md-3 d-flex justify-content-center">
+            <div id="twofa-otp-qrcode"></div>
+        </div>
+        <div class="col">
+            <div id="twofa-otp-instructions">
+                <h5>INSTRUCTIONS:</h5>
+                <ul>
+                    <li>Scan the shown QR Code on your authenticator app.</li>
+                    <li>If, for any reason, you cannot scan the QR Code, you can type in this secret code manually. <br>Secret Code: <span class="font-weight-bold" id="twofa-otp-secret"></span></li>
+                    <li>Once successfully added into your app, enter the generated code from the app and click verify.</li>
+                </ul>
+            </div>
+            <div id="twofa-otp-verification">
+                <h5>VERIFICATION:</h5>
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'verification',
+                        'fieldLabel'                            : 'Generated Code',
+                        'fieldType'                             : 'input',
+                        'fieldGroupPostAddonButtons'          :
+                            [
+                                'verify'   : [
+                                    'title'                   : 'Verify',
+                                    'icon'                    : 'cog fa-spin',
+                                    'iconHidden'              : true,
+                                    'noMargin'                : true,
+                                    'disabled'                : true,
+                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                    'position'                : 'right'
+                                ]
+                            ],
+                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Code generated via the authenticator app.',
+                        'fieldBazScan'                          : false,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : false,
+                        'fieldDataInputMinLength'               : 4,
+                        'fieldDataInputMaxLength'               : 10
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+/* global PNotify Swal */
+var countDownTimer;
+$('#{{componentId}}-{{sectionId}}-twofa_email-email_code').click(function(e) {
+    e.preventDefault();
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['user']  = '{{auth.account()["username"]}}';
+    postData['pass']  = $('#{{componentId}}-{{sectionId}}-current_password').val().trim();
+
+    $.post('{{links.url("auth/sendtwofaemail")}}', postData, function(response) {
+        if (response.responseCode == 0) {
+            if (response.responseData.email_timeout) {
+                setEmailTimer(null, response.responseData.email_timeout);
+            }
+        } else {
+            if (response.responseData && response.responseData.email_timeout && response.responseData.code_sent_on) {
+                setEmailTimer(response.responseData.code_sent_on, response.responseData.email_timeout);
+            }
+
+            PNotify.error(response.responseMessage);
+        }
+
+        if (response.tokenKey && response.token) {
+            $("#security-token").attr("name", response.tokenKey);
+            $("#security-token").val(response.token);
+        }
+    }, 'json');
+
+    clearInterval(countDownTimer);
+});
+
+function setEmailTimer(oldsenttime = null, emailtimeout = 60) {
+    $('#{{componentId}}-{{sectionId}}-twofa_email-email_code').attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-twofa_email-small-text').html('');
+
+    var expiryTimer;
+
+    if (oldsenttime) {
+        expiryTimer = (oldsenttime * 1000) + (emailtimeout * 1000);
+    } else {
+        expiryTimer = new Date().getTime() + (emailtimeout * 1000);
+    }
+
+    countDownTimer = setInterval(() => {
+        var seconds, now, tillExpiry;
+
+        now = new Date().getTime();
+        tillExpiry = expiryTimer - now;
+        seconds = Math.floor((tillExpiry % (emailtimeout * 1000)) / 1000);
+
+        $('#{{componentId}}-{{sectionId}}-twofa_email-small-text').html('Code sent valid for ' + seconds + 's...');
+
+        if (tillExpiry < 0) {
+            clearInterval(countDownTimer);
+            $('#{{componentId}}-{{sectionId}}-twofa_email-email_code').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-twofa_email-small-text').html('');
+        }
+    }, 1000);
+}
+
+$('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
+    e.preventDefault();
+
+    var postData = {
+        'pass'              : $('#{{componentId}}-{{sectionId}}-current_password').val().trim(),
+        'newpass'           : $('#{{componentId}}-{{sectionId}}-new_password').val().trim(),
+        'confirmnewpass'    : $('#{{componentId}}-{{sectionId}}-confirm_password').val().trim()
+    }
+
+    if ($('#twofa-otp').attr('hidden') === 'hidden') {
+        postData['code'] = $('#{{componentId}}-{{sectionId}}-twofa_email').val();
+        postData['twofa_using'] = 'email';
+    } else if ($('#twofa-email').attr('hidden') === 'hidden') {
+        postData['code'] = $('#{{componentId}}-{{sectionId}}-twofa_otp').val();
+        postData['twofa_using'] = 'otp';
+    }
+
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    $.post('{{links.url("system/users/profile/pwreset")}}', postData, function(response) {
+        $('.policy').removeClass(function (index, className) {
+            return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+        }).addClass('text-info');
+        $('.policy').children('i').removeClass(function (index, className) {
+            return (className.match (/(^|\s)fa-\S+/g) || []).join(' ');
+        }).addClass('fa-exclamation-circle');
+
+        if (response.responseCode == 0) {
+            if (response.redirectUrl) {
+                window.location = response.redirectUrl;
+            }
+            $('#{{componentId}}-{{sectionId}}-current_password').val('');
+            $('#{{componentId}}-{{sectionId}}-new_password').val('').trigger('change');
+            $('#{{componentId}}-{{sectionId}}-confirm_password').val('');
+            if ($('#twofa-otp').attr('hidden') === 'hidden') {
+                $('#{{componentId}}-{{sectionId}}-twofa_email').val('');
+                clearInterval(countDownTimer);
+                $('#{{componentId}}-{{sectionId}}-twofa_email-email_code').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-twofa_email-small-text').html('');
+            } else if ($('#twofa-email').attr('hidden') === 'hidden') {
+                $('#{{componentId}}-{{sectionId}}-twofa_otp').val('');
+            }
+            PNotify.success(response.responseMessage);
+        } else {
+            PNotify.error(response.responseMessage);
+
+            if (response.responseData && response.responseData.passwordPolicyErrors) {
+                if (Object.keys(response.responseData.passwordPolicyErrors).length > 0) {
+                    for (var passwordPolicyError in response.responseData.passwordPolicyErrors) {
+                        if (response.responseData.passwordPolicyErrors[passwordPolicyError] == false) {
+                            $('.' + passwordPolicyError).removeClass(function (index, className) {
+                                return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                            }).addClass('text-success');
+                            $('.' + passwordPolicyError).children('i').removeClass(function (index, className) {
+                                return (className.match (/(^|\s)fa-\S+/g) || []).join(' ');
+                            }).addClass('fa-check-circle');
+                        } else if (response.responseData.passwordPolicyErrors[passwordPolicyError] == true) {
+                            $('.' + passwordPolicyError).removeClass(function (index, className) {
+                                return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                            }).addClass('text-danger');
+                            $('.' + passwordPolicyError).children('i').removeClass(function (index, className) {
+                                return (className.match (/(^|\s)fa-\S+/g) || []).join(' ');
+                            }).addClass('fa-times-circle');
+                        }
+                    }
+                }
+            }
+        }
+
+        if (response.tokenKey && response.token) {
+            $("#security-token").attr("name", response.tokenKey);
+            $("#security-token").val(response.token);
+        }
+    }, 'json');
+});
+
+$('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').click(function(e) {
+    e.preventDefault();
+
+    $(this).attr('disabled', true);
+    $(this).children('i').attr('hidden', false);
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    var url = '{{links.url("system/users/profile/enabletwofaotp")}}';
+
+    $.post(url, postData, function(response) {
+        if (response.responseCode === 0) {
+            $('#twofa-otp-qrcode').empty().append(
+                '<img src="' + response.qrcode + '" />'
+            );
+            $('#twofa-otp-details').attr('hidden', false);
+            $('#twofa-otp-secret').empty().append(response.secret);
+            $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').html(
+                '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> REGENERATE TWO FACTOR AUTHENTICATION QR CODE'
+            );
+        } else {
+            PNotify.error({
+                'title' : response.responseMessage
+            });
+        }
+
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').children('i').attr('hidden', true);
+
+    }, 'json');
+});
+
+$('#{{componentId}}-{{sectionId}}-verification').on('input propertychange', function() {
+    if ($(this).val().length > 4) {
+        $('#{{componentId}}-{{sectionId}}-verify').attr('disabled', false);
+    } else {
+        $('#{{componentId}}-{{sectionId}}-verify').attr('disabled', true);
+    }
+});
+
+$('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
+    e.preventDefault();
+
+    $(this).attr('disabled', true);
+    $(this).children('i').attr('hidden', false);
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['code'] = $('#{{componentId}}-{{sectionId}}-verification').val().trim();
+
+    var url = '{{links.url("system/users/profile/verifytwofaotp")}}';
+
+    $.post(url, postData, function(response) {
+        if (response.responseCode === 0) {
+            PNotify.success({
+                'title' : response.responseMessage
+            });
+
+            $('#{{componentId}}-{{sectionId}}-verification').val('');
+            $('#twofa-otp-qrcode').empty();
+            $('#twofa-otp-secret').empty();
+            $('#twofa-otp-details').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-disable-twofa-otp-button').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').html(
+                '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> ENABLE TWO FACTOR AUTHENTICATION'
+            );
+        } else {
+            PNotify.error({
+                'title' : response.responseMessage
+            });
+        }
+
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        $('#{{componentId}}-{{sectionId}}-verify').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-verify').children('i').attr('hidden', true);
+
+    }, 'json');
+});
+
+$('#{{componentId}}-{{sectionId}}-disable-twofa-otp-button').click(function(e) {
+    e.preventDefault();
+
+    Swal.fire({
+        title                       : '<span class="text-danger">Disable 2FA Authentication?</span>',
+        icon                        : 'question',
+        width                       : '100%',
+        background                  : 'rgba(0,0,0,.8)',
+        backdrop                    : 'rgba(0,0,0,.6)',
+        buttonsStyling              : false,
+        confirmButtonText           : 'Disable',
+        customClass                 : {
+            'confirmButton'             : 'btn btn-danger text-uppercase',
+            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+            'inputLabel'                : 'text-white',
+            'input'                     : 'text-white'
+        },
+        showCancelButton            : true,
+        keydownListenerCapture      : true,
+        allowOutsideClick           : false,
+        allowEscapeKey              : false,
+        input                       : 'text',
+        inputLabel                  : 'GENERATED CODE',
+        didOpen                     : function() {
+            window.dataCollection.env.sounds.swalSound.play();
+        }
+    }).then((result) => {
+        if (result.isConfirmed === true &&
+            result.value !== ''
+        ) {
+            var postData = { };
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+            postData['code'] = result.value;
+
+            var url = '{{links.url("system/users/profile/disabletwofaotp")}}';
+
+            $.post(url, postData, function(response) {
+                if (response.responseCode === 0) {
+                    $('#{{componentId}}-{{sectionId}}-disable-twofa-otp-button').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').attr('hidden', false);
+                    PNotify.success({
+                        'title' : response.responseMessage
+                    });
+                } else {
+                    PNotify.error({
+                        'title' : response.responseMessage
+                    });
+                }
+
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
+                }
+            }, 'json');
+        }
+    });
+});
+</script>

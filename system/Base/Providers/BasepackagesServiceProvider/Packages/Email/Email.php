@@ -5,7 +5,6 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Email;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailException;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServices;
@@ -72,7 +71,7 @@ class Email extends BasePackage
                 $this->domain = $this->domains->getById($domainId);
 
                 if (!is_array($this->domain['apps']) && $this->domain['apps'] !== '') {
-                    $this->domain['apps'] = Json::decode($this->domain['apps'], true);
+                    $this->domain['apps'] = $this->helper->decode($this->domain['apps'], true);
                 }
             }
 
@@ -100,7 +99,7 @@ class Email extends BasePackage
             $this->email->Port          = $this->emailSettings['port'];
         }
 
-        if ($this->emailSettings['auth'] === '1' &&
+        if ($this->emailSettings['auth'] == '1' &&
             ($this->emailSettings['username'] === '' || $this->emailSettings['password'] === '')
         ) {
             throw new EmailException(
@@ -113,12 +112,12 @@ class Email extends BasePackage
         }
 
         $this->email->SMTPSecure =
-            isset($this->emailSettings['encryption']) && $this->emailSettings['encryption'] === '1' ?
+            isset($this->emailSettings['encryption']) && $this->emailSettings['encryption'] == '1' ?
             PHPMailer::ENCRYPTION_SMTPS :
             '';
 
         $this->email->isHTML(
-            isset($this->emailSettings['allow_html_body']) && $this->emailSettings['allow_html_body'] === '1' ?
+            isset($this->emailSettings['allow_html_body']) && $this->emailSettings['allow_html_body'] == '1' ?
             $this->emailSettings['allow_html_body'] :
             ''
         );

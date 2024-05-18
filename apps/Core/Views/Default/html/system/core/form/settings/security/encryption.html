@@ -1,0 +1,59 @@
+<div class="row">
+    <div class="col">
+        {% set minNumber = 4 %}
+        {% set maxNumber = 16 %}
+        {% if core['settings']['dev'] == true %}
+            {% set minNumber = 2 %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'passwordWorkFactor',
+                'fieldLabel'                            : 'Password Encryption Level',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Level of encryption on the password. The higher the number, the longer server will take to encrypt.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : minNumber,
+                'fieldDataInputMaxNumber'               : maxNumber,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : core['settings']['security']['passwordWorkFactor']
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'cookiesWorkFactor',
+                'fieldLabel'                            : 'Cookies Encryption Level',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Level of encryption on the cookies. The higher the number, the longer server will take to encrypt.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : minNumber,
+                'fieldDataInputMaxNumber'               : maxNumber,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : core['settings']['security']['cookiesWorkFactor']
+            ]
+        )}}
+    </div>
+</div>
+<small class="text-danger">Note: These numbers are set during installation. Changing these numbers will require all users to change their password and will be logged out of the system.</small>
+<hr>

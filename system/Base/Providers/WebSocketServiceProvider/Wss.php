@@ -2,17 +2,26 @@
 
 namespace System\Base\Providers\WebSocketServiceProvider;
 
-use Phalcon\Helper\Json;
-use Phalcon\Validation as PhalconValidation;
 use ZMQContext;
 
 class Wss
 {
+    protected $config;
+
     protected $connector = null;
 
     protected $context;
 
     protected $socket;
+
+    protected $helper;
+
+    public function __construct($config, $helper)
+    {
+        $this->config = $config;
+
+        $this->helper = $helper;
+    }
 
     public function init()
     {
@@ -27,7 +36,12 @@ class Wss
             return;
         }
 
-        $this->connector = 'tcp://localhost:5555';
+        $this->connector = 
+            $this->config->websocket->protocol . 
+            '://' . 
+            $this->config->websocket->host . 
+            ':' . 
+            $this->config->websocket->port;
     }
 
     public function getConnector()
@@ -71,6 +85,8 @@ class Wss
 
         $this->socket->connect($this->connector);
 
-        $this->socket->send(Json::encode($data));
+        $this->socket->send($this->helper->encode($data));
+
+        return true;
     }
 }

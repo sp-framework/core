@@ -2,55 +2,48 @@
 
 namespace System\Base\Providers\LoggerServiceProvider;
 
-use Phalcon\Helper\Json;
-use Phalcon\Helper\Str;
 use Phalcon\Logger\Formatter\AbstractFormatter;
 use Phalcon\Logger\Item;
 
 class CustomFormat extends AbstractFormatter
 {
-	protected $dateFormat;
+	protected $clientIpAddress;
 
 	protected $sessionId;
 
 	protected $connectionId;
 
-	protected $clientIpAddress;
+	protected $dateFormat;
 
-	public function __construct(string $dateFormat = 'c', $sessionId, $connectionId, $clientIpAddress)
+	protected $helper;
+
+	public function __construct($clientIpAddress, $sessionId, $connectionId, $helper, string $dateFormat = 'c')
 	{
-		$this->dateFormat = $dateFormat;
+		$this->clientIpAddress = $clientIpAddress;
 
 		$this->sessionId = $sessionId;
 
 		$this->connectionId = $connectionId;
 
-		$this->clientIpAddress = $clientIpAddress;
+		$this->dateFormat = $dateFormat;
+
+		$this->helper = $helper;
 	}
 
 	public function format(Item $item) : string
 	{
-		if (is_array($item->getContext())) {
-			$message = $this->interpolate(
-				$item->getMessage(),
-				$item->getContext()
-			);
-		} else {
-			$message = $item->getMessage();
-		}
-
 		$toLog =
 				[
-					"type"      	=> $item->getType(),
-					"typeName"     	=> $item->getName(),
-					"message"   	=> $message,
+					"type"      	=> $item->getLevel(),
+					"typeName"     	=> $item->getLevelName(),
+					"message"   	=> $item->getMessage(),
 					"session"   	=> $this->sessionId,
 					"connection" 	=> $this->connectionId,
 					"client_ip"		=> $this->clientIpAddress,
-					"timestamp" 	=> $this->getFormattedDate(),
+					"timestamp" 	=> $this->getFormattedDate($item),
 					"mseconds" 		=> microtime()
 				];
 
-		return Json::encode($toLog);
+		return $this->helper->encode($toLog);
 	}
 }

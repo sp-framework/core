@@ -2,13 +2,16 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
+use System\Base\Providers\ModulesServiceProvider\Installer;
+use System\Base\Providers\ModulesServiceProvider\Manager;
+use System\Base\Providers\ModulesServiceProvider\Queues;
+use System\Base\Providers\ModulesServiceProvider\Modules\Bundles;
 use System\Base\Providers\ModulesServiceProvider\Modules\Components;
 use System\Base\Providers\ModulesServiceProvider\Modules\Middlewares;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages;
 use System\Base\Providers\ModulesServiceProvider\Modules\Repositories;
 use System\Base\Providers\ModulesServiceProvider\Modules\Views;
-use System\Base\Providers\ModulesServiceProvider\Manager;
-use System\Base\Providers\ModulesServiceProvider\Installer;
+use System\Base\Providers\ModulesServiceProvider\Modules\Views\ViewsSettings;
 
 class Modules
 {
@@ -20,11 +23,17 @@ class Modules
 
 	protected $views;
 
+	protected $viewsSettings;
+
 	protected $repositories;
+
+	protected $bundles;
 
 	protected $manager;
 
 	protected $installer;
+
+	protected $queues;
 
 	public function __construct()
 	{
@@ -69,11 +78,25 @@ class Modules
 		return $this->views;
 	}
 
+	protected function initViewsSettings()
+	{
+		$this->viewsSettings = (new ViewsSettings())->init();
+
+		return $this->viewsSettings;
+	}
+
 	protected function initRepositories()
 	{
 		$this->repositories = (new Repositories())->init();
 
 		return $this->repositories;
+	}
+
+	protected function initBundles()
+	{
+		$this->bundles = (new Bundles())->init();
+
+		return $this->bundles;
 	}
 
 	protected function initManager()
@@ -88,5 +111,12 @@ class Modules
 		$this->installer = (new Installer())->init();
 
 		return $this->installer;
+	}
+
+	protected function initQueues()
+	{
+		$this->queues = (new Queues())->init();
+
+		return $this->queues;
 	}
 }

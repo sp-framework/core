@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Geo;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries as GeoCountriesModel;
 
@@ -66,7 +65,9 @@ class GeoCountries extends BasePackage
         if ($this->add($data)) {
 
             if (!isset($data['id'])) {
-                $this->updateSeq();
+                if ($this->config->databasetype === 'db') {
+                    $this->updateSeq();
+                }
             }
 
             $this->addResponse('Added country ' . $data['name']);
@@ -120,7 +121,7 @@ class GeoCountries extends BasePackage
             return false;
         }
 
-        $countryData = Json::decode($this->localContent->read($this->sourceDir . $data['country_iso2'] . '.json'), true);
+        $countryData = $this->helper->decode($this->localContent->read($this->sourceDir . $data['country_iso2'] . '.json'), true);
 
         $this->registerStates($countryData['states'], $countryData['id']);
             // dump($countryData);
@@ -142,7 +143,7 @@ class GeoCountries extends BasePackage
         try {
             $this->localContent->write(
                 $this->sourceDir . $country . '.zip',
-                $this->remoteContent
+                $this->remoteWebContent
                     ->request(
                         'GET',
                         'https://dev.bazaari.com.au/sp-public/geodata/raw/branch/master/' . $country . '.zip',
@@ -176,7 +177,7 @@ class GeoCountries extends BasePackage
                 return false;
             }
 
-            $zip->close(base_path($this->sourceDir . $country . '.zip'));
+            $zip->close();
 
             return true;
         } catch (\Exception $e) {

@@ -2,8 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Email;
 
-use Phalcon\Helper\Arr;
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Email\BasepackagesEmailQueue;
 
@@ -43,10 +41,17 @@ class EmailQueue extends BasePackage
         if ($this->add($data)){
             $this->addResponse('Added email to queue with ID ' . $this->packagesData->last['id'], 0, null, true);
 
-            $task = $this->basepackages->workers->tasks->findByParameter($data['priority'], "priority", 'processemailqueue');
+            $task = $this->basepackages->workers->tasks->findByCallArgs($data['priority'], "priority", 'processemailqueue');
 
             if ($task && $task['force_next_run'] === null) {
                 $this->basepackages->workers->tasks->forceNextRun(['id' => $task['id']]);
+            }
+
+            if (!$this->basepackages->email->setup(null, $this->domains->getDomain()['id'], $this->apps->getAppInfo()['id'])) {
+                $this->basepackages->emailservices->errorEmailService(
+                    'Email was added to the queue but, there is no email service associated with app: ' . $this->apps->getAppInfo()['name'] . '. Please add a new service ' .
+                    'and assign it to the app via domains.'
+                );
             }
 
             return true;
@@ -62,7 +67,7 @@ class EmailQueue extends BasePackage
         return $this->queueLock;
     }
 
-    public function processQueue($processPriority = 0)
+    public function processQueue($processPriority = 0, $confidential = false, $id = null)
     {
         if ($this->queueLock === true && $processPriority === $this->priorityToProcess) {
             $this->addResponse('Another process is clearing the queue, please wait...', 1);
@@ -70,8 +75,8 @@ class EmailQueue extends BasePackage
             return;
         }
 
-        if ($processPriority !== 0) {
-            $this->priorityToProcess = $processPriority;
+        if ($processPriority != 0) {
+            $this->priorityToProcess = (int) $processPriority;
         } else {
             $this->priorityToProcess = self::PRIORITY_LOW;
         }
@@ -80,17 +85,48 @@ class EmailQueue extends BasePackage
 
         $hadErrors = false;
 
-        $conditions =
-            [
-                'conditions'    => 'status = :status: AND priority = :priority:',
-                'bind'          =>
+        if ($this->config->databasetype === 'db') {
+            if ($id) {
+                $conditions =
                     [
-                        'status'    => self::STATUS_IN_QUEUE,
-                        'priority'  => $this->priorityToProcess
-                    ]
-            ];
+                        'conditions'    => 'id = :id:',
+                        'bind'          =>
+                            [
+                                'id'    => $id,
+                            ]
+                    ];
+            } else if ($confidential) {
+                $conditions =
+                    [
+                        'conditions'    => 'status = :status: AND confidential = :confidential:',
+                        'bind'          =>
+                            [
+                                'status'        => self::STATUS_IN_QUEUE,
+                                'confidential'  => 1
+                            ]
+                    ];
+            } else {
+                $conditions =
+                    [
+                        'conditions'    => 'status = :status: AND priority = :priority:',
+                        'bind'          =>
+                            [
+                                'status'    => self::STATUS_IN_QUEUE,
+                                'priority'  => $this->priorityToProcess
+                            ]
+                    ];
+            }
+        } else {
+            if ($id) {
+                $conditions = ['conditions' => ['id', '=', (int) $id]];
+            } else {
+                $conditions = ['conditions' => [['status', '=', self::STATUS_IN_QUEUE], ['priority', '=', $this->priorityToProcess]]];
+            }
+        }
 
         $queue = $this->getByParams($conditions, true, false);
+
+        $queueProcessedIds = [];
 
         if ($queue && is_array($queue) && count($queue) > 0) {
             foreach ($queue as $key => $queueEmail) {
@@ -106,15 +142,15 @@ class EmailQueue extends BasePackage
 
                     $this->basepackages->email->setSender($queueEmailSettings['from_address'], $queueEmailSettings['from_address']);
 
-                    $queueEmail['to_addresses'] = Json::decode($queueEmail['to_addresses'], true);
+                    $queueEmail['to_addresses'] = $this->helper->decode($queueEmail['to_addresses'], true);
                     if (count($queueEmail['to_addresses']) > 1) {
                         foreach ($queueEmail['to_addresses'] as $key => $toAddress) {
                             $this->basepackages->email->setRecipientTo($toAddress, $toAddress);
                         }
                     } else {
-                        $this->basepackages->email->setRecipientTo(Arr::first($queueEmail['to_addresses']), Arr::first($queueEmail['to_addresses']));
+                        $this->basepackages->email->setRecipientTo($this->helper->first($queueEmail['to_addresses']), $this->helper->first($queueEmail['to_addresses']));
                     }
-                    $queueEmail['to_addresses'] = Json::encode($queueEmail['to_addresses']);
+                    $queueEmail['to_addresses'] = $this->helper->encode($queueEmail['to_addresses']);
 
                     $this->basepackages->email->setSubject($queueEmail['subject']);
 
@@ -133,11 +169,15 @@ class EmailQueue extends BasePackage
                         $queueEmail['logs'] = 'Sent';
                         $queueEmail['sent_on'] = date("F j, Y, g:i a");
 
+                        array_push($queueProcessedIds, $queueEmail['id']);
+
                         $this->update($queueEmail);
                     }
                 }
             }
         }
+
+        $this->queueLock = false;
 
         if ($hadErrors) {
             $this->addResponse('Queue processed with some errors. Please check the email queue for details.', 1);
@@ -145,7 +185,7 @@ class EmailQueue extends BasePackage
             return;
         }
 
-        $this->addResponse('Queue processed successfully.');
+        $this->addResponse('Queue processed successfully.', 0, ['queueProcessedIds' => $queueProcessedIds]);
     }
 
     public function requeue(array $data)
@@ -156,7 +196,7 @@ class EmailQueue extends BasePackage
         $email['logs'] = '';
 
         if ($this->update($email)) {
-            $task = $this->basepackages->workers->tasks->findByParameter($email['priority'], "priority", 'processemailqueue');
+            $task = $this->basepackages->workers->tasks->findByCallArgs($email['priority'], "priority", 'processemailqueue');
 
             if ($task && $task['force_next_run'] === null) {
                 $this->basepackages->workers->tasks->forceNextRun(['id' => $task['id']]);

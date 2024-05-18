@@ -20,13 +20,11 @@ class VoltTools
 
     protected $whitelist = ['.', '..', '.gitignore'];
 
-    public function __construct($container)
+    public function __construct($volt, $view)
     {
-        $this->container = $container;
+        $this->volt = $volt;
 
-        $this->volt = $this->container->getShared('volt');
-
-        $this->view = $this->container->getShared('view');
+        $this->view = $view;
 
         $this->viewPath  = $this->view->getViewsDir();
     }

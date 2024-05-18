@@ -1,0 +1,64 @@
+{
+    "name"          : "Barcodes",
+    "display_name"  : "Barcodes Package",
+    "description"   : "Package for generating and validating Barcodes",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "basepackages",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Barcodes",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "settings"      : {
+        "componentRoute"        : "system/tools/barcodes",
+        "availableCodes"        : {
+            "C128"              : "C128",
+            "C128A"             : "C128A",
+            "C128B"             : "C128B",
+            "C128C"             : "C128C",
+            "EAN2"              : "EAN2",
+            "EAN5"              : "EAN5",
+            "EAN8"              : "EAN8",
+            "EAN13"             : "EAN13",
+            "UPCA"              : "UPCA",
+            "UPCE"              : "UPCE",
+            "PHARMA"            : "PHARMA",
+            "PHARMA2T"          : "PHARMA2T"
+        },
+        "enabledCodes"          :
+            [
+                "C128",
+                "C128A",
+                "C128B",
+                "C128C",
+                "EAN13",
+                "UPCA"
+            ],
+        "availableGenerators"   : {
+            "SVG"               : "SVG",
+            "PNG"               : "PNG",
+            "HTML"              : "HTML"
+        },
+        "defaultGenerator"      : "HTML",
+        "widthFactor"           : 2,
+        "height"                : 30,
+        "foreground"            : "#000000",
+        "showText"              : false,
+        "textPlacements"        : {
+            "TOP"               : "TOP",
+            "BOTTOM"            : "BOTTOM"
+        },
+        "defaultTextPlacement"  : "BOTTOM"
+    }
+}

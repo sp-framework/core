@@ -1,0 +1,325 @@
+<div class="row">
+    <div class="col">
+        <label class="text-sm">TAKEN AT: </label>
+        <span class="text-sm">{{backupInfoFile['takenAt']}}</span>
+    </div>
+    <div class="col">
+        <label class="text-sm">CREATED BY: </label>
+        <span class="text-sm">{{backupInfoFile['createdBy']}}</span>
+    </div>
+    <div class="col">
+        <label class="text-sm">BACKUP NAME: </label>
+        <span class="text-sm">{{backupInfoFile['backupName']}}</span>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <label class="text-sm">BACKUP APPS DIRECTORY: </label>
+        {% if backupInfoFile['request']['apps_dir'] == 'true' %}
+            <span class="text-sm">Yes</span>
+        {% else %}
+            <span class="text-sm">No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label class="text-sm">BACKUP SYSTEMS DIRECTORY: </label>
+        {% if backupInfoFile['request']['systems_dir'] == 'true' %}
+            <span class="text-sm">Yes</span>
+        {% else %}
+            <span class="text-sm">No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label class="text-sm">BACKUP PUBLIC DIRECTORY: </label>
+        {% if backupInfoFile['request']['public_dir'] == 'true' %}
+            <span class="text-sm">Yes</span>
+        {% else %}
+            <span class="text-sm">No</span>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <label class="text-sm">BACKUP PRIVATE DIRECTORY: </label>
+        {% if backupInfoFile['request']['private_dir'] == 'true' %}
+            <span class="text-sm">Yes</span>
+        {% else %}
+            <span class="text-sm">No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label class="text-sm">BACKUP EXTERNAL DIRECTORY: </label>
+        {% if backupInfoFile['request']['external_dir'] == 'true' %}
+            <span class="text-sm">Yes</span>
+        {% else %}
+            <span class="text-sm">No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label class="text-sm">COMPILED HTML DIRECTORY: </label>
+        {% if backupInfoFile['request']['html_compiled'] == 'true' %}
+            <span class="text-sm">Yes</span>
+        {% else %}
+            <span class="text-sm">No</span>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <label class="text-sm">VAR DIRECTORY: </label>
+        {% if backupInfoFile['request']['var_dir'] == 'true' %}
+            <span class="text-sm">Yes</span>
+        {% else %}
+            <span class="text-sm">No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label class="text-sm">BACKUP EXTERNAL VENDOR DIRECTORY: </label>
+        {% if backupInfoFile['request']['external_vendor_dir'] == 'true' %}
+            <span class="text-sm">Yes</span>
+        {% else %}
+            <span class="text-sm">No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label class="text-sm">OLD BACKUP FILES: </label>
+        {% if backupInfoFile['request']['old_backups'] == 'true' %}
+            <span class="text-sm">Yes</span>
+        {% else %}
+            <span class="text-sm">No</span>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <label class="text-sm">DATABASE: </label>
+        {% if backupInfoFile['request']['database'] == 'true' %}
+            <span class="text-sm">Yes</span>
+        {% else %}
+            <span class="text-sm">No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label class="text-sm">SECURITY/DB KEYS: </label>
+        {% if backupInfoFile['request']['keys'] == 'true' %}
+            <span class="text-sm">Yes</span>
+        {% else %}
+            <span class="text-sm">No</span>
+        {% endif %}
+    </div>
+    <div class="col">
+        <label class="text-sm">PASSWORD PROTECTED: </label>
+        {% if backupInfoFile['request']['password_protect'] is defined and backupInfoFile['request']['password_protect'] !== '' %}
+            <span class="text-sm">Yes</span>
+        {% else %}
+            <span class="text-sm">No</span>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <label class="text-sm">NOTES: </label>
+        {% if backupInfoFile['request']['notes'] is defined and backupInfoFile['request']['notes'] != '' %}
+            <p>{{backupInfoFile['request']['notes']}}</p>
+        {% else %}
+            <span class="text-sm">-</span>
+        {% endif %}
+    </div>
+</div>
+<hr>
+<div class="row vdivide">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : 'analysis',
+                'fieldId'                                   : 'backup_structure',
+                'fieldLabel'                                : 'Backup Structure',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'This is a structure of files in the backup zip file. You can select which files you want to restore.',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : true,
+                'fieldJstreeDataSrcArr'                     : ["structure":["srcArr" : backupInfoFile['structure']]],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeAllChecked'                     : false,
+                'fieldJstreeRootIcon'                       : 'folder-tree',
+                'fieldJstreeToggleAllChildren'              : true,
+                'fieldJstreeIncludeRootInPath'              : true,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : true,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false,
+                'fieldJstreeReplaceIdWithDataField'         : 'pathid',
+                'fieldJstreePlugins'                        : ["checkbox", "search", "types", "dnd"]
+            ]
+        )}}
+    </div>
+    {% if backupInfoFile['request']['database'] == 'true' or backupInfoFile['request']['password_protect'] is defined and backupInfoFile['request']['password_protect'] !== '' %}
+        <div class="col">
+            {% if backupInfoFile['request']['password_protect'] is defined and backupInfoFile['request']['password_protect'] !== '' %}
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : 'analysis',
+                                'fieldId'                               : 'password',
+                                'fieldLabel'                            : 'Password',
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'password',
+                                'fieldInputPasswordToggleVisibility'    : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Enter the password that was entered during the time of backup.',
+                                'fieldRequired'                         : true,
+                                'fieldDisabled'                         : false,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : false
+                            ]
+                        )}}
+                    </div>
+                </div>
+            {% endif %}
+            <hr>
+            {% if backupInfoFile['request']['database'] == 'true' and backupInfoFile['dbs']|length > 0 %}
+                <label class="text-uppercase">Restore Databases</label>
+                {% for db, dbPath in backupInfoFile['dbs'] %}
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : 'analysis',
+                                    'fieldId'                        : db,
+                                    'fieldLabel'                     : false,
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'Restore db ' ~ db ~ '? Note: If there is a database ' ~ db ~ ', it will be dropped and replaced by this database.',
+                                    'fieldRequired'                  : false,
+                                    'fieldType'                      : 'checkbox',
+                                    'fieldCheckboxType'              : 'success',
+                                    'fieldCheckboxLabel'             : db,
+                                    'fieldCheckboxChecked'           : true,
+                                    'fieldBazJstreeSearch'           : false,
+                                    'fieldBazPostOnCreate'           : false,
+                                    'fieldBazPostOnUpdate'           : false,
+                                    'fieldBazScan'                   : false,
+                                    'fieldAdditionalClass'           : 'db-restore'
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : 'analysis',
+                                'fieldId'                        : 'root_username',
+                                'fieldLabel'                     : 'Root Username',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Username with database create permission.',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : false,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : false,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 50,
+                                'fieldValue'                     : ''
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : 'analysis',
+                                'fieldId'                               : 'root_password',
+                                'fieldLabel'                            : 'Root Password',
+                                'fieldType'                             : 'input',
+                                'fieldInputType'                        : 'password',
+                                'fieldHelp'                             : true,
+                                'fieldInputPasswordToggleVisibility'    : true,
+                                'fieldHelpTooltipContent'               : 'Password with database create permission.',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : false,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 50,
+                                'fieldValue'                            : ''
+                            ]
+                        )}}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+<hr>
+<div id="restore-progress" class="mb-3" hidden></div>
+<script>
+/* globals BazContentFields BazProgress */
+$(document).ready(function() {
+    BazContentFields.init({
+        'componentId'   : "{{componentId}}",
+        'sectionId'     : "{{componentId}}-analysis"
+    });
+
+    $('.tooltip').remove();
+    $('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="popover"]').popover('enable');
+});
+
+/* globals PNotify Swal */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-analysis']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-analysis'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-analysis'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-analysis-password'                 : { },
+        '{{componentId}}-analysis-root_password'            : {
+            afterInit : function() {
+                BazProgress.buildProgressBar($('#restore-progress'));
+            }
+        }
+    });
+</script>

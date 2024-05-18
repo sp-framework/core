@@ -37,6 +37,13 @@ class Profiles
                         ]
                     ),
                     new Column(
+                        'initials_avatar',
+                        [
+                            'type'          => Column::TYPE_JSON,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
                         'first_name',
                         [
                             'type'          => Column::TYPE_VARCHAR,

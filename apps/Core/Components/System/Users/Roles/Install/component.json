@@ -1,0 +1,57 @@
+{
+    "route": "system/users/roles",
+    "name": "User Roles",
+    "description": "Manage user roles via this component",
+    "module_type": "components",
+    "app_type": "core",
+    "category": "admin",
+    "version": "0.0.0",
+    "repo": "https://.../",
+    "class": "Apps\\Core\\Components\\System\\Users\\Roles\\RolesComponent",
+    "dependencies":
+    {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "menu":
+    {
+        "seq": 6,
+        "system":
+        {
+            "icon": "cogs",
+            "title": "system",
+            "childs":
+            {
+                "users":
+                {
+                    "title": "users",
+                    "icon": "users",
+                    "childs":
+                    {
+                        "roles":
+                        {
+                            "title": "Roles",
+                            "link": "system/users/roles"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings":
+    {
+        "mandatory":
+        {
+            "core": true
+        },
+        "importexportPackage": "UsersRoles"
+    }
+}

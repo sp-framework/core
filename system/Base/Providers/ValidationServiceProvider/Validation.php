@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\ValidationServiceProvider;
 
-use Phalcon\Validation as PhalconValidation;
+use Phalcon\Filter\Validation as PhalconValidation;
 
 class Validation
 {
@@ -10,11 +10,12 @@ class Validation
 
     public function __construct()
     {
-        $this->validator = new PhalconValidation();
     }
 
     public function init()
     {
+        $this->validator = new PhalconValidation();
+
         return $this;
     }
 

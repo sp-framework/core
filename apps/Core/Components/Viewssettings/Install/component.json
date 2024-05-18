@@ -1,0 +1,36 @@
+{
+    "route"         : "viewssettings",
+    "name"          : "Views Settings",
+    "description"   : "Manage views settings for each domain's apps's views via this component",
+    "module_type"   : "components",
+    "app_type"      : "core",
+    "category"      : "admin",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "Apps\\Core\\Components\\Viewssettings\\ViewssettingsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "menu"              : {
+        "seq"           : 6,
+        "views"       : {
+            "title"     : "views settings",
+            "icon"      : "eye",
+            "link"      : "viewssettings"
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "core"     : true
+        }
+    }
+}

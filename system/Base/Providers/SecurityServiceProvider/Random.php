@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\SecurityServiceProvider;
 
-use Phalcon\Security\Random as PhalconRandom;
+use Phalcon\Encryption\Security\Random as PhalconRandom;
 
 class Random
 {

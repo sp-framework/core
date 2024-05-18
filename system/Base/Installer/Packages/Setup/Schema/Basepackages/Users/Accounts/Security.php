@@ -64,17 +64,106 @@ class Security
                         ]
                     ),
                     new Column(
-                        'two_fa_status',
+                        'twofa_otp_status',
                         [
                             'type'          => Column::TYPE_BOOLEAN,
                             'notNull'       => false,
                         ]
                     ),
                     new Column(
-                        'two_fa_secret',
+                        'twofa_otp_secret',
                         [
                             'type'          => Column::TYPE_VARCHAR,
                             'size'          => 1024,
+                            'notNull'       => false
+                        ]
+                    ),
+                    new Column(
+                        'twofa_otp_hotp_counter',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => false
+                        ]
+                    ),
+                    new Column(
+                        'twofa_email_code',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 1024,
+                            'notNull'       => false
+                        ]
+                    ),
+                    new Column(
+                        'twofa_email_code_sent_on',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => false
+                        ]
+                    ),
+                    new Column(
+                        'password_history',
+                        [
+                            'type'          => Column::TYPE_JSON,
+                            'notNull'       => false
+                        ]
+                    ),
+                    new Column(
+                        'password_set_on',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => true
+                        ]
+                    ),
+                    new Column(
+                        'force_pwreset_after',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => false
+                        ]
+                    ),
+                    new Column(
+                        'forgotten_request',
+                        [
+                            'type'          => Column::TYPE_BOOLEAN,
+                            'notNull'       => false
+                        ]
+                    ),
+                    new Column(
+                        'forgotten_request_session_id',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 50,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'forgotten_request_ip',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 100,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'forgotten_request_agent',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 2048,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'forgotten_request_code',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 2048,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'forgotten_request_sent_on',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
                             'notNull'       => false
                         ]
                     )

@@ -1,12 +1,24 @@
 {
     "name"          : "Apps",
     "display_name"  : "Apps",
-    "description"   : "Basepackage Apps",
-    "app_type"      : "dash",
-    "category"      : "system",
-    "sub_category"  : "tools",
-    "version"       : "0.0.1",
+    "description"   : "Apps",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "providers",
+    "version"       : "0.0.0",
     "repo"          : "https://.../",
     "class"         : "System\\Base\\Providers\\AppsServiceProvider\\Apps",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
     "settings"      : {"componentRoute":"apps"}
 }

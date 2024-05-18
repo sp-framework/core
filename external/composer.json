@@ -1,0 +1,19 @@
+{
+    "require": {
+        "composer\/composer": "^2.7",
+        "cweagans\/composer-patches": "^1.7",
+        "league\/oauth2-server": "^8.5"
+    },
+    "config": {
+        "allow-plugins": {
+            "cweagans\/composer-patches": true
+        }
+    },
+    "extra": {
+        "patches": {
+            "league\/oauth2-server": {
+                "extract client_id": "\/var\/www\/html\/sp\/system\/Base\/..\/..\/external\/patches\/oauth2_server_bearertokenvalidator.patch"
+            }
+        }
+    }
+}

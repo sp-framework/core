@@ -1,0 +1,1638 @@
+<div class="row vdivide">
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'form-fields',
+                'fieldLabel'                                : 'Form Fields',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Form Fields',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : [],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeToggleAllChildren'              : false,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : false,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false
+            ]
+        )}}
+    </div>
+    <div class="col-md-10">
+        <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'core/form/info'
+                                ],
+                                'settings'   :
+                                [
+                                    'tabTitle'          : 'Settings',
+                                    'tabInclude'        : 'core/form/settings'
+                                ],
+                                'database'   :
+                                [
+                                    'tabTitle'          : 'Database',
+                                    'tabInclude'        : 'core/form/database'
+                                ]
+                            ]
+                    ]
+                )}}
+            </fieldset>
+        </form>
+    </div>
+</div>
+{% set ffs = json_encode(core['settings']['ffs'], 16) %}
+{% set dbs = json_encode(core['settings']['dbs'], 16) %}
+<script>
+/* globals PNotify Swal BazProgress */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+if (!dataCollectionSectionForm['vars']) {
+    dataCollectionSectionForm['vars'] = { };
+}
+if (!dataCollectionSectionForm['funcs']) {
+    dataCollectionSectionForm['funcs'] = { };
+}
+dataCollectionSectionForm['vars']['ffs'] = JSON.parse('{{ffs}}');
+dataCollectionSectionForm['vars']['dbs'] = JSON.parse('{{dbs}}');
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                              : { },
+        '{{componentId}}-{{sectionId}}-name'                                            : { },
+        '{{componentId}}-{{sectionId}}-display_name'                                    : { },
+        '{{componentId}}-{{sectionId}}-version'                                         : { },
+        '{{componentId}}-{{sectionId}}-repo'                                            : { },
+        '{{componentId}}-{{sectionId}}-description'                                     : { },
+        '{{componentId}}-{{sectionId}}-debug'                                           : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-debug').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'debugon') {
+                        $('#{{componentId}}-{{sectionId}}-auto_off_debug').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-auto_off_debug').val('');
+                        $('#{{componentId}}-{{sectionId}}-auto_off_debug').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-reset').click(function() {
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("system/core/reset")}}', postData, function(response) {
+                        if (response.responseCode == 0) {
+                            PNotify.success({text: 'Done'});
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-auto_off_debug'                                  : { },
+        '{{componentId}}-{{sectionId}}-cache'                                           : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-cache').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'cacheon') {
+                        $('#{{componentId}}-{{sectionId}}-cache_timeout').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-cache_service').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-clear-cache').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-cache_timeout').val('');
+                        $('#{{componentId}}-{{sectionId}}-cache_timeout').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-cache_service').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-clear-cache').attr('disabled', true);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-cache_timeout'                                   : { },
+        '{{componentId}}-{{sectionId}}-cache_service'                                   : {
+            placeholder : 'SELECT CACHE SERVICE'
+        },
+        '{{componentId}}-{{sectionId}}-single_sign_on'                                  : { },
+        '{{componentId}}-{{sectionId}}-passwordWorkFactor'                              : { },
+        '{{componentId}}-{{sectionId}}-cookiesWorkFactor'                               : { },
+        '{{componentId}}-{{sectionId}}-password_policy'                                 : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-password_policy').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'passwordpolicyon') {
+                        $('#{{componentId}}-{{sectionId}}-password_policy_complexity, ' +
+                          '#{{componentId}}-{{sectionId}}-password_policy_force_relogin_after_pwreset, ' +
+                          '#{{componentId}}-{{sectionId}}-password_policy_force_pwreset_after, ' +
+                          '#{{componentId}}-{{sectionId}}-password_policy_block_previous_passwords, ' +
+                          '#{{componentId}}-{{sectionId}}-password_policy_forgotten_password_timeout'
+                          ).attr('disabled', false);
+                        if ($('#{{componentId}}-{{sectionId}}-password_policy_complexity').val() === 'simple') {
+                            $('#simple-div').attr('hidden', false);
+                            $('#complex-div').attr('hidden', true);
+                        } else if ($('#{{componentId}}-{{sectionId}}-password_policy_complexity').val() === 'complex') {
+                            $('#simple-div').attr('hidden', true);
+                            $('#complex-div').attr('hidden', false);
+                        }
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-password_policy_complexity, ' +
+                          '#{{componentId}}-{{sectionId}}-password_policy_force_relogin_after_pwreset, ' +
+                          '#{{componentId}}-{{sectionId}}-password_policy_force_pwreset_after, ' +
+                          '#{{componentId}}-{{sectionId}}-password_policy_block_previous_passwords, ' +
+                          '#{{componentId}}-{{sectionId}}-password_policy_forgotten_password_timeout'
+                          ).attr('disabled', true);
+                        $('#simple-div').attr('hidden', true);
+                        $('#complex-div').attr('hidden', true);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-password_policy_force_relogin_after_pwreset'     : { },
+        '{{componentId}}-{{sectionId}}-password_policy_force_pwreset_after'             : { },
+        '{{componentId}}-{{sectionId}}-password_policy_block_previous_passwords'        : { },
+        '{{componentId}}-{{sectionId}}-password_policy_forgotten_password_timeout'      : { },
+        '{{componentId}}-{{sectionId}}-password_policy_complexity'                      : {
+            placeholder : 'SELECT PASSWORD COMPLEXITY',
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-password_policy_complexity').on('select2:select', function(e) {
+                    if (e.params.data.id === 'simple') {
+                        $('#simple-div').attr('hidden', false);
+                        $('#complex-div').attr('hidden', true);
+                    } else if (e.params.data.id === 'complex') {
+                        $('#simple-div').attr('hidden', true);
+                        $('#complex-div').attr('hidden', false);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-password_policy_lowercase, ' +
+                  '#{{componentId}}-{{sectionId}}-password_policy_uppercase, ' +
+                  '#{{componentId}}-{{sectionId}}-password_policy_numbers, ' +
+                  '#{{componentId}}-{{sectionId}}-password_policy_symbols,' +
+                  '#{{componentId}}-{{sectionId}}-password_policy_avoid_similar').each(function(i, checkbox) {
+                    if ($(checkbox)[0].checked === true) {
+                        if ($(checkbox)[0].id === '{{componentId}}-{{sectionId}}-password_policy_uppercase') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_uppercase_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_uppercase_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_uppercase_include').attr('disabled', false);
+                        } else if ($(checkbox)[0].id === '{{componentId}}-{{sectionId}}-password_policy_lowercase') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_lowercase_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_lowercase_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_lowercase_include').attr('disabled', false);
+                        } else if ($(checkbox)[0].id === '{{componentId}}-{{sectionId}}-password_policy_numbers') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_numbers_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_numbers_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_numbers_include').attr('disabled', false);
+                        } else if ($(checkbox)[0].id === '{{componentId}}-{{sectionId}}-password_policy_symbols') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_symbols_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_symbols_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_symbols_include').attr('disabled', false);
+                        } else if ($(checkbox)[0].id === '{{componentId}}-{{sectionId}}-password_policy_avoid_similar') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_avoid_similar_characters').attr('disabled', false);
+                        }
+                    } else {
+                        if ($(checkbox)[0].id === '{{componentId}}-{{sectionId}}-password_policy_uppercase') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_uppercase_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_uppercase_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_uppercase_include').attr('disabled', true);
+                        } else if ($(checkbox)[0].id === '{{componentId}}-{{sectionId}}-password_policy_lowercase') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_lowercase_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_lowercase_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_lowercase_include').attr('disabled', true);
+                        } else if ($(checkbox)[0].id === '{{componentId}}-{{sectionId}}-password_policy_numbers') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_numbers_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_numbers_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_numbers_include').attr('disabled', true);
+                        } else if ($(checkbox)[0].id === '{{componentId}}-{{sectionId}}-password_policy_symbols') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_symbols_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_symbols_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_symbols_include').attr('disabled', true);
+                        } else if ($(checkbox)[0].id === '{{componentId}}-{{sectionId}}-password_policy_avoid_similar') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_avoid_similar_characters').attr('disabled', true);
+                        }
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-password_policy_lowercase, ' +
+                  '#{{componentId}}-{{sectionId}}-password_policy_uppercase, ' +
+                  '#{{componentId}}-{{sectionId}}-password_policy_numbers, ' +
+                  '#{{componentId}}-{{sectionId}}-password_policy_symbols,' +
+                  '#{{componentId}}-{{sectionId}}-password_policy_avoid_similar').click(function() {
+                    if ($(this)[0].checked === true) {
+                        if ($(this)[0].id === '{{componentId}}-{{sectionId}}-password_policy_uppercase') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_uppercase_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_uppercase_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_uppercase_include').attr('disabled', false);
+                        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-password_policy_lowercase') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_lowercase_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_lowercase_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_lowercase_include').attr('disabled', false);
+                        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-password_policy_numbers') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_numbers_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_numbers_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_numbers_include').attr('disabled', false);
+                        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-password_policy_symbols') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_symbols_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_symbols_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_symbols_include').attr('disabled', false);
+                        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-password_policy_avoid_similar') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_avoid_similar_characters').attr('disabled', false);
+                        }
+                    } else {
+                        if ($(this)[0].id === '{{componentId}}-{{sectionId}}-password_policy_uppercase') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_uppercase_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_uppercase_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_uppercase_include').attr('disabled', true);
+                        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-password_policy_lowercase') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_lowercase_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_lowercase_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_lowercase_include').attr('disabled', true);
+                        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-password_policy_numbers') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_numbers_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_numbers_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_numbers_include').attr('disabled', true);
+                        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-password_policy_symbols') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_symbols_min_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_symbols_max_count, ' +
+                              '#{{componentId}}-{{sectionId}}-password_policy_symbols_include').attr('disabled', true);
+                        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-password_policy_avoid_similar') {
+                            $('#{{componentId}}-{{sectionId}}-password_policy_avoid_similar_characters').attr('disabled', true);
+                        }
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-password_policy_simple_acceptable_level'         : {
+            placeholder : "SELECT ACCEPTABLE LEVEL"
+        },
+        '{{componentId}}-{{sectionId}}-password_policy_acceptable_test'                 : { },
+        '{{componentId}}-{{sectionId}}-password_policy_length_min'                      : { },
+        '{{componentId}}-{{sectionId}}-password_policy_length_max'                      : { },
+        '{{componentId}}-{{sectionId}}-password_policy_uppercase'                       : { },
+        '{{componentId}}-{{sectionId}}-password_policy_uppercase_min_count'             : { },
+        '{{componentId}}-{{sectionId}}-password_policy_uppercase_max_count'             : { },
+        '{{componentId}}-{{sectionId}}-password_policy_uppercase_include'               : { },
+        '{{componentId}}-{{sectionId}}-password_policy_lowercase'                       : { },
+        '{{componentId}}-{{sectionId}}-password_policy_lowercase_min_count'             : { },
+        '{{componentId}}-{{sectionId}}-password_policy_lowercase_max_count'             : { },
+        '{{componentId}}-{{sectionId}}-password_policy_lowercase_include'               : { },
+        '{{componentId}}-{{sectionId}}-password_policy_numbers'                         : { },
+        '{{componentId}}-{{sectionId}}-password_policy_numbers_min_count'               : { },
+        '{{componentId}}-{{sectionId}}-password_policy_numbers_max_count'               : { },
+        '{{componentId}}-{{sectionId}}-password_policy_numbers_include'                 : { },
+        '{{componentId}}-{{sectionId}}-password_policy_symbols'                         : { },
+        '{{componentId}}-{{sectionId}}-password_policy_symbols_min_count'               : { },
+        '{{componentId}}-{{sectionId}}-password_policy_symbols_max_count'               : { },
+        '{{componentId}}-{{sectionId}}-password_policy_symbols_include'                 : { },
+        '{{componentId}}-{{sectionId}}-password_policy_avoid_similar'                   : { },
+        '{{componentId}}-{{sectionId}}-password_policy_avoid_similar_characters'        : { },
+        '{{componentId}}-{{sectionId}}-password_policy_generate_test_password'          : { },
+        '{{componentId}}-{{sectionId}}-twofa'                                           : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-twofa').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'twofaon') {
+                        $('#{{componentId}}-{{sectionId}}-twofa_using, ' +
+                          '#{{componentId}}-{{sectionId}}-twofa_pwreset_need_2fa'
+                          ).attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-twofa_using, ' +
+                          '#{{componentId}}-{{sectionId}}-twofa_pwreset_need_2fa'
+                          ).attr('disabled', true);
+                        $('#twofa-email-div').attr('hidden', true);
+                        $('#twofa-otp-div').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-twofa_using').val(0).trigger('change');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-twofa_pwreset_need_2fa'                          : { },
+        '{{componentId}}-{{sectionId}}-twofa_email_code_timeout'                        : { },
+        '{{componentId}}-{{sectionId}}-twofa_email_code_length'                         : { },
+        '{{componentId}}-{{sectionId}}-twofa_using'                                     : {
+            'placeholder'   : 'SELECT 2FA METHODS',
+            afterInit       : function() {
+                function enableDisableFields(select) {
+                    if (select.selected === true) {
+                        if (select.id === 'email') {
+                            $('#twofa-email-div').attr('hidden', false);
+                        } else if (select.id === 'otp') {
+                            $('#twofa-otp-div').attr('hidden', false);
+                        }
+                    } else {
+                        if (select.id === 'email') {
+                            $('#twofa-email-div').attr('hidden', true);
+                        } else if (select.id === 'otp') {
+                            $('#twofa-otp-div').attr('hidden', true);
+                        }
+                    }
+                }
+
+                $('#{{componentId}}-{{sectionId}}-twofa_using').on('select2:select', function(e) {
+                    enableDisableFields(e.params.data);
+                });
+                $('#{{componentId}}-{{sectionId}}-twofa_using').on('select2:unselect', function(e) {
+                    enableDisableFields(e.params.data);
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-twofa_otp'                                       : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-twofa_otp').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'totp') {
+                        $('#twofa-otp-totp-settings-div').attr('hidden', false);
+                        $('#twofa-otp-hotp-settings-div').attr('hidden', true);
+                    } else {
+                        $('#twofa-otp-totp-settings-div').attr('hidden', true);
+                        $('#twofa-otp-hotp-settings-div').attr('hidden', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-twofa_otp_secret_size'                           : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_totp_timeout'                          : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_totp_window'                           : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_hotp_counter'                          : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_hotp_window'                           : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_label'                                 : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_issuer'                                : { },
+        '{{componentId}}-{{sectionId}}-twofa_otp_algorithm'                             : {
+            placeholder : "SELECT HASH ALGORITHM"
+        },
+        '{{componentId}}-{{sectionId}}-twofa_otp_digits_length'                         : { },
+        '{{componentId}}-{{sectionId}}-agent_email_code_timeout'                        : { },
+        '{{componentId}}-{{sectionId}}-agent_email_code_length'                         : { },
+        '{{componentId}}-{{sectionId}}-logs'                                            : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-logs').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'logson') {
+                        $('#{{componentId}}-{{sectionId}}-logs_level').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-logs_level').attr('disabled', true);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-logs_level'                                      : {
+            placeholder : 'SELECT LOGS LEVEL'
+        },
+        '{{componentId}}-{{sectionId}}-logs_exceptions'                                 : { },
+        '{{componentId}}-{{sectionId}}-emergency_logs_email'                            : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-emergency_logs_email').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 'emergencyon') {
+                        $('#{{componentId}}-{{sectionId}}-emergency_logs_email_addresses').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-emergency_logs_email_addresses').val('');
+                        $('#{{componentId}}-{{sectionId}}-emergency_logs_email_addresses').attr('disabled', true);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-emergency_logs_email_addresses'                  : { },
+        '{{componentId}}-{{sectionId}}-websocket'                                       : { },
+        '{{componentId}}-{{sectionId}}-websocket_protocol'                              : { },
+        '{{componentId}}-{{sectionId}}-websocket_host'                                  : { },
+        '{{componentId}}-{{sectionId}}-websocket_port'                                  : { },
+        '{{componentId}}-{{sectionId}}-timeout_cookies'                                 : { },
+        '{{componentId}}-{{sectionId}}-ff-databasedir'                                  : { },
+        '{{componentId}}-{{sectionId}}-databasetype'                                    : {
+            placeholder : 'SELECT DATABASE TYPE',
+            afterInit: function() {
+                //Change DB Type Here
+            }
+        },
+        '{{componentId}}-{{sectionId}}-ffs'                                             : { },
+        '{{componentId}}-{{sectionId}}-allffs'                                          : {
+            placeholder : "SELECT DATABASE",
+            afterInit : function() {
+                BazProgress.buildProgressBar($('#maintenance-progress'));
+
+                if ($('#{{componentId}}-{{sectionId}}-cache').find('input[type=radio]:checked').data('value') == 'cacheoff') {
+                    $('#{{componentId}}-{{sectionId}}-clear-cache').attr('disabled', true);
+                }
+
+                dataCollectionSectionForm['vars']['checkedStores'] = [];
+
+                //Check Uncheck all
+                $('#{{componentId}}-{{sectionId}}-check_uncheck_all').click(function() {
+                    var stores;
+                    if ($(this)[0].checked === true) {
+                        for (stores in dataCollectionSectionForm['vars']['ffStores']) {
+                            $('#' + stores)[0].checked = true;
+                            dataCollectionSectionForm['vars']['checkedStores'].push(dataCollectionSectionForm['vars']['ffStores'][stores]);
+                        }
+                    } else {
+                        for (stores in dataCollectionSectionForm['vars']['ffStores']) {
+                            $('#' + stores)[0].checked = false;
+                        }
+                        dataCollectionSectionForm['vars']['checkedStores'] = [];
+                    }
+                });
+
+                for (var store in dataCollectionSectionForm['vars']['ffStores']) {
+                    $('#' + store).click(function() {
+                        if ($(this)[0].checked === true) {
+                            dataCollectionSectionForm['vars']['checkedStores'].push(dataCollectionSectionForm['vars']['ffStores'][$(this)[0].id]);
+                        } else {
+                            var index = dataCollectionSectionForm['vars']['checkedStores'].indexOf(dataCollectionSectionForm['vars']['ffStores'][$(this)[0].id]);
+
+                            if (index > -1) {
+                                dataCollectionSectionForm['vars']['checkedStores'].splice(index, 1);
+                            }
+                        }
+                    });
+                }
+
+                $('#{{componentId}}-{{sectionId}}-clear-cache, #{{componentId}}-{{sectionId}}-re-index, #{{componentId}}-{{sectionId}}-re-sync').click(function(e) {
+                    e.preventDefault();
+
+                    if (dataCollectionSectionForm['vars']['checkedStores'].length === 0) {
+                        PNotify.error('Please select a store!');
+
+                        return;
+                    }
+
+                    var task;
+
+                    if ($(this).hasClass('clear-cache')) {
+                        task = 'clear-cache';
+                    } else if ($(this).hasClass('re-index')) {
+                        task = 're-index';
+                    } else if ($(this).hasClass('re-sync')) {
+                        task = 're-sync';
+                    }
+
+                    var postData = { };
+                    postData['task'] = task;
+                    postData['selectedStores'] = dataCollectionSectionForm['vars']['checkedStores'];
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("system/core/maintainff")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            PNotify.success({text : response.responseMessage});
+                        } else {
+                            PNotify.error({text : response.responseMessage});
+                        }
+                    }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-allffs').on('select2:select', function(e) {
+                    // dataCollectionSectionForm['funcs']['clearFields']('remove');
+                    $('.generate-ff-backup-span').html('<i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Backup ' + e.params.data.text + ' db');
+                    $('.update-ff-span').html('<i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Update ' + e.params.data.text + ' db');
+                    $('.delete-ff-span').html('<i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Remove ' + e.params.data.text + ' db');
+
+                    if (dataCollectionSectionForm['vars']['ffs'][e.params.data.id]['active'] && dataCollectionSectionForm['vars']['ffs'][e.params.data.id]['active'] == true) {
+                        $('#{{componentId}}-{{sectionId}}-ff_is_active')[0].checked = true;
+                        $('#{{componentId}}-{{sectionId}}-ff_is_active').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-delete-ff').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-update-ff').attr('disabled', true);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-ff_is_active')[0].checked = false;
+                        $('#{{componentId}}-{{sectionId}}-ff_is_active').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-delete-ff').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-update-ff').attr('disabled', false);
+                    }
+                    $('#{{componentId}}-{{sectionId}}-backup-ff').attr('disabled', false);
+                    // $('#{{componentId}}-{{sectionId}}-db_host').val(dataCollectionSectionForm['vars']['ffs'][e.params.data.id]['host']);
+                    // $('#{{componentId}}-{{sectionId}}-db_port').val(dataCollectionSectionForm['vars']['ffs'][e.params.data.id]['port']);
+                    // $('#{{componentId}}-{{sectionId}}-db_name').val(dataCollectionSectionForm['vars']['ffs'][e.params.data.id]['dbname']);
+                    // $('#{{componentId}}-{{sectionId}}-db_charset').val(dataCollectionSectionForm['vars']['ffs'][e.params.data.id]['charset']);
+                    // $('#{{componentId}}-{{sectionId}}-db_collation').val(dataCollectionSectionForm['vars']['ffs'][e.params.data.id]['collation']);
+                    // $('#{{componentId}}-{{sectionId}}-db_username').val(dataCollectionSectionForm['vars']['ffs'][e.params.data.id]['username']);
+                    // $('#{{componentId}}-{{sectionId}}-db_remove_db_user').parent().siblings('label')
+                    //     .html('REMOVE DATABASE USER ' + dataCollectionSectionForm['vars']['ffs'][e.params.data.id]['username'].toUpperCase() + '?');
+                });
+
+                function generateFfBackup(id) {
+                    // $('#{{componentId}}-{{sectionId}}-backup-ff').attr('disabled', true);
+                    // $('#{{componentId}}-{{sectionId}}-backup-ff').children('i').attr('hidden', false);
+
+                    var postData = { };
+                    postData['ff'] = id;
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['password_protect'] = $('#{{componentId}}-{{sectionId}}-ff_password_protect').val();
+
+                    $.post('{{links.url("system/core/backupff")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            PNotify.success({text : response.responseMessage});
+
+                            var data = {
+                                id: response.responseData['uuid'],
+                                text: response.responseData['filename']
+                            };
+
+                            var newOption = new Option(data.text, data.id, false, false);
+                            $('#{{componentId}}-{{sectionId}}-backupffs').append(newOption).val(data.id).trigger('change');
+                            dataCollectionSectionForm['funcs']['addedNewBackupFfOption'](data.id, data.text);
+
+                            $('#{{componentId}}-{{sectionId}}-backup-ff').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-backup-ff').children('i').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-ff_password_protect').val('').trigger('change');
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-backup-ff').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-backup-ff').children('i').attr('hidden', true);
+                            PNotify.error({text : response.responseMessage});
+                        }
+                    }, 'json');
+                }
+
+                function removeFf(id) {
+                    // $('#{{componentId}}-{{sectionId}}-start-remove').attr('disabled', true);
+                    // $('#{{componentId}}-{{sectionId}}-start-remove').children('i').attr('hidden', false);
+
+                    // if ($('#{{componentId}}-{{sectionId}}-db_remove_root_username').val() === '') {
+                    //     $('#{{componentId}}-{{sectionId}}-db_remove_root_username').addClass('is-invalid');
+                    //     $('#{{componentId}}-{{sectionId}}-db_remove_root_username').focus(function() {
+                    //         $(this).removeClass('is-invalid');
+                    //     });
+                    // } else if ($('#{{componentId}}-{{sectionId}}-db_remove_root_password').val() === '') {
+                    //     $('#{{componentId}}-{{sectionId}}-db_remove_root_password').addClass('is-invalid');
+                    //     $('#{{componentId}}-{{sectionId}}-db_remove_root_password').focus(function() {
+                    //         $(this).removeClass('is-invalid');
+                    //     });
+                    // } else {
+                        var postData = { };
+                        postData['ff'] = id;
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        // postData['username'] = $('#{{componentId}}-{{sectionId}}-db_remove_root_username').val();
+                        // postData['password'] = $('#{{componentId}}-{{sectionId}}-db_remove_root_password').val();
+                        // postData['removeUser'] = $('#{{componentId}}-{{sectionId}}-db_remove_db_user')[0].checked;
+                        // if (postData['removeUser'] == true) {
+                        //     postData['userToRemove'] = $('#{{componentId}}-{{sectionId}}-db_username').val();
+                        // }
+
+                        $.post('{{links.url("system/core/removeff")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+
+                            if (response.responseCode == 0) {
+                                PNotify.success({text : response.responseMessage});
+                                $('#{{componentId}}-{{sectionId}}-allffs option[value="' + id + '"]').remove();
+                                delete dataCollectionSectionForm['vars']['ffs'][id];
+
+                                // $('#{{componentId}}-{{sectionId}}-db_host').val('');
+                                // $('#{{componentId}}-{{sectionId}}-db_port').val('');
+                                // $('#{{componentId}}-{{sectionId}}-db_name').val('');
+                                // $('#{{componentId}}-{{sectionId}}-db_charset').val('');
+                                // $('#{{componentId}}-{{sectionId}}-db_collation').val('');
+                                // $('#{{componentId}}-{{sectionId}}-db_username').val('');
+                                // $('#{{componentId}}-{{sectionId}}-db_password').val('').trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-ff_is_active')[0].checked = false;
+                                // dataCollectionSectionForm['funcs']['clearFields']('remove');
+                                dataCollectionSectionForm['funcs']['extractFfData']();
+                            } else {
+                                PNotify.error({text : response.responseMessage});
+                            }
+
+                            // $('#{{componentId}}-{{sectionId}}-start-remove').attr('disabled', false);
+                            // $('#{{componentId}}-{{sectionId}}-start-remove').children('i').attr('hidden', true);
+                        }, 'json');
+                    // }
+                }
+
+                function updateFf(id) {
+                    dataCollectionSectionForm['funcs']['extractFfData'](true, id);
+                    $('#{{componentId}}-{{sectionId}}-update-ff').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-update-ff').children('i').attr('hidden', false);
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['ff'] = dataCollectionSectionForm['vars']['ffs'][id];
+                    postData['changeActive'] = dataCollectionSectionForm['vars']['ffs']['changeActive'];
+
+                    $.post('{{links.url("system/core/updateff")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            PNotify.success({text : response.responseMessage});
+                        } else {
+                            PNotify.error({text : response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-update-ff').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-update-ff').children('i').attr('hidden', true);
+                    }, 'json');
+                }
+
+                $('#{{componentId}}-{{sectionId}}-backup-ff').click(function(e) {
+                    e.preventDefault();
+
+                    var id = $('#{{componentId}}-{{sectionId}}-allffs').val();
+
+                    generateFfBackup(id);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-update-ff').click(function(e) {
+                    e.preventDefault();
+
+                    var id = $('#{{componentId}}-{{sectionId}}-allffs').val();
+
+                    updateFf(id);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-delete-ff').click(function(e) {
+                    e.preventDefault();
+
+                    $('#remove-fields').attr('hidden', false);
+                    $(this).attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-backup-ff').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-update-ff').attr('disabled', true);
+
+                    $('#{{componentId}}-{{sectionId}}-cancel-remove').off();
+                    $('#{{componentId}}-{{sectionId}}-cancel-remove').click(function(e) {
+                        e.preventDefault();
+
+                        dataCollectionSectionForm['funcs']['clearFields']('remove');
+                    });
+                    $('#{{componentId}}-{{sectionId}}-start-remove').off();
+                    $('#{{componentId}}-{{sectionId}}-start-remove').click(function(e) {
+                        e.preventDefault();
+
+                        var id = $('#{{componentId}}-{{sectionId}}-allffs').val();
+                        var text = $('#{{componentId}}-{{sectionId}}-allffs option:selected').text();
+
+                        Swal.fire({
+                            title                       : '<span class="text-danger"> Remove ' + text + ' flat file from system?</span>',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Remove',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                removeFf(id);
+                            }
+                        });
+                    });
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-ff_is_active'                                    : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-ff_is_active').click(function() {
+                    var id = $('#{{componentId}}-{{sectionId}}-allffs').val();
+                    var text = $('#{{componentId}}-{{sectionId}}-allffs option:selected').text();
+                    var activeFf;
+
+                    for (var ff in dataCollectionSectionForm['vars']['ffs']) {
+                        if (dataCollectionSectionForm['vars']['ffs'][ff]['active'] == true) {
+                            activeFf = ff;
+                        }
+                    }
+
+                    if (activeFf !== ff && $('#{{componentId}}-{{sectionId}}-ff_is_active')[0].checked === true) {
+                        Swal.fire({
+                            title                       : '<span class="text-danger"> Make flat file ' + text + ' active?</span>',
+                            text                        : 'Upon update of core configuration, ' + text + ' flat file will become active.',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Yes',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                $('#{{componentId}}-{{sectionId}}-ff_is_active')[0].checked = true;
+                                $('#{{componentId}}-{{sectionId}}-ff_is_active').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-delete-ff').attr('disabled', true);
+                                dataCollectionSectionForm['vars']['ffs'][activeFf]['active'] = false;
+                                dataCollectionSectionForm['vars']['ffs'][id]['active'] = true;
+                                dataCollectionSectionForm['vars']['ffs']['changeActive'] = true;
+                                dataCollectionSectionForm['funcs']['extractData']();
+                                return;
+                            }
+                            $('#{{componentId}}-{{sectionId}}-ff_is_active')[0].checked = false;
+                        });
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-ff_password_protect'                             : { },
+        '{{componentId}}-{{sectionId}}-dbs'                                             : { },
+        '{{componentId}}-{{sectionId}}-alldbs'                                          : {
+            placeholder : "SELECT DATABASE",
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-alldbs').on('select2:select', function(e) {
+                    dataCollectionSectionForm['funcs']['clearFields']('remove');
+                    $('.generate-backup-span').html('<i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Backup ' + e.params.data.text + ' db');
+                    $('.update-db-span').html('<i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Update ' + e.params.data.text + ' db');
+                    $('.delete-db-span').html('<i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Remove ' + e.params.data.text + ' db');
+
+                    if (dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['active'] && dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['active'] == true) {
+                        $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = true;
+                        $('#{{componentId}}-{{sectionId}}-is_active').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', true);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = false;
+                        $('#{{componentId}}-{{sectionId}}-is_active').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', false);
+                    }
+                    $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-db_host').val(dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['host']);
+                    $('#{{componentId}}-{{sectionId}}-db_port').val(dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['port']);
+                    $('#{{componentId}}-{{sectionId}}-db_name').val(dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['dbname']);
+                    $('#{{componentId}}-{{sectionId}}-db_charset').val(dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['charset']);
+                    $('#{{componentId}}-{{sectionId}}-db_collation').val(dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['collation']);
+                    $('#{{componentId}}-{{sectionId}}-db_username').val(dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['username']);
+                    $('#{{componentId}}-{{sectionId}}-db_remove_db_user').parent().siblings('label')
+                        .html('REMOVE DATABASE USER ' + dataCollectionSectionForm['vars']['dbs'][e.params.data.id]['username'].toUpperCase() + '?');
+                });
+
+                function generateDbBackup(id) {
+                    $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-backup-db').children('i').attr('hidden', false);
+
+                    var postData = { };
+                    postData['db'] = id;
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['password_protect'] = $('#{{componentId}}-{{sectionId}}-password_protect').val();
+
+                    $.post('{{links.url("system/core/backupdb")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            PNotify.success({text : response.responseMessage});
+
+                            var data = {
+                                id: response.responseData['uuid'],
+                                text: response.responseData['filename']
+                            };
+
+                            var newOption = new Option(data.text, data.id, false, false);
+                            $('#{{componentId}}-{{sectionId}}-backupdbs').append(newOption).val(data.id).trigger('change');
+                            dataCollectionSectionForm['funcs']['addedNewBackupDbOption'](data.id, data.text);
+
+                            $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-backup-db').children('i').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-password_protect').val('').trigger('change');
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-backup-db').children('i').attr('hidden', true);
+                            PNotify.error({text : response.responseMessage});
+                        }
+                    }, 'json');
+                }
+
+                function removeDb(id) {
+                    $('#{{componentId}}-{{sectionId}}-start-remove').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-start-remove').children('i').attr('hidden', false);
+
+                    if ($('#{{componentId}}-{{sectionId}}-db_remove_root_username').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-db_remove_root_username').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-db_remove_root_username').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-db_remove_root_password').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-db_remove_root_password').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-db_remove_root_password').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else {
+                        var postData = { };
+                        postData['db'] = id;
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['username'] = $('#{{componentId}}-{{sectionId}}-db_remove_root_username').val();
+                        postData['password'] = $('#{{componentId}}-{{sectionId}}-db_remove_root_password').val();
+                        postData['removeUser'] = $('#{{componentId}}-{{sectionId}}-db_remove_db_user')[0].checked;
+                        if (postData['removeUser'] == true) {
+                            postData['userToRemove'] = $('#{{componentId}}-{{sectionId}}-db_username').val();
+                        }
+
+                        $.post('{{links.url("system/core/removedb")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
+                            }
+
+                            if (response.responseCode == 0) {
+                                PNotify.success({text : response.responseMessage});
+                                $('#{{componentId}}-{{sectionId}}-alldbs option[value="' + id + '"]').remove();
+                                delete dataCollectionSectionForm['vars']['dbs'][id];
+
+                                $('#{{componentId}}-{{sectionId}}-db_host').val('');
+                                $('#{{componentId}}-{{sectionId}}-db_port').val('');
+                                $('#{{componentId}}-{{sectionId}}-db_name').val('');
+                                $('#{{componentId}}-{{sectionId}}-db_charset').val('');
+                                $('#{{componentId}}-{{sectionId}}-db_collation').val('');
+                                $('#{{componentId}}-{{sectionId}}-db_username').val('');
+                                $('#{{componentId}}-{{sectionId}}-db_password').val('').trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = false;
+                                dataCollectionSectionForm['funcs']['clearFields']('remove');
+                                dataCollectionSectionForm['funcs']['extractData']();
+                            } else {
+                                PNotify.error({text : response.responseMessage});
+                            }
+
+                            $('#{{componentId}}-{{sectionId}}-start-remove').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-start-remove').children('i').attr('hidden', true);
+                        }, 'json');
+                    }
+                }
+
+                function updateDb(id) {
+                    dataCollectionSectionForm['funcs']['extractData'](true, id);
+                    $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-update-db').children('i').attr('hidden', false);
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['db'] = dataCollectionSectionForm['vars']['dbs'][id];
+                    postData['changeActive'] = dataCollectionSectionForm['vars']['dbs']['changeActive'];
+
+                    $.post('{{links.url("system/core/updatedb")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            PNotify.success({text : response.responseMessage});
+                        } else {
+                            PNotify.error({text : response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-update-db').children('i').attr('hidden', true);
+                    }, 'json');
+                }
+
+                $('#{{componentId}}-{{sectionId}}-backup-db').click(function(e) {
+                    e.preventDefault();
+
+                    var id = $('#{{componentId}}-{{sectionId}}-alldbs').val();
+
+                    generateDbBackup(id);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-update-db').click(function(e) {
+                    e.preventDefault();
+
+                    var id = $('#{{componentId}}-{{sectionId}}-alldbs').val();
+
+                    updateDb(id);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-delete-db').click(function(e) {
+                    e.preventDefault();
+
+                    $('#remove-fields').attr('hidden', false);
+                    $(this).attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', true);
+
+                    $('#{{componentId}}-{{sectionId}}-cancel-remove').off();
+                    $('#{{componentId}}-{{sectionId}}-cancel-remove').click(function(e) {
+                        e.preventDefault();
+
+                        dataCollectionSectionForm['funcs']['clearFields']('remove');
+                    });
+                    $('#{{componentId}}-{{sectionId}}-start-remove').off();
+                    $('#{{componentId}}-{{sectionId}}-start-remove').click(function(e) {
+                        e.preventDefault();
+
+                        var id = $('#{{componentId}}-{{sectionId}}-alldbs').val();
+                        var text = $('#{{componentId}}-{{sectionId}}-alldbs option:selected').text();
+
+                        Swal.fire({
+                            title                       : '<span class="text-danger"> Remove ' + text + ' database file from system?</span>',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Remove',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                removeDb(id);
+                            }
+                        });
+                    });
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-is_active'                                       : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-is_active').click(function() {
+                    var id = $('#{{componentId}}-{{sectionId}}-alldbs').val();
+                    var text = $('#{{componentId}}-{{sectionId}}-alldbs option:selected').text();
+                    var activeDb;
+
+                    for (var db in dataCollectionSectionForm['vars']['dbs']) {
+                        if (dataCollectionSectionForm['vars']['dbs'][db]['active'] == true) {
+                            activeDb = db;
+                        }
+                    }
+
+                    if (activeDb !== db && $('#{{componentId}}-{{sectionId}}-is_active')[0].checked === true) {
+                        Swal.fire({
+                            title                       : '<span class="text-danger"> Make database ' + text + ' active?</span>',
+                            text                        : 'Upon update of core configuration, ' + text + ' database will become active.',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Yes',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = true;
+                                $('#{{componentId}}-{{sectionId}}-is_active').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', true);
+                                dataCollectionSectionForm['vars']['dbs'][activeDb]['active'] = false;
+                                dataCollectionSectionForm['vars']['dbs'][id]['active'] = true;
+                                dataCollectionSectionForm['vars']['dbs']['changeActive'] = true;
+                                dataCollectionSectionForm['funcs']['extractData']();
+                                return;
+                            }
+                            $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = false;
+                        });
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-password_protect'                                : { },
+        '{{componentId}}-{{sectionId}}-backupffs'                                       : {
+            placeholder : "SELECT FLAT FILE TO RESTORE",
+            allowClear  : true,
+            afterInit   : function() {
+                $('#{{componentId}}-{{sectionId}}-backupffs').on('select2:select', function(e) {
+                    dataCollectionSectionForm['funcs']['addedNewBackupFfOption'](e.params.data.id, e.params.data.text);
+                });
+
+                // $('#{{componentId}}-{{sectionId}}-backupffs').on('select2:clear', function(e) {
+                //     dataCollectionSectionForm['funcs']['ffClearFields']('remove');
+                // });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-ff_password_protect_restore'                     : { },
+        '{{componentId}}-{{sectionId}}-db_host'                                         : { },
+        '{{componentId}}-{{sectionId}}-db_port'                                         : { },
+        '{{componentId}}-{{sectionId}}-db_name'                                         : { },
+        '{{componentId}}-{{sectionId}}-db_charset'                                      : { },
+        '{{componentId}}-{{sectionId}}-db_collation'                                    : { },
+        '{{componentId}}-{{sectionId}}-db_username'                                     : { },
+        '{{componentId}}-{{sectionId}}-db_password'                                     : { },
+        '{{componentId}}-{{sectionId}}-db_password_strength_meter'                      : { },
+        '{{componentId}}-{{sectionId}}-db_remove_db_user'                               : { },
+        '{{componentId}}-{{sectionId}}-db_remove_root_username'                         : { },
+        '{{componentId}}-{{sectionId}}-db_remove_root_password'                         : { },
+        '{{componentId}}-{{sectionId}}-db_drop'                                         : { },
+        '{{componentId}}-{{sectionId}}-db_restore_root_username'                        : { },
+        '{{componentId}}-{{sectionId}}-db_restore_root_password'                        : { },
+        '{{componentId}}-{{sectionId}}-db_restore_db_name'                              : { },
+        '{{componentId}}-{{sectionId}}-db_restore_charset'                              : { },
+        '{{componentId}}-{{sectionId}}-db_restore_collation'                            : { },
+        '{{componentId}}-{{sectionId}}-db_restore_db_username'                          : { },
+        '{{componentId}}-{{sectionId}}-db_restore_db_password'                          : { },
+        '{{componentId}}-{{sectionId}}-db_restore_db_password_strength_meter'           : { },
+        '{{componentId}}-{{sectionId}}-password_protect_restore'                        : { },
+        '{{componentId}}-{{sectionId}}-backupdbs'                                       : {
+            placeholder : "SELECT DATABASE TO RESTORE",
+            allowClear  : true,
+            afterInit   : function() {
+                $('#{{componentId}}-{{sectionId}}-backupdbs').on('select2:select', function(e) {
+                    dataCollectionSectionForm['funcs']['addedNewBackupDbOption'](e.params.data.id, e.params.data.text);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-backupdbs').on('select2:clear', function(e) {
+                    dataCollectionSectionForm['funcs']['clearFields']('remove');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                                            : $.extend(dataCollectionSectionForm, {
+            rules: {
+                '{{componentId}}-{{sectionId}}-auto_off_debug'                          : 'required',
+                '{{componentId}}-{{sectionId}}-cache_timeout'                           : 'required',
+                '{{componentId}}-{{sectionId}}-passwordWorkFactor'                      : 'required',
+                '{{componentId}}-{{sectionId}}-cookiesWorkFactor'                       : 'required',
+                '{{componentId}}-{{sectionId}}-password_policy_complexity'              : 'required',
+                '{{componentId}}-{{sectionId}}-password_policy_acceptable_level'        : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_using'                             : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_email_timeout'                     : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_secret_size'                   : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_totp_timeout'                  : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_hotp_counter'                  : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_label'                         : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_issuer'                        : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_algorithm'                     : 'required',
+                '{{componentId}}-{{sectionId}}-twofa_otp_digits_length'                 : 'required',
+                '{{componentId}}-{{sectionId}}-agent_email_timeout'                     : 'required',
+                '{{componentId}}-{{sectionId}}-logs_level'                              : 'required',
+                '{{componentId}}-{{sectionId}}-emergency_logs_email_addresses'          : 'required',
+                '{{componentId}}-{{sectionId}}-websocket_host'                          : 'required',
+                '{{componentId}}-{{sectionId}}-websocket_port'                          : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-auto_off_debug'                          : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-cache_timeout'                           : 'Please enter seconds',
+                '{{componentId}}-{{sectionId}}-passwordWorkFactor'                      : 'Please enter encryption level',
+                '{{componentId}}-{{sectionId}}-cookiesWorkFactor'                       : 'Please enter encryption level',
+                '{{componentId}}-{{sectionId}}-password_policy_complexity'              : 'Please select policy complexity',
+                '{{componentId}}-{{sectionId}}-password_policy_acceptable_level'        : 'Please select policy acceptable level',
+                '{{componentId}}-{{sectionId}}-twofa_using'                             : 'Please select 2FA Method(s)',
+                '{{componentId}}-{{sectionId}}-twofa_email_timeout'                     : 'Please enter email timeout (seconds)',
+                '{{componentId}}-{{sectionId}}-twofa_otp_secret_size'                   : 'Please enter secret size',
+                '{{componentId}}-{{sectionId}}-twofa_otp_totp_timeout'                  : 'Please enter totp timeout (seconds)',
+                '{{componentId}}-{{sectionId}}-twofa_otp_hotp_counter'                  : 'Please enter hotp counter (count)',
+                '{{componentId}}-{{sectionId}}-twofa_otp_label'                         : 'Please enter otp label',
+                '{{componentId}}-{{sectionId}}-twofa_otp_issuer'                        : 'Please enter otp issuer',
+                '{{componentId}}-{{sectionId}}-twofa_otp_algorithm'                     : 'Please select an algorithm',
+                '{{componentId}}-{{sectionId}}-twofa_otp_digits_length'                 : 'Please enter the length of digits',
+                '{{componentId}}-{{sectionId}}-agent_email_timeout'                     : 'Please enter email timeout (seconds)',
+                '{{componentId}}-{{sectionId}}-logs_level'                              : 'Please select logs level',
+                '{{componentId}}-{{sectionId}}-emergency_logs_email_addresses'          : 'Please enter email addresses (comma saperated)',
+                '{{componentId}}-{{sectionId}}-websocket_host'                          : 'Please enter websocket host address',
+                '{{componentId}}-{{sectionId}}-websocket_port'                          : 'Please enter websocket host port',
+            },
+            onSubmit : function() {
+                if (dataCollectionSection['dataToSubmit']['debug'] === 'debugon') {
+                    dataCollectionSection['dataToSubmit']['debug'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['debug'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['cache'] === 'cacheon') {
+                    dataCollectionSection['dataToSubmit']['cache'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['cache'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['single_sign_on'] === 'ssoon') {
+                    dataCollectionSection['dataToSubmit']['single_sign_on'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['single_sign_on'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['password_policy'] === 'passwordpolicyon') {
+                    dataCollectionSection['dataToSubmit']['password_policy'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['password_policy'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['twofa'] === 'twofaon') {
+                    dataCollectionSection['dataToSubmit']['twofa'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['twofa'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['logs'] === 'logson') {
+                    dataCollectionSection['dataToSubmit']['logs'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['logs'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['logs_exceptions'] == '1') {
+                    dataCollectionSection['dataToSubmit']['logs_exceptions'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['logs_exceptions'] = false;
+                }
+                if (dataCollectionSection['dataToSubmit']['emergency_logs_email'] === 'emergencyon') {
+                    dataCollectionSection['dataToSubmit']['emergency_logs_email'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['emergency_logs_email'] = false;
+                }
+
+                return true;
+            }
+        })
+    });
+
+var swalSound = window['dataCollection'].env.sounds.swalSound;
+
+dataCollectionSectionForm['funcs']['ffClearFields'] = function(fields = 'restore', clear = true) {
+    // if (fields === 'restore') {
+    //     $('#restore-fields').attr('hidden', true);
+    //     $('#{{componentId}}-{{sectionId}}-db_restore_db_username, ' +
+    //       '#{{componentId}}-{{sectionId}}-db_restore_db_password, ' +
+    //       '#{{componentId}}-{{sectionId}}-db_restore_root_username, ' +
+    //       '#{{componentId}}-{{sectionId}}-db_restore_root_password').val('').trigger('change');
+    //     $('#{{componentId}}-{{sectionId}}-db_drop')[0].checked = false;
+
+    //     if (clear) {
+    //         $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+    //         $('#{{componentId}}-{{sectionId}}-download-db').addClass('disabled');
+    //         $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '#');
+    //         $('#{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+    //     }
+    // } else if (fields === 'remove') {
+    //     $('#remove-fields').attr('hidden', true);
+    //     $('#{{componentId}}-{{sectionId}}-db_remove_root_username, ' +
+    //       '#{{componentId}}-{{sectionId}}-db_remove_root_password').val('');
+    //     $('#{{componentId}}-{{sectionId}}-db_remove_db_user')[0].checked = false;
+    //     $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', false);
+    //     $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', false);
+    //     $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', false);
+    // }
+}
+
+dataCollectionSectionForm['funcs']['addedNewBackupFfOption'] = function(id, text) {
+    // dataCollectionSectionForm['funcs']['ffClearFields']('restore', false);
+    $('#{{componentId}}-{{sectionId}}-restore-ff').attr('disabled', false);
+    $('#{{componentId}}-{{sectionId}}-remove-ff').attr('disabled', false);
+    $('#{{componentId}}-{{sectionId}}-restore-ff, #{{componentId}}-{{sectionId}}-remove-ff').attr('disabled', false);
+    $('#{{componentId}}-{{sectionId}}-download-ff').removeClass('disabled');
+    $('#{{componentId}}-{{sectionId}}-download-ff').attr('href', '{{links.url("system/storages/q/uuid/' + id + '")}}');
+
+    $('#{{componentId}}-{{sectionId}}-remove-ff').off();
+    $('#{{componentId}}-{{sectionId}}-remove-ff').click(function(e) {
+        e.preventDefault();
+
+        Swal.fire({
+            title                       : '<span class="text-danger"> Remove restore file from system?</span>',
+            icon                        : 'question',
+            background                  : 'rgba(0,0,0,.8)',
+            backdrop                    : 'rgba(0,0,0,.6)',
+            buttonsStyling              : false,
+            confirmButtonText           : 'Remove',
+            customClass                 : {
+                'confirmButton'             : 'btn btn-danger text-uppercase',
+                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+            },
+            showCancelButton            : true,
+            keydownListenerCapture      : true,
+            allowOutsideClick           : true,
+            allowEscapeKey              : true,
+            didOpen                     : function() {
+                swalSound.play();
+            }
+        }).then((result) => {
+            if (result.value) {
+                var postData = { };
+                postData['uuid'] = id;
+                postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                $.post('{{links.url("system/storages/remove")}}', postData, function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+
+                    if (response.responseCode == 0) {
+                        PNotify.success({text : response.responseMessage});
+
+                        $('#{{componentId}}-{{sectionId}}-backupffs option[value="' + id + '"]').remove();
+                        $('#{{componentId}}-{{sectionId}}-restore-ff, #{{componentId}}-{{sectionId}}-remove-ff').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-download-ff').addClass('disabled');
+                        $('#{{componentId}}-{{sectionId}}-download-ff').attr('href', '#');
+                    }
+                }, 'json');
+            }
+        });
+    });
+
+    $('#{{componentId}}-{{sectionId}}-restore-ff').off();
+    $('#{{componentId}}-{{sectionId}}-restore-ff').click(function(e) {
+        e.preventDefault();
+
+        // $(this).attr('disabled', true);
+        $('#ff-restore-fields').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-remove-ff').attr('disabled', true);
+        // var dbname = $('#{{componentId}}-{{sectionId}}-backupffs').find(':selected').text().trim().slice(0, -4);
+        // var dbUsername = dbname + 'User';
+        // $('#{{componentId}}-{{sectionId}}-db_restore_db_name').val(dbname);
+        // $('#{{componentId}}-{{sectionId}}-db_restore_charset').val('utf8mb4');
+        // $('#{{componentId}}-{{sectionId}}-db_restore_collation').val('utf8mb4_general_ci');
+        // $('#{{componentId}}-{{sectionId}}-db_restore_db_username').val(dbUsername);
+    });
+
+    $('#{{componentId}}-{{sectionId}}-ff-cancel-restore').off();
+    $('#{{componentId}}-{{sectionId}}-ff-cancel-restore').click(function(e) {
+        e.preventDefault();
+
+        // dataCollectionSectionForm['funcs']['clearFields']('restore', false);
+    });
+    $('#{{componentId}}-{{sectionId}}-ff-start-restore').off();
+    $('#{{componentId}}-{{sectionId}}-ff-start-restore').click(function(e) {
+        e.preventDefault();
+
+        // $(this).attr('disabled', true);
+        $(this).children('i').attr('hidden', false);
+
+        var postData = { };
+        postData['id'] = id;
+        postData['password_protect_restore'] = $('#{{componentId}}-{{sectionId}}-ff_password_protect_restore').val();
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+        $.post('{{links.url("system/core/restoreff")}}', postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+
+            if (response.responseCode == 0) {
+                PNotify.success({text : response.responseMessage});
+
+                dataCollectionSectionForm['vars']['ffs'][response.responseData.newFf.ffname] = response.responseData.newFf;
+
+                var newOption = new Option(response.responseData.newFf.ffname, response.responseData.newFf.ffname, false, false);
+                $('#{{componentId}}-{{sectionId}}-allffs').append(newOption).val(response.responseData.newFf.ffname).trigger('change');
+                // dataCollectionSectionForm['funcs']['clearFields']('restore');
+                $('#{{componentId}}-{{sectionId}}-backupffs').val(null).trigger('change');
+                $('#{{componentId}}-{{sectionId}}-ff_is_active')[0].checked = false;
+                $('#{{componentId}}-{{sectionId}}-ff_is_active').attr('disabled', false);
+                dataCollectionSectionForm['funcs']['extractFfData']();
+                $('.generate-ff-backup-span').html('<i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Backup ' + response.responseData.newFf.ffname + ' ff');
+                $('.update-ff-span').html('<i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Update ' + response.responseData.newFf.ffname + ' ff');
+                $('.delete-ff-span').html('<i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Remove ' + response.responseData.newFf.ffname + ' ff');
+                $('#{{componentId}}-{{sectionId}}-remove-ff').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-download-ff').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-restore-ff').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-backup-ff').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-update-ff').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-delete-ff').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-ff_password_protect_restore').val('').trigger('change');
+            } else {
+                PNotify.error({text : response.responseMessage});
+            }
+            $('#{{componentId}}-{{sectionId}}-ff-start-restore').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-ff-start-restore').children('i').attr('hidden', true);
+        }, 'json');
+    });
+}
+
+dataCollectionSectionForm['funcs']['clearFields'] = function(fields = 'restore', clear = true) {
+    if (fields === 'restore') {
+        $('#restore-fields').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-db_restore_db_username, ' +
+          '#{{componentId}}-{{sectionId}}-db_restore_db_password, ' +
+          '#{{componentId}}-{{sectionId}}-db_restore_root_username, ' +
+          '#{{componentId}}-{{sectionId}}-db_restore_root_password').val('').trigger('change');
+        $('#{{componentId}}-{{sectionId}}-db_drop')[0].checked = false;
+
+        if (clear) {
+            $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-download-db').addClass('disabled');
+            $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '#');
+            $('#{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+        }
+    } else if (fields === 'remove') {
+        $('#remove-fields').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-db_remove_root_username, ' +
+          '#{{componentId}}-{{sectionId}}-db_remove_root_password').val('');
+        $('#{{componentId}}-{{sectionId}}-db_remove_db_user')[0].checked = false;
+        $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', false);
+    }
+}
+
+dataCollectionSectionForm['funcs']['addedNewBackupDbOption'] = function(id, text) {
+    dataCollectionSectionForm['funcs']['clearFields']('restore', false);
+    $('#{{componentId}}-{{sectionId}}-restore-db').attr('disabled', false);
+    $('#{{componentId}}-{{sectionId}}-remove-db').attr('disabled', false);
+    $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', false);
+    $('#{{componentId}}-{{sectionId}}-download-db').removeClass('disabled');
+    $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '{{links.url("system/storages/q/uuid/' + id + '")}}');
+
+    $('#{{componentId}}-{{sectionId}}-remove-db').off();
+    $('#{{componentId}}-{{sectionId}}-remove-db').click(function(e) {
+        e.preventDefault();
+
+        Swal.fire({
+            title                       : '<span class="text-danger"> Remove restore file from system?</span>',
+            icon                        : 'question',
+            background                  : 'rgba(0,0,0,.8)',
+            backdrop                    : 'rgba(0,0,0,.6)',
+            buttonsStyling              : false,
+            confirmButtonText           : 'Remove',
+            customClass                 : {
+                'confirmButton'             : 'btn btn-danger text-uppercase',
+                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+            },
+            showCancelButton            : true,
+            keydownListenerCapture      : true,
+            allowOutsideClick           : true,
+            allowEscapeKey              : true,
+            didOpen                     : function() {
+                swalSound.play();
+            }
+        }).then((result) => {
+            if (result.value) {
+                var postData = { };
+                postData['uuid'] = id;
+                postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                $.post('{{links.url("system/storages/remove")}}', postData, function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+
+                    if (response.responseCode == 0) {
+                        PNotify.success({text : response.responseMessage});
+
+                        $('#{{componentId}}-{{sectionId}}-backupdbs option[value="' + id + '"]').remove();
+                        $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-download-db').addClass('disabled');
+                        $('#{{componentId}}-{{sectionId}}-download-db').attr('href', '#');
+                    }
+                }, 'json');
+            }
+        });
+    });
+
+    $('#{{componentId}}-{{sectionId}}-restore-db').off();
+    $('#{{componentId}}-{{sectionId}}-restore-db').click(function(e) {
+        e.preventDefault();
+
+        $(this).attr('disabled', true);
+        $('#restore-fields').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+        var dbname = $('#{{componentId}}-{{sectionId}}-backupdbs').find(':selected').text().trim().slice(0, -4);
+        var dbUsername = dbname + 'User';
+        $('#{{componentId}}-{{sectionId}}-db_restore_db_name').val(dbname);
+        $('#{{componentId}}-{{sectionId}}-db_restore_charset').val('utf8mb4');
+        $('#{{componentId}}-{{sectionId}}-db_restore_collation').val('utf8mb4_general_ci');
+        $('#{{componentId}}-{{sectionId}}-db_restore_db_username').val(dbUsername);
+    });
+
+    $('#{{componentId}}-{{sectionId}}-cancel-restore').off();
+    $('#{{componentId}}-{{sectionId}}-cancel-restore').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['clearFields']('restore', false);
+    });
+    $('#{{componentId}}-{{sectionId}}-start-restore').off();
+    $('#{{componentId}}-{{sectionId}}-start-restore').click(function(e) {
+        e.preventDefault();
+
+        if ($('#{{componentId}}-{{sectionId}}-db_restore_db_name').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_restore_db_name').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_restore_db_name').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#{{componentId}}-{{sectionId}}-db_restore_charset').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_restore_charset').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_restore_charset').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#{{componentId}}-{{sectionId}}-db_restore_collation').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_restore_collation').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_restore_collation').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#{{componentId}}-{{sectionId}}-db_restore_db_username').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_restore_db_username').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_restore_db_username').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#{{componentId}}-{{sectionId}}-db_restore_db_password').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_restore_db_password').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_restore_db_password').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#{{componentId}}-{{sectionId}}-db_restore_root_username').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_restore_root_username').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_restore_root_username').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#{{componentId}}-{{sectionId}}-db_restore_root_password').val() === '') {
+            $('#{{componentId}}-{{sectionId}}-db_restore_root_password').addClass('is-invalid');
+            $('#{{componentId}}-{{sectionId}}-db_restore_root_password').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else {
+            $(this).attr('disabled', true);
+            $(this).children('i').attr('hidden', false);
+
+            var postData = { };
+            postData['id'] = id;
+            postData['dbname'] = $('#{{componentId}}-{{sectionId}}-db_restore_db_name').val();
+            postData['charset'] = $('#{{componentId}}-{{sectionId}}-db_restore_charset').val();
+            postData['collation'] = $('#{{componentId}}-{{sectionId}}-db_restore_collation').val();
+            postData['username'] = $('#{{componentId}}-{{sectionId}}-db_restore_db_username').val();
+            postData['password'] = $('#{{componentId}}-{{sectionId}}-db_restore_db_password').val();
+            postData['root_username'] = $('#{{componentId}}-{{sectionId}}-db_restore_root_username').val();
+            postData['root_password'] = $('#{{componentId}}-{{sectionId}}-db_restore_root_password').val();
+            postData['password_protect_restore'] = $('#{{componentId}}-{{sectionId}}-password_protect_restore').val();
+            postData['drop'] = $('#{{componentId}}-{{sectionId}}-db_drop')[0].checked;
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+            $.post('{{links.url("system/core/restoredb")}}', postData, function(response) {
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
+                }
+
+                if (response.responseCode == 0) {
+                    PNotify.success({text : response.responseMessage});
+
+                    dataCollectionSectionForm['vars']['dbs'][response.responseData.newDb.dbname] = response.responseData.newDb;
+
+                    var newOption = new Option(response.responseData.newDb.dbname, response.responseData.newDb.dbname, false, false);
+                    $('#{{componentId}}-{{sectionId}}-alldbs').append(newOption).val(response.responseData.newDb.dbname).trigger('change');
+                    dataCollectionSectionForm['funcs']['clearFields']('restore');
+                    $('#{{componentId}}-{{sectionId}}-backupdbs').val(null).trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-is_active')[0].checked = false;
+                    $('#{{componentId}}-{{sectionId}}-is_active').attr('disabled', false);
+                    dataCollectionSectionForm['funcs']['extractData']();
+                    $('.generate-backup-span').html('<i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Backup ' + response.responseData.newDb.dbname + ' db');
+                    $('.update-db-span').html('<i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Update ' + response.responseData.newDb.dbname + ' db');
+                    $('.delete-db-span').html('<i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Remove ' + response.responseData.newDb.dbname + ' db');
+                    $('#{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-download-db').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-restore-db').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-delete-db').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-db_host').val(response.responseData.newDb.host);
+                    $('#{{componentId}}-{{sectionId}}-db_port').val(response.responseData.newDb.port);
+                    $('#{{componentId}}-{{sectionId}}-db_name').val(response.responseData.newDb.dbname);
+                    $('#{{componentId}}-{{sectionId}}-db_charset').val(response.responseData.newDb.charset);
+                    $('#{{componentId}}-{{sectionId}}-db_collation').val(response.responseData.newDb.collation);
+                    $('#{{componentId}}-{{sectionId}}-db_username').val(response.responseData.newDb.username);
+                    $('#{{componentId}}-{{sectionId}}-db_password').val('').trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-password_protect_restore').val('').trigger('change');
+                } else {
+                    PNotify.error({text : response.responseMessage});
+                }
+                $('#{{componentId}}-{{sectionId}}-start-restore').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-start-restore').children('i').attr('hidden', true);
+            }, 'json');
+        }
+    });
+}
+
+$('#body').off('dropzoneInitDone');
+$('#body').on('dropzoneInitDone', function() {
+    if (dataCollectionSection['admin-core-main-ff_upload_restore']) {
+        dataCollectionSection['admin-core-main-ff_upload_restore']['onSuccess'] = function(file, response) {
+            if (response.responseData && response.responseData.name && response.responseData.uuid) {
+                var newOption = new Option(response.responseData.name, response.responseData.uuid, false, false);
+                $('#{{componentId}}-{{sectionId}}-backupffs').append(newOption).val(response.responseData.uuid).trigger('change');
+                dataCollectionSectionForm['funcs']['addedNewBackupFfOption'](response.responseData.uuid, response.responseData.name);
+                PNotify.success({text: 'File ' + response.responseData.name + ' uploaded and ready to be restored.'});
+                dataCollectionSection['admin-core-main-ff_upload_restore']['reset']();
+            }
+        };
+    }
+    if (dataCollectionSection['admin-core-main-upload_restore']) {
+        dataCollectionSection['admin-core-main-upload_restore']['onSuccess'] = function(file, response) {
+            if (response.responseData && response.responseData.name && response.responseData.uuid) {
+                var newOption = new Option(response.responseData.name, response.responseData.uuid, false, false);
+                $('#{{componentId}}-{{sectionId}}-backupdbs').append(newOption).val(response.responseData.uuid).trigger('change');
+                dataCollectionSectionForm['funcs']['addedNewBackupDbOption'](response.responseData.uuid, response.responseData.name);
+                PNotify.success({text: 'File ' + response.responseData.name + ' uploaded and ready to be restored.'});
+                dataCollectionSection['admin-core-main-upload_restore']['reset']();
+            }
+        };
+    }
+});
+
+dataCollectionSectionForm['funcs']['extractData'] = function(updateDb = false, id = null) {
+    // Make a data object
+    if (!dataCollectionSectionForm['data']) {
+        dataCollectionSectionForm['data'] = { };
+    }
+    if (!dataCollectionSection['data']) {
+        dataCollectionSection['data'] = { };
+    }
+    if (!dataCollectionSection['data']['dbs']) {
+        dataCollectionSection['data']['dbs'] = { };
+    }
+
+    if (updateDb === true && id) {
+        dataCollectionSectionForm['vars']['dbs'][id]['host'] = $('#{{componentId}}-{{sectionId}}-db_host').val();
+        dataCollectionSectionForm['vars']['dbs'][id]['port'] = $('#{{componentId}}-{{sectionId}}-db_port').val();
+        dataCollectionSectionForm['vars']['dbs'][id]['dbname'] = $('#{{componentId}}-{{sectionId}}-db_name').val();
+        dataCollectionSectionForm['vars']['dbs'][id]['charset'] = $('#{{componentId}}-{{sectionId}}-db_charset').val();
+        dataCollectionSectionForm['vars']['dbs'][id]['collation'] = $('#{{componentId}}-{{sectionId}}-db_collation').val();
+        dataCollectionSectionForm['vars']['dbs'][id]['username'] = $('#{{componentId}}-{{sectionId}}-db_username').val();
+        dataCollectionSectionForm['vars']['dbs'][id]['password'] = $('#{{componentId}}-{{sectionId}}-db_password').val();
+    }
+
+    dataCollectionSection['data']['dbs'] = dataCollectionSectionForm['vars']['dbs'];
+}
+
+dataCollectionSectionForm['funcs']['extractFfData'] = function(updateFf = false, id = null) {
+    // Make a data object
+    if (!dataCollectionSectionForm['data']) {
+        dataCollectionSectionForm['data'] = { };
+    }
+    if (!dataCollectionSection['data']) {
+        dataCollectionSection['data'] = { };
+    }
+    if (!dataCollectionSection['data']['ffs']) {
+        dataCollectionSection['data']['ffs'] = { };
+    }
+
+    // if (updateDb === true && id) {
+    //     dataCollectionSectionForm['vars']['ffs'][id]['host'] = $('#{{componentId}}-{{sectionId}}-db_host').val();
+    //     dataCollectionSectionForm['vars']['ffs'][id]['port'] = $('#{{componentId}}-{{sectionId}}-db_port').val();
+    //     dataCollectionSectionForm['vars']['ffs'][id]['dbname'] = $('#{{componentId}}-{{sectionId}}-db_name').val();
+    //     dataCollectionSectionForm['vars']['ffs'][id]['charset'] = $('#{{componentId}}-{{sectionId}}-db_charset').val();
+    //     dataCollectionSectionForm['vars']['ffs'][id]['collation'] = $('#{{componentId}}-{{sectionId}}-db_collation').val();
+    //     dataCollectionSectionForm['vars']['ffs'][id]['username'] = $('#{{componentId}}-{{sectionId}}-db_username').val();
+    //     dataCollectionSectionForm['vars']['ffs'][id]['password'] = $('#{{componentId}}-{{sectionId}}-db_password').val();
+    // }
+
+    dataCollectionSection['data']['ffs'] = dataCollectionSectionForm['vars']['ffs'];
+}
+
+$(document).ready(function() {
+    dataCollectionSectionForm['funcs']['extractData']();
+    dataCollectionSectionForm['funcs']['extractFfData']();
+});
+
+</script>

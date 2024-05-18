@@ -11,4 +11,8 @@ class BasepackagesMenus extends BaseModel
     public $menu;
 
     public $apps;
+
+    public $app_type;
+
+    public $sequence;
 }

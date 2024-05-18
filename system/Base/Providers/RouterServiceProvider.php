@@ -10,16 +10,33 @@ class RouterServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
+		$api = $container->getShared('api');
+		$request = $container->getShared('request');
+
 		$container->setShared(
 			'router',
-			function () use ($container) {
+			function () use ($api, $request, $container) {
 				$domains = $container->getShared('domains');
 				$apps = $container->getShared('apps');
-				$components = $container->getShared('modules')->components;
-				$views = $container->getShared('modules')->views;
+				if (!$api->isApi()) {
+					$components = $container->getShared('modules')->components;
+					$views = $container->getShared('modules')->views;
+					$dispatcher = null;
+				} else {
+					$components = null;
+					$views = null;
+					$dispatcher = $container->getShared('dispatcher');//We need dispatcher to assign get Query params.
+				}
 				$logger = $container->getShared('logger');
-				$request = $container->getShared('request');
-				return (new Router($domains, $apps, $components, $views, $logger, $request))->init();
+				$response = $container->getShared('response');
+				$helper = $container->getShared('helper');
+				$config = $container->getShared('config');
+				$basepackages = $container->getShared('basepackages');
+				return (
+					new Router(
+						$api, $domains, $apps, $components, $views, $logger, $request, $response, $helper, $config, $basepackages, $dispatcher
+					)
+				)->init();
 			}
 		);
 	}

@@ -1,0 +1,28 @@
+{
+    "name": "Auth",
+    "display_name": "Authentication",
+    "description": "This middleware is used by authentication package. Once enabled, user need to authentication to this app to access any resource.",
+    "module_type"   : "middlewares",
+    "app_type": "core",
+    "category": "tools",
+    "version": "0.0.0",
+    "repo": "https://.../",
+    "class": "Apps\\Core\\Middlewares\\Auth\\Auth",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "core"      : true
+        }
+    }
+}

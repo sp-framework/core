@@ -5,7 +5,9 @@ namespace System\Base\Providers;
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
 use Phalcon\Mvc\ViewBaseInterface;
+use System\Base\Providers\ViewServiceProvider\Assets;
 use System\Base\Providers\ViewServiceProvider\Escaper;
+use System\Base\Providers\ViewServiceProvider\SimpleView;
 use System\Base\Providers\ViewServiceProvider\Tag;
 use System\Base\Providers\ViewServiceProvider\View;
 use System\Base\Providers\ViewServiceProvider\Volt;
@@ -15,16 +17,15 @@ class ViewServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
-
 		$container->setShared(
 			'volt',
-			function(ViewBaseInterface $view) use ($container) {
+			function() use ($container) {
 				$cache = $container->getShared('modules')->views->getCache();
 				$compiledPath = $container->getShared('modules')->views->getVoltCompiledPath();
+				$view = $container->getShared('view');
 				return (new Volt($view))->init($container, $cache, $compiledPath);
 			}
 		);
-
 
 		$container->setShared(
 			'view',
@@ -36,16 +37,19 @@ class ViewServiceProvider implements ServiceProviderInterface
 		);
 
 		$container->setShared(
-			'voltTools',
+			'viewSimple',
 			function () use ($container) {
-				return new VoltTools($container);
+				$views = $container->getShared('modules')->views->init();
+				return (new SimpleView($views))->init();
 			}
 		);
 
 		$container->setShared(
-			'tag',
-			function () {
-				return (new Tag())->init();
+			'voltTools',
+			function () use ($container) {
+				$volt = $container->getShared('volt');
+				$view = $container->getShared('view');
+				return new VoltTools($volt, $view);
 			}
 		);
 
@@ -53,6 +57,24 @@ class ViewServiceProvider implements ServiceProviderInterface
 			'escaper',
 			function () {
 				return (new Escaper())->init();
+			}
+		);
+
+		$container->setShared(
+			'tag',
+			function () use ($container) {
+				$escaper = $container->getShared('escaper');
+
+				return (new Tag($escaper))->init();
+			}
+		);
+
+		$container->setShared(
+			'assets',
+			function () use ($container) {
+				$tag = $container->getShared('tag');
+
+				return (new Assets($tag))->init();
 			}
 		);
 

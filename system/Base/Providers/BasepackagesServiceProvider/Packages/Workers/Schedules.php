@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersSchedules;
 
@@ -109,34 +108,37 @@ class Schedules extends BasePackage
         $objData['name'] = $data['name'];
         $objData['description'] = $data['description'];
         $objData['type'] = $data['type'];//user(1) or system(0)
+        $objData['schedule']['type'] = $data['schedule'];
 
-        if ($data['schedule'] === 'everyminute') {
-            $objData['schedule']['type'] = $data['schedule'];
+        if ($data['schedule'] === 'everyxseconds') {
+            $data['everyxseconds'] = explode(',', $data['everyxseconds']);
+
+            foreach ($data['everyxseconds'] as &$seconds) {
+                $seconds = (int) $seconds;
+            }
+            $data['everyxseconds'] = array_unique($data['everyxseconds']);
+
+            $objData['schedule']['params']['seconds'] = $data['everyxseconds'];
+        } else if ($data['schedule'] === 'everyminute') {
         } else if ($data['schedule'] === 'everyxminutes') {
-            $objData['schedule']['type'] = $data['schedule'];
             $objData['schedule']['params']['minutes'] = $data['everyxminutes_minutes'];
         } else if ($data['schedule'] === 'everyxminutesbetween') {
-            $objData['schedule']['type'] = $data['schedule'];
             $objData['schedule']['params']['minutes'] = $data['everyxminutesbetween_minutes'];
             $objData['schedule']['params']['start'] = $data['everyxminutesbetween_start'];
             $objData['schedule']['params']['end'] = $data['everyxminutesbetween_end'];
         } else if ($data['schedule'] === 'hourly') {
-            $objData['schedule']['type'] = $data['schedule'];
             $objData['schedule']['params']['hourly_minutes'] = $data['hourly_minutes'];
         } else if ($data['schedule'] === 'daily') {
-            $objData['schedule']['type'] = $data['schedule'];
             $objData['schedule']['params']['daily_hours'] = $data['daily_hours'];
             $objData['schedule']['params']['daily_minutes'] = $data['daily_minutes'];
         } else if ($data['schedule'] === 'weekly') {
-            $objData['schedule']['type'] = $data['schedule'];
-            $data['weekly_days'] = Json::decode($data['weekly_days'], true);
+            $data['weekly_days'] = $this->helper->decode($data['weekly_days'], true);
             $data['weekly_days'] = $data['weekly_days']['data'];
             $objData['schedule']['params']['weekly_days'] = $data['weekly_days'];
             $objData['schedule']['params']['weekly_hours'] = $data['weekly_hours'];
             $objData['schedule']['params']['weekly_minutes'] = $data['weekly_minutes'];
         } else if ($data['schedule'] === 'monthly') {
-            $objData['schedule']['type'] = $data['schedule'];
-            $data['monthly_months'] = Json::decode($data['monthly_months'], true);
+            $data['monthly_months'] = $this->helper->decode($data['monthly_months'], true);
             $data['monthly_months'] = $data['monthly_months']['data'];
             $objData['schedule']['params']['monthly_months'] = $data['monthly_months'];
             $objData['schedule']['params']['monthly_day'] = $data['monthly_day'];
@@ -149,20 +151,39 @@ class Schedules extends BasePackage
 
     public function getSchedulesSchedule($id)
     {
-        $filter =
-            $this->model->filter(
-                function($function) use ($id) {
-                    $function = $function->toArray();
+        if ($this->config->databasetype === 'db') {
+            $filter =
+                $this->model->filter(
+                    function($function) use ($id) {
+                        $function = $function->toArray();
 
-                    if ($function['id'] == $id) {
-                        $function['schedule'] = Json::decode($function['schedule'], true);
+                        if ($function['id'] == $id) {
+                            $function['schedule'] = $this->helper->decode($function['schedule'], true);
 
-                        return $function['schedule'];
+                            return $function['schedule'];
+                        }
                     }
-                }
-            );
+                );
 
-        return $filter[0];
+            return $filter[0];
+        } else {
+            if (!$this->{$this->packageName}) {
+                $this->init();
+            }
+
+            foreach ($this->schedules as $key => $function) {
+                if ($function['id'] == $id) {
+
+                    if (is_string($function['schedule'])) {
+                        $function['schedule'] = $this->helper->decode($function['schedule'], true);
+                    }
+
+                    return $function['schedule'];
+                }
+            }
+        }
+
+        return false;
     }
 
     public function getWeekdays()

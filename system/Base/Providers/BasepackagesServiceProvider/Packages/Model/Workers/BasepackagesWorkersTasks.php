@@ -12,29 +12,31 @@ class BasepackagesWorkersTasks extends BaseModel
 
     public $description;
 
-    public $function;
-
     public $schedule_id;
 
-    public $is_external;
-
-    public $is_raw;
-
     public $priority;
+
+    public $is_on_demand;
 
     public $enabled;
 
     public $status;
 
-    public $type;//System OR User
+    public $type;
+
+    public $exec_type;
+
+    public $call;
+
+    public $call_args;
+
+    public $pid;
 
     public $previous_run;
 
     public $next_run;
 
     public $force_next_run;
-
-    public $parameters;
 
     public $email;
 

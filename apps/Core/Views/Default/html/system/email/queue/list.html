@@ -1,0 +1,204 @@
+{{adminltetags.useTag('content',
+    [
+        'component'                 : table['component'],
+        'componentName'             : componentName,
+        'componentId'               : componentId,
+        'parentComponentId'         : parent,
+        'sectionId'                 : 'listing',
+        'contentType'               : 'sectionWithListing',
+        'cardHeader'                : true,
+        'cardType'                  : 'primary',
+        'cardIcon'                  : 'inbox',
+        'cardTitle'                 : 'Email Queue',
+        'cardAdditionalClass'       : 'rounded-0',
+        'cardShowTools'             : ['maximize'],
+        'dtFixedHeader'             : true,
+        'dtFilter'                  : true,
+        'dtFilterShowQuickFilter'   : true,
+        'dtFilterButtons'           : ['edit', 'delete', 'add', 'clone', 'reset'],
+        'dtFilters'                 : table['filters'],
+        'dtFilterColumns'           : table['filterColumns'],
+        'dtPrimaryButtons'          :
+            {
+                'componentId'                       : componentId,
+                'sectionId'                         : 'listing',
+                'buttonType'                        : 'DropdownSplitButtons',
+                'dropdownButtonId'                  : 'main',
+                'dropdownButtonTitle'               : 'Process Queue',
+                'dropdownButtonIcon'                : 'paper-plane',
+                'dropdownButtonAdditionalClass'     : 'text-uppercase',
+                'buttonPosition'                    : 'right',
+                'dropdownAlign'                     : 'right',
+                'buttons'               :
+                    {
+                        'process-high' : {
+                            'title'                   : 'High Priority',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'position'                : 'right',
+                            'additionalClass'         : 'process-queue high',
+                            'url'                     : links.url('system/email/queue/processqueue')
+                        },
+                        'process-medium' : {
+                            'title'                   : 'Medium Priority',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'position'                : 'right',
+                            'additionalClass'         : 'process-queue medium',
+                            'url'                     : links.url('system/email/queue/processqueue')
+                        },
+                        'process-low' : {
+                            'title'                   : 'Low Priority',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'position'                : 'right',
+                            'additionalClass'         : 'process-queue low',
+                            'url'                     : links.url('system/email/queue/processqueue')
+                        }
+                    }
+            },
+        'dtTable'                   : table,
+        'dtColumns'                 : table['columns'],
+        'dtPostUrl'                 : table['postUrl'],
+        'dtPostUrlParams'           : table['postUrlParams'],
+        'dtStriped'                 : true,
+        'dtStateSave'               : false,
+        'dtBordered'                : false,
+        'dtHideIdColumn'            : true,
+        'dtNoOfColumnsToShow'       : 6,
+        'dtTableCompact'            : true,
+        'dtZeroRecords'             : 'No email in queue.'
+    ]
+)}}
+<script>
+/* globals Swal PNotify BazContentLoader BazCore */
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
+    initFuncs();
+}
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterRedraw"] = function() {
+    initFuncs();
+}
+
+$('.process-queue').click(function(e) {
+    e.preventDefault();
+
+    var thisButton = $(this).parent().siblings();
+    var url = $(this).attr('href');
+    $(thisButton).children('i').removeClass('fa-paper-plane').addClass('fa-spin fa-cog');
+    $(thisButton).attr('disabled', true);
+
+    var priority;
+
+    if ($(this).hasClass('high')) {
+        priority = 1;
+    } else if ($(this).hasClass('medium')) {
+        priority = 2;
+    } else if ($(this).hasClass('low')) {
+        priority = 3;
+    }
+
+    var dataToSend = { };
+    dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+    dataToSend['priority'] = priority;
+
+    $.ajax({
+        url         : url,
+        method      : 'post',
+        dataType    : 'json',
+        data        : dataToSend,
+        success     : function(response) {
+            if (response.responseCode === 0) {
+                window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+            } else {
+                PNotify.error({
+                    title           : response.responseMessage,
+                });
+            }
+
+            $(thisButton).children('i').removeClass('fa-spin fa-cog').addClass('fa-paper-plane');
+            $(thisButton).attr('disabled', false);
+
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+        }
+    });
+});
+
+function initFuncs() {
+    $('.rowSendNow').each(function(index,row) {
+        $(row).off();
+        $(row).click(function(e) {
+            e.preventDefault();
+
+            var thisButton = this;
+            var url = $(this).attr('href');
+            $(thisButton).children('i').removeClass('fa-paper-plane').addClass('fa-spin fa-cog');
+            $(thisButton).addClass('disabled');
+
+            var dataToSend = { };
+            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+
+            $.ajax({
+                url         : url,
+                method      : 'post',
+                dataType    : 'json',
+                data        : dataToSend,
+                success     : function(response) {
+                    if (response.responseCode === 0) {
+                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                    } else {
+                        PNotify.error({
+                            title           : response.responseMessage,
+                        });
+                    }
+
+                    $(thisButton).children('i').removeClass('fa-paper-plane').addClass('fa-spin fa-cog');
+                    $(thisButton).removeClass('disabled');
+
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                }
+            });
+        });
+    });
+
+    $('.rowRequeue').each(function(index,row) {
+        $(row).off();
+        $(row).click(function(e) {
+            e.preventDefault();
+
+            var thisButton = this;
+            var url = $(this).attr('href');
+
+            var dataToSend = { };
+            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+
+            $.ajax({
+                url         : url,
+                method      : 'post',
+                dataType    : 'json',
+                data        : dataToSend,
+                success     : function(response) {
+                    if (response.responseCode === 0) {
+                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                    } else {
+                        PNotify.error({
+                            title           : response.responseMessage,
+                        });
+                    }
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                }
+            });
+        });
+    });
+}
+</script>

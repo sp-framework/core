@@ -18,5 +18,5 @@ class BasepackagesActivityLogs extends BaseModel
 
     public $package_row_id;
 
-    public $logs;
+    public $log;
 }

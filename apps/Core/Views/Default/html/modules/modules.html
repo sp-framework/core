@@ -1,0 +1,1762 @@
+{# <div class="row">
+    <div id="repo" class="col">
+        {% include 'modules/repositories/list.html' %}
+    </div>
+</div> #}
+<div class="row vdivide">
+    <div class="col-md-4 vdivide-resizable">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'modules',
+                'fieldLabel'                                : 'Modules',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Available modules on repository.',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : ["modules":["srcArr" : modules]],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : true,
+                'fieldJstreeAllChecked'                     : false,
+                'fieldJstreeRootIcon'                       : 'th',
+                'fieldJstreeToggleAllChildren'              : true,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : true,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : true,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : true,
+                'fieldJstreeHideJstreeIcons'                : false,
+                'fieldJstreeAdditionalTools'                :
+                    [
+                        'repo-add' :
+                            [
+                                'id'        : 'repo-add',
+                                'tooltip'   : 'Repo Add',
+                                'icon'      : 'circle-plus',
+                                'iconColor' : 'success',
+                                'disabled'  : true,
+                                'url'       : links.url('system/api/client/services')
+                            ],
+                        'repo-update' :
+                            [
+                                'id'        : 'repo-update',
+                                'tooltip'   : 'Repo Update',
+                                'icon'      : 'edit',
+                                'iconColor' : 'warning',
+                                'disabled'  : true,
+                                'url'       : links.url('system/api/client/services/q/id/')
+                            ],
+                        'repo-sync' :
+                            [
+                                'id'        : 'repo-sync',
+                                'tooltip'   : 'Repo Sync',
+                                'icon'      : 'sync-alt',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        '0'       :
+                            [
+                                'id'        : 'divider'
+                            ],
+                        'filter-update-available' :
+                            [
+                                'id'        : 'filter-update-available',
+                                'tooltip'   : 'Apply Filter (update)',
+                                'icon'      : 'circle-up',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        'filter-new-available' :
+                            [
+                                'id'        : 'filter-new-available',
+                                'tooltip'   : 'Apply Filter (new)',
+                                'icon'      : 'star',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        '1'       :
+                            [
+                                'id'        : 'divider'
+                            ],
+                        'filter-update' :
+                            [
+                                'id'        : 'filter-update',
+                                'tooltip'   : 'Apply Filter (:update)',
+                                'icon'      : 'circle-up',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        'filter-install' :
+                            [
+                                'id'        : 'filter-install',
+                                'tooltip'   : 'Apply Filter Install/Update (:install)',
+                                'icon'      : 'circle-plus',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        'filter-uninstall' :
+                            [
+                                'id'        : 'filter-uninstall',
+                                'tooltip'   : 'Apply Filter Uninstall (:uninstall)',
+                                'icon'      : 'circle-minus',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        'filter-remove' :
+                            [
+                                'id'        : 'filter-remove',
+                                'tooltip'   : 'Apply Filter Remove (:remove)',
+                                'icon'      : 'circle-xmark',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        '2'       :
+                            [
+                                'id'        : 'divider'
+                            ],
+                        'filter-queue' :
+                            [
+                                'id'        : 'filter-queue',
+                                'tooltip'   : 'Apply Filter In Queue (queue:)',
+                                'icon'      : 'list',
+                                'iconColor' : 'secondary',
+                                'disabled'  : true
+                            ],
+                        'filter-clear' :
+                            [
+                                'id'        : 'filter-clear',
+                                'tooltip'   : 'Clear all filters',
+                                'icon'      : 'times',
+                                'iconColor' : 'primary'
+                            ]
+                    ],
+                'fieldJstreeReplaceIdWithDataField'         : 'moduleid',
+                'fieldJstreePlugins'                        : ["search", "types"],
+                'fieldJstreeAdditionalClass'                : 'text-uppercase'
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-error" hidden>
+            <div class="col">
+                <h6><i class="fa fa-fw fa-info-circle text-danger"></i> Error loading module information. Please contact administrator.</h6>
+            </div>
+        </div>
+        <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-noinfo">
+            <div class="col">
+                <h6><i class="fa fa-fw fa-info-circle text-info"></i> Select module from the tree to see it's details.</h6>
+            </div>
+        </div>
+        <div class="row text-center" id="{{componentId}}-{{sectionId}}-moduleinfo-loader" hidden>
+            <div class="col">
+                <i class="fa fa-cog fa-spin"></i> Loading module information...
+            </div>
+        </div>
+        <div class="row" id="{{componentId}}-{{sectionId}}-moduleinfo-info" hidden>
+            <div class="col">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : sectionId,
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'modules/modules/info'
+                                ],
+                                'description'   :
+                                [
+                                    'tabTitle'          : 'Description',
+                                    'tabInclude'        : 'modules/modules/description'
+                                ],
+                                'changelogs'   :
+                                [
+                                    'tabTitle'          : 'Change logs',
+                                    'tabInclude'        : 'modules/modules/changelogs'
+                                ],
+                                'settings'   :
+                                [
+                                    'tabTitle'          : 'Settings',
+                                    'tabInclude'        : 'modules/modules/settings'
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'queue_id',
+                'fieldLabel'                     : 'Queue ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Queue ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : queue['id']
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <span class="text-uppercase">Queue:
+            <span style="top: -2px;position: relative;" class="badge badge-info" id="queue-counter">{{queue['tasks_count']}}</span>
+        </span>
+    </div>
+    {% set queue = json_encode(queue, 16) %}
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        'analyse-queue'     : [
+                            'title'             : 'Analyse Queue',
+                            'position'          : 'right',
+                            'size'              : 'xs',
+                            'icon'              : 'fa-cog fa-spin',
+                            'iconHidden'        : true,
+                            'disabled'          : true
+                        ],
+                        'clear-queue'       : [
+                            'title'             : 'Clear Queue',
+                            'position'          : 'right',
+                            'type'              : 'danger',
+                            'size'              : 'xs',
+                            'disabled'          : true
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+{% set modules = json_encode(modules, 16) %}
+<script>
+/*global PNotify BazProgress Swal BazContentFields BazHelpers */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-level_of_update'             : {
+            placeholder: 'SELECT LEVEL OF UPDATE'
+        },
+        '{{componentId}}-{{sectionId}}-auto_update'                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-save-settings').off();
+                $('#{{componentId}}-{{sectionId}}-save-settings').click(function() {
+                    $('#{{componentId}}-{{sectionId}}-save-settings').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-save-settings').children("i").removeClass("fa-save").addClass("fa-cog fa-spin");
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['module_id'] = dataCollectionSectionForm['vars']['module']['id'];
+                    postData['module_type'] = dataCollectionSectionForm['vars']['module']['module_type'];
+                    postData['level_of_update'] = $('#{{componentId}}-{{sectionId}}-level_of_update').val();
+                    postData['auto_update'] = '0';
+                    if ($('#{{componentId}}-{{sectionId}}-auto_update')[0].checked === true) {
+                        postData['auto_update'] = '1';
+                    }
+
+                    $.post('{{links.url("modules/saveModuleSettings")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            PNotify.success({text: response.responseMessage});
+                        } else if (response.responseCode == 1) {
+                            PNotify.error({text: response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-save-settings').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-save-settings').children("i").removeClass("fa-cog fa-spin").addClass("fa-save");
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-queue_id'                    : { },
+        '{{componentId}}-{{sectionId}}-form'                        : {
+            rules: { },
+            messages: { }
+        }
+    });
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['sync'] = false;
+dataCollectionSectionForm['vars']['rootTree'] = [];
+dataCollectionSectionForm['vars']['org_update_available'] = 0;
+dataCollectionSectionForm['vars']['update_available'] = 0;
+dataCollectionSectionForm['vars']['new_available'] = 0;
+dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modules}}');
+dataCollectionSectionForm['vars']['module'] = { };
+dataCollectionSectionForm['vars']['queue'] = JSON.parse('{{queue}}');
+// dataCollectionSectionForm['vars']['queue_data'] = { };
+// dataCollectionSectionForm['vars']['queue_data']['install'] = { };
+// dataCollectionSectionForm['vars']['queue_data']['uninstall'] = { };
+// dataCollectionSectionForm['vars']['queue_data']['update'] = { };
+// dataCollectionSectionForm['vars']['queue_data']['remove'] = { };
+dataCollectionSectionForm['vars']['initJstree'] = false;
+dataCollectionSectionForm['vars']['syncInfo'] = '';
+
+dataCollectionSectionForm['funcs'] = { };
+
+dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
+    $('#{{componentId}}-{{sectionId}}-modules').off('ready.jstree');
+    $('#{{componentId}}-{{sectionId}}-modules').on('ready.jstree', function() {
+        dataCollectionSectionForm['vars']['rootTree'] = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {flat:true});
+
+        var selected;
+
+        $(dataCollectionSectionForm['vars']['rootTree']).each(function(i, v) {
+            v.text = v.text.toLowerCase();
+            if (v.data.apiid == '1' && v.data.type === 'repo' && v.text.includes('core')) {
+                selected = v.id;
+
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().select_node(v.id);
+
+                return false;
+            }
+        });
+
+        dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](null, false, false, false, true);
+    });
+
+    $('#{{componentId}}-{{sectionId}}-modules').on('search.jstree', function(e, res) {
+        if (dataCollectionSectionForm['vars']['syncInfo'] === '') {
+            $(res.nodes).each(function(i, node) {
+                var updateNode = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(node);
+                var apiNode = updateNode.parents[updateNode.parents.length - 2];
+                var apiNodeObj = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(apiNode);
+                var update = 'update';
+                if (res.nodes.length > 1) {
+                    update = 'updates';
+                }
+                dataCollectionSectionForm['vars']['syncInfo'] += apiNodeObj.text + ' has ' + res.nodes.length + ' new ' + update + ' available.<br>';
+            });
+        }
+
+        if (dataCollectionSectionForm['vars']['initJstree'] === true) {
+            dataCollectionSectionForm['vars']['org_update_available'] = res.nodes.length;
+            dataCollectionSectionForm['vars']['update_available'] = res.nodes.length;
+            dataCollectionSectionForm['vars']['initJstree'] = false;
+            PNotify.info({
+                text        : dataCollectionSectionForm['vars']['syncInfo'],
+                textTrusted : true
+            });
+        }
+
+        dataCollectionSectionForm['vars']['syncInfo'] = '';
+
+        if (dataCollectionSectionForm['vars']['update_available'] > 0) {
+            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', 'warning', false);
+        }
+    });
+
+    dataCollectionSectionForm['funcs']['initJstreeButtons']();
+}
+dataCollectionSectionForm['funcs']['initJstreeButtons'] = function() {
+    $('#{{componentId}}-{{sectionId}}-modules-repo-sync, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-update-available, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-new-available, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-update, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-install, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-uninstall, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-uninstall, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-queue, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-clear').off();
+
+    $('#{{componentId}}-{{sectionId}}-modules-repo-sync, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-update-available, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-new-available, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-update, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-install, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-uninstall, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-remove, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-queue, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-clear').tooltip('dispose');
+    $('#{{componentId}}-{{sectionId}}-modules-repo-sync, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-update-available, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-new-available, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-update, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-install, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-uninstall, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-remove, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-queue, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-clear').tooltip('enable');
+
+    $('#{{componentId}}-{{sectionId}}-modules-repo-sync, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-update-available, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-new-available, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-update, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-install, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-uninstall, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-remove, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-queue, ' +
+      '#{{componentId}}-{{sectionId}}-modules-filter-clear')
+    .click(function(e) {
+        e.preventDefault();
+
+        if (dataCollectionSectionForm['vars']['sync'] === true) {
+            return;
+        }
+
+        if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-repo-sync') {
+            dataCollectionSectionForm['funcs']['toggleJstreeTool']($(this)[0].id);
+
+            dataCollectionSectionForm['funcs']['initSync'](
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true)[0].data.apiid
+            );
+
+            return;
+        }
+
+        dataCollectionSectionForm['vars']['filter'] = false;
+
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
+
+        if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-filter-update-available' ||
+            $(this)[0].id === '{{componentId}}-{{sectionId}}-modules-filter-update'
+        ) {
+            dataCollectionSectionForm['vars']['filter'] = true;
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-filter-new-available') {
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('new');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('new');
+        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-filter-install') {
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val(':Install');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search(':Install');
+        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-filter-uninstall') {
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val(':Uninstall');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search(':Uninstall');
+        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-filter-remove') {
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val(':Remove');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search(':Remove');
+        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-filter-queue') {
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('in queue:');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('in queue:');
+        } else if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-filter-clear') {
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().open_all();
+        }
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update');
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
+
+        dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo'], []);
+    });
+}
+
+dataCollectionSectionForm['funcs']['jstreeReady']();//We start here
+
+dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
+    function(nodeId = null, install = false, uninstall = false, remove = false, init = false) {
+        var allNodes;
+
+        if (nodeId) {
+            allNodes = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(nodeId);
+        } else {
+            allNodes = dataCollectionSectionForm['vars']['rootTree']
+        }
+
+        var updateAvailable = false;
+        var nT, nD, index;
+        var orgInstall = install;
+        var orgUninstall = uninstall;
+        var orgRemove = remove;
+
+        $(allNodes).each(function(i, node) {
+            install = orgInstall;
+            uninstall = orgUninstall;
+            remove = orgRemove;
+
+            if (node.id.startsWith('j')) {
+                if (node.data.type === 'repo') {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-cloud-arrow-down text-primary');
+                }
+                return true;
+            }
+
+            nD = node.data;
+
+            if (dataCollectionSectionForm['vars']['modules'][nD.apiid]['childs'][nD.apptype]['childs'][nD.moduletype]['childs'][nD.modulecategory]) {
+                nT =
+                    dataCollectionSectionForm['vars']['modules'][nD.apiid]['childs'][nD.apptype]['childs'][nD.moduletype]['childs'][nD.modulecategory]['childs'][node.id]['name'];
+            } else if (dataCollectionSectionForm['vars']['modules'][nD.apiid]['childs'][nD.apptype]['childs'][nD.moduletype]['childs'][node.id]) {
+                nT =
+                    dataCollectionSectionForm['vars']['modules'][nD.apiid]['childs'][nD.apptype]['childs'][nD.moduletype]['childs'][node.id]['name'];
+            }
+
+            if (dataCollectionSectionForm['vars']['queue']['tasks_count'] > 0) {
+                var tasks = ['install', 'update', 'uninstall', 'remove'];
+
+                $(tasks).each(function(i, task) {
+                    if (Object.keys(dataCollectionSectionForm['vars']['queue']['tasks'][task]).length > 0) {
+                        if (dataCollectionSectionForm['vars']['queue']['tasks'][task][nD.moduletype] &&
+                            BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks'][task][nD.moduletype], nD.id) > -1
+                        ) {
+                            if (task === 'install') {
+                                install = true;
+                                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install', 'info', false);
+                            } else if (task === 'uninstall') {
+                                uninstall = true;
+                                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall', 'danger', false);
+                            } else if (task === 'remove') {
+                                remove = true;
+                                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove', 'danger', false);
+                            }
+
+                            return;
+                        }
+                    }
+                });
+                dataCollectionSectionForm['funcs']['initQueueButtons']();
+            } else {
+                dataCollectionSectionForm['funcs']['initQueueButtons'](false);
+            }
+
+            if (install === true) {
+                if (nD.update_available && nD.update_available == 1) {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-plus text-info');
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Update)');
+                    updateAvailable = true;
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', 'warning', false);
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-square-plus text-info');
+
+                    if (nD.isnew && nD.isnew == 1) {
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(
+                            node,
+                            nT +
+                            ' (In Queue:Install) ' +
+                            ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-info">NEW</span></span>'
+                        );
+                        dataCollectionSectionForm['vars']['new_available'] = 1;
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Install)');
+                    }
+                }
+            } else if (uninstall === true) {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-minus text-danger');
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Uninstall)');
+            } else if (remove === true) {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-xmark text-danger');
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Remove)');
+            } else {
+                if (nD.installed == 1) {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-check text-success');
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fa fa-fw fa-circle-dot');
+                    if (nD.isnew && nD.isnew == 1) {
+                        $('#{{componentId}}-{{sectionId}}-modules')
+                        .jstree()
+                        .set_text(
+                            node,
+                            nT +
+                                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-info">NEW</span></span>'
+                        );
+                        dataCollectionSectionForm['vars']['new_available'] = 1;
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
+                    }
+                }
+
+                if (nD.update_available && nD.update_available == 1) {
+                    updateAvailable = true;
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', 'warning', false);
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-warning');
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (Update Available)');
+
+                    if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][nD.moduletype] &&
+                        BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][nD.moduletype], nD.id) > -1
+                    ) {
+                        index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][nD.moduletype], nD.id)
+
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-info');
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Update)');
+                        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update', 'warning', false);
+                    }
+                }
+            }
+        });
+
+        if (updateAvailable && (dataCollectionSectionForm['vars']['filter'] === true || init === true)) {
+            if (init === true) {
+                dataCollectionSectionForm['vars']['initJstree'] = true;
+            } else {
+                dataCollectionSectionForm['vars']['initJstree'] = false;
+            }
+
+            dataCollectionSectionForm['vars']['filter'] = true;
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+        } else if (dataCollectionSectionForm['vars']['new_available'] == 1) {
+            dataCollectionSectionForm['vars']['filter'] = true;
+            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('new');
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('new');
+        }
+
+        if (dataCollectionSectionForm['vars']['queue']['tasks_count'] > 0) {
+            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
+            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-clear', 'primary', false);
+        }
+
+        if (dataCollectionSectionForm['vars']['new_available'] > 0) {
+            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-new-available', 'info', false);
+            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-clear', 'primary', false);
+        }
+}
+
+dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
+    $('#{{componentId}}-{{sectionId}}-modules').off('select_node.jstree');
+    $('#{{componentId}}-{{sectionId}}-modules').on('select_node.jstree', function() {
+        var selected = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true);
+
+        if (selected[0].id.startsWith('j')) {
+            if (selected[0].data.type !== 'repo') {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_node(selected);
+
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-add');
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update');
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
+                dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
+                return false;
+            } else if (selected[0].data.type === 'repo') {
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-add', 'success', false);
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update', 'warning', false);
+                $('#{{componentId}}-{{sectionId}}-modules-repo-update').attr(
+                    'href', '{{links.url("system/api/client/services/q/id/' + selected[0].data.apiid + '")}}'
+                );
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync', 'primary', false);
+            }
+
+            dataCollectionSectionForm['funcs']['moduleinfo']();
+        } else {
+            if (selected[0].data.type !== 'repo') {
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-add');
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update');
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
+            }
+
+            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
+            dataCollectionSectionForm['funcs']['moduleinfo'](['loader']);
+            dataCollectionSectionForm['funcs']['getSelectedModuleInfo'](selected[0].id);
+        }
+    });
+}
+dataCollectionSectionForm['funcs']['jstreeSelectNode']();//Enable selection of modules
+
+dataCollectionSectionForm['funcs']['toggleJstreeTool'] = function(toolId, textColor, isDisabled = true) {
+    if (textColor === 'undefined') {
+        textColor = 'secondary';
+    }
+
+    if (isDisabled) {
+        $('#' + toolId).addClass('disabled');
+        if (textColor !== null) {
+            $('#' + toolId).children('i').removeClass(function (index, className) {
+                return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+            }).addClass('text-secondary');
+            $('#' + toolId).find('.badge').removeClass(function (index, className) {
+                return (className.match (/(^|\s)badge-\S+/g) || []).join(' ');
+            }).addClass('badge-secondary');
+        }
+    } else {
+        $('#' + toolId).removeClass('disabled');
+        if (textColor !== null) {
+            $('#' + toolId).children('i').removeClass(function (index, className) {
+                return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+            }).addClass('text-' + textColor);
+            $('#' + toolId).find('.badge').removeClass(function (index, className) {
+                return (className.match (/(^|\s)badge-\S+/g) || []).join(' ');
+            }).addClass('badge-' + textColor);
+        }
+    }
+}
+dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], showButtons = ['cancel'], showSettings = true) {
+    if (!showSettings) {
+        $('a[href*="#{{componentId}}-{{sectionId}}-tabs-settings"]').parent().addClass('d-none');
+    } else {
+        $('a[href*="#{{componentId}}-{{sectionId}}-tabs-settings"]').parent().removeClass('d-none');
+    }
+
+    if (show.length > 0) {
+        var moduleinfos = ['loader', 'info', 'noinfo', 'error', 'buttons'];
+        $(moduleinfos).each(function(e, moduleinfo) {
+            if (show.includes(moduleinfo)) {
+                $('#{{componentId}}-{{sectionId}}-moduleinfo-' + moduleinfo).attr('hidden', false);
+            } else {
+                $('#{{componentId}}-{{sectionId}}-moduleinfo-' + moduleinfo).attr('hidden', true);
+            }
+        });
+    }
+
+    if (showButtons.length > 0) {
+        var modulebuttons = ['install', 'update', 'uninstall', 'remove', 'cancel', 'repo-sync'];
+        $(modulebuttons).each(function(e, modulebutton) {
+            if (showButtons.includes(modulebutton)) {
+                $('#{{componentId}}-{{sectionId}}-moduleinfo-' + modulebutton).attr('hidden', false);
+            } else {
+                $('#{{componentId}}-{{sectionId}}-moduleinfo-' + modulebutton).attr('hidden', true);
+            }
+        });
+    }
+}
+
+dataCollectionSectionForm['funcs']['getSelectedModuleInfo'] = function(selected) {
+    if (!selected) {
+        return false;
+    }
+
+    var splitModule, moduleType, moduleId;
+
+    splitModule = selected.split('-');
+    moduleId = splitModule[1];
+
+    if (selected.startsWith('components')) {
+        moduleType = 'components';
+    } else if (selected.startsWith('packages')) {
+        moduleType = 'packages';
+    } else if (selected.startsWith('middlewares')) {
+        moduleType = 'middlewares';
+    } else if (selected.startsWith('views')) {
+        moduleType = 'views';
+    } else if (selected.startsWith('bundles')) {
+        moduleType = 'bundles';
+    }
+
+    if (moduleType && moduleId) {
+        dataCollectionSectionForm['funcs']['getModuleInfo'](moduleType, moduleId);
+
+        return true;
+    }
+
+    return false;
+}
+
+dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, moduleId, sync = false) {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['module_type'] = moduleType;
+    postData['module_id'] = moduleId;
+    if (sync) {
+        dataCollectionSectionForm['vars']['sync'] = true;
+        postData['sync'] = true;
+    }
+
+    $.post('{{links.url("modules/getModuleInfo")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
+
+        if (response.responseCode == 0) {
+            if (response.responseData.module) {
+
+                dataCollectionSectionForm['vars']['module'] = response.responseData.module;
+
+                dataCollectionSectionForm['funcs']['processModuleInfo'](response.responseData.module);
+            }
+        } else if (response.responseCode == 1) {
+            dataCollectionSectionForm['funcs']['moduleinfo'](['error']);
+        } else if (response.responseCode == 2) {
+            PNotify.error({text: response.responseMessage});
+            if (response.responseData.module) {
+                dataCollectionSectionForm['vars']['module'] = response.responseData.module;
+                dataCollectionSectionForm['funcs']['processModuleInfo'](response.responseData.module);
+            }
+        }
+        dataCollectionSectionForm['vars']['sync'] = false;
+    }, 'json');
+}
+
+dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
+    var moduleData = { };
+    var index;
+
+    for (var m in moduleInfo) {
+        if (moduleInfo[m] === '' || moduleInfo[m] === null) {
+            moduleData[m] = '-';
+        } else {
+            moduleData[m] = moduleInfo[m];
+        }
+    }
+
+    if (moduleData['installed'] == 1) {
+        moduleData['installed'] = '<span class="badge badge-success">Yes</span>';
+    } else {
+        moduleData['installed'] = '<span class="badge badge-secondary">No</span>';
+    }
+
+    if (moduleData['update_available'] !== '-' && moduleData['update_available'] == 1) {
+        moduleData['update_available'] = '<span class="badge badge-warning">Yes</span>';
+    }
+    if (moduleData['update_version'] !== '-') {
+        moduleData['update_version'] = '<span class="badge badge-warning">' + moduleData['update_version'] + '</span>';
+    }
+
+    moduleData['version'] = '<span class="badge badge-info">' + moduleData['version'] + '</span>';
+
+    $('#app_type').html(moduleData.app_type);
+    $('#category').html(moduleData.category);
+    $('#update_available').html(moduleData.update_available);
+    $('#update_version').html(moduleData.update_version);
+    $('#updated_on').html(moduleData.updated_on);
+    $('#installed').html(moduleData.installed);
+    $('#version').html(moduleData.version);
+    $('#updated_by').html(moduleData.updated_by);
+    $('#module_type').html(moduleData.module_type);
+    if (moduleData.display_name) {
+        $('#display_name').html(moduleData.display_name);
+        $('#display_name').html(moduleData.display_name);
+    } else {
+        $('#display_name').html(moduleData.name);
+    }
+    $('#module_id').html(moduleData.id);
+    $('#description').html(moduleData.description);
+
+    //This is for Gitea, github will change
+    if (moduleData.repo_details.latestRelease && moduleData.repo_details.latestRelease.body) {
+        var changelogText;
+        if (moduleData.repo_details.latestRelease.prerelease === false) {
+            changelogText =
+                'Version: ' + moduleData.repo_details.latestRelease.name +
+                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-success">STABLE</span></span>';
+        } else {
+            changelogText =
+                'Version: ' + moduleData.repo_details.latestRelease.name +
+                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-danger">UNSTABLE</span></span>';
+        }
+        $('#changelogs-version').html(changelogText);
+        $('#changelogs').html(moduleData.repo_details.latestRelease.body);
+    }
+
+    $('#{{componentId}}-{{sectionId}}-auto_update')[0].checked = false;
+    if (moduleInfo.auto_update !== 'null') {
+        if (moduleInfo.auto_update == '0') {
+            $('#{{componentId}}-{{sectionId}}-auto_update')[0].checked = false;
+        } else if (moduleInfo.auto_update == '1') {
+            $('#{{componentId}}-{{sectionId}}-auto_update')[0].checked = true;
+        }
+    }
+
+    if (moduleInfo.level_of_update !== 'null') {
+        $('#{{componentId}}-{{sectionId}}-level_of_update').val(moduleInfo.level_of_update).trigger('change');
+    }
+
+    if (moduleInfo.installed == '1') {
+        if (moduleInfo.update_available == '1') {
+            if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type] &&
+                dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type].includes(moduleInfo.id)
+            ) {
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
+            } else {
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'remove', 'repo-sync']);
+            }
+        } else {
+            if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
+                dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type].includes(moduleInfo.id)
+            ) {
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
+            } else {
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['uninstall', 'remove', 'repo-sync']);
+            }
+        }
+    } else {
+        if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleData.module_type]) {
+            index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleData.module_type], moduleData.id);
+        }
+        if (!index && dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleData.module_type]) {
+            index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleData.module_type], moduleData.id);
+        }
+
+        if (index > -1) {
+            dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel', 'repo-sync']);
+        } else {
+            dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
+        }
+    }
+
+    dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], []);
+
+    if (moduleData['app_type'] === 'core') {
+        if (moduleInfo['name'] !== 'Core') {
+            dataCollectionSectionForm['funcs']['moduleinfo'](['info'], [], false);
+        } else {
+            if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type]) {
+                index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type], moduleData.id);
+            }
+
+            if (index !== 'undefined' && index > -1) {
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
+            } else {
+                if (moduleInfo.update_available == '1') {
+                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'repo-sync']);
+                } else {
+                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['repo-sync']);
+                }
+            }
+        }
+    }
+
+    dataCollectionSectionForm['funcs']['initModuleButtons']();
+}
+
+dataCollectionSectionForm['funcs']['initModuleButtons'] = function() {
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-install, ' +
+      '#{{componentId}}-{{sectionId}}-moduleinfo-update, ' +
+      '#{{componentId}}-{{sectionId}}-moduleinfo-uninstall, ' +
+      '#{{componentId}}-{{sectionId}}-moduleinfo-remove, ' +
+      '#{{componentId}}-{{sectionId}}-moduleinfo-cancel, ' +
+      '#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').off();
+
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-install').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['updateQueue'](
+            dataCollectionSectionForm['vars']['module']['id'],
+            dataCollectionSectionForm['vars']['module']['module_type'],
+            'install'
+        );
+    });
+
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-update').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['updateQueue'](
+            dataCollectionSectionForm['vars']['module']['id'],
+            dataCollectionSectionForm['vars']['module']['module_type'],
+            'update'
+        );
+    });
+
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['updateQueue'](
+            dataCollectionSectionForm['vars']['module']['id'],
+            dataCollectionSectionForm['vars']['module']['module_type'],
+            'uninstall'
+        );
+    });
+
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-remove').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['updateQueue'](
+            dataCollectionSectionForm['vars']['module']['id'],
+            dataCollectionSectionForm['vars']['module']['module_type'],
+            'remove'
+        );
+    });
+
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['updateQueue'](
+            dataCollectionSectionForm['vars']['module']['id'],
+            dataCollectionSectionForm['vars']['module']['module_type'],
+            'cancel'
+        );
+    });
+
+    $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').click(function(e) {
+        e.preventDefault();
+
+        $(this).attr('disabled', true);
+        $(this).children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
+
+        dataCollectionSectionForm['funcs']['moduleinfo'](['loader', 'buttons'], ['repo-sync']);
+
+        dataCollectionSectionForm['funcs']['getModuleInfo'](
+            dataCollectionSectionForm['vars']['module']['module_type'],
+            dataCollectionSectionForm['vars']['module']['id'],
+            true
+        );
+    });
+}
+
+dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, task) {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['task'] = task;
+    postData['id'] = id;
+    postData['moduleType'] = moduleType;
+
+    $.post('{{links.url("modules/modifyQueue")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            PNotify.success({
+                text        : response.responseMessage,
+            });
+
+            var index;
+
+            if (response.responseData.queue) {
+                dataCollectionSectionForm['vars']['queue']['tasks'] = response.responseData.queue.tasks;
+                dataCollectionSectionForm['vars']['queue']['tasks_count'] = response.responseData.queue.tasks_count;
+            }
+
+            // if (task !== 'cancel' && task !== 'clearQueue') {
+            //     if (!dataCollectionSectionForm['vars']['queue_data'][task][moduleType]) {
+            //         dataCollectionSectionForm['vars']['queue_data'][task][moduleType] = { };
+            //     }
+
+            //     dataCollectionSectionForm['vars']['queue_data'][task][moduleType][id] = dataCollectionSectionForm['vars']['module'];
+            // }
+
+            $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['tasks_count']);
+
+            if (task === 'install') {
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install', 'info', false);
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
+                dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, true);
+            } else if (task === 'update') {
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update', 'info', false);
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
+                dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id);
+            } else if (task === 'uninstall') {
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall', 'danger', false);
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
+                dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, false, true);
+            } else if (task === 'remove') {
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel']);
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove', 'danger', false);
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
+                dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, false, false, true);
+            } else if (task === 'cancel') {
+                dataCollectionSectionForm['funcs']['processModuleInfo'](dataCollectionSectionForm['vars']['module']);
+
+                dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](
+                    dataCollectionSectionForm['vars']['module']['module_type'] + '-' + dataCollectionSectionForm['vars']['module']['id']
+                );
+            } else if (task === 'clearQueue') {
+                dataCollectionSectionForm['funcs']['clearQueue']();
+            }
+        } else {
+            PNotify.error({
+                text        : response.responseMessage,
+            });
+        }
+    }, 'json');
+}
+
+dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
+    if (init) {
+        $('#{{componentId}}-{{sectionId}}-analyse-queue').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', false);
+
+        $('#{{componentId}}-{{sectionId}}-analyse-queue, ' +
+          '#{{componentId}}-{{sectionId}}-clear-queue, ' +
+          '#{{componentId}}-{{sectionId}}-perform-precheck, ' +
+          '#{{componentId}}-{{sectionId}}-process-queue'
+          ).off();
+
+        $('#{{componentId}}-{{sectionId}}-clear-queue').click(function(e) {
+            e.preventDefault();
+
+            dataCollectionSectionForm['funcs']['updateQueue'](0, 'all', 'clearQueue');
+        });
+
+        $('#{{componentId}}-{{sectionId}}-analyse-queue').click(function(e) {
+            e.preventDefault();
+
+            dataCollectionSectionForm['funcs']['analyseQueue']();
+        });
+
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
+            e.preventDefault();
+
+            dataCollectionSectionForm['funcs']['processQueue']();
+        });
+
+        $('#{{componentId}}-{{sectionId}}-process-queue').click(function(e) {
+            e.preventDefault();
+
+            dataCollectionSectionForm['funcs']['processQueue']('process');
+        });
+    } else {
+        $('#{{componentId}}-{{sectionId}}-analyse-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
+    }
+}
+dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
+    var moduleHtml = '';
+    for (var q in dataCollectionSectionForm['vars']['queue']['tasks']) {
+        var count = 0;
+
+        if (q === 'install' || q === 'uninstall' || q === 'update' || q === 'remove') {
+            if (Object.keys(dataCollectionSectionForm['vars']['queue']['tasks'][q]).length > 0) {
+                for (var installTypes in dataCollectionSectionForm['vars']['queue']['tasks'][q]) {
+                    if (dataCollectionSectionForm['vars']['queue']['tasks'][q][installTypes].length > 0) {
+                        count = count + dataCollectionSectionForm['vars']['queue']['tasks'][q][installTypes].length;
+
+                        $(dataCollectionSectionForm['vars']['queue']['tasks'][q][installTypes]).each(function(i, id) {
+                            var name = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['name'];
+                            var moduleType = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['module_type'];
+                            var repo = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['repo'];
+                            var color = 'info';
+
+                            if (dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['display_name']) {
+                                name = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['display_name'];
+                            }
+
+                            if (q === 'update') {
+                                color = 'warning';
+                            } else if (q === 'uninstall' || q === 'remove') {
+                                color = 'danger';
+                            }
+                            moduleHtml +=
+                            '       <tr>' +
+                            '           <td>' +  name + '</td>' +
+                            '           <td>' +  moduleType + '</td>' +
+                            '           <td>' +  repo + '</td>' +
+                            '           <td>' +  '<span class="badge badge-' + color + ' mt-1 text-xs text-uppercase">' + q + '</span></td>' +
+                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' + id + '"></td>' +
+                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' + id + '"></td>' +
+                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + id + '"></td>' +
+                            '       </tr>';
+
+                        });
+                    }
+                }
+            }
+
+            $('#{{componentId}}-{{sectionId}}-queue-' + q).children('span').html(count);
+        }
+    }
+
+    $('#{{componentId}}-{{sectionId}}-queue-table tbody').empty().html(moduleHtml);
+    $('#{{componentId}}-{{sectionId}}-queue-analyse-modal').modal('show');
+}
+dataCollectionSectionForm['funcs']['clearQueue'] = function() {
+    // var index;
+    //This should be done via modifyQueue
+    // if (clearAll) {
+        dataCollectionSectionForm['vars']['sync'] = false;
+        dataCollectionSectionForm['vars']['initJstree'] = false;
+        dataCollectionSectionForm['vars']['filter'] = false;
+        dataCollectionSectionForm['vars']['module'] = { };
+        dataCollectionSectionForm['vars']['update_available'] = 0;
+        dataCollectionSectionForm['vars']['new_available'] = 0;
+        // dataCollectionSectionForm['vars']['queue_data'] = { };
+        // dataCollectionSectionForm['vars']['queue_data']['install'] = { };
+        // dataCollectionSectionForm['vars']['queue_data']['uninstall'] = { };
+        // dataCollectionSectionForm['vars']['queue_data']['update'] = { };
+        // dataCollectionSectionForm['vars']['queue_data']['remove'] = { };
+        dataCollectionSectionForm['vars']['syncInfo'] = '';
+        dataCollectionSectionForm['funcs']['initQueueButtons'](false);
+        dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](null, false, false, false, true);
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install');
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update');
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove');
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall');
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue');
+        dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
+        $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
+    // } else {
+    //     if (id && moduleType) {
+    //         var actionTypes = ['install', 'update', 'uninstall', 'remove'];
+
+    //         var foundIn;
+    //         var disableFilterIcons = [];
+
+    //         $(actionTypes).each(function(i, actionType) {
+    //             if (dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType]) {
+    //                 if (dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType].includes(id)) {
+    //                     index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType], id);
+
+    //                     if (index > -1) {
+    //                         dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType].splice(index, 1);
+
+    //                         foundIn = actionType;
+    //                     }
+    //                 }
+
+    //                 if (dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType].length === 0) {
+    //                     delete dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType];
+    //                 }
+
+    //                 if (Object.keys(dataCollectionSectionForm['vars']['queue']['tasks'][actionType]).length === 0) {
+    //                     disableFilterIcons.push(actionType);
+    //                 }
+    //             }
+
+    //             if (dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType] &&
+    //                 dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType][id]
+    //             ) {
+    //                 delete dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType][id];
+
+    //                 if (Object.keys(dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType]).length === 0) {
+    //                     delete dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType];
+    //                 }
+    //             }
+    //         });
+
+    //         if (foundIn) {
+    //             if (foundIn === 'install') {
+    //                 dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
+    //             } else if (foundIn === 'update') {
+    //                 dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'remove', 'repo-sync']);
+    //             } else if (foundIn === 'uninstall') {
+    //                 if (dataCollectionSectionForm['vars']['module']['update_available'] == '1') {
+    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'remove', 'repo-sync']);
+    //                 } else {
+    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['uninstall', 'remove', 'repo-sync']);
+    //                 }
+    //             } else if (foundIn === 'remove') {
+    //                 if (dataCollectionSectionForm['vars']['module']['update_available'] == '1') {
+    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'remove', 'repo-sync']);
+    //                 } else if (dataCollectionSectionForm['vars']['module']['installed'] == '1') {
+    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['uninstall', 'remove', 'repo-sync']);
+    //                 } else {
+    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
+    //                 }
+    //             }
+
+    //             if (dataCollectionSectionForm['vars']['module']['app_type'] === 'core') {
+    //                 if (dataCollectionSectionForm['vars']['module']['name'] !== 'Core') {
+    //                     dataCollectionSectionForm['funcs']['moduleinfo'](['info'], []);
+    //                 } else {
+    //                     dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['update', 'repo-sync']);
+    //                 }
+    //             }
+    //         }
+
+    //         if (disableFilterIcons.length > 0) {
+    //             $(disableFilterIcons).each(function(i, filterIcon) {
+    //                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-' + filterIcon);
+    //             });
+    //         }
+    //     }
+
+    //     dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] - 1;
+    // }
+
+    // $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
+
+    dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText']();
+}
+dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['queue'] = dataCollectionSectionForm['vars']['queue']['tasks'];
+    postData['process'] = 'runprecheck';
+    if (task === 'process') {
+        postData['process'] = 'runprocess';
+    }
+
+    $.post('{{links.url("modules/processQueue")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            PNotify.success({
+                text        : response.responseMessage,
+                textTrusted : true
+            });
+        } else {
+            PNotify.error({
+                text        : response.responseMessage,
+                textTrusted : true
+            });
+        }
+    }, 'json');
+}
+
+dataCollectionSectionForm['funcs']['initSync'] = function(val) {
+    dataCollectionSectionForm['vars']['sync'] = true;
+    $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
+
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', null, true);
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-new-available', null, true);
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install', null, true);
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update', null, true);
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove', null, true);
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall', null, true);
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', null, true);
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-clear', null, true);
+
+    $('#{{componentId}}-{{sectionId}}-modules').children('ul').hide();
+
+    if ($('#{{componentId}}-{{sectionId}}-modules-empty').length > 0) {
+        $('#{{componentId}}-{{sectionId}}-modules-empty').remove();
+    }
+
+    $('#{{componentId}}-{{sectionId}}-modules').append(
+        '<div id="{{componentId}}-{{sectionId}}-modules-empty" class="text-center">' +
+            '<i class="fa fa-cog fa-spin"></i> Syncing modules...' +
+        '</div>'
+    );
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['api_id'] = val;
+    postData['get_repository_modules'] = true;
+
+    $.post('{{links.url("modules/sync")}}', postData, function(response) {
+        dataCollectionSectionForm['vars']['sync'] = false;
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
+
+            if (response.responseData) {
+                var text = 'Sync Complete.<br>';
+                var newCounter = 0;
+                var updatesCounter = 0;
+                var newModule = 'new module';
+                var update = 'update';
+
+                if (response.responseData.counter.new && response.responseData.counter.new.count) {
+                    newCounter = response.responseData.counter.new.count;
+
+                    if (response.responseData.counter.new.api && response.responseData.counter.new.api.name) {
+                            text += response.responseData.counter.new.api.name + ' has '
+                    }
+                }
+
+                if (response.responseData.counter.updates && response.responseData.counter.updates.count) {
+                    updatesCounter = response.responseData.counter.updates.count;
+
+                    if (response.responseData.counter.updates.api && response.responseData.counter.updates.api.name) {
+                        text += response.responseData.counter.updates.api.name + ' has '
+                    }
+                }
+
+                if (newCounter > 0 || updatesCounter > 0) {
+                    if (newCounter > 1) {
+                        newModule = 'new modules';
+                    }
+                    if (updatesCounter > 1) {
+                        update = 'updates';
+                    }
+                    if (newCounter !== 0 && updatesCounter === 0) {
+                        dataCollectionSectionForm['vars']['new_available'] = newCounter;
+                        text += newCounter + ' ' + newModule + ' available.<br> No ' + update + ' available.';
+                    } else if (newCounter === 0 && updatesCounter !== 0) {
+                        text += updatesCounter + ' new ' + update + ' available.<br> No ' + newModule + ' available.';
+                    } else if (newCounter !== 0 && updatesCounter !== 0) {
+                        text += updatesCounter + ' new ' + update + ' available.<br>' + newCounter + ' ' + newModule + ' available.';
+                    }
+                } else {
+                    text = 'Sync Complete.<br>No ' + newModule + ' or ' + update + ' available.';
+                }
+
+                if (response.responseData.modules) {
+                    dataCollectionSectionForm['vars']['modules'] = response.responseData.modules;
+                }
+                if (response.responseData.modules_html && response.responseData.modules_html !== '') {
+                    var modulesHtml =
+                        '<div id="{{componentId}}-{{sectionId}}-modules" data-bazscantype="jstree">' +
+                            '<ul>' +
+                                response.responseData.modules_html +
+                            '</ul>' +
+                        '</div>';
+
+                    $('#{{componentId}}-{{sectionId}}-modules-tree-div').empty().html(modulesHtml);
+                }
+
+                BazContentFields.init({
+                    'componentId'   : '{{componentId}}',
+                    'sectionId'     : '{{componentId}}-{{sectionId}}',
+                    'fieldId'       : '{{componentId}}-{{sectionId}}-modules'
+                });
+
+                dataCollectionSectionForm['funcs']['jstreeSelectNode']();
+                dataCollectionSectionForm['funcs']['jstreeReady']();
+
+                dataCollectionSectionForm['vars']['syncInfo'] = text;
+
+                if (updatesCounter > 0) {
+                    dataCollectionSectionForm['vars']['update_available'] = 1;
+                    dataCollectionSectionForm['vars']['filter'] = true;
+                    dataCollectionSectionForm['vars']['initJstree'] = false;
+                    // $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
+                    // $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+                } else {
+                    PNotify.info({
+                        text        : dataCollectionSectionForm['vars']['syncInfo'],
+                        textTrusted : true
+                    });
+                }
+            }
+        } else {
+            PNotify.error({
+                text        : response.responseMessage,
+                textTrusted : true
+            });
+
+            if ($('#{{componentId}}-{{sectionId}}-modules-empty').length > 0) {
+                $('#{{componentId}}-{{sectionId}}-modules-empty').remove();
+            }
+
+            $('#{{componentId}}-{{sectionId}}-modules').children('ul').show();
+        }
+        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync', 'primary', false);
+        $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
+    }, 'json');
+}
+
+$(document).ready(function() {
+    BazProgress.buildProgressBar($('#installer-progress'));
+
+    $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').on('keyup', function() {
+        var term = $(this).val();
+        if (term === '') {
+            dataCollectionSectionForm['vars']['filter'] = false;
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().clear_search();
+        } else {
+            dataCollectionSectionForm['vars']['filter'] = true;
+            $('#{{componentId}}-{{sectionId}}-modules').jstree().search(term);
+        }
+    });
+});
+
+// var dataSet = [];
+// dataCollectionSection['{{componentId}}-{{sectionId}}-queue'] = { };
+
+// if (!$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
+//     dataCollectionSection['{{componentId}}-{{sectionId}}-queue']['datatable'] =
+//     $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
+//             "responsive": true,
+//             "columns": [
+//                 { data : 'name'},
+//                 { data : 'repo'},
+//                 { data : 'task'},
+//                 { data : 'precheck'},
+//                 { data : 'completed'},
+//                 { data : 'logs'},
+//             ],
+//             "data": dataSet
+//         }
+//     );
+
+//     dataCollectionSection['{{componentId}}-{{sectionId}}-queue']['datatable'].on( 'draw', function () {
+//         dataCollectionSection['{{componentId}}-{{sectionId}}-queue']['datatable'].columns.adjust().responsive.recalc();
+//     });
+// }
+// dataCollectionSectionForm['funcs']['deleteRepo'] = function(repoName, repoId) {
+//     Swal.fire({
+//         title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2">' +
+//                                       '</i> <span style="font-size:40px;" class="text-danger"> Delete Repo ' +
+//                                       repoName + '?</span>',
+//         icon                        : 'question',
+//         background                  : 'rgba(0,0,0,.8)',
+//         backdrop                    : 'rgba(0,0,0,.6)',
+//         buttonsStyling              : false,
+//         confirmButtonText           : 'Delete',
+//         customClass                 : {
+//             'confirmButton'             : 'btn btn-danger text-uppercase',
+//             'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+//         },
+//         showCancelButton            : true,
+//         keydownListenerCapture      : true,
+//         allowOutsideClick           : false,
+//         allowEscapeKey              : false,
+//         didOpen                     : function() {
+//             window.dataCollection.env.sounds.swalSound.play();
+//         }
+//     }).then((result) => {
+//         if (result.isConfirmed) {
+//             var postData = { };
+//             postData[$('#security-token').attr('name')] = $('#security-token').val();
+//             postData['id'] = repoId;
+
+//             $.post('{{links.url("system/api/remove")}}', postData,
+//                     function(response) {
+//                         if (response.responseCode == 0) {
+//                             $('#{{componentId}}-{{sectionId}}-repositories').find('[data-value="' + repoId + '"]').remove();
+//                         } else {
+//                             PNotify.error({
+//                                 text        : response.responseMessage,
+//                                 textTrusted : true
+//                             });
+//                         }
+//                         if (response.tokenKey && response.token) {
+//                             $('#security-token').attr('name', response.tokenKey);
+//                             $('#security-token').val(response.token);
+//                         }
+//                     },
+//                     'json'
+//                 );
+//         }
+//     });
+// }
+// $('#{{componentId}}-{{sectionId}}-delete').click(function() {
+//     var repoName = $('#{{componentId}}-{{sectionId}}-repositories option:selected').html();
+//     var repoId = $('#{{componentId}}-{{sectionId}}-repositories option:selected').val();
+
+//     dataCollectionSectionForm['funcs']['deleteRepo'](repoName, repoId);
+// });
+//
+// $('#{{componentId}}-{{sectionId}}-repositories').change(function() {
+//     dataCollectionSectionForm['funcs']['initSync']($(this).val());
+// });
+
+
+// $('#{{componentId}}-{{sectionId}}-repositories').on('focus', function() {
+//     dataCollectionSectionForm['vars']['previous'] = this.value;
+// }).change(function() {
+//     if (this.value == '0') {
+//         dataCollectionSectionForm['vars']['previous'] = this.value;
+//         $('#repo-details').attr('hidden', true);
+//         return;
+//     } else {
+//         dataCollectionSectionForm['funcs']['processRepositorySwitch']();
+//     }
+
+//     // if (dataCollectionSectionForm['vars']['previous'] == '0') {
+//     //     dataCollectionSectionForm['vars']['previous'] = this.value;
+//     //     dataCollectionSectionForm['funcs']['processRepositorySwitch']();
+//     //     return;
+//     // }
+
+//     // Swal.fire({
+//     //     title                       : '<span class="text-warning"> Switch Repository? It will reset the queue.</span>',
+//     //     icon                        : 'question',
+//     //     background                  : 'rgba(0,0,0,.8)',
+//     //     backdrop                    : 'rgba(0,0,0,.6)',
+//     //     buttonsStyling              : false,
+//     //     confirmButtonText           : 'Switch',
+//     //     customClass                 : {
+//     //         'confirmButton'             : 'btn btn-warning text-uppercase',
+//     //         'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+//     //     },
+//     //     showCancelButton            : true,
+//     //     keydownListenerCapture      : true,
+//     //     allowOutsideClick           : false,
+//     //     allowEscapeKey              : false,
+//     //     didOpen                     : function() {
+//     //         window['dataCollection'].env.sounds.swalSound.play();
+//     //     }
+//     // }).then((result) => {
+//     //     if (result.value) {
+//     //         dataCollectionSectionForm['funcs']['processRepositorySwitch']();
+//     //     } else {
+//     //         $('#{{componentId}}-{{sectionId}}-repositories').val(dataCollectionSectionForm['vars']['previous']);
+//     //     }
+//     // });
+// });
+
+// dataCollectionSectionForm['funcs']['processRepositorySwitch'] = function() {
+//     var selectedRepository = $('#{{componentId}}-{{sectionId}}-repositories').find(":selected").data('value');
+
+//     $('#repo-details').attr('hidden', false);
+
+//     // dataCollectionSectionForm['vars']['queue'] = { };
+//     // dataCollectionSectionForm['vars']['queue']['count'] = 0;
+//     // dataCollectionSectionForm['vars']['queue']['install_update'] = { };
+//     // dataCollectionSectionForm['vars']['queue']['uninstall'] = { };
+//     $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+//     $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
+//     $('#{{componentId}}-{{sectionId}}-process-queue').off();
+//     $('#{{componentId}}-{{sectionId}}-clear-queue').off();
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('disabled', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').attr('hidden', true);
+//     $('#{{componentId}}-{{sectionId}}-install-update').attr('disabled', true);
+//     $('#{{componentId}}-{{sectionId}}-install-update').attr('hidden', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('disabled', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').attr('hidden', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').attr('disabled', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').attr('hidden', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+//     $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+//     $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
+//     $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
+//     if ($('#{{componentId}}-{{sectionId}}-modules-empty').length > 0) {
+//         $('#{{componentId}}-{{sectionId}}-modules-empty').remove();
+//     }
+
+//     $('#{{componentId}}-{{sectionId}}-modules').append(
+//         '<div id="{{componentId}}-{{sectionId}}-modules-empty" class="text-center">' +
+//             '<i class="fa fa-cog fa-spin"></i> Loading modules...' +
+//         '</div>'
+//     );
+
+//     dataCollectionSectionForm['funcs']['getRepositoryModules'](selectedRepository);
+// }
+
+// dataCollectionSectionForm['funcs']['changeRepoButtons'] = function(val = '0') {
+//     var url = "{{links.url('system/api/q/repository/true/id/')}}" + val;
+
+//     if (val == '1' || val == '2') {
+//         $('#{{componentId}}-{{sectionId}}-sync').attr('disabled', false);
+//         $('#{{componentId}}-{{sectionId}}-delete').attr('disabled', true);
+//         $('#{{componentId}}-{{sectionId}}-edit').removeClass('disabled');
+//         $('#{{componentId}}-{{sectionId}}-edit').attr('href', url);
+//     } else if (val == '0') {
+//         $('#{{componentId}}-{{sectionId}}-sync, #{{componentId}}-{{sectionId}}-delete').attr('disabled', true);
+//         $('#{{componentId}}-{{sectionId}}-edit').addClass('disabled');
+//     } else {
+//         $('#{{componentId}}-{{sectionId}}-sync, #{{componentId}}-{{sectionId}}-delete').attr('disabled', false);
+//         $('#{{componentId}}-{{sectionId}}-edit').removeClass('disabled');
+//         $('#{{componentId}}-{{sectionId}}-edit').attr('href', url);
+//     }
+// }
+//
+// dataCollectionSectionForm['funcs']['getRepositoryModules'] = function(repositoryId) {
+//     var postData = { };
+//     postData[$('#security-token').attr('name')] = $('#security-token').val();
+//     postData['api_id'] = repositoryId;
+
+//     $.post('{{links.url("modules/getRepositoryModules")}}', postData, function(response) {
+//         if (response.tokenKey && response.token) {
+//             $('#security-token').attr('name', response.tokenKey);
+//             $('#security-token').val(response.token);
+//         }
+
+//         $('#{{componentId}}-{{sectionId}}-moduleinfo-loader').attr('hidden', true);
+//         $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').attr('disabled', false);
+//         $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
+
+//         if (response.responseCode == 0) {
+//             if (response.responseData.modules) {
+//                 dataCollectionSectionForm['vars']['modules'] = response.responseData.modules;
+//             }
+//             if (response.responseData.modules_html && response.responseData.modules_html !== '') {
+//                 var modulesHtml =
+//                     '<div id="{{componentId}}-{{sectionId}}-modules" data-bazscantype="jstree">' +
+//                         '<ul>' +
+//                             response.responseData.modules_html +
+//                         '</ul>' +
+//                     '</div>';
+
+//                 $('#{{componentId}}-{{sectionId}}-modules-tree-div').empty().html(modulesHtml);
+//             }
+
+//             BazContentFields.init({
+//                 'componentId'   : '{{componentId}}',
+//                 'sectionId'     : '{{componentId}}-{{sectionId}}',
+//                 'fieldId'       : '{{componentId}}-{{sectionId}}-modules'
+//             });
+
+//             dataCollectionSectionForm['funcs']['jstreeSelectNode']();
+//             dataCollectionSectionForm['funcs']['jstreeReady']();
+//         } else if (response.responseCode == 1) {
+//             $('#{{componentId}}-{{sectionId}}-moduleinfo-info').attr('hidden', true);
+//             $('#{{componentId}}-{{sectionId}}-moduleinfo-buttons').attr('hidden', true);
+//             $('#{{componentId}}-{{sectionId}}-moduleinfo-noinfo').attr('hidden', false);
+//         }
+//     }, 'json');
+// }
+</script>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'queue-analyse-modal',
+            'modalBodyInclude'          : 'modules/analyse/view',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> MODULES IN QUEUE',
+            'modalFooterButtons'        :
+                [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                        [
+                            'perform-precheck' : [
+                                'title'                   : 'Perform Precheck',
+                                'type'                    : 'primary',
+                                'position'                : 'right',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true
+                            ],
+                            'process-queue' : [
+                                'title'                   : 'Process Queue',
+                                'type'                    : 'primary',
+                                'position'                : 'right',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true,
+                                'hidden'                  : true
+                            ]
+                        ]
+                ]
+        ]
+    )}}
+</div>

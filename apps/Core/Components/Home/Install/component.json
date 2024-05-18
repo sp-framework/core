@@ -1,0 +1,34 @@
+{
+    "route"         : "home",
+    "name"          : "Home",
+    "description"   : "Core home",
+    "module_type"   : "components",
+    "app_type"      : "core",
+    "category"      : "tools",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "Apps\\Core\\Components\\Home\\HomeComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "menu"             : {
+        "seq"           : 0,
+        "home"          : {
+            "title"     : "home",
+            "icon"      : "home",
+            "link"      : "home"
+        }
+    },
+    "settings"      : {
+        "mandatory"     : true
+    }
+}

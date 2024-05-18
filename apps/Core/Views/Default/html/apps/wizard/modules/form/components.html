@@ -1,0 +1,362 @@
+{% if components is defined and components|length > 0 %}
+    {% if app['default_component'] is defined and app['default_component'] != 0 %}
+        {% set appDefaultComponent = app['default_component'] %}
+    {% else %}
+        {% set appDefaultComponent = 0 %}
+    {% endif %}
+    {% if app['errors_component'] is defined and app['errors_component'] != 0 %}
+        {% set appErrorsComponent = app['errors_component'] %}
+    {% else %}
+        {% set appErrorsComponent = 0 %}
+    {% endif %}
+    {% set selectComponents = [] %}
+    {% for key, selectComponent in components %}
+        {% if app['app_type'] === 'core' or app['app_type'] === 'dash' %}
+            {% if selectComponent['route'] != 'home' %}
+                {% set selectComponents[key] = selectComponent %}
+            {% endif %}
+        {% else %}
+            {% set selectComponents[key] = selectComponent %}
+        {% endif %}
+    {% endfor %}
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'default_component',
+                    'fieldLabel'                     : 'Default Component',
+                    'fieldType'                      : 'select2',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Select a default component for this app.',
+                    'fieldBazScan'                   : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldRequired'                  : true,
+                    'fieldDataSelect2Options'        : selectComponents,
+                    'fieldDataSelect2OptionsKey'     : 'id',
+                    'fieldDataSelect2OptionsValue'   : 'name',
+                    'fieldDataSelect2OptionsArray'   : true,
+                    'fieldDataSelect2OptionsSelected': appDefaultComponent
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'errors_component',
+                    'fieldLabel'                     : 'Errors Component',
+                    'fieldType'                      : 'select2',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Select an errors component for this app.',
+                    'fieldBazScan'                   : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldRequired'                  : true,
+                    'fieldDataSelect2Options'        : selectComponents,
+                    'fieldDataSelect2OptionsKey'     : 'id',
+                    'fieldDataSelect2OptionsValue'   : 'name',
+                    'fieldDataSelect2OptionsArray'   : true,
+                    'fieldDataSelect2OptionsSelected': appErrorsComponent
+                ]
+            )}}
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'components',
+                    'fieldLabel'                     : 'Components',
+                    'fieldType'                      : 'html',
+                    'fieldAdditionalClass'           : 'mb-0',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Components are building blocks of an app. Each component together with their backend packages performs a specific task.',
+                    'fieldRequired'                  : false,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {% set componentIds = [] %}
+            {% set menuIds = [] %}
+            {% include 'apps/tables/modules' with
+                [
+                    'component'             : component,
+                    'componentId'           : componentId,
+                    'parent'                : parent,
+                    'sectionId'             : sectionId,
+                    'moduleType'            : 'component',
+                    'mandatoryModules'      : mandatoryComponents,
+                    'modules'               : components
+                ]
+            %}
+            {% for component in components %}
+                {% set componentIds[componentId ~ '-' ~ sectionId ~ '-component-' ~ component['id']] = component['id'] %}
+                {% set menuIds[componentId ~ '-' ~ sectionId ~ '-component-menu-' ~ component['id']] = component['menu_id'] %}
+                {% set needAuthIds[componentId ~ '-' ~ sectionId ~ '-component-need_auth-' ~ component['id']] = component['id'] %}
+            {% endfor %}
+            {% set componentIds = json_encode(componentIds, 16) %}
+            {% set menuIds = json_encode(menuIds, 16) %}
+            {% set needAuthIds = json_encode(needAuthIds, 16) %}
+        </div>
+    </div>
+{% else %}
+    <label>No components available for this app type. Go to <a href="{{links.url('modules')}}" class="contentAjaxLink">modules</a> and download components.</label>
+    {% set componentIds = json_encode([]) %}
+    {% set menuIds = json_encode([]) %}
+    {% set needAuthIds = json_encode([]) %}
+{% endif %}
+<script>
+/* globals Sortable */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-default_component'               : {
+            'placeholder'   : 'SELECT DEFAULT COMPONENT'
+        },
+        '{{componentId}}-{{sectionId}}-errors_component'                : {
+            'placeholder'   : 'SELECT ERRORS COMPONENT'
+        },
+        '{{componentId}}-{{sectionId}}-components'                      : {
+            afterInit: function() {
+                var componentIds = { };
+                componentIds = JSON.parse('{{componentIds}}');
+
+                if (Object.keys(componentIds).length === 0) {//if not able to parse json properly during wizard
+                    $('#{{componentId}}-{{sectionId}}-component-table input').each(function(index, input) {
+                        if ($(input).data('type') === 'component') {
+                            componentIds[$(input)[0].id] = $(input).data('id');
+                        }
+                    });
+
+                    if (Object.keys(componentIds).length > 0) {
+                        initCheckboxes();
+                    }
+                } else if (Object.keys(componentIds).length > 0) {
+                    initCheckboxes();
+                }
+
+                function initCheckboxes() {
+                    window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['components'] = { };
+
+                    for (var componentCheckbox in componentIds) {
+                        $('#' + componentCheckbox).click(function() {
+                            var id = $(this)[0].id;
+                            extractComponentCheckboxData(id, componentIds[componentCheckbox], true);
+                        });
+                        extractComponentCheckboxData(componentCheckbox, componentIds[componentCheckbox]);
+                    }
+                }
+
+                function extractComponentCheckboxData(componentCheckbox, component, switchMenu = false) {
+                    var componentId = $('#' + componentCheckbox).data('id');
+                    var menuId = $('#' + componentCheckbox).data('menu');
+                    var appId = $('#' + componentCheckbox).data('app_id');
+
+                    if ($('#' + componentCheckbox)[0].checked === true) {
+                        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['components'][componentId] = true;
+                        if (switchMenu &&
+                            Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)).length > 0
+                        ) {
+                            $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId).attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)[0].checked = true;
+                            window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = true;
+                        } else {
+                            //matched during onload extractComponentCheckboxData
+                            if (Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)).length > 0) {
+                                $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', false);
+                                $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId).attr('disabled', false);
+                                // $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)[0].checked = true;
+                                // window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = true;
+                            }
+                        }
+                        $('#{{componentId}}-{{sectionId}}-default_component').find('[value="' + componentId + '"]').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-default_component').trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-errors_component').find('[value="' + componentId + '"]').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-errors_component').trigger('change');
+                    } else {
+                        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['components'][componentId] = false;
+                        $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', true);
+                        if (switchMenu &&
+                            Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)).length > 0
+                        ) {
+                            $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId).attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)[0].checked = false;
+                            window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = false;
+                            $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId)[0].checked = false;
+                            window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['need_auths'][componentId] = false;
+                        }
+                        $('#{{componentId}}-{{sectionId}}-default_component').find('[value="' + componentId + '"]').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-default_component').trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-errors_component').find('[value="' + componentId + '"]').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-errors_component').trigger('change');
+                    }
+                }
+
+                $(document).ready(function() {
+                    if (!$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-component-table')) {
+                        $('#{{componentId}}-{{sectionId}}-component-table').DataTable({
+                              columns: [
+                                { orderable: false },
+                                { orderable: false },
+                                { orderable: false },
+                                null,
+                                { orderable: false },
+                                null,
+                              ]
+                            }
+                        );
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-menus'                           : {
+            afterInit: function() {
+
+                var menuIds = { };
+                menuIds = JSON.parse('{{menuIds}}');
+
+                if (Object.keys(menuIds).length === 0) {//if not able to parse json properly during wizard
+                    $('#{{componentId}}-{{sectionId}}-component-table input').each(function(index, input) {
+                        if ($(input).data('type') === 'menu') {
+                            menuIds[$(input)[0].id] = $(input).data('menu');
+                        }
+                    });
+
+                    if (Object.keys(menuIds).length > 0) {
+                        initCheckboxes();
+                    }
+                } else if (Object.keys(menuIds).length > 0) {
+                    initCheckboxes();
+                }
+
+                function initCheckboxes() {
+                    window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'] = { };
+
+                    for (var menuCheckbox in menuIds) {
+                        $('#' + menuCheckbox).click(function() {
+                            var id = $(this)[0].id;
+                            extractMenuCheckboxData(id, menuIds[menuCheckbox]);
+                        });
+                        extractMenuCheckboxData(menuCheckbox, menuIds[menuCheckbox]);
+                    }
+                }
+
+                function extractMenuCheckboxData(menuCheckbox, menu) {
+                    var appId = $('#' + menuCheckbox).data('app_id');
+                    var menuId = $('#' + menuCheckbox).data('menu');
+
+                    if (appId && menuId) {
+                        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId] = { };
+                        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId] = { };
+
+                        if ($('#' + menuCheckbox)[0].checked === true) {
+                            window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = true;
+                        } else {
+                            window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = false;
+                        }
+                    }
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-need_auths'                      : {
+            afterInit: function() {
+                var needAuthIds = { };
+                needAuthIds = JSON.parse('{{needAuthIds}}');
+
+                if (Object.keys(needAuthIds).length === 0) {//if not able to parse json properly during wizard
+                    $('#{{componentId}}-{{sectionId}}-component-table input').each(function(index, input) {
+                        if ($(input).data('type') === 'needauth') {
+                            needAuthIds[$(input)[0].id] = $(input).data('id');
+                        }
+                    });
+
+                    if (Object.keys(needAuthIds).length > 0) {
+                        initCheckboxes();
+                    }
+                } else if (Object.keys(needAuthIds).length > 0) {
+                    initCheckboxes();
+                }
+
+                function initCheckboxes() {
+                    window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['need_auths'] = { };
+
+                    for (var noAuthCheckbox in needAuthIds) {
+                        if ($('#' + noAuthCheckbox).length > 0) {
+                            $('#' + noAuthCheckbox).click(function() {
+                                var id = $(this)[0].id;
+                                extractComponentCheckboxData(id);
+                            });
+                            extractComponentCheckboxData(noAuthCheckbox);
+                        }
+                    }
+                }
+
+                function extractComponentCheckboxData(noAuthCheckbox) {
+                    var componentId = $('#' + noAuthCheckbox).data('component_id');
+
+                    if ($('#' + noAuthCheckbox)[0].checked === true) {
+                        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['need_auths'][componentId] = true;
+                    } else {
+                        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['need_auths'][componentId] = false;
+                    }
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                            : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-default_component'       : 'required',
+                '{{componentId}}-{{sectionId}}-errors_component'        : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
+                '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',
+            }
+        }
+    });
+</script>

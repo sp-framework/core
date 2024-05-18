@@ -4,7 +4,6 @@ namespace System\Base\Providers;
 
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
-use Phalcon\Helper\Json;
 use System\Base\Providers\HttpServiceProvider\Cookies;
 use System\Base\Providers\HttpServiceProvider\Links;
 use System\Base\Providers\HttpServiceProvider\Request;
@@ -45,7 +44,7 @@ class HttpServiceProvider implements ServiceProviderInterface
                 $app = $container->getShared('apps')->getAppInfo();
                 $view = $container->getShared('modules')->views->getViewInfo();
                 $domain = $container->getShared('domains')->getDomain();
-                return new Links($request, $app, $view, $domain);
+                return (new Links($request, $app, $view, $domain))->init();
             }
         );
     }

@@ -1,0 +1,15 @@
+--- src/AuthorizationValidators/BearerTokenValidator.php    2024-04-16 02:38:13.929817207 +1000
++++ src/AuthorizationValidators/BearerTokenValidator.php    2024-04-16 02:38:29.686305504 +1000
+@@ -101,6 +101,12 @@
+         $header = $request->getHeader('authorization');
+         $jwt = \trim((string) \preg_replace('/^\s*Bearer\s/', '', $header[0]));
+
++        $authorization = explode('||', $jwt);
++
++        if (isset($authorization[0])) {
++            $jwt = $authorization[0];
++        }
++
+         try {
+             // Attempt to parse the JWT
+             $token = $this->jwtConfiguration->parser()->parse($jwt);

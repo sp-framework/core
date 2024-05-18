@@ -66,6 +66,13 @@ class Agents
                             'notNull'      => false,
                         ]
                     ),
+                    new Column(
+                        'email_code_sent_on',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => false
+                        ]
+                    )
                 ],
                 'options' => [
                     'TABLE_COLLATION' => 'utf8mb4_general_ci'

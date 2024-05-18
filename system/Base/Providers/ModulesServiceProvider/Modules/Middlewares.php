@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesMiddlewares;
 
@@ -19,13 +18,30 @@ class Middlewares extends BasePackage
 		return $this;
 	}
 
-	public function getNamedMiddlewareForApp($name, $appId)
+	public function getMiddlewareByNameForAppId($name, $appId)
 	{
 		foreach($this->middlewares as $middleware) {
-			$middleware['apps'] = Json::decode($middleware['apps'], true);
+			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 
-			if ($middleware['apps'][$appId]['enabled'] === true &&
+			if (isset($middleware['apps'][$appId]) &&
+				$middleware['apps'][$appId]['enabled'] === true &&
 				strtolower($middleware['name']) === strtolower($name)
+			) {
+				$middleware['sequence'] = $middleware['apps'][$appId]['sequence'];
+				$middleware['enabled'] = $middleware['apps'][$appId]['enabled'];
+
+				return $middleware;
+			}
+		}
+
+		return false;
+	}
+
+	public function getMiddlewareByNameForAppType($name, $appType)
+	{
+		foreach($this->middlewares as $middleware) {
+			if (strtolower($middleware['name']) === strtolower($name) &&
+				strtolower($middleware['app_type']) === strtolower($appType)
 			) {
 				return $middleware;
 			}
@@ -34,14 +50,92 @@ class Middlewares extends BasePackage
 		return false;
 	}
 
-	public function getMiddlewaresForApp($appId)
+	public function getMiddlewareById($id)
+	{
+		foreach($this->middlewares as $middleware) {
+			if ($middleware['id'] == $id) {
+				return $middleware;
+			}
+		}
+
+		return false;
+	}
+
+	public function getMiddlewareByRepo($repo)
+	{
+		foreach($this->middlewares as $middleware) {
+			if ($middleware['repo'] == $repo) {
+				return $middleware;
+			}
+		}
+
+		return false;
+	}
+
+	public function getMiddlewareByClassForAppId($class, $appId = null)
+	{
+		if (!$appId) {
+			$appId = isset($this->apps->getAppInfo()['id']) ? $this->apps->getAppInfo()['id'] : false;
+
+			if (!$appId) {
+				return false;
+			}
+		}
+
+		foreach($this->middlewares as $middleware) {
+			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
+
+			if ($middleware['class'] !== $class) {
+				continue;
+			}
+
+			if (isset($middleware['apps'][$appId])) {
+				if (isset($middleware['apps'][$appId]['enabled']) &&
+					$middleware['apps'][$appId]['enabled'] === true
+				) {
+					return $middleware;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public function getMiddlewareByAppTypeAndRepoAndClass($appType, $repo, $class)
+	{
+		foreach($this->middlewares as $middleware) {
+			if ($middleware['app_type'] === $appType &&
+				$middleware['repo'] === $repo &&
+				trim($class, '\\') === trim($middleware['class'], '\\')
+			) {
+				return $middleware;
+			}
+		}
+
+		return false;
+	}
+
+	public function getMiddlewaresByApiId($apiId)
 	{
 		$middlewares = [];
 
 		foreach($this->middlewares as $middleware) {
-			$middleware['apps'] = Json::decode($middleware['apps'], true);
+			if ($middleware['api_id'] == $apiId) {
+				array_push($middlewares, $middleware);
+			}
+		}
 
-			if (isset($middleware['apps'][$appId]['enabled']) &&
+		return $middlewares;
+	}
+
+	public function getMiddlewaresForAppId($appId)
+	{
+		$middlewares = [];
+
+		foreach($this->middlewares as $middleware) {
+			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
+
+			if (isset($middleware['apps'][$appId]) &&
 				$middleware['apps'][$appId]['enabled'] == true
 			) {
 				$middlewares[$middleware['id']] = $middleware;
@@ -53,17 +147,17 @@ class Middlewares extends BasePackage
 		return $middlewares;
 	}
 
-	public function getMiddlewaresForCategoryAndSubcategory($category, $subCategory, $appId = null)
+	public function getMiddlewaresForCategoryAndSubcategory($category, $appId = null)
 	{
 		$middlewares = [];
 
 		foreach($this->middlewares as $middleware) {
 
-			if ($middleware['category'] === $category && $middleware['sub_category'] === $subCategory) {
+			if ($middleware['category'] === $category) {
 				$middlewares[$middleware['id']] = $middleware;
 
 				if ($appId) {
-					$middleware['apps'] = Json::decode($middleware['apps'], true);
+					$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 					if (isset($middleware['apps'][$appId])) {
 						if (isset($middleware['apps'][$appId]['sequence'])) {
 							$middlewares[$middleware['id']]['sequence'] = $middleware['apps'][$appId]['sequence'];
@@ -86,16 +180,16 @@ class Middlewares extends BasePackage
 		return $middlewares;
 	}
 
-	public function getMiddlewaresForAppType(string $type, $appId = null)
+	public function getMiddlewaresForAppType($appType, $appId = null)
 	{
 		$middlewares = [];
 
 		foreach($this->middlewares as $middleware) {
-			if ($middleware['app_type'] == $type) {
+			if ($middleware['app_type'] == $appType) {
 				$middlewares[$middleware['id']] = $middleware;
 
 				if ($appId) {
-					$middleware['apps'] = Json::decode($middleware['apps'], true);
+					$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 					if (isset($middleware['apps'][$appId])) {
 						if (isset($middleware['apps'][$appId]['sequence'])) {
 							$middlewares[$middleware['id']]['sequence'] = $middleware['apps'][$appId]['sequence'];
@@ -120,40 +214,103 @@ class Middlewares extends BasePackage
 
 	public function updateMiddlewares(array $data)
 	{
-		$middlewares = Json::decode($data['middlewares'], true);
+		if ($data['middlewares'] === '') {
+			return true;
+		}
+
+		$dependencyArray = [];
+
+		$middlewares = $this->helper->decode($data['middlewares'], true);
 
 		foreach ($middlewares['middlewares'] as $middlewareId => $status) {
 			$middleware = $this->getById($middlewareId);
 
-			$middleware['apps'] = Json::decode($middleware['apps'], true);
+			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 
 			if ($status === true) {
 				$middleware['apps'][$data['id']]['enabled'] = true;
+
+				$dependencyArray = 
+					array_merge($dependencyArray, $this->checkMiddlewareDependencies($data, $middlewares, $middleware));
 			} else if ($status === false) {
 				$middleware['apps'][$data['id']]['enabled'] = false;
 			}
 
-			$middleware['apps'] = Json::encode($middleware['apps']);
+			if (in_array($middlewareId, $dependencyArray)) {
+				$middleware['apps'][$data['id']]['enabled'] = true;				
+			}
+
+			$middleware['apps'] = $this->helper->encode($middleware['apps']);
 
 			$this->update($middleware);
 		}
+
+		//For middlewars that are not system based.
+		//Change this number to reflect the number of system middlewares in future.
+		$nonSystemMiddlewaresSeqStart = 5;
 
 		foreach ($middlewares['sequence'] as $sequence => $middlewareId) {
 			$middleware = $this->getById($middlewareId);
 
-			$middleware['apps'] = Json::decode($middleware['apps'], true);
+			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
 
-			if ($status === true) {
-				$middleware['apps'][$data['id']]['sequence'] = $sequence;
-			} else if ($status === false) {
-				$middleware['apps'][$data['id']]['sequence'] = $sequence;
+			//System Middlewares
+			if ($middleware['name'] === 'IpFilter') {
+				$middleware['apps'][$data['id']]['sequence'] = 0;
+			} else if ($middleware['name'] === 'Maintenance') {
+				$middleware['apps'][$data['id']]['sequence'] = 1;
+			} else if ($middleware['name'] === 'Auth') {
+				$middleware['apps'][$data['id']]['sequence'] = 2;
+			} else if ($middleware['name'] === 'AgentCheck') {
+				$middleware['apps'][$data['id']]['sequence'] = 3;
+			} else if ($middleware['name'] === 'Acl') {
+				$middleware['apps'][$data['id']]['sequence'] = 4;
+			} else {
+				//Non System Middlewares
+				$middleware['apps'][$data['id']]['sequence'] = $nonSystemMiddlewaresSeqStart;
+				$nonSystemMiddlewaresSeqStart++;
 			}
 
-			$middleware['apps'] = Json::encode($middleware['apps']);
+			$middleware['apps'] = $this->helper->encode($middleware['apps']);
 
 			$this->update($middleware);
 		}
+	}
 
-		return true;
+	protected function checkMiddlewareDependencies($data, &$middlewares, &$middleware)
+	{
+		$dependencyArray = [];
+
+		if (is_string($middleware['dependencies'])) {
+			$middleware['dependencies'] = $this->helper->decode($middleware['dependencies'], true);
+		}
+
+		if (!isset($middleware['dependencies']['middlewares'])) {
+			return $dependencyArray;
+		} 
+
+		if (is_array($middleware['dependencies']['middlewares']) && count($middleware['dependencies']['middlewares']) === 0) {
+			return $dependencyArray;
+		}
+
+		foreach ($middleware['dependencies']['middlewares'] as $key => $dependency) {
+			$dependencyMiddleware = $this->getFirst('name', $dependency['name'], false, true, null, [], true);
+
+			if ($dependencyMiddleware) {
+				$dependencyMiddleware['apps'] = $this->helper->decode($dependencyMiddleware['apps'], true);
+
+				$dependencyMiddleware['apps'][$data['id']]['enabled'] = true;
+
+				$dependencyMiddleware['apps'] = $this->helper->encode($dependencyMiddleware['apps']);
+
+				$middlewares['middlewares'][$dependencyMiddleware['id']] = true;
+
+				array_push($dependencyArray, $dependencyMiddleware['id']);
+
+				$this->update($dependencyMiddleware);				
+			}
+		}
+
+		return $dependencyArray;
 	}
 }

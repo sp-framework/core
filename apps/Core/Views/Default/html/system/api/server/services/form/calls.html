@@ -1,0 +1,100 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'concurrent_calls_limit',
+                'fieldLabel'                            : 'Concurrent Calls Limit',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Number of calls that can be initiated at the same time. Example, there might be a call running and if you start another call, it will be considered as a concurrent call.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 0,
+                'fieldDataInputMaxNumber'               : 10,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : apiConcurrentCallsLimit
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'per_minute_calls_limit',
+                'fieldLabel'                            : 'Per Mintue Calls Limit',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Number of calls that can be made in a minute (from start of the minute).',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 0,
+                'fieldDataInputMaxNumber'               : 10000,
+                'fieldDataInputMaxLength'               : 5,
+                'fieldValue'                            : apiPerMinuteCallsLimit
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'per_hour_calls_limit',
+                'fieldLabel'                            : 'Per Hour Calls Limit',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Number of calls that can be made in an hour (from start of the hour).',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 0,
+                'fieldDataInputMaxNumber'               : 600000,
+                'fieldDataInputMaxLength'               : 6,
+                'fieldValue'                            : apiPerHourCallsLimit
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'per_day_calls_limit',
+                'fieldLabel'                            : 'Per Day Calls Limit',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Number of calls that can be made in a day (24 hours, from the start of midnight)',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 0,
+                'fieldDataInputMaxNumber'               : 14400000,
+                'fieldDataInputMaxLength'               : 8,
+                'fieldValue'                            : apiPerDayCallsLimit
+            ]
+        )}}
+    </div>
+</div>

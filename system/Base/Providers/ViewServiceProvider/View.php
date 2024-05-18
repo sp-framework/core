@@ -27,17 +27,19 @@ class View
 		$this->events->attach(
 			'view',
 			function (Event $event, $view) {
-
-				if($event->getType() == 'beforeRender') {
-
+				if ($event->getType() == 'beforeRender') {
 					$path = $view->getViewsDir();
-
 					$path .= strtolower($view->getControllerName()) . '/';
-
 					$path .= $view->getActionName() . '.html';
-
 					if (!file_exists($path)) {
 						throw new \Exception('Template '.$path.' not found');
+					}
+
+					//Check Layout
+					$path = $view->getLayoutsDir();
+					$path .= $view->getLayout() . '.html';
+					if (!file_exists($path)) {
+						throw new \Exception('Layout '.$path.' not found');
 					}
 				}
 			}

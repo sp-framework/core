@@ -1,0 +1,47 @@
+{
+    "route"         : "system/email/services",
+    "name"          : "Email Services",
+    "description"   : "Manage admin email services via this component",
+    "module_type"   : "components",
+    "app_type"      : "core",
+    "category"      : "admin",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "Apps\\Core\\Components\\System\\Email\\Services\\ServicesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "menu"              : {
+        "seq"           : 6,
+        "system"      : {
+            "icon"      : "cogs",
+            "title"     : "system",
+            "childs"    : {
+                "email" : {
+                    "title"     : "Email",
+                    "icon"      : "envelope",
+                    "childs"    : {
+                        "services" : {
+                            "title"     : "Services",
+                            "link"      : "system/email/services"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "core"      : true
+        }
+    }
+}

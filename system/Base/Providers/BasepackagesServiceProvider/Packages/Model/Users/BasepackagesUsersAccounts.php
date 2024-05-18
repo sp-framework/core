@@ -3,6 +3,8 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users;
 
 use System\Base\BaseModel;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
+use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiUsers;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
@@ -10,6 +12,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accou
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersRoles;
 
 class BasepackagesUsersAccounts extends BaseModel
 {
@@ -20,6 +23,8 @@ class BasepackagesUsersAccounts extends BaseModel
     public $status;
 
     public $email;
+
+    public $username;
 
     public $domain;
 
@@ -56,25 +61,22 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        $this->modelRelations['identifiers']['relationObj'] = $this->hasOneThrough(
+        $this->modelRelations['identifier']['relationObj'] = $this->hasOneThrough(
             'id',
             BasepackagesUsersAccountsSessions::class,
             'account_id',
-            'session_id',
+            ['account_id', 'session_id'],
             BasepackagesUsersAccountsIdentifiers::class,
-            'session_id',
+            ['account_id', 'session_id'],
             [
-                'alias'         => 'identifiers'
+                'alias'         => 'identifier'
             ]
         );
 
-        $this->modelRelations['agents']['relationObj'] = $this->hasOneThrough(
+        $this->modelRelations['agents']['relationObj'] = $this->hasMany(
             'id',
-            BasepackagesUsersAccountsSessions::class,
-            'account_id',
-            'session_id',
             BasepackagesUsersAccountsAgents::class,
-            'session_id',
+            'account_id',
             [
                 'alias'         => 'agents'
             ]
@@ -89,12 +91,44 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        $this->modelRelations['profiles']['relationObj'] = $this->hasOne(
+        $this->modelRelations['profile']['relationObj'] = $this->hasOne(
             'id',
             BasepackagesUsersProfiles::class,
             'account_id',
             [
-                'alias'         => 'profiles'
+                'alias'         => 'profile'
+            ]
+        );
+
+        $account_id = '0';
+        if (isset($this->auth) && $this->auth->account()) {
+            $account_id = $this->auth->account()['id'];
+        }
+        $this->modelRelations['api_clients']['relationObj'] = $this->hasMany(
+            'id',
+            ServiceProviderApiClients::class,
+            'account_id',
+            [
+                'alias'         => 'api_clients',
+                'params'        => [
+                    'conditions'    => 'account_id = :account_id: AND revoked = :revoked:',
+                    'bind'          => [
+                        'account_id'    => $account_id,
+                        'revoked'       => '0'
+                    ]
+                ]
+            ]
+        );
+
+        $this->modelRelations['role']['relationObj'] = $this->hasOneThrough(
+            'id',
+            BasepackagesUsersAccountsSecurity::class,
+            'account_id',
+            'role_id',
+            BasepackagesUsersRoles::class,
+            'id',
+            [
+                'alias'         => 'role'
             ]
         );
 

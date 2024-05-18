@@ -1,0 +1,40 @@
+{% if role['id'] is defined %}
+    {% set roleId = role['id'] %}
+    {% set roleName = role['name'] %}
+    {% set roleDescription = role['description'] %}
+    {% set title = 'Role (' ~ role['name'] ~ ')' %}
+{% else %}
+    {% set roleId = '' %}
+    {% set roleName = '' %}
+    {% set roleDescription = '' %}
+    {% set title = 'New Role' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'sitemap',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'roles/form',
+        'formButtons'                   :
+        [
+            'canAdd'                        : canAdd,
+            'canUpdate'                     : canUpdate,
+            'updateButtonId'                : roleId,
+            'addActionUrl'                  : 'system/users/roles/add',
+            'addSuccessRedirectUrl'         : 'system/users/roles',
+            'updateActionUrl'               : 'system/users/roles/update',
+            'updateSuccessRedirectUrl'      : 'system/users/roles',
+            'cancelActionUrl'               : 'system/users/roles',
+            'closeActionUrl'                : 'system/users/roles'
+        ]
+    ]
+)}}

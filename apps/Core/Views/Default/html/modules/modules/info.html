@@ -1,0 +1,108 @@
+<div class="row">
+    <div class="col">
+        <label>NAME: </label>
+        <span class="text-uppercase" id="display_name"></span>
+    </div>
+    <div class="col">
+        <label>INSTALLED: </label>
+        <span class="text-uppercase" style="top: -1px;position: relative;" id="installed"></span>
+    </div>
+    <div class="col">
+        <label>VERSION: </label>
+        <span class="text-uppercase" style="top: -1px;position: relative;" id="version"></span>
+    </div>
+</div>
+<hr class="mt-1">
+<div class="row">
+    <div class="col small">
+        <label>APP TYPE: </label>
+        <span class="text-uppercase" id="app_type"></span>
+    </div>
+    <div class="col small">
+        <label>MODULE TYPE: </label>
+        <span class="text-uppercase" id="module_type"></span>
+    </div>
+    <div class="col small">
+        <label>CATEGORY: </label>
+        <span class="text-uppercase" id="category"></span>
+    </div>
+</div>
+<div class="row">
+    <div class="col small">
+        <label>UPDATE AVAILABLE: </label>
+        <span id="update_available"></span>
+    </div>
+    <div class="col small">
+        <label>UPDATE VERSION: </label>
+        <span id="update_version"></span>
+    </div>
+    <div class="col small">
+        <label>UPDATED ON: </label>
+        <span id="updated_on"></span>
+    </div>
+</div>
+<div class="row">
+    <div class="col small">
+        <label>INSTALLED/UPDATED BY: </label>
+        <span id="updated_by"></span>
+    </div>
+    <div class="col small">
+        <span class="text-uppercase" id="module_id" hidden></span>
+    </div>
+</div>
+<hr>
+<div class="row" id="{{componentId}}-{{sectionId}}-moduleinfo-buttons" hidden>
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        'moduleinfo-repo-sync'  : [
+                            'title'             : false,
+                            'size'              : 'xs',
+                            'icon'              : 'sync-alt',
+                            'hidden'            : true,
+                            'position'          : 'right'
+                        ],
+                        'moduleinfo-install'    : [
+                            'title'             : 'Install',
+                            'size'              : 'xs',
+                            'icon'              : 'plus',
+                            'hidden'            : true
+                        ],
+                        'moduleinfo-update'     : [
+                            'title'             : 'Update',
+                            'size'              : 'xs',
+                            'icon'              : 'arrow-up',
+                            'hidden'            : true
+                        ],
+                        'moduleinfo-uninstall'  : [
+                            'title'             : 'Uninstall',
+                            'type'              : 'danger',
+                            'size'              : 'xs',
+                            'icon'              : 'minus',
+                            'hidden'            : true
+                        ],
+                        'moduleinfo-remove'     : [
+                            'title'             : 'Remove',
+                            'type'              : 'danger',
+                            'size'              : 'xs',
+                            'icon'              : 'xmark',
+                            'hidden'            : true
+                        ],
+                        'moduleinfo-cancel'     : [
+                            'title'             : 'Cancel',
+                            'type'              : 'secondary',
+                            'size'              : 'xs',
+                            'hidden'            : true
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>

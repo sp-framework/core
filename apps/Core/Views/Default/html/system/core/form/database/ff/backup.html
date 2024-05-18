@@ -1,0 +1,143 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'ffs',
+                'fieldLabel'                            : 'FFs',
+                'fieldHidden'                           : true,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldHtmlContent'                      : ''
+            ]
+        )}}
+        {% set activeFf = 0 %}
+        {% set activeFfData = [] %}
+        {% for ffkey, ff in core['settings']['ffs'] %}
+            {% if ff['active'] is defined and ff['active'] === true %}
+                {% set activeFf = ffkey %}
+                {% set activeFfData = ff %}
+            {% endif %}
+        {% endfor %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'allffs',
+                'fieldLabel'                     : 'Select Flat File Directory',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select flat file that you want to make active.',
+                'fieldBazScan'                   : true,
+                'fieldRequired'                  : true,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldDataSelect2Options'        : core['settings']['ffs'],
+                'fieldDataSelect2OptionsKey'     : 'ffname',
+                'fieldDataSelect2OptionsValue'   : 'ffname',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': activeFf
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'ff_is_active',
+                'fieldLabel'                     : 'Is Active',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Is selected flat file active?',
+                'fieldRequired'                  : true,
+                'fieldDisabled'                  : true,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'ff_password_protect',
+                'fieldLabel'                            : 'Password Protect',
+                'fieldType'                             : 'input',
+                'fieldInputType'                        : 'password',
+                'fieldInputPasswordToggleVisibility'    : true,
+                'fieldInputPasswordGenerate'            : true,
+                'fieldInputPasswordStrengthMeter'       : true,
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'We will password protect the zip file if password is provided. Password protection is a must in case of Security and DB keys. During restore, you need to enter this password, else restore will fail. Please keep this password safe.',
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldAdditionalClass'                  : 'mb-0'
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col text-center">
+        {% set backupDisabled = false %}
+        {% set updateDisabled = false %}
+        {% set deleteDisabled = true %}
+        {% if activeFf == '0' %}
+            {% set backupDisabled = true %}
+            {% set updateDisabled = true %}
+            {% set deleteDisabled = false %}
+        {% endif %}
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                     : 'button',
+                'buttons'                        :
+                    [
+                        'delete-ff'    : [
+                            'title'                   : 'Remove ' ~ activeFf ~ ' ff',
+                            'size'                    : 'xs',
+                            'disabled'                : deleteDisabled,
+                            'type'                    : 'danger',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'buttonAdditionalClass'   : 'delete-ff-span text-uppercase mt-1'
+                        ],
+                        'backup-ff'    : [
+                            'title'                   : 'Backup ' ~ activeFf ~ ' ff',
+                            'size'                    : 'xs',
+                            'disabled'                : backupDisabled,
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'buttonAdditionalClass'   : 'generate-ff-backup-span text-uppercase mt-1'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>

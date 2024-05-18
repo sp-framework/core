@@ -1,0 +1,65 @@
+{{adminltetags.useTag('fields',
+    [
+        'component'                         : component,
+        'componentName'                     : componentName,
+        'componentId'                       : componentId,
+        'sectionId'                         : sectionId,
+        'parentComponentId'                 : parent,
+        'fieldId'                           : 'repositories',
+        'fieldLabel'                        : false,
+        'fieldType'                         : 'input',
+        'fieldAdditionalClass'              : 'mb-1',
+        'fieldGroupPreAddonIcon'            : 'cloud-download-alt',
+        'fieldGroupPostAddonButtons'        :
+            [
+                'sync'   : [
+                    'title'                   : false,
+                    'type'                    : 'primary',
+                    'tooltipTitle'            : 'Sync Repository',
+                    'icon'                    : 'sync-alt',
+                    'noMargin'                : true,
+                    'disabled'                : true,
+                    'buttonAdditionalClass'   : 'rounded-0',
+                    'position'                : 'right'
+                ],
+                'edit'   : [
+                    'title'                   : false,
+                    'type'                    : 'warning',
+                    'icon'                    : 'edit',
+                    'noMargin'                : true,
+                    'disabled'                : true,
+                    'url'                     : links.url('system/api/q/repository/true/id/0'),
+                    'buttonAdditionalClass'   : 'rounded-0 text-white contentAjaxLink disabled',
+                    'position'                : 'right'
+                ],
+                'delete'   : [
+                    'title'                   : false,
+                    'type'                    : 'danger',
+                    'icon'                    : 'trash',
+                    'noMargin'                : true,
+                    'disabled'                : true,
+                    'buttonAdditionalClass'   : 'rounded-0',
+                    'position'                : 'right'
+                ],
+                'add'   : [
+                    'title'                   : false,
+                    'type'                    : 'success',
+                    'icon'                    : 'plus',
+                    'noMargin'                : true,
+                    'url'                     : links.url('system/api/q/repository/true/id/0'),
+                    'buttonAdditionalClass'   : 'rounded-0 contentAjaxLink',
+                    'position'                : 'right'
+                ]
+            ],
+        'fieldInputType'                      : 'select',
+        'fieldHelp'                           : false,
+        'fieldDataSelectOptions'              : repositories,
+        'fieldDataSelectOptionsArray'         : true,
+        'fieldDataSelectOptionsKey'           : 'id',
+        'fieldDataSelectOptionsValue'         : 'name',
+        'fieldDataSelectOptionsSelected'      : '0',
+        'fieldDataSelectOptionsZero'          : true,
+        'fieldDataSelectOptionsZeroTitle'     : 'Select Repository'
+
+    ]
+)}}

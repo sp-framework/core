@@ -1,0 +1,34 @@
+{% set simpleAcceptableLevel =
+    '<div class="col">
+        <span class="text-info mr-1 policy passwordPolicySimpleAcceptableLevel">
+            <i class="fa fas fa-exclamation-circle"></i>
+        </span>
+        <span class="mb-1">Minimum password strength level : <strong>' ~ coreSettings['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel'] ~ '</strong></span>
+    </div>'
+%}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : 'form',
+                'fieldId'                               : 'password-policy-simple',
+                'fieldLabel'                            : 'Simple Password Reset Policies',
+                'fieldLabelLegend'                      : false,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldDataAttributes'                   :
+                [
+                    'simple_acceptable_level'           : coreSettings['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel']
+                ],
+                'fieldHtmlContent'                      : '<div class="row">' ~ simpleAcceptableLevel ~ '</div>'
+            ]
+        )}}
+    </div>
+</div>

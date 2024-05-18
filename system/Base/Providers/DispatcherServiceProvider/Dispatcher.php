@@ -20,9 +20,9 @@ class Dispatcher
 
     protected $components;
 
-    protected $router;
+    protected $helper;
 
-    public function __construct($appsInfo, $config, $events, $components, $router)
+    public function __construct($appsInfo, $events, $components, $helper)
     {
         $this->appsInfo = $appsInfo;
 
@@ -30,7 +30,7 @@ class Dispatcher
 
         $this->components = $components;
 
-        $this->router = $router;
+        $this->helper = $helper;
 
         $this->dispatcher = new PhalconDispatcher();
 
@@ -45,7 +45,7 @@ class Dispatcher
                 $this->appsInfo['errors_component'] != 0
             ) {
                 $errorClassArr = explode('\\', $component['class']);
-                unset($errorClassArr[Arr::lastKey($errorClassArr)]);
+                unset($errorClassArr[$this->helper->lastKey($errorClassArr)]);
                 $errorComponent = ucfirst($component['route']);
                 $namespace = implode('\\', $errorClassArr);
             } else {

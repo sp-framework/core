@@ -1,0 +1,27 @@
+{
+    "name"          : "ApiServerServices",
+    "display_name"  : "Api Server Services Package",
+    "description"   : "Package for managing system api server services",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "providers",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\ApiServiceProvider\\Api",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "settings"      : {
+        "componentRoute":"system/api/server/services",
+        "maxApiPerDeveloper" : 10
+    }
+}

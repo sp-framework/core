@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotifications;
 
@@ -46,7 +45,7 @@ class Notifications extends BasePackage
         }
 
         if ($notificationDetails && is_array($notificationDetails)) {
-            $notificationDetails = Json::encode($notificationDetails);
+            $notificationDetails = $this->helper->encode($notificationDetails);
         }
 
         $newNotification = [];
@@ -158,7 +157,7 @@ class Notifications extends BasePackage
         }
 
         if ($domainId) {
-            $domain = $this->domains->getIdDomain($domainId);
+            $domain = $this->domains->getDomainById($domainId);
         } else {
             $domain = $this->domains->getDomain();
         }
@@ -167,7 +166,7 @@ class Notifications extends BasePackage
         $email['app_id'] = $appId;
         $email['status'] = 1;
         $email['priority'] = 3;
-        $email['to_addresses'] = Json::encode($emailAddresses);
+        $email['to_addresses'] = $this->helper->encode($emailAddresses);
         if ($subject) {
             $email['subject'] = $subject;
         } else {
@@ -233,7 +232,8 @@ class Notifications extends BasePackage
 
     protected function getNotificationsCount()
     {
-        return $this->getByParams(
+        if ($this->config->databasetype === 'db') {
+            $conditions =
                 [
                     'conditions'    =>
                         'app_id = :appId: AND account_id = :aId: AND read = :read: AND archive = :archive:',
@@ -244,8 +244,20 @@ class Notifications extends BasePackage
                             'read'          => 0,
                             'archive'       => 0
                         ]
-                ], false, false
-            );
+                ];
+        } else {
+            $conditions =
+                [
+                    'conditions'    => [
+                        ['app_id', '=', $this->apps->getAppInfo()['id']],
+                        ['account_id', '=', $this->auth->account()['id']],
+                        ['read', '=', 0],
+                        ['archive', '=', 0]
+                    ]
+                ];
+        }
+
+        return $this->getByParams($conditions, false, false);
     }
 
     public function changeNotificationState(array $data)
@@ -266,7 +278,7 @@ class Notifications extends BasePackage
             }
         }
 
-        $profile['settings'] = Json::encode($profile['settings']);
+        $profile['settings'] = $this->helper->encode($profile['settings']);
 
         $this->basepackages->profile->updateProfile($profile);
 
@@ -292,7 +304,7 @@ class Notifications extends BasePackage
 
         if ($notificationsArr && count($notificationsArr) > 0) {
             foreach ($notificationsArr as $key => &$notification) {
-                $notification['notification'] = Json::decode($notification['notification'], true);
+                $notification['notification'] = $this->helper->decode($notification['notification'], true);
             }
         }
 

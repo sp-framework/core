@@ -37,6 +37,14 @@ class Menus
                         ]
                     ),
                     new Column(
+                        'app_type',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 50,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
                         'sequence',
                         [
                             'type'    => Column::TYPE_INTEGER,

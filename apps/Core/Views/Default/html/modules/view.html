@@ -1,0 +1,34 @@
+{# {% if modulesData is defined %}
+    {% set data =
+        [
+            'filters'       : filters,
+            'repositories'  : repositories,
+            'modulesData'   : modulesData
+        ]
+    %}
+    {% else %}
+    {% set data =
+        [
+            'filters'       : filters,
+            'repositories'  : repositories
+        ]
+    %}
+{% endif %} #}
+{{adminltetags.useTag('content',
+    [
+        'component'                   : component,
+        'componentId'                 : componentId,
+        'parentComponentId'           : parent,
+        'sectionId'                   : 'manager',
+        'contentType'                 : 'section',
+        'cardId'                      : 'manager-card',
+        'cardHeader'                  : true,
+        'cardType'                    : 'primary',
+        'cardIcon'                    : 'th',
+        'cardTitle'                   : 'Modules',
+        'cardAdditionalClass'         : 'rounded-0',
+        'cardCollapsed'               : false,
+        'cardBodyInclude'             : 'modules/modules',
+        'cardShowTools'               : ['maximize']
+    ]
+)}}

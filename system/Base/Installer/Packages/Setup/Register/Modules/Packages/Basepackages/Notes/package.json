@@ -1,13 +1,25 @@
 {
-    "name": "Notes",
-    "display_name": "Notes",
-    "description": "Basepackage Notes",
-    "app_type": "dash",
-    "category": "system",
-    "sub_category": "tools",
-    "version"       : "0.0.1",
-    "repo"          : "https://.../",
-    "class": "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Notes",
+    "name"              : "Notes",
+    "display_name"      : "Notes",
+    "description"       : "Basepackage Notes",
+    "module_type"       : "packages",
+    "app_type"          : "core",
+    "category"          : "basepackages",
+    "version"           : "0.0.0",
+    "repo"              : "https://.../",
+    "class"             : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Notes",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
     "settings":
     {
         "noteTypes":
