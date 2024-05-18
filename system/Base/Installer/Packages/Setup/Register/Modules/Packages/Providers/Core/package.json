@@ -5,7 +5,7 @@
 	"module_type" : "packages",
 	"app_type" : "core",
 	"category" : "providers",
-	"version" : "0.0.0",
+	"version" : "0.0.0-rc.0",
 	"repo" : "https://dev.bazaari.com.au/sp-core/core",
 	"class" : "System\\Base\\Providers\\CoreServiceProvider\\Core",
 	"dependencies" : 
