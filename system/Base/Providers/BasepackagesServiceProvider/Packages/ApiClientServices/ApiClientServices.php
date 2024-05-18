@@ -418,11 +418,11 @@ class ApiClientServices extends BasePackage
     {
         if (isset($data['auth_type'])) {
             if ($data['auth_type'] == 'auth') {
-                $data['password'] = $this->crypt->encryptBase64($data['password'], $this->secTools->getSigKey());
+                $data['password'] = $this->crypt->encryptBase64(trim($data['password']), $this->secTools->getSigKey());
             } else if ($data['auth_type'] == 'access_token') {
-                $data['access_token'] = $this->crypt->encryptBase64($data['access_token'], $this->secTools->getSigKey());
+                $data['access_token'] = $this->crypt->encryptBase64(trim($data['access_token']), $this->secTools->getSigKey());
             } else if ($data['auth_type'] == 'autho') {
-                $data['authorization'] = $this->crypt->encryptBase64($data['authorization'], $this->secTools->getSigKey());
+                $data['authorization'] = $this->crypt->encryptBase64(trim($data['authorization']), $this->secTools->getSigKey());
             }
         }
 
