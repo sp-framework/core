@@ -50,7 +50,14 @@ class Manager extends BasePackage
             $module = $this->modules->views->getViewById($data['module_id']);
         }
 
+
         if ($module) {
+            if ($module['app_type'] === 'core' && strtolower($module['name']) !== 'core') {
+                $this->addResponse('Core package settings cannot be updated. Change settings via Core module.', 1);
+
+                return false;
+            }
+
             $module = array_merge($module, $data);
 
             try {

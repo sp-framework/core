@@ -734,7 +734,13 @@ dataCollectionSectionForm['funcs']['toggleJstreeTool'] = function(toolId, textCo
         }
     }
 }
-dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], showButtons = ['cancel']) {
+dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], showButtons = ['cancel'], showSettings = true) {
+    if (!showSettings) {
+        $('a[href*="#{{componentId}}-{{sectionId}}-tabs-settings"]').parent().addClass('d-none');
+    } else {
+        $('a[href*="#{{componentId}}-{{sectionId}}-tabs-settings"]').parent().removeClass('d-none');
+    }
+
     if (show.length > 0) {
         var moduleinfos = ['loader', 'info', 'noinfo', 'error', 'buttons'];
         $(moduleinfos).each(function(e, moduleinfo) {
@@ -939,7 +945,7 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
 
     if (moduleData['app_type'] === 'core') {
         if (moduleInfo['name'] !== 'Core') {
-            dataCollectionSectionForm['funcs']['moduleinfo'](['info'], []);
+            dataCollectionSectionForm['funcs']['moduleinfo'](['info'], [], false);
         } else {
             if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type]) {
                 index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type], moduleData.id);
