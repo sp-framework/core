@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Exception\ClientException;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Installer;
+use System\Base\Providers\ModulesServiceProvider\Settings;
 use z4kn4fein\SemVer\Version;
 
 class Manager extends BasePackage
@@ -29,6 +30,8 @@ class Manager extends BasePackage
     protected $middlewares;
 
     protected $views;
+
+    protected $settings = Settings::class;
 
     public function init()
     {
@@ -198,6 +201,18 @@ class Manager extends BasePackage
         }
 
         foreach ($apis as $api) {
+            if ($api['in_use'] == 0) {
+                continue;
+            }
+
+            if (is_string($api['used_by'])) {
+                $api['used_by'] = $this->helper->decode($api['used_by'], true);
+            }
+
+            if (!in_array('modules', $api['used_by'])) {
+                continue;
+            }
+
             if ($api['category'] === 'repos') {
                 $this->apiClient = $this->basepackages->apiClientServices->useApi($api['id']);
                 $this->apiClientConfig = $this->apiClient->getApiConfig();
@@ -208,6 +223,12 @@ class Manager extends BasePackage
                 $sortedModules[$api['id']]['data']['type'] = 'repo';
                 $sortedModules[$api['id']]['data']['apiid'] = $this->apiClientConfig['id'];
             }
+        }
+
+        if (count($sortedModules) === 0) {
+            $this->addResponse('Ok', 0, ['modules' => $sortedModules]);
+
+            return $sortedModules;
         }
 
         if (isset($data['api_id'])) {
@@ -227,6 +248,10 @@ class Manager extends BasePackage
         foreach ($localModules as $moduleType => $modulesArr) {
             if (count($modulesArr) > 0) {
                 foreach ($modulesArr as $moduleArr) {
+                    if (!isset($sortedModules[$moduleArr['api_id']])) {
+                        continue;
+                    }
+
                     if (!isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']])) {
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']] = [];
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['name'] = $moduleArr['app_type'];
@@ -363,7 +388,6 @@ class Manager extends BasePackage
                 return true;
             }
         } catch (ClientException | \throwable $e) {
-            trace([$e]);
             $this->addResponse($e->getMessage(), 1);
 
             return false;
@@ -755,4 +779,59 @@ class Manager extends BasePackage
 
     //     return $path;
     // }
+    //
+
+    public function getAvailableApis($getAll = false, $returnApis = true)
+    {
+        $apisArr = [];
+
+        if (!$getAll) {
+            $package = $this->getPackage();
+            if (isset($package['settings']) &&
+                isset($package['settings']['api_clients']) &&
+                is_array($package['settings']['api_clients']) &&
+                count($package['settings']['api_clients']) > 0
+            ) {
+                foreach ($package['settings']['api_clients'] as $key => $clientId) {
+                    $client = $this->basepackages->apiClientServices->getApiById($clientId);
+
+                    if ($client) {
+                        array_push($apisArr, $client);
+                    }
+                }
+            }
+        } else {
+            $apisArr = $this->basepackages->apiClientServices->getAll()->apiClientServices;
+        }
+
+        if (count($apisArr) > 0) {
+            foreach ($apisArr as $api) {
+                if ($api['category'] === 'repos') {
+                    $useApi = $this->basepackages->apiClientServices->useApi([
+                            'config' =>
+                                [
+                                    'id'           => $api['id'],
+                                    'category'     => $api['category'],
+                                    'provider'     => $api['provider'],
+                                    'checkOnly'    => true//Set this to check if the API exists and can be instantiated.
+                                ]
+                        ]);
+
+                    if ($useApi) {
+                        $apiConfig = $useApi->getApiConfig();
+
+                        $apis[$api['id']]['id'] = $apiConfig['id'];
+                        $apis[$api['id']]['name'] = $apiConfig['name'];
+                        $apis[$api['id']]['data']['url'] = $apiConfig['repo_url'];
+                    }
+                }
+            }
+        }
+
+        if ($returnApis) {
+            return $apis;
+        }
+
+        return $apisArr;
+    }
 }

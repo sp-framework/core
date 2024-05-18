@@ -10,7 +10,7 @@ class Repositories extends BasePackage
 
 	public function init()
 	{
-		$this->repositories = $this->basepackages->api->getApiByCategory('repos');
+		$this->repositories = $this->basepackages->apiClientServices->getApiByCategory('repos');
 
 		return $this;
 	}

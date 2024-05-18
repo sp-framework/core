@@ -6,12 +6,25 @@ use System\Base\BaseComponent;
 
 class ModulesComponent extends BaseComponent
 {
+	public function initialize()
+	{
+		$this->modulesManager = $this->usePackage('manager');
+
+		$this->setModuleSettings(true);
+
+		$this->setModuleSettingsData([
+				'apis' => $this->modulesManager->getAvailableApis(true, false),
+				'apiClients' => $this->modulesManager->getAvailableApis(false, false)
+			]
+		);
+	}
+
 	/**
 	 * @acl(name=view)
 	 */
 	public function viewAction()
 	{
-		$this->view->modules = $this->modules->manager->getRepositoryModules();
+		$this->view->modules = $this->modulesManager->getRepositoryModules();
 
 		$queue = $this->modules->queues->getActiveQueue();
 
@@ -143,13 +156,13 @@ class ModulesComponent extends BaseComponent
 	{
 		$this->requestIsPost();
 
-		if ($this->modules->manager->syncRemoteWithLocal($this->postData())) {
-			$counter = $this->modules->manager->packagesData->counter;
-			$modulesTree = $this->modules->manager->packagesData->responseData;
+		if ($this->modulesManager->syncRemoteWithLocal($this->postData())) {
+			$counter = $this->modulesManager->packagesData->counter;
+			$modulesTree = $this->modulesManager->packagesData->responseData;
 
 			$this->addResponse(
-				$this->modules->manager->packagesData->responseMessage,
-				$this->modules->manager->packagesData->responseCode,
+				$this->modulesManager->packagesData->responseMessage,
+				$this->modulesManager->packagesData->responseCode,
 				array_merge($modulesTree, ['counter' => $counter, 'modules_html' => $this->generateTree($modulesTree)])
 			);
 
@@ -157,8 +170,8 @@ class ModulesComponent extends BaseComponent
 		}
 
 		$this->addResponse(
-			$this->modules->manager->packagesData->responseMessage,
-			$this->modules->manager->packagesData->responseCode
+			$this->modulesManager->packagesData->responseMessage,
+			$this->modulesManager->packagesData->responseCode
 		);
 	}
 
@@ -167,12 +180,12 @@ class ModulesComponent extends BaseComponent
 		$this->requestIsPost();
 
 		if (isset($this->postData()['module_type']) && isset($this->postData()['module_id'])) {
-			$this->modules->manager->getModuleInfo($this->postData());
+			$this->modulesManager->getModuleInfo($this->postData());
 
 			$this->addResponse(
-				$this->modules->manager->packagesData->responseMessage,
-				$this->modules->manager->packagesData->responseCode,
-				$this->modules->manager->packagesData->responseData,
+				$this->modulesManager->packagesData->responseMessage,
+				$this->modulesManager->packagesData->responseCode,
+				$this->modulesManager->packagesData->responseData,
 			);
 		} else {
 			$this->addResponse('Please provide module type and module id', 1);
@@ -184,15 +197,15 @@ class ModulesComponent extends BaseComponent
 		$this->requestIsPost();
 
 		if (isset($this->postData()['api_id'])) {
-			$this->modules->manager->getRepositoryModules($this->postData());
+			$this->modulesManager->getRepositoryModules($this->postData());
 
-			$modulesTree = $this->modules->manager->packagesData->responseData;
+			$modulesTree = $this->modulesManager->packagesData->responseData;
 
 			$responseData = array_merge($modulesTree, ['modules_html' => $this->generateTree($modulesTree)]);
 
 			$this->addResponse(
-				$this->modules->manager->packagesData->responseMessage,
-				$this->modules->manager->packagesData->responseCode,
+				$this->modulesManager->packagesData->responseMessage,
+				$this->modulesManager->packagesData->responseCode,
 				$responseData
 			);
 		} else {
@@ -230,11 +243,11 @@ class ModulesComponent extends BaseComponent
 		$this->requestIsPost();
 
 		if (isset($this->postData()['module_id']) && isset($this->postData()['module_type'])) {
-			$this->modules->manager->saveModuleSettings($this->postData());
+			$this->modulesManager->saveModuleSettings($this->postData());
 
 			$this->addResponse(
-				$this->modules->manager->packagesData->responseMessage,
-				$this->modules->manager->packagesData->responseCode
+				$this->modulesManager->packagesData->responseMessage,
+				$this->modulesManager->packagesData->responseCode
 			);
 		} else {
 			$this->addResponse('Please provide module type and module id', 1);
