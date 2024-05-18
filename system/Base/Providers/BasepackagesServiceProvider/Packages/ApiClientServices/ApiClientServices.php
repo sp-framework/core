@@ -399,42 +399,19 @@ class ApiClientServices extends BasePackage
         return false;
     }
 
-    public function getApiByCategory($category, $inuse = null)
+    public function getApiByCategory($category)
     {
         $this->getAll();
 
-        if (isset($inuse)) {
-            if ($inuse === true) {
-                $inUse = '1';
-            } else {
-                $inUse = '0'|null;
+        $apis = [];
+
+        foreach ($this->apiClientServices as $api) {
+            if ($api['category'] === strtolower($category)) {
+                $apis[$api['id']] = $api;
             }
-            $filter =
-                $this->model->filter(
-                    function($api) use ($category, $inUse) {
-                        $api = $this->getApiById($api->id);
-
-                        if ($api['category'] === strtolower($category) &&
-                            $api['in_use'] == $inUse
-                        ) {
-                            return $api;
-                        }
-                    }
-                );
-        } else {
-            $filter =
-                $this->model->filter(
-                    function($api) use ($category) {
-                        $api = $this->getApiById($api->id);
-
-                        if ($api['category'] === strtolower($category)) {
-                            return $api;
-                        }
-                    }
-                );
         }
 
-        return $filter;
+        return $apis;
     }
 
     protected function encryptPassToken(array $data)
