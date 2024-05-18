@@ -579,11 +579,18 @@ abstract class BaseComponent extends Controller
 				count($this->usedModules['packages']) > 0
 			) {
 				foreach ($this->usedModules['packages'] as $usedModulesPackage) {
-					$packageInfo = $this->modules->packages->getPackageByNameForAppId($usedModulesPackage);
+					if (str_contains($usedModulesPackage, '\\')) {
+						$packageInfo = $this->modules->packages->getPackageByClassForAppId($usedModulesPackage);
+					} else {
+						$packageInfo = $this->modules->packages->getPackageByNameForAppId($usedModulesPackage);
+					}
+
 					if (!$packageInfo) {
 						continue;
 					}
+
 					$thisPackage['id'] = $packageInfo['id'];
+					$thisPackage['display_name'] = $packageInfo['display_name'];
 					$thisPackage['name'] = $packageInfo['name'];
 					$thisPackage['settings'] = $packageInfo['settings'];
 					if (is_string($thisPackage['settings'])) {
@@ -814,13 +821,31 @@ abstract class BaseComponent extends Controller
 
 	protected function usePackage($packageClass)
 	{
+		$packageType = null;
+
 		if (strpos($packageClass, '\\') === false) {
-			$package = $this->basepackages->$packageClass;
+			try {
+				$package = $this->basepackages->$packageClass;
+			} catch (\Exception $e) {
+				if (str_contains($e->getMessage(), 'Undefined property')) {
+					$package = $this->modules->$packageClass;
+				}
+			}
 
 			$reflection = new \ReflectionClass($package);
 
 			$packageClass = $reflection->getName();
-			$packageClass = str_replace('System\Base\Providers\BasepackagesServiceProvider\Packages\\', '', $packageClass);
+
+			$usedModulesPackageClass = $packageClass;
+
+			if (str_contains($packageClass, 'BasepackagesServiceProvider')) {
+				$packageClass = str_replace('System\Base\Providers\BasepackagesServiceProvider\Packages\\', '', $packageClass);
+				$packageType = 'basepackages';
+			} else if (str_contains($packageClass, 'ModulesServiceProvider')) {
+				$packageClass = str_replace('System\Base\Providers\ModulesServiceProvider\\', '', $packageClass);
+				$packageType = 'modules';
+			}
+
 			$packageClass = explode('\\', $packageClass);
 
 			if (count($packageClass) === 1) {
@@ -844,7 +869,11 @@ abstract class BaseComponent extends Controller
 			$this->usedModules['packages'] = [];
 		}
 
-		array_push($this->usedModules['packages'], $packageName);
+		if ($packageType && ($packageType === 'basepackages' || $packageType === 'modules')) {
+			array_push($this->usedModules['packages'], $usedModulesPackageClass);
+		} else {
+			array_push($this->usedModules['packages'], $packageName);
+		}
 
 		return $package;
 	}
@@ -1075,6 +1104,6 @@ abstract class BaseComponent extends Controller
 			$this->getData()['settings'] == 'true'
 		) {
 			$this->showModuleSettingsData = $data;
-	}
+		}
 	}
 }
