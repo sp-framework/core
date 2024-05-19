@@ -84,7 +84,9 @@ if (!function_exists('toBytes')) {
 
 if (!function_exists('json_decode_recursive')) {
     function json_decode_recursive(&$value, $key) {
-        if ($value !== null) {
+        if ($value !== null &&
+            (str_starts_with($value, '{') || str_starts_with($value, '['))
+        ) {
             $value_decoded = json_decode($value, true);
         }
 
