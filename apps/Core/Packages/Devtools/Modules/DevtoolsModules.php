@@ -2198,7 +2198,7 @@ $file .= '
                     if (isset($data['mark-as-draft']) && $data['mark-as-draft'] == 'true') {
                         $newMilestone = $this->createReleaseMilestone($versionData, $data, $module, $repo);
 
-                        if ($newMilestone) {
+                        if ($newMilestone && is_array($newMilestone) && isset($newMilestone['newMilestone'])) {
                             $releaseData = array_merge($releaseData, $newMilestone);
                         }
                     } else {
@@ -2234,9 +2234,9 @@ $file .= '
         $found = false;
 
         if ($currentMilestones && isset($currentMilestones['milestones'])) {
-            array_walk($currentMilestones['milestones'], function($label) use(&$found, $versionData) {
-                if ($label['name'] === $version) {
-                    $found = true;
+            array_walk($currentMilestones['milestones'], function($milestone) use(&$found, $version) {
+                if ($milestone['title'] === $version) {
+                    $found = $milestone['number'] ?? $milestone['id'];
                 }
             });
         }
@@ -2260,19 +2260,21 @@ $file .= '
                         'description'   => 'Tracking milestone for version ' . $version
                     ]
                 ];
+
+            try {
+                $newMilestone = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+                return ['newMilestone' => $newMilestone];
+            } catch (\throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+
+            $this->addResponse('Error generating new label', 1);
         }
 
-        try {
-            $newMilestone = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
-
-            return ['newMilestone' => $newMilestone];
-        } catch (\throwable $e) {
-            $this->addResponse($e->getMessage(), 1);
-
-            return false;
-        }
-
-        $this->addResponse('Error generating new label', 1);
+        return true;
     }
 
     protected function closeReleaseMilestone($versionData, $data, $module, $repo)
