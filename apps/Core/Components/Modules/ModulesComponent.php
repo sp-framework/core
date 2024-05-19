@@ -226,6 +226,19 @@ class ModulesComponent extends BaseComponent
 		);
 	}
 
+	public function analyseActiveQueueAction()
+	{
+		$this->requestIsPost();
+
+		$this->modules->queues->analyseActiveQueue();
+
+		$this->addResponse(
+			$this->modules->queues->packagesData->responseMessage,
+			$this->modules->queues->packagesData->responseCode,
+			$this->modules->queues->packagesData->responseData ?? []
+		);
+	}
+
 	public function processQueueAction()
 	{
 		$this->requestIsPost();

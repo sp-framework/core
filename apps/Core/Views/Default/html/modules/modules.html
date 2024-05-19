@@ -847,19 +847,19 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     }
 
     if (moduleData['installed'] == 1) {
-        moduleData['installed'] = '<span class="badge badge-success">Yes</span>';
+        moduleData['installed'] = '<span class="badge badge-success text-xs">Yes</span>';
     } else {
-        moduleData['installed'] = '<span class="badge badge-secondary">No</span>';
+        moduleData['installed'] = '<span class="badge badge-secondary text-xs">No</span>';
     }
 
     if (moduleData['update_available'] !== '-' && moduleData['update_available'] == 1) {
-        moduleData['update_available'] = '<span class="badge badge-warning">Yes</span>';
+        moduleData['update_available'] = '<span class="badge badge-info text-xs">Yes</span>';
     }
     if (moduleData['update_version'] !== '-') {
-        moduleData['update_version'] = '<span class="badge badge-warning">' + moduleData['update_version'] + '</span>';
+        moduleData['update_version'] = '<span class="badge badge-info text-xs">' + moduleData['update_version'] + '</span>';
     }
 
-    moduleData['version'] = '<span class="badge badge-info">' + moduleData['version'] + '</span>';
+    moduleData['version'] = '<span class="badge badge-info text-xs">' + moduleData['version'] + '</span>';
 
     $('#app_type').html(moduleData.app_type);
     $('#category').html(moduleData.category);
@@ -884,12 +884,12 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
         var changelogText;
         if (moduleData.repo_details.latestRelease.prerelease === false) {
             changelogText =
-                'Version: ' + moduleData.repo_details.latestRelease.name +
-                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-success">STABLE</span></span>';
+                'VERSION: ' + moduleData.repo_details.latestRelease.name +
+                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-success text-xs">STABLE</span></span>';
         } else {
             changelogText =
-                'Version: ' + moduleData.repo_details.latestRelease.name +
-                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-danger">UNSTABLE</span></span>';
+                'VERSION: ' + moduleData.repo_details.latestRelease.name +
+                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-danger text-xs">UNSTABLE</span></span>';
         }
         $('#changelogs-version').html(changelogText);
         $('#changelogs').html(moduleData.repo_details.latestRelease.body);
@@ -911,7 +911,7 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     if (moduleInfo.installed == '1') {
         if (moduleInfo.update_available == '1') {
             if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type] &&
-                dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type].includes(moduleInfo.id)
+                (BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type], moduleInfo.id) > -1)
             ) {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
             } else {
@@ -919,7 +919,7 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
             }
         } else {
             if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
-                dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type].includes(moduleInfo.id)
+                (BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type], moduleInfo.id) > -1)
             ) {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
             } else {
@@ -1152,53 +1152,68 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
     }
 }
 dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
-    var moduleHtml = '';
-    for (var q in dataCollectionSectionForm['vars']['queue']['tasks']) {
-        var count = 0;
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-        if (q === 'install' || q === 'uninstall' || q === 'update' || q === 'remove') {
-            if (Object.keys(dataCollectionSectionForm['vars']['queue']['tasks'][q]).length > 0) {
-                for (var installTypes in dataCollectionSectionForm['vars']['queue']['tasks'][q]) {
-                    if (dataCollectionSectionForm['vars']['queue']['tasks'][q][installTypes].length > 0) {
-                        count = count + dataCollectionSectionForm['vars']['queue']['tasks'][q][installTypes].length;
+    $.post('{{links.url("modules/analyseActiveQueue")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
 
-                        $(dataCollectionSectionForm['vars']['queue']['tasks'][q][installTypes]).each(function(i, id) {
-                            var name = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['name'];
-                            var moduleType = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['module_type'];
-                            var repo = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['repo'];
-                            var color = 'info';
+        if (response.responseCode == 0) {
+            PNotify.success({
+                text        : response.responseMessage,
+                textTrusted : true
+            });
 
-                            if (dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['display_name']) {
-                                name = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['display_name'];
+            if (response.responseData && response.responseData.queueTasks && response.responseData.queueTasksCounter) {
+                var moduleHtml = '';
+                for (var q in response.responseData.queueTasks) {
+                    if (q === 'install' || q === 'uninstall' || q === 'update' || q === 'remove') {
+                        if (Object.keys(response.responseData.queueTasks[q]).length > 0) {
+                            for (var installTypes in response.responseData.queueTasks[q]) {
+                                if (Object.keys(response.responseData.queueTasks[q][installTypes]).length > 0) {
+                                    for (var installType in response.responseData.queueTasks[q][installTypes]) {
+                                        var color = 'primary';
+
+                                        if (q === 'update') {
+                                            color = 'info';
+                                        } else if (q === 'uninstall' || q === 'remove') {
+                                            color = 'danger';
+                                        }
+
+                                        moduleHtml +=
+                                        '       <tr>' +
+                                        '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['name'] + '</td>' +
+                                        '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['module_type'] + '</td>' +
+                                        '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['repo'] + '</td>' +
+                                        '           <td>' +  '<span class="badge badge-' + color + ' mt-1 text-xs text-uppercase">' + q + '</span></td>' +
+                                        '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>' +
+                                        '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>' +
+                                        '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>' +
+                                        '       </tr>';
+
+                                    }
+                                }
                             }
-
-                            if (q === 'update') {
-                                color = 'warning';
-                            } else if (q === 'uninstall' || q === 'remove') {
-                                color = 'danger';
-                            }
-                            moduleHtml +=
-                            '       <tr>' +
-                            '           <td>' +  name + '</td>' +
-                            '           <td>' +  moduleType + '</td>' +
-                            '           <td>' +  repo + '</td>' +
-                            '           <td>' +  '<span class="badge badge-' + color + ' mt-1 text-xs text-uppercase">' + q + '</span></td>' +
-                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' + id + '"></td>' +
-                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' + id + '"></td>' +
-                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + id + '"></td>' +
-                            '       </tr>';
-
-                        });
+                        }
+                    }
+                    if (response.responseData.queueTasksCounter[q]) {
+                        $('#{{componentId}}-{{sectionId}}-queue-' + q).children('span').html(response.responseData.queueTasksCounter[q]);
                     }
                 }
+
+                $('#{{componentId}}-{{sectionId}}-queue-table tbody').empty().html(moduleHtml);
+                $('#{{componentId}}-{{sectionId}}-queue-analyse-modal').modal('show');
             }
-
-            $('#{{componentId}}-{{sectionId}}-queue-' + q).children('span').html(count);
+        } else {
+            PNotify.error({
+                text        : response.responseMessage,
+                textTrusted : true
+            });
         }
-    }
-
-    $('#{{componentId}}-{{sectionId}}-queue-table tbody').empty().html(moduleHtml);
-    $('#{{componentId}}-{{sectionId}}-queue-analyse-modal').modal('show');
+    }, 'json');
 }
 dataCollectionSectionForm['funcs']['clearQueue'] = function() {
     // var index;

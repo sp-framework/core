@@ -169,4 +169,49 @@ class Queues extends BasePackage
 
         return $counter;
     }
+
+    public function analyseActiveQueue()
+    {
+        $queue = $this->getActiveQueue();
+
+        $queueTasks = [];
+        $queueTasksCounter = [];
+
+        foreach ($queue['tasks'] as $taskName => $tasks) {
+            if (!isset($queueTasks[$taskName])) {
+                $queueTasks[$taskName] = [];
+            }
+
+            if (count($tasks) === 0) {
+                $queueTasksCounter[$taskName] = 0;
+
+                continue;
+            }
+
+            foreach ($tasks as $moduleType => $moduleIds) {
+                if (!isset($queueTasks[$taskName][$moduleType])) {
+                    $queueTasks[$taskName][$moduleType] = [];
+                }
+
+                foreach ($moduleIds as $moduleIdKey => $moduleId) {
+                    $moduleMethod = 'get' . ucfirst(substr($moduleType, 0, -1)) . 'ById';
+                    $module = $this->modules->$moduleType->$moduleMethod($moduleId);
+
+                    if ($module) {
+                        $queueTasks[$taskName][$moduleType][$module['id']] = [];
+                        $queueTasks[$taskName][$moduleType][$module['id']]['id'] = $module['id'];
+                        $queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['display_name'] ?? $module['name'];
+                        $queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $module['module_type'];
+                        $queueTasks[$taskName][$moduleType][$module['id']]['repo'] = $module['repo'];
+                    } else {
+                        unset($moduleIds[$moduleIdKey]);
+                    }
+                }
+
+                $queueTasksCounter[$taskName] = count($queueTasks[$taskName]);
+            }
+        }
+
+        $this->addResponse('Processed Queue', 0, ['queueTasks' => $queueTasks, 'queueTasksCounter' => $queueTasksCounter]);
+    }
 }

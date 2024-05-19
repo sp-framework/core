@@ -40,16 +40,8 @@ class Manager extends BasePackage
 
     public function saveModuleSettings($data)
     {
-        if ($data['module_type'] === 'components') {
-            $module = $this->modules->components->getComponentById($data['module_id']);
-        } else if ($data['module_type'] === 'packages') {
-            $module = $this->modules->packages->getPackageById($data['module_id']);
-        } else if ($data['module_type'] === 'middlewares') {
-            $module = $this->modules->middlewares->getMiddlewareById($data['module_id']);
-        } else if ($data['module_type'] === 'views') {
-            $module = $this->modules->views->getViewById($data['module_id']);
-        }
-
+        $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ById';
+        $module = $this->modules->{$data['module_type']}->$moduleMethod($data['module_id']);
 
         if ($module) {
             if ($module['app_type'] === 'core' && strtolower($module['name']) !== 'core') {
@@ -74,17 +66,8 @@ class Manager extends BasePackage
 
     public function getModuleInfo($data)
     {
-        if ($data['module_type'] === 'components') {
-            $module = $this->modules->components->getComponentById($data['module_id']);
-        } else if ($data['module_type'] === 'packages') {
-            $module = $this->modules->packages->getPackageById($data['module_id']);
-        } else if ($data['module_type'] === 'middlewares') {
-            $module = $this->modules->middlewares->getMiddlewareById($data['module_id']);
-        } else if ($data['module_type'] === 'views') {
-            $module = $this->modules->views->getViewById($data['module_id']);
-        } else if ($data['module_type'] === 'bundles') {
-            $module = $this->modules->bundles->getBundleById($data['module_id']);
-        }
+        $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ById';
+        $module = $this->modules->{$data['module_type']}->$moduleMethod($data['module_id']);
 
         if (isset($module) && is_array($module)) {
             if (array_key_exists('notification_subscriptions', $module)) {
@@ -395,6 +378,7 @@ class Manager extends BasePackage
                 return true;
             }
         } catch (ClientException | \throwable $e) {
+            trace([$e]);
             $this->addResponse($e->getMessage(), 1);
 
             return false;
@@ -612,7 +596,13 @@ class Manager extends BasePackage
                     if ($remoteModulesType === 'apptypes') {
                         $this->apps->types->add($registerRemotePackage);
                     } else {
-                        if ($registerRemotePackage['module_type'] === 'views') {
+                        if ($registerRemotePackage['module_type'] === 'components') {
+                            if (!isset($registerRemotePackage['menu']) ||
+                                (isset($registerRemotePackage['menu']) && is_bool($registerRemotePackage['menu']))
+                            ) {
+                                $registerRemotePackage['menu'] = 'false';
+                            }
+                        } else if ($registerRemotePackage['module_type'] === 'views') {
                             if (count($registerRemotePackage['dependencies']['views']) === 0 &&
                                 (!isset($registerRemotePackage['base_view_module_id']) ||
                                  (isset($registerRemotePackage['base_view_module_id']) && $registerRemotePackage['base_view_module_id'] === null)
@@ -660,16 +650,9 @@ class Manager extends BasePackage
 
             if ($remoteModulesType === 'apptypes') {
                 $localModule = $this->apps->types->getAppTypeByRepo($repoUrl);
-            } else if ($remoteModulesType === 'components') {
-                $localModule = $this->modules->components->getComponentByRepo($repoUrl);
-            } else if ($remoteModulesType === 'packages') {
-                $localModule = $this->modules->packages->getPackageByRepo($repoUrl);
-            } else if ($remoteModulesType === 'middlewares') {
-                $localModule = $this->modules->middlewares->getMiddlewareByRepo($repoUrl);
-            } else if ($remoteModulesType === 'views') {
-                $localModule = $this->modules->views->getViewByRepo($repoUrl);
-            } else if ($remoteModulesType === 'bundles') {
-                $localModule = $this->modules->bundles->getBundleByRepo($repoUrl);
+            } else {
+                $moduleMethod = 'get' . ucfirst(substr($remoteModulesType, 0, -1)) . 'ByRepo';
+                $localModule = $this->modules->{$remoteModulesType}->$moduleMethod($repoUrl);
             }
 
             if ($localModule) {
@@ -695,7 +678,7 @@ class Manager extends BasePackage
 
                     $modules['updates'][$localModule['id']] = $localModule;
                 } else {
-                    if ($localModule['update_available'] == 1) {
+                    if (isset($localModule['update_available']) && $localModule['update_available'] == 1) {
                         $localModule['update_available'] = '0';
                         $localModule['update_version'] = null;
 
