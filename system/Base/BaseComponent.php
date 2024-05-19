@@ -455,6 +455,8 @@ abstract class BaseComponent extends Controller
 				$this->view->breadcrumb = $this->componentRoute;
 			}
 		}
+
+		$this->view->version = $this->core->getVersion();
 	}
 
 	protected function sendJson()
