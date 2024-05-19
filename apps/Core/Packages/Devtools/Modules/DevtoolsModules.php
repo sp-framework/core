@@ -341,7 +341,7 @@ class DevtoolsModules extends BasePackage
     public function removeModule($data)
     {
         if ($data['module_type'] !== 'core') {
-            if ($data['module_type'] === 'apptypes') {
+            if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
                 $this->apps->types->removeAppType($data);
                 $this->addResponse('Removed app type from DB. Remove files manually...');
 
@@ -800,7 +800,7 @@ class DevtoolsModules extends BasePackage
                 ucfirst($data['name']) . '/' .
                 substr($data['module_type'], 0, -1) . '.json';
         } else {
-            if ($data['module_type'] === 'apptypes') {
+            if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
                 return $moduleLocation . 'Install/type.json';
             } else if ($data['module_type'] === 'components') {
                 $routeArr = explode('/', $data['route']);
@@ -1332,7 +1332,9 @@ $file .= '
 
     public function syncLabels($data)
     {
-        if ($data['module_type'] === 'apptypes') {
+        if (isset($data['module_type']) &&
+            $data['module_type'] === 'apptypes'
+        ) {
             $module = $this->apps->types->getAppTypeById($data['id']);
         } else {
             $module = $this->modules->{$data['module_type']}->getById($data['id']);
@@ -1389,7 +1391,7 @@ $file .= '
             $module = $data;
             $status = 'open';
         } else {
-            if ($data['module_type'] === 'apptypes') {
+            if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
                 $module = $this->apps->types->getAppTypeById($data['id']);
             } else {
                 $module = $this->modules->{$data['module_type']}->getById($data['id']);
@@ -1411,6 +1413,32 @@ $file .= '
             $this->getReleases($module, true);
 
             $status = 'closed';
+        }
+
+        $currentMilestones = $this->syncMilestones($data);
+
+        $found = false;
+
+        if ($currentMilestones && isset($currentMilestones['milestones'])) {
+            array_walk($currentMilestones['milestones'], function($milestone) use(&$found, $data) {
+                if ((int) $data['milestone'] !== 0) {
+                    $milestoneIdentifier = $milestone['number'] ?? $milestone['id'];
+
+                    if ((int) $milestoneIdentifier === (int) $data['milestone']) {
+                        $found = true;
+                    }
+                } else {
+                    if ($milestone['title'] === $data['milestone']) {
+                        $found = true;
+                    }
+                }
+            });
+        }
+
+        if (!$found) {
+            $this->addResponse('Error syncing issues as milestone does not exists', 1);
+
+            return false;
         }
 
         if (!$this->latestRelease) {
@@ -1436,7 +1464,7 @@ $file .= '
                     $data['label'],
                     null,
                     null,
-                    $data['milestone'],
+                    (int) $data['milestone'],
                     $since
                 ];
         } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
@@ -1446,7 +1474,7 @@ $file .= '
                 [
                     $this->apiClientConfig['org_user'],
                     strtolower($this->helper->last(explode('/', $module['repo']))),
-                    $data['milestone'],
+                    (int) $data['milestone'],
                     $status,
                     null,
                     null,
@@ -1458,15 +1486,23 @@ $file .= '
                 ];
         }
 
-        $issues = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+        try {
+            $issues = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
 
-        if ($issues) {
-            $this->addResponse('Issues Synced', 0, ['issues' => $issues]);
+            if ($issues) {
+                $this->addResponse('Issues Synced', 0, ['issues' => $issues]);
 
-            return $issues;
+                return $issues;
+            }
+
+            $this->addResponse('No issues found with selected milestone/label', 1);
+        } catch (\Exception $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
         }
 
-        $this->addResponse('Error syncing issues or No issues found with selected milestone/label', 1);
+        return true;
     }
 
     protected function getReleases($module, $getLatestRelease = false)
@@ -1560,7 +1596,7 @@ $file .= '
         }
 
         if (!isset($data['repo'])) {
-            if ($data['module_type'] === 'apptypes') {
+            if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
                 $module = $this->apps->types->getAppTypeById($data['id']);
             } else {
                 $module = $this->modules->{$data['module_type']}->getById($data['id']);
@@ -1780,7 +1816,7 @@ $file .= '
 
     public function syncBranches($data)
     {
-        if ($data['module_type'] === 'apptypes') {
+        if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
             $module = $this->apps->types->getAppTypeById($data['id']);
         } else {
             $module = $this->modules->{$data['module_type']}->getById($data['id']);
@@ -1849,7 +1885,7 @@ $file .= '
 
     public function syncMilestones($data)
     {
-        if ($data['module_type'] === 'apptypes') {
+        if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
             $module = $this->apps->types->getAppTypeById($data['id']);
         } else {
             $module = $this->modules->{$data['module_type']}->getById($data['id']);
@@ -1890,9 +1926,9 @@ $file .= '
         }
 
         if ($milestones) {
-            $this->addResponse('Labels Synced', 0, ['milestones' => $milestones]);
+            $this->addResponse('Milestones Synced', 0, ['milestones' => $milestones]);
 
-            return $milestones;
+            return ['milestones' => $milestones];
         }
 
         $this->addResponse('Error syncing milestones or no milestones configured.', 1);
@@ -1902,6 +1938,7 @@ $file .= '
     {
         if ($data['module_type'] === 'apptypes') {
             $module = $this->apps->types->getAppTypeById($data['id']);
+            $module['module_type'] = 'apptypes';
         } else {
             $module = $this->modules->{$data['module_type']}->getById($data['id']);
         }
@@ -1959,9 +1996,6 @@ $file .= '
         if (!$this->latestRelease ||
             ($this->latestRelease && $data['mark-as-draft'] == 'false')
         ) {
-            $module['version'] = $name;
-            $module['branch'] = $data['branch'];
-
             //Check for any open issues against the milestone that was created during draft creation.
             if ($this->getMilestoneLabelIssues($module, true)) {
                 $this->addResponse('Milestone ' . $module['version'] . ' has a issues open. Please close those issues before generating release.', 1);
@@ -1969,6 +2003,8 @@ $file .= '
                 return false;
             }
 
+            $module['version'] = $name;
+            $module['branch'] = $data['branch'];
             //Check for any open pull request against the branch we have to create release from.
             if (!$this->checkPullRequests($module)) {
                 return false;
@@ -2147,7 +2183,7 @@ $file .= '
                         ) {
                             $core = $this->core->core;
 
-                            $core['version'] = $data['version'];
+                            $core['version'] = $module['version'];
 
                             $this->core->update($core);
                         }
@@ -2165,6 +2201,8 @@ $file .= '
                         if ($newMilestone) {
                             $releaseData = array_merge($releaseData, $newMilestone);
                         }
+                    } else {
+                        $this->closeReleaseMilestone($versionData, $data, $module, $repo);
                     }
                 }
             } catch (\throwable $e) {
@@ -2235,6 +2273,58 @@ $file .= '
         }
 
         $this->addResponse('Error generating new label', 1);
+    }
+
+    protected function closeReleaseMilestone($versionData, $data, $module, $repo)
+    {
+        if (isset($versionData['newVersion'])) {
+            $version = $versionData['newVersion'];
+        } else if (isset($versionData['release'])) {
+            $version = $versionData['release'];
+        }
+
+        $currentMilestones = $this->syncMilestones($data);
+
+        $found = false;
+
+        if ($currentMilestones && isset($currentMilestones['milestones'])) {
+            array_walk($currentMilestones['milestones'], function($milestone) use(&$found, $version) {
+                if ($milestone['title'] === $version) {
+                    $found = $milestone['number'] ?? $milestone['id'];
+                }
+            });
+        }
+
+        if ($found) {
+            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                $collection = 'IssueApi';
+                $method = 'issueEditMilestone';
+            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                $collection = 'IssuesApi';
+                $method = 'issuesUpdateMilestone';
+            }
+
+            $args =
+                [
+                    $this->apiClientConfig['org_user'],
+                    strtolower($this->helper->last(explode('/', $repo))),
+                    $found,
+                    [
+                        'state'         => 'closed',
+                    ]
+                ];
+            try {
+                $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+            } catch (\throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function commitBundleJson($data)

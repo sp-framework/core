@@ -51,9 +51,6 @@ dataCollectionSection =
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-import-issues').off();
                 $('#{{componentId}}-{{sectionId}}-import-issues').click(function(e) {
-                    $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-list-check').addClass('fa-spin fa-cog');
-
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
@@ -68,6 +65,9 @@ dataCollectionSection =
                         postData['label'] = $('#{{componentId}}-{{sectionId}}-label').select2('data')[0].text;
                     }
 
+                    $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-list-check').addClass('fa-spin fa-cog');
+
                     $.post('{{links.url("devtools/modules/getMilestoneLabelIssues")}}', postData, function(response) {
                         if (response.tokenKey && response.token) {
                             $('#security-token').attr('name', response.tokenKey);
@@ -78,7 +78,7 @@ dataCollectionSection =
                             if (response.responseData && response.responseData.issues) {
                                 var html = $('#{{componentId}}-{{sectionId}}-release-notes').trumbowyg('html');
 
-                                html += '<h6>RESOLVED ISSUES (' + $('#{{componentId}}-{{sectionId}}-milestone').text() + ')';
+                                html += '<h6>RESOLVED ISSUES (' + $('#{{componentId}}-{{sectionId}}-milestone').select2('data')[0].text + ')';
 
                                 if ($('#{{componentId}}-{{sectionId}}-label').val()) {
                                     html += ' (' + $('#{{componentId}}-{{sectionId}}-label').select2('data')[0].text + ')';
@@ -485,13 +485,22 @@ dataCollectionSection =
                             if (response.responseData && response.responseData.milestones) {
                                 $('#{{componentId}}-{{sectionId}}-milestone').empty().trigger('change');
                                 for (var milestone in response.responseData.milestones) {
+                                    var milestoneNumber = 1;
+
+                                    if (response.responseData.milestones[milestone]['number']) {
+                                        milestoneNumber = response.responseData.milestones[milestone]['number'];
+                                    } else if (response.responseData.milestones[milestone]['id']) {
+                                        milestoneNumber = response.responseData.milestones[milestone]['id'];
+                                    }
                                     var newOption
                                         = new Option(
                                             response.responseData.milestones[milestone]['title'],
-                                            response.responseData.milestones[milestone]['number'], false, false
+                                            milestoneNumber, false, false
                                         );
 
                                     $('#{{componentId}}-{{sectionId}}-milestone').append(newOption).trigger('change');
+
+                                    milestoneNumber++;
                                 }
                             }
                             PNotify.success({'text': 'Synced ' + response.responseData.milestones.length + ' milestones.'});
