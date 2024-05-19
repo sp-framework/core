@@ -175,40 +175,11 @@
                         'fieldAdditionalClass'                  : 'mb-2',
                         'fieldBazScan'                          : true,
                         'fieldHelpTooltipContent'               : 'Select release type: Major, Minor Or Patch.',
-                        'fieldDataSelect2Options'               : {
-                            'major' : {
-                                'id'    : 'major',
-                                'name'  : 'MAJOR'
-                            },
-                            'minor' : {
-                                'id'    : 'minor',
-                                'name'  : 'MINOR'
-                            },
-                            'patch' : {
-                                'id'    : 'patch',
-                                'name'  : 'PATCH'
-                            },
-                            'preRelease' : {
-                                'id'    : 'preRelease',
-                                'name'  : 'PRE RELEASE'
-                            },
-                            'buildMeta' : {
-                                'id'    : 'buildMeta',
-                                'name'  : 'BUILD META'
-                            },
-                            'preReleaseBuildMeta' : {
-                                'id'    : 'preReleaseBuildMeta',
-                                'name'  : 'PRE RELEASE + BUILD META'
-                            },
-                            'custom' : {
-                                'id'    : 'custom',
-                                'name'  : 'CUSTOM (NON SEMANTIC VERSION)'
-                            }
-                        },
-                        'fieldDataSelect2OptionsArray'           : true,
-                        'fieldDataSelect2OptionsKey'             : 'id',
-                        'fieldDataSelect2OptionsValue'           : 'name',
-                        'fieldDataSelect2OptionsSelected'        : releastTypeSelect
+                        'fieldDataSelect2Options'               : availableReleaseTypes,
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsSelected'       : releastTypeSelect
                     ]
                 )}}
             </div>

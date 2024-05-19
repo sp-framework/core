@@ -123,21 +123,33 @@ dataCollectionSection =
                         $('#custom').attr('hidden', true);
                         $('#{{componentId}}-{{sectionId}}-custom-version').val('');
 
-                        if (bump === 'buildMeta') {
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
-                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
-                        } else if (bump === 'preRelease') {
+                        if (bump === 'preRelease' ||
+                            bump === 'major_preRelease' ||
+                            bump === 'minor_preRelease' ||
+                            bump === 'patch_preRelease'
+                        ) {
                             $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
                             $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
                             $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', true);
                             $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
                             $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
-                        } else if (bump === 'preReleaseBuildMeta') {
+                        } else if (bump === 'buildMeta' ||
+                                   bump === 'major_buildMeta' ||
+                                   bump === 'minor_buildMeta' ||
+                                   bump === 'patch_buildMeta'
+                        ) {
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
+                            $('#{{componentId}}-{{sectionId}}-build-meta-prefix').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked = true;
+                        } else if (bump === 'preReleaseBuildMeta' ||
+                                   bump === 'major_preReleaseBuildMeta' ||
+                                   bump === 'minor_preReleaseBuildMeta' ||
+                                   bump === 'patch_preReleaseBuildMeta'
+                        ) {
                             $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val('');
                             $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val('');
                             $('#{{componentId}}-{{sectionId}}-pre-release-prefix').attr('disabled', false);
@@ -172,19 +184,31 @@ dataCollectionSection =
                     postData['force-mark-prerelease'] = $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked;
                     postData['bump'] = bump;
 
-                    if (bump === 'preRelease') {
+                    if (bump === 'preRelease' ||
+                        bump === 'major_preRelease' ||
+                        bump === 'minor_preRelease' ||
+                        bump === 'patch_preRelease'
+                    ) {
                         postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
                         if (postData['preReleasePrefix'] === '') {
                             PNotify.error({'text': 'Provide pre-release prefix.'});
                             return;
                         }
-                    } else if (bump === 'buildMeta') {
+                    } else if (bump === 'buildMeta' ||
+                               bump === 'major_buildMeta' ||
+                               bump === 'minor_buildMeta' ||
+                               bump === 'patch_buildMeta'
+                    ) {
                         postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
                         if (postData['buildMetaPrefix'] === '') {
                             PNotify.error({'text': 'Provide build meta prefix.'});
                             return;
                         }
-                    } else if (bump === 'preReleaseBuildMeta') {
+                    } else if (bump === 'preReleaseBuildMeta' ||
+                               bump === 'major_preReleaseBuildMeta' ||
+                               bump === 'minor_preReleaseBuildMeta' ||
+                               bump === 'patch_preReleaseBuildMeta'
+                    ) {
                         postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
                         postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
                         if (postData['preReleasePrefix'] === '') {
@@ -301,24 +325,36 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}').BazContentSectionWithForm({'task':'validateForm'});
 
                     if ($('#{{componentId}}-{{sectionId}}-alert').length === 0) {
-                        $('#generate').attr('disabled', true);
-                        $('#generate').children('i').removeClass('fa-wand-sparkles').addClass('fa-spin fa-cog');
+                        // $('#generate').attr('disabled', true);
+                        // $('#generate').children('i').removeClass('fa-wand-sparkles').addClass('fa-spin fa-cog');
 
                         var postData = { };
                         postData['bump'] = $('#{{componentId}}-{{sectionId}}-release-type').val();
-                        if (postData['bump'] === 'preRelease') {
+                        if (postData['bump'] === 'preRelease' ||
+                            postData['bump'] === 'major_preRelease' ||
+                            postData['bump'] === 'minor_preRelease' ||
+                            postData['bump'] === 'patch_preRelease'
+                        ) {
                             postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
                             if (postData['preReleasePrefix'] === '') {
                                 PNotify.error({'text': 'Provide pre-release prefix.'});
                                 return;
                             }
-                        } else if (postData['bump'] === 'buildMeta') {
+                        } else if (postData['bump'] === 'buildMeta' ||
+                                   postData['bump'] === 'major_buildMeta' ||
+                                   postData['bump'] === 'minor_buildMeta' ||
+                                   postData['bump'] === 'patch_buildMeta'
+                        ) {
                             postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
                             if (postData['buildMetaPrefix'] === '') {
                                 PNotify.error({'text': 'Provide build meta prefix.'});
                                 return;
                             }
-                        } else if (postData['bump'] === 'preReleaseBuildMeta') {
+                        } else if (postData['bump'] === 'preReleaseBuildMeta' ||
+                                   postData['bump'] === 'major_preReleaseBuildMeta' ||
+                                   postData['bump'] === 'minor_preReleaseBuildMeta' ||
+                                   postData['bump'] === 'patch_preReleaseBuildMeta'
+                        ) {
                             postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
                             postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
                             if (postData['preReleasePrefix'] === '') {
@@ -1223,6 +1259,7 @@ dataCollectionSection =
                     $('#repo-details').attr('hidden', false);
                     $('#module-details').attr('hidden', true);
                     $('.addData').attr('hidden', true);
+                    $('.updateData').attr('hidden', true);
                     $('.cancelForm').attr('hidden', true);
                     $('.closeForm').attr('hidden', false);
 
