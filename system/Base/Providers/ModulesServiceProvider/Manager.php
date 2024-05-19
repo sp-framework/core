@@ -700,8 +700,7 @@ class Manager extends BasePackage
             } else {
                 $remoteModule['repo_details'] = [];
                 $remoteModule['repo_details']['details'] = $remoteModule;
-                $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($remoteModule);
-                $remoteModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
+                $remoteModule['repo_details']['latestRelease'] = $this->moduleNeedsUpgrade($remoteModule);
 
                 $modules['new'][$remoteModuleKey] = $remoteModule;
             }
@@ -710,30 +709,44 @@ class Manager extends BasePackage
         return $modules;
     }
 
-    protected function moduleNeedsUpgrade($remoteModule, $localModule = null, $returnLatestReleaseOnly = false)
+    protected function moduleNeedsUpgrade($remoteModule, $localModule = null)
     {
-        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
-            $collection = 'RepositoryApi';
-            $method = 'repoGetLatestRelease';
-        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
-            $collection = 'ReposApi';
-            $method = 'reposGetLatestRelease';
+        if ($localModule) {
+            if (array_key_exists('level_of_update', $localModule) &&
+                $localModule['level_of_update'] == '4'
+            ) {
+                try {
+                    if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                        $collection = 'RepositoryApi';
+                        $method = 'repoListReleases';
+                    } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                        $collection = 'ReposApi';
+                        $method = 'reposListReleases';
+                    }
+
+                    $args =
+                        [
+                            $this->apiClientConfig['org_user'],
+                            strtolower($remoteModule['name'])
+                        ];
+
+                    $releases = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+                } catch (\Exception $e) {
+                    $latestRelease = $this->getLatestRelease($remoteModule);
+                }
+
+                if ($releases && count($releases) > 0) {
+                    $latestRelease = $releases[0];
+                }
+            } else {
+                $latestRelease = $this->getLatestRelease($remoteModule);
+            }
+        } else {
+            $latestRelease = $this->getLatestRelease($remoteModule);
         }
-
-        $args =
-            [
-                $this->apiClientConfig['org_user'],
-                $remoteModule['name']
-            ];
-
-        $latestRelease = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
 
         if (!$latestRelease) {
             return false;
-        }
-
-        if ($returnLatestReleaseOnly) {
-            return $latestRelease;
         }
 
         if ($localModule) {
@@ -758,6 +771,10 @@ class Manager extends BasePackage
                     ) {
                         return $latestRelease;
                     }
+                } else if ($localModule['level_of_update'] == '4') {//pre-release
+                    if (Version::greaterThan($latestRelease['tag_name'], $localModule['version'])) {
+                        return $latestRelease;
+                    }
                 }
 
                 return false;
@@ -771,22 +788,32 @@ class Manager extends BasePackage
         }
     }
 
-    // protected function getNamesPathString($names)
-    // {
-    //     unset($names[0]);
-    //     unset($names[1]);
-    //     unset($names[2]);
-    //     unset($names[3]);
+    protected function getLatestRelease($remoteModule)
+    {
+        try {
+            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                $collection = 'RepositoryApi';
+                $method = 'repoGetLatestRelease';
+            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                $collection = 'ReposApi';
+                $method = 'reposGetLatestRelease';
+            }
 
-    //     $path = '';
+            $args =
+                [
+                    $this->apiClientConfig['org_user'],
+                    strtolower($remoteModule['name'])
+                ];
 
-    //     foreach ($names as $name) {
-    //         $path .= ucfirst($name) . '/';
-    //     }
+            return $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                return false;
+            }
 
-    //     return $path;
-    // }
-    //
+            $this->addResponse($e->getMessage(), 1);
+        }
+    }
 
     public function getAvailableApis($getAll = false, $returnApis = true)
     {
