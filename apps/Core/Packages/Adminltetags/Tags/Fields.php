@@ -205,7 +205,7 @@ class Fields extends Adminltetags
 
             $this->fieldParams['fieldHelpTooltipContent'] =
                 isset($this->params['fieldHelpTooltipContent']) ?
-                $this->params['fieldHelpTooltipContent'] :
+                $this->escaper->escapeHtml($this->params['fieldHelpTooltipContent']) :
                 'missing_fieldHelpTooltipContent';
 
             if ($this->fieldParams['fieldHelpStyle'] === 'popover') {
