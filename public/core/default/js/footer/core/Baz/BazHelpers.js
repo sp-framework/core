@@ -144,6 +144,8 @@ var BazHelpers = function() {
         } else if (Array.isArray(objectOrArray)) {
             return objectOrArray.indexOf(value);
         }
+
+        return false;
     }
 
     function bazHelpersConstructor() {

@@ -281,7 +281,7 @@ class ModulesComponent extends BaseComponent
 					if (isset($module['settings']) && is_array($module['settings'])) {
 						$this->view->moduleSettings = $module['settings'] = $this->helper->encode($module['settings']);
 					}
-					if (isset($module['settings']) && is_array($module['dependencies'])) {
+					if (isset($module['dependencies']) && is_array($module['dependencies'])) {
 						$this->view->moduleDependencies = $module['dependencies'] = $this->helper->encode($module['dependencies']);
 					}
 				} else {
