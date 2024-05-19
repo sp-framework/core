@@ -189,22 +189,101 @@ class Queues extends BasePackage
             }
 
             foreach ($tasks as $moduleType => $moduleIds) {
-                if (!isset($queueTasks[$taskName][$moduleType])) {
-                    $queueTasks[$taskName][$moduleType] = [];
-                }
-
                 foreach ($moduleIds as $moduleIdKey => $moduleId) {
                     $moduleMethod = 'get' . ucfirst(substr($moduleType, 0, -1)) . 'ById';
                     $module = $this->modules->$moduleType->$moduleMethod($moduleId);
 
-                    if ($module) {
-                        $queueTasks[$taskName][$moduleType][$module['id']] = [];
-                        $queueTasks[$taskName][$moduleType][$module['id']]['id'] = $module['id'];
-                        $queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['display_name'] ?? $module['name'];
-                        $queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $module['module_type'];
-                        $queueTasks[$taskName][$moduleType][$module['id']]['repo'] = $module['repo'];
+                    if ($moduleType === 'bundles') {
+                        if ($taskName === 'remove') {
+                            if (!isset($queueTasks[$taskName][$moduleType][$module['id']])) {
+                                $queueTasks[$taskName][$moduleType][$module['id']] = [];
+                                $queueTasks[$taskName][$moduleType][$module['id']]['id'] = $module['id'];
+                                $queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['display_name'] ?? $module['name'];
+                                $queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $module['module_type'];
+                                $queueTasks[$taskName][$moduleType][$module['id']]['version'] = $module['version'];
+                                $queueTasks[$taskName][$moduleType][$module['id']]['repo'] = $module['repo'];
+                            }
+                        } else {
+                            if (isset($module['bundle_modules'])) {
+                                if (is_string($module['bundle_modules'])) {
+                                    $module['bundle_modules'] = $this->helper->decode($module['bundle_modules'], true);
+                                }
+
+                                if (count($module['bundle_modules']) > 0) {
+                                    foreach ($module['bundle_modules'] as $bundleType => $bundles) {
+                                        if (count($bundles) === 0) {
+                                            continue;
+                                        }
+
+                                        if ($bundleType === 'apptype') {
+                                            if (!isset($queueTasks[$taskName][$bundleType])) {
+                                                $queueTasks[$taskName][$bundleType] = [];
+                                            }
+                                            $bundleModule = $this->apps->types->getAppTypeByRepo($bundles['repo']);
+                                            if ($bundleModule) {
+                                                $queueTasks[$taskName][$bundleType][$bundleModule['id']]['id'] = $bundleModule['id'];
+                                                $queueTasks[$taskName][$bundleType][$bundleModule['id']]['name'] = $bundleModule['display_name'] ?? $bundleModule['name'];
+                                                $queueTasks[$taskName][$bundleType][$bundleModule['id']]['module_type'] = 'apptype';
+                                                $queueTasks[$taskName][$bundleType][$bundleModule['id']]['version'] = $bundleModule['version'];
+                                                $queueTasks[$taskName][$bundleType][$bundleModule['id']]['repo'] = $bundleModule['repo'];
+                                            } else {
+                                                $queueTasks[$taskName][$bundleType][0]['id'] = '0';
+                                                $queueTasks[$taskName][$bundleType][0]['name'] = $bundles['name'];
+                                                $queueTasks[$taskName][$bundleType][0]['module_type'] = 'apptype';
+                                                $queueTasks[$taskName][$bundleType][0]['version'] = $bundles['version'];
+                                                $queueTasks[$taskName][$bundleType][0]['repo'] = $bundles['repo'];
+                                                $queueTasks[$taskName][$bundleType][0]['error'] = 'Not Found';
+                                            }
+                                        } else if ($bundleType === 'core') {
+                                            $bundleModule = $this->modules->packages->getPackageByRepo($bundles['repo']);
+
+                                            if ($bundles['version'] !== $bundleModule['version']) {
+                                                if (!isset($queueTasks['update']['packages'][$bundleModule['id']]['id'])) {
+                                                    $queueTasks['update']['packages'][$bundleModule['id']]['id'] = $bundleModule['id'];
+                                                    $queueTasks['update']['packages'][$bundleModule['id']]['name'] = $bundleModule['display_name'] ?? $bundleModule['name'];
+                                                    $queueTasks['update']['packages'][$bundleModule['id']]['module_type'] = $bundleModule['module_type'];
+                                                    $queueTasks['update']['packages'][$bundleModule['id']]['version'] = $bundleModule['version'];
+                                                    $queueTasks['update']['packages'][$bundleModule['id']]['repo'] = $bundleModule['repo'];
+                                                }
+                                            }
+                                        } else {
+                                            foreach ($bundles as $bundleKey => $bundle) {
+                                                $bundleModuleMethod = 'get' . ucfirst(substr($bundleType, 0, -1)) . 'ByRepo';
+                                                $bundleModuleType = $bundleType;
+
+                                                $bundleModule = $this->modules->{$bundleModuleType}->$bundleModuleMethod($bundle['repo']);
+
+                                                if ($bundleModule) {
+                                                    if (!isset($queueTasks[$taskName][$bundleType][$bundleModule['id']]['id'])) {
+                                                        $queueTasks[$taskName][$bundleType][$bundleModule['id']]['id'] = $bundleModule['id'];
+                                                        $queueTasks[$taskName][$bundleType][$bundleModule['id']]['name'] = $bundleModule['display_name'] ?? $bundleModule['name'];
+                                                        $queueTasks[$taskName][$bundleType][$bundleModule['id']]['module_type'] = $bundleModule['module_type'];
+                                                        $queueTasks[$taskName][$bundleType][$bundleModule['id']]['version'] = $bundleModule['version'];
+                                                        $queueTasks[$taskName][$bundleType][$bundleModule['id']]['repo'] = $bundleModule['repo'];
+                                                    }
+                                                } else {
+                                                    $queueTasks[$taskName][$bundleType][$bundleKey]['id'] = '0';
+                                                    $queueTasks[$taskName][$bundleType][$bundleKey]['name'] = $bundle['name'];
+                                                    $queueTasks[$taskName][$bundleType][$bundleKey]['module_type'] = $bundleType;
+                                                    $queueTasks[$taskName][$bundleType][$bundleKey]['version'] = $bundle['version'];
+                                                    $queueTasks[$taskName][$bundleType][$bundleKey]['repo'] = $bundle['repo'];
+                                                    $queueTasks[$taskName][$bundleType][$bundleKey]['error'] = 'Not Found';
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     } else {
-                        unset($moduleIds[$moduleIdKey]);
+                        if (!isset($queueTasks[$taskName][$moduleType][$module['id']])) {
+                            $queueTasks[$taskName][$moduleType][$module['id']] = [];
+                            $queueTasks[$taskName][$moduleType][$module['id']]['id'] = $module['id'];
+                            $queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['display_name'] ?? $module['name'];
+                            $queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $module['module_type'];
+                            $queueTasks[$taskName][$moduleType][$module['id']]['version'] = $module['version'];
+                            $queueTasks[$taskName][$moduleType][$module['id']]['repo'] = $module['repo'];
+                        }
                     }
                 }
 
@@ -212,6 +291,6 @@ class Queues extends BasePackage
             }
         }
 
-        $this->addResponse('Processed Queue', 0, ['queueTasks' => $queueTasks, 'queueTasksCounter' => $queueTasksCounter]);
+        $this->addResponse('Analysed Queue', 0, ['queueTasks' => $queueTasks, 'queueTasksCounter' => $queueTasksCounter]);
     }
 }

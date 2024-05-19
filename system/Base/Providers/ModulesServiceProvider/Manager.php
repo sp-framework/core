@@ -562,6 +562,9 @@ class Manager extends BasePackage
 
             if (count($remotePackages['new']) > 0) {
                 foreach ($remotePackages['new'] as $registerRemotePackageKey => $registerRemotePackage) {
+                    if ($registerRemotePackage['repo_details']['latestRelease'] === false) {
+                        continue;
+                    }
                     if (!isset($counter['new'])) {
                         $counter['new'] = [];
                         $counter['new']['api']['id'] = $this->apiClientConfig['id'];

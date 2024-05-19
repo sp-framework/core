@@ -1152,6 +1152,7 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
     }
 }
 dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
+    var error = false;
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
@@ -1162,11 +1163,6 @@ dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
         }
 
         if (response.responseCode == 0) {
-            PNotify.success({
-                text        : response.responseMessage,
-                textTrusted : true
-            });
-
             if (response.responseData && response.responseData.queueTasks && response.responseData.queueTasksCounter) {
                 var moduleHtml = '';
                 for (var q in response.responseData.queueTasks) {
@@ -1183,16 +1179,31 @@ dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
                                             color = 'danger';
                                         }
 
+                                        if (response.responseData.queueTasks[q][installTypes][installType]['error']) {
+                                            error = true;
                                         moduleHtml +=
-                                        '       <tr>' +
+                                        '       <tr class="bg-danger">';
+                                        } else {
+                                        moduleHtml +=
+                                        '       <tr>';
+                                        }
+                                        moduleHtml +=
                                         '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['name'] + '</td>' +
                                         '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['module_type'] + '</td>' +
+                                        '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['version'] + '</td>' +
                                         '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['repo'] + '</td>' +
                                         '           <td>' +  '<span class="badge badge-' + color + ' mt-1 text-xs text-uppercase">' + q + '</span></td>' +
                                         '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>' +
-                                        '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>' +
+                                        '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>';
+                                        if (response.responseData.queueTasks[q][installTypes][installType]['error']) {
+                                        moduleHtml +=
+                                        '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '">Error: ' + response.responseData.queueTasks[q][installTypes][installType]['error'] + '</td>' +
+                                        '       </tr>';
+                                        } else {
+                                        moduleHtml +=
                                         '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>' +
                                         '       </tr>';
+                                        }
 
                                     }
                                 }
@@ -1206,6 +1217,11 @@ dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
 
                 $('#{{componentId}}-{{sectionId}}-queue-table tbody').empty().html(moduleHtml);
                 $('#{{componentId}}-{{sectionId}}-queue-analyse-modal').modal('show');
+            }
+            if (error) {
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', true);
+            } else {
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
             }
         } else {
             PNotify.error({
