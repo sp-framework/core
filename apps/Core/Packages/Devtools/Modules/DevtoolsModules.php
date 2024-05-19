@@ -587,7 +587,9 @@ class DevtoolsModules extends BasePackage
 
             $jsonContent['version'] = $data['version'];
 
-            if (count($jsonContent['dependencies']['views']) === 0) {
+            if (isset($jsonContent['dependencies']['views']) &&
+                count($jsonContent['dependencies']['views']) === 0
+            ) {
                 $data['base_view_module_id'] = 0;
             }
 
@@ -1370,28 +1372,36 @@ $file .= '
         $this->addResponse('Error syncing labels or no labels configured.', 1);
     }
 
-    public function getMilestoneLabelIssues($data)
+    public function getMilestoneLabelIssues($data, $viaGenerateRelease = false)
     {
-        if ($data['module_type'] === 'apptypes') {
-            $module = $this->apps->types->getAppTypeById($data['id']);
+        if ($viaGenerateRelease) {
+            $data['milestone'] = $data['version'];
+            $module = $data;
+            $status = 'open';
         } else {
-            $module = $this->modules->{$data['module_type']}->getById($data['id']);
+            if ($data['module_type'] === 'apptypes') {
+                $module = $this->apps->types->getAppTypeById($data['id']);
+            } else {
+                $module = $this->modules->{$data['module_type']}->getById($data['id']);
+            }
+
+            if (!$module) {
+                $this->addResponse('Bundle not found.', 1);
+
+                return false;
+            }
+
+            if (!$this->initApi($module)) {
+                $this->addResponse('Could not initialize the API assigned to this module.', 1);
+
+                return false;
+            }
+
+            //Get Latest Release (Last One, we need to sync issues since that release)
+            $this->getReleases($module, true);
+
+            $status = 'closed';
         }
-
-        if (!$module) {
-            $this->addResponse('Bundle not found.', 1);
-
-            return false;
-        }
-
-        if (!$this->initApi($module)) {
-            $this->addResponse('Could not initialize the API assigned to this module.', 1);
-
-            return false;
-        }
-
-        //Get Latest Release (Last One, we need to sync issues since that release)
-        $this->getReleases($module, true);
 
         if (!$this->latestRelease) {
             $since = null;
@@ -1412,7 +1422,7 @@ $file .= '
                 [
                     $this->apiClientConfig['org_user'],
                     strtolower($this->helper->last(explode('/', $module['repo']))),
-                    'closed',
+                    $status,
                     $data['label'],
                     null,
                     null,
@@ -1427,7 +1437,7 @@ $file .= '
                     $this->apiClientConfig['org_user'],
                     strtolower($this->helper->last(explode('/', $module['repo']))),
                     $data['milestone'],
-                    'closed',
+                    $status,
                     null,
                     null,
                     null,
@@ -1443,7 +1453,7 @@ $file .= '
         if ($issues) {
             $this->addResponse('Issues Synced', 0, ['issues' => $issues]);
 
-            return true;
+            return $issues;
         }
 
         $this->addResponse('Error syncing issues or No issues found with selected milestone/label', 1);
@@ -1642,68 +1652,105 @@ $file .= '
             return false;
         }
 
-        if (isset($module['preReleasePrefix']) || isset($module['buildMetaPrefix'])) {
-            $moduleVersion = $currentVersion;
-
-            if (isset($module['preReleasePrefix']) && !isset($module['buildMetaPrefix'])) {
-                $moduleVersion = explode('+', $moduleVersion)[0];
-            }
-
-            $parsedVersion = Version::parse($moduleVersion);
-
-            if (!$parsedVersion->isPreRelease() && isset($module['preReleasePrefix'])) {
-                $parsedVersion = Version::parse($parsedVersion->__toString() . '-' . $module['preReleasePrefix']);
-            }
-
-            if (isset($module['preReleasePrefix']) && isset($module['buildMetaPrefix'])) {
-                $parsedVersion = $parsedVersion->getNextPreReleaseVersion();
-            }
-
-            $newVersion = $parsedVersion->__toString();
-
-            if (!$parsedVersion->getBuildMeta() && isset($module['buildMetaPrefix'])) {
-                $module['buildMetaPrefix'] = explode('.', $module['buildMetaPrefix']);
-
-                array_walk($module['buildMetaPrefix'], function(&$prefix) {
-                    if ($prefix === 'now') {
-                        $prefix = time();
-                    }
-                });
-                $newVersion = $newVersion . '+' . implode('.', $module['buildMetaPrefix']);
-            } else if ($parsedVersion->getBuildMeta() &&
-                       isset($module['buildMetaPrefix']) &&
-                       str_contains($module['buildMetaPrefix'], 'now')
-            ) {
-                $module['buildMetaPrefix'] = explode('.', $module['buildMetaPrefix']);
-
-                $newVersion = explode('+', $newVersion)[0];
-
-                array_walk($module['buildMetaPrefix'], function(&$prefix) {
-                    if ($prefix === 'now') {
-                        $prefix = time();
-                    }
-                });
-
-                $newVersion = $newVersion . '+' . implode('.', $module['buildMetaPrefix']);
-            }
-        } else {
-            $version = Version::parse($currentVersion);
-            if ($version->isPreRelease()) {
-                $newVersion = $version->withoutSuffixes();
-            } else {
-                $bump = 'getNext' . ucfirst($module['bump']) . 'Version';
-                $newVersion = $version->$bump();
-            }
-            $newVersion = $newVersion->__toString();
-        }
-
         $versionIsDraft = false;
         $versionMessage = 'New Version';
+
         if ($this->latestRelease && $this->latestRelease['draft'] == true) {
             $newVersion = $currentVersion;
             $versionIsDraft = true;
             $versionMessage = 'Remote Version is Draft';
             $compareVersion = 3;
+        } else {
+            if (isset($module['preReleasePrefix']) || isset($module['buildMetaPrefix'])) {
+                $moduleVersion = $currentVersion;
+
+                $module['bump'] = explode('_', $module['bump']);
+
+                if (count($module['bump']) > 1) {
+                    $moduleVersionArr = explode('-', $moduleVersion);
+                    if (count($moduleVersionArr) === 2) {
+                        $version = Version::parse($moduleVersionArr[0]);
+
+                        $bump = 'getNext' . ucfirst($module['bump'][0]) . 'Version';
+                        $moduleVersion = $version->$bump();
+
+                        if ($module['bump'][1] === 'preRelease' ||
+                            $module['bump'][1] === 'preReleaseBuildMeta'
+                        ) {
+                            if (isset($module['preReleasePrefix'])) {
+                                $moduleVersion = $moduleVersion->__toString() . '-' . $module['preReleasePrefix'];
+                                $moduleVersion = Version::parse($moduleVersion);
+                            }
+
+                            $moduleVersion = $moduleVersion->getNextPreReleaseVersion();
+                        }
+
+                        $moduleVersion = $moduleVersion->__toString();
+                    }
+                }
+
+                if (isset($module['preReleasePrefix']) && !isset($module['buildMetaPrefix'])) {
+                    $moduleVersion = explode('+', $moduleVersion)[0];
+                }
+
+                $parsedVersion = Version::parse($moduleVersion);
+
+                if (!$parsedVersion->isPreRelease() && isset($module['preReleasePrefix'])) {
+                    $parsedVersion = Version::parse($parsedVersion->__toString() . '-' . $module['preReleasePrefix']);
+                }
+
+                if (isset($module['preReleasePrefix']) && count($module['bump']) === 1) {
+                    $parsedVersion = $parsedVersion->getNextPreReleaseVersion();
+                }
+
+                $newVersion = $parsedVersion->__toString();
+
+                if (!$parsedVersion->getBuildMeta() && isset($module['buildMetaPrefix'])) {
+                    $module['buildMetaPrefix'] = explode('.', $module['buildMetaPrefix']);
+
+                    array_walk($module['buildMetaPrefix'], function(&$prefix) {
+                        if ($prefix === 'now') {
+                            $prefix = time();
+                        }
+                    });
+
+                    if (!isset($module['preReleasePrefix'])) {
+                        $newVersion = explode('-', $newVersion);
+                        $newVersion = $newVersion[0];
+                    }
+
+                    $newVersion = $newVersion . '+' . implode('.', $module['buildMetaPrefix']);
+                } else if ($parsedVersion->getBuildMeta() &&
+                           isset($module['buildMetaPrefix']) &&
+                           str_contains($module['buildMetaPrefix'], 'now')
+                ) {
+                    $module['buildMetaPrefix'] = explode('.', $module['buildMetaPrefix']);
+
+                    $newVersion = explode('+', $newVersion)[0];
+
+                    array_walk($module['buildMetaPrefix'], function(&$prefix) {
+                        if ($prefix === 'now') {
+                            $prefix = time();
+                        }
+                    });
+
+                    if (!isset($module['preReleasePrefix'])) {
+                        $newVersion = explode('-', $newVersion);
+                        $newVersion = $newVersion[0];
+                    }
+
+                    $newVersion = $newVersion . '+' . implode('.', $module['buildMetaPrefix']);
+                }
+            } else {
+                $version = Version::parse($currentVersion);
+                if ($version->isPreRelease()) {
+                    $newVersion = $version->withoutSuffixes();
+                } else {
+                    $bump = 'getNext' . ucfirst($module['bump']) . 'Version';
+                    $newVersion = $version->$bump();
+                }
+                $newVersion = $newVersion->__toString();
+            }
         }
 
         if (isset($newVersion)) {
@@ -1849,6 +1896,14 @@ $file .= '
             $module = $this->modules->{$data['module_type']}->getById($data['id']);
         }
 
+        if ($module['app_type'] === 'core' &&
+            strtolower($module['name']) !== 'core'
+        ) {
+            $this->addResponse('Release for core modules are generated via Core package.', 1);
+
+            return false;
+        }
+
         if (!$module) {
             $this->addResponse('Module not found.', 1);
 
@@ -1862,9 +1917,18 @@ $file .= '
         }
 
         $prerelease = false;
-        if ($data['bump'] == 'preRelease' ||
-            $data['bump'] == 'buildMeta' ||
-            $data['bump'] == 'preReleaseBuildMeta' ||
+        if (($data['bump'] == 'preRelease' ||
+             $data['bump'] == 'buildMeta' ||
+             $data['bump'] == 'preReleaseBuildMeta' ||
+             $data['bump'] == 'major_preRelease' ||
+             $data['bump'] == 'major_buildMeta' ||
+             $data['bump'] == 'major_preReleaseBuildMeta' ||
+             $data['bump'] == 'minor_preRelease' ||
+             $data['bump'] == 'minor_buildMeta' ||
+             $data['bump'] == 'minor_preReleaseBuildMeta' ||
+             $data['bump'] == 'patch_preRelease' ||
+             $data['bump'] == 'patch_buildMeta' ||
+             $data['bump'] == 'patch_preReleaseBuildMeta') ||
             (isset($data['force-mark-prerelease']) && $data['force-mark-prerelease'] == 'true')
         ) {
             $prerelease = true;
@@ -1878,16 +1942,22 @@ $file .= '
         } else if (isset($versionData['release'])) {
             $name = $versionData['release'];
         }
-
         //We first update Json File with the updated version and we push the json file with the new version and
         //then we generate latest release using the updated json file, else the json file on remote consist of older version
         //and needs to be manually pushed before release.
         //NOTE: The API key used should have write permissions to the branch which is used for generating the release.
         if (!$this->latestRelease ||
-            $this->latestRelease && $this->latestRelease['draft'] == false
+            ($this->latestRelease && $data['mark-as-draft'] == 'false')
         ) {
             $module['version'] = $name;
             $module['branch'] = $data['branch'];
+
+            //Check for any open issues against the milestone that was created during draft creation.
+            if ($this->getMilestoneLabelIssues($module, true)) {
+                $this->addResponse('Milestone ' . $module['version'] . ' has a issues open. Please close those issues before generating release.', 1);
+
+                return false;
+            }
 
             //Check for any open pull request against the branch we have to create release from.
             if (!$this->checkPullRequests($module)) {
@@ -1907,7 +1977,17 @@ $file .= '
 
                 $fileLocation = explode('/Install/', $this->getModuleJsonFileLocation($module));
 
-                if ($data['module_type'] === 'views' && isset($data['base_view_module_id']) && $data['base_view_module_id'] == 0) {
+                if (count($fileLocation) > 1) {
+                    $fileLocation = $data['module_type'] === 'views' ? 'view.json' : 'Install/' . $fileLocation[1];
+                } else if (count($fileLocation) === 1) {
+                    $fileLocation = $fileLocation[0];
+                }
+
+                if (isset($data['module_type']) &&
+                    $data['module_type'] === 'views' &&
+                    isset($data['base_view_module_id']) &&
+                    $data['base_view_module_id'] == 0
+                ) {
                     array_push($reposArr, $module['repo'] . '-public');
                 }
 
@@ -1940,7 +2020,7 @@ $file .= '
                             [
                                 $this->apiClientConfig['org_user'],
                                 strtolower($this->helper->last(explode('/', $repo))),
-                                $data['module_type'] === 'views' ? 'view.json' : 'Install/' . $fileLocation[1],
+                                $fileLocation,
                                 $module['branch']
                             ]
                         )->getResponse(true);
@@ -1967,7 +2047,7 @@ $file .= '
                             [
                                 $this->apiClientConfig['org_user'],
                                 strtolower($this->helper->last(explode('/', $repo))),
-                                $data['module_type'] === 'views' ? 'view.json' : 'Install/' . $fileLocation[1],
+                                $fileLocation,
                                 [
                                     'message'   => $module['commit_message'],
                                     'content'   => $base64EncodedJsonContent,
@@ -1991,7 +2071,11 @@ $file .= '
         //Now we generate release after updating the json file.
         $reposArr = [$module['repo']];
 
-        if ($data['module_type'] === 'views' && isset($data['base_view_module_id']) && $data['base_view_module_id'] == 0) {
+        if (isset($data['module_type']) &&
+            $data['module_type'] === 'views' &&
+            isset($data['base_view_module_id']) &&
+            $data['base_view_module_id'] == 0
+        ) {
             array_push($reposArr, $module['repo'] . '-public');
         }
 
@@ -2196,6 +2280,8 @@ $file .= '
 
                 return;
             }
+
+            throw $e;
         }
 
         $jsonContent = [];
@@ -2383,7 +2469,11 @@ $file .= '
 
         $reposArr = [$data['repo']];
 
-        if ($data['module_type'] === 'views' && isset($data['base_view_module_id']) && $data['base_view_module_id'] == 0) {
+        if (isset($data['module_type']) &&
+            $data['module_type'] === 'views' &&
+            isset($data['base_view_module_id']) &&
+            $data['base_view_module_id'] == 0
+        ) {
             array_push($reposArr, $data['repo'] . '-public');
         }
 
@@ -2759,5 +2849,76 @@ $file .= '
         }
 
         return $apisArr;
+    }
+
+    public function getAvailableReleaseTypes()
+    {
+        return
+            [
+                'major' => [
+                    'id'    => 'major',
+                    'name'  => 'MAJOR'
+                ],
+                'minor' => [
+                    'id'    => 'minor',
+                    'name'  => 'MINOR'
+                ],
+                'patch' => [
+                    'id'    => 'patch',
+                    'name'  => 'PATCH'
+                ],
+                'preRelease' => [
+                    'id'    => 'preRelease',
+                    'name'  => 'PRE RELEASE'
+                ],
+                'buildMeta' => [
+                    'id'    => 'buildMeta',
+                    'name'  => 'BUILD META'
+                ],
+                'preReleaseBuildMeta' => [
+                    'id'    => 'preReleaseBuildMeta',
+                    'name'  => 'PRE RELEASE + BUILD META'
+                ],
+                'major_preRelease' => [
+                    'id'    => 'major_preRelease',
+                    'name'  => 'MAJOR + PRE RELEASE'
+                ],
+                'major_buildMeta' => [
+                    'id'    => 'major_buildMeta',
+                    'name'  => 'MAJOR + BUILD META'
+                ],
+                'major_preReleaseBuildMeta' => [
+                    'id'    => 'major_preReleaseBuildMeta',
+                    'name'  => 'MAJOR + PRE RELEASE + BUILD META'
+                ],
+                'minor_preRelease' => [
+                    'id'    => 'minor_preRelease',
+                    'name'  => 'MINOR + PRE RELEASE'
+                ],
+                'minor_buildMeta' => [
+                    'id'    => 'minor_buildMeta',
+                    'name'  => 'MINOR + BUILD META'
+                ],
+                'minor_preReleaseBuildMeta' => [
+                    'id'    => 'minor_preReleaseBuildMeta',
+                    'name'  => 'MINOR + PRE RELEASE + BUILD META'
+                ],
+                'patch_preRelease' => [
+                    'id'    => 'patch_preRelease',
+                    'name'  => 'PATCH + PRE RELEASE'
+                ],
+                'patch_buildMeta' => [
+                    'id'    => 'patch_buildMeta',
+                    'name'  => 'PATCH + BUILD META'
+                ],
+                'patch_preReleaseBuildMeta' => [
+                    'id'    => 'patch_preReleaseBuildMeta',
+                    'name'  => 'PATCH + PRE RELEASE + BUILD META'
+                ],
+                'custom' => [
+                    'id'    => 'custom',
+                    'name'  => 'CUSTOM (NON SEMANTIC VERSION)'
+               ]
+            ];
     }
 }

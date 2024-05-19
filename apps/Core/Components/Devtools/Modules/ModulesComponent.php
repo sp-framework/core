@@ -321,6 +321,8 @@ class ModulesComponent extends BaseComponent
 				}
 
 				if ($this->view->newrelease) {
+					$this->view->availableReleaseTypes = $this->modulesPackage->getAvailableReleaseTypes();
+
 					$module['isPreRelease'] = false;
 					$module['preRelease'] = false;
 					$module['buildMeta'] = false;
