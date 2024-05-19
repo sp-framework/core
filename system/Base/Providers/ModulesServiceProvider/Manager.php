@@ -570,7 +570,7 @@ class Manager extends BasePackage
                         $this->modules->{$remoteModulesType}->update($updateRemotePackage);
                     }
 
-                    if ($updateRemotePackage['installed'] == '1') {
+                    if ($updateRemotePackage['installed'] == '1' && $updateRemotePackage['update_available'] == '1') {
                         $counter['updates']['count'] = $counter['updates']['count'] + 1;
                     }
                 }
@@ -694,9 +694,16 @@ class Manager extends BasePackage
                     }
 
                     $modules['updates'][$localModule['id']] = $localModule;
+                } else {
+                    if ($localModule['update_available'] == 1) {
+                        $localModule['update_available'] = '0';
+                        $localModule['update_version'] = null;
 
-                    unset($remoteModules[$remoteModuleKey]);
+                        $modules['updates'][$localModule['id']] = $localModule;
+                    }
                 }
+
+                unset($remoteModules[$remoteModuleKey]);
             } else {
                 $remoteModule['repo_details'] = [];
                 $remoteModule['repo_details']['details'] = $remoteModule;
@@ -736,7 +743,15 @@ class Manager extends BasePackage
                 }
 
                 if ($releases && count($releases) > 0) {
-                    $latestRelease = $releases[0];
+                    foreach ($releases as $release) {
+                        if (isset($release['draft']) && $release['draft'] == 'true') {
+                            continue;
+                        }
+
+                        $latestRelease = $release;
+
+                        break;
+                    }
                 }
             } else {
                 $latestRelease = $this->getLatestRelease($remoteModule);
