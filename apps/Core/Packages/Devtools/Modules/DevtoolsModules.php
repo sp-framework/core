@@ -299,7 +299,7 @@ class DevtoolsModules extends BasePackage
                         }
                     }
 
-                    if ($data['createrepo'] == true) {
+                    if ($data['createrepo'] == true && strtolower($data['name']) !== 'core') {
                         if (!$this->checkRepo($data)) {
                             $newRepo = $this->createRepo($data);
 
@@ -312,6 +312,16 @@ class DevtoolsModules extends BasePackage
 
                             return;
                         }
+                    }
+
+                    if (strtolower($data['name']) === 'core' &&
+                        $this->core->getVersion() !== $data['version']
+                    ) {
+                        $core = $this->core->core;
+
+                        $core['version'] = $data['version'];
+
+                        $this->core->update($core);
                     }
 
                     $this->addResponse('Module updated');
@@ -2131,6 +2141,16 @@ $file .= '
                         $this->apps->types->updateAppType($module);
                     } else {
                         $this->modules->{$data['module_type']}->update($module);
+
+                        if (strtolower($module['name']) === 'core' &&
+                            $this->core->getVersion() !== $module['version']
+                        ) {
+                            $core = $this->core->core;
+
+                            $core['version'] = $data['version'];
+
+                            $this->core->update($core);
+                        }
                     }
 
                     if ($data['module_type'] === 'views' && str_contains($repo, '-public')) {
