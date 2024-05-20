@@ -9285,8 +9285,12 @@ var BazContentFields = function() {
             $('#' + thisFieldId + '-tools-collapse').attr('hidden', true);
             $('#' + thisFieldId + '-tools-expand').attr('hidden', true);
 
+            var emptyTreeText = 'NO ' + $('#' + thisFieldId + '-tree-div').siblings('label').html() + '!';
+            if (options.bazJstreeOptions.treeEmptyText && options.bazJstreeOptions.treeEmptyText !== '') {
+                emptyTreeText = options.bazJstreeOptions.treeEmptyText;
+            }
             $('#' + thisFieldId + '-tree-div').append(
-                '<span id="' + thisFieldId + '-tree-empty">NO ' + $('#' + thisFieldId + '-tree-div').siblings('label').html() + '!</span>'
+                '<span id="' + thisFieldId + '-tree-empty">' + emptyTreeText + '</span>'
             );
 
             if (options.afterInit) {
