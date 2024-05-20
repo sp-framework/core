@@ -18,19 +18,21 @@ class Queues extends BasePackage
 
     public function getActiveQueue()
     {
-        $queue = $this->getFirst('processed', false);
+        $queue = $this->getFirst('status', 0);
 
         if (!$queue) {
             return $this->addActiveQueue();
         }
 
-        return $queue->toArray();
+        $queue = $queue->toArray();
+
+        return $queue;
     }
 
     protected function addActiveQueue()
     {
         $queue = [
-            'processed' => 0,
+            'status' => 0,
             'tasks'     => $this->helper->encode(
                 [
                     'install'   => [],
@@ -42,7 +44,11 @@ class Queues extends BasePackage
         ];
 
         if ($this->add($queue)) {
-            return $this->packagesData->last;
+            $queue = $this->packagesData->last;
+
+            $queue['total'] = 0;
+
+            return $queue;
         }
 
         throw new \Exception('Cannot add new queue!');
@@ -78,7 +84,8 @@ class Queues extends BasePackage
             $queue['tasks']['uninstall'] = [];
             $queue['tasks']['remove']    = [];
 
-            $queue['tasks_count'] = 0;
+            $queue['tasks_count'] = [];
+            $queue['total'] = 0;
 
             $this->addResponse('Queue cleared', 0, ['queue' => $queue]);
         } else if ($data['task'] === 'cancel') {
@@ -104,7 +111,7 @@ class Queues extends BasePackage
             }
 
             if ($found) {
-                $queue['tasks_count'] = $this->getTasksCount($queue);
+                $this->getTasksCount($queue);
 
                 $this->addResponse('Removed from queue', 0, ['queue' => $queue]);
             }
@@ -141,7 +148,7 @@ class Queues extends BasePackage
                 }
             }
 
-            $queue['tasks_count'] = $this->getTasksCount($queue);
+            $this->getTasksCount($queue);
 
             $this->addResponse('Added to queue', 0, ['queue' => $queue]);
         }
@@ -155,19 +162,26 @@ class Queues extends BasePackage
         return false;
     }
 
-    protected function getTasksCount($queue)
+    protected function getTasksCount(&$queue)
     {
-        $counter = 0;
+        $queue['total'] = 0;
+        $queue['tasks_count'] = [];
 
-        foreach ($queue['tasks'] as $tasks) {
-            if (count($tasks) > 0) {
-                foreach ($tasks as $moduleType) {
-                    $counter = $counter + count($moduleType);
+        foreach ($queue['tasks'] as $taskType => $task) {
+            if (count($task) > 0) {
+                foreach ($task as $moduleType => $modules) {
+                    if (count($modules) > 0) {
+                        if (isset($queue['tasks_count'][$taskType]) && $queue['tasks_count'][$taskType] > 0) {
+                            $queue['tasks_count'][$taskType] = $queue['tasks_count'][$taskType] + count($modules);
+                        } else {
+                            $queue['tasks_count'][$taskType] = count($modules);
+                        }
+                    }
                 }
+
+                $queue['total'] = $queue['total'] + $queue['tasks_count'][$taskType];
             }
         }
-
-        return $counter;
     }
 
     public function analyseActiveQueue()
@@ -291,6 +305,16 @@ class Queues extends BasePackage
             }
         }
 
-        $this->addResponse('Analysed Queue', 0, ['queueTasks' => $queueTasks, 'queueTasksCounter' => $queueTasksCounter]);
+        $queue['tasks_count'] = $queueTasksCounter;
+
+        if ($this->update($queue)) {
+            $this->addResponse('Analysed Queue', 0, ['queueTasks' => $queueTasks, 'queueTasksCounter' => $queueTasksCounter]);
+
+            return true;
+        }
+
+        $this->addResponse('Error analysing queue', 1);
+
+        return false;
     }
 }

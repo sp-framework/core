@@ -21,25 +21,10 @@ class Queues
                         ]
                     ),
                     new Column(
-                        'processed',
+                        'status',
                         [
-                            'type'    => Column::TYPE_BOOLEAN,
+                            'type'    => Column::TYPE_TINYINTEGER,
                             'notNull' => true,
-                        ]
-                    ),
-                    new Column(
-                        'processed_at',
-                        [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 100,
-                            'notNull' => false,
-                        ]
-                    ),
-                    new Column(
-                        'analysed',
-                        [
-                            'type'    => Column::TYPE_BOOLEAN,
-                            'notNull' => false,
                         ]
                     ),
                     new Column(
@@ -51,9 +36,31 @@ class Queues
                         ]
                     ),
                     new Column(
-                        'analysed_result',
+                        'analysed_by',
                         [
-                            'type'    => Column::TYPE_TEXT,
+                            'type'    => Column::TYPE_INTEGER,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
+                        'processed_at',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 100,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
+                        'processed_by',
+                        [
+                            'type'    => Column::TYPE_INTEGER,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
+                        'results',
+                        [
+                            'type'    => Column::TYPE_JSON,
                             'notNull' => false,
                         ]
                     ),
@@ -65,19 +72,19 @@ class Queues
                         ]
                     ),
                     new Column(
-                        'tasks_result',
+                        'tasks_count',
                         [
-                            'type'    => Column::TYPE_TEXT,
+                            'type'    => Column::TYPE_JSON,
                             'notNull' => false,
                         ]
                     ),
                     new Column(
-                        'tasks_count',
+                        'total',
                         [
                             'type'    => Column::TYPE_SMALLINTEGER,
                             'notNull' => false,
                         ]
-                    ),
+                    )
                 ]
             ];
     }

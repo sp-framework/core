@@ -8,19 +8,21 @@ class ServiceProviderModulesQueues extends BaseModel
 {
     public $id;
 
-    public $processed;
-
-    public $processed_at;
-
-    public $analysed;
+    public $status;
 
     public $analysed_at;
 
-    public $analysed_result;
+    public $analysed_by;
+
+    public $processed_at;
+
+    public $processed_by;
+
+    public $results;
 
     public $tasks;
 
-    public $tasks_result;
-
     public $tasks_count;
+
+    public $total;
 }
