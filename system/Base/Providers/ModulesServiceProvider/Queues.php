@@ -184,7 +184,7 @@ class Queues extends BasePackage
         }
     }
 
-    public function analyseActiveQueue(&$queue = null)
+    public function analyseQueue(&$queue = null)
     {
         if (!$queue) {
             $queue = $this->getActiveQueue();
@@ -258,7 +258,7 @@ class Queues extends BasePackage
                                                     $queueTasks['update']['packages'][$bundleModule['id']]['id'] = $bundleModule['id'];
                                                     $queueTasks['update']['packages'][$bundleModule['id']]['name'] = $bundleModule['display_name'] ?? $bundleModule['name'];
                                                     $queueTasks['update']['packages'][$bundleModule['id']]['module_type'] = $bundleModule['module_type'];
-                                                    $queueTasks['update']['packages'][$bundleModule['id']]['version'] = $bundleModule['version'];
+                                                    $queueTasks['update']['packages'][$bundleModule['id']]['version'] = $bundleModule['version'] . ' -> ' . $bundleModule['update_version'];
                                                     $queueTasks['update']['packages'][$bundleModule['id']]['repo'] = $bundleModule['repo'];
                                                 }
                                             }
@@ -298,6 +298,9 @@ class Queues extends BasePackage
                             $queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['display_name'] ?? $module['name'];
                             $queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $module['module_type'];
                             $queueTasks[$taskName][$moduleType][$module['id']]['version'] = $module['version'];
+                            if ($taskName === 'update') {
+                                $queueTasks[$taskName][$moduleType][$module['id']]['version'] = $module['version'] . ' -> ' . $module['update_version'];
+                            }
                             $queueTasks[$taskName][$moduleType][$module['id']]['repo'] = $module['repo'];
                         }
                     }

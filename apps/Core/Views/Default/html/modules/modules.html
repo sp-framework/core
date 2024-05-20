@@ -1194,9 +1194,7 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
         $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', false);
 
         $('#{{componentId}}-{{sectionId}}-analyse-queue, ' +
-          '#{{componentId}}-{{sectionId}}-clear-queue, ' +
-          '#{{componentId}}-{{sectionId}}-perform-precheck, ' +
-          '#{{componentId}}-{{sectionId}}-process-queue'
+          '#{{componentId}}-{{sectionId}}-clear-queue'
           ).off();
 
         $('#{{componentId}}-{{sectionId}}-clear-queue').click(function(e) {
@@ -1226,17 +1224,17 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
             // dataCollectionSectionForm['funcs']['analyseQueue']();
         });
 
-        $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
-            e.preventDefault();
+        // $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
+        //     e.preventDefault();
 
-            dataCollectionSectionForm['funcs']['processQueue']();
-        });
+        //     dataCollectionSectionForm['funcs']['processQueue']();
+        // });
 
-        $('#{{componentId}}-{{sectionId}}-process-queue').click(function(e) {
-            e.preventDefault();
+        // $('#{{componentId}}-{{sectionId}}-process-queue').click(function(e) {
+        //     e.preventDefault();
 
-            dataCollectionSectionForm['funcs']['processQueue']('process');
-        });
+        //     dataCollectionSectionForm['funcs']['processQueue']('process');
+        // });
     } else {
         $('#{{componentId}}-{{sectionId}}-analyse-queue').attr('disabled', true);
         $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
@@ -1431,34 +1429,34 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function() {
 
     dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText']();
 }
-dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
-    var postData = { };
-    postData[$('#security-token').attr('name')] = $('#security-token').val();
-    postData['queue'] = dataCollectionSectionForm['vars']['queue']['tasks'];
-    postData['process'] = 'runprecheck';
-    if (task === 'process') {
-        postData['process'] = 'runprocess';
-    }
+// dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
+//     var postData = { };
+//     postData[$('#security-token').attr('name')] = $('#security-token').val();
+//     postData['queue'] = dataCollectionSectionForm['vars']['queue']['tasks'];
+//     postData['process'] = 'runprecheck';
+//     if (task === 'process') {
+//         postData['process'] = 'runprocess';
+//     }
 
-    $.post('{{links.url("modules/processQueue")}}', postData, function(response) {
-        if (response.tokenKey && response.token) {
-            $('#security-token').attr('name', response.tokenKey);
-            $('#security-token').val(response.token);
-        }
+//     $.post('{{links.url("modules/processQueue")}}', postData, function(response) {
+//         if (response.tokenKey && response.token) {
+//             $('#security-token').attr('name', response.tokenKey);
+//             $('#security-token').val(response.token);
+//         }
 
-        if (response.responseCode == 0) {
-            PNotify.success({
-                text        : response.responseMessage,
-                textTrusted : true
-            });
-        } else {
-            PNotify.error({
-                text        : response.responseMessage,
-                textTrusted : true
-            });
-        }
-    }, 'json');
-}
+//         if (response.responseCode == 0) {
+//             PNotify.success({
+//                 text        : response.responseMessage,
+//                 textTrusted : true
+//             });
+//         } else {
+//             PNotify.error({
+//                 text        : response.responseMessage,
+//                 textTrusted : true
+//             });
+//         }
+//     }, 'json');
+// }
 
 dataCollectionSectionForm['funcs']['initSync'] = function(val) {
     dataCollectionSectionForm['vars']['sync'] = true;
@@ -1612,46 +1610,3 @@ $(document).ready(function() {
     });
 });
 </script>
-{# <div>
-    {{adminltetags.useTag('modal',
-        [
-            'component'                 : component,
-            'componentName'             : componentName,
-            'componentId'               : componentId,
-            'sectionId'                 : sectionId,
-            'modalId'                   : 'queue-analyse-modal',
-            'modalBodyInclude'          : 'modules/analyse/view',
-            'modalSize'                 : 'xl',
-            'modalHeader'               : true,
-            'modalFooter'               : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> MODULES IN QUEUE',
-            'modalFooterButtons'        :
-                [
-                'component'                     : component,
-                'componentName'                 : componentName,
-                'componentId'                   : componentId,
-                'parentComponentId'             : parent,
-                'sectionId'                     : sectionId,
-                'buttonType'                    : 'button',
-                'buttons'                       :
-                        [
-                            'perform-precheck' : [
-                                'title'                   : 'Perform Precheck',
-                                'type'                    : 'primary',
-                                'position'                : 'right',
-                                'icon'                    : 'cog fa-spin',
-                                'iconHidden'              : true
-                            ],
-                            'process-queue' : [
-                                'title'                   : 'Process Queue',
-                                'type'                    : 'primary',
-                                'position'                : 'right',
-                                'icon'                    : 'cog fa-spin',
-                                'iconHidden'              : true,
-                                'hidden'                  : true
-                            ]
-                        ]
-                ]
-        ]
-    )}}
-</div> #}

@@ -35,13 +35,12 @@ class ModulesComponent extends BaseComponent
 				return $this->throwIdNotFound();
 			}
 
-			$this->modules->queues->analyseActiveQueue($queue);
+			$this->modules->queues->analyseQueue($queue);
 
+			$this->view->queues = true;
 			$this->view->queue = $queue;
 			$this->view->queueTasks = $this->modules->queues->packagesData->responseData['queueTasks'] ?? [];
 			$this->view->queueTasksCounter = $this->modules->queues->packagesData->responseData['queueTasksCounter'] ?? [];
-
-			$this->view->pick('modules/analyse');
 
 			return;
 		}
@@ -253,14 +252,11 @@ class ModulesComponent extends BaseComponent
 		);
 	}
 
-	public function analyseActiveQueueAction()
+	public function analyseQueueAction()
 	{
 		$this->requestIsPost();
-		try {
-			$this->modules->queues->analyseActiveQueue();
-		} catch (\Exception $e) {
-			trace([$e]);
-		}
+
+		$this->modules->queues->analyseQueue();
 
 		$this->addResponse(
 			$this->modules->queues->packagesData->responseMessage,

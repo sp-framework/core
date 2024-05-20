@@ -1,17 +1,73 @@
-{{adminltetags.useTag('content',
-    [
-        'component'                   : component,
-        'componentId'                 : componentId,
-        'parentComponentId'           : parent,
-        'sectionId'                   : 'manager',
-        'contentType'                 : 'section',
-        'cardHeader'                  : true,
-        'cardType'                    : 'primary',
-        'cardIcon'                    : 'th',
-        'cardTitle'                   : 'Modules',
-        'cardAdditionalClass'         : 'rounded-0',
-        'cardCollapsed'               : false,
-        'cardBodyInclude'             : 'modules/modules',
-        'cardShowTools'               : ['maximize', 'packageSettings']
-    ]
-)}}
+{% if queues is defined and queues === true %}
+    {% set footerContent =
+        adminltetags.useTag('buttons',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : 'analyse',
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        'perform-precheck' : [
+                            'title'                   : 'Perform Precheck',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true
+                        ],
+                        'process-queue' : [
+                            'title'                   : 'Process Queue',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'hidden'                  : true
+                        ],
+                        'cancel' : [
+                            'title'                   : 'Cancel',
+                            'type'                    : 'secondary',
+                            'position'                : 'right',
+                            'url'                     : links.url('modules')
+                        ]
+                    ]
+            ]
+        )
+    %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                   : component,
+            'componentId'                 : componentId,
+            'parentComponentId'           : parent,
+            'sectionId'                   : 'analyse',
+            'contentType'                 : 'section',
+            'cardHeader'                  : true,
+            'cardFooter'                  : true,
+            'cardType'                    : 'primary',
+            'cardIcon'                    : 'th',
+            'cardTitle'                   : 'Analyse Modules',
+            'cardAdditionalClass'         : 'rounded-0',
+            'cardCollapsed'               : false,
+            'cardBodyInclude'             : 'modules/analyse',
+            'cardShowTools'               : ['maximize'],
+            'cardFooterContent'           : footerContent
+        ]
+    )}}
+{% else %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                   : component,
+            'componentId'                 : componentId,
+            'parentComponentId'           : parent,
+            'sectionId'                   : 'manager',
+            'contentType'                 : 'section',
+            'cardHeader'                  : true,
+            'cardType'                    : 'primary',
+            'cardIcon'                    : 'th',
+            'cardTitle'                   : 'Modules',
+            'cardAdditionalClass'         : 'rounded-0',
+            'cardCollapsed'               : false,
+            'cardBodyInclude'             : 'modules/modules',
+            'cardShowTools'               : ['maximize', 'packageSettings']
+        ]
+    )}}
+{% endif %}

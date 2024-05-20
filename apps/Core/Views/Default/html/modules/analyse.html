@@ -1,18 +1,255 @@
-{{adminltetags.useTag('content',
-    [
-        'component'                   : component,
-        'componentId'                 : componentId,
-        'parentComponentId'           : parent,
-        'sectionId'                   : 'analyse',
-        'contentType'                 : 'section',
-        'cardHeader'                  : true,
-        'cardType'                    : 'primary',
-        'cardIcon'                    : 'th',
-        'cardTitle'                   : 'Analyse Modules',
-        'cardAdditionalClass'         : 'rounded-0',
-        'cardCollapsed'               : false,
-        'cardBodyInclude'             : 'modules/analyse/view',
-        'cardShowTools'               : ['maximize'],
-        'cardHideTools'               : ['settings']
-    ]
-)}}
+<!-- htmlhint tag-pair:false -->
+{% set queueTasksCounterInstall = 0 %}
+{% set queueTasksCounterUpdate = 0 %}
+{% set queueTasksCounterUninstall = 0 %}
+{% set queueTasksCounterRemove = 0 %}
+{% if queueTasksCounter['install'] is defined %}
+    {% set queueTasksCounterInstall = queueTasksCounter['install'] %}
+{% endif %}
+{% if queueTasksCounter['update'] is defined %}
+    {% set queueTasksCounterUpdate = queueTasksCounter['update'] %}
+{% endif %}
+{% if queueTasksCounter['uninstall'] is defined %}
+    {% set queueTasksCounterUninstall = queueTasksCounter['uninstall'] %}
+{% endif %}
+{% if queueTasksCounter['remove'] is defined %}
+    {% set queueTasksCounterRemove = queueTasksCounter['remove'] %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'fieldId'                       : 'queue',
+                'fieldLabel'                    : false,
+                'fieldType'                     : 'counters',
+                'fieldCountersPlacementType'    : 'horizontal',
+                'fieldCounters'                 :
+                    [
+                        'install'       :
+                            [
+                                'id'        : 'install',
+                                'title'     : 'Install',
+                                'type'      : 'primary',
+                                'value'     : queueTasksCounterInstall
+                            ],
+                        'update'        :
+                            [
+                                'id'        : 'update',
+                                'title'     : 'Update',
+                                'type'      : 'info',
+                                'value'     : queueTasksCounterUpdate
+                            ],
+                        'uninstall'     :
+                            [
+                                'id'        : 'uninstall',
+                                'title'     : 'Uninstall',
+                                'type'      : 'warning',
+                                'value'     : queueTasksCounterUninstall
+                            ],
+                        'remove'        :
+                            [
+                                'id'        : 'remove',
+                                'title'     : 'Remove',
+                                'type'      : 'danger',
+                                'value'     : queueTasksCounterRemove
+                            ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+{% set moduleHtml = '' %}
+{% set error = false %}
+{% if queueTasks|length > 0 %}
+    {% for task, queueTaskModules in queueTasks %}
+        {% if task === 'install' or task === 'uninstall' or task === 'update' or task === 'remove' %}
+            {% if queueTaskModules|length > 0 %}
+                {% for modulesType, modules in queueTaskModules %}
+                    {% if modules|length > 0 %}
+                        {% for moduleId, module in modules %}
+                            {% set color = 'primary' %}
+                            {% if task === 'update' %}
+                                {% set color = 'info' %}
+                            {% elseif task === 'uninstall' %}
+                                {% set color = 'warning' %}
+                            {% elseif task === 'remove' %}
+                                {% set color = 'danger' %}
+                            {% endif %}
+
+                            {% set errorClass = '' %}
+                            {% if module['error'] is defined %}
+                                {% set error = true %}
+                                {% set errorClass = ' class="bg-danger"' %}
+                            {% endif %}
+
+                            {% set moduleHtml = moduleHtml ~ '<tr' ~ errorClass ~ '>' ~
+                            '           <td>' ~  module['name'] ~ '</td>' ~
+                            '           <td>' ~  module['module_type'] ~ '</td>' ~
+                            '           <td>' ~  module['version'] ~ '</td>' ~
+                            '           <td>' ~  module['repo'] ~ '</td>' ~
+                            '           <td>' ~  '<span class="badge badge-' ~ color ~ ' mt-1 text-xs text-uppercase">' ~ task ~ '</span></td>' ~
+                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' ~ module['id'] ~ '"></td>' ~
+                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' ~ module['id'] ~ '"></td>' ~
+                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' ~ module['id'] ~ '">' ~
+                            '               <a href="#" type="button" data-id="' ~ module['id'] ~ '" class="ml-1 mr-1 text-white btn btn-info btn-xs">' ~
+                            '                   <i class="fas fa-fw fa-xs fa-eye"></i>' ~
+                            '               </a>' ~
+                            '           </td>' ~
+                            '       </tr>' %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{% if moduleHtml !== '' %}
+    <div class="row">
+        <div class="col height-control-400">
+            <table id="{{componentId}}-{{sectionId}}-queue-table" class="table table-sm table-hover responsive nowrap mb-0" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th class="text-uppercase">Name</th>
+                        <th class="text-uppercase">Module Type</th>
+                        <th class="text-uppercase">Version</th>
+                        <th class="text-uppercase">Repository</th>
+                        <th class="text-uppercase">Task</th>
+                        <th class="text-uppercase">PreCheck</th>
+                        <th class="text-uppercase">Completed</th>
+                        <th class="text-uppercase">Logs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{moduleHtml}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <div id="installer-progress" class="mb-3"></div>
+        </div>
+    </div>
+{% endif %}
+{% set queue = json_encode(queue, 16) %}
+<script>
+/*global PNotify BazProgress Swal BazContentFields BazHelpers BazContentLoader Pace BazCore */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+if (!window['dataCollection']) {
+    window['dataCollection'] = { };
+}
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['queue'] = JSON.parse('{{queue}}');
+dataCollectionSectionForm['funcs'] = { };
+
+dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['queue'] = dataCollectionSectionForm['vars']['queue']['tasks'];
+    postData['process'] = 'runprecheck';
+    if (task === 'process') {
+        postData['process'] = 'runprocess';
+    }
+
+    $.post('{{links.url("modules/processQueue")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            PNotify.success({
+                text        : response.responseMessage,
+                textTrusted : true
+            });
+        } else {
+            PNotify.error({
+                text        : response.responseMessage,
+                textTrusted : true
+            });
+        }
+    }, 'json');
+}
+
+dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
+    $('#{{componentId}}-{{sectionId}}-perform-precheck, ' +
+      '#{{componentId}}-{{sectionId}}-process-queue'
+      ).off();
+
+    $('#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
+        e.preventDefault();
+
+        BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-cancel'), {
+            ajaxBefore                      : function () {
+                                                Pace.restart();
+                                                $("#baz-content").empty();
+                                                $("#loader").attr('hidden', false);
+                                            },
+            ajaxFinished                    : function () {
+                                                BazCore.updateBreadcrumb();
+                                                $("#loader").attr('hidden', true);
+                                            },
+            ajaxError                       : function () {
+                                                $("#loader").attr('hidden', true);
+                                                BazCore.updateBreadcrumb();
+                                            }
+        });
+    });
+
+    $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['processQueue']();
+    });
+
+    $('#{{componentId}}-{{sectionId}}-process-queue').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['processQueue']('process');
+    });
+}
+dataCollectionSectionForm['funcs']['initQueueButtons']();
+</script>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'queue-logs-modal',
+            'modalBodyInclude'          : 'modules/logs',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> LOGS'
+        ]
+    )}}
+</div>
