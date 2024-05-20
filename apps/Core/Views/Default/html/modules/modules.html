@@ -1,8 +1,7 @@
-{# <div class="row">
-    <div id="repo" class="col">
-        {% include 'modules/repositories/list.html' %}
-    </div>
-</div> #}
+{% set fieldJstreeEmptyText = false %}
+{% if modulesError is defined %}
+    {% set fieldJstreeEmptyText = modulesError %}
+{% endif %}
 <div class="row vdivide">
     <div class="col-md-4 vdivide-resizable">
         {{adminltetags.useTag('fields',
@@ -39,6 +38,7 @@
                 'fieldJstreeSearchCaseSensitive'            : false,
                 'fieldJstreeSearchShowOnlyMatches'          : true,
                 'fieldJstreeSearchShowOnlyMatchesChildren'  : true,
+                'fieldJstreeEmptyText'                      : fieldJstreeEmptyText,
                 'fieldJstreeHideJstreeIcons'                : false,
                 'fieldJstreeAdditionalTools'                :
                     [
@@ -241,7 +241,12 @@
             <span style="top: -2px;position: relative;" class="badge badge-info" id="queue-counter">{{queue['total']}}</span>
         </span>
     </div>
-    {% set queue = json_encode(queue, 16) %}
+    {% set analyseDisabled = true %}
+    {% set clearDisabled = true %}
+    {% if queue['total'] > 0 %}
+        {% set analyseDisabled = false %}
+        {% set clearDisabled = false %}
+    {% endif %}
     <div class="col">
         {{adminltetags.useTag('buttons',
             [
@@ -256,25 +261,25 @@
                             'title'             : 'Analyse Queue',
                             'position'          : 'right',
                             'size'              : 'xs',
-                            'icon'              : 'fa-cog fa-spin',
-                            'iconHidden'        : true,
-                            'disabled'          : true
+                            'url'               : links.url('modules/q/queue/true'),
+                            'disabled'          : analyseDisabled
                         ],
                         'clear-queue'       : [
                             'title'             : 'Clear Queue',
                             'position'          : 'right',
                             'type'              : 'danger',
                             'size'              : 'xs',
-                            'disabled'          : true
+                            'disabled'          : clearDisabled
                         ]
                     ]
             ]
         )}}
     </div>
 </div>
+{% set queue = json_encode(queue, 16) %}
 {% set modules = json_encode(modules, 16) %}
 <script>
-/*global PNotify BazProgress Swal BazContentFields BazHelpers */
+/*global PNotify BazProgress Swal BazContentFields BazHelpers BazContentLoader Pace BazCore */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -367,7 +372,7 @@ dataCollectionSectionForm['funcs'] = { };
 
 dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
     $('#{{componentId}}-{{sectionId}}-modules').off('ready.jstree');
-    $('#{{componentId}}-{{sectionId}}-modules').on('ready.jstree', function() {
+    $('#{{componentId}}-{{sectionId}}-modules').on('ready.jstree', function(e) {
         dataCollectionSectionForm['vars']['rootTree'] = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {flat:true});
 
         var selected;
@@ -1203,7 +1208,22 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
         $('#{{componentId}}-{{sectionId}}-analyse-queue').click(function(e) {
             e.preventDefault();
 
-            dataCollectionSectionForm['funcs']['analyseQueue']();
+            BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-analyse-queue'), {
+                ajaxBefore                      : function () {
+                                                    Pace.restart();
+                                                    $("#baz-content").empty();
+                                                    $("#loader").attr('hidden', false);
+                                                },
+                ajaxFinished                    : function () {
+                                                    BazCore.updateBreadcrumb();
+                                                    $("#loader").attr('hidden', true);
+                                                },
+                ajaxError                       : function () {
+                                                    $("#loader").attr('hidden', true);
+                                                    BazCore.updateBreadcrumb();
+                                                }
+            });
+            // dataCollectionSectionForm['funcs']['analyseQueue']();
         });
 
         $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
@@ -1222,87 +1242,87 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
         $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
     }
 }
-dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
-    var error = false;
-    var postData = { };
-    postData[$('#security-token').attr('name')] = $('#security-token').val();
+// dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
+//     var error = false;
+//     var postData = { };
+//     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    $.post('{{links.url("modules/analyseActiveQueue")}}', postData, function(response) {
-        if (response.tokenKey && response.token) {
-            $('#security-token').attr('name', response.tokenKey);
-            $('#security-token').val(response.token);
-        }
+//     $.post('{{links.url("modules/analyseActiveQueue")}}', postData, function(response) {
+//         if (response.tokenKey && response.token) {
+//             $('#security-token').attr('name', response.tokenKey);
+//             $('#security-token').val(response.token);
+//         }
 
-        if (response.responseCode == 0) {
-            if (response.responseData && response.responseData.queueTasks && response.responseData.queueTasksCounter) {
-                var moduleHtml = '';
-                for (var q in response.responseData.queueTasks) {
-                    if (q === 'install' || q === 'uninstall' || q === 'update' || q === 'remove') {
-                        if (Object.keys(response.responseData.queueTasks[q]).length > 0) {
-                            for (var installTypes in response.responseData.queueTasks[q]) {
-                                if (Object.keys(response.responseData.queueTasks[q][installTypes]).length > 0) {
-                                    for (var installType in response.responseData.queueTasks[q][installTypes]) {
-                                        var color = 'primary';
+//         if (response.responseCode == 0) {
+//             if (response.responseData && response.responseData.queueTasks && response.responseData.queueTasksCounter) {
+//                 var moduleHtml = '';
+//                 for (var q in response.responseData.queueTasks) {
+//                     if (q === 'install' || q === 'uninstall' || q === 'update' || q === 'remove') {
+//                         if (Object.keys(response.responseData.queueTasks[q]).length > 0) {
+//                             for (var installTypes in response.responseData.queueTasks[q]) {
+//                                 if (Object.keys(response.responseData.queueTasks[q][installTypes]).length > 0) {
+//                                     for (var installType in response.responseData.queueTasks[q][installTypes]) {
+//                                         var color = 'primary';
 
-                                        if (q === 'update') {
-                                            color = 'info';
-                                        } else if (q === 'uninstall') {
-                                            color = 'warning';
-                                        } else if (q === 'remove') {
-                                            color = 'danger';
-                                        }
+//                                         if (q === 'update') {
+//                                             color = 'info';
+//                                         } else if (q === 'uninstall') {
+//                                             color = 'warning';
+//                                         } else if (q === 'remove') {
+//                                             color = 'danger';
+//                                         }
 
-                                        if (response.responseData.queueTasks[q][installTypes][installType]['error']) {
-                                            error = true;
-                                        moduleHtml +=
-                                        '       <tr class="bg-danger">';
-                                        } else {
-                                        moduleHtml +=
-                                        '       <tr>';
-                                        }
-                                        moduleHtml +=
-                                        '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['name'] + '</td>' +
-                                        '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['module_type'] + '</td>' +
-                                        '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['version'] + '</td>' +
-                                        '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['repo'] + '</td>' +
-                                        '           <td>' +  '<span class="badge badge-' + color + ' mt-1 text-xs text-uppercase">' + q + '</span></td>' +
-                                        '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>' +
-                                        '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>';
-                                        if (response.responseData.queueTasks[q][installTypes][installType]['error']) {
-                                        moduleHtml +=
-                                        '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '">Error: ' + response.responseData.queueTasks[q][installTypes][installType]['error'] + '</td>' +
-                                        '       </tr>';
-                                        } else {
-                                        moduleHtml +=
-                                        '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>' +
-                                        '       </tr>';
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (response.responseData.queueTasksCounter[q]) {
-                        $('#{{componentId}}-{{sectionId}}-queue-' + q).children('span').html(response.responseData.queueTasksCounter[q]);
-                    }
-                }
+//                                         if (response.responseData.queueTasks[q][installTypes][installType]['error']) {
+//                                             error = true;
+//                                         moduleHtml +=
+//                                         '       <tr class="bg-danger">';
+//                                         } else {
+//                                         moduleHtml +=
+//                                         '       <tr>';
+//                                         }
+//                                         moduleHtml +=
+//                                         '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['name'] + '</td>' +
+//                                         '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['module_type'] + '</td>' +
+//                                         '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['version'] + '</td>' +
+//                                         '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['repo'] + '</td>' +
+//                                         '           <td>' +  '<span class="badge badge-' + color + ' mt-1 text-xs text-uppercase">' + q + '</span></td>' +
+//                                         '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>' +
+//                                         '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>';
+//                                         if (response.responseData.queueTasks[q][installTypes][installType]['error']) {
+//                                         moduleHtml +=
+//                                         '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '">Error: ' + response.responseData.queueTasks[q][installTypes][installType]['error'] + '</td>' +
+//                                         '       </tr>';
+//                                         } else {
+//                                         moduleHtml +=
+//                                         '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>' +
+//                                         '       </tr>';
+//                                         }
+//                                     }
+//                                 }
+//                             }
+//                         }
+//                     }
+//                     if (response.responseData.queueTasksCounter[q]) {
+//                         $('#{{componentId}}-{{sectionId}}-queue-' + q).children('span').html(response.responseData.queueTasksCounter[q]);
+//                     }
+//                 }
 
-                $('#{{componentId}}-{{sectionId}}-queue-table tbody').empty().html(moduleHtml);
-                $('#{{componentId}}-{{sectionId}}-queue-analyse-modal').modal('show');
-            }
-            if (error) {
-                $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', true);
-            } else {
-                $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
-            }
-        } else {
-            PNotify.error({
-                text        : response.responseMessage,
-                textTrusted : true
-            });
-        }
-    }, 'json');
-}
+//                 $('#{{componentId}}-{{sectionId}}-queue-table tbody').empty().html(moduleHtml);
+//                 $('#{{componentId}}-{{sectionId}}-queue-analyse-modal').modal('show');
+//             }
+//             if (error) {
+//                 $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', true);
+//             } else {
+//                 $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
+//             }
+//         } else {
+//             PNotify.error({
+//                 text        : response.responseMessage,
+//                 textTrusted : true
+//             });
+//         }
+//     }, 'json');
+// }
 dataCollectionSectionForm['funcs']['clearQueue'] = function() {
     // var index;
     //This should be done via modifyQueue
@@ -1578,7 +1598,7 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
 }
 
 $(document).ready(function() {
-    BazProgress.buildProgressBar($('#installer-progress'));
+    // BazProgress.buildProgressBar($('#installer-progress'));
 
     $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').on('keyup', function() {
         var term = $(this).val();
@@ -1592,7 +1612,7 @@ $(document).ready(function() {
     });
 });
 </script>
-<div>
+{# <div>
     {{adminltetags.useTag('modal',
         [
             'component'                 : component,
@@ -1634,4 +1654,4 @@ $(document).ready(function() {
                 ]
         ]
     )}}
-</div>
+</div> #}

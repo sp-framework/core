@@ -22,8 +22,8 @@ class Repos
                 'description'       => 'Bazaari Core Repository',
                 'category'          => 'repos',
                 'provider'          => 'Gitea',
-                'in_use'            => 1,
-                'used_by'           => json_encode(['modules']),
+                'in_use'            => 0,
+                'used_by'           => json_encode([]),
                 'setup'             => 4,
                 'location'          => 'basepackages'
             ];
@@ -44,8 +44,8 @@ class Repos
                 'description'           => 'Bazaari Modules Repository',
                 'category'              => 'repos',
                 'provider'              => 'Gitea',
-                'in_use'                => 1,
-                'used_by'               => json_encode(['modules']),
+                'in_use'                => 0,
+                'used_by'               => json_encode([]),
                 'setup'                 => 4,
                 'location'              => 'basepackages'
             ];
@@ -66,8 +66,8 @@ class Repos
                 'description'           => 'Github Modules Repository',
                 'category'              => 'repos',
                 'provider'              => 'Github',
-                'in_use'                => 1,
-                'used_by'               => json_encode(['modules']),
+                'in_use'                => 0,
+                'used_by'               => json_encode([]),
                 'setup'                 => 4,
                 'location'              => 'basepackages'
             ];

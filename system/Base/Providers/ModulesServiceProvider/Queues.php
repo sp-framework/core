@@ -184,9 +184,11 @@ class Queues extends BasePackage
         }
     }
 
-    public function analyseActiveQueue()
+    public function analyseActiveQueue(&$queue = null)
     {
-        $queue = $this->getActiveQueue();
+        if (!$queue) {
+            $queue = $this->getActiveQueue();
+        }
 
         $queueTasks = [];
         $queueTasksCounter = [];

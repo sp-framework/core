@@ -190,6 +190,28 @@ class Manager extends BasePackage
             return false;
         }
 
+        $modulesManagerPackage = $this->modules->packages->getPackageByName('ModulesManager');
+
+        if (!$modulesManagerPackage) {
+            $this->addResponse('Modules Manager not found in packages, contact administrator.', 1);
+
+            return false;
+        }
+
+        if (is_string($modulesManagerPackage['settings'])) {
+            $modulesManagerPackage['settings'] = $this->helper->decode($modulesManagerPackage['settings'], true);
+        }
+
+        if (!isset($modulesManagerPackage['settings']['api_clients'])) {
+            $modulesManagerPackage['settings']['api_clients'] = [];
+        }
+
+        if (count($modulesManagerPackage['settings']['api_clients']) === 0) {
+            $this->addResponse('Modules Manager settings does not have any API clients assigned to modules.', 1);
+
+            return false;
+        }
+
         foreach ($apis as $api) {
             if ($api['in_use'] == 0) {
                 continue;
@@ -199,7 +221,9 @@ class Manager extends BasePackage
                 $api['used_by'] = $this->helper->decode($api['used_by'], true);
             }
 
-            if (!in_array('modules', $api['used_by'])) {
+            if (!in_array('modules', $api['used_by']) ||
+                !in_array($api['id'], $modulesManagerPackage['settings']['api_clients'])
+            ) {
                 continue;
             }
 
@@ -216,9 +240,9 @@ class Manager extends BasePackage
         }
 
         if (count($sortedModules) === 0) {
-            $this->addResponse('Ok', 0, ['modules' => $sortedModules]);
+            $this->addResponse('Modules Manager settings does not have any API clients assigned to modules.', 1);
 
-            return $sortedModules;
+            return false;
         }
 
         if (isset($data['api_id'])) {

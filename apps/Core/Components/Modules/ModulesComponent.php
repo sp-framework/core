@@ -24,7 +24,34 @@ class ModulesComponent extends BaseComponent
 	 */
 	public function viewAction()
 	{
+		if (isset($this->getData()['queue'])) {
+			if (isset($this->getData()['id']) && $this->getData()['id'] != 0) {
+				$queue = $this->modules->queues->getById($this->getData()['id']);
+			} else {
+				$queue = $this->modules->queues->getActiveQueue();
+			}
+
+			if (!$queue) {
+				return $this->throwIdNotFound();
+			}
+
+			$this->modules->queues->analyseActiveQueue($queue);
+
+			$this->view->queue = $queue;
+			$this->view->queueTasks = $this->modules->queues->packagesData->responseData['queueTasks'] ?? [];
+			$this->view->queueTasksCounter = $this->modules->queues->packagesData->responseData['queueTasksCounter'] ?? [];
+
+			$this->view->pick('modules/analyse');
+
+			return;
+		}
+
 		$this->view->modules = $this->modulesManager->getRepositoryModules();
+
+		if (!$this->view->modules) {
+			$this->view->modules = ['modules' => []];
+			$this->view->modulesError = $this->modulesManager->packagesData->responseMessage;
+		}
 
 		$queue = $this->modules->queues->getActiveQueue();
 
@@ -229,8 +256,11 @@ class ModulesComponent extends BaseComponent
 	public function analyseActiveQueueAction()
 	{
 		$this->requestIsPost();
-
-		$this->modules->queues->analyseActiveQueue();
+		try {
+			$this->modules->queues->analyseActiveQueue();
+		} catch (\Exception $e) {
+			trace([$e]);
+		}
 
 		$this->addResponse(
 			$this->modules->queues->packagesData->responseMessage,
