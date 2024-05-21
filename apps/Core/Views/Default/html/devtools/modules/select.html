@@ -118,6 +118,7 @@
                 'fieldBazScan'                         : true,
                 'fieldBazPostOnCreate'                 : true,
                 'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2AddDataAttrFromData'  : ['installed'],
                 'fieldDataSelect2Options'              : modules,
                 'fieldDataSelect2OptionsKey'           : 'id',
                 'fieldDataSelect2OptionsValue'         : 'display_name:app_type|name:app_type',
@@ -261,9 +262,12 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', true);
                         }
                     }
-                    // if (label === 'bundles') {
-                    //     $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', true);
-                    // }
+
+                    if ('installed' in $(e.params.data.element).data() &&
+                        $(e.params.data.element).data()['installed'] == 0
+                    ) {
+                        $('#{{componentId}}-{{sectionId}}-clone-module, #{{componentId}}-{{sectionId}}-remove-module').attr('disabled', true);
+                    }
                 });
 
                 $('#{{componentId}}-{{sectionId}}-include_core_modules').click(function() {
