@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set queueTasksCounterInstall = 0 %}
 {% set queueTasksCounterUpdate = 0 %}
 {% set queueTasksCounterUninstall = 0 %}
@@ -63,7 +63,7 @@
     </div>
 </div>
 {% set moduleHtml = '' %}
-{% set error = false %}
+{% set hasError = false %}
 {% if queueTasks|length > 0 %}
     {% for task, queueTaskModules in queueTasks %}
         {% if task === 'install' or task === 'uninstall' or task === 'update' or task === 'remove' %}
@@ -71,6 +71,7 @@
                 {% for modulesType, modules in queueTaskModules %}
                     {% if modules|length > 0 %}
                         {% for moduleId, module in modules %}
+                            {% set error = 'false' %}
                             {% set color = 'primary' %}
                             {% if task === 'update' %}
                                 {% set color = 'info' %}
@@ -81,8 +82,10 @@
                             {% endif %}
 
                             {% set errorClass = '' %}
-                            {% if module['error'] is defined %}
-                                {% set error = true %}
+                            {% if queue['results'][task][modulesType][module['name']]['analyse'] is defined and queue['results'][task][modulesType][module['name']]['analyse'] === 'fail' %}
+                                {% set module['id'] = module['name'] %}
+                                {% set hasError = true %}
+                                {% set error = 'true' %}
                                 {% set errorClass = ' class="bg-danger"' %}
                             {% endif %}
 
@@ -92,10 +95,10 @@
                             '           <td>' ~  module['version'] ~ '</td>' ~
                             '           <td>' ~  module['repo'] ~ '</td>' ~
                             '           <td>' ~  '<span class="badge badge-' ~ color ~ ' mt-1 text-xs text-uppercase">' ~ task ~ '</span></td>' ~
-                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' ~ module['id'] ~ '"></td>' ~
-                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' ~ module['id'] ~ '"></td>' ~
+                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' ~ module['id'] ~ '">-</td>' ~
+                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' ~ module['id'] ~ '">-</td>' ~
                             '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' ~ module['id'] ~ '">' ~
-                            '               <a href="#" type="button" data-id="' ~ module['id'] ~ '" class="ml-1 mr-1 text-white btn btn-info btn-xs">' ~
+                            '               <a href="#" type="button" data-error="' ~ error ~ '" data-task="' ~ task ~ '" data-moduletype="' ~ modulesType ~ '" data-id="' ~ module['id'] ~ '" class="ml-1 mr-1 text-white btn btn-info btn-xs viewLogs">' ~
                             '                   <i class="fas fa-fw fa-xs fa-eye"></i>' ~
                             '               </a>' ~
                             '           </td>' ~
@@ -199,9 +202,37 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
 }
 
 dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
-    $('#{{componentId}}-{{sectionId}}-perform-precheck, ' +
-      '#{{componentId}}-{{sectionId}}-process-queue'
-      ).off();
+    if (dataCollectionSectionForm['vars']['queue']['status'] === 0) {
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-result-queue').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-result-queue').attr('disabled', true);
+    } else if (dataCollectionSectionForm['vars']['queue']['status'] === 1) {
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-result-queue').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-result-queue').attr('disabled', true);
+    } else if (dataCollectionSectionForm['vars']['queue']['status'] === 2) {
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-result-queue').attr('hidden', false);
+        $('#{{componentId}}-{{sectionId}}-result-queue').attr('disabled', false);
+    }
+
+    if (dataCollectionSectionForm['vars']['hasError']) {
+        $('#{{componentId}}-{{sectionId}}-perform-precheck, ' +
+          '#{{componentId}}-{{sectionId}}-process-queue, ' +
+          '#{{componentId}}-{{sectionId}}-result-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-perform-precheck, ' +
+          '#{{componentId}}-{{sectionId}}-process-queue, ' +
+          '#{{componentId}}-{{sectionId}}-result-queue').attr('hidden', true);
+    }
 
     $('#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
         e.preventDefault();
@@ -223,6 +254,9 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
         });
     });
 
+    $('#{{componentId}}-{{sectionId}}-perform-precheck, ' +
+      '#{{componentId}}-{{sectionId}}-process-queue'
+      ).off();
     $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
         e.preventDefault();
 
@@ -234,8 +268,25 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
 
         dataCollectionSectionForm['funcs']['processQueue']('process');
     });
+
+    $('.viewLogs').off();
+    $('.viewLogs').click(function(e) {
+        e.preventDefault();
+
+        var html = '<strong class="text-uppercase">Logs: </strong>' +
+            BazHelpers.createHtmlList({'obj': dataCollectionSectionForm['vars']['queue']['results'][$(this).data()['task']][$(this).data()['moduletype']][$(this).data()['id']]});
+
+        $('#{{componentId}}-{{sectionId}}-queue-logs').empty().html(html);
+        $('#{{componentId}}-{{sectionId}}-queue-logs-modal').modal('show');
+    });
 }
-dataCollectionSectionForm['funcs']['initQueueButtons']();
+$(document).ready(function() {
+    BazProgress.buildProgressBar($('#installer-progress'));
+
+    dataCollectionSectionForm['vars']['hasError'] = BazHelpers.stringToBoolean("{{hasError}}");
+
+    dataCollectionSectionForm['funcs']['initQueueButtons']();
+});
 </script>
 <div>
     {{adminltetags.useTag('modal',
@@ -253,3 +304,4 @@ dataCollectionSectionForm['funcs']['initQueueButtons']();
         ]
     )}}
 </div>
+<!-- htmlmin:ignore -->

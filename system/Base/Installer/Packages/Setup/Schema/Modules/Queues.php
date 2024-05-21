@@ -28,7 +28,7 @@ class Queues
                         ]
                     ),
                     new Column(
-                        'analysed_at',
+                        'prechecked_at',
                         [
                             'type'    => Column::TYPE_VARCHAR,
                             'size'    => 100,
@@ -36,7 +36,7 @@ class Queues
                         ]
                     ),
                     new Column(
-                        'analysed_by',
+                        'prechecked_by',
                         [
                             'type'    => Column::TYPE_INTEGER,
                             'notNull' => false,

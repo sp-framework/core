@@ -10,9 +10,9 @@ class ServiceProviderModulesQueues extends BaseModel
 
     public $status;
 
-    public $analysed_at;
+    public $prechecked_at;
 
-    public $analysed_by;
+    public $prechecked_by;
 
     public $processed_at;
 

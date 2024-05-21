@@ -32,7 +32,7 @@ class Queues extends BasePackage
     protected function addActiveQueue()
     {
         $queue = [
-            'status' => 0,
+            'status' => 0,//1 - pre-checked, 2 - processed
             'tasks'     => $this->helper->encode(
                 [
                     'install'   => [],
@@ -153,6 +153,9 @@ class Queues extends BasePackage
             $this->addResponse('Added to queue', 0, ['queue' => $queue]);
         }
 
+        $queue['prechecked_at'] = null;
+        $queue['prechecked_by'] = null;
+
         if ($this->update($queue)) {
             return true;
         }
@@ -192,10 +195,14 @@ class Queues extends BasePackage
 
         $queueTasks = [];
         $queueTasksCounter = [];
+        $results = [];
 
         foreach ($queue['tasks'] as $taskName => $tasks) {
             if (!isset($queueTasks[$taskName])) {
                 $queueTasks[$taskName] = [];
+            }
+            if (!isset($results[$taskName])) {
+                $results[$taskName] = [];
             }
 
             if (count($tasks) === 0) {
@@ -205,6 +212,13 @@ class Queues extends BasePackage
             }
 
             foreach ($tasks as $moduleType => $moduleIds) {
+                if (!isset($queueTasks[$taskName][$moduleType])) {
+                    $queueTasks[$taskName][$moduleType] = [];
+                }
+                if (!isset($results[$taskName][$moduleType])) {
+                    $results[$taskName][$moduleType] = [];
+                }
+
                 foreach ($moduleIds as $moduleIdKey => $moduleId) {
                     $moduleMethod = 'get' . ucfirst(substr($moduleType, 0, -1)) . 'ById';
                     $module = $this->modules->$moduleType->$moduleMethod($moduleId);
@@ -218,6 +232,12 @@ class Queues extends BasePackage
                                 $queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $module['module_type'];
                                 $queueTasks[$taskName][$moduleType][$module['id']]['version'] = $module['version'];
                                 $queueTasks[$taskName][$moduleType][$module['id']]['repo'] = $module['repo'];
+                                $results[$taskName][$moduleType][$module['id']]['analyse'] = 'pass';
+                                $results[$taskName][$moduleType][$module['id']]['analyse_errors'] = '-';
+                                $results[$taskName][$moduleType][$module['id']]['precheck'] = '-';
+                                $results[$taskName][$moduleType][$module['id']]['precheck_errors'] = '-';
+                                $results[$taskName][$moduleType][$module['id']]['result'] = '-';
+                                $results[$taskName][$moduleType][$module['id']]['result_errors'] = '-';
                             }
                         } else {
                             if (isset($module['bundle_modules'])) {
@@ -242,13 +262,25 @@ class Queues extends BasePackage
                                                 $queueTasks[$taskName][$bundleType][$bundleModule['id']]['module_type'] = 'apptype';
                                                 $queueTasks[$taskName][$bundleType][$bundleModule['id']]['version'] = $bundleModule['version'];
                                                 $queueTasks[$taskName][$bundleType][$bundleModule['id']]['repo'] = $bundleModule['repo'];
+                                                $results[$taskName][$bundleType][$bundleModule['id']]['analyse'] = 'pass';
+                                                $results[$taskName][$bundleType][$bundleModule['id']]['analyse_errors'] = '-';
+                                                $results[$taskName][$bundleType][$bundleModule['id']]['precheck'] = '-';
+                                                $results[$taskName][$bundleType][$bundleModule['id']]['precheck_errors'] = '-';
+                                                $results[$taskName][$bundleType][$bundleModule['id']]['result'] = '-';
+                                                $results[$taskName][$bundleType][$bundleModule['id']]['result_errors'] = '-';
+
                                             } else {
                                                 $queueTasks[$taskName][$bundleType][0]['id'] = '0';
                                                 $queueTasks[$taskName][$bundleType][0]['name'] = $bundles['name'];
                                                 $queueTasks[$taskName][$bundleType][0]['module_type'] = 'apptype';
                                                 $queueTasks[$taskName][$bundleType][0]['version'] = $bundles['version'];
                                                 $queueTasks[$taskName][$bundleType][0]['repo'] = $bundles['repo'];
-                                                $queueTasks[$taskName][$bundleType][0]['error'] = 'Not Found';
+                                                $results[$taskName][$bundleType][$bundles['name']]['analyse'] = 'fail';
+                                                $results[$taskName][$bundleType][$bundles['name']]['analyse_errors'] = 'Bundle module not found in local system.';
+                                                $results[$taskName][$bundleType][$bundles['name']]['precheck'] = '-';
+                                                $results[$taskName][$bundleType][$bundles['name']]['precheck_errors'] = '-';
+                                                $results[$taskName][$bundleType][$bundles['name']]['result'] = '-';
+                                                $results[$taskName][$bundleType][$bundles['name']]['result_errors'] = '-';
                                             }
                                         } else if ($bundleType === 'core') {
                                             $bundleModule = $this->modules->packages->getPackageByRepo($bundles['repo']);
@@ -260,6 +292,12 @@ class Queues extends BasePackage
                                                     $queueTasks['update']['packages'][$bundleModule['id']]['module_type'] = $bundleModule['module_type'];
                                                     $queueTasks['update']['packages'][$bundleModule['id']]['version'] = $bundleModule['version'] . ' -> ' . $bundleModule['update_version'];
                                                     $queueTasks['update']['packages'][$bundleModule['id']]['repo'] = $bundleModule['repo'];
+                                                    $results['update']['packages'][$bundleModule['id']]['analyse'] = 'pass';
+                                                    $results['update']['packages'][$bundleModule['id']]['analyse_errors'] = '-';
+                                                    $results['update']['packages'][$bundleModule['id']]['precheck'] = '-';
+                                                    $results['update']['packages'][$bundleModule['id']]['precheck_errors'] = '-';
+                                                    $results['update']['packages'][$bundleModule['id']]['result'] = '-';
+                                                    $results['update']['packages'][$bundleModule['id']]['result_errors'] = '-';
                                                 }
                                             }
                                         } else {
@@ -276,6 +314,12 @@ class Queues extends BasePackage
                                                         $queueTasks[$taskName][$bundleType][$bundleModule['id']]['module_type'] = $bundleModule['module_type'];
                                                         $queueTasks[$taskName][$bundleType][$bundleModule['id']]['version'] = $bundleModule['version'];
                                                         $queueTasks[$taskName][$bundleType][$bundleModule['id']]['repo'] = $bundleModule['repo'];
+                                                        $results[$taskName][$bundleType][$bundleModule['id']]['analyse'] = 'pass';
+                                                        $results[$taskName][$bundleType][$bundleModule['id']]['analyse_errors'] = '-';
+                                                        $results[$taskName][$bundleType][$bundleModule['id']]['precheck'] = '-';
+                                                        $results[$taskName][$bundleType][$bundleModule['id']]['precheck_errors'] = '-';
+                                                        $results[$taskName][$bundleType][$bundleModule['id']]['result'] = '-';
+                                                        $results[$taskName][$bundleType][$bundleModule['id']]['result_errors'] = '-';
                                                     }
                                                 } else {
                                                     $queueTasks[$taskName][$bundleType][$bundleKey]['id'] = '0';
@@ -283,7 +327,12 @@ class Queues extends BasePackage
                                                     $queueTasks[$taskName][$bundleType][$bundleKey]['module_type'] = $bundleType;
                                                     $queueTasks[$taskName][$bundleType][$bundleKey]['version'] = $bundle['version'];
                                                     $queueTasks[$taskName][$bundleType][$bundleKey]['repo'] = $bundle['repo'];
-                                                    $queueTasks[$taskName][$bundleType][$bundleKey]['error'] = 'Not Found';
+                                                    $results[$taskName][$bundleType][$bundle['name']]['analyse'] = 'fail';
+                                                    $results[$taskName][$bundleType][$bundle['name']]['analyse_errors'] = 'Bundle module not found in local system.';
+                                                    $results[$taskName][$bundleType][$bundle['name']]['precheck'] = '-';
+                                                    $results[$taskName][$bundleType][$bundle['name']]['precheck_errors'] = '-';
+                                                    $results[$taskName][$bundleType][$bundle['name']]['result'] = '-';
+                                                    $results[$taskName][$bundleType][$bundle['name']]['result_errors'] = '-';
                                                 }
                                             }
                                         }
@@ -302,6 +351,12 @@ class Queues extends BasePackage
                                 $queueTasks[$taskName][$moduleType][$module['id']]['version'] = $module['version'] . ' -> ' . $module['update_version'];
                             }
                             $queueTasks[$taskName][$moduleType][$module['id']]['repo'] = $module['repo'];
+                            $results[$taskName][$moduleType][$module['id']]['analyse'] = 'pass';
+                            $results[$taskName][$moduleType][$module['id']]['analyse_errors'] = '-';
+                            $results[$taskName][$moduleType][$module['id']]['precheck'] = '-';
+                            $results[$taskName][$moduleType][$module['id']]['precheck_errors'] = '-';
+                            $results[$taskName][$moduleType][$module['id']]['result'] = '-';
+                            $results[$taskName][$moduleType][$module['id']]['result_errors'] = '-';
                         }
                     }
                 }
@@ -311,6 +366,7 @@ class Queues extends BasePackage
         }
 
         $queue['tasks_count'] = $queueTasksCounter;
+        $queue['results'] = $results;
 
         if ($this->update($queue)) {
             $this->addResponse('Analysed Queue', 0, ['queueTasks' => $queueTasks, 'queueTasksCounter' => $queueTasksCounter]);
