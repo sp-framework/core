@@ -1190,7 +1190,7 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
 
 dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
     if (init) {
-        $('#{{componentId}}-{{sectionId}}-analyse-queue').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-analyse-queue').removeClass('disabled');
         $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', false);
 
         $('#{{componentId}}-{{sectionId}}-analyse-queue, ' +
@@ -1236,7 +1236,7 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
         //     dataCollectionSectionForm['funcs']['processQueue']('process');
         // });
     } else {
-        $('#{{componentId}}-{{sectionId}}-analyse-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-analyse-queue').addClass('disabled');
         $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
     }
 }

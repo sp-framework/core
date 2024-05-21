@@ -414,6 +414,31 @@ class ApiClientServices extends BasePackage
         return $apis;
     }
 
+    public function getApiByRepoUrl($url, $getApiClientServiceInfo = true)
+    {
+        $this->getAll();
+
+        foreach ($this->apiClientServices as $api) {
+            if ($api['category'] === strtolower('repos')) {
+                $this->switchApiModel($api);
+
+                $apiData = $this->getById($api['api_category_id'], false, false);
+
+                if ($apiData && isset($apiData['repo_url']) && $apiData['repo_url'] === $url) {
+                    if ($getApiClientServiceInfo) {
+                        $api['api_category'] = $apiData;
+
+                        return $api;
+                    }
+
+                    return $apiData;
+                }
+            }
+        }
+
+        return false;
+    }
+
     protected function encryptPassToken(array $data)
     {
         if (isset($data['auth_type'])) {

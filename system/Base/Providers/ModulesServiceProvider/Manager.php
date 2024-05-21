@@ -402,7 +402,6 @@ class Manager extends BasePackage
                 return true;
             }
         } catch (ClientException | \throwable $e) {
-            trace([$e]);
             $this->addResponse($e->getMessage(), 1);
 
             return false;
@@ -429,7 +428,9 @@ class Manager extends BasePackage
             $this->addResponse($e->getMessage(), 1);
 
             if ($e->getCode() === 401) {
-                $this->addResponse('API Authentication failed!', 1);
+                $this->addResponse('API Authentication failed.', 1);
+            } else if (str_contains($e->getMessage(), 'Connection timed out')) {
+                $this->addResponse('Error connecting to the repository.', 1);
             }
 
             return false;
