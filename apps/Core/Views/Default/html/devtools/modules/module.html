@@ -3000,10 +3000,12 @@ dataCollectionSection =
                   '#{{componentId}}-{{sectionId}}-dependencies-external-add').click(function(e) {
                     e.preventDefault();
 
-                    if ($('#{{componentId}}-{{sectionId}}-dependencies-external-version').val() === '') {
-                        $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val('^0');
-                    } else if (!$('#{{componentId}}-{{sectionId}}-dependencies-external-version').val().startsWith('^')) {
-                        $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val('^' + $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val());
+                    if ($('#{{componentId}}-{{sectionId}}-dependencies-external-version').length > 0) {
+                        if ($('#{{componentId}}-{{sectionId}}-dependencies-external-version').val() === '') {
+                            $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val('^0');
+                        } else if (!$('#{{componentId}}-{{sectionId}}-dependencies-external-version').val().startsWith('^')) {
+                            $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val('^' + $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val());
+                        }
                     }
 
                     var found = false;
@@ -3046,7 +3048,7 @@ dataCollectionSection =
                                 if (!found) {
                                     if (modules === 'views' && dataCollectionSectionForm['vars']['module_type'] === 'views') {
                                         if (dataCollectionSectionForm['vars']['modules'][modules][moduleData['id']]['base_view_module_id'] != '0') {
-                                            PNotify.error({'text': 'Only base view modules can be a view dependency'});
+                                            PNotify.error({'text': 'Only non base view modules can be a view dependency'});
 
                                             reset();
 

@@ -143,7 +143,7 @@ class DevtoolsModules extends BasePackage
 
         try {
             if ($this->modules->{$data['module_type']}->add($data) &&
-                $this->updateModuleJson($data) &&
+                $this->updateModuleJson($data, false, true) &&
                 $this->generateNewFiles($data)
             ) {
                 if ($data['createrepo'] == true) {
@@ -278,7 +278,7 @@ class DevtoolsModules extends BasePackage
                 $module = array_merge($module, $data);
 
                 if ($this->modules->{$data['module_type']}->update($module) &&
-                    $this->updateModuleJson($data)
+                    $this->updateModuleJson($data, false, true)
                 ) {
                     if ($data['module_type'] === 'components') {
                         $this->addUpdateComponentMenu($data);
@@ -300,17 +300,41 @@ class DevtoolsModules extends BasePackage
                     }
 
                     if ($data['createrepo'] == true && strtolower($data['name']) !== 'core') {
-                        if (!$this->checkRepo($data)) {
-                            $newRepo = $this->createRepo($data);
+                        if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {//Create public repository as well
+                            if (!$this->checkRepo($data)) {
+                                $newRepo['base'] = $this->createRepo($data);
+                            }
+
+                            $data['repo'] = $data['repo'] . '-public';
+                            if (!$this->checkRepo($data)) {
+                                $newRepo['public'] = $this->createRepo($data);
+                            }
 
                             $this->addResponse('Module updated & created new repo.',
                                                0,
                                                [
+                                                'newFiles'  => $this->newFiles,
+                                                'newDirs'   => $this->newDirs,
                                                 'newRepo'   => $newRepo
                                                ]
                                             );
 
                             return;
+                        } else {
+                            if (!$this->checkRepo($data)) {
+                                $newRepo = $this->createRepo($data);
+
+                                $this->addResponse('Module updated & created new repo.',
+                                                   0,
+                                                   [
+                                                    'newFiles'  => $this->newFiles,
+                                                    'newDirs'   => $this->newDirs,
+                                                    'newRepo'   => $newRepo
+                                                   ]
+                                                );
+
+                                return;
+                            }
                         }
                     }
 
@@ -657,7 +681,7 @@ class DevtoolsModules extends BasePackage
         try {
             $this->localContent->write($jsonFile, $jsonContent);
 
-            if ($viewPublic) {
+            if ($data['module_type'] === 'views' && $viewPublic) {
                 $jsonFile = $this->getNewFilesLocation($data, true);
 
                 if (!str_contains($data['repo'], '-public')) {
@@ -2025,7 +2049,11 @@ $file .= '
             } else {
                 $reposArr = [$module['repo']];
 
-                $fileLocation = explode('/Install/', $this->getModuleJsonFileLocation($module));
+                if ($data['module_type'] === 'views') {
+                    $fileLocation = explode('/Default/', $this->getModuleJsonFileLocation($module));
+                } else {
+                    $fileLocation = explode('/Install/', $this->getModuleJsonFileLocation($module));
+                }
 
                 if (count($fileLocation) > 1) {
                     $fileLocation = $data['module_type'] === 'views' ? 'view.json' : 'Install/' . $fileLocation[1];
@@ -2123,8 +2151,8 @@ $file .= '
 
         if (isset($data['module_type']) &&
             $data['module_type'] === 'views' &&
-            isset($data['base_view_module_id']) &&
-            $data['base_view_module_id'] == 0
+            isset($module['base_view_module_id']) &&
+            $module['base_view_module_id'] == 0
         ) {
             array_push($reposArr, $module['repo'] . '-public');
         }
