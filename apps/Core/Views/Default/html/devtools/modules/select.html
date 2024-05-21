@@ -266,7 +266,10 @@ dataCollectionSection =
                     if ('installed' in $(e.params.data.element).data() &&
                         $(e.params.data.element).data()['installed'] == 0
                     ) {
-                        $('#{{componentId}}-{{sectionId}}-clone-module, #{{componentId}}-{{sectionId}}-remove-module').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-clone-module, ' +
+                          '#{{componentId}}-{{sectionId}}-edit-module, ' +
+                          '#{{componentId}}-{{sectionId}}-generate-new-release, ' +
+                          '#{{componentId}}-{{sectionId}}-commit-bundle-json').attr('disabled', true);
                     }
                 });
 
