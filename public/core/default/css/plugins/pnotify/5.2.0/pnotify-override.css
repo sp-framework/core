@@ -2,3 +2,18 @@
     top: 5px;
     position: relative;
 }
+.bootstrap4-paginate-previous {
+    margin-left: 10px;
+    margin-right: 2px;
+}
+.bootstrap4-paginate-previous:after {
+  content: '\f0d9';
+  font-family: FontAwesome;
+}
+.bootstrap4-paginate-next {
+    margin-left: 2px;
+}
+.bootstrap4-paginate-next:after {
+  content: '\f0da';
+  font-family: FontAwesome;
+}
