@@ -77,7 +77,7 @@
     )}}
 </div>
 <script>
-/* globals showPaginate GridStack Swal */
+/* globals paginatedPNotify GridStack Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -169,12 +169,12 @@ dataCollectionSection =
                             grid.enableResize(false);
                         } else {
                             $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
-                            showPaginate('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
+                            paginatedPNotify('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
                         }
                     } else if (response.responseCode === 1) {
-                        showPaginate('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
+                        paginatedPNotify('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
                     } else if (response.responseCode === 2) {
-                        showPaginate('error', {'text' : response.responseMessage});
+                        paginatedPNotify('error', {'text' : response.responseMessage});
                         $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
                     }
                     $('#{{componentId}}-{{sectionId}}-dashboard-loader').attr('hidden', true);
@@ -242,7 +242,7 @@ dataCollectionSection =
                                 }
 
                                 if (response.responseCode === 0) {
-                                    showPaginate('success', {'text' : response.responseMessage});
+                                    paginatedPNotify('success', {'text' : response.responseMessage});
 
                                     if ($(gridWidget).data('method')) {
                                         var widgetJstreeId =  $('li').find('[data-method="' + $(gridWidget).data('method') + '"]')[0].id;
@@ -369,7 +369,7 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode === 0) {
-                            showPaginate('success', {'text' : response.responseMessage});
+                            paginatedPNotify('success', {'text' : response.responseMessage});
 
                             addWidgetToGrid(response.responseData);
                             $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', true);
@@ -383,11 +383,11 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-widget-info').empty();
                             $('#{{componentId}}-{{sectionId}}-widget-no-widgets').attr('hidden', false);
                         } else {
-                            showPaginate('error', {'text' : response.responseMessage});
+                            paginatedPNotify('error', {'text' : response.responseMessage});
                         }
                     }, 'json');
                 } else {
-                    showPaginate('error', {
+                    paginatedPNotify('error', {
                         'title' : 'Please select 1 widget to add.'
                     });
                 }
@@ -456,9 +456,9 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode === 0) {
-                            showPaginate('success', {'text' : response.responseMessage});
+                            paginatedPNotify('success', {'text' : response.responseMessage});
                         } else if (response.responseCode === 1) {
-                            showPaginate('error', {'text' : response.responseMessage});
+                            paginatedPNotify('error', {'text' : response.responseMessage});
                         }
                     }, 'json');
                 }
