@@ -26,6 +26,8 @@ class ModulesViews extends BaseModel
 
     public $base_view_module_id;
 
+    public $is_subview;
+
     public $repo;
 
     public $settings;

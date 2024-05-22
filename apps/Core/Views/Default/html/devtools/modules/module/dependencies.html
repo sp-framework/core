@@ -82,6 +82,34 @@
                             ]
                         )}}
                     </div>
+                    <div class="col">
+                        {% set subviewChecked = false %}
+                        {% if subview is defined and subview === true %}
+                            {% set subviewChecked = true %}
+                        {% endif %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'is_subview',
+                                'fieldLabel'                     : 'is Subview?',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'is view module subview. checkbox should be automatically checked via script.',
+                                'fieldRequired'                  : true,
+                                'fieldDisabled'                  : true,
+                                'fieldHidden'                    : false,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxChecked'           : subviewChecked,
+                                'fieldCheckboxType'              : 'primary',
+                                'fieldBazJstreeSearch'           : false,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldBazScan'                   : true
+                            ]
+                        )}}
+                    </div>
                 {% endif %}
             </div>
             <div id="selected-module-information" hidden>

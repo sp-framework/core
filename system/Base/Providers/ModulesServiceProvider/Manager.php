@@ -646,16 +646,20 @@ class Manager extends BasePackage
                                 )
                             ) {
                                 $registerRemotePackage['base_view_module_id'] = 0;
+                                $registerRemotePackage['is_subview'] = false;
                             } else if (count($registerRemotePackage['dependencies']['views']) === 1) {
                                 $baseView = $this->modules->views->getViewByRepo($registerRemotePackage['dependencies']['views'][0]['repo']);
 
                                 if ($baseView) {//Add Baseview ID here or during installation.
                                     $registerRemotePackage['base_view_module_id'] = $baseView['id'];
+                                    $registerRemotePackage['is_subview'] = true;
                                 } else {
                                     $registerRemotePackage['base_view_module_id'] = 0;
+                                    $registerRemotePackage['is_subview'] = false;
                                 }
                             } else {
                                 $registerRemotePackage['base_view_module_id'] = 0;
+                                $registerRemotePackage['is_subview'] = false;
                             }
                         }
 

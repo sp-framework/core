@@ -1571,7 +1571,10 @@ dataCollectionSection =
 
                     if (dataCollectionSectionForm['vars']['subview'] == true) {
                         postData['base_view_module_id'] = $('#{{componentId}}-{{sectionId}}-base_view_module_id').val();
-                        postData['subview'] = true;
+                        postData['is_subview'] = true;
+                    } else {
+                        postData['base_view_module_id'] = '0';
+                        postData['is_subview'] = false;
                     }
 
                     $.post('{{links.url("devtools/modules/generateModuleRepoUrl")}}', postData, function(response) {
@@ -3131,6 +3134,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-dependencies-external'                   : { },
         '{{componentId}}-{{sectionId}}-base_view_module_id'                     : { },
         '{{componentId}}-{{sectionId}}-base_view_module'                        : { },
+        '{{componentId}}-{{sectionId}}-is_subview'                              : { },
         '{{componentId}}-{{sectionId}}-dependencies-external-version'           : { },
         '{{componentId}}-{{sectionId}}-release-notes'                           : { },
         '{{componentId}}-{{sectionId}}-release-version'                         : {

@@ -2819,7 +2819,7 @@ $file .= '
                 $this->validation->add('category', PresenceOf::class, ["message" => "Please provide category."]);
             }
 
-            if ($data['module_type'] === 'views' && isset($data['subview']) && $data['subview'] == 'true') {
+            if ($data['module_type'] === 'views' && isset($data['is_subview']) && $data['is_subview'] == 'true') {
                 $this->validation->add('base_view_module_id', PresenceOf::class, ["message" => "Please provide main view module id."]);
             }
 
@@ -2835,7 +2835,7 @@ $file .= '
                 return false;
             }
 
-            if ($data['module_type'] === 'views' && isset($data['subview']) && $data['subview'] == 'true') {
+            if ($data['module_type'] === 'views' && isset($data['is_subview']) && $data['is_subview'] == 'true') {
                 $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
             }
 
