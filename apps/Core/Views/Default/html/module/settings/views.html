@@ -15,7 +15,7 @@
     </div>
 </div>
 <script>
-/*global PNotify */
+/*global paginatedPNotify */
 $('#modal-save').click(function() {
     var postData = { };
 
@@ -36,7 +36,7 @@ $('#modal-save').click(function() {
         if (data.responseCode === 0) {
             location.reload();
         } else {
-            PNotify.error({
+            paginatedPNotify('error', {
                 text        : data.responseMessage,
                 textTrusted : true
             });

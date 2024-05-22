@@ -71,7 +71,7 @@
     ]
 )}}
 <script>
-/* globals Swal PNotify BazContentLoader BazCore */
+/* globals Swal paginatedPNotify BazContentLoader BazCore */
 window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
     initFuncs();
 }
@@ -110,7 +110,7 @@ $('.process-queue').click(function(e) {
             if (response.responseCode === 0) {
                 window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     title           : response.responseMessage,
                 });
             }
@@ -150,7 +150,7 @@ function initFuncs() {
                     if (response.responseCode === 0) {
                         window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
                     } else {
-                        PNotify.error({
+                        paginatedPNotify('error', {
                             title           : response.responseMessage,
                         });
                     }
@@ -188,7 +188,7 @@ function initFuncs() {
                     if (response.responseCode === 0) {
                         window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
                     } else {
-                        PNotify.error({
+                        paginatedPNotify('error', {
                             title           : response.responseMessage,
                         });
                     }

@@ -118,7 +118,7 @@
     ]
 )}}
 <script>
-/* globals Swal PNotify BazCore BazNotifications */
+/* globals Swal paginatedPNotify BazCore BazNotifications */
 window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
     initFuncs();
     mark();
@@ -199,7 +199,7 @@ function mark() {
                     window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
                     BazNotifications.getNotificationsCount();
                 } else {
-                    PNotify.error({
+                    paginatedPNotify('error', {
                         title           : response.responseMessage,
                     });
                     $('#{{componentId}}-listing-mark').attr('disabled', false);
@@ -264,7 +264,7 @@ function initFuncs() {
                         window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
                         BazNotifications.getNotificationsCount();
                     } else {
-                        PNotify.error({
+                        paginatedPNotify('error', {
                             title           : response.responseMessage,
                         });
                     }
@@ -299,7 +299,7 @@ function initFuncs() {
                         window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
                         BazNotifications.getNotificationsCount();
                     } else {
-                        PNotify.error({
+                        paginatedPNotify('error', {
                             title           : response.responseMessage,
                         });
                     }
@@ -343,7 +343,7 @@ $('#{{componentId}}-listing-mute').click(function(e) {
             $('#{{componentId}}-listing-unmute').attr('hidden', false);
             $('#notifications-button').children('i').removeClass('fa-bell').addClass('fa-bell-slash');
         } else {
-            PNotify.error({
+            paginatedPNotify('error', {
                 title           : response.responseMessage,
             });
         }
@@ -372,7 +372,7 @@ $('#{{componentId}}-listing-unmute').click(function(e) {
             $('#notifications-button').children('i').removeClass('fa-bell-slash').addClass('fa-bell');
             BazNotifications.getNotificationsCount();
         } else {
-            PNotify.error({
+            paginatedPNotify('error', {
                 title           : response.responseMessage,
             });
         }

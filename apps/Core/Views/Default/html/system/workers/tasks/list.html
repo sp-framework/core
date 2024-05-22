@@ -48,7 +48,7 @@
     ]
 )}}
 <script>
-/* globals Swal PNotify BazContentLoader BazNotifications */
+/* globals Swal paginatedPNotify BazContentLoader BazNotifications */
 window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
     initFuncs();
     BazContentLoader.init();
@@ -97,11 +97,11 @@ function initFuncs() {
                 success     : function(response) {
                     if (response.responseCode === 0) {
                         window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
-                        PNotify.success({
+                        paginatedPNotify('success', {
                             title           : response.responseMessage,
                         });
                     } else {
-                        PNotify.error({
+                        paginatedPNotify('error', {
                             title           : response.responseMessage,
                         });
                     }

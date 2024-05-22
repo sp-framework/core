@@ -405,7 +405,7 @@
     </fieldset>
 </form>
 <script>
-/* globals PNotify Swal */
+/* globals paginatedPNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -495,12 +495,12 @@ dataCollectionSection =
                         data        : dataToSend,
                         success     : function(response) {
                             if (response.responseCode === 0) {
-                                PNotify.success({title : response.responseMessage});
+                                paginatedPNotify('success', {title : response.responseMessage});
                                 if (response.responseData && response.responseData.murl) {
                                     $('#{{componentId}}-{{sectionId}}-murl').val(response.responseData.murl);
                                 }
                             } else {
-                                PNotify.error({title : response.responseMessage});
+                                paginatedPNotify('error', {title : response.responseMessage});
                             }
 
                             if (response.tokenKey && response.token) {

@@ -317,7 +317,7 @@
 {% set allMenuItems = json_encode(menuBaseStructure, 16) %}
 {% set enabledMenuItems = json_encode(app['menu_structure'], 16) %}
 <script>
-/* globals Sortable BazHelpers PNotify Swal */
+/* globals Sortable BazHelpers paginatedPNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -792,7 +792,7 @@ dataCollectionSection =
                         var selectedNode = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_selected(true);
 
                         if (selectedNode[0].children.length > 0) {
-                            PNotify.notice({
+                            paginatedPNotify('notice', {
                                 title: 'Menu item cannot deleted as it has sub menu items. Delete them first.'
                             });
                         } else {
@@ -889,7 +889,7 @@ dataCollectionSection =
 
                             if (nodeData['data']['sub_menu'] && nodeData['data']['sub_menu'] === true) {
                                 if (!isSubmenu && nodeData.children.length > 0) {
-                                    PNotify.notice({
+                                    paginatedPNotify('notice', {
                                         title: 'Menu item cannot be converted to link as its a sub menu.'
                                     });
                                     return;
@@ -897,7 +897,7 @@ dataCollectionSection =
                             }
 
                             if (checkDuplicate(nodeId, parent, title)) {
-                                PNotify.notice({
+                                paginatedPNotify('notice', {
                                     title: 'Duplicate title!'
                                 });
                                 return;
@@ -929,7 +929,7 @@ dataCollectionSection =
                             }
                         } else {
                             if (checkDuplicate(nodeId, parent, title)) {
-                                PNotify.notice({
+                                paginatedPNotify('notice', {
                                     title: 'Duplicate title!'
                                 });
                                 return;

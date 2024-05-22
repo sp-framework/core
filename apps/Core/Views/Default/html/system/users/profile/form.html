@@ -125,7 +125,7 @@
     </div>
 </div>
 <script>
-/* globals BazContentFieldsValidator PNotify autoComplete fixGrid Inputmask Swal */
+/* globals BazContentFieldsValidator paginatedPNotify autoComplete fixGrid Inputmask Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -214,7 +214,7 @@ function getPasswordApiFields() {
 
                     $.post('{{links.url("system/api/server/clients/generateclientkeys")}}', postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success(response.responseMessage);
+                            paginatedPNotify('success', response.responseMessage);
 
                             if (response.responseData && response.responseData.client_id && response.responseData.client_secret) {
                                 $('#{{componentId}}-{{sectionId}}-api_client_id_' + passwordApi['id']).val(response.responseData.client_id);
@@ -226,7 +226,7 @@ function getPasswordApiFields() {
                             $('#{{componentId}}-{{sectionId}}-generate-api-client-keys-' + passwordApi['id']).attr('hidden', true);
                             $('#{{componentId}}-{{sectionId}}-regenerate-api-client-keys-' + passwordApi['id']).attr('hidden', false);
                         } else {
-                            PNotify.error(response.responseMessage);
+                            paginatedPNotify('error', response.responseMessage);
                         }
 
                         if (response.tokenKey && response.token) {

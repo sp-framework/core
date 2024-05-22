@@ -72,7 +72,7 @@
     </div>
 </div>
 <script>
-/* globals PNotify */
+/* globals paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -175,7 +175,7 @@ dataCollectionSection =
                                     $('#security-token').val(response.token);
                                 }
                             } else {
-                                PNotify.error({
+                                paginatedPNotify('error', {
                                     'title' : response.responseMessage
                                 });
                             }

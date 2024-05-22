@@ -371,7 +371,7 @@
     </div>
     {% set allMenuItems = json_encode(menuBaseStructure, 16) %}
     <script>
-/* globals Sortable BazHelpers PNotify Swal BazContentFields */
+/* globals Sortable BazHelpers paginatedPNotify Swal BazContentFields */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -662,7 +662,7 @@ dataCollectionSection =
                         var selectedNode = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_selected(true);
 
                         if (selectedNode[0].children.length > 0) {
-                            PNotify.notice({
+                            paginatedPNotify('notice', {
                                 title: 'Menu item cannot deleted as it has sub menu items. Delete them first.'
                             });
                         } else {
@@ -743,7 +743,7 @@ dataCollectionSection =
                         if (parents.length === 1) {
                             menu[parentNodeText]['link'] = $('#{{componentId}}-{{sectionId}}-route').val();
                             if ($('#{{componentId}}-{{sectionId}}-route').val() === '') {
-                                PNotify.error({text: 'Link is not added to menu item because component route is missing.'});
+                                paginatedPNotify('error', {text: 'Link is not added to menu item because component route is missing.'});
                             }
                         }
                     }
@@ -836,7 +836,7 @@ dataCollectionSection =
 
                             if (nodeData['data']['sub_menu'] && nodeData['data']['sub_menu'] === true) {
                                 if (!isSubmenu && nodeData.children.length > 0) {
-                                    PNotify.notice({
+                                    paginatedPNotify('notice', {
                                         title: 'Menu item cannot be converted to link as its a sub menu.'
                                     });
                                     return;
@@ -844,7 +844,7 @@ dataCollectionSection =
                             }
 
                             if (checkDuplicate(nodeId, parent, title)) {
-                                PNotify.notice({
+                                paginatedPNotify('notice', {
                                     title: 'Duplicate title!'
                                 });
                                 return;
@@ -876,7 +876,7 @@ dataCollectionSection =
                             }
                         } else {
                             if (checkDuplicate(nodeId, parent, title)) {
-                                PNotify.notice({
+                                paginatedPNotify('notice', {
                                     title: 'Duplicate title!'
                                 });
                                 return;
@@ -1017,7 +1017,7 @@ dataCollectionSection =
                             cleanMenuForm();
                         }
                     } else {
-                        PNotify.error({
+                        paginatedPNotify('error', {
                             text        : response.responseMessage,
                             textTrusted : true
                         });

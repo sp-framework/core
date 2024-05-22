@@ -74,7 +74,7 @@
 {% set ffs = json_encode(core['settings']['ffs'], 16) %}
 {% set dbs = json_encode(core['settings']['dbs'], 16) %}
 <script>
-/* globals PNotify Swal BazProgress */
+/* globals paginatedPNotify Swal BazProgress */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -133,7 +133,7 @@ dataCollectionSection =
 
                     $.post('{{links.url("system/core/reset")}}', postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success({text: 'Done'});
+                            paginatedPNotify('success', {text: 'Done'});
                         }
                     }, 'json');
                 });
@@ -492,7 +492,7 @@ dataCollectionSection =
                     e.preventDefault();
 
                     if (dataCollectionSectionForm['vars']['checkedStores'].length === 0) {
-                        PNotify.error('Please select a store!');
+                        paginatedPNotify('error', 'Please select a store!');
 
                         return;
                     }
@@ -519,9 +519,9 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode == 0) {
-                            PNotify.success({text : response.responseMessage});
+                            paginatedPNotify('success', {text : response.responseMessage});
                         } else {
-                            PNotify.error({text : response.responseMessage});
+                            paginatedPNotify('error', {text : response.responseMessage});
                         }
                     }, 'json');
                 });
@@ -570,7 +570,7 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode == 0) {
-                            PNotify.success({text : response.responseMessage});
+                            paginatedPNotify('success', {text : response.responseMessage});
 
                             var data = {
                                 id: response.responseData['uuid'],
@@ -587,7 +587,7 @@ dataCollectionSection =
                         } else {
                             $('#{{componentId}}-{{sectionId}}-backup-ff').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-backup-ff').children('i').attr('hidden', true);
-                            PNotify.error({text : response.responseMessage});
+                            paginatedPNotify('error', {text : response.responseMessage});
                         }
                     }, 'json');
                 }
@@ -624,7 +624,7 @@ dataCollectionSection =
                             }
 
                             if (response.responseCode == 0) {
-                                PNotify.success({text : response.responseMessage});
+                                paginatedPNotify('success', {text : response.responseMessage});
                                 $('#{{componentId}}-{{sectionId}}-allffs option[value="' + id + '"]').remove();
                                 delete dataCollectionSectionForm['vars']['ffs'][id];
 
@@ -639,7 +639,7 @@ dataCollectionSection =
                                 // dataCollectionSectionForm['funcs']['clearFields']('remove');
                                 dataCollectionSectionForm['funcs']['extractFfData']();
                             } else {
-                                PNotify.error({text : response.responseMessage});
+                                paginatedPNotify('error', {text : response.responseMessage});
                             }
 
                             // $('#{{componentId}}-{{sectionId}}-start-remove').attr('disabled', false);
@@ -665,9 +665,9 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode == 0) {
-                            PNotify.success({text : response.responseMessage});
+                            paginatedPNotify('success', {text : response.responseMessage});
                         } else {
-                            PNotify.error({text : response.responseMessage});
+                            paginatedPNotify('error', {text : response.responseMessage});
                         }
 
                         $('#{{componentId}}-{{sectionId}}-update-ff').attr('disabled', false);
@@ -838,7 +838,7 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode == 0) {
-                            PNotify.success({text : response.responseMessage});
+                            paginatedPNotify('success', {text : response.responseMessage});
 
                             var data = {
                                 id: response.responseData['uuid'],
@@ -855,7 +855,7 @@ dataCollectionSection =
                         } else {
                             $('#{{componentId}}-{{sectionId}}-backup-db').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-backup-db').children('i').attr('hidden', true);
-                            PNotify.error({text : response.responseMessage});
+                            paginatedPNotify('error', {text : response.responseMessage});
                         }
                     }, 'json');
                 }
@@ -892,7 +892,7 @@ dataCollectionSection =
                             }
 
                             if (response.responseCode == 0) {
-                                PNotify.success({text : response.responseMessage});
+                                paginatedPNotify('success', {text : response.responseMessage});
                                 $('#{{componentId}}-{{sectionId}}-alldbs option[value="' + id + '"]').remove();
                                 delete dataCollectionSectionForm['vars']['dbs'][id];
 
@@ -907,7 +907,7 @@ dataCollectionSection =
                                 dataCollectionSectionForm['funcs']['clearFields']('remove');
                                 dataCollectionSectionForm['funcs']['extractData']();
                             } else {
-                                PNotify.error({text : response.responseMessage});
+                                paginatedPNotify('error', {text : response.responseMessage});
                             }
 
                             $('#{{componentId}}-{{sectionId}}-start-remove').attr('disabled', false);
@@ -933,9 +933,9 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode == 0) {
-                            PNotify.success({text : response.responseMessage});
+                            paginatedPNotify('success', {text : response.responseMessage});
                         } else {
-                            PNotify.error({text : response.responseMessage});
+                            paginatedPNotify('error', {text : response.responseMessage});
                         }
 
                         $('#{{componentId}}-{{sectionId}}-update-db').attr('disabled', false);
@@ -1269,7 +1269,7 @@ dataCollectionSectionForm['funcs']['addedNewBackupFfOption'] = function(id, text
                     }
 
                     if (response.responseCode == 0) {
-                        PNotify.success({text : response.responseMessage});
+                        paginatedPNotify('success', {text : response.responseMessage});
 
                         $('#{{componentId}}-{{sectionId}}-backupffs option[value="' + id + '"]').remove();
                         $('#{{componentId}}-{{sectionId}}-restore-ff, #{{componentId}}-{{sectionId}}-remove-ff').attr('disabled', true);
@@ -1321,7 +1321,7 @@ dataCollectionSectionForm['funcs']['addedNewBackupFfOption'] = function(id, text
             }
 
             if (response.responseCode == 0) {
-                PNotify.success({text : response.responseMessage});
+                paginatedPNotify('success', {text : response.responseMessage});
 
                 dataCollectionSectionForm['vars']['ffs'][response.responseData.newFf.ffname] = response.responseData.newFf;
 
@@ -1343,7 +1343,7 @@ dataCollectionSectionForm['funcs']['addedNewBackupFfOption'] = function(id, text
                 $('#{{componentId}}-{{sectionId}}-delete-ff').attr('disabled', false);
                 $('#{{componentId}}-{{sectionId}}-ff_password_protect_restore').val('').trigger('change');
             } else {
-                PNotify.error({text : response.responseMessage});
+                paginatedPNotify('error', {text : response.responseMessage});
             }
             $('#{{componentId}}-{{sectionId}}-ff-start-restore').attr('disabled', false);
             $('#{{componentId}}-{{sectionId}}-ff-start-restore').children('i').attr('hidden', true);
@@ -1420,7 +1420,7 @@ dataCollectionSectionForm['funcs']['addedNewBackupDbOption'] = function(id, text
                     }
 
                     if (response.responseCode == 0) {
-                        PNotify.success({text : response.responseMessage});
+                        paginatedPNotify('success', {text : response.responseMessage});
 
                         $('#{{componentId}}-{{sectionId}}-backupdbs option[value="' + id + '"]').remove();
                         $('#{{componentId}}-{{sectionId}}-restore-db, #{{componentId}}-{{sectionId}}-remove-db').attr('disabled', true);
@@ -1516,7 +1516,7 @@ dataCollectionSectionForm['funcs']['addedNewBackupDbOption'] = function(id, text
                 }
 
                 if (response.responseCode == 0) {
-                    PNotify.success({text : response.responseMessage});
+                    paginatedPNotify('success', {text : response.responseMessage});
 
                     dataCollectionSectionForm['vars']['dbs'][response.responseData.newDb.dbname] = response.responseData.newDb;
 
@@ -1545,7 +1545,7 @@ dataCollectionSectionForm['funcs']['addedNewBackupDbOption'] = function(id, text
                     $('#{{componentId}}-{{sectionId}}-db_password').val('').trigger('change');
                     $('#{{componentId}}-{{sectionId}}-password_protect_restore').val('').trigger('change');
                 } else {
-                    PNotify.error({text : response.responseMessage});
+                    paginatedPNotify('error', {text : response.responseMessage});
                 }
                 $('#{{componentId}}-{{sectionId}}-start-restore').attr('disabled', false);
                 $('#{{componentId}}-{{sectionId}}-start-restore').children('i').attr('hidden', true);
@@ -1562,7 +1562,7 @@ $('#body').on('dropzoneInitDone', function() {
                 var newOption = new Option(response.responseData.name, response.responseData.uuid, false, false);
                 $('#{{componentId}}-{{sectionId}}-backupffs').append(newOption).val(response.responseData.uuid).trigger('change');
                 dataCollectionSectionForm['funcs']['addedNewBackupFfOption'](response.responseData.uuid, response.responseData.name);
-                PNotify.success({text: 'File ' + response.responseData.name + ' uploaded and ready to be restored.'});
+                paginatedPNotify('success', {text: 'File ' + response.responseData.name + ' uploaded and ready to be restored.'});
                 dataCollectionSection['admin-core-main-ff_upload_restore']['reset']();
             }
         };
@@ -1573,7 +1573,7 @@ $('#body').on('dropzoneInitDone', function() {
                 var newOption = new Option(response.responseData.name, response.responseData.uuid, false, false);
                 $('#{{componentId}}-{{sectionId}}-backupdbs').append(newOption).val(response.responseData.uuid).trigger('change');
                 dataCollectionSectionForm['funcs']['addedNewBackupDbOption'](response.responseData.uuid, response.responseData.name);
-                PNotify.success({text: 'File ' + response.responseData.name + ' uploaded and ready to be restored.'});
+                paginatedPNotify('success', {text: 'File ' + response.responseData.name + ' uploaded and ready to be restored.'});
                 dataCollectionSection['admin-core-main-upload_restore']['reset']();
             }
         };

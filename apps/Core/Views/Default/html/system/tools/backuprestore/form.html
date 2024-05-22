@@ -26,7 +26,7 @@
     </fieldset>
 </form>
 <script>
-/* globals PNotify Swal BazHelpers BazProgress */
+/* globals paginatedPNotify Swal BazHelpers BazProgress */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -158,7 +158,7 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode == 0) {
-                            PNotify.success({text : response.responseMessage});
+                            paginatedPNotify('success', {text : response.responseMessage});
 
                             var data = {
                                 id: response.responseData['uuid'],
@@ -169,7 +169,7 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-backups').append(newOption).val(data.id).trigger('change');
                             dataCollectionSectionForm['funcs']['addedNewBackupOption'](data.id, data.text);
                         } else {
-                            PNotify.error({text : response.responseMessage});
+                            paginatedPNotify('error', {text : response.responseMessage});
                             $('#{{componentId}}-{{sectionId}}-backup').attr('disabled', false);
                         }
 
@@ -255,7 +255,7 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
                     }
 
                     if (response.responseCode == 0) {
-                        PNotify.success({text : response.responseMessage});
+                        paginatedPNotify('success', {text : response.responseMessage});
 
                         $('#{{componentId}}-{{sectionId}}-backups option[value="' + id + '"]').remove();
                         $('#{{componentId}}-{{sectionId}}-analyse, #{{componentId}}-{{sectionId}}-remove').attr('disabled', true);
@@ -380,7 +380,7 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
 
         var checkedFiles = dataCollectionComponent['{{componentId}}-analysis']['{{componentId}}-analysis-backup_structure']['jstree'].get_checked();
         if (checkedFiles.length === 0 && postData['dbs'].length === 0) {
-            PNotify.error({text: 'Nothing to restore! Select files or database to restore.'});
+            paginatedPNotify('error', {text: 'Nothing to restore! Select files or database to restore.'});
             $('#{{componentId}}-analysis-start-restore').attr('disabled', false);
             $('#{{componentId}}-analysis-start-restore').children('i').attr('hidden', true);
 
@@ -415,10 +415,10 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
             }
 
             if (response.responseCode == 0) {
-                PNotify.success({text: response.responseMessage});
+                paginatedPNotify('success', {text: response.responseMessage});
                 $('#{{componentId}}-analysis-start-restore').children('i').attr('hidden', true);
             } else {
-                PNotify.error({text: response.responseMessage});
+                paginatedPNotify('error', {text: response.responseMessage});
                 $('#{{componentId}}-analysis-start-restore').attr('disabled', false);
                 $('#{{componentId}}-analysis-start-restore').children('i').attr('hidden', true);
             }
@@ -433,7 +433,7 @@ $('#body').on('dropzoneInitDone', function() {
                 var newOption = new Option(response.responseData.name, response.responseData.uuid, false, false);
                 $('#{{componentId}}-{{sectionId}}-backups').append(newOption).val(response.responseData.uuid).trigger('change');
                 dataCollectionSectionForm['funcs']['addedNewBackupOption'](response.responseData.uuid, response.responseData.name);
-                PNotify.success({text: 'File ' + response.responseData.name + ' uploaded and ready to be restored.'});
+                paginatedPNotify('success', {text: 'File ' + response.responseData.name + ' uploaded and ready to be restored.'});
                 dataCollectionSection['admin-backuprestore-main-backup_upload_restore']['reset']();
             }
         };

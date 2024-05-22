@@ -11,7 +11,7 @@
     </div>
     {% set moduleId = module['id'] %}
     <script>
-/* globals PNotify BazContentLoader Pace BazCore */
+/* globals paginatedPNotify BazContentLoader Pace BazCore */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -57,7 +57,7 @@ dataCollectionSection =
                     postData['module_type'] = $('#{{componentId}}-{{sectionId}}-module_type').val();
                     postData['milestone'] = $('#{{componentId}}-{{sectionId}}-milestone').val();
                     if (postData['milestone'] === '' || postData['milestone'] === '0') {
-                        PNotify.error({'text': 'Select milestone to import issues.'});
+                        paginatedPNotify('error', {'text': 'Select milestone to import issues.'});
 
                         return;
                     }
@@ -92,9 +92,9 @@ dataCollectionSection =
 
                                 $('#{{componentId}}-{{sectionId}}-release-notes').trumbowyg('html', html);
                             }
-                            PNotify.success({'text': 'Got ' + response.responseData.issues.length + ' issues.'});
+                            paginatedPNotify('success', {'text': 'Got ' + response.responseData.issues.length + ' issues.'});
                         } else {
-                            PNotify.error({'text': response.responseMessage});
+                            paginatedPNotify('error', {'text': response.responseMessage});
                         }
 
                         $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', false);
@@ -191,7 +191,7 @@ dataCollectionSection =
                     ) {
                         postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
                         if (postData['preReleasePrefix'] === '') {
-                            PNotify.error({'text': 'Provide pre-release prefix.'});
+                            paginatedPNotify('error', {'text': 'Provide pre-release prefix.'});
                             return;
                         }
                     } else if (bump === 'buildMeta' ||
@@ -201,7 +201,7 @@ dataCollectionSection =
                     ) {
                         postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
                         if (postData['buildMetaPrefix'] === '') {
-                            PNotify.error({'text': 'Provide build meta prefix.'});
+                            paginatedPNotify('error', {'text': 'Provide build meta prefix.'});
                             return;
                         }
                     } else if (bump === 'preReleaseBuildMeta' ||
@@ -212,11 +212,11 @@ dataCollectionSection =
                         postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
                         postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
                         if (postData['preReleasePrefix'] === '') {
-                            PNotify.error({'text': 'Provide pre-release prefix.'});
+                            paginatedPNotify('error', {'text': 'Provide pre-release prefix.'});
                             return;
                         }
                         if (postData['buildMetaPrefix'] === '') {
-                            PNotify.error({'text': 'Provide build meta prefix.'});
+                            paginatedPNotify('error', {'text': 'Provide build meta prefix.'});
                             return;
                         }
                     }
@@ -244,13 +244,13 @@ dataCollectionSection =
                             response.responseCode == 3
                         ) {
                             if (response.responseCode == -1) {
-                                PNotify.notice({'text': 'Local version is lower than remote version!'});
+                                paginatedPNotify('notice', {'text': 'Local version is lower than remote version!'});
                                 color = 'warning';
                             } else if (response.responseCode == 2) {
-                                PNotify.error({'text': 'Local Version is greater than remote version!'});
+                                paginatedPNotify('error', {'text': 'Local Version is greater than remote version!'});
                                 color = 'danger';
                             } else if (response.responseCode == 3) {
-                                PNotify.info({'text': 'Remote release is set as draft!'});
+                                paginatedPNotify('info', {'text': 'Remote release is set as draft!'});
                                 color = 'info';
                                 $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked = true;
                                 $('#{{componentId}}-{{sectionId}} .card-header').removeClass('bg-success').addClass('bg-info');
@@ -281,7 +281,7 @@ dataCollectionSection =
                                 );
                             }
 
-                            PNotify.error({'text': response.responseMessage});
+                            paginatedPNotify('error', {'text': response.responseMessage});
                         }
 
                         if (response.responseData && response.responseData.versionIsDraft && response.responseData.versionIsDraft == true) {
@@ -337,7 +337,7 @@ dataCollectionSection =
                         ) {
                             postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
                             if (postData['preReleasePrefix'] === '') {
-                                PNotify.error({'text': 'Provide pre-release prefix.'});
+                                paginatedPNotify('error', {'text': 'Provide pre-release prefix.'});
                                 return;
                             }
                         } else if (postData['bump'] === 'buildMeta' ||
@@ -347,7 +347,7 @@ dataCollectionSection =
                         ) {
                             postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
                             if (postData['buildMetaPrefix'] === '') {
-                                PNotify.error({'text': 'Provide build meta prefix.'});
+                                paginatedPNotify('error', {'text': 'Provide build meta prefix.'});
                                 return;
                             }
                         } else if (postData['bump'] === 'preReleaseBuildMeta' ||
@@ -358,11 +358,11 @@ dataCollectionSection =
                             postData['preReleasePrefix'] = $('#{{componentId}}-{{sectionId}}-pre-release-prefix').val();
                             postData['buildMetaPrefix'] = $('#{{componentId}}-{{sectionId}}-build-meta-prefix').val();
                             if (postData['preReleasePrefix'] === '') {
-                                PNotify.error({'text': 'Provide pre-release prefix.'});
+                                paginatedPNotify('error', {'text': 'Provide pre-release prefix.'});
                                 return;
                             }
                             if (postData['buildMetaPrefix'] === '') {
-                                PNotify.error({'text': 'Provide build meta prefix.'});
+                                paginatedPNotify('error', {'text': 'Provide build meta prefix.'});
                                 return;
                             }
                         }
@@ -382,7 +382,7 @@ dataCollectionSection =
                             }
 
                             if (response.responseCode == 0) {
-                                PNotify.success({'text': response.responseMessage});
+                                paginatedPNotify('success', {'text': response.responseMessage});
 
                                 if (response.responseData && response.responseData.newRelease && $('#release-details').length > 0) {
                                     $('#release_url').html(response.responseData.newRelease.html_url);
@@ -401,7 +401,7 @@ dataCollectionSection =
 
                                 $('#generate').attr('hidden', true);
                             } else {
-                                PNotify.error({'text': response.responseMessage});
+                                paginatedPNotify('error', {'text': response.responseMessage});
 
                                 $('#generate').attr('disabled', false);
                             }
@@ -449,9 +449,9 @@ dataCollectionSection =
                                     $('#{{componentId}}-{{sectionId}}-branch').append(newOption).trigger('change');
                                 }
                             }
-                            PNotify.success({'text': 'Synced ' + response.responseData.branches.length + ' branches.'});
+                            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.branches.length + ' branches.'});
                         } else {
-                            PNotify.error({'text': response.responseMessage});
+                            paginatedPNotify('error', {'text': response.responseMessage});
                         }
 
                         $('#{{componentId}}-{{sectionId}}-sync-branches').attr('disabled', false);
@@ -503,9 +503,9 @@ dataCollectionSection =
                                     milestoneNumber++;
                                 }
                             }
-                            PNotify.success({'text': 'Synced ' + response.responseData.milestones.length + ' milestones.'});
+                            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.milestones.length + ' milestones.'});
                         } else {
-                            PNotify.error({'text': response.responseMessage});
+                            paginatedPNotify('error', {'text': response.responseMessage});
                         }
 
                         $('#{{componentId}}-{{sectionId}}-sync-milestones').attr('disabled', false);
@@ -550,9 +550,9 @@ dataCollectionSection =
                                     $('#{{componentId}}-{{sectionId}}-label').append(newOption).trigger('change');
                                 }
                             }
-                            PNotify.success({'text': 'Synced ' + response.responseData.labels.length + ' label.'});
+                            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.labels.length + ' label.'});
                         } else {
-                            PNotify.error({'text': response.responseMessage});
+                            paginatedPNotify('error', {'text': response.responseMessage});
                         }
                         $('#{{componentId}}-{{sectionId}}-sync-label').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-sync-label').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
@@ -593,7 +593,7 @@ dataCollectionSection =
                 </form>
                 {% set moduleId = bundle['id'] %}
                 <script>
-/* globals PNotify BazContentLoader Pace BazCore */
+/* globals paginatedPNotify BazContentLoader Pace BazCore */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -663,7 +663,7 @@ dataCollectionSection =
                             }
 
                             if (response.responseCode == 0) {
-                                PNotify.success({'text': response.responseMessage});
+                                paginatedPNotify('success', {'text': response.responseMessage});
 
                                 BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-cancelForm'), {
                                     ajaxBefore                      : function () {
@@ -681,7 +681,7 @@ dataCollectionSection =
                                                                     }
                                 });
                             } else {
-                                PNotify.error({'text': response.responseMessage});
+                                paginatedPNotify('error', {'text': response.responseMessage});
 
                                 $('#commit').attr('disabled', false);
                             }
@@ -750,7 +750,7 @@ dataCollectionSection =
                     {% set bundleId = '0' %}
                 {% endif %}
                 <script>
-/* globals PNotify BazHelpers */
+/* globals paginatedPNotify BazHelpers */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -826,16 +826,16 @@ dataCollectionSection =
                     postData['version'] = $('#{{componentId}}-{{sectionId}}-version').val();
 
                     if (postData['version'] === '') {
-                        PNotify.error('Please enter version.');
+                        paginatedPNotify('error', 'Please enter version.');
 
                         return;
                     }
 
                     $.post('{{links.url("devtools/modules/checkVersion")}}', postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success(response.responseMessage);
+                            paginatedPNotify('success', response.responseMessage);
                         } else {
-                            PNotify.error(response.responseMessage);
+                            paginatedPNotify('error', response.responseMessage);
                         }
 
                         if (response.tokenKey && response.token) {
@@ -859,43 +859,43 @@ dataCollectionSection =
                     postData['name'] = $('#{{componentId}}-{{sectionId}}-name').val();
 
                     if (postData['api_id'] === '') {
-                        PNotify.error('Please select api.');
+                        paginatedPNotify('error', 'Please select api.');
                         return;
                     }
 
                     if (postData['app_type'] === '') {
-                        PNotify.error('Please select app type.');
+                        paginatedPNotify('error', 'Please select app type.');
                         return;
                     }
                     if (postData['module_type'] === '') {
-                        PNotify.error('Please select module type.');
+                        paginatedPNotify('error', 'Please select module type.');
                         return;
                     }
                     if (postData['module_type'] === 'components') {
                         if (postData['route'] === '') {
-                            PNotify.error('Please enter route.');
+                            paginatedPNotify('error', 'Please enter route.');
                             return;
                         }
                     } else {
                         if (postData['name'] === '') {
-                            PNotify.error('Please enter name.');
+                            paginatedPNotify('error', 'Please enter name.');
                             return;
                         }
                         if (postData['category'] === '') {
-                            PNotify.error('Please select category.');
+                            paginatedPNotify('error', 'Please select category.');
                             return;
                         }
                     }
 
                     $.post('{{links.url("devtools/modules/generateModuleRepoUrl")}}', postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success(response.responseMessage);
+                            paginatedPNotify('success', response.responseMessage);
 
                             if (response.responseData.repo) {
                                 $('#{{componentId}}-{{sectionId}}-repo').val(response.responseData.repo);
                             }
                         } else {
-                            PNotify.error(response.responseMessage);
+                            paginatedPNotify('error', response.responseMessage);
                         }
 
                         if (response.tokenKey && response.token) {
@@ -1123,7 +1123,7 @@ dataCollectionSection =
                 </fieldset>
             </form>
             <script>
-/* globals PNotify BazHelpers */
+/* globals paginatedPNotify BazHelpers */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -1183,16 +1183,16 @@ dataCollectionSection =
                     postData['version'] = $('#{{componentId}}-{{sectionId}}-version').val();
 
                     if (postData['version'] === '') {
-                        PNotify.error('Please enter version.');
+                        paginatedPNotify('error', 'Please enter version.');
 
                         return;
                     }
 
                     $.post('{{links.url("devtools/modules/checkVersion")}}', postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success(response.responseMessage);
+                            paginatedPNotify('success', response.responseMessage);
                         } else {
-                            PNotify.error(response.responseMessage);
+                            paginatedPNotify('error', response.responseMessage);
                         }
 
                         if (response.tokenKey && response.token) {
@@ -1216,28 +1216,28 @@ dataCollectionSection =
                     postData['module_type'] = 'apps_types';
 
                     if (postData['api_id'] === '') {
-                        PNotify.error('Please select api.');
+                        paginatedPNotify('error', 'Please select api.');
                         return;
                     }
 
                     if (postData['app_type'] === '') {
-                        PNotify.error('Please select app type.');
+                        paginatedPNotify('error', 'Please select app type.');
                         return;
                     }
                     if (postData['module_type'] === '') {
-                        PNotify.error('Please select module type.');
+                        paginatedPNotify('error', 'Please select module type.');
                         return;
                     }
 
                     $.post('{{links.url("devtools/modules/generateModuleRepoUrl")}}', postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success(response.responseMessage);
+                            paginatedPNotify('success', response.responseMessage);
 
                             if (response.responseData.repo) {
                                 $('#{{componentId}}-{{sectionId}}-repo').val(response.responseData.repo);
                             }
                         } else {
-                            PNotify.error(response.responseMessage);
+                            paginatedPNotify('error', response.responseMessage);
                         }
 
                         if (response.tokenKey && response.token) {
@@ -1354,7 +1354,7 @@ dataCollectionSection =
                 {% set subView = true %}
             {% endif %}
             <script>
-/* globals PNotify BazHelpers */
+/* globals paginatedPNotify BazHelpers */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -1495,16 +1495,16 @@ dataCollectionSection =
                     postData['version'] = $('#{{componentId}}-{{sectionId}}-version').val();
 
                     if (postData['version'] === '') {
-                        PNotify.error('Please enter version.');
+                        paginatedPNotify('error', 'Please enter version.');
 
                         return;
                     }
 
                     $.post('{{links.url("devtools/modules/checkVersion")}}', postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success(response.responseMessage);
+                            paginatedPNotify('success', response.responseMessage);
                         } else {
-                            PNotify.error(response.responseMessage);
+                            paginatedPNotify('error', response.responseMessage);
                         }
 
                         if (response.tokenKey && response.token) {
@@ -1533,30 +1533,30 @@ dataCollectionSection =
                     }
 
                     if (postData['api_id'] === '') {
-                        PNotify.error('Please select repository.');
+                        paginatedPNotify('error', 'Please select repository.');
                         return;
                     }
 
                     if (postData['app_type'] === '') {
-                        PNotify.error('Please select app type.');
+                        paginatedPNotify('error', 'Please select app type.');
                         return;
                     }
                     if (postData['module_type'] === '') {
-                        PNotify.error('Please select module type.');
+                        paginatedPNotify('error', 'Please select module type.');
                         return;
                     }
                     if (postData['module_type'] === 'components') {
                         if (postData['route'] === '') {
-                            PNotify.error('Please enter route.');
+                            paginatedPNotify('error', 'Please enter route.');
                             return;
                         }
                     } else {
                         if (postData['name'] === '') {
-                            PNotify.error('Please enter name.');
+                            paginatedPNotify('error', 'Please enter name.');
                             return;
                         }
                         if (postData['category'] === '') {
-                            PNotify.error('Please select category.');
+                            paginatedPNotify('error', 'Please select category.');
                             return;
                         }
                     }
@@ -1565,7 +1565,7 @@ dataCollectionSection =
                         ($('#{{componentId}}-{{sectionId}}-base_view_module_id').val() === '' ||
                          $('#{{componentId}}-{{sectionId}}-base_view_module_id').val() == '0')
                     ) {
-                        PNotify.error('View dependency for this subview not set.');
+                        paginatedPNotify('error', 'View dependency for this subview not set.');
                         return;
                     }
 
@@ -1576,13 +1576,13 @@ dataCollectionSection =
 
                     $.post('{{links.url("devtools/modules/generateModuleRepoUrl")}}', postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success(response.responseMessage);
+                            paginatedPNotify('success', response.responseMessage);
 
                             if (response.responseData.repo) {
                                 $('#{{componentId}}-{{sectionId}}-repo').val(response.responseData.repo);
                             }
                         } else {
-                            PNotify.error(response.responseMessage);
+                            paginatedPNotify('error', response.responseMessage);
                         }
 
                         if (response.tokenKey && response.token) {
@@ -1613,43 +1613,43 @@ dataCollectionSection =
                     }
 
                     if (postData['app_type'] === '') {
-                        PNotify.error('Please select app type.');
+                        paginatedPNotify('error', 'Please select app type.');
                         return;
                     }
                     if (postData['module_type'] === '') {
-                        PNotify.error('Please select module type.');
+                        paginatedPNotify('error', 'Please select module type.');
                         return;
                     }
                     if (postData['module_type'] === 'components') {
                         if (postData['route'] === '') {
-                            PNotify.error('Please enter route.');
+                            paginatedPNotify('error', 'Please enter route.');
                             return;
                         }
                     } else if (postData['module_type'] === 'packages') {
                         if (postData['name'] === '') {
-                            PNotify.error('Please enter name.');
+                            paginatedPNotify('error', 'Please enter name.');
                             return;
                         }
                         if (postData['category'] === '') {
-                            PNotify.error('Please select category.');
+                            paginatedPNotify('error', 'Please select category.');
                             return;
                         }
                     } else if (postData['module_type'] === 'middlewares') {
                         if (postData['name'] === '') {
-                            PNotify.error('Please enter name.');
+                            paginatedPNotify('error', 'Please enter name.');
                             return;
                         }
                     }
 
                     $.post('{{links.url("devtools/modules/generateModuleClass")}}', postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success(response.responseMessage);
+                            paginatedPNotify('success', response.responseMessage);
 
                             if (response.responseData.class) {
                                 $('#{{componentId}}-{{sectionId}}-class').val(response.responseData.class);
                             }
                         } else {
-                            PNotify.error(response.responseMessage);
+                            paginatedPNotify('error', response.responseMessage);
                         }
 
                         if (response.tokenKey && response.token) {
@@ -2240,7 +2240,7 @@ dataCollectionSection =
                         switch (key) {
                             case 'mandatory' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -2256,7 +2256,7 @@ dataCollectionSection =
                                 break;
                             case 'layouts' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -2272,7 +2272,7 @@ dataCollectionSection =
                                 break;
                             case 'tags' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -2288,7 +2288,7 @@ dataCollectionSection =
                                 break;
                             case 'branding' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -2304,7 +2304,7 @@ dataCollectionSection =
                                 break;
                             case 'head-title' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -2320,7 +2320,7 @@ dataCollectionSection =
                                 break;
                             case 'head-meta-author' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -2336,7 +2336,7 @@ dataCollectionSection =
                                 break;
                             case 'head-meta-charset' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -2352,7 +2352,7 @@ dataCollectionSection =
                                 break;
                             case 'head-meta-keywords' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -2368,7 +2368,7 @@ dataCollectionSection =
                                 break;
                             case 'head-meta-viewport' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -2384,7 +2384,7 @@ dataCollectionSection =
                                 break;
                             case 'head-meta-description' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -2436,7 +2436,7 @@ dataCollectionSection =
                                 break;
                             case 'footer-copyright-name' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -2452,7 +2452,7 @@ dataCollectionSection =
                                 break;
                             case 'footer-copyright-site' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -2468,7 +2468,7 @@ dataCollectionSection =
                                 break;
                             case 'footer-copyright-fromYear' :
                                 if (dataCollectionSectionForm['vars']['subview'] == true) {
-                                    PNotify.error({text: 'Setting not valid for non base view module.'});
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
 
                                     $(this).val(0).trigger('change');
                                     return false;
@@ -3048,7 +3048,7 @@ dataCollectionSection =
                                 if (!found) {
                                     if (modules === 'views' && dataCollectionSectionForm['vars']['module_type'] === 'views') {
                                         if (dataCollectionSectionForm['vars']['modules'][modules][moduleData['id']]['base_view_module_id'] != '0') {
-                                            PNotify.error({'text': 'Only non base view modules can be a view dependency'});
+                                            paginatedPNotify('error', {'text': 'Only non base view modules can be a view dependency'});
 
                                             reset();
 
@@ -3174,9 +3174,9 @@ dataCollectionSection =
                                 $('#{{componentId}}-{{sectionId}}-release-version').val(response.responseData.version);
                             }
 
-                            PNotify.success({'text': 'Bumped to version ' + response.responseData.version});
+                            paginatedPNotify('success', {'text': 'Bumped to version ' + response.responseData.version});
                         } else {
-                            PNotify.error({'text': response.responseMessage});
+                            paginatedPNotify('error', {'text': response.responseMessage});
                         }
                     }, 'json');
                 });
@@ -3215,9 +3215,9 @@ dataCollectionSection =
                                         $('#{{componentId}}-{{sectionId}}-labels').append(newOption).trigger('change');
                                     }
                                 }
-                                PNotify.success({'text': 'Synced ' + response.responseData.labels.length + ' labels.'});
+                                paginatedPNotify('success', {'text': 'Synced ' + response.responseData.labels.length + ' labels.'});
                             } else {
-                                PNotify.error({'text': response.responseMessage});
+                                paginatedPNotify('error', {'text': response.responseMessage});
                             }
                             $('#{{componentId}}-{{sectionId}}-sync-labels').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-sync-labels').children('i').removeClass('fa-spin');
@@ -3229,7 +3229,7 @@ dataCollectionSection =
                     var selectedLabels = $('#{{componentId}}-{{sectionId}}-labels').select2('data');
                     var labelsArr = [];
                     if (selectedLabels.length === 0) {
-                        PNotify.error({'text': 'Please select labels to import issues'});
+                        paginatedPNotify('error', {'text': 'Please select labels to import issues'});
 
                         return;
                     }
@@ -3269,9 +3269,9 @@ dataCollectionSection =
 
                                 $('#{{componentId}}-{{sectionId}}-release-notes').trumbowyg('html', html);
                             }
-                            PNotify.success({'text': 'Got ' + response.responseData.issues.length + ' issues.'});
+                            paginatedPNotify('success', {'text': 'Got ' + response.responseData.issues.length + ' issues.'});
                         } else {
-                            PNotify.error({'text': response.responseMessage});
+                            paginatedPNotify('error', {'text': response.responseMessage});
                         }
 
                         $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', false);

@@ -279,7 +279,7 @@
 {% set queue = json_encode(queue, 16) %}
 {% set modules = json_encode(modules, 16) %}
 <script>
-/*global PNotify BazProgress Swal BazContentFields BazHelpers BazContentLoader Pace BazCore */
+/*global BazProgress Swal BazContentFields BazHelpers BazContentLoader Pace BazCore paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -333,9 +333,9 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode == 0) {
-                            PNotify.success({text: response.responseMessage});
+                            paginatedPNotify('success', {text: response.responseMessage});
                         } else if (response.responseCode == 1) {
-                            PNotify.error({text: response.responseMessage});
+                            paginatedPNotify('error', {text: response.responseMessage});
                         }
 
                         $('#{{componentId}}-{{sectionId}}-save-settings').attr('disabled', false);
@@ -409,7 +409,7 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
             dataCollectionSectionForm['vars']['org_update_available'] = res.nodes.length;
             dataCollectionSectionForm['vars']['update_available'] = res.nodes.length;
             dataCollectionSectionForm['vars']['initJstree'] = false;
-            PNotify.info({
+            paginatedPNotify('info', {
                 text        : dataCollectionSectionForm['vars']['syncInfo'],
                 textTrusted : true
             });
@@ -844,7 +844,7 @@ dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, modul
         } else if (response.responseCode == 1) {
             dataCollectionSectionForm['funcs']['moduleinfo'](['error']);
         } else if (response.responseCode == 2) {
-            PNotify.error({text: response.responseMessage});
+            paginatedPNotify('error', {text: response.responseMessage});
             if (response.responseData.module) {
                 dataCollectionSectionForm['vars']['module'] = response.responseData.module;
                 dataCollectionSectionForm['funcs']['processModuleInfo'](response.responseData.module);
@@ -1120,7 +1120,7 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
         }
 
         if (response.responseCode == 0) {
-            PNotify.success({
+            paginatedPNotify('success', {
                 text        : response.responseMessage,
             });
 
@@ -1130,7 +1130,7 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
                 dataCollectionSectionForm['vars']['queue']['tasks'] = response.responseData.queue.tasks;
                 dataCollectionSectionForm['vars']['queue']['total'] = response.responseData.queue.total;
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     text        : 'Incorrect information received from queue manager. Please contact administrator.',
                 });
             }
@@ -1181,7 +1181,7 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
                 dataCollectionSectionForm['funcs']['clearQueue']();
             }
         } else {
-            PNotify.error({
+            paginatedPNotify('error', {
                 text        : response.responseMessage,
             });
         }
@@ -1314,7 +1314,7 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
 //                 $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
 //             }
 //         } else {
-//             PNotify.error({
+//             paginatedPNotify('error', {
 //                 text        : response.responseMessage,
 //                 textTrusted : true
 //             });
@@ -1445,12 +1445,12 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function() {
 //         }
 
 //         if (response.responseCode == 0) {
-//             PNotify.success({
+//             paginatedPNotify('success', {
 //                 text        : response.responseMessage,
 //                 textTrusted : true
 //             });
 //         } else {
-//             PNotify.error({
+//             paginatedPNotify('error', {
 //                 text        : response.responseMessage,
 //                 textTrusted : true
 //             });
@@ -1572,14 +1572,14 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
                     // $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
                     // $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
                 } else {
-                    PNotify.info({
+                    paginatedPNotify('info', {
                         text        : dataCollectionSectionForm['vars']['syncInfo'],
                         textTrusted : true
                     });
                 }
             }
         } else {
-            PNotify.error({
+            paginatedPNotify('error', {
                 text        : response.responseMessage,
                 textTrusted : true
             });

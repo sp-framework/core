@@ -1,4 +1,4 @@
-/* globals define exports PNotify BazHelpers */
+/* globals define exports PNotify paginatedPNotify BazHelpers */
 /*
 * @title                    : BazContentDevModeTools
 * @description              : Baz Lib for devmode tools for sections/content
@@ -227,7 +227,7 @@
                                     },
                         error       : function(data) {
                                         PNotify.removeAll();
-                                        PNotify.error({
+                                        paginatedPNotify('error', {
                                             title   : 'Error',
                                             text    : data.status + ' : ' + data.statusText
                                         });
@@ -273,7 +273,7 @@
                                     },
                         error       : function(data) {
                                         PNotify.removeAll();
-                                        PNotify.error({
+                                        paginatedPNotify('error', {
                                             title   : 'Error',
                                             text    : data.status + ' : ' + data.statusText
                                         });
@@ -319,7 +319,7 @@
                                     },
                         error       : function(data) {
                                         PNotify.removeAll();
-                                        PNotify.error({
+                                        paginatedPNotify('error', {
                                             title   : 'Error',
                                             text    : data.status + ' : ' + data.statusText
                                         });
@@ -393,7 +393,7 @@
                                     },
                         error       : function(data) {
                                         PNotify.removeAll();
-                                        PNotify.error({
+                                        paginatedPNotify('error', {
                                             title   : 'Error',
                                             text    : data.status + ' : ' + data.statusText
                                         });
@@ -446,7 +446,7 @@
                                             },
                                 error       : function(data) {
                                                 PNotify.removeAll();
-                                                PNotify.error({
+                                                paginatedPNotify('error', {
                                                     title   : 'Error',
                                                     text    : data.status + ' : ' + data.statusText
                                                 });
@@ -454,7 +454,7 @@
                             });
                         } else {
                             PNotify.removeAll();
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 title: 'Checkbox not selected!',
                                 text: 'No include field data checkbox checked',
                                 type: 'error'
@@ -679,7 +679,7 @@
                     },
                     error       : function(data) {
                                     PNotify.removeAll();
-                                    PNotify.error({
+                                    paginatedPNotify('error', {
                                         title   : 'Error:',
                                         text    : data.status + ' : ' + data.statusText
                                     });
@@ -697,7 +697,7 @@
                     },
                     error       : function(data) {
                                     PNotify.removeAll();
-                                    PNotify.error({
+                                    paginatedPNotify('error', {
                                         title   : 'Error:',
                                         text    : data.status + ' : ' + data.statusText
                                     });
@@ -725,7 +725,7 @@
                                         },
                                         error       : function(data) {
                                                         PNotify.removeAll();
-                                                        PNotify.error({
+                                                        paginatedPNotify('error', {
                                                             title   : 'Error:',
                                                             text    : data.status + ' : ' + data.statusText
                                                         });
@@ -783,7 +783,7 @@
                                         }
                                     } else {
                                         PNotify.removeAll();
-                                        PNotify.error({
+                                        paginatedPNotify('error', {
                                             title   : 'Error:',
                                             text    : 'Cannot execute as another install/update process is currently running. Please try again in couple of minutes.'
                                         });
@@ -791,7 +791,7 @@
                     },
                     error       : function(data) {
                                     PNotify.removeAll();
-                                    PNotify.error({
+                                    paginatedPNotify('error', {
                                         title   : 'Error:',
                                         text    : data.status + ' : ' + data.statusText
                                     });
@@ -809,7 +809,7 @@
                     },
                     error       : function(data) {
                                     PNotify.removeAll();
-                                    PNotify.error({
+                                    paginatedPNotify('error', {
                                         title   : 'Error:',
                                         text    : data.status + ' : ' + data.statusText
                                     });
@@ -1202,7 +1202,7 @@
                     }
 
                     PNotify.removeAll();
-                    PNotify.success({
+                    paginatedPNotify('success', {
                         title: 'Hook Added',
                         text: 'Now you can select hook to edit/delete it',
                     });

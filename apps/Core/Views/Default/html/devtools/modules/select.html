@@ -201,7 +201,7 @@
     </div>
 </div>
 <script>
-/* globals BazContentLoader Pace BazCore PNotify */
+/* globals BazContentLoader Pace BazCore paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -313,14 +313,14 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode == 0) {
-                            PNotify.success({'text': response.responseMessage});
+                            paginatedPNotify('success', {'text': response.responseMessage});
                             if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
                                 dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
                             } else {
                                 dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
                             }
                         } else {
-                            PNotify.error({'text': response.responseMessage});
+                            paginatedPNotify('error', {'text': response.responseMessage});
                         }
                     }, 'json');
                 });

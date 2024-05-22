@@ -166,7 +166,7 @@
     </fieldset>
 </form>
 <script>
-/* globals PNotify */
+/* globals paginatedPNotify */
 var acls = JSON.parse('{{acls}}');
 var gridColumns = [];
 gridColumns.push(
@@ -262,12 +262,12 @@ dataCollectionSection =
                         data        : dataToSend,
                         success     : function(response) {
                             if (response.responseCode === 0) {
-                                PNotify.success({title : response.responseMessage});
+                                paginatedPNotify('success', {title : response.responseMessage});
                                 if (response.responseData && response.responseData.scope_name) {
                                     $('#{{componentId}}-{{sectionId}}-scope_name').val(response.responseData.scope_name);
                                 }
                             } else {
-                                PNotify.error({title : response.responseMessage});
+                                paginatedPNotify('error', {title : response.responseMessage});
                             }
 
                             if (response.tokenKey && response.token) {

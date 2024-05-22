@@ -269,7 +269,7 @@
     </fieldset>
 </form>
 <script>
-/* globals PNotify */
+/* globals paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -369,7 +369,7 @@ dataCollectionSection =
 
                     dataCollectionSection['{{componentId}}-{{sectionId}}-form']['onSubmit'] = function() {
                         if (dataCollectionSection['{{componentId}}-{{sectionId}}-upload']['uuidData'].length !== 1) {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 title   : 'Please upload CSV file!',
                             });
 
@@ -379,7 +379,7 @@ dataCollectionSection =
                         if (dataCollectionSection['{{componentId}}-{{sectionId}}-rows']['rows'].length === 1 &&
                             dataCollectionSection['{{componentId}}-{{sectionId}}-rows']['rows'][0]['csvrowno'] === 'CSV ROW #'
                         ) {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 title   : 'CSV File uploaded has no rows!',
                             });
 
@@ -403,7 +403,7 @@ dataCollectionSection =
                                 rowText = 'rows #';
                             }
 
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 title   : 'CSV file ' + rowText + ' ' + errorInRow.join() + ' has errors. Please fix those errors and upload file again.',
                             });
 
@@ -433,7 +433,7 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode == 1) {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 title   : response.responseMessage
                             });
 
