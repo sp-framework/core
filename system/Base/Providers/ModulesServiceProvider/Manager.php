@@ -31,6 +31,8 @@ class Manager extends BasePackage
 
     protected $views;
 
+    protected $counter = [];
+
     protected $settings = Settings::class;
 
     public function init()
@@ -463,6 +465,15 @@ class Manager extends BasePackage
                 }
 
                 if ($module['release_counter'] == 0) {
+                    if (!isset($this->counter['noRelease']['count'])) {
+                        $this->counter['noRelease']['count'] = 1;
+                    } else {
+                        $this->counter['noRelease']['count'] = $this->counter['noRelease']['count'] + 1;
+                    }
+
+                    $this->counter['noRelease']['api']['id'] = $this->apiClientConfig['id'];
+                    $this->counter['noRelease']['api']['name'] = $this->apiClientConfig['name'];
+
                     continue;//Dont add as there are no releases.
                 }
 
@@ -555,8 +566,6 @@ class Manager extends BasePackage
 
     protected function updateRemoteModulesToDB()
     {
-        $counter = [];
-
         if ($this->remoteModules && count($this->remoteModules) === 0) {
             return true;
         }
@@ -566,11 +575,11 @@ class Manager extends BasePackage
 
             if (count($remotePackages['updates']) > 0) {
                 foreach ($remotePackages['updates'] as $updateRemotePackageKey => $updateRemotePackage) {
-                    if (!isset($counter['updates'])) {
-                        $counter['updates'] = [];
-                        $counter['updates']['api']['id'] = $this->apiClientConfig['id'];
-                        $counter['updates']['api']['name'] = $this->apiClientConfig['name'];
-                        $counter['updates']['count'] = 0;
+                    if (!isset($this->counter['updates'])) {
+                        $this->counter['updates'] = [];
+                        $this->counter['updates']['api']['id'] = $this->apiClientConfig['id'];
+                        $this->counter['updates']['api']['name'] = $this->apiClientConfig['name'];
+                        $this->counter['updates']['count'] = 0;
                     }
 
                     if ($remoteModulesType === 'apptypes') {
@@ -580,7 +589,7 @@ class Manager extends BasePackage
                     }
 
                     if ($updateRemotePackage['installed'] == '1' && $updateRemotePackage['update_available'] == '1') {
-                        $counter['updates']['count'] = $counter['updates']['count'] + 1;
+                        $this->counter['updates']['count'] = $this->counter['updates']['count'] + 1;
                     }
                 }
             }
@@ -590,11 +599,11 @@ class Manager extends BasePackage
                     if ($registerRemotePackage['repo_details']['latestRelease'] === false) {
                         continue;
                     }
-                    if (!isset($counter['new'])) {
-                        $counter['new'] = [];
-                        $counter['new']['api']['id'] = $this->apiClientConfig['id'];
-                        $counter['new']['api']['name'] = $this->apiClientConfig['name'];
-                        $counter['new']['count'] = 0;
+                    if (!isset($this->counter['new'])) {
+                        $this->counter['new'] = [];
+                        $this->counter['new']['api']['id'] = $this->apiClientConfig['id'];
+                        $this->counter['new']['api']['name'] = $this->apiClientConfig['name'];
+                        $this->counter['new']['count'] = 0;
                     }
 
                     $repo_details = $registerRemotePackage['repo_details'];
@@ -653,12 +662,12 @@ class Manager extends BasePackage
                         $this->modules->{$remoteModulesType}->add($registerRemotePackage);
                     }
 
-                    $counter['new']['count'] = $counter['new']['count'] + 1;
+                    $this->counter['new']['count'] = $this->counter['new']['count'] + 1;
                 }
             }
         }
 
-        $this->packagesData->counter = $counter;
+        $this->packagesData->counter = $this->counter;
 
         return true;
     }

@@ -1502,8 +1502,10 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
                 var text = 'Sync Complete.<br>';
                 var newCounter = 0;
                 var updatesCounter = 0;
+                var noReleaseCounter = 0;
                 var newModule = 'new module';
                 var update = 'update';
+                var noRelease = ' module with no release. It was ignored.';
 
                 if (response.responseData.counter.new && response.responseData.counter.new.count) {
                     newCounter = response.responseData.counter.new.count;
@@ -1521,12 +1523,23 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
                     }
                 }
 
-                if (newCounter > 0 || updatesCounter > 0) {
+                if (response.responseData.counter.noRelease && response.responseData.counter.noRelease.count) {
+                    noReleaseCounter = response.responseData.counter.noRelease.count;
+
+                    if (response.responseData.counter.noRelease.api && response.responseData.counter.noRelease.api.name) {
+                        text += response.responseData.counter.noRelease.api.name + ' has '
+                    }
+                }
+
+                if (newCounter > 0 || updatesCounter > 0 || noReleaseCounter > 0) {
                     if (newCounter > 1) {
                         newModule = 'new modules';
                     }
                     if (updatesCounter > 1) {
                         update = 'updates';
+                    }
+                    if (noReleaseCounter > 1) {
+                        noRelease = ' modules with no release. It was ignored.';
                     }
                     if (newCounter !== 0 && updatesCounter === 0) {
                         dataCollectionSectionForm['vars']['new_available'] = newCounter;
@@ -1535,6 +1548,12 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
                         text += updatesCounter + ' new ' + update + ' available.<br> No ' + newModule + ' available.';
                     } else if (newCounter !== 0 && updatesCounter !== 0) {
                         text += updatesCounter + ' new ' + update + ' available.<br>' + newCounter + ' ' + newModule + ' available.';
+                    }
+
+                    if ((newCounter !== 0 || updatesCounter !== 0) && noReleaseCounter !== 0) {
+                        text += '<br>'  + noReleaseCounter + noRelease + '<br>';
+                    } else if (noReleaseCounter !== 0) {
+                        text += noReleaseCounter + noRelease + '<br>';
                     }
                 } else {
                     text = 'Sync Complete.<br>No ' + newModule + ' or ' + update + ' available.';

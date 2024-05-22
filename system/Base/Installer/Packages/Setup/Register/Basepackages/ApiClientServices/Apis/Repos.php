@@ -54,7 +54,7 @@ class Repos
             [
                 'api_url'               => 'https://api.github.com',
                 'org_user'              => 'sp-modules',
-                'repo_url'              => 'https://www.github.com/sp-modules',
+                'repo_url'              => 'https://github.com/sp-modules',
                 'branch'                => 'main',
                 'auth_type'             => 'autho',
                 'authorization'         => ''//github Token
