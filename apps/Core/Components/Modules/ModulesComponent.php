@@ -35,7 +35,11 @@ class ModulesComponent extends BaseComponent
 				return $this->throwIdNotFound();
 			}
 
-			$this->modules->queues->analyseQueue($queue);
+			try {
+				$this->modules->queues->analyseQueue($queue);
+			} catch (\Exception $e) {
+				trace([$e]);
+			}
 
 			$this->view->queues = true;
 			$this->view->queue = $queue;
@@ -184,12 +188,13 @@ class ModulesComponent extends BaseComponent
 
 		if ($this->modulesManager->syncRemoteWithLocal($this->postData())) {
 			$counter = $this->modulesManager->packagesData->counter;
+			$queue = $this->modulesManager->packagesData->queue;
 			$modulesTree = $this->modulesManager->packagesData->responseData;
 
 			$this->addResponse(
 				$this->modulesManager->packagesData->responseMessage,
 				$this->modulesManager->packagesData->responseCode,
-				array_merge($modulesTree, ['counter' => $counter, 'modules_html' => $this->generateTree($modulesTree)])
+				array_merge($modulesTree, ['counter' => $counter, 'queue' => $queue, 'modules_html' => $this->generateTree($modulesTree)])
 			);
 
 			return true;

@@ -1504,6 +1504,9 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
             $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
 
             if (response.responseData) {
+                if (response.responseData.queue && response.responseData.queue['total'] == 0) {
+                    dataCollectionSectionForm['funcs']['clearQueue']();
+                }
                 var text = 'Sync Complete.<br>';
                 var newCounter = 0;
                 var updatesCounter = 0;

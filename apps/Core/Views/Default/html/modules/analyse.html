@@ -141,7 +141,7 @@
 {% endif %}
 {% set queue = json_encode(queue, 16) %}
 <script>
-/*global paginatedPNotify BazProgress Swal BazContentFields BazHelpers BazContentLoader Pace BazCore */
+/*global paginatedPNotify BazProgress BazContentFields BazHelpers BazContentLoader Pace BazCore */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 if (!window['dataCollection']) {
     window['dataCollection'] = { };
@@ -281,11 +281,11 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
     });
 }
 $(document).ready(function() {
-    BazProgress.buildProgressBar($('#installer-progress'));
-
     dataCollectionSectionForm['vars']['hasError'] = BazHelpers.stringToBoolean("{{hasError}}");
 
     dataCollectionSectionForm['funcs']['initQueueButtons']();
+
+    BazProgress.buildProgressBar($('#installer-progress'));
 });
 </script>
 <div>

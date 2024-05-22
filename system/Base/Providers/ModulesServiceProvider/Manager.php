@@ -401,6 +401,8 @@ class Manager extends BasePackage
                     $this->getRepositoryModules(['api_id' => $this->apiClientConfig['id']]);
                 }
 
+                $this->packagesData->queue = $this->modules->queues->modifyQueue(['task' => 'clearQueue'], true);
+
                 return true;
             }
         } catch (ClientException | \throwable $e) {
