@@ -409,10 +409,13 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
             dataCollectionSectionForm['vars']['org_update_available'] = res.nodes.length;
             dataCollectionSectionForm['vars']['update_available'] = res.nodes.length;
             dataCollectionSectionForm['vars']['initJstree'] = false;
-            paginatedPNotify('info', {
-                text        : dataCollectionSectionForm['vars']['syncInfo'],
-                textTrusted : true
-            });
+            if (window.stackPaginate.length === 0) {
+                paginatedPNotify('info', {
+                    text        : dataCollectionSectionForm['vars']['syncInfo'],
+                    textTrusted : true
+                });
+            }
+
         }
 
         dataCollectionSectionForm['vars']['syncInfo'] = '';
