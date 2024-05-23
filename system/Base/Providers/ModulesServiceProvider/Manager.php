@@ -230,14 +230,14 @@ class Manager extends BasePackage
             }
 
             if ($api['category'] === 'repos') {
-                $this->apiClient = $this->basepackages->apiClientServices->useApi($api['id']);
-                $this->apiClientConfig = $this->apiClient->getApiConfig();
+                $apiClient = $this->basepackages->apiClientServices->useApi($api['id']);
+                $apiClientConfig = $apiClient->getApiConfig();
 
                 $sortedModules[$api['id']] = [];
                 $sortedModules[$api['id']]['childs'] = [];
-                $sortedModules[$api['id']]['name'] = $this->apiClientConfig['name'];
+                $sortedModules[$api['id']]['name'] = $apiClientConfig['name'];
                 $sortedModules[$api['id']]['data']['type'] = 'repo';
-                $sortedModules[$api['id']]['data']['apiid'] = $this->apiClientConfig['id'];
+                $sortedModules[$api['id']]['data']['apiid'] = $apiClientConfig['id'];
             }
         }
 
@@ -401,6 +401,21 @@ class Manager extends BasePackage
                     $this->getRepositoryModules(['api_id' => $this->apiClientConfig['id']]);
                 }
 
+                $queue = $this->modules->queues->getActiveQueue();
+
+                if ($queue) {
+                    if ($queue['sync'] && !isset($queue['sync'][$this->apiClientConfig['id']])) {
+                        $queue['sync'][$this->apiClientConfig['id']] = [];
+                    } else {
+                        $queue['sync'] = [];
+                        $queue['sync'][$this->apiClientConfig['id']] = [];
+                    }
+
+                    $queue['sync'][$this->apiClientConfig['id']]['last_sync'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
+
+                    $this->modules->queues->update($queue);
+                }
+
                 return true;
             }
         } catch (ClientException | \throwable $e) {
@@ -439,7 +454,25 @@ class Manager extends BasePackage
         }
 
         if ($modulesArr) {
+            $queue = $this->modules->queues->getActiveQueue();
+
+            if ($queue) {
+                if ($queue['sync'] &&
+                    isset($queue['sync'][$this->apiClientConfig['id']]['last_sync'])
+                ) {
+                    $lastSync = \Carbon\Carbon::parse($queue['sync'][$this->apiClientConfig['id']]['last_sync']);
+                }
+            }
+
             foreach ($modulesArr as $key => $module) {
+                if (isset($lastSync) && isset($module['updated_at']) && $module['updated_at'] !== '') {
+                    $updatedAt = \Carbon\Carbon::parse($module['updated_at']);
+
+                    if ($lastSync->greaterThan($updatedAt)) {//Only process if its updated.
+                        continue;
+                    }
+                }
+
                 $names = explode('-', $module['name']);
 
                 if ($names[0] === 'core') {
@@ -588,7 +621,10 @@ class Manager extends BasePackage
                         $this->modules->{$remoteModulesType}->update($updateRemotePackage);
                     }
 
-                    if ($updateRemotePackage['installed'] == '1' && $updateRemotePackage['update_available'] == '1') {
+                    if (isset($updateRemotePackage['installed']) &&
+                        $updateRemotePackage['installed'] == '1' &&
+                        $updateRemotePackage['update_available'] == '1'
+                    ) {
                         $this->counter['updates']['count'] = $this->counter['updates']['count'] + 1;
                     }
                 }
@@ -707,9 +743,10 @@ class Manager extends BasePackage
                     }
 
                     $localModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
-                    if ($localModule['installed'] == '0') {
+
+                    if (isset($localModule['installed']) && $localModule['installed'] == '0') {
                         $localModule['version'] = $moduleNeedsUpgrade['name'];
-                    } else if ($localModule['installed'] == '1') {
+                    } else if (isset($localModule['installed']) && $localModule['installed'] == '1') {
                         $localModule['update_available'] = '1';
                         $localModule['update_version'] = $moduleNeedsUpgrade['name'];
                     }

@@ -1433,7 +1433,11 @@ dataCollectionSectionForm['funcs']['processSync'] = function(response) {
         dataCollectionSectionForm['vars']['filter'] = true;
         dataCollectionSectionForm['vars']['initJstree'] = false;
     } else {
-        paginatedPNotify('info', {
+        var notificationClass = 'info';
+        if (noReleaseCounter > 0) {
+            notificationClass = 'notice';
+        }
+        paginatedPNotify(notificationClass, {
             text        : dataCollectionSectionForm['vars']['syncInfo'],
             textTrusted : true
         });
@@ -1446,8 +1450,6 @@ dataCollectionSectionForm['funcs']['processSync'] = function(response) {
 }
 
 $(document).ready(function() {
-    // BazProgress.buildProgressBar($('#installer-progress'));
-
     $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').on('keyup', function() {
         var term = $(this).val();
         if (term === '') {

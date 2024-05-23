@@ -79,6 +79,13 @@ class Queues
                         ]
                     ),
                     new Column(
+                        'sync',
+                        [
+                            'type'    => Column::TYPE_JSON,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
                         'total',
                         [
                             'type'    => Column::TYPE_SMALLINTEGER,
