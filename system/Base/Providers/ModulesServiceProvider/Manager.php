@@ -401,8 +401,6 @@ class Manager extends BasePackage
                     $this->getRepositoryModules(['api_id' => $this->apiClientConfig['id']]);
                 }
 
-                $this->packagesData->queue = $this->modules->queues->modifyQueue(['task' => 'clearQueue'], true);
-
                 return true;
             }
         } catch (ClientException | \throwable $e) {
@@ -601,6 +599,7 @@ class Manager extends BasePackage
                     if ($registerRemotePackage['repo_details']['latestRelease'] === false) {
                         continue;
                     }
+
                     if (!isset($this->counter['new'])) {
                         $this->counter['new'] = [];
                         $this->counter['new']['api']['id'] = $this->apiClientConfig['id'];
@@ -648,20 +647,16 @@ class Manager extends BasePackage
                                 )
                             ) {
                                 $registerRemotePackage['base_view_module_id'] = 0;
-                                $registerRemotePackage['is_subview'] = false;
                             } else if (count($registerRemotePackage['dependencies']['views']) === 1) {
                                 $baseView = $this->modules->views->getViewByRepo($registerRemotePackage['dependencies']['views'][0]['repo']);
 
                                 if ($baseView) {//Add Baseview ID here or during installation.
                                     $registerRemotePackage['base_view_module_id'] = $baseView['id'];
-                                    $registerRemotePackage['is_subview'] = true;
                                 } else {
                                     $registerRemotePackage['base_view_module_id'] = 0;
-                                    $registerRemotePackage['is_subview'] = false;
                                 }
                             } else {
                                 $registerRemotePackage['base_view_module_id'] = 0;
-                                $registerRemotePackage['is_subview'] = false;
                             }
                         }
 

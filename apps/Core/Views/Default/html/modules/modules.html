@@ -360,11 +360,6 @@ dataCollectionSectionForm['vars']['new_available'] = 0;
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modules}}');
 dataCollectionSectionForm['vars']['module'] = { };
 dataCollectionSectionForm['vars']['queue'] = JSON.parse('{{queue}}');
-// dataCollectionSectionForm['vars']['queue_data'] = { };
-// dataCollectionSectionForm['vars']['queue_data']['install'] = { };
-// dataCollectionSectionForm['vars']['queue_data']['uninstall'] = { };
-// dataCollectionSectionForm['vars']['queue_data']['update'] = { };
-// dataCollectionSectionForm['vars']['queue_data']['remove'] = { };
 dataCollectionSectionForm['vars']['initJstree'] = false;
 dataCollectionSectionForm['vars']['syncInfo'] = '';
 
@@ -1140,14 +1135,6 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
                 });
             }
 
-            // if (task !== 'cancel' && task !== 'clearQueue') {
-            //     if (!dataCollectionSectionForm['vars']['queue_data'][task][moduleType]) {
-            //         dataCollectionSectionForm['vars']['queue_data'][task][moduleType] = { };
-            //     }
-
-            //     dataCollectionSectionForm['vars']['queue_data'][task][moduleType][id] = dataCollectionSectionForm['vars']['module'];
-            // }
-
             $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['total']);
 
             if (task === 'install') {
@@ -1245,194 +1232,24 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
         $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
     }
 }
-// dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
-//     var error = false;
-//     var postData = { };
-//     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-//     $.post('{{links.url("modules/analyseActiveQueue")}}', postData, function(response) {
-//         if (response.tokenKey && response.token) {
-//             $('#security-token').attr('name', response.tokenKey);
-//             $('#security-token').val(response.token);
-//         }
-
-//         if (response.responseCode == 0) {
-//             if (response.responseData && response.responseData.queueTasks && response.responseData.queueTasksCounter) {
-//                 var moduleHtml = '';
-//                 for (var q in response.responseData.queueTasks) {
-//                     if (q === 'install' || q === 'uninstall' || q === 'update' || q === 'remove') {
-//                         if (Object.keys(response.responseData.queueTasks[q]).length > 0) {
-//                             for (var installTypes in response.responseData.queueTasks[q]) {
-//                                 if (Object.keys(response.responseData.queueTasks[q][installTypes]).length > 0) {
-//                                     for (var installType in response.responseData.queueTasks[q][installTypes]) {
-//                                         var color = 'primary';
-
-//                                         if (q === 'update') {
-//                                             color = 'info';
-//                                         } else if (q === 'uninstall') {
-//                                             color = 'warning';
-//                                         } else if (q === 'remove') {
-//                                             color = 'danger';
-//                                         }
-
-//                                         if (response.responseData.queueTasks[q][installTypes][installType]['error']) {
-//                                             error = true;
-//                                         moduleHtml +=
-//                                         '       <tr class="bg-danger">';
-//                                         } else {
-//                                         moduleHtml +=
-//                                         '       <tr>';
-//                                         }
-//                                         moduleHtml +=
-//                                         '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['name'] + '</td>' +
-//                                         '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['module_type'] + '</td>' +
-//                                         '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['version'] + '</td>' +
-//                                         '           <td>' +  response.responseData.queueTasks[q][installTypes][installType]['repo'] + '</td>' +
-//                                         '           <td>' +  '<span class="badge badge-' + color + ' mt-1 text-xs text-uppercase">' + q + '</span></td>' +
-//                                         '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>' +
-//                                         '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>';
-//                                         if (response.responseData.queueTasks[q][installTypes][installType]['error']) {
-//                                         moduleHtml +=
-//                                         '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '">Error: ' + response.responseData.queueTasks[q][installTypes][installType]['error'] + '</td>' +
-//                                         '       </tr>';
-//                                         } else {
-//                                         moduleHtml +=
-//                                         '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + response.responseData.queueTasks[q][installTypes][installType]['id'] + '"></td>' +
-//                                         '       </tr>';
-//                                         }
-//                                     }
-//                                 }
-//                             }
-//                         }
-//                     }
-//                     if (response.responseData.queueTasksCounter[q]) {
-//                         $('#{{componentId}}-{{sectionId}}-queue-' + q).children('span').html(response.responseData.queueTasksCounter[q]);
-//                     }
-//                 }
-
-//                 $('#{{componentId}}-{{sectionId}}-queue-table tbody').empty().html(moduleHtml);
-//                 $('#{{componentId}}-{{sectionId}}-queue-analyse-modal').modal('show');
-//             }
-//             if (error) {
-//                 $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', true);
-//             } else {
-//                 $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
-//             }
-//         } else {
-//             paginatedPNotify('error', {
-//                 text        : response.responseMessage,
-//                 textTrusted : true
-//             });
-//         }
-//     }, 'json');
-// }
 dataCollectionSectionForm['funcs']['clearQueue'] = function() {
-    // var index;
-    //This should be done via modifyQueue
-    // if (clearAll) {
-        dataCollectionSectionForm['vars']['sync'] = false;
-        dataCollectionSectionForm['vars']['initJstree'] = false;
-        dataCollectionSectionForm['vars']['filter'] = false;
-        dataCollectionSectionForm['vars']['module'] = { };
-        dataCollectionSectionForm['vars']['update_available'] = 0;
-        dataCollectionSectionForm['vars']['new_available'] = 0;
-        // dataCollectionSectionForm['vars']['queue_data'] = { };
-        // dataCollectionSectionForm['vars']['queue_data']['install'] = { };
-        // dataCollectionSectionForm['vars']['queue_data']['uninstall'] = { };
-        // dataCollectionSectionForm['vars']['queue_data']['update'] = { };
-        // dataCollectionSectionForm['vars']['queue_data']['remove'] = { };
-        dataCollectionSectionForm['vars']['syncInfo'] = '';
-        dataCollectionSectionForm['funcs']['initQueueButtons'](false);
-        dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](null, false, false, false, true);
-        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install');
-        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update');
-        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove');
-        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall');
-        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue');
-        dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
-        $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
-    // } else {
-    //     if (id && moduleType) {
-    //         var actionTypes = ['install', 'update', 'uninstall', 'remove'];
-
-    //         var foundIn;
-    //         var disableFilterIcons = [];
-
-    //         $(actionTypes).each(function(i, actionType) {
-    //             if (dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType]) {
-    //                 if (dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType].includes(id)) {
-    //                     index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType], id);
-
-    //                     if (index > -1) {
-    //                         dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType].splice(index, 1);
-
-    //                         foundIn = actionType;
-    //                     }
-    //                 }
-
-    //                 if (dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType].length === 0) {
-    //                     delete dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType];
-    //                 }
-
-    //                 if (Object.keys(dataCollectionSectionForm['vars']['queue']['tasks'][actionType]).length === 0) {
-    //                     disableFilterIcons.push(actionType);
-    //                 }
-    //             }
-
-    //             if (dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType] &&
-    //                 dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType][id]
-    //             ) {
-    //                 delete dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType][id];
-
-    //                 if (Object.keys(dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType]).length === 0) {
-    //                     delete dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType];
-    //                 }
-    //             }
-    //         });
-
-    //         if (foundIn) {
-    //             if (foundIn === 'install') {
-    //                 dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
-    //             } else if (foundIn === 'update') {
-    //                 dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'remove', 'repo-sync']);
-    //             } else if (foundIn === 'uninstall') {
-    //                 if (dataCollectionSectionForm['vars']['module']['update_available'] == '1') {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'remove', 'repo-sync']);
-    //                 } else {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['uninstall', 'remove', 'repo-sync']);
-    //                 }
-    //             } else if (foundIn === 'remove') {
-    //                 if (dataCollectionSectionForm['vars']['module']['update_available'] == '1') {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'remove', 'repo-sync']);
-    //                 } else if (dataCollectionSectionForm['vars']['module']['installed'] == '1') {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['uninstall', 'remove', 'repo-sync']);
-    //                 } else {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
-    //                 }
-    //             }
-
-    //             if (dataCollectionSectionForm['vars']['module']['app_type'] === 'core') {
-    //                 if (dataCollectionSectionForm['vars']['module']['name'] !== 'Core') {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo'](['info'], []);
-    //                 } else {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['update', 'repo-sync']);
-    //                 }
-    //             }
-    //         }
-
-    //         if (disableFilterIcons.length > 0) {
-    //             $(disableFilterIcons).each(function(i, filterIcon) {
-    //                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-' + filterIcon);
-    //             });
-    //         }
-    //     }
-
-    //     dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] - 1;
-    // }
-
-    // $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
-
-    dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText']();
+    dataCollectionSectionForm['vars']['sync'] = false;
+    dataCollectionSectionForm['vars']['initJstree'] = false;
+    dataCollectionSectionForm['vars']['filter'] = false;
+    dataCollectionSectionForm['vars']['module'] = { };
+    dataCollectionSectionForm['vars']['update_available'] = 0;
+    dataCollectionSectionForm['vars']['new_available'] = 0;
+    dataCollectionSectionForm['vars']['syncInfo'] = '';
+    dataCollectionSectionForm['funcs']['initQueueButtons'](false);
+    dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](null, false, false, false, true);
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install');
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update');
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove');
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall');
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue');
+    dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
+    $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
 }
 // dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
 //     var postData = { };
@@ -1466,6 +1283,8 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function() {
 dataCollectionSectionForm['funcs']['initSync'] = function(val) {
     dataCollectionSectionForm['vars']['sync'] = true;
     $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
+    $('#{{componentId}}-{{sectionId}}-analyse-queue').addClass('disabled');
+    $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
 
     dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', null, true);
     dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-new-available', null, true);
@@ -1504,106 +1323,7 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
             $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
 
             if (response.responseData) {
-                if (response.responseData.queue && response.responseData.queue['total'] == 0) {
-                    dataCollectionSectionForm['funcs']['clearQueue']();
-                }
-                var text = 'Sync Complete.<br>';
-                var newCounter = 0;
-                var updatesCounter = 0;
-                var noReleaseCounter = 0;
-                var newModule = 'new module';
-                var update = 'update';
-                var noRelease = ' module with no release. It was ignored.';
-
-                if (response.responseData.counter.new && response.responseData.counter.new.count) {
-                    newCounter = response.responseData.counter.new.count;
-
-                    if (response.responseData.counter.new.api && response.responseData.counter.new.api.name) {
-                            text += response.responseData.counter.new.api.name + ' has '
-                    }
-                }
-
-                if (response.responseData.counter.updates && response.responseData.counter.updates.count) {
-                    updatesCounter = response.responseData.counter.updates.count;
-
-                    if (response.responseData.counter.updates.api && response.responseData.counter.updates.api.name) {
-                        text += response.responseData.counter.updates.api.name + ' has '
-                    }
-                }
-
-                if (response.responseData.counter.noRelease && response.responseData.counter.noRelease.count) {
-                    noReleaseCounter = response.responseData.counter.noRelease.count;
-
-                    if (response.responseData.counter.noRelease.api && response.responseData.counter.noRelease.api.name) {
-                        text += response.responseData.counter.noRelease.api.name + ' has '
-                    }
-                }
-
-                if (newCounter > 0 || updatesCounter > 0 || noReleaseCounter > 0) {
-                    if (newCounter > 1) {
-                        newModule = 'new modules';
-                    }
-                    if (updatesCounter > 1) {
-                        update = 'updates';
-                    }
-                    if (noReleaseCounter > 1) {
-                        noRelease = ' modules with no release. It was ignored.';
-                    }
-                    if (newCounter !== 0 && updatesCounter === 0) {
-                        dataCollectionSectionForm['vars']['new_available'] = newCounter;
-                        text += newCounter + ' ' + newModule + ' available.<br> No ' + update + ' available.';
-                    } else if (newCounter === 0 && updatesCounter !== 0) {
-                        text += updatesCounter + ' new ' + update + ' available.<br> No ' + newModule + ' available.';
-                    } else if (newCounter !== 0 && updatesCounter !== 0) {
-                        text += updatesCounter + ' new ' + update + ' available.<br>' + newCounter + ' ' + newModule + ' available.';
-                    }
-
-                    if ((newCounter !== 0 || updatesCounter !== 0) && noReleaseCounter !== 0) {
-                        text += '<br>'  + noReleaseCounter + noRelease + '<br>';
-                    } else if (noReleaseCounter !== 0) {
-                        text += noReleaseCounter + noRelease + '<br>';
-                    }
-                } else {
-                    text = 'Sync Complete.<br>No ' + newModule + ' or ' + update + ' available.';
-                }
-
-                if (response.responseData.modules) {
-                    dataCollectionSectionForm['vars']['modules'] = response.responseData.modules;
-                }
-                if (response.responseData.modules_html && response.responseData.modules_html !== '') {
-                    var modulesHtml =
-                        '<div id="{{componentId}}-{{sectionId}}-modules" data-bazscantype="jstree">' +
-                            '<ul>' +
-                                response.responseData.modules_html +
-                            '</ul>' +
-                        '</div>';
-
-                    $('#{{componentId}}-{{sectionId}}-modules-tree-div').empty().html(modulesHtml);
-                }
-
-                BazContentFields.init({
-                    'componentId'   : '{{componentId}}',
-                    'sectionId'     : '{{componentId}}-{{sectionId}}',
-                    'fieldId'       : '{{componentId}}-{{sectionId}}-modules'
-                });
-
-                dataCollectionSectionForm['funcs']['jstreeSelectNode']();
-                dataCollectionSectionForm['funcs']['jstreeReady']();
-
-                dataCollectionSectionForm['vars']['syncInfo'] = text;
-
-                if (updatesCounter > 0) {
-                    dataCollectionSectionForm['vars']['update_available'] = 1;
-                    dataCollectionSectionForm['vars']['filter'] = true;
-                    dataCollectionSectionForm['vars']['initJstree'] = false;
-                    // $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
-                    // $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
-                } else {
-                    paginatedPNotify('info', {
-                        text        : dataCollectionSectionForm['vars']['syncInfo'],
-                        textTrusted : true
-                    });
-                }
+                dataCollectionSectionForm['funcs']['processSync'](response);
             }
         } else {
             paginatedPNotify('error', {
@@ -1620,6 +1340,109 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
         dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync', 'primary', false);
         $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
     }, 'json');
+}
+
+dataCollectionSectionForm['funcs']['processSync'] = function(response) {
+    var text = 'Sync Complete.<br>';
+    var newCounter = 0;
+    var updatesCounter = 0;
+    var noReleaseCounter = 0;
+    var newModule = 'new module';
+    var update = 'update';
+    var noRelease = ' module with no release. It was ignored.';
+
+    if (response.responseData.counter.new && response.responseData.counter.new.count) {
+        newCounter = response.responseData.counter.new.count;
+
+        if (response.responseData.counter.new.api && response.responseData.counter.new.api.name) {
+                text += response.responseData.counter.new.api.name + ' has '
+        }
+    }
+
+    if (response.responseData.counter.updates && response.responseData.counter.updates.count) {
+        updatesCounter = response.responseData.counter.updates.count;
+
+        if (response.responseData.counter.updates.api && response.responseData.counter.updates.api.name) {
+            text += response.responseData.counter.updates.api.name + ' has '
+        }
+    }
+
+    if (response.responseData.counter.noRelease && response.responseData.counter.noRelease.count) {
+        noReleaseCounter = response.responseData.counter.noRelease.count;
+
+        if (response.responseData.counter.noRelease.api && response.responseData.counter.noRelease.api.name) {
+            text += response.responseData.counter.noRelease.api.name + ' has '
+        }
+    }
+
+    if (newCounter > 0 || updatesCounter > 0 || noReleaseCounter > 0) {
+        if (newCounter > 1) {
+            newModule = 'new modules';
+        }
+        if (updatesCounter > 1) {
+            update = 'updates';
+        }
+        if (noReleaseCounter > 1) {
+            noRelease = ' modules with no release. They were ignored.';
+        }
+        if (newCounter !== 0 && updatesCounter === 0) {
+            dataCollectionSectionForm['vars']['new_available'] = newCounter;
+            text += newCounter + ' ' + newModule + ' available.<br> No ' + update + ' available.';
+        } else if (newCounter === 0 && updatesCounter !== 0) {
+            text += updatesCounter + ' new ' + update + ' available.<br> No ' + newModule + ' available.';
+        } else if (newCounter !== 0 && updatesCounter !== 0) {
+            text += updatesCounter + ' new ' + update + ' available.<br>' + newCounter + ' ' + newModule + ' available.';
+        }
+
+        if ((newCounter !== 0 || updatesCounter !== 0) && noReleaseCounter !== 0) {
+            text += '<br>'  + noReleaseCounter + noRelease + '<br>';
+        } else if (noReleaseCounter !== 0) {
+            text += noReleaseCounter + noRelease + '<br>';
+        }
+    } else {
+        text = 'Sync Complete.<br>No ' + newModule + ' or ' + update + ' available.';
+    }
+
+    if (response.responseData.modules) {
+        dataCollectionSectionForm['vars']['modules'] = response.responseData.modules;
+    }
+    if (response.responseData.modules_html && response.responseData.modules_html !== '') {
+        var modulesHtml =
+            '<div id="{{componentId}}-{{sectionId}}-modules" data-bazscantype="jstree">' +
+                '<ul>' +
+                    response.responseData.modules_html +
+                '</ul>' +
+            '</div>';
+
+        $('#{{componentId}}-{{sectionId}}-modules-tree-div').empty().html(modulesHtml);
+    }
+
+    BazContentFields.init({
+        'componentId'   : '{{componentId}}',
+        'sectionId'     : '{{componentId}}-{{sectionId}}',
+        'fieldId'       : '{{componentId}}-{{sectionId}}-modules'
+    });
+
+    dataCollectionSectionForm['funcs']['jstreeSelectNode']();
+    dataCollectionSectionForm['funcs']['jstreeReady']();
+
+    dataCollectionSectionForm['vars']['syncInfo'] = text;
+
+    if (updatesCounter > 0) {
+        dataCollectionSectionForm['vars']['update_available'] = 1;
+        dataCollectionSectionForm['vars']['filter'] = true;
+        dataCollectionSectionForm['vars']['initJstree'] = false;
+    } else {
+        paginatedPNotify('info', {
+            text        : dataCollectionSectionForm['vars']['syncInfo'],
+            textTrusted : true
+        });
+    }
+
+    if (dataCollectionSectionForm['vars']['queue']['total'] > 0) {
+        $('#{{componentId}}-{{sectionId}}-analyse-queue').removeClass('disabled');
+        $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', false);
+    }
 }
 
 $(document).ready(function() {

@@ -18,6 +18,8 @@ class Queues extends BasePackage
 
     protected $results;
 
+    // protected $coreExternalDependencies;
+
     public function init(bool $resetCache = false)
     {
         return $this;
@@ -61,9 +63,9 @@ class Queues extends BasePackage
         throw new \Exception('Cannot add new queue!');
     }
 
-    public function modifyQueue($data, $viaManagerSync = false)
+    public function modifyQueue($data)
     {
-        if (!$viaManagerSync &&
+        if ($data['task'] !== 'clearQueue' &&
             (!isset($data['id']) || !isset($data['moduleType']) || !isset($data['task']))
         ) {
             $this->addResponse('Provide correct information to modify queue', 1);
@@ -96,10 +98,7 @@ class Queues extends BasePackage
             $queue['results'] = [];
             $queue['tasks_count'] = [];
             $queue['total'] = 0;
-
-            if ($viaManagerSync) {
-                return $queue;
-            }
+            $queue['status'] = 0;
 
             $this->addResponse('Queue cleared', 0, ['queue' => $queue]);
         } else if ($data['task'] === 'cancel') {
@@ -210,6 +209,7 @@ class Queues extends BasePackage
         $this->queueTasks = [];
         $this->queueTasksCounter = [];
         $this->results = [];
+        // $this->coreExternalDependencies = $this->getComposerJsonFile();
 
         foreach ($queue['tasks'] as $taskName => $tasks) {
             if (!isset($this->queueTasks[$taskName])) {
@@ -236,6 +236,12 @@ class Queues extends BasePackage
                 foreach ($moduleIds as $moduleIdKey => $moduleId) {
                     $moduleMethod = 'get' . ucfirst(substr($moduleType, 0, -1)) . 'ById';
                     $module = $this->modules->$moduleType->$moduleMethod($moduleId);
+
+                    if (!$module) {
+                        unset($queue['tasks'][$taskName][$moduleType][$moduleIdKey]);
+
+                        continue;
+                    }
 
                     if ($moduleType === 'bundles') {
                         if ($taskName === 'remove') {
@@ -361,8 +367,16 @@ class Queues extends BasePackage
                         }
 
                         foreach ($module['dependencies'] as $dependencyType => $dependencies) {
+                            if (count($dependencies) === 0) {
+                                continue;
+                            }
+
                             if ($taskName === 'uninstall' || $taskName === 'remove') {
                                 continue;//we dont process dependencies for anything other than install/update
+                            }
+
+                            if ($dependencyType === 'composer' || $dependencyType === 'external') {
+                                continue;
                             }
 
                             if ($dependencyType === 'core') {
@@ -920,16 +934,47 @@ class Queues extends BasePackage
                                         }
                                     }
                                 }
+
+                            // } else {Composer dependencies will be resolved during pre-check to make sure we have also downloaded any patches that needs to be added
+                            //
+                                // foreach ($dependencies['require'] as $dependencyPackage => $dependencyVersion) {
+                                //     $this->coreExternalDependencies['require'][$dependencyPackage] = $dependencyVersion;
+                                // }
+
+                                // if (isset($dependencies['config'])) {
+                                //     $this->coreExternalDependencies['config'] = array_merge_recursive_distinct($this->coreExternalDependencies['config'], $dependencies['config']);
+                                // }
+
+                                // if (isset($dependencies['extra'])) {
+                                //     if (isset($dependencies['extra']['patches']) && count($dependencies['extra']['patches']) > 0) {
+                                //         foreach ($dependencies['extra']['patches'] as &$patches) {
+                                //             if (count($patches) > 0) {
+                                //                 foreach ($patches as $patchKey => &$patch) {
+                                //                     //Check if the patch actually exists!!
+                                //                     $patch = base_path($patch);
+                                //
+                                //                 }
+                                //             }
+                                //         }
+                                //     }
+                                //     $this->coreExternalDependencies['extra'] = array_merge_recursive_distinct($this->coreExternalDependencies['extra'], $dependencies['extra']);
+                                // }
+
+                                // try {
+                                //     $this->localContent->write('external/composer.json', $this->helper->encode($this->coreExternalDependencies, JSON_PRETTY_PRINT));
+                                // } catch (\throwable $exception) {
+
+                                // }
                             }
                         }
 
-                        if ($taskName === 'update') {
-                            if (isset($module['update_version']) &&
-                                $module['update_version'] !== ''
-                            ) {
-                                $module['version'] = $module['version'] . ' -> ' . $module['update_version'];
-                            }
-                        }
+                        // if ($taskName === 'update') {
+                        //     if (isset($module['update_version']) &&
+                        //         $module['update_version'] !== ''
+                        //     ) {
+                        //         $module['version'] = $module['version'] . ' -> ' . $module['update_version'];
+                        //     }
+                        // }
 
                         $this->addToQueueTasksAndResults(
                             $taskName,
@@ -996,7 +1041,7 @@ class Queues extends BasePackage
 
         $queue['tasks_count'] = $this->queueTasksCounter;
         $queue['results'] = $this->results;
-        trace([$this->queueTasks, $this->results]);
+        trace([$queue, $this->queueTasks, $this->results]);
         if ($this->update($queue)) {
             $this->addResponse('Analysed Queue', 0, ['queueTasks' => $this->queueTasks, 'queueTasksCounter' => $this->queueTasksCounter]);
 
@@ -1064,6 +1109,19 @@ class Queues extends BasePackage
             $this->results[$taskName][$moduleType][$module['id']]['precheck_logs'] = '-';
             $this->results[$taskName][$moduleType][$module['id']]['result'] = '-';
             $this->results[$taskName][$moduleType][$module['id']]['result_logs'] = '-';
+        }
+    }
+
+    protected function getComposerJsonFile()
+    {
+        if (file_exists(base_path('external/composer.lock'))) {
+            unlink(base_path('external/composer.lock'));
+        }
+
+        try {
+            return $this->helper->decode($this->localContent->read('external/composer.json'), true);
+        } catch (\throwable $exception) {
+            return false;
         }
     }
 }

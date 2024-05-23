@@ -847,6 +847,5 @@ Class Setup
 
 			$this->view->responseMessage = 'Error reading Core Json File. Please download Core again from repository.';
 		}
-
 	}
 }
