@@ -662,6 +662,7 @@ class DevtoolsModules extends BasePackage
                 ) {
                     $data = $this->mergeViewSettings($data);
                 }
+                $jsonContent["is_subview"] = $data["is_subview"] == '0' ? false : true;
             }
 
             $jsonContent["settings"] = $data["settings"];

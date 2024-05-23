@@ -2962,6 +2962,29 @@ dataCollectionSection =
                     label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
 
                     moduleData = dataCollectionSectionForm['vars']['modules'][label][id];
+
+                    if (label === 'views') {
+                        if (dataCollectionSectionForm['vars']['subview'] == true) {
+                            if (moduleData['is_subview'] == true) {
+                                paginatedPNotify('error', 'Subview can only have 1 views dependency and it has to be main view.');
+
+                                $('#{{componentId}}-{{sectionId}}-dependencies-modules').val(0).trigger('change');
+
+                                return false;
+                            } else {
+                                if (dataCollectionSectionForm['vars']['moduleDependencies']['views'].length > 0) {
+                                    if (dataCollectionSectionForm['vars']['moduleDependencies']['views'][0]['repo'] === moduleData['repo']) {
+                                        $('#{{componentId}}-{{sectionId}}-dependencies-modules').val(0).trigger('change');
+                                    } else {
+                                        paginatedPNotify('error', 'Subview already has 1 main view dependency remove that to add a new one.');
+
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     $('#{{componentId}}-{{sectionId}}-dependencies-modulename').val(moduleData['name']);
                     $('#{{componentId}}-{{sectionId}}-dependencies-moduleversion').val(moduleData['version']);
                     $('#{{componentId}}-{{sectionId}}-dependencies-modulerepo').val(moduleData['repo']);

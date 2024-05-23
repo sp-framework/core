@@ -130,7 +130,8 @@ class ModulesComponent extends BaseComponent
 					$modulesJson[$moduleKey][$child['id']] =
 						array_merge($modulesJson[$moduleKey][$child['id']],
 							[
-								'base_view_module_id' => $child['base_view_module_id']
+								'base_view_module_id' 	=> $child['base_view_module_id'],
+								'is_subview' 			=> $child['is_subview'] ?? false
 							]
 						);
 				}
