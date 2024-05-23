@@ -994,11 +994,11 @@ dataCollectionSection =
                         dataCollectionSectionForm['vars']['bundleModules'][label]['repo'] = moduleData['repo'];
 
                     } else if (label === 'external') {
-                        if (dataCollectionSectionForm['vars']['bundleModules']['external'].length === 0) {
-                            dataCollectionSectionForm['vars']['bundleModules']['external'] = { };
+                        if (dataCollectionSectionForm['vars']['bundleModules']['external']['composer']['require'].length === 0) {
+                            dataCollectionSectionForm['vars']['bundleModules']['external']['composer']['require'] = { };
                         }
 
-                        dataCollectionSectionForm['vars']['bundleModules'][label][$('#{{componentId}}-{{sectionId}}-modules-external').val()]
+                        dataCollectionSectionForm['vars']['bundleModules'][label]['composer']['require'][$('#{{componentId}}-{{sectionId}}-modules-external').val()]
                             = $('#{{componentId}}-{{sectionId}}-modules-external-version').val();
 
                         reset();
@@ -1041,7 +1041,7 @@ dataCollectionSection =
                         }
                         dataCollectionSectionForm['vars']['bundleModules'][label] = { };
                     } else if (label === 'external') {
-                        delete dataCollectionSectionForm['vars']['bundleModules'][label][$('#{{componentId}}-{{sectionId}}-modules-external').val()];
+                        delete dataCollectionSectionForm['vars']['bundleModules'][label]['composer']['require'][$('#{{componentId}}-{{sectionId}}-modules-external').val()];
                     } else {
                         for (var modules in dataCollectionSectionForm['vars']['bundleModules']) {
                             if (label === modules) {
@@ -3056,10 +3056,10 @@ dataCollectionSection =
                             dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]
                                 = $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val();
                         } else {
-                            if (dataCollectionSectionForm['vars']['moduleDependencies']['external'].length === 0) {
-                                dataCollectionSectionForm['vars']['moduleDependencies']['external'] = { };
+                            if (dataCollectionSectionForm['vars']['moduleDependencies'][label]['composer']['require'].length === 0) {
+                                dataCollectionSectionForm['vars']['moduleDependencies'][label]['composer']['require'] = { };
                             }
-                            dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]
+                            dataCollectionSectionForm['vars']['moduleDependencies'][label]['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]
                                 = $('#{{componentId}}-{{sectionId}}-dependencies-external-version').val();
                         }
                     } else {
@@ -3120,8 +3120,8 @@ dataCollectionSection =
                                 delete dataCollectionSectionForm['vars']['moduleDependencies']['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()];
                             }
                         } else {
-                            if (dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]) {
-                                delete dataCollectionSectionForm['vars']['moduleDependencies'][label][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()];
+                            if (dataCollectionSectionForm['vars']['moduleDependencies'][label]['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()]) {
+                                delete dataCollectionSectionForm['vars']['moduleDependencies'][label]['composer']['require'][$('#{{componentId}}-{{sectionId}}-dependencies-external').val()];
                             }
                         }
                     } else {

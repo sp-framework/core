@@ -594,13 +594,23 @@ class DevtoolsModules extends BasePackage
     {
         $defaultDependencies =
             [
-                'core'              => [],
-                'apptype'           => [],
-                'components'        => [],
-                'packages'          => [],
-                'middlewares'       => [],
-                'views'             => [],
-                'external'          => []
+                'core'                      => [],
+                'apptype'                   => [],
+                'components'                => [],
+                'packages'                  => [],
+                'middlewares'               => [],
+                'views'                     => [],
+                'external'                  => [
+                    'composer'              => [
+                        'require'           => []
+                    ],
+                    'config'                => [
+                        'allow-plugins'     => []
+                    ],
+                    'extra'                 => [
+                        'patches'           => []
+                    ]
+                ]
             ];
 
         if ($type && $type === 'views') {
@@ -1586,6 +1596,7 @@ $file .= '
         }
 
         $this->apiClient = $this->basepackages->apiClientServices->useApi($data['api_id'], true);
+
         $this->apiClientConfig = $this->apiClient->getApiConfig();
 
         if ($this->apiClientConfig['auth_type'] === 'auth' &&
@@ -2425,8 +2436,6 @@ $file .= '
 
                 return;
             }
-
-            throw $e;
         }
 
         $jsonContent = [];
