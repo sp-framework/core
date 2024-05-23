@@ -245,20 +245,21 @@ class Queues extends BasePackage
 
                     if ($moduleType === 'bundles') {
                         if ($taskName === 'remove') {
-                            if (!isset($this->queueTasks[$taskName][$moduleType][$module['id']])) {
-                                $this->queueTasks[$taskName][$moduleType][$module['id']] = [];
-                                $this->queueTasks[$taskName][$moduleType][$module['id']]['id'] = $module['id'];
-                                $this->queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['display_name'] ?? $module['name'];
-                                $this->queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $module['module_type'];
-                                $this->queueTasks[$taskName][$moduleType][$module['id']]['version'] = $module['version'];
-                                $this->queueTasks[$taskName][$moduleType][$module['id']]['repo'] = $module['repo'];
-                                $this->results[$taskName][$moduleType][$module['id']]['analyse'] = 'pass';
-                                $this->results[$taskName][$moduleType][$module['id']]['analyse_logs'] = '-';
-                                $this->results[$taskName][$moduleType][$module['id']]['precheck'] = '-';
-                                $this->results[$taskName][$moduleType][$module['id']]['precheck_logs'] = '-';
-                                $this->results[$taskName][$moduleType][$module['id']]['result'] = '-';
-                                $this->results[$taskName][$moduleType][$module['id']]['result_logs'] = '-';
-                            }
+                            $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
+                            // if (!isset($this->queueTasks[$taskName][$moduleType][$module['id']])) {
+                            //     $this->queueTasks[$taskName][$moduleType][$module['id']] = [];
+                            //     $this->queueTasks[$taskName][$moduleType][$module['id']]['id'] = $module['id'];
+                            //     $this->queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['display_name'] ?? $module['name'];
+                            //     $this->queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $module['module_type'];
+                            //     $this->queueTasks[$taskName][$moduleType][$module['id']]['version'] = $module['version'];
+                            //     $this->queueTasks[$taskName][$moduleType][$module['id']]['repo'] = $module['repo'];
+                            //     $this->results[$taskName][$moduleType][$module['id']]['analyse'] = 'pass';
+                            //     $this->results[$taskName][$moduleType][$module['id']]['analyse_logs'] = '-';
+                            //     $this->results[$taskName][$moduleType][$module['id']]['precheck'] = '-';
+                            //     $this->results[$taskName][$moduleType][$module['id']]['precheck_logs'] = '-';
+                            //     $this->results[$taskName][$moduleType][$module['id']]['result'] = '-';
+                            //     $this->results[$taskName][$moduleType][$module['id']]['result_logs'] = '-';
+                            // }
                         } else {
                             if (isset($module['bundle_modules'])) {
                                 if (is_string($module['bundle_modules'])) {
@@ -279,17 +280,18 @@ class Queues extends BasePackage
                                             $bundleModule = $this->apps->types->getAppTypeByRepo($bundles['repo']);
 
                                             if ($bundleModule) {
-                                                $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['id'] = $bundleModule['id'];
-                                                $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['name'] = $bundleModule['display_name'] ?? $bundleModule['name'];
-                                                $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['module_type'] = 'apptype';
-                                                $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['version'] = $bundleModule['version'];
-                                                $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['repo'] = $bundleModule['repo'];
-                                                $this->results[$taskName][$bundleType][$bundleModule['id']]['analyse'] = 'pass';
-                                                $this->results[$taskName][$bundleType][$bundleModule['id']]['analyse_logs'] = '-';
-                                                $this->results[$taskName][$bundleType][$bundleModule['id']]['precheck'] = '-';
-                                                $this->results[$taskName][$bundleType][$bundleModule['id']]['precheck_logs'] = '-';
-                                                $this->results[$taskName][$bundleType][$bundleModule['id']]['result'] = '-';
-                                                $this->results[$taskName][$bundleType][$bundleModule['id']]['result_logs'] = '-';
+                                                $this->addToQueueTasksAndResults($taskName, $bundleType, $bundleModule);
+                                                // $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['id'] = $bundleModule['id'];
+                                                // $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['name'] = $bundleModule['display_name'] ?? $bundleModule['name'];
+                                                // $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['module_type'] = 'apptype';
+                                                // $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['version'] = $bundleModule['version'];
+                                                // $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['repo'] = $bundleModule['repo'];
+                                                // $this->results[$taskName][$bundleType][$bundleModule['id']]['analyse'] = 'pass';
+                                                // $this->results[$taskName][$bundleType][$bundleModule['id']]['analyse_logs'] = '-';
+                                                // $this->results[$taskName][$bundleType][$bundleModule['id']]['precheck'] = '-';
+                                                // $this->results[$taskName][$bundleType][$bundleModule['id']]['precheck_logs'] = '-';
+                                                // $this->results[$taskName][$bundleType][$bundleModule['id']]['result'] = '-';
+                                                // $this->results[$taskName][$bundleType][$bundleModule['id']]['result_logs'] = '-';
                                             } else {
                                                 $this->queueTasks[$taskName][$bundleType][0]['id'] = '0';
                                                 $this->queueTasks[$taskName][$bundleType][0]['name'] = $bundles['name'];
@@ -307,19 +309,20 @@ class Queues extends BasePackage
                                             $bundleModule = $this->modules->packages->getPackageByRepo($bundles['repo']);
 
                                             if ($bundles['version'] !== $bundleModule['version']) {
-                                                if (!isset($this->queueTasks['update']['packages'][$bundleModule['id']]['id'])) {
-                                                    $this->queueTasks['update']['packages'][$bundleModule['id']]['id'] = $bundleModule['id'];
-                                                    $this->queueTasks['update']['packages'][$bundleModule['id']]['name'] = $bundleModule['display_name'] ?? $bundleModule['name'];
-                                                    $this->queueTasks['update']['packages'][$bundleModule['id']]['module_type'] = $bundleModule['module_type'];
-                                                    $this->queueTasks['update']['packages'][$bundleModule['id']]['version'] = $bundleModule['version'] . ' -> ' . $bundleModule['update_version'];
-                                                    $this->queueTasks['update']['packages'][$bundleModule['id']]['repo'] = $bundleModule['repo'];
-                                                    $this->results['update']['packages'][$bundleModule['id']]['analyse'] = 'pass';
-                                                    $this->results['update']['packages'][$bundleModule['id']]['analyse_logs'] = '-';
-                                                    $this->results['update']['packages'][$bundleModule['id']]['precheck'] = '-';
-                                                    $this->results['update']['packages'][$bundleModule['id']]['precheck_logs'] = '-';
-                                                    $this->results['update']['packages'][$bundleModule['id']]['result'] = '-';
-                                                    $this->results['update']['packages'][$bundleModule['id']]['result_logs'] = '-';
-                                                }
+                                                $this->addToQueueTasksAndResults('update', 'packages', $bundleModule);
+                                                // if (!isset($this->queueTasks['update']['packages'][$bundleModule['id']]['id'])) {
+                                                //     $this->queueTasks['update']['packages'][$bundleModule['id']]['id'] = $bundleModule['id'];
+                                                //     $this->queueTasks['update']['packages'][$bundleModule['id']]['name'] = $bundleModule['display_name'] ?? $bundleModule['name'];
+                                                //     $this->queueTasks['update']['packages'][$bundleModule['id']]['module_type'] = $bundleModule['module_type'];
+                                                //     $this->queueTasks['update']['packages'][$bundleModule['id']]['version'] = $bundleModule['version'] . ' -> ' . $bundleModule['update_version'];
+                                                //     $this->queueTasks['update']['packages'][$bundleModule['id']]['repo'] = $bundleModule['repo'];
+                                                //     $this->results['update']['packages'][$bundleModule['id']]['analyse'] = 'pass';
+                                                //     $this->results['update']['packages'][$bundleModule['id']]['analyse_logs'] = '-';
+                                                //     $this->results['update']['packages'][$bundleModule['id']]['precheck'] = '-';
+                                                //     $this->results['update']['packages'][$bundleModule['id']]['precheck_logs'] = '-';
+                                                //     $this->results['update']['packages'][$bundleModule['id']]['result'] = '-';
+                                                //     $this->results['update']['packages'][$bundleModule['id']]['result_logs'] = '-';
+                                                // }
                                             }
                                         } else {
                                             foreach ($bundles as $bundleKey => $bundle) {
@@ -329,19 +332,20 @@ class Queues extends BasePackage
                                                 $bundleModule = $this->modules->{$bundleModuleType}->$bundleModuleMethod($bundle['repo']);
 
                                                 if ($bundleModule) {
-                                                    if (!isset($this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['id'])) {
-                                                        $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['id'] = $bundleModule['id'];
-                                                        $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['name'] = $bundleModule['display_name'] ?? $bundleModule['name'];
-                                                        $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['module_type'] = $bundleModule['module_type'];
-                                                        $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['version'] = $bundleModule['version'];
-                                                        $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['repo'] = $bundleModule['repo'];
-                                                        $this->results[$taskName][$bundleType][$bundleModule['id']]['analyse'] = 'pass';
-                                                        $this->results[$taskName][$bundleType][$bundleModule['id']]['analyse_logs'] = '-';
-                                                        $this->results[$taskName][$bundleType][$bundleModule['id']]['precheck'] = '-';
-                                                        $this->results[$taskName][$bundleType][$bundleModule['id']]['precheck_logs'] = '-';
-                                                        $this->results[$taskName][$bundleType][$bundleModule['id']]['result'] = '-';
-                                                        $this->results[$taskName][$bundleType][$bundleModule['id']]['result_logs'] = '-';
-                                                    }
+                                                    $this->addToQueueTasksAndResults($taskName, $bundleType, $bundleModule);
+                                                    // if (!isset($this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['id'])) {
+                                                    //     $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['id'] = $bundleModule['id'];
+                                                    //     $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['name'] = $bundleModule['display_name'] ?? $bundleModule['name'];
+                                                    //     $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['module_type'] = $bundleModule['module_type'];
+                                                    //     $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['version'] = $bundleModule['version'];
+                                                    //     $this->queueTasks[$taskName][$bundleType][$bundleModule['id']]['repo'] = $bundleModule['repo'];
+                                                    //     $this->results[$taskName][$bundleType][$bundleModule['id']]['analyse'] = 'pass';
+                                                    //     $this->results[$taskName][$bundleType][$bundleModule['id']]['analyse_logs'] = '-';
+                                                    //     $this->results[$taskName][$bundleType][$bundleModule['id']]['precheck'] = '-';
+                                                    //     $this->results[$taskName][$bundleType][$bundleModule['id']]['precheck_logs'] = '-';
+                                                    //     $this->results[$taskName][$bundleType][$bundleModule['id']]['result'] = '-';
+                                                    //     $this->results[$taskName][$bundleType][$bundleModule['id']]['result_logs'] = '-';
+                                                    // }
                                                 } else {
                                                     $this->queueTasks[$taskName][$bundleType][$bundleKey]['id'] = '0';
                                                     $this->queueTasks[$taskName][$bundleType][$bundleKey]['name'] = $bundle['name'];
@@ -464,14 +468,7 @@ class Queues extends BasePackage
                                                         $analyseLogs = 'Dependencies require version ' . $dependencies['version'] . ' for ' . $appType['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
                                                     }
 
-                                                    $this->addToQueueTasksAndResults(
-                                                        $taskName,
-                                                        $dependencyType,
-                                                        $appType,
-                                                        null,
-                                                        'fail',
-                                                        $analyseLogs
-                                                    );
+                                                    $this->addToQueueTasksAndResults($taskName, $dependencyType, $appType, null, 'fail', $analyseLogs);
                                                     // $this->queueTasks[$taskName][$dependencyType][$appType['id']]['id'] = '0';
                                                     // $this->queueTasks[$taskName][$dependencyType][$appType['id']]['name'] = $appType['name'];
                                                     // $this->queueTasks[$taskName][$dependencyType][$appType['id']]['module_type'] = $dependencyType;
@@ -491,12 +488,7 @@ class Queues extends BasePackage
                                                     // $this->results[$taskName][$dependencyType][$appType['name']]['result_logs'] = '-';
                                                 } else if ($appType['update_version'] === $dependencies['version']) {
                                                     if ($appType['installed'] != '1') {
-                                                        $this->addToQueueTasksAndResults(
-                                                            'install',
-                                                            $dependencyType,
-                                                            $appType
-                                                        );
-
+                                                        $this->addToQueueTasksAndResults('install', $dependencyType, $appType);
                                                         // if (!isset($this->queueTasks['install'][$dependencyType][$appType['id']])) {
                                                         //     $this->queueTasks['install'][$dependencyType][$appType['id']] = [];
                                                         //     $this->queueTasks['install'][$dependencyType][$appType['id']]['id'] = $appType['id'];
@@ -512,11 +504,7 @@ class Queues extends BasePackage
                                                         //     $this->results['install'][$dependencyType][$appType['id']]['result_logs'] = '-';
                                                         // }
                                                     } else {
-                                                        $this->addToQueueTasksAndResults(
-                                                            'update',
-                                                            $dependencyType,
-                                                            $appType
-                                                        );
+                                                        $this->addToQueueTasksAndResults('update', $dependencyType, $appType);
                                                         // $this->queueTasks['update'][$dependencyType][$appType['id']] = [];
                                                         // $this->queueTasks['update'][$dependencyType][$appType['id']]['id'] = $appType['id'];
                                                         // $this->queueTasks['update'][$dependencyType][$appType['id']]['name'] = $appType['display_name'] ?? $appType['name'];
@@ -541,14 +529,7 @@ class Queues extends BasePackage
                                                         'Dependencies require version ' . $dependencies['version'] . ' for ' . $appType['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
                                                 }
 
-                                                $this->addToQueueTasksAndResults(
-                                                    $taskName,
-                                                    $dependencyType,
-                                                    $appType,
-                                                    null,
-                                                    'fail',
-                                                    $analyseLogs
-                                                );
+                                                $this->addToQueueTasksAndResults($taskName, $dependencyType, $appType, null, 'fail', $analyseLogs);
                                                 // $this->queueTasks[$taskName][$dependencyType][$appType['id']]['id'] = '0';
                                                 // $this->queueTasks[$taskName][$dependencyType][$appType['id']]['name'] = $appType['name'];
                                                 // $this->queueTasks[$taskName][$dependencyType][$appType['id']]['module_type'] = $dependencyType;
@@ -569,11 +550,7 @@ class Queues extends BasePackage
                                             }
                                         } else {
                                             if ($appType['installed'] != '1') {
-                                                $this->addToQueueTasksAndResults(
-                                                    'install',
-                                                    $dependencyType,
-                                                    $appType
-                                                );
+                                                $this->addToQueueTasksAndResults('install', $dependencyType, $appType);
                                                 // if (!isset($this->queueTasks['install'][$dependencyType][$appType['id']])) {
                                                 //     $this->queueTasks['install'][$dependencyType][$appType['id']] = [];
                                                 //     $this->queueTasks['install'][$dependencyType][$appType['id']]['id'] = $appType['id'];
@@ -592,11 +569,7 @@ class Queues extends BasePackage
                                         }
                                     } else {
                                         if ($appType['installed'] != '1') {
-                                            $this->addToQueueTasksAndResults(
-                                                'install',
-                                                $dependencyType,
-                                                $appType
-                                            );
+                                            $this->addToQueueTasksAndResults('install', $dependencyType, $appType);
                                             // if (!isset($this->queueTasks['install'][$dependencyType][$appType['id']])) {
                                             //     $this->queueTasks['install'][$dependencyType][$appType['id']] = [];
                                             //     $this->queueTasks['install'][$dependencyType][$appType['id']]['id'] = $appType['id'];
@@ -614,14 +587,7 @@ class Queues extends BasePackage
                                         }
                                     }
                                 } else {
-                                    $this->addToQueueTasksAndResults(
-                                        $taskName,
-                                        $dependencyType,
-                                        $dependencies,
-                                        null,
-                                        'fail',
-                                        $apiClientService = $this->getApiClientServices($dependencies)
-                                    );
+                                    $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependencies, null, 'fail', $this->getApiClientServices($dependencies, true));
                                     // $this->queueTasks[$taskName][$dependencyType][0]['id'] = '0';
                                     // $this->queueTasks[$taskName][$dependencyType][0]['name'] = $dependencies['name'];
                                     // $this->queueTasks[$taskName][$dependencyType][0]['module_type'] = $dependencyType;
@@ -657,14 +623,7 @@ class Queues extends BasePackage
                                                                 $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $dependencyModule['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
                                                             }
 
-                                                            $this->addToQueueTasksAndResults(
-                                                                $taskName,
-                                                                $dependencyType,
-                                                                $dependencyModule,
-                                                                null,
-                                                                'fail',
-                                                                $analyseLogs
-                                                            );
+                                                            $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependencyModule, null, 'fail', $analyseLogs);
                                                             // $this->queueTasks[$taskName][$dependencyType][$dependencyModule['id']]['id'] = '0';
                                                             // $this->queueTasks[$taskName][$dependencyType][$dependencyModule['id']]['name'] = $dependencyModule['name'];
                                                             // $this->queueTasks[$taskName][$dependencyType][$dependencyModule['id']]['module_type'] = $dependencyType;
@@ -683,11 +642,7 @@ class Queues extends BasePackage
                                                             // $this->results[$taskName][$dependencyType][$dependencyModule['name']]['result_logs'] = '-';
                                                         } else if ($dependencyModule['update_version'] === $dependency['version']) {
                                                             if ($dependencyModule['installed'] != '1') {
-                                                                $this->addToQueueTasksAndResults(
-                                                                    'install',
-                                                                    $dependencyType,
-                                                                    $dependencyModule
-                                                                );
+                                                                $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
                                                                 if ($dependencyType === 'views' &&
                                                                     array_key_exists('is_subview', $dependencyModule) &&
                                                                     $dependencyModule['is_subview'] == 0
@@ -695,11 +650,7 @@ class Queues extends BasePackage
                                                                     $dependencyModule['id'] = $dependencyModule['id'] . '-public';
                                                                     $dependencyModule['name'] = ($dependencyModule['display_name'] ?? $dependencyModule['name']) . ' (Public)';
                                                                     $dependencyModule['repo'] = $dependencyModule['repo'] . '-public';
-                                                                    $this->addToQueueTasksAndResults(
-                                                                        'install',
-                                                                        $dependencyType,
-                                                                        $dependencyModule
-                                                                    );
+                                                                    $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
                                                                 }
 
                                                                 // if (!isset($this->queueTasks['install'][$dependencyType][$dependencyModule['id']])) {
@@ -733,11 +684,8 @@ class Queues extends BasePackage
                                                                     // }
                                                                 // }
                                                             } else {
-                                                                $this->addToQueueTasksAndResults(
-                                                                    'update',
-                                                                    $dependencyType,
-                                                                    $dependencyModule
-                                                                );
+                                                                $this->addToQueueTasksAndResults('update', $dependencyType, $dependencyModule);
+
                                                                 if ($dependencyType === 'views' &&
                                                                     array_key_exists('is_subview', $dependencyModule) &&
                                                                     $dependencyModule['is_subview'] == 0
@@ -745,11 +693,8 @@ class Queues extends BasePackage
                                                                     $dependencyModule['id'] = $dependencyModule['id'] . '-public';
                                                                     $dependencyModule['name'] = ($dependencyModule['display_name'] ?? $dependencyModule['name']) . ' (Public)';
                                                                     $dependencyModule['repo'] = $dependencyModule['repo'] . '-public';
-                                                                    $this->addToQueueTasksAndResults(
-                                                                        'update',
-                                                                        $dependencyType,
-                                                                        $dependencyModule
-                                                                    );
+
+                                                                    $this->addToQueueTasksAndResults('update', $dependencyType, $dependencyModule);
                                                                 }
                                                                 // $this->queueTasks['update'][$dependencyType][$dependencyModule['id']] = [];
                                                                 // $this->queueTasks['update'][$dependencyType][$dependencyModule['id']]['id'] = $dependencyModule['id'];
@@ -789,14 +734,7 @@ class Queues extends BasePackage
                                                             $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $dependencyModule['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
                                                         }
 
-                                                        $this->addToQueueTasksAndResults(
-                                                            $taskName,
-                                                            $dependencyType,
-                                                            $dependencyModule,
-                                                            null,
-                                                            'fail',
-                                                            $analyseLogs
-                                                        );
+                                                        $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependencyModule, null, 'fail', $analyseLogs);
                                                         // $this->queueTasks[$taskName][$dependencyType][$dependencyModule['id']]['id'] = '0';
                                                         // $this->queueTasks[$taskName][$dependencyType][$dependencyModule['id']]['name'] = $dependencyModule['name'];
                                                         // $this->queueTasks[$taskName][$dependencyType][$dependencyModule['id']]['module_type'] = $dependencyType;
@@ -817,11 +755,8 @@ class Queues extends BasePackage
                                                     }
                                                 } else {
                                                     if ($dependencyModule['installed'] != '1') {
-                                                        $this->addToQueueTasksAndResults(
-                                                            'install',
-                                                            $dependencyType,
-                                                            $dependencyModule
-                                                        );
+                                                        $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
+
                                                         if ($dependencyType === 'views' &&
                                                             array_key_exists('is_subview', $dependencyModule) &&
                                                             $dependencyModule['is_subview'] == 0
@@ -829,11 +764,8 @@ class Queues extends BasePackage
                                                             $dependencyModule['id'] = $dependencyModule['id'] . '-public';
                                                             $dependencyModule['name'] = ($dependencyModule['display_name'] ?? $dependencyModule['name']) . ' (Public)';
                                                             $dependencyModule['repo'] = $dependencyModule['repo'] . '-public';
-                                                            $this->addToQueueTasksAndResults(
-                                                                'install',
-                                                                $dependencyType,
-                                                                $dependencyModule
-                                                            );
+
+                                                            $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
                                                         }
                                                         // if (!isset($this->queueTasks['install'][$dependencyType][$dependencyModule['id']])) {
                                                         //     $this->queueTasks['install'][$dependencyType][$dependencyModule['id']] = [];
@@ -869,11 +801,8 @@ class Queues extends BasePackage
                                                 }
                                             } else {
                                                 if ($dependencyModule['installed'] != '1') {
-                                                    $this->addToQueueTasksAndResults(
-                                                        'install',
-                                                        $dependencyType,
-                                                        $dependencyModule
-                                                    );
+                                                    $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
+
                                                     if ($dependencyType === 'views' &&
                                                         array_key_exists('is_subview', $dependencyModule) &&
                                                         $dependencyModule['is_subview'] == 0
@@ -881,11 +810,8 @@ class Queues extends BasePackage
                                                         $dependencyModule['id'] = $dependencyModule['id'] . '-public';
                                                         $dependencyModule['name'] = ($dependencyModule['display_name'] ?? $dependencyModule['name']) . ' (Public)';
                                                         $dependencyModule['repo'] = $dependencyModule['repo'] . '-public';
-                                                        $this->addToQueueTasksAndResults(
-                                                            'install',
-                                                            $dependencyType,
-                                                            $dependencyModule
-                                                        );
+
+                                                        $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
                                                     }
                                                     // if (!isset($this->queueTasks['install'][$dependencyType][$dependencyModule['id']])) {
                                                     //     $this->queueTasks['install'][$dependencyType][$dependencyModule['id']] = [];
@@ -920,17 +846,18 @@ class Queues extends BasePackage
                                                 }
                                             }
                                         } else {
-                                            $this->queueTasks[$taskName][$dependencyType][0]['id'] = '0';
-                                            $this->queueTasks[$taskName][$dependencyType][0]['name'] = $dependency['name'];
-                                            $this->queueTasks[$taskName][$dependencyType][0]['module_type'] = $dependencyType;
-                                            $this->queueTasks[$taskName][$dependencyType][0]['version'] = $dependency['version'];
-                                            $this->queueTasks[$taskName][$dependencyType][0]['repo'] = $dependency['repo'];
-                                            $this->results[$taskName][$dependencyType][$dependency['name']]['analyse'] = 'fail';
-                                            $this->results[$taskName][$dependencyType][$dependency['name']]['analyse_logs'] = $this->getApiClientServices($dependency, true);
-                                            $this->results[$taskName][$dependencyType][$dependency['name']]['precheck'] = '-';
-                                            $this->results[$taskName][$dependencyType][$dependency['name']]['precheck_logs'] = '-';
-                                            $this->results[$taskName][$dependencyType][$dependency['name']]['result'] = '-';
-                                            $this->results[$taskName][$dependencyType][$dependency['name']]['result_logs'] = '-';
+                                            $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependency, null, 'fail', $this->getApiClientServices($dependency, true));
+                                            // $this->queueTasks[$taskName][$dependencyType][0]['id'] = '0';
+                                            // $this->queueTasks[$taskName][$dependencyType][0]['name'] = $dependency['name'];
+                                            // $this->queueTasks[$taskName][$dependencyType][0]['module_type'] = $dependencyType;
+                                            // $this->queueTasks[$taskName][$dependencyType][0]['version'] = $dependency['version'];
+                                            // $this->queueTasks[$taskName][$dependencyType][0]['repo'] = $dependency['repo'];
+                                            // $this->results[$taskName][$dependencyType][$dependency['name']]['analyse'] = 'fail';
+                                            // $this->results[$taskName][$dependencyType][$dependency['name']]['analyse_logs'] = $this->getApiClientServices($dependency, true);
+                                            // $this->results[$taskName][$dependencyType][$dependency['name']]['precheck'] = '-';
+                                            // $this->results[$taskName][$dependencyType][$dependency['name']]['precheck_logs'] = '-';
+                                            // $this->results[$taskName][$dependencyType][$dependency['name']]['result'] = '-';
+                                            // $this->results[$taskName][$dependencyType][$dependency['name']]['result_logs'] = '-';
                                         }
                                     }
                                 }
@@ -976,11 +903,8 @@ class Queues extends BasePackage
                         //     }
                         // }
 
-                        $this->addToQueueTasksAndResults(
-                            $taskName,
-                            $moduleType,
-                            $module
-                        );
+                        $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
+
                         if ($moduleType === 'views' &&
                             array_key_exists('is_subview', $module) &&
                             $module['is_subview'] == 0
@@ -989,11 +913,7 @@ class Queues extends BasePackage
                             $module['name'] = ($module['display_name'] ?? $module['name']) . ' (Public)';
                             $module['repo'] = $module['repo'] . '-public';
 
-                            $this->addToQueueTasksAndResults(
-                                $taskName,
-                                $moduleType,
-                                $module
-                            );
+                            $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
                         }
 
                         // if (!isset($this->queueTasks[$taskName][$moduleType][$module['id']])) {
