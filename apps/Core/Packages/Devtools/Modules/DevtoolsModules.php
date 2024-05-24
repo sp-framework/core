@@ -2,7 +2,6 @@
 
 namespace Apps\Core\Packages\Devtools\Modules;
 
-use Apps\Core\Packages\Devtools\Modules\Model\AppsCoreDevtoolsModulesBundles;
 use Apps\Core\Packages\Devtools\Modules\Settings;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToCreateDirectory;
@@ -17,12 +16,6 @@ use z4kn4fein\SemVer\Version;
 
 class DevtoolsModules extends BasePackage
 {
-    protected $modelToUse = AppsCoreDevtoolsModulesBundles::class;
-
-    protected $packageName = 'bundles';
-
-    public $bundles;
-
     protected $apiClient;
 
     protected $apiClientConfig;
