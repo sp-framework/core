@@ -238,10 +238,14 @@ class Queues extends BasePackage
             }
 
             foreach ($tasks as $moduleType => $moduleIds) {
-                if (!isset($this->queueTasks[$taskName][$moduleType])) {
+                if (!isset($this->queueTasks[$taskName][$moduleType]) &&
+                    $moduleType !== 'bundles'
+                ) {
                     $this->queueTasks[$taskName][$moduleType] = [];
                 }
-                if (!isset($this->results[$taskName][$moduleType])) {
+                if (!isset($this->results[$taskName][$moduleType]) &&
+                    $moduleType !== 'bundles'
+                ) {
                     $this->results[$taskName][$moduleType] = [];
                 }
 
@@ -618,7 +622,9 @@ class Queues extends BasePackage
 
     protected function addToQueueTasksAndResults($taskName, $moduleType, $module, $version = null, $analyseResult = 'pass', $analyseResultLogs = '-',)
     {
-        $moduleId = $module['id'];
+        if (isset($module['id'])) {
+            $moduleId = $module['id'];
+        }
 
         if ($analyseResult === 'fail') {
             $moduleId = '0';
