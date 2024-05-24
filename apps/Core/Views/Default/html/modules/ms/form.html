@@ -36,6 +36,31 @@
                     )}}
                 </div>
             </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                            : component,
+                            'componentName'                        : componentName,
+                            'componentId'                          : componentId,
+                            'sectionId'                            : sectionId,
+                            'fieldId'                              : 'reset_last_sync_at',
+                            'fieldLabel'                           : 'Reset Last Sync At for Repo',
+                            'fieldType'                            : 'select2',
+                            'fieldHelp'                            : true,
+                            'fieldHelpTooltipContent'              : 'Everytime sync happens, we record the time in queues. Select repos to reset the last sync time in case there is a sync issue.',
+                            'fieldBazScan'                         : true,
+                            'fieldBazPostOnCreate'                 : true,
+                            'fieldBazPostOnUpdate'                 : true,
+                            'fieldDataSelect2OptionsArray'         : true,
+                            'fieldDataSelect2Options'              : apis,
+                            'fieldDataSelect2OptionsKey'           : 'id',
+                            'fieldDataSelect2OptionsValue'         : 'name',
+                            'fieldDataSelect2OptionsSelected'      : ''
+                        ]
+                    )}}
+                </div>
+            </div>
         </div>
     </fieldset>
 </form>
@@ -69,6 +94,9 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-api_clients'                                 : {
             'placeholder' : 'SELECT API CLIENTS'
+        },
+        '{{componentId}}-{{sectionId}}-reset_last_sync_at'                          : {
+            'placeholder' : 'SELECT API CLIENT TO RESET SYNC AT'
         },
         '{{componentId}}-{{sectionId}}-form'                                        : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',

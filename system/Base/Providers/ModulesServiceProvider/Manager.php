@@ -458,7 +458,8 @@ class Manager extends BasePackage
 
             if ($queue) {
                 if ($queue['sync'] &&
-                    isset($queue['sync'][$this->apiClientConfig['id']]['last_sync'])
+                    isset($queue['sync'][$this->apiClientConfig['id']]['last_sync']) &&
+                    $queue['sync'][$this->apiClientConfig['id']]['last_sync'] !== ''
                 ) {
                     $lastSync = \Carbon\Carbon::parse($queue['sync'][$this->apiClientConfig['id']]['last_sync']);
                 }

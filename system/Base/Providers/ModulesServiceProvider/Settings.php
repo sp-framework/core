@@ -6,6 +6,19 @@ use System\Base\BasePackage;
 
 class Settings extends BasePackage
 {
+    public function beforeUpdate($packageClass, $package, $data)
+    {
+        if (isset($data['reset_last_sync_at'])) {
+            $queue = $this->modules->queues->getActiveQueue();
+
+            if (isset($queue['sync'][$data['reset_last_sync_at']])) {
+                unset($queue['sync'][$data['reset_last_sync_at']]);
+
+                $this->modules->queues->update($queue);
+            }
+        }
+    }
+
     public function afterUpdate($packageClass, $package, $data)
     {
         if (is_string($package['settings'])) {
