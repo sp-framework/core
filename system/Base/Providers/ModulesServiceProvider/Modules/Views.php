@@ -481,7 +481,7 @@ class Views extends BasePackage
 
     public function getCalculatedAssetsVersion()
     {
-        $viewsModulesVersion = [0,0,0,1];
+        $viewsModulesVersion = [0,0,0];
 
         $baseViewVersion = $this->view['version'];
         $baseViewVersion = explode('.', $baseViewVersion);
@@ -499,8 +499,6 @@ class Views extends BasePackage
                     $viewsModulesVersion[$key] = $viewsModulesVersion[$key] + (int) $version;
                 }
             }
-
-            $viewsModulesVersion[3] = count($views) + $viewsModulesVersion[3];
         }
 
         $this->view['view_modules_version'] = $viewsModulesVersion = implode('.', $viewsModulesVersion);
@@ -525,7 +523,7 @@ class Views extends BasePackage
                 $this->assetsVersion = $this->core->getVersion();
             } else {
                 if ($this->view['view_modules_version'] &&
-                    $this->view['view_modules_version'] !== '0.0.0.0'
+                    $this->view['view_modules_version'] !== '0.0.0'
                 ) {
                     $this->assetsVersion = $this->view['view_modules_version'];
                 } else {
