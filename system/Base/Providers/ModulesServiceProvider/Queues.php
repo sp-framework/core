@@ -199,6 +199,12 @@ class Queues extends BasePackage
             $tasks = $queue['results'];
         }
         foreach ($tasks as $taskType => $task) {
+            if (isset($tasks['analysed']) &&
+                $taskType === 'analysed'
+            ) {
+                continue;
+            }
+
             if (count($task) > 0) {
                 foreach ($task as $moduleType => $modules) {
                     if (count($modules) > 0) {
@@ -226,6 +232,12 @@ class Queues extends BasePackage
         // $this->coreExternalDependencies = $this->getComposerJsonFile();
 
         foreach ($queue['tasks'] as $taskName => $tasks) {
+            if (isset($queue['tasks']['analysed']) &&
+                $taskName === 'analysed'
+            ) {
+                continue;
+            }
+
             if (!isset($this->queueTasks[$taskName])) {
                 $this->queueTasks[$taskName] = [];
             }
@@ -584,10 +596,13 @@ class Queues extends BasePackage
         }
 
         $queue['results'] = $this->results;
+
+        $queue['tasks']['analysed'] = $this->queueTasks;
+
         $this->getTasksCount($queue, true);
 
         if ($this->update($queue)) {
-            $this->addResponse('Analysed Queue', 0, ['queueTasks' => $this->queueTasks, 'queueTasksCounter' => $queue['tasks_count']]);
+            $this->addResponse('Analysed Queue');
 
             return true;
         }

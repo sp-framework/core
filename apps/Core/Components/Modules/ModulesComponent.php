@@ -41,12 +41,14 @@ class ModulesComponent extends BaseComponent
 				trace([$e]);
 			}
 
-			$this->view->queues = true;
-			$this->view->queue = $queue;
-			$this->view->queueTasks = $this->modules->queues->packagesData->responseData['queueTasks'] ?? [];
-			$this->view->queueTasksCounter = $this->modules->queues->packagesData->responseData['queueTasksCounter'] ?? [];
+			if ($queue['total'] !== 0) {
+				$this->view->queues = true;
+				$this->view->queue = $queue;
+				$this->view->queueTasks = $this->modules->queues->packagesData->responseData['queueTasks'] ?? [];
+				$this->view->queueTasksCounter = $this->modules->queues->packagesData->responseData['queueTasksCounter'] ?? [];
 
-			return;
+				return;
+			}
 		}
 
 		$this->view->modules = $this->modulesManager->getRepositoryModules();

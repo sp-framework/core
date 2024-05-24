@@ -3,17 +3,17 @@
 {% set queueTasksCounterUpdate = 0 %}
 {% set queueTasksCounterUninstall = 0 %}
 {% set queueTasksCounterRemove = 0 %}
-{% if queueTasksCounter['install'] is defined %}
-    {% set queueTasksCounterInstall = queueTasksCounter['install'] %}
+{% if queue['tasks_count']['install'] is defined %}
+    {% set queueTasksCounterInstall = queue['tasks_count']['install'] %}
 {% endif %}
-{% if queueTasksCounter['update'] is defined %}
-    {% set queueTasksCounterUpdate = queueTasksCounter['update'] %}
+{% if queue['tasks_count']['update'] is defined %}
+    {% set queueTasksCounterUpdate = queue['tasks_count']['update'] %}
 {% endif %}
-{% if queueTasksCounter['uninstall'] is defined %}
-    {% set queueTasksCounterUninstall = queueTasksCounter['uninstall'] %}
+{% if queue['tasks_count']['uninstall'] is defined %}
+    {% set queueTasksCounterUninstall = queue['tasks_count']['uninstall'] %}
 {% endif %}
-{% if queueTasksCounter['remove'] is defined %}
-    {% set queueTasksCounterRemove = queueTasksCounter['remove'] %}
+{% if queue['tasks_count']['remove'] is defined %}
+    {% set queueTasksCounterRemove = queue['tasks_count']['remove'] %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -63,9 +63,9 @@
     </div>
 </div>
 {% set moduleHtml = '' %}
-{% set hasError = 'false' %}
-{% if queueTasks|length > 0 %}
-    {% for task, queueTaskModules in queueTasks %}
+{% set hasAnalysisError = 'false' %}
+{% if queue['tasks']['analysed']|length > 0 %}
+    {% for task, queueTaskModules in queue['tasks']['analysed'] %}
         {% if task === 'install' or task === 'uninstall' or task === 'update' or task === 'remove' %}
             {% if queueTaskModules|length > 0 %}
                 {% for modulesType, modules in queueTaskModules %}
@@ -84,7 +84,7 @@
                             {% set errorClass = '' %}
                             {% if queue['results'][task][modulesType][module['name']]['analyse'] is defined and queue['results'][task][modulesType][module['name']]['analyse'] === 'fail' %}
                                 {% set module['id'] = module['name'] %}
-                                {% set hasError = 'true' %}
+                                {% set hasAnalysisError = 'true' %}
                                 {% set error = 'true' %}
                                 {% set errorClass = ' class="bg-danger"' %}
                             {% endif %}
@@ -175,7 +175,6 @@ dataCollectionSectionForm['funcs'] = { };
 dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
-    postData['queue'] = dataCollectionSectionForm['vars']['queue']['tasks'];
     postData['process'] = 'runprecheck';
     if (task === 'process') {
         postData['process'] = 'runprocess';
@@ -225,7 +224,7 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
         $('#{{componentId}}-{{sectionId}}-result-queue').attr('disabled', false);
     }
 
-    if (dataCollectionSectionForm['vars']['hasError']) {
+    if (dataCollectionSectionForm['vars']['hasAnalysisError']) {
         $('#{{componentId}}-{{sectionId}}-perform-precheck, ' +
           '#{{componentId}}-{{sectionId}}-process-queue, ' +
           '#{{componentId}}-{{sectionId}}-result-queue').attr('disabled', true);
@@ -281,7 +280,7 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
     });
 }
 $(document).ready(function() {
-    dataCollectionSectionForm['vars']['hasError'] = BazHelpers.stringToBoolean("{{hasError}}");
+    dataCollectionSectionForm['vars']['hasAnalysisError'] = BazHelpers.stringToBoolean("{{hasAnalysisError}}");
 
     dataCollectionSectionForm['funcs']['initQueueButtons']();
 
