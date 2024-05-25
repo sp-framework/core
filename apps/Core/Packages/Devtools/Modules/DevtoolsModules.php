@@ -1696,8 +1696,20 @@ $file .= '
                     $module['buildMetaPrefix'] = explode('.', $module['buildMetaPrefix']);
 
                     array_walk($module['buildMetaPrefix'], function(&$prefix) {
-                        if ($prefix === 'now') {
+                        if ($prefix === 'now') {//now
                             $prefix = time();
+                        }
+                        if ($prefix === 'dom') {//day of month
+                            $prefix = (\Carbon\Carbon::now())->day;
+                        }
+                        if ($prefix === 'moy') {//month of year
+                            $prefix = (\Carbon\Carbon::now())->month;
+                        }
+                        if ($prefix === 'wom') {//week of month
+                            $prefix = (\Carbon\Carbon::now())->weekOfMonth;
+                        }
+                        if ($prefix === 'woy') {//week of year
+                            $prefix = (\Carbon\Carbon::now())->weekOfYear;
                         }
                     });
                     $parsedVersionString = $parsedVersionString . '+' . implode('.', $module['buildMetaPrefix']);
@@ -1788,8 +1800,20 @@ $file .= '
                     $module['buildMetaPrefix'] = explode('.', $module['buildMetaPrefix']);
 
                     array_walk($module['buildMetaPrefix'], function(&$prefix) {
-                        if ($prefix === 'now') {
+                        if ($prefix === 'now') {//now
                             $prefix = time();
+                        }
+                        if ($prefix === 'dom') {//day of month
+                            $prefix = (\Carbon\Carbon::now())->day;
+                        }
+                        if ($prefix === 'moy') {//month of year
+                            $prefix = (\Carbon\Carbon::now())->month;
+                        }
+                        if ($prefix === 'wom') {//week of month
+                            $prefix = (\Carbon\Carbon::now())->weekOfMonth;
+                        }
+                        if ($prefix === 'woy') {//week of year
+                            $prefix = (\Carbon\Carbon::now())->weekOfYear;
                         }
                     });
 
@@ -1808,8 +1832,20 @@ $file .= '
                     $newVersion = explode('+', $newVersion)[0];
 
                     array_walk($module['buildMetaPrefix'], function(&$prefix) {
-                        if ($prefix === 'now') {
+                        if ($prefix === 'now') {//now
                             $prefix = time();
+                        }
+                        if ($prefix === 'dom') {//day of month
+                            $prefix = (\Carbon\Carbon::now())->day;
+                        }
+                        if ($prefix === 'moy') {//month of year
+                            $prefix = (\Carbon\Carbon::now())->month;
+                        }
+                        if ($prefix === 'wom') {//week of month
+                            $prefix = (\Carbon\Carbon::now())->weekOfMonth;
+                        }
+                        if ($prefix === 'woy') {//week of year
+                            $prefix = (\Carbon\Carbon::now())->weekOfYear;
                         }
                     });
 
