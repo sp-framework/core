@@ -44,8 +44,6 @@ class ModulesComponent extends BaseComponent
 			if ($queue['total'] !== 0) {
 				$this->view->queues = true;
 				$this->view->queue = $queue;
-				$this->view->queueTasks = $this->modules->queues->packagesData->responseData['queueTasks'] ?? [];
-				$this->view->queueTasksCounter = $this->modules->queues->packagesData->responseData['queueTasksCounter'] ?? [];
 
 				return;
 			}
