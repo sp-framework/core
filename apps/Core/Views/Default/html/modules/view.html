@@ -1,4 +1,4 @@
-{% if queues is defined and queues === true %}
+{% if queues is defined and queues === true and queue['total'] != 0 %}
     {% set footerContent =
         adminltetags.useTag('buttons',
             [

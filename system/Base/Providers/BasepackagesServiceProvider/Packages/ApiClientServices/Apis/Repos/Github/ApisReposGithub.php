@@ -6,7 +6,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices
 
 class ApisReposGithub extends Repos
 {
-    public function init($apiConfig = null, $api = null, $httpOptions = null)
+    public function init($apiConfig = null, $api = null, $httpOptions = null, $monitorProgress = null)
     {
         if (!isset($apiConfig['category'])) {
             $apiConfig['category'] = 'Repos';
@@ -15,7 +15,7 @@ class ApisReposGithub extends Repos
             $apiConfig['provider'] = 'Github';
         }
 
-        parent::init($apiConfig, $api, $httpOptions);
+        parent::init($apiConfig, $api, $httpOptions, $monitorProgress);
 
         return $this;
     }

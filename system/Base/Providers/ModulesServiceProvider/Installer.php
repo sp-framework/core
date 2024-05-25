@@ -7,9 +7,15 @@ use z4kn4fein\SemVer\Version;
 
 class Installer extends BasePackage
 {
-    protected $api;
+    protected $queue;
 
-    protected $apiConfig;
+    public static $trackCounter = 0;
+
+    public $method;
+
+    protected $apiClient;
+
+    protected $apiClientConfig;
 
     protected $process;
 
@@ -23,7 +29,7 @@ class Installer extends BasePackage
 
     protected $preCheckResult = [];
 
-    protected $modulesToInstallOrUpdate = [];
+    protected $modulesToInstallOrUpdate;
 
     protected $runProcessPrecheckProgressMethods;
 
@@ -33,6 +39,14 @@ class Installer extends BasePackage
 
     public function init($process = 'precheck')
     {
+        $this->queue = $this->modules->queues->getActiveQueue();
+
+        if (!$this->queue) {
+            $this->addResponse('Not able to obtain queue', 1);
+
+            return false;
+        }
+
         $this->process = $process;
 
         $this->zip = new \ZipArchive;
@@ -81,12 +95,8 @@ class Installer extends BasePackage
 
     public function runProcess(array $data)
     {
-        if (!isset($data['queue']) || isset($data['queue']) && !is_array($data['queue'])) {
-            $this->addResponse('Nothing to process. Add something to queue!', 1);
-
-            $this->basepackages->progress->preCheckComplete(false);
-
-            $this->basepackages->progress->resetProgress();
+        if (!isset($this->queue['tasks']['analysed'])) {
+            $this->addResponse('Queue needs to be analysed first!', 1);
 
             return false;
         }
@@ -97,65 +107,43 @@ class Installer extends BasePackage
             $this->basepackages->progress->preCheckComplete();
 
             foreach ($this->runProcessPrecheckProgressMethods as $method) {
-                if ($this->withProgress($method['method'], $data) === false) {
+                if ($this->withProgress($method['method'], $method['args'] ?? []) === false) {
                      return false;
                 }
 
-                usleep(500);
+                // usleep(500);
             }
         }
     }
 
-    protected function analyseQueueData($data)
+    protected function precheckQueueData($module)
     {
-        foreach ($data['queue'] as $task => $modules) {
-            if ($task === 'install' || $task === 'update') {
-                if (count($modules) > 0) {
-                    foreach ($modules as $moduleType => $moduleList) {
-                        if (count($moduleList) > 0) {
-                            foreach ($moduleList as $module) {
-                                $moduleInfo = $this->modules->$moduleType->getById($module);
+        $this->modulesToInstallOrUpdate = $this->modules->manager->getModuleInfo(
+            [
+                'module_type'   => $module['module_type'],
+                'module_id'     => $module['id'],
+                'sync'          => true
+            ]
+        );
 
-                                if ($moduleInfo) {
-                                    if (array_key_exists('files', $moduleInfo)) {
-                                        unset($moduleInfo['files']);
-                                    }
+        if ($this->modulesToInstallOrUpdate) {
+            if (is_string($this->modulesToInstallOrUpdate['repo_details'])) {
+                try {
+                    $this->modulesToInstallOrUpdate['repo_details'] = $this->helper->decode($this->modulesToInstallOrUpdate['repo_details'], true);
+                } catch (\Exception $e) {
+                    $this->addResponse('Could not retrieve repository information for module: ' . $this->modulesToInstallOrUpdate['name'], 1);
 
-                                    if (!$moduleInfo['repo_details']) {
-                                        $moduleName = $moduleInfo['name'];
+                    $this->basepackages->progress->resetProgress();
 
-                                        $moduleInfo = $this->modules->manager->getModuleInfo(
-                                            [
-                                                'module_type'   => $moduleType,
-                                                'module_id'     => $moduleInfo['id'],
-                                                'sync'          => true
-                                            ]
-                                        );
-
-                                        if (!$moduleInfo) {
-                                            $this->addResponse('Could not retrieve repository information for module: ' . $moduleName);
-
-                                            return false;
-                                        }
-                                    } else {
-                                        if (is_string($moduleInfo['repo_details'])) {
-                                            try {
-                                                $moduleInfo['repo_details'] = $this->helper->decode($moduleInfo['repo_details'], true);
-                                            } catch (\Exception $e) {
-                                                $this->addResponse('Could not retrieve repository information for module: ' . $moduleInfo['name']);
-
-                                                return false;
-                                            }
-                                        }
-                                    }
-
-                                    array_push($this->modulesToInstallOrUpdate, $moduleInfo);
-                                }
-                            }
-                        }
-                    }
+                    return false;
                 }
             }
+        } else {
+            $this->addResponse($this->modules->manager->packagesData->responseMessage ?? 'Could not retrieve repository information for module: ' . $module['name'], 1);
+
+            $this->basepackages->progress->resetProgress();
+
+            return false;
         }
 
         return true;
@@ -163,60 +151,139 @@ class Installer extends BasePackage
 
     protected function downloadModulesFromRepo($data)
     {
-        //Needs subProgress for downloading multiple modules from different repos
-        foreach ($this->modulesToInstallOrUpdate as $key => $moduleToInstallOrUpdate) {
-            // remove old data so there is no conflict
-            $files = $this->basepackages->utils->scanDir($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name']);
-            if (count($files['files']) > 0) {
-                foreach ($files['files'] as $file) {
-                    $this->localContent->delete($file);
-                }
-            }
-            if (count($files['dirs']) > 0) {
-                foreach ($files['dirs'] as $dir) {
-                    $this->localContent->deleteDirectory($dir);
-                }
-            }
+        if ($this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] === '' &&
+            $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['tag_name'] !== ''
+        ) {
+            $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] =
+                $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['tag_name'];
+        }
 
-            $this->localContent->createDirectory($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name']);
+        // remove old data so there is no conflict
+        $files =
+            $this->basepackages->utils->scanDir(
+                $this->downloadLocation .
+                $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name']
+            );
 
-            if (!$this->initApi($moduleToInstallOrUpdate['api_id'])) {
+        if (count($files['files']) > 0) {
+            foreach ($files['files'] as $file) {
+                $this->localContent->delete($file);
+            }
+        }
+
+        if (count($files['dirs']) > 0) {
+            foreach ($files['dirs'] as $dir) {
+                $this->localContent->deleteDirectory($dir);
+            }
+        }
+
+        $this->localContent->createDirectory(
+            $this->downloadLocation .
+            $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+            $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name']
+        );
+
+        if ((isset($this->modulesToInstallOrUpdate['repo_details']['details']['internal']) &&
+            $this->modulesToInstallOrUpdate['repo_details']['details']['internal'] == true) ||
+            (isset($this->modulesToInstallOrUpdate['repo_details']['details']['private']) &&
+            $this->modulesToInstallOrUpdate['repo_details']['details']['private'] == true)
+        ) {
+            if (!$this->initApi([
+                    'api_id' => $this->modulesToInstallOrUpdate['api_id']
+                    ],
+                    base_path($this->downloadLocation .
+                        $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                        $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/' .
+                        $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                        $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip'
+                    ),
+                    'downloadModulesFromRepo'
+                )
+            ) {
                 $this->basepackages->progress->resetProgress();
 
                 return false;
             }
 
-            if (strtolower($this->apiConfig['provider']) === 'gitea') {
+            if ($this->apiClientConfig['id'] !== $this->modulesToInstallOrUpdate['api_id']) {
+                $this->apiClientConfig = null;
+
+                if (!$this->initApi([
+                        'api_id' => $this->modulesToInstallOrUpdate['api_id']
+                        ],
+                        base_path($this->downloadLocation .
+                            $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                            $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/' .
+                            $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                            $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip'
+                        ),
+                        'downloadModulesFromRepo'
+                    )
+                ) {
+                    $this->basepackages->progress->resetProgress();
+
+                    return false;
+                }
+            }
+
+            $args =
+                [
+                    $this->apiClientConfig['org_user'],
+                    $this->modulesToInstallOrUpdate['repo_details']['details']['name']
+                ];
+            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
                 $collection = 'RepositoryApi';
                 $method = 'repoGetArchive';
-                $args = [$this->apiConfig['org_user'], $moduleToInstallOrUpdate['repo_details']['details']['name'], $moduleToInstallOrUpdate['repo_details']['latestRelease']['tag_name'] . '.zip'];
-            } else if (strtolower($this->apiConfig['provider']) === 'github') {
-                //For github
+                $args = array_merge($args, [$this->modulesToInstallOrUpdate['repo_details']['latestRelease']['tag_name'] . '.zip']);
+            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                $collection = 'ReposApi';
+                $method = 'reposDownloadZipballArchive';
+                $args = array_merge($args, ['main']);
             }
 
             try {
-                $latestRelease = $this->api->useMethod($collection, $method, $args)->getResponse();
-                $file = $this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name'] . '/' . $moduleToInstallOrUpdate['repo_details']['latestRelease']['tag_name'] . '.zip';
+                $latestRelease = $this->apiClient->useMethod($collection, $method, $args)->getResponse();
 
-                $this->localContent->write($file, $latestRelease->getContents());
+                $file =
+                    $this->downloadLocation .
+                    $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                    $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/' .
+                    $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                    $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip';
+
+                $this->localContent->write($file, $latestRelease->getBody()->getContents());
             } catch (\throwable $e) {
+                trace([$e]);
                 $this->basepackages->progress->resetProgress();
 
                 $this->addResponse($e->getMessage(), 1);
 
                 return false;
             }
+        } else {
+            $this->method = 'downloadModulesFromRepo';
 
-            $this->zipFiles[$key]['location'] = base_path($this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name'] . '/');
-            $this->zipFiles[$key]['file'] = base_path($file);
-            $this->zipFiles[$key]['name'] = $moduleToInstallOrUpdate['repo_details']['details']['name'];
-
-            $this->modulesToProcess[$moduleToInstallOrUpdate['repo_details']['details']['name']]['location'] =
-                $this->downloadLocation . $moduleToInstallOrUpdate['repo_details']['details']['name'] . '/' . $moduleToInstallOrUpdate['repo_details']['details']['name'] . '/';
-            $this->modulesToProcess[$moduleToInstallOrUpdate['repo_details']['details']['name']]['module'] = $moduleToInstallOrUpdate;
+            if (isset($this->modulesToInstallOrUpdate['repo_details']['latestRelease']['zipball_url'])) {
+                return $this->downloadData(
+                    $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['zipball_url'],
+                    base_path($this->downloadLocation .
+                              $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                              $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/' .
+                              $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                              $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip')
+                );
+            }
         }
+            // $this->zipFiles[$key]['location'] = base_path($this->downloadLocation . $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '/');
+            // $this->zipFiles[$key]['file'] = base_path($file);
+            // $this->zipFiles[$key]['name'] = $this->modulesToInstallOrUpdate['repo_details']['details']['name'];
 
-        return true;
+            // $this->modulesToProcess[$this->modulesToInstallOrUpdate['repo_details']['details']['name']]['location'] =
+            //     $this->downloadLocation . $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '/' . $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '/';
+            // $this->modulesToProcess[$this->modulesToInstallOrUpdate['repo_details']['details']['name']]['module'] = $this->modulesToInstallOrUpdate;
+
+        // return true;
     }
 
     protected function extractModulesDownloadedFromRepo()
@@ -698,29 +765,51 @@ class Installer extends BasePackage
 
     protected function registerRunProcessPrecheckProgressMethods()
     {
-        $this->runProcessPrecheckProgressMethods =
-            [
-                [
-                    'method'    => 'analyseQueueData',
-                    'text'      => 'Analyse Queue...'
-                ],
-                [
-                    'method'    => 'downloadModulesFromRepo',
-                    'text'      => 'Download module files from repository...'
-                ],
-                [
-                    'method'    => 'extractModulesDownloadedFromRepo',
-                    'text'      => 'Extract downloaded module zip files...'
-                ],
-                [
-                    'method'    => 'checkDependencies',
-                    'text'      => 'Checking dependencies...'
-                ],
-                [
-                    'method'    => 'finishPrecheck',
-                    'text'      => 'Fnishing up...'
-                ]
-            ];
+        $this->runProcessPrecheckProgressMethods = [];
+
+        foreach ($this->queue['tasks']['analysed'] as $taskName => $modulesTypes) {
+            if (($taskName === 'install' || $taskName === 'update') &&
+                count($modulesTypes) > 0
+            ) {
+                foreach ($modulesTypes as $moduleType => $modules) {
+                    if (count($modules) === 0) {
+                        continue;
+                    }
+
+                    foreach ($modules as $module) {
+                        array_push($this->runProcessPrecheckProgressMethods,
+                            [
+                                'method'    => 'precheckQueueData',
+                                'text'      => 'Perform precheck for module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
+                                'args'      => $module,
+                            ]
+                        );
+                        array_push($this->runProcessPrecheckProgressMethods,
+                            [
+                                'method'    => 'downloadModulesFromRepo',
+                                'text'      => 'Download module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') files from repository...',
+                                'args'      => $module,
+                                'remoteWeb' => true
+                            ]
+                        );
+                        // array_push($this->runProcessPrecheckProgressMethods,
+                        //     [
+                        //         'method'    => 'extractModulesDownloadedFromRepo',
+                        //         'text'      => 'Extract module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') files...',
+                        //         'args'      => $module,
+                        //     ]
+                        // );
+                    }
+                }
+            }
+        }
+
+        // array_push($this->runProcessPrecheckProgressMethods,
+        //     [
+        //         'method'    => 'finishPrecheck',
+        //         'text'      => 'Finishing up...'
+        //     ]
+        // );
 
         $this->basepackages->progress->registerMethods($this->runProcessPrecheckProgressMethods);
     }
@@ -746,27 +835,47 @@ class Installer extends BasePackage
         $this->basepackages->progress->registerMethods($this->runProcessProgressMethods);
     }
 
-    protected function initApi($id)
+    protected function initApi($data, $sink = null, $method = null)
     {
-        $this->api = $this->basepackages->api->useApi($id, true);
+        if ($this->apiClient && $this->apiClientConfig) {
+            return true;
+        }
 
-        $this->apiConfig = $this->api->getApiConfig();
+        if (!isset($data['api_id'])) {
+            $this->addResponse('API information not provided', 1, []);
 
-        if ($this->apiConfig['auth_type'] === 'auth' &&
-            ((!$this->apiConfig['username'] || $this->apiConfig['username'] === '') &&
-             (!$this->apiConfig['password'] || $this->apiConfig['password'] === ''))
+            return false;
+        }
+
+        if (isset($data['api_id']) && $data['api_id'] == '0') {
+            $this->addResponse('This is local module and not remote module, cannot sync.', 1, []);
+
+            return false;
+        }
+
+        if ($sink & $method) {
+            $this->apiClient = $this->basepackages->apiClientServices->setHttpOptions(['timeout' => 3600])->setMonitorProgress($sink, $method)->useApi($data['api_id']);
+        } else {
+            $this->apiClient = $this->basepackages->apiClientServices->useApi($data['api_id']);
+        }
+
+        $this->apiClientConfig = $this->apiClient->getApiConfig();
+
+        if ($this->apiClientConfig['auth_type'] === 'auth' &&
+            ((!$this->apiClientConfig['username'] || $this->apiClientConfig['username'] === '') &&
+            (!$this->apiClientConfig['password'] || $this->apiClientConfig['password'] === ''))
         ) {
             $this->addResponse('Username/Password missing, cannot sync', 1);
 
             return false;
-        } else if ($this->apiConfig['auth_type'] === 'access_token' &&
-                   (!$this->apiConfig['access_token'] || $this->apiConfig['access_token'] === '')
+        } else if ($this->apiClientConfig['auth_type'] === 'access_token' &&
+                  (!$this->apiClientConfig['access_token'] || $this->apiClientConfig['access_token'] === '')
         ) {
             $this->addResponse('Access token missing, cannot sync', 1);
 
             return false;
-        } else if ($this->apiConfig['auth_type'] === 'autho' &&
-                   (!$this->apiConfig['authorization'] || $this->apiConfig['authorization'] === '')
+        } else if ($this->apiClientConfig['auth_type'] === 'autho' &&
+                  (!$this->apiClientConfig['authorization'] || $this->apiClientConfig['authorization'] === '')
         ) {
             $this->addResponse('Authorization token missing, cannot sync', 1);
 
@@ -776,6 +885,67 @@ class Installer extends BasePackage
         return true;
     }
 
+    protected function downloadData($url, $sink)
+    {
+        $download = $this->remoteWebContent->request(
+            'GET',
+            $url,
+            $this->getHttpOptions($sink)
+        );
+
+        $this->trackCounter = 0;
+
+        if ($download->getStatusCode() === 200) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getHttpOptions($sink)//Public because remoteWebContent needs to access it
+    {
+        self::$trackCounter = 0;
+
+        return [
+            'progress' => function(
+                $downloadTotal,
+                $downloadedBytes,
+                $uploadTotal,
+                $uploadedBytes
+            ) {
+                $trackCounter = \System\Base\Providers\ModulesServiceProvider\Installer::$trackCounter;
+
+                $counters =
+                        [
+                            'downloadTotal'     => $downloadTotal,
+                            'downloadedBytes'   => $downloadedBytes,
+                            'uploadTotal'       => $uploadTotal,
+                            'uploadedBytes'     => $uploadedBytes
+                        ];
+
+                if ($downloadedBytes === 0) {
+                    return;
+                }
+
+                //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
+                //So this way, we only update progress when there is actually an update.
+                if ($downloadedBytes === $this->trackCounter) {
+                    return;
+                }
+
+                $this->trackCounter = $downloadedBytes;
+
+                $downloadComplete = null;
+                if ($downloadedBytes === $downloadTotal) {
+                    $downloadComplete = true;
+                }
+                $this->basepackages->progress->updateProgress($this->method, $downloadComplete, false, null, $counters);
+            },
+            'verify'            => false,
+            'connect_timeout'   => 60,
+            'sink'              => $sink
+        ];
+    }
     // protected function downloadPackagesAndDependencies($module)
     // {
     //     try {

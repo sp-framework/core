@@ -24,6 +24,10 @@ class ApiClientServices extends BasePackage
 
     public $apiStats;
 
+    public $httpOptions;
+
+    public $monitorProgress;
+
     public function init()
     {
         $this->packageName = 'apiClientServices';
@@ -39,6 +43,21 @@ class ApiClientServices extends BasePackage
         }
 
         $this->apiStats = new ApiClientServicesStats;
+
+        return $this;
+    }
+
+    public function setHttpOptions(array $options)
+    {
+        $this->httpOptions = $options;
+
+        return $this;
+    }
+
+    public function setMonitorProgress($monitorProgressSink, $method)
+    {
+        $this->monitorProgress['sink'] = $monitorProgressSink;
+        $this->monitorProgress['method'] = $method;
 
         return $this;
     }
@@ -363,7 +382,7 @@ class ApiClientServices extends BasePackage
 
         if ($apiClass) {
             try {
-                return (new $apiClass())->init($config, $this);
+                return (new $apiClass())->init($config, $this, $this->httpOptions, $this->monitorProgress);
             } catch (\Exception $e) {
                 throw $e;
             }

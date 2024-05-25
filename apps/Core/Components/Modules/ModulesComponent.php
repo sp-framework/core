@@ -273,14 +273,22 @@ class ModulesComponent extends BaseComponent
 
 	public function processQueueAction()
 	{
-		$this->requestIsPost();
+		try {
+			$this->requestIsPost();
 
-		$this->modules->installer->init($this->postData()['process'])->runProcess($this->postData());
+			$installer = $this->modules->installer->init($this->postData()['process']);
 
-		$this->addResponse(
-			$this->modules->installer->packagesData->responseMessage,
-			$this->modules->installer->packagesData->responseCode
-		);
+			if ($installer) {
+				$installer->runProcess($this->postData());
+			}
+
+			$this->addResponse(
+				$this->modules->installer->packagesData->responseMessage,
+				$this->modules->installer->packagesData->responseCode
+			);
+		} catch (\Exception $e) {
+			trace([$e]);
+		}
 	}
 
 	public function saveModuleSettingsAction()

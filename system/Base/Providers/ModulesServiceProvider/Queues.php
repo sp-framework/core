@@ -578,6 +578,7 @@ class Queues extends BasePackage
                             }
                         }
 
+                        $module['name'] = $module['display_name'] ?? $module['name'];
                         $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
 
                         if ($moduleType === 'views' &&
@@ -649,7 +650,7 @@ class Queues extends BasePackage
         if (!isset($this->queueTasks[$taskName][$moduleType][$module['id']])) {
             $this->queueTasks[$taskName][$moduleType][$module['id']] = [];
             $this->queueTasks[$taskName][$moduleType][$module['id']]['id'] = $moduleId;
-            $this->queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['display_name'] ?? $module['name'];
+            $this->queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['name'];
             $this->queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $moduleType;
             if (!$version) {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['version'] =

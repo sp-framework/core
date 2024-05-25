@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set queueTasksCounterInstall = 0 %}
 {% set queueTasksCounterUpdate = 0 %}
 {% set queueTasksCounterUninstall = 0 %}
@@ -284,7 +284,7 @@ $(document).ready(function() {
 
     dataCollectionSectionForm['funcs']['initQueueButtons']();
 
-    BazProgress.buildProgressBar($('#installer-progress'));
+    BazProgress.buildProgressBar($('#installer-progress'), false, false, true);
 });
 </script>
 <div>
@@ -303,3 +303,4 @@ $(document).ready(function() {
         ]
     )}}
 </div>
+<!-- htmlmin:ignore -->

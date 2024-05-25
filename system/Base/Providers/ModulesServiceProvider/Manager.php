@@ -68,8 +68,21 @@ class Manager extends BasePackage
 
     public function getModuleInfo($data)
     {
-        $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ById';
-        $module = $this->modules->{$data['module_type']}->$moduleMethod($data['module_id']);
+        $moduleId = $data['module_id'];
+
+        if ($data['module_type'] === 'apptype') {
+            $module = $this->apps->types->getAppTypeById($data['module_id']);
+            $module['module_type'] = 'apptypes';
+        } else {
+            if ($data['module_type'] === 'views' &&
+                str_contains($data['module_id'], '-public')
+            ) {
+                $moduleId = explode('-', $data['module_id'])[0];
+            }
+
+            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ById';
+            $module = $this->modules->{$data['module_type']}->$moduleMethod($moduleId);
+        }
 
         if (isset($module) && is_array($module)) {
             if (array_key_exists('notification_subscriptions', $module)) {
@@ -95,7 +108,7 @@ class Manager extends BasePackage
             }
 
             if (isset($data['sync']) && $data['sync'] == true) {
-                $module = $this->updateModuleRepoDetails($module);
+                $module = $this->updateModuleRepoDetails($module, $data);
 
                 if (!$module) {
                     return false;
@@ -122,9 +135,11 @@ class Manager extends BasePackage
         return false;
     }
 
-    public function updateModuleRepoDetails($module)
+    public function updateModuleRepoDetails($module, $data = null)
     {
-        if ($module['app_type'] === 'core') {
+        if (isset($module['app_type']) &&
+            $module['app_type'] === 'core'
+        ) {
             $repo = 'core';
         } else {
             $repo = strtolower($this->helper->last(explode('/', $module['repo'])));
@@ -133,6 +148,14 @@ class Manager extends BasePackage
         try {
             if (!$this->initApi($module)) {
                 return false;
+            }
+
+            if ($this->apiClientConfig['id'] !== $module['api_id']) {
+                $this->apiClientConfig = null;
+
+                if (!$this->initApi($module)) {
+                    return false;
+                }
             }
 
             if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
@@ -164,11 +187,48 @@ class Manager extends BasePackage
                     $module['update_version'] = $module['repo_details']['latestRelease']['name'];
                 }
 
-                $this->modules->{$module['module_type']}->update($module);
+                if ($module['module_type'] === 'apptypes') {
+                    $this->apps->types->update($module);
+                } else {
+                    $this->modules->{$module['module_type']}->update($module);
+                }
             } else {
                 $module['repo_details'] = false;
             }
+
+            if ($data &&
+                $data['module_type'] === 'views' &&
+                str_contains($data['module_id'], '-public')
+            ) {
+                $repo = $repo . '-public';
+                $args = [$this->apiClientConfig['org_user'], $repo];
+
+                $responseArr = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+                if ($responseArr) {
+                    if (is_string($module['repo_details'])) {
+                        $module['repo_details'] = $this->helper->decode($module['repo_details'], true);
+                    }
+
+                    $module['repo_details']['details'] = $responseArr;
+
+                    $latestRelease = $this->moduleNeedsUpgrade($responseArr, $module);
+
+                    if ($latestRelease) {
+                        $module['repo_details']['latestRelease'] = $latestRelease;
+                        $module['update_available'] = '1';
+                        $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                    }
+                } else {
+                    $module['repo_details'] = false;
+
+                    // $this->addResponse('Could not retrieve repository information for module: ' . ($module['display_name'] ?? $module['name']) . ' (Public)' , 1);
+
+                    // return false;
+                }
+            }
         } catch (ClientException | \throwable $e) {
+            trace([$e, $module]);
             $this->addResponse($e->getMessage(), 2, ['module' => $module]);
 
             return false;

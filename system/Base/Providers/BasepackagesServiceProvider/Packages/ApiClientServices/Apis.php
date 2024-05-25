@@ -3,6 +3,7 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices;
 
 use GuzzleHttp\TransferStats;
+use Mattiasgeniar\Percentage\Percentage;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\ApiClientServices;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\ApisHeaderSelector;
@@ -23,6 +24,8 @@ class Apis extends BasePackage
 
     protected $headers = null;
 
+    public static $trackCounter = 0;
+
     protected $httpOptions = [
         'debug'           => false,
         'http_errors'     => true,
@@ -30,7 +33,7 @@ class Apis extends BasePackage
         'verify'          => false
     ];
 
-    public function init($apiConfig = null, $apiClientServices = null, $httpOptions = null)
+    public function init($apiConfig = null, $apiClientServices = null, $httpOptions = null, $monitorProgress = null)
     {
         if (isset($apiConfig['checkOnly']) && $apiConfig['checkOnly'] === true) {//used for checking via ServicesComponent if the API exists
             return $this;
@@ -46,8 +49,12 @@ class Apis extends BasePackage
 
         $this->setConfiguration();
 
-        if ($httpOptions) {
+        if ($httpOptions && is_array($httpOptions)) {
             $this->httpOptions = array_merge($this->httpOptions, $httpOptions);
+        }
+
+        if ($monitorProgress && is_array($monitorProgress)) {
+            $this->initMonitorProgress($monitorProgress);
         }
 
         if ($this->apiConfig['location'] === 'Basepackages') {
@@ -182,5 +189,67 @@ class Apis extends BasePackage
     public function setHeaders(array $accept = [], string $contentType = '', bool $isMultipart = false)
     {
         $this->headers = (new ApisHeaderSelector)->selectHeaders($accept, $contentType, $isMultipart);
+    }
+
+    protected function initMonitorProgress($monitorProgress)
+    {
+        self::$trackCounter = 0;
+
+        $this->httpOptions['sink'] = $monitorProgress['sink'];
+
+        $this->httpOptions['progress'] =
+            function (
+                $downloadTotal,
+                $downloadedBytes,
+                $uploadTotal,
+                $uploadedBytes
+            ) use ($monitorProgress) {
+                $trackCounter = \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis::$trackCounter;
+
+                $counters =
+                        [
+                            'downloadTotal'     => $downloadTotal,
+                            'downloadedBytes'   => $downloadedBytes,
+                            'uploadTotal'       => $uploadTotal,
+                            'uploadedBytes'     => $uploadedBytes
+                        ];
+
+                if ($downloadTotal > 0) {
+                    if ($downloadedBytes === 0) {
+                        return;
+                    }
+
+                    //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
+                    //So this way, we only update progress when there is actually an update.
+                    if ($downloadedBytes === $trackCounter) {
+                        return;
+                    }
+                    $trackCounter = $downloadedBytes;
+
+                    $downloadComplete = null;
+                    if ($downloadedBytes === $downloadTotal) {
+                        $downloadComplete = true;
+                    }
+                    $this->basepackages->progress->updateProgress($monitorProgress['method'], $downloadComplete, false, null, $counters);
+                } else if ($uploadTotal > 0) {
+                    if ($uploadedBytes === 0) {
+                        return;
+                    }
+
+                    //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
+                    //So this way, we only update progress when there is actually an update.
+                    if ($uploadedBytes === $trackCounter) {
+                        return;
+                    }
+
+                    $trackCounter = $uploadedBytes;
+
+                    $uploadComplete = null;
+                    if ($uploadedBytes === $uploadTotal) {
+                        $uploadComplete = true;
+                    }
+                    $this->basepackages->progress->updateProgress($monitorProgress['method'], $uploadComplete, false, null, $counters);
+                }
+            };
     }
 }
