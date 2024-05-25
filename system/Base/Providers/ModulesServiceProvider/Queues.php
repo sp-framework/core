@@ -57,7 +57,8 @@ class Queues extends BasePackage
                     'uninstall' => [],
                     'remove'    => []
                 ]
-            )
+            ),
+            'total'     => 0
         ];
 
         if ($oldQueue && isset($oldQueue['sync'])) {
@@ -66,8 +67,6 @@ class Queues extends BasePackage
 
         if ($this->add($queue)) {
             $queue = $this->packagesData->last;
-
-            $queue['total'] = 0;
 
             return $queue;
         }
@@ -287,23 +286,18 @@ class Queues extends BasePackage
                                         }
 
                                         if ($bundleType === 'apptype') {
-                                            if (!isset($this->queueTasks[$taskName][$bundleType])) {
-                                                $this->queueTasks[$taskName][$bundleType] = [];
-                                            }
-
                                             $bundleModule = $this->apps->types->getAppTypeByRepo($bundles['repo']);
 
                                             if ($bundleModule) {
-                                                $this->addToQueueTasksAndResults($taskName, $bundleType, $bundleModule);
+                                                $this->compareAndAddToQueue($bundles, $bundleModule, $taskName, $bundleType);
+                                                // $this->addToQueueTasksAndResults($taskName, $bundleType, $bundleModule);
                                             } else {
                                                 $this->addToQueueTasksAndResults($taskName, $bundleType, $bundles, null, 'fail', $this->getApiClientServices($bundles, true));
                                             }
                                         } else if ($bundleType === 'core') {
                                             $bundleModule = $this->modules->packages->getPackageByRepo($bundles['repo']);
 
-                                            if ($bundles['version'] !== $bundleModule['version']) {
-                                                $this->addToQueueTasksAndResults('update', 'packages', $bundleModule);
-                                            }
+                                            $this->compareAndAddToQueue($bundles, $bundleModule, 'update', 'packages');
                                         } else {
                                             if ($bundleType === 'external') {
                                                 continue;
@@ -316,18 +310,19 @@ class Queues extends BasePackage
                                                 $bundleModule = $this->modules->{$bundleModuleType}->$bundleModuleMethod($bundle['repo']);
 
                                                 if ($bundleModule) {
-                                                    $this->addToQueueTasksAndResults($taskName, $bundleType, $bundleModule);
+                                                    $this->compareAndAddToQueue($bundle, $bundleModule, $taskName, $bundleType);
+                                                    // $this->addToQueueTasksAndResults($taskName, $bundleType, $bundleModule);
 
-                                                    if ($bundleType === 'views' &&
-                                                        array_key_exists('is_subview', $bundleModule) &&
-                                                        $bundleModule['is_subview'] == 0
-                                                    ) {
-                                                        $bundleModule['id'] = $bundleModule['id'] . '-public';
-                                                        $bundleModule['name'] = ($bundleModule['display_name'] ?? $bundleModule['name']) . ' (Public)';
-                                                        $bundleModule['repo'] = $bundleModule['repo'] . '-public';
+                                                    // if ($bundleType === 'views' &&
+                                                    //     array_key_exists('is_subview', $bundleModule) &&
+                                                    //     $bundleModule['is_subview'] == 0
+                                                    // ) {
+                                                    //     $bundleModule['id'] = $bundleModule['id'] . '-public';
+                                                    //     $bundleModule['name'] = ($bundleModule['display_name'] ?? $bundleModule['name']) . ' (Public)';
+                                                    //     $bundleModule['repo'] = $bundleModule['repo'] . '-public';
 
-                                                        $this->addToQueueTasksAndResults('install', $bundleType, $bundleModule);
-                                                    }
+                                                    //     $this->addToQueueTasksAndResults('install', $bundleType, $bundleModule);
+                                                    // }
                                                 } else {
                                                     $this->addToQueueTasksAndResults($taskName, $bundleType, $bundle, null, 'fail', $this->getApiClientServices($bundle, true));
                                                 }
@@ -358,79 +353,77 @@ class Queues extends BasePackage
                             if ($dependencyType === 'core') {
                                 $core = $this->modules->packages->getPackageByRepo($dependencies['repo']);
 
-                                if ($dependencies['version'] !== $core['version']) {
-                                    if (Version::greaterThan($dependencies['version'], $core['version'])) {
-                                        if (isset($core['update_version']) &&
-                                            $core['update_version'] !== '' &&
-                                            $core['update_version'] === $dependencies['version']
-                                        ) {
-                                            $this->addToQueueTasksAndResults('update', 'packages', $core);
-                                        } else {
-                                            $updateToVersion = $core['version'] . ' -> ' . $core['update_version'];
+                                $this->compareAndAddToQueue($dependencies, $core, 'update', 'packages');
+                                // if (Version::greaterThan($dependencies['version'], $core['version'])) {
+                                //     if (isset($core['update_version']) &&
+                                //         $core['update_version'] !== ''
+                                //     ) {
+                                //         if (Version::greaterThan($dependencies['version'], $core['update_version'])) {
+                                //             $apiClientService = $this->getApiClientServices($dependencies);
+                                //             if ($apiClientService) {
+                                //                 $analyseLogs = 'Dependencies require version ' . $dependencies['version'] . ' for ' . $core['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
+                                //             } else {
+                                //                 $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $core['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
+                                //             }
 
-                                            if (Version::greaterThan($dependencies['version'], $core['update_version'])) {
-                                                $updateToVersion = $core['version'] . ' -> ' . $dependencies['version'];
-                                            }
+                                //             $this->addToQueueTasksAndResults('update', 'packages', $core, null, 'fail', $analyseLogs);
+                                //         } else if (Version::equal($dependencies['version'], $core['update_version'])) {
+                                //             $this->addToQueueTasksAndResults('update', 'packages', $core);
+                                //         }
+                                //     } else {
+                                //         $apiClientService = $this->getApiClientServices($dependencies);
+                                //         if ($apiClientService) {
+                                //             $analyseLogs = 'Dependencies require version ' . $dependencies['version'] . ' for ' . $core['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
+                                //         } else {
+                                //             $analyseLogs = 'Dependencies require version ' . $dependencies['version'] . ' for ' . $core['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
+                                //         }
 
-                                            $analyseLogs =
-                                                'Dependencies require version ' . $dependencies['version'] . ' for core. Either the version in dependency is incorrect or you need to sync core repository to get the latest version. If sync does not solve the problem, please contact module developer.';
-
-                                            $this->addToQueueTasksAndResults('update', 'packages', $core, $updateToVersion, 'fail',$analyseLogs);
-                                        }
-                                    }
-                                }
+                                //         $this->addToQueueTasksAndResults('update', 'packages', $core, null, 'fail', $analyseLogs);
+                                //     }
+                                // }
                             } else if ($dependencyType === 'apptype') {
-                                if (!isset($this->queueTasks[$taskName][$dependencyType])) {
-                                    $this->queueTasks[$taskName][$dependencyType] = [];
-                                }
-
                                 $appType = $this->apps->types->getAppTypeByRepo($dependencies['repo']);
 
                                 if ($appType) {
-                                    if ($dependencies['version'] !== $appType['version']) {
-                                        if (Version::greaterThan($dependencies['version'], $appType['version'])) {
-                                            if (isset($appType['update_version']) &&
-                                                $appType['update_version'] !== ''
-                                            ) {
-                                                if (Version::greaterThan($dependencies['version'], $appType['update_version'])) {
-                                                    $analyseLogs =
-                                                        'Dependencies require version ' . $dependencies['version'] . ' for ' . $appType['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
+                                    $this->compareAndAddToQueue($dependencies, $appType, $taskName, $dependencyType);
+                                    // if (Version::greaterThan($dependencies['version'], $appType['version'])) {
+                                    //     if (isset($appType['update_version']) &&
+                                    //         $appType['update_version'] !== ''
+                                    //     ) {
+                                    //         if (Version::greaterThan($dependencies['version'], $appType['update_version'])) {
+                                    //             $apiClientService = $this->getApiClientServices($dependencies);
+                                    //             if ($apiClientService) {
+                                    //                 $analyseLogs =
+                                    //                     'Dependencies require version ' . $dependencies['version'] . ' for ' . $appType['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
+                                    //             } else {
+                                    //                 $analyseLogs = 'Dependencies require version ' . $dependencies['version'] . ' for ' . $appType['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
+                                    //             }
 
-                                                    $apiClientService = $this->getApiClientServices($dependencies);
-                                                    if (!$apiClientService) {
-                                                        $analyseLogs = 'Dependencies require version ' . $dependencies['version'] . ' for ' . $appType['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
-                                                    }
+                                    //             $this->addToQueueTasksAndResults($taskName, $dependencyType, $appType, null, 'fail', $analyseLogs);
+                                    //         } else if (Version::equal($dependencies['version'], $appType['update_version'])) {
+                                    //             if ($appType['installed'] != '1') {
+                                    //                 $this->addToQueueTasksAndResults('install', $dependencyType, $appType);
+                                    //             } else {
+                                    //                 $this->addToQueueTasksAndResults('update', $dependencyType, $appType);
+                                    //             }
+                                    //         }
+                                    //     } else {
+                                    //         $apiClientService = $this->getApiClientServices($dependencies);
+                                    //         if ($apiClientService) {
+                                    //             $analyseLogs =
+                                    //                 'Dependencies require version ' . $dependencies['version'] . ' for ' . $appType['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
+                                    //         } else {
+                                    //             $analyseLogs =
+                                    //                 'Dependencies require version ' . $dependencies['version'] . ' for ' . $appType['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
+                                    //         }
 
-                                                    $this->addToQueueTasksAndResults($taskName, $dependencyType, $appType, null, 'fail', $analyseLogs);
-                                                } else if ($appType['update_version'] === $dependencies['version']) {
-                                                    if ($appType['installed'] != '1') {
-                                                        $this->addToQueueTasksAndResults('install', $dependencyType, $appType);
-                                                    } else {
-                                                        $this->addToQueueTasksAndResults('update', $dependencyType, $appType);
-                                                    }
-                                                }
-                                            } else {
-                                                $analyseLogs =
-                                                    'Dependencies require version ' . $dependencies['version'] . ' for ' . $appType['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
-                                                $apiClientService = $this->getApiClientServices($dependencies);
-
-                                                if (!$apiClientService) {
-                                                    $analyseLogs =
-                                                        'Dependencies require version ' . $dependencies['version'] . ' for ' . $appType['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
-                                                }
-
-                                                $this->addToQueueTasksAndResults($taskName, $dependencyType, $appType, null, 'fail', $analyseLogs);
-                                            }
-                                        } else {
-                                            if ($appType['installed'] != '1') {
-                                                $this->addToQueueTasksAndResults('install', $dependencyType, $appType);
-                                            }
-                                        }
-                                    } else {
-                                        if ($appType['installed'] != '1') {
-                                            $this->addToQueueTasksAndResults('install', $dependencyType, $appType);
-                                        }
-                                    }
+                                    //         $this->addToQueueTasksAndResults($taskName, $dependencyType, $appType, null, 'fail', $analyseLogs);
+                                    //     }
+                                    // } else {
+                                    //     if ($appType['installed'] != '1') {
+                                    //         $this->addToQueueTasksAndResults('install', $dependencyType, $appType);
+                                    //     }
+                                    // }
                                 } else {
                                     $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependencies, null, 'fail', $this->getApiClientServices($dependencies, true));
                                 }
@@ -455,90 +448,75 @@ class Queues extends BasePackage
                                                 }
                                             }
 
-                                            if ($dependency['version'] !== $dependencyModule['version']) {
-                                                if (Version::greaterThan($dependency['version'], $dependencyModule['version'])) {
-                                                    if (isset($dependencyModule['update_version']) &&
-                                                        $dependencyModule['update_version'] !== ''
-                                                    ) {
-                                                        if (Version::greaterThan($dependency['version'], $dependencyModule['update_version'])) {
-                                                            $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $dependencyModule['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
-                                                            $apiClientService = $this->getApiClientServices($dependency);
-                                                            if (!$apiClientService) {
-                                                                $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $dependencyModule['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
-                                                            }
+                                            $this->compareAndAddToQueue($dependency, $dependencyModule, $taskName, $dependencyType);
+                                            // if (Version::greaterThan($dependency['version'], $dependencyModule['version'])) {
+                                            //     if (isset($dependencyModule['update_version']) &&
+                                            //         $dependencyModule['update_version'] !== ''
+                                            //     ) {
+                                            //         if (Version::greaterThan($dependency['version'], $dependencyModule['update_version'])) {
+                                            //             $apiClientService = $this->getApiClientServices($dependency);
+                                            //             if ($apiClientService) {
+                                            //                 $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $dependencyModule['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
+                                            //             } else {
+                                            //                 $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $dependencyModule['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
+                                            //             }
 
-                                                            $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependencyModule, null, 'fail', $analyseLogs);
-                                                        } else if ($dependencyModule['update_version'] === $dependency['version']) {
-                                                            if ($dependencyModule['installed'] != '1') {
-                                                                $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
+                                            //             $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependencyModule, null, 'fail', $analyseLogs);
+                                            //         } else if (Version::equal($dependency['version'], $dependencyModule['update_version'])) {
+                                            //             if ($dependencyModule['installed'] != '1') {
+                                            //                 $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
 
-                                                                if ($dependencyType === 'views' &&
-                                                                    array_key_exists('is_subview', $dependencyModule) &&
-                                                                    $dependencyModule['is_subview'] == 0
-                                                                ) {
-                                                                    $dependencyModule['id'] = $dependencyModule['id'] . '-public';
-                                                                    $dependencyModule['name'] = ($dependencyModule['display_name'] ?? $dependencyModule['name']) . ' (Public)';
-                                                                    $dependencyModule['repo'] = $dependencyModule['repo'] . '-public';
+                                            //                 if ($dependencyType === 'views' &&
+                                            //                     array_key_exists('is_subview', $dependencyModule) &&
+                                            //                     $dependencyModule['is_subview'] == 0
+                                            //                 ) {
+                                            //                     $dependencyModule['id'] = $dependencyModule['id'] . '-public';
+                                            //                     $dependencyModule['name'] = ($dependencyModule['display_name'] ?? $dependencyModule['name']) . ' (Public)';
+                                            //                     $dependencyModule['repo'] = $dependencyModule['repo'] . '-public';
 
-                                                                    $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
-                                                                }
-                                                            } else {
-                                                                $this->addToQueueTasksAndResults('update', $dependencyType, $dependencyModule);
+                                            //                     $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
+                                            //                 }
+                                            //             } else {
+                                            //                 $this->addToQueueTasksAndResults('update', $dependencyType, $dependencyModule);
 
-                                                                if ($dependencyType === 'views' &&
-                                                                    array_key_exists('is_subview', $dependencyModule) &&
-                                                                    $dependencyModule['is_subview'] == 0
-                                                                ) {
-                                                                    $dependencyModule['id'] = $dependencyModule['id'] . '-public';
-                                                                    $dependencyModule['name'] = ($dependencyModule['display_name'] ?? $dependencyModule['name']) . ' (Public)';
-                                                                    $dependencyModule['repo'] = $dependencyModule['repo'] . '-public';
+                                            //                 if ($dependencyType === 'views' &&
+                                            //                     array_key_exists('is_subview', $dependencyModule) &&
+                                            //                     $dependencyModule['is_subview'] == 0
+                                            //                 ) {
+                                            //                     $dependencyModule['id'] = $dependencyModule['id'] . '-public';
+                                            //                     $dependencyModule['name'] = ($dependencyModule['display_name'] ?? $dependencyModule['name']) . ' (Public)';
+                                            //                     $dependencyModule['repo'] = $dependencyModule['repo'] . '-public';
 
-                                                                    $this->addToQueueTasksAndResults('update', $dependencyType, $dependencyModule);
-                                                                }
-                                                            }
-                                                        }
-                                                    } else {
-                                                        $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $dependencyModule['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
+                                            //                     $this->addToQueueTasksAndResults('update', $dependencyType, $dependencyModule);
+                                            //                 }
+                                            //             }
+                                            //         }
+                                            //     } else {
+                                            //         $apiClientService = $this->getApiClientServices($dependency);
+                                            //         if ($apiClientService) {
+                                            //             $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $dependencyModule['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
+                                            //         } else {
+                                            //             $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $dependencyModule['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
+                                            //         }
 
-                                                        $apiClientService = $this->getApiClientServices($dependency);
-                                                        if (!$apiClientService) {
-                                                            $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $dependencyModule['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
-                                                        }
+                                            //         $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependencyModule, null, 'fail', $analyseLogs);
+                                            //     }
+                                            // } else {
+                                            //     if ($dependencyModule['installed'] != '1') {
+                                            //         $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
 
-                                                        $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependencyModule, null, 'fail', $analyseLogs);
-                                                    }
-                                                } else {
-                                                    if ($dependencyModule['installed'] != '1') {
-                                                        $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
+                                            //         if ($dependencyType === 'views' &&
+                                            //             array_key_exists('is_subview', $dependencyModule) &&
+                                            //             $dependencyModule['is_subview'] == 0
+                                            //         ) {
+                                            //             $dependencyModule['id'] = $dependencyModule['id'] . '-public';
+                                            //             $dependencyModule['name'] = ($dependencyModule['display_name'] ?? $dependencyModule['name']) . ' (Public)';
+                                            //             $dependencyModule['repo'] = $dependencyModule['repo'] . '-public';
 
-                                                        if ($dependencyType === 'views' &&
-                                                            array_key_exists('is_subview', $dependencyModule) &&
-                                                            $dependencyModule['is_subview'] == 0
-                                                        ) {
-                                                            $dependencyModule['id'] = $dependencyModule['id'] . '-public';
-                                                            $dependencyModule['name'] = ($dependencyModule['display_name'] ?? $dependencyModule['name']) . ' (Public)';
-                                                            $dependencyModule['repo'] = $dependencyModule['repo'] . '-public';
-
-                                                            $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
-                                                        }
-                                                    }
-                                                }
-                                            } else {
-                                                if ($dependencyModule['installed'] != '1') {
-                                                    $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
-
-                                                    if ($dependencyType === 'views' &&
-                                                        array_key_exists('is_subview', $dependencyModule) &&
-                                                        $dependencyModule['is_subview'] == 0
-                                                    ) {
-                                                        $dependencyModule['id'] = $dependencyModule['id'] . '-public';
-                                                        $dependencyModule['name'] = ($dependencyModule['display_name'] ?? $dependencyModule['name']) . ' (Public)';
-                                                        $dependencyModule['repo'] = $dependencyModule['repo'] . '-public';
-
-                                                        $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
-                                                    }
-                                                }
-                                            }
+                                            //             $this->addToQueueTasksAndResults('install', $dependencyType, $dependencyModule);
+                                            //         }
+                                            //     }
+                                            // }
                                         } else {
                                             $this->addToQueueTasksAndResults($taskName, $dependencyType, $dependency, null, 'fail', $this->getApiClientServices($dependency, true));
                                         }
@@ -634,6 +612,74 @@ class Queues extends BasePackage
         }
 
         return $apiClientService;
+    }
+
+    protected function compareAndAddToQueue($requestedModule, $installedModule, $task, $moduleType)
+    {
+        if (Version::greaterThan($requestedModule['version'], $installedModule['version'])) {
+            if (isset($installedModule['update_version']) &&
+                $installedModule['update_version'] !== ''
+            ) {
+                if (Version::greaterThan($requestedModule['version'], $installedModule['update_version'])) {
+                    $apiClientService = $this->getApiClientServices($requestedModule);
+                    if ($apiClientService) {
+                        $analyseLogs = 'Dependencies require version ' . $requestedModule['version'] . ' for ' . $installedModule['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
+                    } else {
+                        $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $installedModule['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
+                    }
+
+                    $this->addToQueueTasksAndResults($task, $moduleType, $installedModule, null, 'fail', $analyseLogs);
+                } else if (Version::equal($requestedModule['version'], $installedModule['update_version'])) {
+                    if ($installedModule['installed'] != '1') {
+                        $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
+                    } else {
+                        $this->addToQueueTasksAndResults('update', $moduleType, $installedModule);
+                    }
+
+                    // $this->addToQueueTasksAndResults($task, $moduleType, $installedModule);
+
+                    if ($moduleType === 'views' &&
+                        array_key_exists('is_subview', $installedModule) &&
+                        $installedModule['is_subview'] == 0
+                    ) {
+                        $installedModule['id'] = $installedModule['id'] . '-public';
+                        $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']) . ' (Public)';
+                        $installedModule['repo'] = $installedModule['repo'] . '-public';
+
+                        if ($installedModule['installed'] != '1') {
+                            $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
+                        } else {
+                            $this->addToQueueTasksAndResults('update', $moduleType, $installedModule);
+                        }
+                        // $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
+                    }
+                }
+            } else {
+                $apiClientService = $this->getApiClientServices($requestedModule);
+                if ($apiClientService) {
+                    $analyseLogs = 'Dependencies require version ' . $requestedModule['version'] . ' for ' . $installedModule['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
+                } else {
+                    $analyseLogs = 'Dependencies require version ' . $requestedModule['version'] . ' for ' . $installedModule['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
+                }
+
+                $this->addToQueueTasksAndResults($task, $moduleType, $installedModule, null, 'fail', $analyseLogs);
+            }
+        } else {
+            if ($installedModule['installed'] != '1') {
+                $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
+
+                if ($moduleType === 'views' &&
+                    array_key_exists('is_subview', $installedModule) &&
+                    $installedModule['is_subview'] == 0
+                ) {
+                    $installedModule['id'] = $installedModule['id'] . '-public';
+                    $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']) . ' (Public)';
+                    $installedModule['repo'] = $installedModule['repo'] . '-public';
+
+                    $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
+                }
+            }
+        }
     }
 
     protected function addToQueueTasksAndResults($taskName, $moduleType, $module, $version = null, $analyseResult = 'pass', $analyseResultLogs = '-',)
