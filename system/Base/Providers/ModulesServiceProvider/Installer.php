@@ -893,8 +893,6 @@ class Installer extends BasePackage
             $this->getHttpOptions($sink)
         );
 
-        $this->trackCounter = 0;
-
         if ($download->getStatusCode() === 200) {
             return true;
         }
@@ -929,11 +927,11 @@ class Installer extends BasePackage
 
                 //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
                 //So this way, we only update progress when there is actually an update.
-                if ($downloadedBytes === $this->trackCounter) {
+                if ($downloadedBytes === $trackCounter) {
                     return;
                 }
 
-                $this->trackCounter = $downloadedBytes;
+                $trackCounter = $downloadedBytes;
 
                 $downloadComplete = null;
                 if ($downloadedBytes === $downloadTotal) {
