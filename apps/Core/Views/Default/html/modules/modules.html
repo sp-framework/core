@@ -973,6 +973,20 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
                     '           <td>' +  moduleData.bundle_modules[bundleModuleType]['version'] + '</td>' +
                     '           <td>' +  moduleData.bundle_modules[bundleModuleType]['repo'] + '</td>' +
                     '       </tr>';
+                } else if(bundleModuleType === 'external' &&
+                          moduleData.bundle_modules[bundleModuleType]['composer'] &&
+                          moduleData.bundle_modules[bundleModuleType]['composer']['require'] &&
+                          Object.keys(moduleData.bundle_modules[bundleModuleType]['composer']['require']).length > 0
+                ) {
+                    for (var composerPackage in moduleData.bundle_modules[bundleModuleType]['composer']['require']) {
+                        bundleModuleHtml +=
+                        '       <tr>' +
+                        '           <td>' +  composerPackage + '</td>' +
+                        '           <td>' +  bundleModuleType + '</td>' +
+                        '           <td>' +  moduleData.bundle_modules[bundleModuleType]['composer']['require'][composerPackage] + '</td>' +
+                        '           <td>Via composer</td>' +
+                        '       </tr>';
+                    }
                 } else {
                     if (Array.isArray(moduleData.bundle_modules[bundleModuleType]) && moduleData.bundle_modules[bundleModuleType].length > 0) {
                         $(moduleData.bundle_modules[bundleModuleType]).each(function(i, v) {
@@ -991,7 +1005,7 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
 
         $('#{{componentId}}-{{sectionId}}-bundle-table tbody').empty().html(bundleModuleHtml);
 
-        $(document).ready(function() {
+        $(window).on('load', function() {
             if (!$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-bundle-table')) {
                 $('#{{componentId}}-{{sectionId}}-bundle-table').DataTable({
                       columns: [

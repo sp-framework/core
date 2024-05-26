@@ -279,12 +279,49 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
         $('#{{componentId}}-{{sectionId}}-queue-logs-modal').modal('show');
     });
 }
+
 $(document).ready(function() {
     dataCollectionSectionForm['vars']['hasAnalysisError'] = BazHelpers.stringToBoolean("{{hasAnalysisError}}");
 
     dataCollectionSectionForm['funcs']['initQueueButtons']();
 
     BazProgress.buildProgressBar($('#installer-progress'), false, false, true);
+
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
+        $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
+              columns: [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                { orderable: false }
+              ]
+            }
+        );
+    }
+});
+
+$(window).on('load', function() {
+    BazProgress.buildProgressBar($('#installer-progress'), false, false, true);
+
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
+        $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
+              columns: [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                { orderable: false }
+              ]
+            }
+        );
+    }
 });
 </script>
 <div>

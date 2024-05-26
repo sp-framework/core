@@ -300,6 +300,8 @@ class Queues extends BasePackage
                                             $this->compareAndAddToQueue($bundles, $bundleModule, 'update', 'packages');
                                         } else {
                                             if ($bundleType === 'external') {
+                                                $this->checkComposerAndAddToQueue($bundles);
+
                                                 continue;
                                             }
 
@@ -347,6 +349,8 @@ class Queues extends BasePackage
                             }
 
                             if ($dependencyType === 'composer' || $dependencyType === 'external') {
+                                $this->checkComposerAndAddToQueue($dependencies);
+
                                 continue;
                             }
 
@@ -680,6 +684,81 @@ class Queues extends BasePackage
                 }
             }
         }
+    }
+
+    protected function checkComposerAndAddToQueue($composerPackages)
+    {
+        if (!isset($composerPackages['composer']['require']) && !isset($composerPackages['require'])) {
+            return true;
+        }
+
+        $composerRequire = [];
+
+        if (isset($composerPackages['composer']['require']) && count($composerPackages['composer']['require']) > 0) {
+            $composerRequire = $composerPackages['composer']['require'];
+        } else if (isset($composerPackages['require']) && count($composerPackages['require']) === 0) {
+            $composerRequire = $composerPackages['require'];
+        }
+
+        if (count($composerRequire) === 0) {
+            return true;
+        }
+
+        try {
+            $composerJsonFile = $this->helper->decode(file_get_contents(base_path('external/composer.json')), true);
+        } catch (\throwable $exception) {
+            $composerJsonFile = false;
+        }
+
+        foreach ($composerRequire as $composerPackage => $version) {
+            if ($composerJsonFile && isset($composerJsonFile['require'])) {
+                if (!isset($composerJsonFile['require'][$composerPackage])) {
+                    $package['id'] = explode('/', $composerPackage)[1];
+                    $package['name'] = $composerPackage;
+                    $package['repo'] = 'Via composer';
+
+                    $this->addToQueueTasksAndResults('install', 'external', $package, $version);
+                }
+            } else {
+                $package['id'] = '0';
+                $package['name'] = $composerPackage;
+                $package['repo'] = 'Via composer';
+                $analyseLogs = 'Error reading composer json file from the external directory.';
+                $this->addToQueueTasksAndResults('install', 'external', $package, $version, 'fail', $analyseLogs);
+            }
+        }
+
+        //This will be done during pre-check
+        // if (isset($composerPackages['config'])) {
+        //     if (!isset($composerJsonFile['config'])) {
+        //         $composerJsonFile['config'] = $composerPackages['config'];
+        //     } else {
+        //         $composerJsonFile['config'] = array_merge_recursive_distinct($composerJsonFile['config'], $composerPackages['config']);
+        //     }
+        // }
+
+        // if (isset($composerPackages['extra'])) {
+        //     if (isset($composerPackages['extra']['patches']) &&
+        //         is_array($composerPackages['extra']['patches'])
+        //     ) {
+        //         foreach ($composerPackages['extra']['patches'] as $package => &$patchDetails) {
+        //             if (is_array($patchDetails)) {
+        //                 foreach ($patchDetails as $description => &$location) {
+        //                     $location = base_path($location);
+        //                 }
+        //             }
+
+        //             if (!isset($composerJsonFile['extra']['patches'][$package])) {
+        //                 $composerJsonFile['extra']['patches'][$package] = $patchDetails;
+        //             } else {
+        //                 $composerJsonFile['extra']['patches'][$package] = array_merge(
+        //                     $composerJsonFile['extra']['patches'][$package],
+        //                     $composerPackages['extra']['patches'][$package]
+        //                 );
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     protected function addToQueueTasksAndResults($taskName, $moduleType, $module, $version = null, $analyseResult = 'pass', $analyseResultLogs = '-',)
