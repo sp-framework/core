@@ -15,6 +15,8 @@ class Progress extends BasePackage
 
     protected $progressFileName;
 
+    protected $remoteWebCountersTimer;
+
     public function init($container = null, $fileName = null)
     {
         if ($container) {
@@ -215,7 +217,7 @@ class Progress extends BasePackage
             $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult, $child, $remoteWebCounters);
 
             if ($callResult === true) {
-                $this->sendNotification($callResult);
+                $this->sendNotification($callResult, $remoteWebCounters);
             }
 
             return true;
@@ -237,8 +239,22 @@ class Progress extends BasePackage
         }
     }
 
-    protected function sendNotification($callResult)
+    protected function sendNotification($callResult, $remoteWebCounters = null)
     {
+        if ($remoteWebCounters &&
+            $remoteWebCounters['downloadTotal'] !== $remoteWebCounters['downloadedBytes']
+        ) {//only for remoteWebCounters
+            if (!$this->remoteWebCountersTimer) {
+                $this->remoteWebCountersTimer = time();
+            } else {
+                if ((time() - $this->remoteWebCountersTimer) < 1) {
+                    return false;//To minimize chatting on ws, we add a 1 second delay.
+                } else {
+                    $this->remoteWebCountersTimer = time();
+                }
+            }
+        }
+
         if ($this->notificationsTunnel !== null) {
             $progressFile = $this->readProgressFile();
 
