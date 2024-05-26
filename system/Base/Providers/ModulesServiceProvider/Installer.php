@@ -78,19 +78,30 @@ class Installer extends BasePackage
 
     protected function withProgress($method, $arguments)
     {
-        if (method_exists($this, $method)) {
+        $methodToCall = $method;
+
+        if (str_contains($method, '-')) {
+            $methodArr = explode('-', $method);
+            $methodToCall = $methodArr[0];
+        }
+
+        if (method_exists($this, $methodToCall)) {
+            $arguments['progressMethod'] = $method;
+
             if (is_array($arguments)) {
                 $arguments = [$arguments];
             }
 
             $this->basepackages->progress->updateProgress($method, null, false);
 
-            $call = call_user_func_array([$this, $method], $arguments);
+            $call = call_user_func_array([$this, $methodToCall], $arguments);
 
             $this->basepackages->progress->updateProgress($method, $call, false);
 
             return $call;
         }
+
+        return false;
     }
 
     public function runProcess(array $data)
@@ -198,7 +209,7 @@ class Installer extends BasePackage
                         $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
                         $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip'
                     ),
-                    'downloadModulesFromRepo'
+                    $data['progressMethod']
                 )
             ) {
                 $this->basepackages->progress->resetProgress();
@@ -218,7 +229,7 @@ class Installer extends BasePackage
                             $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
                             $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip'
                         ),
-                        'downloadModulesFromRepo'
+                        $data['progressMethod']
                     )
                 ) {
                     $this->basepackages->progress->resetProgress();
@@ -243,16 +254,8 @@ class Installer extends BasePackage
             }
 
             try {
-                $latestRelease = $this->apiClient->useMethod($collection, $method, $args)->getResponse();
-
-                $file =
-                    $this->downloadLocation .
-                    $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
-                    $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/' .
-                    $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
-                    $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip';
-
-                $this->localContent->write($file, $latestRelease->getBody()->getContents());
+                $this->apiClient->useMethod($collection, $method, $args)->getResponse();
+                //As we have provided sink information, this should be downloaded and stored at the sink location.
             } catch (\throwable $e) {
                 trace([$e]);
                 $this->basepackages->progress->resetProgress();
@@ -262,7 +265,7 @@ class Installer extends BasePackage
                 return false;
             }
         } else {
-            $this->method = 'downloadModulesFromRepo';
+            $this->method = $data['progressMethod'];
 
             if (isset($this->modulesToInstallOrUpdate['repo_details']['latestRelease']['zipball_url'])) {
                 return $this->downloadData(
@@ -779,14 +782,14 @@ class Installer extends BasePackage
                     foreach ($modules as $module) {
                         array_push($this->runProcessPrecheckProgressMethods,
                             [
-                                'method'    => 'precheckQueueData',
+                                'method'    => 'precheckQueueData-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
                                 'text'      => 'Perform precheck for module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
                                 'args'      => $module,
                             ]
                         );
                         array_push($this->runProcessPrecheckProgressMethods,
                             [
-                                'method'    => 'downloadModulesFromRepo',
+                                'method'    => 'downloadModulesFromRepo-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
                                 'text'      => 'Download module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') files from repository...',
                                 'args'      => $module,
                                 'remoteWeb' => true
@@ -911,7 +914,9 @@ class Installer extends BasePackage
                 $uploadTotal,
                 $uploadedBytes
             ) {
-                $trackCounter = \System\Base\Providers\ModulesServiceProvider\Installer::$trackCounter;
+                if ($downloadTotal === 0 && $uploadTotal === 0) {
+                    return;
+                }
 
                 $counters =
                         [
@@ -927,11 +932,11 @@ class Installer extends BasePackage
 
                 //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
                 //So this way, we only update progress when there is actually an update.
-                if ($downloadedBytes === $trackCounter) {
+                if ($downloadedBytes === \System\Base\Providers\ModulesServiceProvider\Installer::$trackCounter) {
                     return;
                 }
 
-                $trackCounter = $downloadedBytes;
+                \System\Base\Providers\ModulesServiceProvider\Installer::$trackCounter = $downloadedBytes;
 
                 $downloadComplete = null;
                 if ($downloadedBytes === $downloadTotal) {

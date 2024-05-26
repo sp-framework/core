@@ -204,7 +204,9 @@ class Apis extends BasePackage
                 $uploadTotal,
                 $uploadedBytes
             ) use ($monitorProgress) {
-                $trackCounter = \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis::$trackCounter;
+                if ($downloadTotal === 0 && $uploadTotal === 0) {
+                    return;
+                }
 
                 $counters =
                         [
@@ -221,10 +223,11 @@ class Apis extends BasePackage
 
                     //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
                     //So this way, we only update progress when there is actually an update.
-                    if ($downloadedBytes === $trackCounter) {
+                    if ($downloadedBytes === \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis::$trackCounter) {
                         return;
                     }
-                    $trackCounter = $downloadedBytes;
+
+                    \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis::$trackCounter = $downloadedBytes;
 
                     $downloadComplete = null;
                     if ($downloadedBytes === $downloadTotal) {
@@ -238,11 +241,11 @@ class Apis extends BasePackage
 
                     //Trackcounter is needed as guzzelhttp runs this in a while loop causing too many updates with same download count.
                     //So this way, we only update progress when there is actually an update.
-                    if ($uploadedBytes === $trackCounter) {
+                    if ($uploadedBytes === \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis::$trackCounter) {
                         return;
                     }
 
-                    $trackCounter = $uploadedBytes;
+                    \System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis::$trackCounter = $uploadedBytes;
 
                     $uploadComplete = null;
                     if ($uploadedBytes === $uploadTotal) {

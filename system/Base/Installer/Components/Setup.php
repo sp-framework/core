@@ -809,7 +809,7 @@ Class Setup
 		} catch (\throwable $exception) {
 			$this->view->responseCode = 1;
 
-			$this->view->responseMessage = 'Error reading Composer Json File. Please download Core again from repository.';
+			$this->view->responseMessage = 'Error reading composer json file. Please download Core again from repository.';
 		}
 
 		try {
