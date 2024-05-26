@@ -325,8 +325,8 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}').BazContentSectionWithForm({'task':'validateForm'});
 
                     if ($('#{{componentId}}-{{sectionId}}-alert').length === 0) {
-                        // $('#generate').attr('disabled', true);
-                        // $('#generate').children('i').removeClass('fa-wand-sparkles').addClass('fa-spin fa-cog');
+                        $('#generate').attr('disabled', true);
+                        $('#generate').children('i').removeClass('fa-wand-sparkles').addClass('fa-spin fa-cog');
 
                         var postData = { };
                         postData['bump'] = $('#{{componentId}}-{{sectionId}}-release-type').val();
@@ -684,6 +684,7 @@ dataCollectionSection =
                                 paginatedPNotify('error', {'text': response.responseMessage});
 
                                 $('#commit').attr('disabled', false);
+                                $('#commit').children('i').removeClass('fa-spin fa-cog').addClass('fa-code');
                             }
 
                         }, 'json');
