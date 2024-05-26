@@ -289,7 +289,7 @@ $(document).ready(function() {
 
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
         $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
-              columns: [
+            columns: [
                 null,
                 null,
                 null,
@@ -298,9 +298,12 @@ $(document).ready(function() {
                 null,
                 null,
                 { orderable: false }
-              ]
-            }
-        );
+            ],
+            lengthMenu: [
+                [25, 50, 100, -1],
+                [25, 50, 100, 'All']
+            ]
+        });
     }
 });
 
@@ -309,7 +312,7 @@ $(window).on('load', function() {
 
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
         $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
-              columns: [
+            columns: [
                 null,
                 null,
                 null,
@@ -318,9 +321,12 @@ $(window).on('load', function() {
                 null,
                 null,
                 { orderable: false }
-              ]
-            }
-        );
+            ],
+            lengthMenu: [
+                [25, 50, 100, -1],
+                [25, 50, 100, 'All']
+            ]
+        });
     }
 });
 </script>

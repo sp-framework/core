@@ -2,6 +2,8 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToRetrieveMetadata;
 use System\Base\BasePackage;
 use z4kn4fein\SemVer\Version;
 
@@ -129,6 +131,11 @@ class Installer extends BasePackage
 
     protected function precheckQueueData($module)
     {
+        if ($module['module_type'] === 'external') {
+            $composerFile = $this->getComposerJsonFile();
+            trace([$composerFile, $module]);
+        }
+
         $this->modulesToInstallOrUpdate = $this->modules->manager->getModuleInfo(
             [
                 'module_type'   => $module['module_type'],
@@ -169,6 +176,19 @@ class Installer extends BasePackage
                 $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['tag_name'];
         }
 
+        try {//Check if file was downloaded after release was published
+            $fileModificationTime = $this->localContent->lastModified($this->downloadLocation .
+                        $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                        $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/' .
+                        $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                        $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip');
+
+            if (\Carbon\Carbon::parse($this->modulesToInstallOrUpdate['repo_details']['latestRelease']['published_at'])->timestamp < $fileModificationTime) {
+                return true;
+            }
+        } catch (FilesystemException | UnableToRetrieveMetadata | \Exception $e) {
+            // Do Nothing.
+        }
         // remove old data so there is no conflict
         $files =
             $this->basepackages->utils->scanDir(
@@ -903,7 +923,7 @@ class Installer extends BasePackage
         return false;
     }
 
-    public function getHttpOptions($sink)//Public because remoteWebContent needs to access it
+    protected function getHttpOptions($sink)//Public because remoteWebContent needs to access it
     {
         self::$trackCounter = 0;
 
@@ -949,6 +969,20 @@ class Installer extends BasePackage
             'sink'              => $sink
         ];
     }
+
+    protected function getComposerJsonFile()
+    {
+        // if (file_exists(base_path('external/composer.lock'))) {
+        //     unlink(base_path('external/composer.lock'));
+        // }
+
+        try {
+            return $this->helper->decode($this->localContent->read('external/composer.json'), true);
+        } catch (\throwable $exception) {
+            return false;
+        }
+    }
+
     // protected function downloadPackagesAndDependencies($module)
     // {
     //     try {
