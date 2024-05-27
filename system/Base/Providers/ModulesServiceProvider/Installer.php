@@ -132,37 +132,71 @@ class Installer extends BasePackage
     protected function precheckQueueData($module)
     {
         if ($module['module_type'] === 'external') {
-            $composerFile = $this->getComposerJsonFile();
-            trace([$composerFile, $module]);
-        }
+            trace([$module]);
+            // $composerFile = $this->getComposerJsonFile();
+            if (isset($module['hasPatch'])) {
+                trace([$module]);
+            }
 
-        $this->modulesToInstallOrUpdate = $this->modules->manager->getModuleInfo(
-            [
-                'module_type'   => $module['module_type'],
-                'module_id'     => $module['id'],
-                'sync'          => true
-            ]
-        );
+            return true;
+            try {
+                putenv('COMPOSER_HOME=' . base_path('external/'));
+                // putenv('COMPOSER=' . );
 
-        if ($this->modulesToInstallOrUpdate) {
-            if (is_string($this->modulesToInstallOrUpdate['repo_details'])) {
-                try {
-                    $this->modulesToInstallOrUpdate['repo_details'] = $this->helper->decode($this->modulesToInstallOrUpdate['repo_details'], true);
-                } catch (\Exception $e) {
-                    $this->addResponse('Could not retrieve repository information for module: ' . $this->modulesToInstallOrUpdate['name'], 1);
+                $stream = fopen(base_path('external/composer.install'), 'w');
+                $input = new \Symfony\Component\Console\Input\StringInput('install -d ' . base_path('external/'));
+                $output = new \Symfony\Component\Console\Output\StreamOutput($stream);
 
-                    $this->basepackages->progress->resetProgress();
+                $application = new \Composer\Console\Application();
+                $application->setAutoExit(false); // prevent `$application->run` method from exiting the script
 
-                    return false;
-                }
+                $app = $application->run($input, $output);
+            } catch (\throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                $this->basepackages->progress->resetProgress();
+
+                return false;
+            }
+
+            if ($app !== 0) {
+                $this->addResponse('Could not retrieve repository information for module: ' . $this->modulesToInstallOrUpdate['name'], 1);
+
+                $this->basepackages->progress->resetProgress();
+
+                return false;
             }
         } else {
-            $this->addResponse($this->modules->manager->packagesData->responseMessage ?? 'Could not retrieve repository information for module: ' . $module['name'], 1);
+            $this->modulesToInstallOrUpdate = $this->modules->manager->getModuleInfo(
+                [
+                    'module_type'   => $module['module_type'],
+                    'module_id'     => $module['id'],
+                    'sync'          => true
+                ]
+            );
 
-            $this->basepackages->progress->resetProgress();
+            if ($this->modulesToInstallOrUpdate) {
+                if (is_string($this->modulesToInstallOrUpdate['repo_details'])) {
+                    try {
+                        $this->modulesToInstallOrUpdate['repo_details'] = $this->helper->decode($this->modulesToInstallOrUpdate['repo_details'], true);
+                    } catch (\Exception $e) {
+                        $this->addResponse('Could not retrieve repository information for module: ' . $this->modulesToInstallOrUpdate['name'], 1);
 
-            return false;
+                        $this->basepackages->progress->resetProgress();
+
+                        return false;
+                    }
+                }
+            } else {
+                $this->addResponse($this->modules->manager->packagesData->responseMessage ?? 'Could not retrieve repository information for module: ' . $module['name'], 1);
+
+                $this->basepackages->progress->resetProgress();
+
+                return false;
+            }
         }
+
+        //Update queue pre-check logs
 
         return true;
     }
@@ -791,11 +825,13 @@ class Installer extends BasePackage
         $this->runProcessPrecheckProgressMethods = [];
 
         foreach ($this->queue['tasks']['analysed'] as $taskName => $modulesTypes) {
-            if (($taskName === 'install' || $taskName === 'update') &&
+            if (($taskName === 'first' || $taskName === 'install' || $taskName === 'update') &&
                 count($modulesTypes) > 0
             ) {
                 foreach ($modulesTypes as $moduleType => $modules) {
-                    if (count($modules) === 0) {
+                    if ((is_array($modules) && count($modules) === 0) ||
+                        !is_array($modules)
+                    ) {
                         continue;
                     }
 
