@@ -101,8 +101,6 @@
                             '           <td>' ~  module['version'] ~ '</td>' ~
                             '           <td>' ~  module['repo'] ~ '</td>' ~
                             '           <td>' ~  '<span class="badge badge-' ~ color ~ ' mt-1 text-xs text-uppercase">' ~ taskName ~ '</span></td>' ~
-                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' ~ module['id'] ~ '">-</td>' ~
-                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' ~ module['id'] ~ '">-</td>' ~
                             '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' ~ module['id'] ~ '">' ~
                             '               <a href="#" type="button" data-error="' ~ error ~ '" data-task="' ~ taskName ~ '" data-moduletype="' ~ modulesType ~ '" data-id="' ~ module['id'] ~ '" class="ml-1 mr-1 text-white btn btn-info btn-xs viewLogs">' ~
                             '                   <i class="fas fa-fw fa-xs fa-eye"></i>' ~
@@ -127,8 +125,6 @@
                         <th class="text-uppercase">Version</th>
                         <th class="text-uppercase">Repository</th>
                         <th class="text-uppercase">Task</th>
-                        <th class="text-uppercase">PreCheck</th>
-                        <th class="text-uppercase">Completed</th>
                         <th class="text-uppercase">Logs</th>
                     </tr>
                 </thead>
@@ -201,6 +197,8 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
             if (response.responseData && response.responseData.queue) {
                 dataCollectionSectionForm['vars']['queue'] = response.responseData.queue;
             }
+
+            //Process response here to add bg-danger to precheck/install that has failed.
         } else {
             paginatedPNotify('error', {
                 text        : response.responseMessage,
@@ -330,20 +328,9 @@ $(document).ready(function() {
 
     BazProgress.buildProgressBar($('#installer-progress'), false, false, true);
 
-    var callable = [];
-
-    callable['afterProcess'] = function(response) {
-        //eslint-disable-next-line
-        console.log(response, 'me');
-    }
-
-    BazProgress.setCallable(callable);
-
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
         $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
             columns: [
-                null,
-                null,
                 null,
                 null,
                 null,
@@ -365,8 +352,6 @@ $(window).on('load', function() {
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
         $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
             columns: [
-                null,
-                null,
                 null,
                 null,
                 null,

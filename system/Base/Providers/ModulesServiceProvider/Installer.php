@@ -1048,44 +1048,36 @@ class Installer extends BasePackage
                         }
                     }
 
-                    // foreach ($modules as $module) {
-                    //     if ($taskName === 'first' && $moduleType === 'external') {
-                    //         continue;
-                    //     } else {
-                    //         array_push($this->runProcessPrecheckProgressMethods,
-                    //             [
-                    //                 'method'    => 'precheckQueueData-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                    //                 'text'      => 'Perform precheck for module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
-                    //                 'args'      => $module,
-                    //             ]
-                    //         );
-                    //         array_push($this->runProcessPrecheckProgressMethods,
-                    //             [
-                    //                 'method'    => 'downloadModulesFromRepo-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                    //                 'text'      => 'Download module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') files from repository...',
-                    //                 'args'      => $module,
-                    //                 'remoteWeb' => true
-                    //             ]
-                    //         );
-                    //         array_push($this->runProcessPrecheckProgressMethods,
-                    //             [
-                    //                 'method'    => 'extractModulesDownloadedFromRepo-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                    //                 'text'      => 'Extracting downloaded module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...'
-                    //             ]
-                    //         );
-                    //     }
-                    // }
-
+                    foreach ($modules as $module) {
+                        if ($taskName === 'first' && $moduleType === 'external') {
+                            continue;
+                        } else {
+                            array_push($this->runProcessPrecheckProgressMethods,
+                                [
+                                    'method'    => 'precheckQueueData-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Perform precheck for module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
+                                    'args'      => $module,
+                                ]
+                            );
+                            array_push($this->runProcessPrecheckProgressMethods,
+                                [
+                                    'method'    => 'downloadModulesFromRepo-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Download module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') files from repository...',
+                                    'args'      => $module,
+                                    'remoteWeb' => true
+                                ]
+                            );
+                            array_push($this->runProcessPrecheckProgressMethods,
+                                [
+                                    'method'    => 'extractModulesDownloadedFromRepo-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Extracting downloaded module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...'
+                                ]
+                            );
+                        }
+                    }
                 }
             }
         }
-
-        // array_push($this->runProcessPrecheckProgressMethods,
-        //     [
-        //         'method'    => 'finishPrecheck',
-        //         'text'      => 'Finishing up...'
-        //     ]
-        // );
 
         $this->basepackages->progress->registerMethods($this->runProcessPrecheckProgressMethods);
     }
@@ -1235,84 +1227,4 @@ class Installer extends BasePackage
             return false;
         }
     }
-
-    // protected function downloadPackagesAndDependencies($module)
-    // {
-    //     try {
-    //         $downloadedContents = $this->remoteWebContent
-    //                 ->request('GET', $module['repo'] . '/archive/master.zip')
-    //                 ->getBody()
-    //                 ->getContents();
-
-    //     } catch (\Exception $e) {
-    //         $this->packagesData->responseCode = 1;
-
-    //         $this->packagesData->responseMessage = $e->getMessage();
-
-    //         return $this->packagesData;
-    //     }
-
-    //     $this->downloadLocation = '.downloads/';
-
-    //     if (!$this->localContent->fileExists($this->downloadLocation . ucfirst($module['type']))) {
-    //         $this->localContent->createDirectory($this->downloadLocation . ucfirst($module['type']));
-    //         $this->downloadLocation = $this->downloadLocation . ucfirst($module['type']);
-    //     } else {
-    //         $this->downloadLocation = $this->downloadLocation . ucfirst($module['type']);
-    //     }
-
-    //     if (!$this->localContent->fileExists($this->downloadLocation . '/' . $module['name'])) {
-    //         $this->localContent->createDirectory($this->downloadLocation . '/' . $module['name']);
-    //         $this->downloadLocation = $this->downloadLocation . '/' . $module['name'];
-    //     } else {
-    //         $this->downloadLocation = $this->downloadLocation . '/' . $module['name'];
-    //     }
-
-    //     if (!$this->localContent->fileExists($this->downloadLocation . '/' . $module['version'])) {
-    //         $this->localContent->createDirectory($this->downloadLocation . '/' . $module['version']);
-    //         $this->downloadLocation = $this->downloadLocation . '/' . $module['version'];
-    //     } else {
-    //         $this->downloadLocation = $this->downloadLocation . '/' . $module['version'];
-    //     }
-
-    //     // if (!$this->localContent->fileExists($this->downloadLocation . '/' . $module['repobranch'])) {
-    //     //  $this->localContent->createDirectory($this->downloadLocation . '/' . $module['repobranch']);
-    //     //  $this->downloadLocation = $this->downloadLocation . '/' . $module['repobranch'];
-    //     // } else {
-    //     //  $this->downloadLocation = $this->downloadLocation . '/' . $module['repobranch'];
-    //     // }
-
-    //     // var_dump($this->downloadLocation);
-
-    //     $this->localContent->write(
-    //         $this->downloadLocation . '/master.zip',
-    //         $downloadedContents
-    //     );
-    // }
-
-    // protected function extractDownloadedPackagesAndDependencies($name, $repoName, $type)
-    // {
-    //     if ($this->zip->open($this->downloadLocation . '/master.zip')) {
-    //         $this->zip->extractTo($this->downloadLocation);
-
-    //         if ($type === 'core') {
-    //             $extractedLocation
-    //                 = $this->downloadLocation . '/' . strtolower($repoName) .
-    //                 '-master/';
-    //         } else if ($type === 'app') {
-    //             $extractedLocation
-    //                 = $this->downloadLocation . '/' . strtolower($repoName) .
-    //                 '-master/' . $type . 's/';
-    //         } else {
-    //             $extractedLocation
-    //                 = $this->downloadLocation . '/' . strtolower($repoName) .
-    //                 '-master/' . $type . '/';
-    //         }
-
-    //         return $this->localContent->listContents($extractedLocation, true);
-    //     } else {
-
-    //         return false;
-    //     }
-    // }
 }

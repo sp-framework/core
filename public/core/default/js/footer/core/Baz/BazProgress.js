@@ -376,6 +376,8 @@ var BazProgress = function() {
     }
 
     function onMessage(data) {
+        //eslint-disable-next-line
+        console.log(data);
         processResponse(data);
     }
 
