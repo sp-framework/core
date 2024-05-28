@@ -59,7 +59,8 @@
 				"lasserafn/php-initial-avatar-generator" : "^4.3",
 				"wp-cli/php-cli-tools" : "^0.11.22",
 				"react/event-loop" : "1.5.0",
-				"mattiasgeniar/php-percentages" : "^1.3"
+				"mattiasgeniar/php-percentages" : "^1.3",
+				"react/socket" : "^1.15"
 			},
 			"config" : 
 			{

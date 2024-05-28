@@ -212,7 +212,7 @@ class Manager extends BasePackage
 
                     $module['repo_details']['details'] = $responseArr;
 
-                    $latestRelease = $this->moduleNeedsUpgrade($responseArr, $module);
+                    $latestRelease = $this->moduleNeedsUpgrade($responseArr, $module, $data);
 
                     if ($latestRelease) {
                         $module['repo_details']['latestRelease'] = $latestRelease;
@@ -221,14 +221,9 @@ class Manager extends BasePackage
                     }
                 } else {
                     $module['repo_details'] = false;
-
-                    // $this->addResponse('Could not retrieve repository information for module: ' . ($module['display_name'] ?? $module['name']) . ' (Public)' , 1);
-
-                    // return false;
                 }
             }
         } catch (ClientException | \throwable $e) {
-            trace([$e, $module]);
             $this->addResponse($e->getMessage(), 2, ['module' => $module]);
 
             return false;
@@ -835,9 +830,18 @@ class Manager extends BasePackage
         return $modules;
     }
 
-    protected function moduleNeedsUpgrade($remoteModule, $localModule = null)
+    protected function moduleNeedsUpgrade($remoteModule, $localModule = null, $data = null)
     {
         if ($localModule) {
+            $repo = strtolower($this->helper->last(explode('/', $localModule['repo'])));
+
+            if ($data &&
+                $data['module_type'] === 'views' &&
+                str_contains($data['module_id'], '-public')
+            ) {
+                $repo = $repo . '-public';
+            }
+
             if (array_key_exists('level_of_update', $localModule) &&
                 $localModule['level_of_update'] == '4'
             ) {
@@ -853,12 +857,12 @@ class Manager extends BasePackage
                     $args =
                         [
                             $this->apiClientConfig['org_user'],
-                            strtolower($remoteModule['name'])
+                            $repo
                         ];
 
                     $releases = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
                 } catch (\Exception $e) {
-                    $latestRelease = $this->getLatestRelease($remoteModule);
+                    $latestRelease = $this->getLatestRelease($remoteModule, $data);
                 }
 
                 if ($releases && count($releases) > 0) {
@@ -873,10 +877,10 @@ class Manager extends BasePackage
                     }
                 }
             } else {
-                $latestRelease = $this->getLatestRelease($remoteModule);
+                $latestRelease = $this->getLatestRelease($remoteModule, $data);
             }
         } else {
-            $latestRelease = $this->getLatestRelease($remoteModule);
+            $latestRelease = $this->getLatestRelease($remoteModule, $data);
         }
 
         if (!$latestRelease) {
@@ -916,13 +920,19 @@ class Manager extends BasePackage
                 if (Version::greaterThan($latestRelease['tag_name'], $localModule['version'])) {
                     return $latestRelease;
                 }
+                if ($data &&
+                    $data['module_type'] === 'views' &&
+                    str_contains($data['module_id'], '-public')
+                ) {
+                    return $latestRelease;
+                }
             }
         } else {
             return $latestRelease;
         }
     }
 
-    protected function getLatestRelease($remoteModule)
+    protected function getLatestRelease($remoteModule, $data = null)
     {
         try {
             if (strtolower($this->apiClientConfig['provider']) === 'gitea') {

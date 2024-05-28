@@ -30,6 +30,10 @@ class Utils extends BasePackage
         $files['files'] = [];
 
         if ($directory) {
+            if (str_contains($directory, base_path())) {
+                $directory = str_replace(base_path(), '', $directory);
+            }
+
             $files['files'] =
                 $this->localContent->listContents($directory, $sub)
                 ->filter(fn (StorageAttributes $attributes) => $attributes->isFile())

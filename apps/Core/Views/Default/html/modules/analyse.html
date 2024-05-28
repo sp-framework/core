@@ -66,19 +66,26 @@
 {% set hasAnalysisError = 'false' %}
 {% if queue['tasks']['analysed']|length > 0 %}
     {% for task, queueTaskModules in queue['tasks']['analysed'] %}
-        {% if task === 'install' or task === 'uninstall' or task === 'update' or task === 'remove' %}
+        {% if task === 'first' or task === 'install' or task === 'uninstall' or task === 'update' or task === 'remove' %}
             {% if queueTaskModules|length > 0 %}
                 {% for modulesType, modules in queueTaskModules %}
                     {% if modules|length > 0 %}
                         {% for moduleId, module in modules %}
                             {% set error = 'false' %}
                             {% set color = 'primary' %}
-                            {% if task === 'update' %}
+                            {% if task === 'update' or (task === 'first' and modulesType === 'packages') %}
                                 {% set color = 'info' %}
                             {% elseif task === 'uninstall' %}
                                 {% set color = 'warning' %}
                             {% elseif task === 'remove' %}
                                 {% set color = 'danger' %}
+                            {% endif %}
+                            {% if task === 'first' and modulesType === 'packages' %}
+                                {% set taskName = 'update' %}
+                            {% elseif task === 'first' and modulesType === 'external' %}
+                                {% set taskName = 'install' %}
+                            {% else %}
+                                {% set taskName = task %}
                             {% endif %}
 
                             {% set errorClass = '' %}
@@ -88,17 +95,16 @@
                                 {% set error = 'true' %}
                                 {% set errorClass = ' class="bg-danger"' %}
                             {% endif %}
-
                             {% set moduleHtml = moduleHtml ~ '<tr' ~ errorClass ~ '>' ~
                             '           <td>' ~  module['name'] ~ '</td>' ~
                             '           <td>' ~  module['module_type'] ~ '</td>' ~
                             '           <td>' ~  module['version'] ~ '</td>' ~
                             '           <td>' ~  module['repo'] ~ '</td>' ~
-                            '           <td>' ~  '<span class="badge badge-' ~ color ~ ' mt-1 text-xs text-uppercase">' ~ task ~ '</span></td>' ~
+                            '           <td>' ~  '<span class="badge badge-' ~ color ~ ' mt-1 text-xs text-uppercase">' ~ taskName ~ '</span></td>' ~
                             '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' ~ module['id'] ~ '">-</td>' ~
                             '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' ~ module['id'] ~ '">-</td>' ~
                             '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' ~ module['id'] ~ '">' ~
-                            '               <a href="#" type="button" data-error="' ~ error ~ '" data-task="' ~ task ~ '" data-moduletype="' ~ modulesType ~ '" data-id="' ~ module['id'] ~ '" class="ml-1 mr-1 text-white btn btn-info btn-xs viewLogs">' ~
+                            '               <a href="#" type="button" data-error="' ~ error ~ '" data-task="' ~ taskName ~ '" data-moduletype="' ~ modulesType ~ '" data-id="' ~ module['id'] ~ '" class="ml-1 mr-1 text-white btn btn-info btn-xs viewLogs">' ~
                             '                   <i class="fas fa-fw fa-xs fa-eye"></i>' ~
                             '               </a>' ~
                             '           </td>' ~
@@ -191,6 +197,10 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
                 text        : response.responseMessage,
                 textTrusted : true
             });
+
+            if (response.responseData && response.responseData.queue) {
+                dataCollectionSectionForm['vars']['queue'] = response.responseData.queue;
+            }
         } else {
             paginatedPNotify('error', {
                 text        : response.responseMessage,
@@ -272,8 +282,41 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
     $('.viewLogs').click(function(e) {
         e.preventDefault();
 
+        var logObject;
+
+        if ($(this).data()['moduletype'] === 'external' &&
+            dataCollectionSectionForm['vars']['queue']['results']['first']['external'][$(this).data()['id']]
+        ) {
+            logObject = dataCollectionSectionForm['vars']['queue']['results']['first']['external'][$(this).data()['id']];
+        } else if ($(this).data()['moduletype'] === 'packages' &&
+                   $(this).data()['task'] === 'update' &&
+                   dataCollectionSectionForm['vars']['queue']['results']['first']['packages'][$(this).data()['id']]
+        ) {
+            logObject = dataCollectionSectionForm['vars']['queue']['results']['first']['packages'][$(this).data()['id']];
+        } else {
+            logObject = dataCollectionSectionForm['vars']['queue']['results'][$(this).data()['task']][$(this).data()['moduletype']][$(this).data()['id']];
+        }
+
+        for (var object in logObject) {
+            if (object === 'analyse' || object === 'precheck' || object === 'result') {
+                if (logObject[object] === 'pass') {
+                    logObject[object] = '<span class="badge badge-success mt-1 text-xs text-uppercase">pass</span>';
+                } else if (logObject[object] === 'fail') {
+                    logObject[object] = '<span class="badge badge-danger mt-1 text-xs text-uppercase">fail</span>';
+                } else {
+                    logObject[object] = '-';
+                }
+            }
+
+            if (object === 'analyse_logs' || object === 'precheck_logs' || object === 'result_logs') {
+                if (logObject[object] !== '-') {
+                    logObject[object] = '<pre>' + logObject[object] + '</pre>';
+                }
+            }
+        }
+
         var html = '<strong class="text-uppercase">Logs: </strong>' +
-            BazHelpers.createHtmlList({'obj': dataCollectionSectionForm['vars']['queue']['results'][$(this).data()['task']][$(this).data()['moduletype']][$(this).data()['id']]});
+            BazHelpers.createHtmlList({'obj': logObject});
 
         $('#{{componentId}}-{{sectionId}}-queue-logs').empty().html(html);
         $('#{{componentId}}-{{sectionId}}-queue-logs-modal').modal('show');
@@ -286,6 +329,15 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['initQueueButtons']();
 
     BazProgress.buildProgressBar($('#installer-progress'), false, false, true);
+
+    var callable = [];
+
+    callable['afterProcess'] = function(response) {
+        //eslint-disable-next-line
+        console.log(response, 'me');
+    }
+
+    BazProgress.setCallable(callable);
 
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
         $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({

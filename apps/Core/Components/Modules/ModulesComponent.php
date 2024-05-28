@@ -282,7 +282,8 @@ class ModulesComponent extends BaseComponent
 
 			$this->addResponse(
 				$this->modules->installer->packagesData->responseMessage,
-				$this->modules->installer->packagesData->responseCode
+				$this->modules->installer->packagesData->responseCode,
+				$this->modules->installer->packagesData->responseData ?? []
 			);
 		} catch (\Exception $e) {
 			trace([$e]);
