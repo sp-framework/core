@@ -91,6 +91,13 @@ class Repos
                             'size'    => 2048,
                             'notNull' => false,
                         ]
+                    ),
+                    new Column(
+                        'sync',
+                        [
+                            'type'    => Column::TYPE_JSON,
+                            'notNull' => false,
+                        ]
                     )
                 ]
             ];

@@ -284,7 +284,7 @@ class Manager extends BasePackage
                 continue;
             }
 
-            if ($api['category'] === 'repos') {
+            if (strtolower($api['category']) === 'repos') {
                 $apiClient = $this->basepackages->apiClientServices->useApi($api['id']);
                 $apiClientConfig = $apiClient->getApiConfig();
 
@@ -456,20 +456,9 @@ class Manager extends BasePackage
                     $this->getRepositoryModules(['api_id' => $this->apiClientConfig['id']]);
                 }
 
-                $queue = $this->modules->queues->getActiveQueue();
+                $this->apiClientConfig['sync']['modules']['last_sync'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
 
-                if ($queue) {
-                    if ($queue['sync'] && !isset($queue['sync'][$this->apiClientConfig['id']])) {
-                        $queue['sync'][$this->apiClientConfig['id']] = [];
-                    } else {
-                        $queue['sync'] = [];
-                        $queue['sync'][$this->apiClientConfig['id']] = [];
-                    }
-
-                    $queue['sync'][$this->apiClientConfig['id']]['last_sync'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
-
-                    $this->modules->queues->update($queue);
-                }
+                $this->basepackages->apiClientServices->updateApi($this->apiClientConfig);
 
                 return true;
             }
@@ -509,15 +498,11 @@ class Manager extends BasePackage
         }
 
         if ($modulesArr) {
-            $queue = $this->modules->queues->getActiveQueue();
-
-            if ($queue) {
-                if ($queue['sync'] &&
-                    isset($queue['sync'][$this->apiClientConfig['id']]['last_sync']) &&
-                    $queue['sync'][$this->apiClientConfig['id']]['last_sync'] !== ''
-                ) {
-                    $lastSync = \Carbon\Carbon::parse($queue['sync'][$this->apiClientConfig['id']]['last_sync']);
-                }
+            if ($this->apiClientConfig['sync'] &&
+                isset($this->apiClientConfig['sync']['modules']['last_sync']) &&
+                $this->apiClientConfig['sync']['modules']['last_sync'] !== ''
+            ) {
+                $lastSync = \Carbon\Carbon::parse($this->apiClientConfig['sync']['modules']['last_sync']);
             }
 
             foreach ($modulesArr as $key => $module) {

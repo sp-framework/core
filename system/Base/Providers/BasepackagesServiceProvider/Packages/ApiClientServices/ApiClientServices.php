@@ -173,9 +173,11 @@ class ApiClientServices extends BasePackage
      */
     public function addApi(array $data)
     {
-        $data = $this->encryptPassToken($data);
-
+        $data['location'] = strtolower($data['location']);
+        $data['category'] = strtolower($data['category']);
         $data['provider'] = strtolower($data['provider']);
+
+        $data = $this->encryptPassToken($data);
 
         $this->switchApiModel($data);
 
@@ -204,9 +206,11 @@ class ApiClientServices extends BasePackage
      */
     public function updateApi(array $data)
     {
-        $data = $this->encryptPassToken($data);
-
+        $data['location'] = strtolower($data['location']);
+        $data['category'] = strtolower($data['category']);
         $data['provider'] = strtolower($data['provider']);
+
+        $data = $this->encryptPassToken($data);
 
         $this->switchApiModel($data);
 

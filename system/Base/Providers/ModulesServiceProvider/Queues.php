@@ -38,16 +38,6 @@ class Queues extends BasePackage
 
     protected function addActiveQueue()
     {
-        $params['conditions'] = '';
-        $params['limit'] = 1;
-        $params['order'] = 'id desc';
-
-        $oldQueue = $this->getByParams($params);
-
-        if ($oldQueue && count($oldQueue) === 1) {
-            $oldQueue = $oldQueue[0];
-        }
-
         $queue = [
             'status'    => 0,//1 - pre-checked, 2 - processed
             'tasks'     => $this->helper->encode(
@@ -60,10 +50,6 @@ class Queues extends BasePackage
             ),
             'total'     => 0
         ];
-
-        if ($oldQueue && isset($oldQueue['sync'])) {
-            $queue['sync'] = $oldQueue['sync'];
-        }
 
         if ($this->add($queue)) {
             $queue = $this->packagesData->last;
