@@ -332,14 +332,14 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
         if ($(this).data()['moduletype'] === 'external' &&
             dataCollectionSectionForm['vars']['queue']['results']['first']['external'][$(this).data()['id']]
         ) {
-            logObject = dataCollectionSectionForm['vars']['queue']['results']['first']['external'][$(this).data()['id']];
+            logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results']['first']['external'][$(this).data()['id']]);
         } else if ($(this).data()['moduletype'] === 'packages' &&
                    $(this).data()['task'] === 'update' &&
                    dataCollectionSectionForm['vars']['queue']['results']['first']['packages'][$(this).data()['id']]
         ) {
-            logObject = dataCollectionSectionForm['vars']['queue']['results']['first']['packages'][$(this).data()['id']];
+            logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results']['first']['packages'][$(this).data()['id']]);
         } else {
-            logObject = dataCollectionSectionForm['vars']['queue']['results'][$(this).data()['task']][$(this).data()['moduletype']][$(this).data()['id']];
+            logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results'][$(this).data()['task']][$(this).data()['moduletype']][$(this).data()['id']]);
         }
 
         for (var object in logObject) {
