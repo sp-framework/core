@@ -28,7 +28,11 @@ class Queues extends BasePackage
         $queue = $this->getFirst('status', 0);
 
         if (!$queue) {
-            return $this->addActiveQueue();
+            $queue = $this->getFirst('status', 1);//prechecked
+
+            if (!$queue) {
+                return $this->addActiveQueue();
+            }
         }
 
         $queue = $queue->toArray();
@@ -166,6 +170,7 @@ class Queues extends BasePackage
         $queue['prechecked_at'] = null;
         $queue['prechecked_by'] = null;
         $queue['tasks']['analysed'] = null;
+        $queue['status'] = 0;
 
         if ($this->update($queue)) {
             return true;
@@ -410,6 +415,7 @@ class Queues extends BasePackage
         }
 
         $queue['tasks']['analysed'] = $this->queueTasks;
+        $queue['status'] = 0;
 
         $this->getTasksCount($queue, true);
 

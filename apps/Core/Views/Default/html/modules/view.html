@@ -1,4 +1,16 @@
 {% if queues is defined and queues === true and queue['total'] != 0 %}
+    {% set precheckTitle = 'Perform Precheck' %}
+    {% set precheckHidden = false %}
+    {% set analyseHidden = false %}
+    {% set processHidden = true %}
+    {% if queue['status'] == 1 %}
+        {% set precheckHidden = false %}
+        {% set precheckTitle = 'Re-Perform Precheck' %}
+    {% elseif queue['status'] == 2 %}
+        {% set precheckHidden = true %}
+        {% set analyseHidden = true %}
+        {% set processHidden = true %}
+    {% endif %}
     {% set footerContent =
         adminltetags.useTag('buttons',
             [
@@ -13,20 +25,22 @@
                         're-analyse' : [
                             'title'                   : 'Re-Analyse Queue',
                             'type'                    : 'primary',
-                            'url'                     : links.url('modules/q/queue/true/reanalyse/true')
+                            'url'                     : links.url('modules/q/queue/true/reanalyse/true'),
+                            'hidden'                  : analyseHidden
                         ],
                         'perform-precheck' : [
-                            'title'                   : 'Perform Precheck',
+                            'title'                   : precheckTitle,
                             'type'                    : 'primary',
                             'icon'                    : 'cog fa-spin',
-                            'iconHidden'              : true
+                            'iconHidden'              : true,
+                            'hidden'                  : precheckHidden
                         ],
                         'process-queue' : [
                             'title'                   : 'Process Queue',
                             'type'                    : 'primary',
                             'icon'                    : 'cog fa-spin',
                             'iconHidden'              : true,
-                            'hidden'                  : true,
+                            'hidden'                  : processHidden,
                             'disabled'                : true
                         ],
                         'cancel' : [

@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set queueTasksCounterInstall = 0 %}
 {% set queueTasksCounterUpdate = 0 %}
 {% set queueTasksCounterUninstall = 0 %}
@@ -142,6 +142,7 @@
     </div>
 {% endif %}
 {% set queue = json_encode(queue, 16) %}
+{% set queue = str_replace('\\', '\\\\', queue) %}
 <script>
 /*global paginatedPNotify BazProgress BazContentFields BazHelpers BazContentLoader Pace BazCore */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -175,6 +176,19 @@ dataCollectionSectionForm['vars']['queue'] = JSON.parse('{{queue}}');
 dataCollectionSectionForm['funcs'] = { };
 
 dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
+    if (task === 'precheck') {
+        $('#{{componentId}}-{{sectionId}}-re-analyse').addClass('disabled');
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').children('i').attr('hidden', false);
+    } else if (task === 'process') {
+        $('#{{componentId}}-{{sectionId}}-re-analyse').addClass('disabled');
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', false);
+    }
+
+    $('tr').removeClass('bg-danger');
+
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
     postData['process'] = 'runprecheck';
@@ -188,50 +202,80 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
             $('#security-token').val(response.token);
         }
 
+        if (response.responseData && response.responseData.queue) {
+            dataCollectionSectionForm['vars']['queue'] = response.responseData.queue;
+        }
+
         if (response.responseCode == 0) {
             paginatedPNotify('success', {
                 text        : response.responseMessage,
                 textTrusted : true
             });
 
-            if (response.responseData && response.responseData.queue) {
-                dataCollectionSectionForm['vars']['queue'] = response.responseData.queue;
+            if (postData['process'] === 'runprecheck') {
+                $('#{{componentId}}-{{sectionId}}-re-analyse').removeClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').text(' RE-PERFORM PRECHECK');
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').children('i').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', false);
+            } else if (postData['process'] === 'runprocess') {
+                $('#{{componentId}}-{{sectionId}}-re-analyse').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', true);
             }
-
-            //Process response here to add bg-danger to precheck/install that has failed.
         } else {
             paginatedPNotify('error', {
                 text        : response.responseMessage,
                 textTrusted : true
             });
+
+            if (dataCollectionSectionForm['vars']['queue']['results'] &&
+                Object.keys(dataCollectionSectionForm['vars']['queue']['results']).length > 0
+            ) {
+                for (var task in dataCollectionSectionForm['vars']['queue']['results']) {
+                    if (Array.isArray(dataCollectionSectionForm['vars']['queue']['results'][task]) &&
+                        dataCollectionSectionForm['vars']['queue']['results'][task].length === 0
+                    ) {
+                        continue;
+                    }
+
+                    if (Object.keys(dataCollectionSectionForm['vars']['queue']['results'][task]).length > 0) {
+                        for (var moduleType in dataCollectionSectionForm['vars']['queue']['results'][task]) {
+                            if (Object.keys(dataCollectionSectionForm['vars']['queue']['results'][task][moduleType]).length > 0) {
+                                for (var taskModule in dataCollectionSectionForm['vars']['queue']['results'][task][moduleType]) {
+                                    if (dataCollectionSectionForm['vars']['queue']['results'][task][moduleType][taskModule]['precheck'] === 'fail') {
+                                        var moduleLogs = document.querySelectorAll("[data-id='" + taskModule + "']");
+
+                                        if (moduleLogs.length === 1) {
+                                            $(moduleLogs).parents('tr').addClass('bg-danger');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (postData['process'] === 'runprecheck') {
+                $('#{{componentId}}-{{sectionId}}-re-analyse').removeClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').text(' RE-PERFORM PRECHECK');
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').children('i').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
+            } else if (postData['process'] === 'runprocess') {
+                $('#{{componentId}}-{{sectionId}}-re-analyse').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', true);
+            }
         }
     }, 'json');
 }
 
 dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
-    if (dataCollectionSectionForm['vars']['queue']['status'] === 0) {
-        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', false);
-        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
-        $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
-        $('#{{componentId}}-{{sectionId}}-result-queue').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-result-queue').attr('disabled', true);
-    } else if (dataCollectionSectionForm['vars']['queue']['status'] === 1) {
-        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', true);
-        $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', false);
-        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', false);
-        $('#{{componentId}}-{{sectionId}}-result-queue').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-result-queue').attr('disabled', true);
-    } else if (dataCollectionSectionForm['vars']['queue']['status'] === 2) {
-        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', true);
-        $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
-        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
-        $('#{{componentId}}-{{sectionId}}-result-queue').attr('hidden', false);
-        $('#{{componentId}}-{{sectionId}}-result-queue').attr('disabled', false);
-    }
-
     if (dataCollectionSectionForm['vars']['hasAnalysisError']) {
         $('#{{componentId}}-{{sectionId}}-perform-precheck, ' +
           '#{{componentId}}-{{sectionId}}-process-queue, ' +
@@ -266,6 +310,9 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
       ).off();
     $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
         e.preventDefault();
+
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
 
         dataCollectionSectionForm['funcs']['processQueue']();
     });
@@ -383,3 +430,4 @@ $(window).on('load', function() {
         ]
     )}}
 </div>
+<!-- htmlmin:ignore -->

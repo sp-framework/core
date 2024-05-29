@@ -94,9 +94,7 @@ class Installer extends BasePackage
         if (method_exists($this, $methodToCall)) {
             $arguments['progressMethod'] = $method;
 
-            if (is_array($arguments)) {
-                $arguments = [$arguments];
-            }
+            $arguments = [$arguments];
 
             $this->basepackages->progress->updateProgress($method, null, false);
 
@@ -132,14 +130,19 @@ class Installer extends BasePackage
                 // usleep(500);
             }
 
+            $this->queue['status'] = 1;
+
             $this->modules->queues->update($this->queue);
 
             $this->addResponse('Precheck complete', 0, ['queue' => $this->queue]);
         }
     }
 
-    protected function precheckQueueData($module)
+    protected function precheckQueueData($args)
     {
+        $taskName = $args[0];
+        $module = $args[1];
+
         $this->modulesToInstallOrUpdate = $this->modules->manager->getModuleInfo(
             [
                 'module_type'   => $module['module_type'],
@@ -149,46 +152,64 @@ class Installer extends BasePackage
         );
 
         if ($this->modulesToInstallOrUpdate) {
+            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'pass';
+
             if (is_string($this->modulesToInstallOrUpdate['repo_details'])) {
                 try {
                     $this->modulesToInstallOrUpdate['repo_details'] = $this->helper->decode($this->modulesToInstallOrUpdate['repo_details'], true);
+
+                    return true;
                 } catch (\Exception $e) {
-                    $this->addResponse('Could not retrieve repository information for module: ' . $this->modulesToInstallOrUpdate['name'], 1);
-
-                    $this->basepackages->progress->resetProgress();
-
-                    return false;
+                    //Do Nothings
                 }
+            } else {
+                return true;
             }
-        } else {
+        }
+
+        if ($module['module_type'] === 'bundles') {
             $this->addResponse($this->modules->manager->packagesData->responseMessage ?? 'Could not retrieve repository information for module: ' . $module['name'], 1);
 
             $this->basepackages->progress->resetProgress();
 
             return false;
+        } else if ($taskName === 'first' && strtolower($module['name']) === 'core') {
+            $this->queue['results']['first']['packages'][$module['id']]['precheck'] = 'fail';
+
+            $preCheckQueueLogs = &$this->queue['results']['first']['packages'][$module['id']]['precheck_logs'];
+
+            return $this->preCheckHasErrors(
+                $this->modules->manager->packagesData->responseMessage ?? 'Could not retrieve repository information for module: ' . $module['name'],
+                $preCheckQueueLogs
+            );
+        } else {
+            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
+
+            $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
+
+            return $this->preCheckHasErrors(
+                $this->modules->manager->packagesData->responseMessage ?? 'Could not retrieve repository information for module: ' . $module['name'],
+                $preCheckQueueLogs
+            );
         }
 
-        //Update queue pre-check logs
-
-        return true;
+        return false;
     }
 
-    protected function precheckExternalPackages($module)
+    protected function precheckExternalPackages($args)
     {
+        $module = $args[1];
+
         if ($module['module_type'] === 'external') {
             $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck'] = 'fail';
+            $preCheckQueueLogs = &$this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'];
 
             if (isset($module['hasPatch']) && $module['hasPatch'] === true) {
                 if (!isset($module['composerJsonFile']['extra']['patches'][$module['name']])) {
-                    $errorMessage = 'External packages should have package defined, but are missing from the composer json file for : ' . $module['name'];
-
-                    $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $errorMessage;
-
-                    $this->addResponse($errorMessage, 1);
-
-                    $this->basepackages->progress->resetProgress();
-
-                    return false;
+                    return $this->preCheckHasErrors(
+                        'External packages should have package defined, but are missing from the composer json file for : ' . $module['name'],
+                        $preCheckQueueLogs
+                    );
                 }
 
                 $patches = $this->basepackages->utils->scanDir($this->downloadLocation .
@@ -200,28 +221,17 @@ class Installer extends BasePackage
                 );
 
                 if (count($patches['files']) === 0) {
-                    $errorMessage = 'External package requires a patch which is missing from the repository : ' . $module['root_module']['repo'];
-
-                    $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $errorMessage;
-
-                    $this->addResponse($errorMessage, 1);
-
-                    $this->basepackages->progress->resetProgress();
-
-                    return false;
+                    return $this->preCheckHasErrors(
+                        'External package requires a patch which is missing from the repository : ' . $module['root_module']['repo'],
+                        $preCheckQueueLogs
+                    );
                 }
 
                 if (count($patches['files']) !== count($module['composerJsonFile']['extra']['patches'][$module['name']])) {
-                    $errorMessage =
-                        'External package number of patches do not match what is defined in the composer json file for repository : ' . $module['root_module']['repo'];
-
-                    $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $errorMessage;
-
-                    $this->addResponse($errorMessage, 1);
-
-                    $this->basepackages->progress->resetProgress();
-
-                    return false;
+                    return $this->preCheckHasErrors(
+                        'External package number of patches do not match what is defined in the composer json file for repository : ' . $module['root_module']['repo'],
+                        $preCheckQueueLogs
+                    );
                 }
 
                 $foundAll = [];
@@ -236,15 +246,10 @@ class Installer extends BasePackage
                 }
 
                 if (in_array('false', $foundAll)) {
-                    $errorMessage = 'External package all patches not found in the external/patches directory as per the  composer json file for repository : ' . $module['root_module']['repo'];
-
-                    $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $errorMessage;
-
-                    $this->addResponse($errorMessage, 1);
-
-                    $this->basepackages->progress->resetProgress();
-
-                    return false;
+                    return $this->preCheckHasErrors(
+                        'External package all patches not found in the external/patches directory as per the  composer json file for repository : ' . $module['root_module']['repo'],
+                        $preCheckQueueLogs
+                    );
                 }
 
                 try {
@@ -254,15 +259,7 @@ class Installer extends BasePackage
                         $this->localContent->copy($file, 'external/patches/' . $fileName);
                     }
                 } catch (FilesystemException | UnableToCopyFile $e) {
-                    $errorMessage = 'Error copying file : ' . $fileName;
-
-                    $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $errorMessage;
-
-                    $this->addResponse($errorMessage, 1);
-
-                    $this->basepackages->progress->resetProgress();
-
-                    return false;
+                    return $this->preCheckHasErrors('Error copying file : ' . $fileName, $preCheckQueueLogs);
                 }
             }
 
@@ -271,15 +268,10 @@ class Installer extends BasePackage
 
                 $this->localContent->write('external/' . $externalComposerFileName, $this->helper->encode($module['composerJsonFile']));
             } catch (FilesystemException | UnableToWriteFile $e) {
-                $errorMessage = 'Error writing file external package composer file : ' . $externalComposerFileName;
-
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $errorMessage;
-
-                $this->addResponse($errorMessage, 1);
-
-                $this->basepackages->progress->resetProgress();
-
-                return false;
+                return $this->preCheckHasErrors(
+                    'Error writing file external package composer file : ' . $externalComposerFileName,
+                    $preCheckQueueLogs
+                );
             }
 
             try {
@@ -300,41 +292,28 @@ class Installer extends BasePackage
                 $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck'] = 'pass';
                 $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $precheckLog;
             } catch (\throwable | UnableToReadFile $e) {
-                $errorMessage = $e->getMessage();
-
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $errorMessage;
-
-                $this->addResponse($errorMessage, 1);
-
-                $this->basepackages->progress->resetProgress();
-
-                return false;
+                return $this->preCheckHasErrors($e->getMessage(), $preCheckQueueLogs);
             }
 
             if ($app !== 0) {
-                $errorMessage = 'Precheck for composer package failed : ' . $module['name'];
-
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $errorMessage;
-
-                $this->addResponse($errorMessage, 1);
-
-                $this->basepackages->progress->resetProgress();
-
-                return false;
+                return $this->preCheckHasErrors('Precheck for composer package failed : ' . $module['name'], $preCheckQueueLogs);
             }
         } else {
-            $errorMessage = 'Incorrect external package type: ' . $module['name'];
-
-            $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $errorMessage;
-
-            $this->addResponse($errorMessage, 1);
-
-            $this->basepackages->progress->resetProgress();
-
-            return false;
+            return $this->preCheckHasErrors('Incorrect external package type: ' . $module['name'], $preCheckQueueLogs);
         }
 
         return true;
+    }
+
+    protected function preCheckHasErrors($errorMessage, &$preCheckQueueLogs)
+    {
+        $preCheckQueueLogs = $errorMessage;
+
+        $this->addResponse('Precheck has errors! Check logs.', 1, ['queue' => $this->queue]);
+
+        $this->basepackages->progress->resetProgress();
+
+        return false;
     }
 
     protected function downloadModulesFromRepo($data)
@@ -463,7 +442,6 @@ class Installer extends BasePackage
                 $this->apiClient->useMethod($collection, $method, $args)->getResponse();
                 //As we have provided sink information, this should be downloaded and stored at the sink location.
             } catch (\throwable $e) {
-                trace([$e]);
                 $this->basepackages->progress->resetProgress();
 
                 $this->addResponse($e->getMessage(), 1);
@@ -1018,14 +996,14 @@ class Installer extends BasePackage
                                     [
                                         'method'    => 'precheckQueueData-' . $module['root_module']['id'] . '-' . strtolower(str_replace(' ', '', $module['root_module']['name'])),
                                         'text'      => 'Perform precheck for module ' . $module['root_module']['name'] . ' (' . ucfirst($module['root_module']['module_type']) . ') ...',
-                                        'args'      => $module['root_module'],
+                                        'args'      => [$taskName, $module['root_module']],
                                     ]
                                 );
                                 array_push($this->runProcessPrecheckProgressMethods,
                                     [
                                         'method'    => 'downloadModulesFromRepo-' . $module['root_module']['id'] . '-' . strtolower(str_replace(' ', '', $module['root_module']['name'])),
                                         'text'      => 'Download module ' . $module['root_module']['name'] . ' (' . ucfirst($module['root_module']['module_type']) . ') files from repository...',
-                                        'args'      => $module['root_module'],
+                                        'args'      => [$taskName, $module['root_module']],
                                         'remoteWeb' => true
                                     ]
                                 );
@@ -1040,7 +1018,7 @@ class Installer extends BasePackage
                                 [
                                     'method'    => 'precheckExternalPackages-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
                                     'text'      => 'Perform precheck for external package ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
-                                    'args'      => $module,
+                                    'args'      => [$taskName, $module],
                                 ]
                             );
                         } else {
@@ -1056,14 +1034,14 @@ class Installer extends BasePackage
                                 [
                                     'method'    => 'precheckQueueData-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
                                     'text'      => 'Perform precheck for module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
-                                    'args'      => $module,
+                                    'args'      => [$taskName, $module],
                                 ]
                             );
                             array_push($this->runProcessPrecheckProgressMethods,
                                 [
                                     'method'    => 'downloadModulesFromRepo-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
                                     'text'      => 'Download module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') files from repository...',
-                                    'args'      => $module,
+                                    'args'      => [$taskName, $module],
                                     'remoteWeb' => true
                                 ]
                             );

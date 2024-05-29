@@ -277,6 +277,7 @@
     </div>
 </div>
 {% set queue = json_encode(queue, 16) %}
+{% set queue = str_replace('\\', '\\\\', queue) %}
 {% set modules = json_encode(modules, 16) %}
 <script>
 /*global BazProgress Swal BazContentFields BazHelpers BazContentLoader Pace BazCore paginatedPNotify */
