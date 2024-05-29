@@ -36,7 +36,12 @@ class ModulesComponent extends BaseComponent
 			}
 
 			try {
-				$this->modules->queues->analyseQueue($queue);
+				$reanalyse = false;
+				if (isset($this->getData()['reanalyse']) && $this->getData()['reanalyse'] == true) {
+					$reanalyse = true;
+				}
+
+				$this->modules->queues->analyseQueue($queue, $reanalyse);
 			} catch (\Exception $e) {
 				trace([$e]);
 			}

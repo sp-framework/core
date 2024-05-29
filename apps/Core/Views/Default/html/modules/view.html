@@ -10,6 +10,11 @@
                 'buttonType'                    : 'button',
                 'buttons'                       :
                     [
+                        're-analyse' : [
+                            'title'                   : 'Re-Analyse Queue',
+                            'type'                    : 'primary',
+                            'url'                     : links.url('modules/q/queue/true/reanalyse/true')
+                        ],
                         'perform-precheck' : [
                             'title'                   : 'Perform Precheck',
                             'type'                    : 'primary',
@@ -21,12 +26,6 @@
                             'type'                    : 'primary',
                             'icon'                    : 'cog fa-spin',
                             'iconHidden'              : true,
-                            'hidden'                  : true,
-                            'disabled'                : true
-                        ],
-                        'result-queue' : [
-                            'title'                   : 'Queue Results',
-                            'type'                    : 'primary',
                             'hidden'                  : true,
                             'disabled'                : true
                         ],

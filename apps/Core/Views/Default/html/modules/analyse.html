@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+<!-- htmlhint tag-pair:false -->
 {% set queueTasksCounterInstall = 0 %}
 {% set queueTasksCounterUpdate = 0 %}
 {% set queueTasksCounterUninstall = 0 %}
@@ -241,10 +241,10 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
           '#{{componentId}}-{{sectionId}}-result-queue').attr('hidden', true);
     }
 
-    $('#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
+    $('#{{componentId}}-{{sectionId}}-cancel, #{{componentId}}-{{sectionId}}-re-analyse').click(function(e) {
         e.preventDefault();
 
-        BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-cancel'), {
+        BazContentLoader.loadAjax($('#' + $(this)[0].id), {
             ajaxBefore                      : function () {
                                                 Pace.restart();
                                                 $("#baz-content").empty();
@@ -383,4 +383,3 @@ $(window).on('load', function() {
         ]
     )}}
 </div>
-<!-- htmlmin:ignore -->

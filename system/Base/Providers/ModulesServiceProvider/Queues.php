@@ -165,6 +165,7 @@ class Queues extends BasePackage
 
         $queue['prechecked_at'] = null;
         $queue['prechecked_by'] = null;
+        $queue['tasks']['analysed'] = null;
 
         if ($this->update($queue)) {
             return true;
@@ -183,10 +184,9 @@ class Queues extends BasePackage
         if ($analyse) {
             $tasks = $queue['results'];
         }
+
         foreach ($tasks as $taskType => $task) {
-            if (isset($tasks['analysed']) &&
-                $taskType === 'analysed'
-            ) {
+            if ($taskType === 'analysed') {
                 continue;
             }
 
@@ -200,6 +200,7 @@ class Queues extends BasePackage
                         } else {
                             $taskTypeName = $taskType;
                         }
+
                         if (isset($queue['tasks_count'][$taskTypeName]) && $queue['tasks_count'][$taskTypeName] > 0) {
                             $queue['tasks_count'][$taskTypeName] = $queue['tasks_count'][$taskTypeName] + count($modules);
                         } else {
@@ -207,16 +208,22 @@ class Queues extends BasePackage
                         }
                     }
                 }
-
-                $queue['total'] = $queue['total'] + $queue['tasks_count'][$taskTypeName];
             }
+        }
+
+        foreach ($queue['tasks_count'] as $count) {
+            $queue['total'] = $queue['total'] + $count;
         }
     }
 
-    public function analyseQueue(&$queue = null)
+    public function analyseQueue(&$queue = null, $reAnalyse = false)
     {
         if (!$queue) {
             $queue = $this->getActiveQueue();
+        }
+
+        if (isset($queue['tasks']['analysed']) && !$reAnalyse) {
+            return true;
         }
 
         $this->queueTasks = [];
@@ -237,7 +244,7 @@ class Queues extends BasePackage
                 $this->results[$taskName] = [];
             }
 
-            if (count($tasks) === 0) {
+            if (!$tasks || count($tasks) === 0) {
                 continue;
             }
 
