@@ -1092,7 +1092,9 @@ $file .= '
         }
 
         $data['class'] = explode('\\', $data['class']);
-        unset($data['class'][$this->helper->lastKey($data['class'])]);
+        if (!str_starts_with($data['category'], 'basepackages')) {
+            unset($data['class'][$this->helper->lastKey($data['class'])]);
+        }
         $namespaceClass = implode('\\', $data['class']);
 
         $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass . ';', $file);
@@ -1216,7 +1218,6 @@ $file .= '
 
                 $fileName = $moduleFilesLocation . '/Basepackages' . $data['name'] . '.php';
                 $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-                $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
                 $className = 'Basepackages' . $data['name'];
             } else if ($data['category'] === 'providers') {
                 $moduleFilesLocation = 'system/Base/Providers/' . $data['name'] . 'ServiceProvider/Model/';
