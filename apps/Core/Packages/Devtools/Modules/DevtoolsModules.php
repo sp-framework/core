@@ -1161,31 +1161,33 @@ $file .= '
             return false;
         }
 
-        //Package Installer File
-        try {
-            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/PackageInstallPackage.txt');
-        } catch (FilesystemException | UnableToReadFile $exception) {
-            $this->addResponse('Unable to read module base package file.');
-
-            return false;
-        }
-
-        if ($data['category'] !== str_starts_with($data['category'], 'basepackages') && $data['category'] !== 'providers') {
-            $moduleFilesLocation = str_replace('/Schema', '', $moduleFilesLocation);
-            $fileName = $moduleFilesLocation . '/' . 'Package.php';
-            $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-            $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
-            $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
-            $file = str_replace('"PACKAGESCHEMACLASS"', $moduleSchemaClass . ';', $file);
-            $file = str_replace('"PACKAGESCHEMANAME"', $data['name'], $file);
-
+        //Package Installer File only for apps.
+        if (!str_starts_with($data['category'], 'basepackages') && $data['category'] !== 'providers') {
             try {
-                $this->localContent->write($fileName, $file);
-                array_push($this->newFiles, $fileName);
-            } catch (FilesystemException | UnableToWriteFile $exception) {
-                $this->addResponse('Unable to write module package file');
+                $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/PackageInstallPackage.txt');
+            } catch (FilesystemException | UnableToReadFile $exception) {
+                $this->addResponse('Unable to read module base package file.');
 
                 return false;
+            }
+
+            if ($data['category'] !== str_starts_with($data['category'], 'basepackages') && $data['category'] !== 'providers') {
+                $moduleFilesLocation = str_replace('/Schema', '', $moduleFilesLocation);
+                $fileName = $moduleFilesLocation . '/' . 'Package.php';
+                $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+                $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+                $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
+                $file = str_replace('"PACKAGESCHEMACLASS"', $moduleSchemaClass . ';', $file);
+                $file = str_replace('"PACKAGESCHEMANAME"', $data['name'], $file);
+
+                try {
+                    $this->localContent->write($fileName, $file);
+                    array_push($this->newFiles, $fileName);
+                } catch (FilesystemException | UnableToWriteFile $exception) {
+                    $this->addResponse('Unable to write module package file');
+
+                    return false;
+                }
             }
         }
 
