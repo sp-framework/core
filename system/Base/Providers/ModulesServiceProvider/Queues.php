@@ -342,7 +342,7 @@ class Queues extends BasePackage
                             }
 
                             if ($dependencyType === 'composer' || $dependencyType === 'external') {
-                                $this->checkComposerAndAddToQueue($dependencies);
+                                $this->checkComposerAndAddToQueue($dependencies, $module);
 
                                 continue;
                             }
