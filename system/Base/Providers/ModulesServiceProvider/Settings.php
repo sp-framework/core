@@ -9,12 +9,12 @@ class Settings extends BasePackage
     public function beforeUpdate($packageClass, $package, $data)
     {
         if (isset($data['reset_last_sync_at'])) {
-            $queue = $this->modules->queues->getActiveQueue();
+            $apiClientServices = $this->basepackages->apiClientServices->getById($data['reset_last_sync_at']);
 
-            if (isset($queue['sync'][$data['reset_last_sync_at']])) {
-                unset($queue['sync'][$data['reset_last_sync_at']]);
+            if (isset($apiClientServices['sync']['modules']['last_sync'])) {
+                unset($apiClientServices['sync']['modules']['last_sync']);
 
-                $this->modules->queues->update($queue);
+                $this->basepackages->apiClientServices->update($apiClientServices);
             }
         }
     }
