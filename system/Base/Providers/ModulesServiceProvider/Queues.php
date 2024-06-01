@@ -233,7 +233,6 @@ class Queues extends BasePackage
 
         $this->queueTasks = [];
         $this->results = [];
-        // $this->coreExternalDependencies = $this->getComposerJsonFile();
 
         foreach ($queue['tasks'] as $taskName => $tasks) {
             if (isset($queue['tasks']['analysed']) &&
@@ -389,6 +388,10 @@ class Queues extends BasePackage
                             }
                         }
 
+                        if (strtolower($module['name']) === 'core') {
+                            $taskName = 'first';
+                        }
+
                         $module['name'] = $module['display_name'] ?? $module['name'];
                         $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
 
@@ -472,6 +475,8 @@ class Queues extends BasePackage
                     if ($installedModule['installed'] != '1') {
                         $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
                     } else {
+                        $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']);
+
                         if ($task !== 'first') {
                             $task = 'update';
                         }
@@ -616,7 +621,7 @@ class Queues extends BasePackage
             $this->queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $moduleType;
             if (!$version) {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['version'] =
-                    ($taskName === 'update' && $module['update_version'] && $module['update_version'] !== '') ? $module['version'] . ' -> ' . $module['update_version'] : $module['version'];
+                    (($taskName === 'update' || $taskName === 'first') && $module['update_version'] && $module['update_version'] !== '') ? $module['version'] . ' -> ' . $module['update_version'] : $module['version'];
             } else {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['version'] = $version;
             }
