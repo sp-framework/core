@@ -238,47 +238,49 @@ class Pusher extends WebsocketBase implements WampServerInterface
             }
 
             if ($this->checkSession($cookies)) {
-                $agentCheckMiddleware = $this->modules->middlewares->getMiddlewareByNameForAppId('AgentCheck', $app['id']);
+                if (isset($app['id'])) {
+                    $agentCheckMiddleware = $this->modules->middlewares->getMiddlewareByNameForAppId('AgentCheck', $app['id']);
 
-                if ($agentCheckMiddleware) {
-                    $agent = $conn->httpRequest->getHeader('User-Agent')[0];
+                    if ($agentCheckMiddleware) {
+                        $agent = $conn->httpRequest->getHeader('User-Agent')[0];
 
-                    if ($this->config->databasetype === 'db') {
-                        if ($this->accountsObj->agents) {
-                            if (!$this->accountsObj->agents::findFirst(
-                                    [
-                                        'conditions'    => 'session_id = :sid: AND account_id = :aid: AND verified = :ver: user_agent AND :agent:',
-                                        'bind'          => [
-                                            'sid'       => $cookies['Bazaari'],
-                                            'aid'       => $this->account['id'],
-                                            'ver'       => '1',
-                                            'user_agent'=> $agent
+                        if ($this->config->databasetype === 'db') {
+                            if ($this->accountsObj->agents) {
+                                if (!$this->accountsObj->agents::findFirst(
+                                        [
+                                            'conditions'    => 'session_id = :sid: AND account_id = :aid: AND verified = :ver: user_agent AND :agent:',
+                                            'bind'          => [
+                                                'sid'       => $cookies['Bazaari'],
+                                                'aid'       => $this->account['id'],
+                                                'ver'       => '1',
+                                                'user_agent'=> $agent
+                                            ]
                                         ]
-                                    ]
-                                )
-                            ) {
-                                $this->logger->log->debug($agent . ' browser is not verified. Disconnecting websocket.');
+                                    )
+                                ) {
+                                    $this->logger->log->debug($agent . ' browser is not verified. Disconnecting websocket.');
 
-                                return false;
+                                    return false;
+                                }
                             }
-                        }
-                    } else {
-                        if ($this->account['agents']) {
-                            $agentsStore = $this->ff->store('basepackages_users_accounts_agents');
+                        } else {
+                            if ($this->account['agents']) {
+                                $agentsStore = $this->ff->store('basepackages_users_accounts_agents');
 
-                            $agents = $agentsStore->findOneBy(
-                                [
-                                    ['session_id', '=', $cookies['Bazaari']],
-                                    ['account_id', '=', $this->account['id']],
-                                    ['verified', '=', true],
-                                    ['user_agent', '=', $agent]
-                                ]
-                            );
+                                $agents = $agentsStore->findOneBy(
+                                    [
+                                        ['session_id', '=', $cookies['Bazaari']],
+                                        ['account_id', '=', $this->account['id']],
+                                        ['verified', '=', true],
+                                        ['user_agent', '=', $agent]
+                                    ]
+                                );
 
-                            if (!$agents) {
-                                $this->logger->log->debug($conn->httpRequest->getHeader('User-Agent')[0] . ' browser is not verified. Disconnecting websocket.');
+                                if (!$agents) {
+                                    $this->logger->log->debug($conn->httpRequest->getHeader('User-Agent')[0] . ' browser is not verified. Disconnecting websocket.');
 
-                                return false;
+                                    return false;
+                                }
                             }
                         }
                     }
