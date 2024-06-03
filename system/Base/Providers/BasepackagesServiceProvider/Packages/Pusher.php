@@ -353,14 +353,11 @@ class Pusher extends WebsocketBase implements WampServerInterface
         $account = $this->basepackages->accounts->checkAccountByNotificationsTunnelId($resourceId);
 
         if ($account) {
-            $this->accountsObj->tunnel->assign(['notifications_tunnel'  => null])->update();
-            // $account['notifications_tunnel_id'] = null;
+            $account['notifications_tunnel_id'] = null;
 
-            // $this->basepackages->accounts->update($account);
+            $this->basepackages->accounts->update($account);
 
             $profile = $this->basepackages->profile->getProfile($account['id']);
-
-            $messenger = $this->basepackages->messenger;
 
             if (isset($profile['settings']['messenger']['status'])) {
                 if ($profile['settings']['messenger']['status'] == 4) {
@@ -368,7 +365,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
                 }
             }
 
-            $messenger->changeStatus(['user' => $account['id'], 'status' => 2]);
+            $this->basepackages->messenger->changeStatus(['user' => $account['id'], 'status' => 2]);
         }
     }
 }

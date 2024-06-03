@@ -18,6 +18,7 @@ class MessengerTask extends Task
 
     public function startAction()
     {
+        $this->checkLogPath();
 
         $loop = Loop::get();
 
@@ -52,5 +53,26 @@ class MessengerTask extends Task
         } catch (\Exception $e) {
             exit();//Need to handle errors properly
         }
+    }
+
+    protected function checkLogPath()
+    {
+        if (!is_dir(base_path('var/log/'))) {
+            if (!mkdir(base_path('var/log/'), 0777, true)) {
+                return false;
+            }
+        }
+
+        if (!file_exists(base_path('var/log/messenger-info.log'))) {
+            $file = fopen(base_path('var/log/messenger-info.log'), 'a+');
+            fclose($file);
+        }
+
+        if (!file_exists(base_path('var/log/messenger-error.log'))) {
+            $file = fopen(base_path('var/log/messenger-error.log'), 'a+');
+            fclose($file);
+        }
+
+        return true;
     }
 }
