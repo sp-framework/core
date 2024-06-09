@@ -2,7 +2,9 @@
 
 namespace System\Base\Installer\Packages\Setup\Write;
 
+use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToWriteFile;
 
 class Configs
 {
@@ -301,16 +303,5 @@ if ($this->coreJson['settings']['databasetype'] === 'hybrid') {
 		}
 
 		return $keys[$this->postData['dbname']];
-	}
-
-	private function getDbKey()
-	{
-		try {
-			$keys = $this->container['localContent']->read('system/.dbkeys');
-		} catch (\ErrorException | FilesystemException | UnableToReadFile $exception) {
-			throw $exception;
-		}
-
-		return $this->helper->decode($keys, true)[$this->postData['dbname']];
 	}
 }

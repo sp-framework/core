@@ -202,7 +202,7 @@ class Email extends BasePackage
 
     public function addAttachments($file, $name)
     {
-        $this->attachments = array_merge($this->attachments, [['file' => $email, 'name' => $name]]);
+        $this->attachments = array_merge($this->attachments, [['file' => $file, 'name' => $name]]);
 
         return $this;
     }

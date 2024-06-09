@@ -5,7 +5,6 @@ namespace System;
 use Phalcon\Cli\Console;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Di\FactoryDefault\Cli;
-use Phalcon\Exception as PhalconException;
 use Phalcon\Mvc\Application;
 use Phalcon\Mvc\Micro;
 use System\Base\Loader\Service;
@@ -165,20 +164,14 @@ final class Bootstrap
             $console->handle($arguments);
 
             $this->logger->commit();
-        } catch (PhalconException $e) {
-            fwrite(STDERR, $e->getMessage() . PHP_EOL);
+        } catch (\Exception $exception) {
+            fwrite(STDERR, $exception->getMessage() . PHP_EOL);
 
             $this->logger->commit();
 
             exit(1);
         } catch (\Throwable $throwable) {
             fwrite(STDERR, $throwable->getMessage() . PHP_EOL);
-
-            $this->logger->commit();
-
-            exit(1);
-        } catch (\Exception $exception) {
-            fwrite(STDERR, $exception->getMessage() . PHP_EOL);
 
             $this->logger->commit();
 

@@ -109,7 +109,7 @@ class IndexHandler
                     $data = IoHelper::getFileContent($documentPath);
 
                     $this->setIndex($data);
-                } catch (Exception $exception) {
+                } catch (\Exception $exception) {
                     continue;
                 }
             }

@@ -14,7 +14,9 @@ class SecTools
 
     public $crypt;
 
-    public function __construct($core, $security, $random, $crypt)
+    protected $helper;
+
+    public function __construct($core, $security, $random, $crypt, $helper)
     {
         $this->core = $core;
 

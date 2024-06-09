@@ -2,8 +2,8 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Calls;
 
+use System\Base\Exceptions\CallsParametersIncorrect;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Calls;
-use System\Base\Providers\ErrorServiceProvider\Exceptions\CallsParametersIncorrect;
 
 class ProcessImportExportQueue extends Calls
 {

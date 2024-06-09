@@ -595,10 +595,6 @@ class Setup
 					'schema'	=> new CitiesIp2LocationV6,
 					'model'		=> new BasepackagesGeoCitiesIp2locationv6,
 				],
-			'basepackages_geo_cities' 					=> [
-					'schema'	=> new Cities,
-					'model'		=> new BasepackagesGeoCities,
-				],
 			'basepackages_geo_timezones' 				=> [
 					'schema'	=> new Timezones,
 					'model'		=> new BasepackagesGeoTimezones,

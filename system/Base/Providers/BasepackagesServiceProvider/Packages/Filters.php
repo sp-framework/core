@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Apps\Core\Packages\Hrms\Employees\Employees;
+// use Apps\Core\Packages\Hrms\Employees\Employees;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesFilters;
 
@@ -64,11 +64,11 @@ class Filters extends BasePackage
     {
         $component = $this->modules->components->getComponentById($componentId);
 
-        $employeesPackage = $this->init()->checkPackage('Apps\Core\Packages\Hrms\Employees\Employees');
+        // $employeesPackage = $this->init()->checkPackage('Apps\Core\Packages\Hrms\Employees\Employees');
 
-        if ($employeesPackage) {
-            $employeesPackage = new \Apps\Core\Packages\Hrms\Employees\Employees;
-        }
+        // if ($employeesPackage) {
+        //     $employeesPackage = new \Apps\Core\Packages\Hrms\Employees\Employees;
+        // }
 
         if ($account && isset($account['id'])) {
             if ($this->config->databasetype === 'db') {
@@ -151,17 +151,17 @@ class Filters extends BasePackage
                                         ];
                                     }
 
-                                    if ($employeesPackage) {
-                                        $employee = $employeesPackage->searchByAccountId($sharingAid);
+                                    // if ($employeesPackage) {
+                                    //     $employee = $employeesPackage->searchByAccountId($sharingAid);
 
-                                        if ($employee) {
-                                            $filter['shared_ids']['eids'][$sharingAidKey] =
-                                                [
-                                                    'id'    => $sharingAid,
-                                                    'name'  => $employee['full_name']
-                                                ];
-                                        }
-                                    }
+                                    //     if ($employee) {
+                                    //         $filter['shared_ids']['eids'][$sharingAidKey] =
+                                    //             [
+                                    //                 'id'    => $sharingAid,
+                                    //                 'name'  => $employee['full_name']
+                                    //             ];
+                                    //     }
+                                    // }
                                 }
                             }
 
@@ -208,19 +208,19 @@ class Filters extends BasePackage
                             foreach ($filter['shared_ids']['rids'] as $ridKey => $rid) {
                                 if ($rid == $account['role_id']) {
 
-                                    if ($employeesPackage) {
-                                        $employee = $employeesPackage->searchByAccountId($filter['account_id']);
+                                    // if ($employeesPackage) {
+                                    //     $employee = $employeesPackage->searchByAccountId($filter['account_id']);
 
-                                        if ($employee) {
-                                            $filter['employee_full_name'] = $employee['full_name'];
-                                        }
-                                    } else {
+                                    //     if ($employee) {
+                                    //         $filter['employee_full_name'] = $employee['full_name'];
+                                    //     }
+                                    // } else {
                                         $sharedBy = $this->accounts->getById($filter['account_id']);
 
                                         if ($sharedBy) {
                                             $filter['account_email'] = $sharedBy['email'];
                                         }
-                                    }
+                                    // }
 
                                     $filter['shared_ids'] = $this->escaper->escapeHtml($this->helper->encode($filter['shared_ids']));
 
@@ -236,19 +236,19 @@ class Filters extends BasePackage
                             foreach ($filter['shared_ids']['aids'] as $aidKey => $aid) {
                                 if ($aid == $account['id']) {
 
-                                    if ($employeesPackage) {
-                                        $employee = $employeesPackage->searchByAccountId($filter['account_id']);
+                                    // if ($employeesPackage) {
+                                    //     $employee = $employeesPackage->searchByAccountId($filter['account_id']);
 
-                                        if ($employee) {
-                                            $filter['employee_full_name'] = $employee['full_name'];
-                                        }
-                                    } else {
+                                    //     if ($employee) {
+                                    //         $filter['employee_full_name'] = $employee['full_name'];
+                                    //     }
+                                    // } else {
                                         $sharedBy = $this->accounts->getById($filter['account_id']);
 
                                         if ($sharedBy) {
                                             $filter['account_email'] = $sharedBy['email'];
                                         }
-                                    }
+                                    // }
 
                                     $filter['shared_ids'] = $this->escaper->escapeHtml($this->helper->encode($filter['shared_ids']));
 
@@ -589,18 +589,18 @@ class Filters extends BasePackage
             if (isset($data['shared_ids']) && is_array($data['shared_ids'])) {
                 //Convert EmployeeIds to AccountIds
                 $data['shared_ids']['aids'] = [];
-                if (isset($data['shared_ids']['eids']) && count($data['shared_ids']['eids']) > 0) {
-                    $employees = $this->usePackage(Employees::class);
+                // if (isset($data['shared_ids']['eids']) && count($data['shared_ids']['eids']) > 0) {
+                //     $employees = $this->usePackage(Employees::class);
 
-                    foreach ($data['shared_ids']['eids'] as $eidKey => $eid) {
-                        $searchEmployee = $employees->getById($eid);
+                //     foreach ($data['shared_ids']['eids'] as $eidKey => $eid) {
+                //         $searchEmployee = $employees->getById($eid);
 
-                        if ($searchEmployee) {
-                            array_push($data['shared_ids']['aids'], $searchEmployee['id']);
-                        }
-                    }
-                    unset($data['shared_ids']['eids']);
-                }
+                //         if ($searchEmployee) {
+                //             array_push($data['shared_ids']['aids'], $searchEmployee['id']);
+                //         }
+                //     }
+                //     unset($data['shared_ids']['eids']);
+                // }
                 $data['shared_ids'] = $this->helper->encode($data['shared_ids']);
             }
 

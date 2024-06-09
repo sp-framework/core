@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 
-use Phalcon\Http\Message\UploadedFile;
+use GuzzleHttp\Psr7\UploadedFile;
 use Phalcon\Image\Adapter\Imagick;
 use Phalcon\Image\Enum;
 use System\Base\BasePackage;

@@ -2226,95 +2226,95 @@ abstract class BasePackage extends Controller
 		//Only if debug is enabled.
 	}
 
-	protected function addRefId($data)
-	{
-		if (!isset($data['ref_id'])) {
-			$data['ref_id'] = null;
-		}
+	// protected function addRefId($data)
+	// {
+	// 	if (!isset($data['ref_id'])) {
+	// 		$data['ref_id'] = null;
+	// 	}
 
-		if (!$data['ref_id'] || $data['ref_id'] === '') {
-			if (isset($data['entity_id'])) {
-				$packageName = $this->helper->last($this->getClassName());
+	// 	if (!$data['ref_id'] || $data['ref_id'] === '') {
+	// 		if (isset($data['entity_id'])) {
+	// 			$packageName = $this->helper->last($this->getClassName());
 
-				$entitiesPackage = new \Apps\Core\Packages\Business\Entities\Entities;
+	// 			$entitiesPackage = new \Apps\Core\Packages\Business\Entities\Entities;
 
-				$entities = $entitiesPackage->getAll()->entities;
+	// 			$entities = $entitiesPackage->getAll()->entities;
 
-				if ($entities && count($entities) > 0) {
-					foreach ($entities as $entityKey => $entity) {
-						if ($entity['id'] === $data['entity_id']) {
-							$entityId = $entity['id'];
-							break;
-						}
-					}
-				} else {
-					$entityId = 0;
-				}
+	// 			if ($entities && count($entities) > 0) {
+	// 				foreach ($entities as $entityKey => $entity) {
+	// 					if ($entity['id'] === $data['entity_id']) {
+	// 						$entityId = $entity['id'];
+	// 						break;
+	// 					}
+	// 				}
+	// 			} else {
+	// 				$entityId = 0;
+	// 			}
 
-				if (isset($entities[$entityId])) {
-					$settings = $entities[$entityId]['settings'];
+	// 			if (isset($entities[$entityId])) {
+	// 				$settings = $entities[$entityId]['settings'];
 
-					if (isset($settings['prefix-seq'][$packageName])) {
-						$settings = $settings['prefix-seq'][$packageName];
+	// 				if (isset($settings['prefix-seq'][$packageName])) {
+	// 					$settings = $settings['prefix-seq'][$packageName];
 
-						$model = $this->useModel();
+	// 					$model = $this->useModel();
 
-						$table = $model->getSource();
+	// 					$table = $model->getSource();
 
-						if ($settings['prefix'] !== '') {
-							$settings['prefix'] = explode('%', $settings['prefix']);
+	// 					if ($settings['prefix'] !== '') {
+	// 						$settings['prefix'] = explode('%', $settings['prefix']);
 
-							$prefixValue = '';
-							foreach ($settings['prefix'] as $prefix) {
-								if ($prefix === 'Y') {
-									$prefixValue .= date('Y');
-								} else if ($prefix === 'm') {
-									$prefixValue .= date('m');
-								} else if ($prefix === 'd') {
-									$prefixValue .= date('d');
-								} else {
-									$prefixValue .= $prefix;
-								}
-							}
+	// 						$prefixValue = '';
+	// 						foreach ($settings['prefix'] as $prefix) {
+	// 							if ($prefix === 'Y') {
+	// 								$prefixValue .= date('Y');
+	// 							} else if ($prefix === 'm') {
+	// 								$prefixValue .= date('m');
+	// 							} else if ($prefix === 'd') {
+	// 								$prefixValue .= date('d');
+	// 							} else {
+	// 								$prefixValue .= $prefix;
+	// 							}
+	// 						}
 
-							$currentId = (int) $data['id'];
+	// 						$currentId = (int) $data['id'];
 
-							if (isset($settings['next_seq_number'])) {
-								$nextSeqNumber = (int) $settings['next_seq_number'];
+	// 						if (isset($settings['next_seq_number'])) {
+	// 							$nextSeqNumber = (int) $settings['next_seq_number'];
 
-								if ($nextSeqNumber > 0) {
+	// 							if ($nextSeqNumber > 0) {
 
-									if ($nextSeqNumber > $currentId) {
-										$prefixValue .= $nextSeqNumber;
+	// 								if ($nextSeqNumber > $currentId) {
+	// 									$prefixValue .= $nextSeqNumber;
 
-										$sql = "UPDATE `{$table}` SET `id` = ? WHERE `{$table}`.`id` = ?";
+	// 									$sql = "UPDATE `{$table}` SET `id` = ? WHERE `{$table}`.`id` = ?";
 
-										$this->db->execute($sql, [$nextSeqNumber, $currentId]);
+	// 									$this->db->execute($sql, [$nextSeqNumber, $currentId]);
 
-										$data['id'] = $nextSeqNumber;
-									} else {
-										$prefixValue .= $currentId;
-									}
-								} else {
-									$prefixValue .= $currentId;
-								}
-							} else {
-								$prefixValue .= $currentId;
-							}
+	// 									$data['id'] = $nextSeqNumber;
+	// 								} else {
+	// 									$prefixValue .= $currentId;
+	// 								}
+	// 							} else {
+	// 								$prefixValue .= $currentId;
+	// 							}
+	// 						} else {
+	// 							$prefixValue .= $currentId;
+	// 						}
 
-							$sql = "UPDATE `{$table}` SET `ref_id` = ? WHERE `{$table}`.`id` = ?";
+	// 						$sql = "UPDATE `{$table}` SET `ref_id` = ? WHERE `{$table}`.`id` = ?";
 
-							$this->db->execute($sql, [$prefixValue, $data['id']]);
+	// 						$this->db->execute($sql, [$prefixValue, $data['id']]);
 
-							$data['ref_id'] = $prefixValue;
-						}
-					}
-				}
-			}
-		}
+	// 						$data['ref_id'] = $prefixValue;
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
 
-		return $data;
-	}
+	// 	return $data;
+	// }
 
 	protected function extractNumbers($string)
 	{

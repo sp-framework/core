@@ -20,6 +20,8 @@ class VoltTools
 
     protected $whitelist = ['.', '..', '.gitignore'];
 
+    protected $compiler;
+
     public function __construct($volt, $view)
     {
         $this->volt = $volt;
@@ -32,9 +34,9 @@ class VoltTools
     public function reCompile()
     {
         $iterator =
-            new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($this->viewPath),
-                RecursiveIteratorIterator::CHILD_FIRST
+            new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($this->viewPath),
+                \RecursiveIteratorIterator::CHILD_FIRST
             );
 
         foreach ($iterator as $path) {
@@ -45,9 +47,9 @@ class VoltTools
             }
         }
 
-        $this->filesCount = count($files);
+        $this->filesCount = count($this->files);
 
-        foreach ($files as $file) {
+        foreach ($this->files as $file) {
             $this->volt->getCompiler()->compile($file);
         }
 

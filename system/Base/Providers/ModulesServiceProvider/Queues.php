@@ -467,7 +467,7 @@ class Queues extends BasePackage
                     if ($apiClientService) {
                         $analyseLogs = 'Dependencies require version ' . $requestedModule['version'] . ' for ' . $installedModule['name'] . '. Either the version in dependency is incorrect or you need to sync ' . $apiClientService['name'] . ' repository to get the latest version. If sync does not solve the problem, please contact module developer.';
                     } else {
-                        $analyseLogs = 'Dependencies require version ' . $dependency['version'] . ' for ' . $installedModule['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
+                        $analyseLogs = 'Dependencies require version ' . $requestedModule['version'] . ' for ' . $installedModule['name'] . '. Either the version in dependency is incorrect or you need to re-sync from repository. We also did not find any API client service that can do this. Please add API Client service for the repository and re-sync. If sync does not solve the problem, please contact module developer.';
                     }
 
                     $this->addToQueueTasksAndResults($task, $moduleType, $installedModule, null, 'fail', $analyseLogs);

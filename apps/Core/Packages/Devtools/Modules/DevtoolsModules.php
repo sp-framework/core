@@ -4,6 +4,7 @@ namespace Apps\Core\Packages\Devtools\Modules;
 
 use Apps\Core\Packages\Devtools\Modules\Settings;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
@@ -487,7 +488,7 @@ class DevtoolsModules extends BasePackage
                     $this->localContent->write($path . '/.gitkeep', '');
                 }
             } catch (FilesystemException | UnableToCheckExistence | UnableToWriteFile $exception) {
-                $this->addResponse('Unable to write json content to file: ' . $jsonFile);
+                $this->addResponse('Unable to write json content to file: .gitkeep for apptypes');
 
                 return false;
             }

@@ -54,7 +54,7 @@ class Card extends Adminltetags
         $cardRefreshSource = "";
 
         isset($this->params['cardAnimationSpeed']) ?
-        $cardAnimationSpeed = "data-animation-speed=" . $cardAnimationSpeed :
+        $cardAnimationSpeed = "data-animation-speed=" . $this->params['cardAnimationSpeed'] :
         $cardAnimationSpeed = "data-animation-speed=300";
 
         isset($this->params['cardRefreshParams']) ?

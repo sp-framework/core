@@ -80,7 +80,7 @@ class DevtoolsGeoExtractData extends BasePackage
             if ($this->localContent->fileExists($this->sourceDir . 'countries+states+cities.json')) {
                 $this->sourceFile = $this->helper->decode($this->localContent->read($this->sourceDir . 'countries+states+cities.json'), true);
             }
-        } catch (FilesystemException | UnableToReadFile | throwable $e) {
+        } catch (FilesystemException | UnableToReadFile | \throwable $e) {
             $this->addResponse($e->getMessage(), 1);
 
             return false;
@@ -117,12 +117,12 @@ class DevtoolsGeoExtractData extends BasePackage
         }
 
         foreach ($countries as $countryKey => &$country) {
-            $this->localContent->write($this->sourceDir . $countryKey . '.json', JSON::encode($country));
+            $this->localContent->write($this->sourceDir . $countryKey . '.json', $this->helper->encode($country));
 
             unset($country['states']);
         }
 
-        $this->localContent->write($this->sourceDir . 'AllCountries.json', JSON::encode($countries));
+        $this->localContent->write($this->sourceDir . 'AllCountries.json', $this->helper->encode($countries));
 
         return true;
     }
@@ -137,7 +137,7 @@ class DevtoolsGeoExtractData extends BasePackage
             }
 
             return true;
-        } catch (FilesystemException | UnableToReadFile | throwable $exception) {
+        } catch (FilesystemException | UnableToReadFile | \throwable $exception) {
             throw $exception;
         }
     }
@@ -220,8 +220,8 @@ class DevtoolsGeoExtractData extends BasePackage
         }
 
         try {
-            $this->localContent->write($this->sourceDir . 'TimeZones.json', JSON::encode($wikiTz));
-        } catch (FilesystemException | UnableToWriteFile | throwable $e) {
+            $this->localContent->write($this->sourceDir . 'TimeZones.json', $this->helper->encode($wikiTz));
+        } catch (FilesystemException | UnableToWriteFile | \throwable $e) {
             throw $e;
         }
 
@@ -324,12 +324,12 @@ class DevtoolsGeoExtractData extends BasePackage
         }
 
         foreach ($countries as $countryKey => $country) {
-            $this->localContent->write($this->sourceDir . 'ip2location/' . $ipType . '/' . $countryKey . '.json', JSON::encode($country));
+            $this->localContent->write($this->sourceDir . 'ip2location/' . $ipType . '/' . $countryKey . '.json', $this->helper->encode($country));
 
             array_push($countryKeys, $countryKey);
         }
 
-        $this->localContent->write($this->sourceDir . 'ip2location/AllCountries.json', JSON::encode($countryKeys));
+        $this->localContent->write($this->sourceDir . 'ip2location/AllCountries.json', $this->helper->encode($countryKeys));
 
         return true;
     }
@@ -370,12 +370,12 @@ class DevtoolsGeoExtractData extends BasePackage
 
                     $countryGeoData = array_replace_recursive($countryData, $iplocationv4Data, $iplocationv6Data);
 
-                    $this->localContent->write($this->sourceDir . $country . '.json', JSON::encode($countryGeoData));
+                    $this->localContent->write($this->sourceDir . $country . '.json', $this->helper->encode($countryGeoData));
                 }
             }
 
             return true;
-        } catch (FilesystemException | UnableToReadFile | UnableToWriteFile | throwable $exception) {
+        } catch (FilesystemException | UnableToReadFile | UnableToWriteFile | \throwable $exception) {
             throw $exception;
         }
     }

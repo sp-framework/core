@@ -72,7 +72,7 @@ class GeoCountries extends BasePackage
 
             $this->addResponse('Added country ' . $data['name']);
         } else {
-            $this->addResponse('Error adding country ' . $country['name'], 1);
+            $this->addResponse('Error adding country ' . $data['name'], 1);
         }
     }
 

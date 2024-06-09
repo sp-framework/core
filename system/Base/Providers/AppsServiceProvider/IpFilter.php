@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\AppsServiceProvider;
 
-use Phalcon\Validation\Validator\Ip;
+use Phalcon\Filter\Validation\Validator\Ip;
 use System\Base\BasePackage;
 use System\Base\Providers\AppsServiceProvider\Exceptions\IpFilterBlockedException;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsIpFilter;
@@ -274,14 +274,7 @@ class IpFilter extends BasePackage
             foreach ($filters as $key => $filter) {
                 if (\Symfony\Component\HttpFoundation\IpUtils::checkIp($this->clientAddress, $filter['ip_address'])) {
                     if ($this->config->databasetype === 'db') {
-                        $filterObj = $this->findFirst(
-                            [
-                                'ip_address = :ip_address:',
-                                'bind' => [
-                                    'ip_address' => $filter['ip_address'],
-                                ]
-                            ]
-                        );
+                        $filterObj = $this->getFirst('ip_address', $filter['ip_address']);
 
                         $this->bumpFilterHitCounter($filterObj);
 

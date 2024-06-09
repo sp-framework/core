@@ -11,6 +11,7 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToWriteFile;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\AuthorizationValidators\BearerTokenValidator;
 use League\OAuth2\Server\CryptKey;
@@ -162,7 +163,7 @@ class Api extends BasePackage
                 } else {
                     $client = $this->clients->getFirst('client_id', $newApi['client_id']);
 
-                    if (!$client && ($api['client_id'] !== $data['client_id'])) {
+                    if (!$client && ($newApi['client_id'] !== $data['client_id'])) {
                         $client = $this->clients->generateClientKeys(
                             [
                                 'api_id'        => $data['id'],
@@ -605,7 +606,7 @@ class Api extends BasePackage
 
                 return true;
             } else {
-                $this->clients->incrementCallCount(['concurrent_calls_count'], $client, $api);
+                $this->clients->incrementCallCount($client, $api, ['concurrent_calls_count']);
             }
         }
 
@@ -621,7 +622,7 @@ class Api extends BasePackage
             array_push($toCheckCallCount, 'per_day_calls_count');
         }
 
-        $this->clients->checkCallCount($toCheckCallCount, $client);
+        $this->clients->checkCallCount($client, $toCheckCallCount);
 
         if (in_array('per_minute_calls_count', $toCheckCallCount)) {
             if ((int) $client['per_minute_calls_count'] >= (int) $api['per_minute_calls_limit']) {
@@ -635,7 +636,7 @@ class Api extends BasePackage
 
                 return true;
             } else {
-                $this->clients->incrementCallCount(['per_minute_calls_count'], $client, $api);
+                $this->clients->incrementCallCount($client, $api, ['per_minute_calls_count']);
             }
         }
 
@@ -653,7 +654,7 @@ class Api extends BasePackage
 
                 return true;
             } else {
-                $this->clients->incrementCallCount(['per_hour_calls_count'], $client, $api);
+                $this->clients->incrementCallCount($client, $api, ['per_hour_calls_count']);
             }
         }
 
@@ -671,7 +672,7 @@ class Api extends BasePackage
 
                 return true;
             } else {
-                $this->clients->incrementCallCount(['per_day_calls_count'], $client, $api);
+                $this->clients->incrementCallCount($client, $api, ['per_day_calls_count']);
             }
         }
 

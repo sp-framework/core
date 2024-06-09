@@ -8,6 +8,7 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToWriteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use System\Base\BasePackage;
 
@@ -478,7 +479,7 @@ class BackupRestore extends BasePackage
 
         try {
             $backupInfo = $this->helper->decode($this->localContent->read('var/tmp/backups/' . $this->fileNameLocation . '/backupInfo.json'), true);
-        } catch (\ErrorException | FilesystemException | UnableToReadFile | InvalidArgumentException $exception) {
+        } catch (\ErrorException | FilesystemException | UnableToReadFile | \InvalidArgumentException $exception) {
             $this->addResponse('Error reading/accessing backupInfo.json file. Please upload backup again with correct file.', 1);
 
             $this->basepackages->progress->resetProgress();

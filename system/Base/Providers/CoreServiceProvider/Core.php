@@ -252,7 +252,7 @@ class Core extends BasePackage
 					$dbConfig = $this->getDb(true);
 
 					if ($this->config->dev === false) {
-						$checkPwStrength = $this->checkPwStrength($data['password']);
+						$checkPwStrength = $this->basepackages->utils->checkPwStrength($data['password']);
 
 						if ($checkPwStrength !== false && $checkPwStrength < 4) {
 							$this->addResponse('Password strength is too low.' , 1);

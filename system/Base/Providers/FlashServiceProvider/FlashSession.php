@@ -2,8 +2,8 @@
 
 namespace System\Base\Providers\FlashServiceProvider;
 
-use Phalcon\Escaper;
 use Phalcon\Flash\Session;
+use Phalcon\Html\Escaper;
 
 class FlashSession
 {

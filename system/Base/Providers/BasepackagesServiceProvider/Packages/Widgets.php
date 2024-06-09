@@ -52,7 +52,7 @@ class Widgets extends BasePackage
         }
 
         if ($widget['settings']) {
-            $widget['settings'] = JSON::decode($widget['settings'], true);
+            $widget['settings'] = $this->helper->decode($widget['settings'], true);
         }
         $widgetMethod = $widget['method'];
 

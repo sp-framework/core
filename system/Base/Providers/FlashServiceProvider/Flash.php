@@ -2,8 +2,8 @@
 
 namespace System\Base\Providers\FlashServiceProvider;
 
-use Phalcon\Escaper;
 use Phalcon\Flash\Direct;
+use Phalcon\Html\Escaper;
 
 class Flash
 {

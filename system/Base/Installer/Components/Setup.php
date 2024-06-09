@@ -144,8 +144,8 @@ Class Setup
 
 			$container->setShared(
 				'localContent',
-				function () use ($container) {
-					return (new LocalContent($container))->init();
+				function () {
+					return (new LocalContent())->init();
 				}
 			);
 

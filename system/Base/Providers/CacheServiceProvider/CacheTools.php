@@ -22,9 +22,11 @@ class CacheTools
 
 	protected $index;
 
+	protected $helper;
+
 	public $caches;
 
-	public function __construct($cacheConfig, array $caches, $localContent, $opCache)
+	public function __construct($cacheConfig, array $caches, $localContent, $opCache, $helper)
 	{
 		$this->cacheConfig = $cacheConfig;
 
@@ -43,6 +45,8 @@ class CacheTools
 		$this->localContent = $localContent;
 
 		$this->opCache = $opCache;
+
+		$this->helper = $helper;
 	}
 
 	public function getAvailableCaches()

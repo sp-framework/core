@@ -828,7 +828,7 @@ class Accounts extends BasePackage
                 return $account;
             }
         } else {
-            return $account;
+            return false;
         }
     }
 

@@ -287,7 +287,7 @@ class Notifications extends BasePackage
 
     public function getNotifications($type = 0)
     {
-        $notificationsArr = $this->paged(
+        $notificationsArr = $this->getPaged(
             [
                 'conditions'    =>
                     '[notification_type] = :type: AND app_id = :appId: AND account_id = :aId: AND read = :read: AND archive = :archive:',

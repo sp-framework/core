@@ -66,7 +66,8 @@ class CacheServiceProvider implements ServiceProviderInterface
                 $cacheConfig = $container->getShared('config')->cache;
                 $localContent = $container->getShared('localContent');
                 $opCache = $container->getShared('opCache');
-                return new CacheTools($cacheConfig, $caches, $localContent, $opCache);
+                $helper = $container->getShared('helper');
+                return new CacheTools($cacheConfig, $caches, $localContent, $opCache, $helper);
             }
         );
 

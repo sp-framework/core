@@ -4,6 +4,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use League\Flysystem\StorageAttributes;
 use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
 use System\Base\BasePackage;
 use System\Base\Providers\SecurityServiceProvider\PasswordGenerator\Generator\RequirementPasswordGenerator;
 use ZxcvbnPhp\Zxcvbn;

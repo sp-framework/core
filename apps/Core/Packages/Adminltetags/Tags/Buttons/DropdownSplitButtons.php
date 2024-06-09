@@ -154,13 +154,13 @@ class DropdownSplitButtons
         }
 
         $this->buttonParams['dropdownButtonTooltipPosition'] =
-            isset($button['dropdownButtonTooltipPosition']) ?
-            $button['dropdownButtonTooltipPosition'] :
+            isset($this->params['dropdownButtonTooltipPosition']) ?
+            $this->params['dropdownButtonTooltipPosition'] :
             'auto';
 
         $this->buttonParams['dropdownButtonTooltipTitle'] =
-            isset($button['dropdownButtonTooltipTitle']) ?
-            $button['dropdownButtonTooltipTitle'] :
+            isset($this->params['dropdownButtonTooltipTitle']) ?
+            $this->params['dropdownButtonTooltipTitle'] :
             '';
     }
 
@@ -226,13 +226,13 @@ class DropdownSplitButtons
         }
 
         $this->buttonParams['splitMainButtonTooltipPosition'] =
-            isset($button['splitMainButtonTooltipPosition']) ?
-            $button['splitMainButtonTooltipPosition'] :
+            isset($this->params['splitMainButtonTooltipPosition']) ?
+            $this->params['splitMainButtonTooltipPosition'] :
             'auto';
 
         $this->buttonParams['splitMainButtonTooltipTitle'] =
-            isset($button['splitMainButtonTooltipTitle']) ?
-            $button['splitMainButtonTooltipTitle'] :
+            isset($this->params['splitMainButtonTooltipTitle']) ?
+            $this->params['splitMainButtonTooltipTitle'] :
             '';
 
         //Dropdown Button (Split secondary button)
