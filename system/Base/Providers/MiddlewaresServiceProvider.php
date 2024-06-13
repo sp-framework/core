@@ -50,7 +50,7 @@ class MiddlewaresServiceProvider extends Injectable
                         $mw = (new $middleware['class']())->process($this->data);
                     } catch (\Exception $e) {
                         if ($this->config->logs->exceptions) {
-                            $this->logger->logExceptions->debug($e);
+                            $this->logger->logExceptions->critical(json_trace($e));
                         }
 
                         throw $e;
@@ -99,7 +99,7 @@ class MiddlewaresServiceProvider extends Injectable
                         $mw = (new $middleware['class']())->process($this->data);
                     } catch (\Exception $e) {
                         if ($this->config->logs->exceptions) {
-                            $this->logger->logExceptions->debug($e);
+                            $this->logger->logExceptions->critical(json_trace($e));
                         }
 
                         throw $e;

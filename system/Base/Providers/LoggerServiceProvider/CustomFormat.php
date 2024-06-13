@@ -32,11 +32,17 @@ class CustomFormat extends AbstractFormatter
 
 	public function format(Item $item) : string
 	{
+		try {
+			$message = $this->helper->decode($item->getMessage());
+		} catch (\Exception $e) {
+			$message = $item->getMessage();
+		}
+
 		$toLog =
 				[
 					"type"      	=> $item->getLevel(),
 					"typeName"     	=> $item->getLevelName(),
-					"message"   	=> $item->getMessage(),
+					"message"   	=> $message,
 					"session"   	=> $this->sessionId,
 					"connection" 	=> $this->connectionId,
 					"client_ip"		=> $this->clientIpAddress,

@@ -64,7 +64,7 @@ class ProcessImportExportQueue extends Calls
                 }
             } catch (\Exception $e) {
                 if ($this->config->logs->exceptions) {
-                    $this->logger->logExceptions->debug($e);
+                    $this->logger->logExceptions->critical(json_trace($e));
                 }
 
                 $thisCall->packagesData->responseMessage = 'Exception: Please check exceptions log for more details.';

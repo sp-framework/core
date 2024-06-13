@@ -813,13 +813,13 @@ class Api extends BasePackage
 
             return $tokenResponse->withBody($body);
         } catch (OAuthServerException $exception) {
-            $this->logger->logExceptions->critical($exception);
+            $this->logger->logExceptions->critical(json_trace($exception));
             $this->addResponse($exception->getMessage(), 1, []);
             var_dump($exception);die();
             // All instances of OAuthServerException can be converted to a PSR-7 response
             return $exception->generateHttpResponse($serverResponse);
         } catch (\Exception $exception) {
-            $this->logger->logExceptions->critical($exception);
+            $this->logger->logExceptions->critical(json_trace($exception));
             $this->addResponse($exception->getMessage(), 1, []);
             var_dump($exception);die();
             // Catch unexpected exceptions

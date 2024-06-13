@@ -165,7 +165,7 @@ class Calls extends BasePackage
                 }
 
                 if ($this->config->logs->exceptions) {
-                    $this->logger->logExceptions->debug($e);
+                    $this->logger->logExceptions->critical(json_trace($e));
                 }
 
                 $thisCall->packagesData->responseCode = 1;

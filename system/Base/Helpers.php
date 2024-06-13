@@ -7,7 +7,7 @@ if (!function_exists('base_path')) {
 }
 
 if (!function_exists('trace')) {
-    function trace(array $varsToDump = [], $exit = true, $args = false, $object = false, $file = true, $line = true, $class = true, $function = true) {
+    function trace(array $varsToDump = [], $exit = true, $args = false, $object = false, $file = true, $line = true, $class = true, $function = true, $returnTraces = false) {
         $backtrace = debug_backtrace();
 
         $traces = [];
@@ -31,6 +31,10 @@ if (!function_exists('trace')) {
             if ($object && isset($trace['object'])) {
                 $traces[$key]['object'] = $trace['object'];
             }
+        }
+
+        if ($returnTraces) {
+            return $traces;
         }
 
         $reversedTraces = array_reverse($traces);
@@ -66,6 +70,25 @@ if (!function_exists('trace')) {
         if ($exit) {
             exit;
         }
+    }
+}
+
+if (!function_exists('json_trace')) {
+    function json_trace($e) {
+        $json = [];
+        $json['class']   = $e::class;
+        $json['message'] = $e->getMessage();
+        $json['code']    = $e->getCode();
+        $json['file']    = $e->getFile();
+        $json['line']    = $e->getLine();
+
+        $json['originalTrace'] = [];
+        foreach ($e->getTrace() as $item) {
+            $item['args']            = [];
+            $json['originalTrace'][] = $item;
+        }
+
+        return json_encode($json, 16);
     }
 }
 
