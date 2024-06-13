@@ -352,7 +352,7 @@ abstract class BasePackage extends Controller
 										$relationColumns[$modelRelationKey]['requestedColumns'] = [];
 									}
 									array_push($relationColumns[$modelRelationKey]['requestedColumns'], $column);
-									unset($params['columns'][$columnKey]);
+									// unset($params['columns'][$columnKey]);
 								}
 							}
 						}
