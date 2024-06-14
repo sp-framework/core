@@ -216,6 +216,13 @@ class Components
 							'type'    => Column::TYPE_JSON,
 							'notNull' => false,
 						]
+					),
+					new Column(
+						'notification_subscriptions',
+						[
+							'type'    => Column::TYPE_JSON,
+							'notNull' => false,
+						]
 					)
 				],
 				'indexes' => [

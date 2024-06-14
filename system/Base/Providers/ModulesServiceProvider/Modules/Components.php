@@ -386,6 +386,125 @@ class Components extends BasePackage
 		return true;
 	}
 
+	public function updateNotificationSubscriptions(array $subscriptions)
+	{
+		$account = $this->auth->account();
+
+		if (!$account) {
+			return;
+		}
+
+		foreach ($this->apps->apps as $appId => $app) {
+			if (!isset($subscriptions[$appId]) ||
+				!isset($subscriptions[$appId]['components'])
+			) {
+				continue;
+			}
+
+			foreach ($subscriptions[$appId]['components'] as $componentId => $componentSubscriptions) {
+				if (!isset($this->components[$componentId])) {
+					continue;
+				}
+
+				if ($this->components[$componentId]['notification_subscriptions']) {
+					if (!is_array($this->components[$componentId]['notification_subscriptions'])) {
+						$this->components[$componentId]['notification_subscriptions'] = $this->helper->decode($this->components[$componentId]['notification_subscriptions'], true);
+					}
+
+					if (isset($this->components[$componentId]['notification_subscriptions'][$appId])) {
+						foreach ($componentSubscriptions as $subscriptionKey => $subscriptionValue) {
+							if (isset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey])) {
+								if ($subscriptionValue == 1) {
+									if ($subscriptionKey == 'email') {
+										if (!isset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']])) {
+											$this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']] = $account['email'];
+										}
+									} else {
+										if (!in_array($account['id'], $this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey])) {
+											array_push($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey], $account['id']);
+										}
+									}
+								} else if ($subscriptionValue == 0) {
+									if ($subscriptionKey == 'email') {
+										if (isset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']])) {
+											unset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']]);
+										}
+									} else {
+										if (in_array($account['id'], $this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey])) {
+											unset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][array_keys($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey], $account['id'])[0]]);
+										}
+									}
+								}
+							} else {//If new notificationkey
+								$reflector = $this->annotations->get($this->components[$componentId]['class']);
+								$methods = $reflector->getMethodsAnnotations();
+
+								if ($methods) {
+									$notification_actions = [];
+									foreach ($methods as $annotation) {
+										array_push($notification_actions, $annotation->getAll('notification')[0]->getArguments()['name']);
+										$notification_allowed_methods = $annotation->getAll('notification_allowed_methods');
+										if (count($notification_allowed_methods) > 0) {
+											$notification_allowed_methods = $annotation->getAll('notification_allowed_methods')[0]->getArguments();
+										}
+									}
+
+									if (in_array($subscriptionKey, $notification_actions)) {
+										if ($subscriptionValue == 1) {
+											$this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey] = [$account['id']];
+										} else {
+											$this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey] = [];
+										}
+									}
+
+									if (in_array($subscriptionKey, $notification_allowed_methods)) {
+										if ($subscriptionValue == 1) {
+											if ($subscriptionKey == 'email') {
+												$this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']] = [$account['email']];
+											}
+										} else {
+											$this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey] = [];
+										}
+									}
+								}
+							}
+						}
+					} else {
+						$this->components[$componentId]['notification_subscriptions'][$appId] = [];
+
+						foreach ($componentSubscriptions as $notificationKey => $notification) {
+							if ($notification == 1) {
+								if ($notificationKey == 'email') {
+									$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id'] => $account['email']];
+								} else {
+									$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id']];
+								}
+							} else {
+								$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [];
+							}
+						}
+					}
+				} else {
+					$this->components[$componentId]['notification_subscriptions'][$appId] = [];
+
+					foreach ($componentSubscriptions as $notificationKey => $notification) {
+						if ($notification == 1) {
+							if ($notificationKey == 'email') {
+								$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id'] => $account['email']];
+							} else {
+								$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id']];
+							}
+						} else {
+							$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [];
+						}
+					}
+				}
+
+				$this->update($this->components[$componentId]);
+			}
+		}
+	}
+
 	public function msupdate(array $data)//module settings update
 	{
 		$component = $this->getById($data['id']);

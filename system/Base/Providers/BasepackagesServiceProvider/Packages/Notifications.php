@@ -58,13 +58,15 @@ class Notifications extends BasePackage
             if (isset($this->auth) && $this->auth->account()) {
                 $newNotification['created_by'] = $this->auth->account()['id'];
             } else {
-                $newNotification['created_by'] = '0';
+                $newNotification['created_by'] = 0;
             }
         }
         $newNotification['package_name'] = $packageName;
         $newNotification['package_row_id'] = $packageRowId;
         $newNotification['notification_title'] = $notificationTitle;
         $newNotification['notification_details'] = $notificationDetails;
+        $newNotification['read'] = 0;
+        $newNotification['archive'] = 0;
 
         if ($this->add($newNotification, false)) {
             $this->pushNotification($newNotification);

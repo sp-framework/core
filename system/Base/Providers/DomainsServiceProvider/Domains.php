@@ -55,11 +55,6 @@ class Domains extends BasePackage
 		}
 	}
 
-	/**
-	 * @notification(name=add)
-	 * notification_allowed_methods(email, sms)//Example
-	 * @notification_allowed_methods(email, sms)
-	 */
 	public function addDomain(array $data)
 	{
 		if (!isset($data['dns_record']) ||
@@ -119,18 +114,11 @@ class Domains extends BasePackage
 			$this->addActivityLog($data);
 
 			$this->addResponse('Added ' . $data['name'] . ' domain', 0, null, true);
-
-			$this->addToNotification('add', 'Added new domain ' . $data['name'], null, $this->modules->packages->getPackageByName('Domains'));
 		} else {
 			$this->addResponse('Error adding new domain.', 1, []);
 		}
 	}
 
-	/**
-	 * @notification(name=update)
-	 * notification_allowed_methods(email, sms)//Example
-	 * @notification_allowed_methods(email, sms)
-	 */
 	public function updateDomain(array $data)
 	{
 		if (!isset($data['dns_record']) ||
@@ -177,8 +165,6 @@ class Domains extends BasePackage
 			$this->addActivityLog($data, $domain);
 
 			$this->addResponse('Updated domain ' . $data['name']);
-
-			$this->addToNotification('update', 'Updated domain ' . $data['name'], null, $this->modules->packages->getPackageByName('Domains'));
 		} else {
 			$this->addResponse('Error adding new domain.', 1);
 		}
@@ -230,11 +216,6 @@ class Domains extends BasePackage
 		return $data;
 	}
 
-	/**
-	 * @notification(name=remove)
-	 * notification_allowed_methods(email, sms)//Example
-	 * @notification_allowed_methods(email, sms)
-	 */
 	public function removeDomain(array $data)
 	{
 		$domain = $this->getById($data['id']);
@@ -257,8 +238,6 @@ class Domains extends BasePackage
 
 		if ($this->remove($domain['id'])) {
 			$this->addResponse('Removed domain ' . $domain['name']);
-
-			$this->addToNotification('remove', 'Removed domain ' . $domain['name'], null, $this->modules->packages->getPackageByName('Domains'));
 		} else {
 			$this->addResponse('Error removing domain.', 1);
 		}

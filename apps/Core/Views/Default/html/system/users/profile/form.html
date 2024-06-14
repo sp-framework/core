@@ -258,7 +258,7 @@ gridColumns.push(
                                         'mr-1 text-danger helper packages">' +
                                     '</i>' +
                                 '</span>' +
-                                    ' Packages ' +
+                                    ' MODULES ' +
                                 '<span class="cursor-pointer">' +
                                     '<i id="{{componentId}}-{{sectionId}}-subscriptions-packages-subscribeall" ' +
                                         'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
@@ -379,13 +379,13 @@ dataCollectionSection =
                 }
 
                 $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
-                    if (e.target.hash === '#admin-profile-main-tabs-notifications') {
+                    if (e.target.hash === '#core-profile-main-tabs-notifications') {
                         fixGrid();
                     }
                 });
 
                 $('#{{componentId}}-{{sectionId}}-form-fields').on('select_node.jstree', function(e, data) {
-                    if (data.node.li_attr["data-tabid"] === 'admin-profile-main-tabs-notifications') {
+                    if (data.node.li_attr["data-tabid"] === 'core-profile-main-tabs-notifications') {
                         fixGrid();
                     }
                 });
@@ -406,19 +406,20 @@ dataCollectionSection =
                 notifications = JSON.parse('{{notifications}}');//Parse DB Data
 
                 for (var app in notifications) {
-                    for (var pkg in notifications[app]) {
-                        jstreeId =
-                            $($('#{{componentId}}-{{sectionId}}-subscriptions ul.jstree-children')
-                                .find('[data-id="' + app + '"]'))
-                            .find('[data-id="' + pkg + '"]');
+                    for (var moduleType in notifications[app]) {
+                        for (var pkg in notifications[app][moduleType]) {
+                            jstreeId =
+                                $($('#{{componentId}}-{{sectionId}}-subscriptions ul.jstree-children')
+                                    .find('[data-id="' + app + '"]'))
+                                .find('[data-id="' + pkg + '"]');
 
-                        if (jstreeId.length > 0) {
-                            gridData[jstreeId[0].id] = { };
-                            gridData[jstreeId[0].id]['app_id'] = app;
-                            gridData[jstreeId[0].id]['package_id'] = pkg;
-                            gridData[jstreeId[0].id]['subscriptions'] = notifications[app][pkg];
-                            // gridData[jstreeId[0].id]['parents'] = [];
-                            // gridData[jstreeId[0].id]['children'] = [];
+                            if (jstreeId.length > 0) {
+                                gridData[jstreeId[0].id] = { };
+                                gridData[jstreeId[0].id]['app_id'] = app;
+                                gridData[jstreeId[0].id]['module_type'] = moduleType;
+                                gridData[jstreeId[0].id]['module_id'] = pkg;
+                                gridData[jstreeId[0].id]['subscriptions'] = notifications[app][moduleType][pkg];
+                            }
                         }
                     }
                 }
@@ -428,16 +429,6 @@ dataCollectionSection =
                         var jstreeIdStructure =
                             $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-subscriptions']['jstree'])
                                 .jstree(true).get_json(obj.id, {flat: true})
-
-                        // $.each(jstreeIdStructure, function(index, childrenObj) {
-                        //     if (childrenObj.id !== obj.id) {
-                        //         gridData[obj.id]['children'].push(childrenObj.id);
-                        //     }
-                        // });
-
-                        // $.each(gridData[obj.id]['children'], function(index, childrenId) {
-                        //     gridData[childrenId]['parents'].push(obj.id);
-                        // });
                     }
                 });
 
@@ -732,7 +723,11 @@ dataCollectionSection =
                     }
 
                     for (var nodeId in gridData) {
-                        data[gridData[nodeId]['app_id']][gridData[nodeId]['package_id']] =
+                        if (!data[gridData[nodeId]['app_id']][gridData[nodeId]['module_type']]) {
+                            data[gridData[nodeId]['app_id']][gridData[nodeId]['module_type']] = { };
+                        }
+
+                        data[gridData[nodeId]['app_id']][gridData[nodeId]['module_type']][gridData[nodeId]['module_id']] =
                             gridData[nodeId]['subscriptions'];
                     }
                 }
@@ -757,7 +752,7 @@ dataCollectionSection =
         //         }
 
         //         $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
-        //             if (e.target.hash === '#admin-profile-main-tabs-notifications') {
+        //             if (e.target.hash === '#core-profile-main-tabs-notifications') {
         //                 fixGrid();
         //             }
         //         });

@@ -237,134 +237,113 @@ class Packages extends BasePackage
 			return;
 		}
 
-		$appsIdArr = [];
-
-		$appsArr = $this->apps->apps;
-
-		if (count($appsArr) > 0) {
-			foreach ($appsArr as $key => $value) {
-				array_push($appsIdArr, $value['id']);
+		foreach ($this->apps->apps as $appId => $app) {
+			if (!isset($subscriptions[$appId]) ||
+				!isset($subscriptions[$appId]['packages'])
+			) {
+				continue;
 			}
-		} else {
-			return;
-		}
 
-		foreach ($this->packages as $packageKey => $package) {
-			if ($package['class'] && $package['class'] !== '') {
-				if ($package['notification_subscriptions'] && $package['notification_subscriptions'] !== '') {
-					$package['notification_subscriptions'] = $this->helper->decode($package['notification_subscriptions'], true);
+			foreach ($subscriptions[$appId]['packages'] as $packageId => $packageSubscriptions) {
+				if (!isset($this->packages[$packageId])) {
+					continue;
+				}
 
-					foreach ($appsArr as $appKey => $app) {
-						if (isset($subscriptions[$app['id']][$package['id']])) {
-							if (isset($package['notification_subscriptions'][$app['id']])) {
-								foreach ($subscriptions[$app['id']][$package['id']] as $subscriptionKey => $subscriptionValue) {
-									if (isset($package['notification_subscriptions'][$app['id']][$subscriptionKey])) {
+				if ($this->packages[$packageId]['notification_subscriptions']) {
+					if (!is_array($this->packages[$packageId]['notification_subscriptions'])) {
+						$this->packages[$packageId]['notification_subscriptions'] = $this->helper->decode($this->packages[$packageId]['notification_subscriptions'], true);
+					}
+
+					if (isset($this->packages[$packageId]['notification_subscriptions'][$appId])) {
+						foreach ($packageSubscriptions as $subscriptionKey => $subscriptionValue) {
+							if (isset($this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey])) {
+								if ($subscriptionValue == 1) {
+									if ($subscriptionKey == 'email') {
+										if (!isset($this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']])) {
+											$this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']] = $account['email'];
+										}
+									} else {
+										if (!in_array($account['id'], $this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey])) {
+											array_push($this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey], $account['id']);
+										}
+									}
+								} else if ($subscriptionValue == 0) {
+									if ($subscriptionKey == 'email') {
+										if (isset($this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']])) {
+											unset($this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']]);
+										}
+									} else {
+										if (in_array($account['id'], $this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey])) {
+											unset($this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey][array_keys($this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey], $account['id'])[0]]);
+										}
+									}
+								}
+							} else {//If new notificationkey
+								$reflector = $this->annotations->get($this->packages[$packageId]['class']);
+								$methods = $reflector->getMethodsAnnotations();
+
+								if ($methods) {
+									$notification_actions = [];
+									foreach ($methods as $annotation) {
+										array_push($notification_actions, $annotation->getAll('notification')[0]->getArguments()['name']);
+										$notification_allowed_methods = $annotation->getAll('notification_allowed_methods');
+										if (count($notification_allowed_methods) > 0) {
+											$notification_allowed_methods = $annotation->getAll('notification_allowed_methods')[0]->getArguments();
+										}
+									}
+
+									if (in_array($subscriptionKey, $notification_actions)) {
+										if ($subscriptionValue == 1) {
+											$this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey] = [$account['id']];
+										} else {
+											$this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey] = [];
+										}
+									}
+
+									if (in_array($subscriptionKey, $notification_allowed_methods)) {
 										if ($subscriptionValue == 1) {
 											if ($subscriptionKey == 'email') {
-												if (!isset($package['notification_subscriptions'][$app['id']][$subscriptionKey][$account['id']])) {
-													$package['notification_subscriptions'][$app['id']][$subscriptionKey][$account['id']] = $account['email'];
-												}
-											} else if ($subscriptionKey == 'sms') {
-												if (!isset($package['notification_subscriptions'][$app['id']][$subscriptionKey][$account['id']])) {
-													$package['notification_subscriptions'][$app['id']][$subscriptionKey][$account['id']] = $account['profile']['contact_mobile'];
-												}
-											} else {
-												if (!in_array($account['id'], $package['notification_subscriptions'][$app['id']][$subscriptionKey])) {
-													array_push($package['notification_subscriptions'][$app['id']][$subscriptionKey], $account['id']);
-												}
-											}
-										} else if ($subscriptionValue == 0) {
-											if ($subscriptionKey == 'email' || $subscriptionKey == 'sms') {
-												if (isset($package['notification_subscriptions'][$app['id']][$subscriptionKey][$account['id']])) {
-													unset($package['notification_subscriptions'][$app['id']][$subscriptionKey][$account['id']]);
-												}
-											} else {
-												if (in_array($account['id'], $package['notification_subscriptions'][$app['id']][$subscriptionKey])) {
-													unset($package['notification_subscriptions'][$app['id']][$subscriptionKey][array_keys($package['notification_subscriptions'][$app['id']][$subscriptionKey], $account['id'])[0]]);
-												}
-											}
-										}
-									} else {//If new notificationkey
-										$reflector = $this->annotations->get($package['class']);
-										$methods = $reflector->getMethodsAnnotations();
-
-										if ($methods) {
-											$notification_actions = [];
-											foreach ($methods as $annotation) {
-												array_push($notification_actions, $annotation->getAll('notification')[0]->getArguments()['name']);
-												$notification_allowed_methods = $annotation->getAll('notification_allowed_methods');
-												if (count($notification_allowed_methods) > 0) {
-													$notification_allowed_methods = $annotation->getAll('notification_allowed_methods')[0]->getArguments();
-												}
-											}
-
-											if (in_array($subscriptionKey, $notification_actions)) {
-												if ($subscriptionValue == 1) {
-													$package['notification_subscriptions'][$app['id']][$subscriptionKey] = [$account['id']];
-												} else {
-													$package['notification_subscriptions'][$app['id']][$subscriptionKey] = [];
-												}
-											}
-
-											if (in_array($subscriptionKey, $notification_allowed_methods)) {
-												if ($subscriptionValue == 1) {
-													if ($subscriptionKey == 'email') {
-														$package['notification_subscriptions'][$app['id']][$subscriptionKey][$account['id']] = [$account['email']];
-													} else if ($subscriptionKey == 'sms') {
-														$package['notification_subscriptions'][$app['id']][$subscriptionKey][$account['id']] = [$account['profile']['contact_mobile']];
-													}
-												} else {
-													$package['notification_subscriptions'][$app['id']][$subscriptionKey] = [];
-												}
-											}
-										}
-									}
-								}
-							} else {
-								if (is_array($subscriptions[$app['id']][$package['id']]) && count($subscriptions[$app['id']][$package['id']]) > 0) {
-									$package['notification_subscriptions'][$app['id']] = [];
-
-									foreach ($subscriptions[$app['id']][$package['id']] as $notificationKey => $notification) {
-										if ($notification == 1) {
-											if ($notificationKey == 'email') {
-												$package['notification_subscriptions'][$app['id']][$notificationKey] = [$account['id'] => $account['email']];
-											} else if ($notificationKey == 'sms') {
-												$package['notification_subscriptions'][$app['id']][$notificationKey] = [$account['id'] => $account['profile']['contact_mobile']];
-											} else {
-												$package['notification_subscriptions'][$app['id']][$notificationKey] = [$account['id']];
+												$this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']] = [$account['email']];
 											}
 										} else {
-											$package['notification_subscriptions'][$app['id']][$notificationKey] = [];
+											$this->packages[$packageId]['notification_subscriptions'][$appId][$subscriptionKey] = [];
 										}
 									}
 								}
+							}
+						}
+					} else {
+						$this->packages[$packageId]['notification_subscriptions'][$appId] = [];
+
+						foreach ($packageSubscriptions as $notificationKey => $notification) {
+							if ($notification == 1) {
+								if ($notificationKey == 'email') {
+									$this->packages[$packageId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id'] => $account['email']];
+								} else {
+									$this->packages[$packageId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id']];
+								}
+							} else {
+								$this->packages[$packageId]['notification_subscriptions'][$appId][$notificationKey] = [];
 							}
 						}
 					}
 				} else {
-					foreach ($appsArr as $appKey => $app) {
-						if (isset($subscriptions[$app['id']][$package['id']])) {
-							$package['notification_subscriptions'][$app['id']] = [];
+					$this->packages[$packageId]['notification_subscriptions'][$appId] = [];
 
-							foreach ($subscriptions[$app['id']][$package['id']] as $notificationKey => $notification) {
-								if ($notification == 1) {
-									if ($notificationKey == 'email') {
-										$package['notification_subscriptions'][$app['id']][$notificationKey] = [$account['id'] => $account['email']];
-									} else if ($notificationKey == 'sms') {
-										$package['notification_subscriptions'][$app['id']][$notificationKey] = [$account['id'] => $account['profile']['contact_mobile']];
-									} else {
-										$package['notification_subscriptions'][$app['id']][$notificationKey] = [$account['id']];
-									}
-								} else {
-									$package['notification_subscriptions'][$app['id']][$notificationKey] = [];
-								}
+					foreach ($packageSubscriptions as $notificationKey => $notification) {
+						if ($notification == 1) {
+							if ($notificationKey == 'email') {
+								$this->packages[$packageId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id'] => $account['email']];
+							} else {
+								$this->packages[$packageId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id']];
 							}
+						} else {
+							$this->packages[$packageId]['notification_subscriptions'][$appId][$notificationKey] = [];
 						}
 					}
 				}
-				$package['notification_subscriptions'] = $this->helper->encode($package['notification_subscriptions']);
 
-				$this->update($package);
+				$this->update($this->packages[$packageId]);
 			}
 		}
 	}

@@ -108,11 +108,6 @@ class Accounts extends BasePackage
         return null;
     }
 
-    /**
-     * @notification(name=add)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function addAccount(array $data)
     {
         $validation = $this->validateData($data);
@@ -194,19 +189,12 @@ class Accounts extends BasePackage
 
             $this->addActivityLog($data);
 
-            $this->addToNotification('add', 'Added new account for ID: ' . $data['email']);
-
             $this->addResponse('Added new account for ID: ' . $data['email'], 0, null, true);
         } else {
             $this->addResponse('Error adding account.', 1);
         }
     }
 
-    /**
-     * @notification(name=update)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function updateAccount(array $data)
     {
         if (isset($data['forgotten_request']) && $data['forgotten_request'] == '1') {
@@ -320,8 +308,6 @@ class Accounts extends BasePackage
 
             $this->addActivityLog($data);
 
-            $this->addToNotification('add', 'Updated account for ID: ' . $data['email']);
-
             $this->addResponse('Updated account for ID: ' . $data['email'], 0, null, true);
 
             if ($this->auth->account() &&
@@ -340,11 +326,6 @@ class Accounts extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=remove)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function removeAccount(array $data)
     {
         if (isset($data['id']) && $data['id'] != 1) {
@@ -366,8 +347,6 @@ class Accounts extends BasePackage
                 }
 
                 if ($this->remove($data['id'])) {
-                    $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
-
                     $this->addResponse('Removed account for ID: ' . $account['email']);
 
                     return true;
@@ -384,8 +363,6 @@ class Accounts extends BasePackage
                 }
 
                 if ($this->remove($data['id'])) {
-                    $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
-
                     $this->addResponse('Removed account for ID: ' . $account['email']);
 
                     $this->api->clients->forceRevoke(['account_id' => $data['id']]);

@@ -53,11 +53,6 @@ class Types extends BasePackage
         return false;
     }
 
-    /**
-     * @notification(name=update)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function updateAppType(array $data)
     {
         $appType = $this->getAppTypeById($data['id']);

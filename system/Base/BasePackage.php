@@ -262,16 +262,30 @@ abstract class BasePackage extends Controller
 
 	public function getAll(bool $resetCache = false, bool $enableCache = true, $model = null)
 	{
-		if ($this->config->databasetype === 'db') {
-			if (!$this->{$this->packageName} || $resetCache) {
-				$this->{$this->packageName} = $this->getByParams(['conditions'=>''], $resetCache, $enableCache, $model);
+		if (isset($this->packageName) && property_exists($this, $this->packageName) &&
+			($this->{$this->packageName} === null || $resetCache)
+		) {
+			if ($this->config->databasetype === 'db') {
+				$allPackages = $this->getByParams(['conditions'=>''], $resetCache, $enableCache, $model);
+			} else {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+				$allPackages = $this->ffStore->findAll();
+
+				$this->setFfStoreToUse();
 			}
-		} else {
-			$this->ffStore = $this->ff->store($this->ffStoreToUse);
 
-			$this->{$this->packageName} = $this->ffStore->findAll();
+			$packages = $allPackages;
 
-			$this->setFfStoreToUse();
+			if ($allPackages && is_array($allPackages) && count($allPackages) > 0) {
+				$packages = [];
+
+				foreach ($allPackages as $package) {
+					$packages[$package['id']] = $package;
+				}
+			}
+
+			$this->{$this->packageName} = $packages;
 		}
 
 		return $this;
@@ -589,13 +603,11 @@ abstract class BasePackage extends Controller
 
 			$paginationCounters['filtered_items'] = $paginationCounters['total_items'];
 
-			if ($this->filterConditions && $this->config->databasetype === 'db') {
-				$paginationCounters['filtered_items'] = $this->modelToUse::count($this->filterConditions);
-			} else {
-				if ($data) {
-					$paginationCounters['filtered_items'] = count($data);
+			if ($this->filterConditions) {
+				if ($this->config->databasetype === 'db') {
+					$paginationCounters['filtered_items'] = $this->modelToUse::count($this->filterConditions);
 				} else {
-					$paginationCounters['filtered_items'] = 0;
+					$paginationCounters['filtered_items'] = $this->ffStore->count(false, $this->filterConditions);
 				}
 			}
 
@@ -968,7 +980,7 @@ abstract class BasePackage extends Controller
 		$multiModel = false;
 		$modelColumnMap = $this->getModelsColumnMap();
 
-		$ffConditions = [];
+		$this->filterConditions = [];
 
 		foreach ($postConditions as $conditionKey => $condition) {
 			$and = $or = false;
@@ -1069,15 +1081,15 @@ abstract class BasePackage extends Controller
 							}
 						}
 
-						array_push($ffConditions, [$conditionArr[1], $sign, $valueValue]);
+						array_push($this->filterConditions, [$conditionArr[1], $sign, $valueValue]);
 
 						if ($this->helper->lastKey($valueArr) != $valueKey) {
-							array_push($ffConditions, 'OR');
+							array_push($this->filterConditions, 'OR');
 						}
 					}
 
-					if (count($ffConditions) > 1) {
-						$ffConditions = [$ffConditions];
+					if (count($this->filterConditions) > 1) {
+						$this->filterConditions = [$this->filterConditions];
 					}
 				} else {
 					if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'integer') {
@@ -1099,22 +1111,22 @@ abstract class BasePackage extends Controller
 					}
 
 					if ($and) {
-						array_push($ffConditions, 'AND');
-						array_push($ffConditions, [$conditionArr[1], $sign, $conditionArr[3]]);
+						array_push($this->filterConditions, 'AND');
+						array_push($this->filterConditions, [$conditionArr[1], $sign, $conditionArr[3]]);
 					} else if ($or) {
-						$previousKey = $this->helper->lastKey($ffConditions);
-						$previous = $this->helper->last($ffConditions);
-						unset($ffConditions[$this->helper->lastKey($ffConditions)]);
+						$previousKey = $this->helper->lastKey($this->filterConditions);
+						$previous = $this->helper->last($this->filterConditions);
+						unset($this->filterConditions[$this->helper->lastKey($this->filterConditions)]);
 						$orArr = [];
 						array_push($orArr, $previous);
 						array_push($orArr, 'OR');
 						array_push($orArr, [$conditionArr[1], $sign, $conditionArr[3]]);
-						$ffConditions[$previousKey] = $orArr;
+						$this->filterConditions[$previousKey] = $orArr;
 					} else {
-						array_push($ffConditions, [$conditionArr[1], $sign, $conditionArr[3]]);
+						array_push($this->filterConditions, [$conditionArr[1], $sign, $conditionArr[3]]);
 					}
 				}
-					// var_dump($ffConditions);die();
+					// var_dump($this->filterConditions);die();
 			}
 			// dump($conditionArr);die();
 
@@ -1142,7 +1154,7 @@ abstract class BasePackage extends Controller
 					$this->ffStoreToUse = $query['ff'];
 				}
 
-				$params['conditions'] = $ffConditions;
+				$params['conditions'] = $this->filterConditions;
 				// -|name|like|%aus%&or|name|like|%ind%|&
 				// dump($params);die();
 				$data = $this->getByParams($params, true, false);
@@ -2155,8 +2167,10 @@ abstract class BasePackage extends Controller
 				$packageRowId = null;
 			}
 
-			if ($package['notification_subscriptions'] && $package['notification_subscriptions'] !== '') {
-				$package['notification_subscriptions'] = $this->helper->decode($package['notification_subscriptions'], true);
+			if ($package['notification_subscriptions']) {
+				if (!is_array($package['notification_subscriptions'])) {
+					$package['notification_subscriptions'] = $this->helper->decode($package['notification_subscriptions'], true);
+				}
 
 				if (count($package['notification_subscriptions']) === 0) {
 					return;
@@ -2164,11 +2178,11 @@ abstract class BasePackage extends Controller
 
 				foreach ($package['notification_subscriptions'] as $appId => $subscriptions) {
 					if ($subscriptionType === 'add' || $subscriptionType === 'update' || $subscriptionType === 'remove') {
-						$notificationType = '0';
+						$notificationType = 0;
 					} else if ($subscriptionType === 'warning') {
-						$notificationType = '1';
+						$notificationType = 1;
 					} else if ($subscriptionType === 'error') {
-						$notificationType = '2';
+						$notificationType = 2;
 					}
 
 					if (isset($subscriptions[$subscriptionType]) &&
@@ -2216,8 +2230,6 @@ abstract class BasePackage extends Controller
 					}
 				}
 			}
-		// } else {
-		// 	throw new \Exception('Package ' . $this->packageName . ' for notification not found');
 		}
 	}
 

@@ -516,11 +516,6 @@ class Filters extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=add)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function addFilter(array $data)
     {
         if (!isset($data['filter_type'])) {
@@ -572,11 +567,6 @@ class Filters extends BasePackage
         return false;
     }
 
-    /**
-     * @notification(name=update)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function updateFilter(array $data)
     {
         $component = $this->modules->components->getById($data['component_id']);
@@ -630,11 +620,6 @@ class Filters extends BasePackage
         return false;
     }
 
-    /**
-     * @notification(name=remove)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function removeFilter(array $data)
     {
         $filter = $this->getById($data['id']);

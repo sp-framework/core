@@ -21,37 +21,23 @@ class Storages extends BasePackage
         return $this;
     }
 
-    /**
-     * @notification(name=add)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function addStorage(array $data)
     {
         $data = $this->extractSelectData($data);
 
         if ($this->add($data)) {
             $this->addResponse('Storage Added');
-
-            $this->addToNotification('add', 'Added new storage ' . $data['name']);
         } else {
             $this->addResponse('Error Adding Storage', 1);
         }
     }
 
-    /**
-     * @notification(name=update)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function updateStorage(array $data)
     {
         $data = $this->extractSelectData($data);
 
         if ($this->update($data)) {
             $this->addResponse('Storage Updated');
-
-            $this->addToNotification('update', 'Updated storage ' . $data['name']);
         } else {
             $this->addResponse('Error Updating Storage', 1);
         }
@@ -69,11 +55,6 @@ class Storages extends BasePackage
         return $data;
     }
 
-    /**
-     * @notification(name=remove)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function removeStorage(array $data)
     {
         if ($data['id'] == '1' || $data['id'] == '2') {
@@ -86,8 +67,6 @@ class Storages extends BasePackage
 
         if ($this->remove($data['id'])) {
             $this->addResponse('Storage Removed');
-
-            $this->addToNotification('remove', 'Removed storage ' . $storage['name']);
         } else {
             $this->addResponse('Error Removing Storage', 1);
         }

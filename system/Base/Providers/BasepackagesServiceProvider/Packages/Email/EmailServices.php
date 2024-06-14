@@ -25,11 +25,6 @@ class EmailServices extends BasePackage
         return $this;
     }
 
-    /**
-     * @notification(name=add)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function addEmailService(array $data)
     {
         $data = $this->encryptPass($data);
@@ -46,18 +41,11 @@ class EmailServices extends BasePackage
             $this->addActivityLog($data);
 
             $this->addResponse('Added new email service ' . $data['name'], 0, null, true);
-
-            $this->addToNotification('add', 'Added new email service ' . $data['name']);
         } else {
             $this->addResponse('Error adding new email service.', 1, []);
         }
     }
 
-    /**
-     * @notification(name=update)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function updateEmailService(array $data)
     {
         $data = $this->encryptPass($data);
@@ -77,27 +65,18 @@ class EmailServices extends BasePackage
         if ($this->update($emailService)) {
             $this->addActivityLog($data, $emailService);
 
-            $this->addToNotification('update', 'Updated email service ' . $data['name']);
-
             $this->addResponse('Updated email service ' . $data['name']);
         } else {
             $this->addResponse('Error updating email service.', 1);
         }
     }
 
-    /**
-     * @notification(name=remove)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function removeEmailService(array $data)
     {
         $emailService = $this->getById($data['id']);
 
         //Check relations before removing.
         if ($this->remove($emailService['id'])) {
-            $this->addToNotification('remove', 'Removed email service ' . $emailService['name']);
-
             $this->addResponse('Removed email service ' . $emailService['name']);
         } else {
             $this->addResponse('Error removing email service.', 1);
@@ -106,7 +85,7 @@ class EmailServices extends BasePackage
 
     /**
      * @notification(name=error)
-     * @notification_allowed_methods(email, sms)
+     * @notification_allowed_methods(email)
      */
     public function errorEmailService($messageTitle = null, $messageDetails = null, $id = null)
     {

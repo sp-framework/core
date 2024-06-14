@@ -51,11 +51,6 @@ class GeoCountries extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=add)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function addCountry(array $data)
     {
         if (!isset($data['installed'])) {
@@ -93,11 +88,6 @@ class GeoCountries extends BasePackage
         $this->db->execute($sql, [1001, $this->packagesData->last['id']]);
     }
 
-    /**
-     * @notification(name=update)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function updateCountry(array $data)
     {
         $country = $this->getById($data['id']);

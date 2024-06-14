@@ -168,9 +168,6 @@ class ApiClientServices extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=add)
-     */
     public function addApi(array $data)
     {
         $data['location'] = strtolower($data['location']);
@@ -201,9 +198,6 @@ class ApiClientServices extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=update)
-     */
     public function updateApi(array $data)
     {
         $data['location'] = strtolower($data['location']);
@@ -236,9 +230,6 @@ class ApiClientServices extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=remove)
-     */
     public function removeApi(array $data)
     {
         $api = $this->getById($data['id'], false, false);
@@ -269,7 +260,7 @@ class ApiClientServices extends BasePackage
 
     /**
      * @notification(name=warning)
-     * @notification_allowed_methods(email, sms)
+     * @notification_allowed_methods(email)
      */
     public function warningApi($messageTitle = null, $messageDetails = null, $id = null)
     {
@@ -282,7 +273,7 @@ class ApiClientServices extends BasePackage
 
     /**
      * @notification(name=error)
-     * @notification_allowed_methods(email, sms)
+     * @notification_allowed_methods(email)
      */
     public function errorApi($messageTitle = null, $messageDetails = null, $id = null)
     {

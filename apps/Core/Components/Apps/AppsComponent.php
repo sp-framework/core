@@ -336,6 +336,8 @@ class AppsComponent extends BaseComponent
 
     /**
      * @acl(name=add)
+     * @notification(name=add)
+     * @notification_allowed_methods(email)
      */
     public function addAction()
     {
@@ -356,10 +358,14 @@ class AppsComponent extends BaseComponent
             $this->apps->packagesData->responseCode,
             $this->apps->packagesData->responseData
         );
+
+        $this->addToNotification('add', 'Added new app ' . $this->postData()['name'], null, $this->apps->packagesData->last);
     }
 
     /**
      * @acl(name=update)
+     * @notification(name=update)
+     * @notification_allowed_methods(email)
      */
     public function updateAction()
     {
@@ -371,10 +377,14 @@ class AppsComponent extends BaseComponent
             $this->apps->packagesData->responseMessage,
             $this->apps->packagesData->responseCode
         );
+
+        $this->addToNotification('update', 'Updated app ' . $this->postData()['name'], null, $this->apps->packagesData->last);
     }
 
     /**
      * @acl(name=remove)
+     * @notification(name=remove)
+     * @notification_allowed_methods(email)
      */
     public function removeAction()
     {
@@ -386,6 +396,8 @@ class AppsComponent extends BaseComponent
             $this->apps->packagesData->responseMessage,
             $this->apps->packagesData->responseCode
         );
+
+        $this->addToNotification('remove', 'Removed app with ID ' . $this->postData()['id']);
     }
 
     public function getFiltersAction()

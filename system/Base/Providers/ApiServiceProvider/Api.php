@@ -101,9 +101,6 @@ class Api extends BasePackage
         return $this;
     }
 
-    /**
-     * @notification(name=add)
-     */
     public function addApi(array $data)
     {
         $data['account_id'] = 0;
@@ -196,9 +193,6 @@ class Api extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=update)
-     */
     public function updateApi(array $data)
     {
         $api = $this->getById($data['id']);
@@ -310,9 +304,6 @@ class Api extends BasePackage
         return $data;
     }
 
-    /**
-     * @notification(name=remove)
-     */
     public function removeApi(array $data)
     {
         if (isset($data['id'])) {

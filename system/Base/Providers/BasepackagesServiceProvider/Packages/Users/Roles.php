@@ -20,11 +20,6 @@ class Roles extends BasePackage
         return $this;
     }
 
-    /**
-     * @notification(name=add)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function addRole(array $data)
     {
         $data = $this->removeMS($data);
@@ -36,11 +31,6 @@ class Roles extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=update)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function updateRole(array $data)
     {
         if (!$this->checkForSystemRole($data['id'])) {
@@ -85,11 +75,6 @@ class Roles extends BasePackage
         return $data;
     }
 
-    /**
-     * @notification(name=remove)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function removeRole(array $data)
     {
         if (!$this->checkForSystemRole($data['id'])) {

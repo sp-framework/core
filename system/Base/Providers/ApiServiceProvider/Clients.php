@@ -137,9 +137,6 @@ class Clients extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=update)
-     */
     public function updateClient(array $data)
     {
         if ($this->update($data)) {

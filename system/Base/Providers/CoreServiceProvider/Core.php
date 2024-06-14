@@ -34,7 +34,7 @@ class Core extends BasePackage
 	{
 		$this->getAll($resetCache);
 
-		$this->core = $this->core[0];
+		$this->core = $this->core[1];
 
 		if (is_string($this->core['settings'])) {
 			$this->core['settings'] = $this->helper->decode($this->core['settings'], true);

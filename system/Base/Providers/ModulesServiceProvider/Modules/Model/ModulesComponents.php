@@ -59,4 +59,6 @@ class ModulesComponents extends BaseModel
     public $auto_update;
 
     public $repo_details;
+
+    public $notification_subscriptions;
 }
