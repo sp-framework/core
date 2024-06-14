@@ -1049,8 +1049,16 @@ class Store
         return $this->primaryKey;
     }
 
-    public function count($recount = false): int
+    public function count($recount = false, $criteria = null): int
     {
+        if ($criteria) {
+            $data = $this->findBy($criteria);
+
+            if ($data && is_array($data)) {
+                return count($data);
+            }
+        }
+
         if ($this->useCache === true) {
             $cacheTokenArray = ["count" => true];
 
