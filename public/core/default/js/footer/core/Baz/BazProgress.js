@@ -185,7 +185,10 @@ var BazProgress = function() {
                                 $('#' + $(element)[0].id + ' .progress-child').attr('hidden', false);
                                 $('.child-progress-span').attr('hidden', false);
 
-                                if (responseData['runners']['running']['remoteWeb']) {
+                                if (responseData['runners']['running'] &&
+                                    responseData['runners']['running']['remoteWeb'] &&
+                                    responseData['runners']['running']['remoteWebCounters']
+                                ) {
                                     $('#' + $(element)[0].id + ' .progress-remote').attr('hidden', false);
                                     $('.remote-progress-span').attr('hidden', false);
 
@@ -195,8 +198,7 @@ var BazProgress = function() {
                                     $('.' + $(element)[0].id + '-remote-bar').css('width', responseData['percentComplete'] + '%');
                                     $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', responseData['percentComplete']);
                                 } else {
-                                    $('#' + $(element)[0].id + ' .progress-remote').attr('hidden', true);
-                                    $('.remote-progress-span').attr('hidden', true);
+                                    $('.progress-remote, .remote-progress-span').attr('hidden', true);
 
                                     $('.' + $(element)[0].id + '-child-progress-span')
                                         .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
@@ -210,7 +212,10 @@ var BazProgress = function() {
                                 $('.' + $(element)[0].id + '-child-bar').css('width', '0%');
                                 $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 0);
 
-                                if (responseData['runners']['running']['remoteWeb']) {
+                                if (responseData['runners']['running'] &&
+                                    responseData['runners']['running']['remoteWeb'] &&
+                                    responseData['runners']['running']['remoteWebCounters']
+                                ) {
                                     if (responseData['runners']['running']['remoteWebCounters']) {
                                         $('#' + $(element)[0].id + ' .progress-remote').attr('hidden', false);
                                         $('.remote-progress-span').attr('hidden', false);
@@ -226,8 +231,7 @@ var BazProgress = function() {
                                         $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
                                     }
                                 } else {
-                                    $('#' + $(element)[0].id + ' .progress-remote').attr('hidden', true);
-                                    $('.remote-progress-span').attr('hidden', true);
+                                    $('.progress-remote, .remote-progress-span').attr('hidden', true);
 
                                     $('.' + $(element)[0].id + '-progress-span')
                                         .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
@@ -236,6 +240,8 @@ var BazProgress = function() {
                                     $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', responseData['percentComplete']);
                                 }
                             }
+                        } else {
+                            $('.progress-remote, .remote-progress-span').attr('hidden', true);
                         }
 
                         if (online === false) {
@@ -294,6 +300,7 @@ var BazProgress = function() {
                         $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 0);
                         $('.' + $(element)[0].id + '-remote-bar').css('width', '0%');
                         $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
+                        $('.progress-remote, .remote-progress-span').attr('hidden', true);
                     } else {
                         resetProgressCounter();
                     }

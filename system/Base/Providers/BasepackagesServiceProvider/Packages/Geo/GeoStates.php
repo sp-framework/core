@@ -13,11 +13,6 @@ class GeoStates extends BasePackage
 
     public $geoStates;
 
-    /**
-     * @notification(name=add)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function addState(array $data)
     {
         if ($this->add($data)) {
@@ -51,11 +46,6 @@ class GeoStates extends BasePackage
         $this->db->execute($sql, [100001, $this->packagesData->last['id']]);
     }
 
-    /**
-     * @notification(name=update)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function updateState(array $data)
     {
         if ($this->update($data)) {

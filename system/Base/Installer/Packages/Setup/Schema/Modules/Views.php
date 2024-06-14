@@ -93,6 +93,13 @@ class Views
 						]
 					),
 					new Column(
+						'is_subview',
+						[
+							'type'    => Column::TYPE_BOOLEAN,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'repo',
 						[
 							'type'    => Column::TYPE_VARCHAR,

@@ -63,14 +63,14 @@ class ExceptionHandlers extends BaseComponent
 			'old' => $exception->getOldInput(),
 		]);
 
-		return redirect($exception->getPath());
+		return $this->response->redirect($exception->getPath());
 	}
 
 	public function handleCsrfTokenException()
 	{
 		$this->flash->now('warning', 'Session expired, please login again.');
 
-		return redirect('/auth/login');
+		return $this->response->redirect('/auth/login');
 	}
 
 	public function handleInvalidDataException($exception)

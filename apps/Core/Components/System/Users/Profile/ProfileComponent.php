@@ -40,7 +40,7 @@ class ProfileComponent extends BaseComponent
 
             $this->view->profile = $this->profile->packagesData->profile;
 
-            $this->view->packages = $this->profile->packagesData->packages;
+            $this->view->notifications_modules = $this->profile->packagesData->notifications_modules;
 
             $this->view->subscriptions = $this->profile->packagesData->subscriptions;
 

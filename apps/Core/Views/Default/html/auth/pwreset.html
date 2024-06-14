@@ -82,7 +82,7 @@ BazCore.header({
     </div>
 </div>
 <script>
-/*global BazCore PNotify */
+/*global BazCore paginatedPNotify */
 $(document).ready(function(){
 
     $('#{{componentId}}-regular').attr('hidden', false).addClass('animated fadeIn');
@@ -721,7 +721,7 @@ $(document).ready(function(){
                     $('#{{componentId}}-form-new_password-visibility, #{{componentId}}-form-confirm_password-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
                 }
             } else {
-                PNotify.error(response.responseMessage);
+                paginatedPNotify('error', response.responseMessage);
             }
             if (response.tokenKey && response.token) {
                 $("#security-token").attr("name", response.tokenKey);

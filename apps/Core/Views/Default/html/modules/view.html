@@ -1,34 +1,93 @@
-{# {% if modulesData is defined %}
-    {% set data =
-        [
-            'filters'       : filters,
-            'repositories'  : repositories,
-            'modulesData'   : modulesData
-        ]
+{% if queues is defined and queues === true and queue['total'] != 0 %}
+    {% set precheckTitle = 'Perform Precheck' %}
+    {% set precheckHidden = false %}
+    {% set analyseHidden = false %}
+    {% set processHidden = true %}
+    {% if queue['status'] == 1 %}
+        {% set precheckHidden = false %}
+        {% set precheckTitle = 'Re-Perform Precheck' %}
+    {% elseif queue['status'] == 2 %}
+        {% set precheckHidden = true %}
+        {% set analyseHidden = true %}
+        {% set processHidden = true %}
+    {% endif %}
+    {% set footerContent =
+        adminltetags.useTag('buttons',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : 'analyse',
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        're-analyse' : [
+                            'title'                   : 'Re-Analyse Queue',
+                            'type'                    : 'primary',
+                            'url'                     : links.url('modules/q/queue/true/reanalyse/true'),
+                            'hidden'                  : analyseHidden
+                        ],
+                        'perform-precheck' : [
+                            'title'                   : precheckTitle,
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'hidden'                  : precheckHidden
+                        ],
+                        'process-queue' : [
+                            'title'                   : 'Process Queue',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'hidden'                  : processHidden,
+                            'disabled'                : true
+                        ],
+                        'cancel' : [
+                            'title'                   : 'Cancel',
+                            'type'                    : 'secondary',
+                            'position'                : 'right',
+                            'url'                     : links.url('modules')
+                        ]
+                    ]
+            ]
+        )
     %}
-    {% else %}
-    {% set data =
+    {{adminltetags.useTag('content',
         [
-            'filters'       : filters,
-            'repositories'  : repositories
+            'component'                   : component,
+            'componentId'                 : componentId,
+            'parentComponentId'           : parent,
+            'sectionId'                   : 'analyse',
+            'contentType'                 : 'section',
+            'cardHeader'                  : true,
+            'cardFooter'                  : true,
+            'cardType'                    : 'primary',
+            'cardIcon'                    : 'th',
+            'cardTitle'                   : 'Analyse Modules',
+            'cardAdditionalClass'         : 'rounded-0',
+            'cardCollapsed'               : false,
+            'cardBodyInclude'             : 'modules/analyse',
+            'cardShowTools'               : ['maximize'],
+            'cardFooterContent'           : footerContent
         ]
-    %}
-{% endif %} #}
-{{adminltetags.useTag('content',
-    [
-        'component'                   : component,
-        'componentId'                 : componentId,
-        'parentComponentId'           : parent,
-        'sectionId'                   : 'manager',
-        'contentType'                 : 'section',
-        'cardId'                      : 'manager-card',
-        'cardHeader'                  : true,
-        'cardType'                    : 'primary',
-        'cardIcon'                    : 'th',
-        'cardTitle'                   : 'Modules',
-        'cardAdditionalClass'         : 'rounded-0',
-        'cardCollapsed'               : false,
-        'cardBodyInclude'             : 'modules/modules',
-        'cardShowTools'               : ['maximize']
-    ]
-)}}
+    )}}
+{% else %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                   : component,
+            'componentId'                 : componentId,
+            'parentComponentId'           : parent,
+            'sectionId'                   : 'manager',
+            'contentType'                 : 'section',
+            'cardHeader'                  : true,
+            'cardType'                    : 'primary',
+            'cardIcon'                    : 'th',
+            'cardTitle'                   : 'Modules',
+            'cardAdditionalClass'         : 'rounded-0',
+            'cardCollapsed'               : false,
+            'cardBodyInclude'             : 'modules/modules',
+            'cardShowTools'               : ['maximize', 'packageSettings']
+        ]
+    )}}
+{% endif %}

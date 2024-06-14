@@ -1108,4 +1108,65 @@ abstract class BaseComponent extends Controller
 			$this->showModuleSettingsData = $data;
 		}
 	}
+
+	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $last = null)
+	{
+		if ($this->component['notification_subscriptions']) {
+			if (!is_array($this->component['notification_subscriptions'])) {
+				$this->component['notification_subscriptions'] = $this->helper->decode($this->component['notification_subscriptions'], true);
+			}
+
+			if (count($this->component['notification_subscriptions']) === 0) {
+				return;
+			}
+
+			foreach ($this->component['notification_subscriptions'] as $appId => $subscriptions) {
+				if ($subscriptionType === 'add' || $subscriptionType === 'update' || $subscriptionType === 'remove') {
+					$notificationType = 0;
+				} else if ($subscriptionType === 'warning') {
+					$notificationType = 1;
+				} else if ($subscriptionType === 'error') {
+					$notificationType = 2;
+				}
+
+				if (isset($subscriptions[$subscriptionType]) &&
+					is_array($subscriptions[$subscriptionType]) &&
+					count($subscriptions[$subscriptionType]) > 0
+				) {
+					foreach ($subscriptions[$subscriptionType] as $key => $aId) {
+						$this->basepackages->notifications->addNotification(
+							$messageTitle,
+							$messageDetails,
+							$appId,
+							$aId,
+							null,
+							$this->component['name'],
+							$last ? $last['id'] : null,
+							$notificationType
+						);
+					}
+				}
+
+				if (isset($subscriptions['email']) && count($subscriptions['email']) > 0) {
+					$domainId = '1';//Default Domain for system generated Notifications (like API)
+
+					if ($this->domains && $this->domains->getDomain()) {
+						$domainId = $this->domains->getDomain()['id'];
+					}
+
+					$this->basepackages->notifications->emailNotification(
+						$subscriptions['email'],
+						$messageTitle,
+						$messageDetails,
+						$domainId,
+						$appId,
+						null,
+						$this->component['name'],
+						$last ? $last['id'] : null,
+						$notificationType
+					);
+				}
+			}
+		}
+	}
 }

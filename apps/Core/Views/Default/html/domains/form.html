@@ -47,7 +47,7 @@
     )}}
 </div>
 <script>
-/* globals PNotify */
+/* globals paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -107,7 +107,7 @@ dataCollectionSection =
 
                         if (response.responseCode === 3 || response.responseCode === 4) {
                             $('#{{componentId}}-{{sectionId}}-is_internal')[0].checked = true;
-                            PNotify.notice({
+                            paginatedPNotify('notice', {
                                 text : response.responseMessage
                             });
                             if (response.responseCode === 3) {
@@ -115,12 +115,12 @@ dataCollectionSection =
                             }
                         } else if (response.responseCode === 0) {
                             $('#{{componentId}}-{{sectionId}}-is_internal')[0].checked = false;
-                            PNotify.success({
+                            paginatedPNotify('success', {
                                 text : response.responseMessage
                             });
                         } else if (response.responseCode === 1) {
                             $('#{{componentId}}-{{sectionId}}-is_internal')[0].checked = false;
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 text : response.responseMessage
                             });
                         }

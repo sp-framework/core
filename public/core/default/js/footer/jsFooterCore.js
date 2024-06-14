@@ -3108,6 +3108,8 @@ var BazHelpers = function() {
         } else if (Array.isArray(objectOrArray)) {
             return objectOrArray.indexOf(value);
         }
+
+        return false;
     }
 
     function bazHelpersConstructor() {
@@ -3481,6 +3483,26 @@ var BazHelpers = function() {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
+    function stringToBoolean(string) {
+        switch (string.toLowerCase().trim()) {
+            case "true":
+            case "yes":
+            case "1":
+              return true;
+
+            case "false":
+            case "no":
+            case "0":
+            case null:
+            case undefined:
+            case 'undefined':
+              return false;
+
+            default:
+              return JSON.parse(string);
+        }
+    }
+
     function setup(BazHelpersConstructor) {
         BazHelpers = BazHelpersConstructor;
 
@@ -3574,6 +3596,10 @@ var BazHelpers = function() {
 
         BazHelpers.capitalizeFirstLetter = function(string) {
             return capitalizeFirstLetter(string);
+        }
+
+        BazHelpers.stringToBoolean = function(string) {
+            return stringToBoolean(string);
         }
     }
 
@@ -9283,8 +9309,12 @@ var BazContentFields = function() {
             $('#' + thisFieldId + '-tools-collapse').attr('hidden', true);
             $('#' + thisFieldId + '-tools-expand').attr('hidden', true);
 
+            var emptyTreeText = 'NO ' + $('#' + thisFieldId + '-tree-div').siblings('label').html() + '!';
+            if (options.bazJstreeOptions.treeEmptyText && options.bazJstreeOptions.treeEmptyText !== '') {
+                emptyTreeText = options.bazJstreeOptions.treeEmptyText;
+            }
             $('#' + thisFieldId + '-tree-div').append(
-                '<span id="' + thisFieldId + '-tree-empty">NO ' + $('#' + thisFieldId + '-tree-div').siblings('label').html() + '!</span>'
+                '<span id="' + thisFieldId + '-tree-empty">' + emptyTreeText + '</span>'
             );
 
             if (options.afterInit) {
@@ -11934,7 +11964,10 @@ var BazProgress = function() {
                                 $('#' + $(element)[0].id + ' .progress-child').attr('hidden', false);
                                 $('.child-progress-span').attr('hidden', false);
 
-                                if (responseData['runners']['running']['remoteWeb']) {
+                                if (responseData['runners']['running'] &&
+                                    responseData['runners']['running']['remoteWeb'] &&
+                                    responseData['runners']['running']['remoteWebCounters']
+                                ) {
                                     $('#' + $(element)[0].id + ' .progress-remote').attr('hidden', false);
                                     $('.remote-progress-span').attr('hidden', false);
 
@@ -11944,8 +11977,7 @@ var BazProgress = function() {
                                     $('.' + $(element)[0].id + '-remote-bar').css('width', responseData['percentComplete'] + '%');
                                     $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', responseData['percentComplete']);
                                 } else {
-                                    $('#' + $(element)[0].id + ' .progress-remote').attr('hidden', true);
-                                    $('.remote-progress-span').attr('hidden', true);
+                                    $('.progress-remote, .remote-progress-span').attr('hidden', true);
 
                                     $('.' + $(element)[0].id + '-child-progress-span')
                                         .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
@@ -11959,7 +11991,10 @@ var BazProgress = function() {
                                 $('.' + $(element)[0].id + '-child-bar').css('width', '0%');
                                 $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 0);
 
-                                if (responseData['runners']['running']['remoteWeb']) {
+                                if (responseData['runners']['running'] &&
+                                    responseData['runners']['running']['remoteWeb'] &&
+                                    responseData['runners']['running']['remoteWebCounters']
+                                ) {
                                     if (responseData['runners']['running']['remoteWebCounters']) {
                                         $('#' + $(element)[0].id + ' .progress-remote').attr('hidden', false);
                                         $('.remote-progress-span').attr('hidden', false);
@@ -11975,8 +12010,7 @@ var BazProgress = function() {
                                         $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
                                     }
                                 } else {
-                                    $('#' + $(element)[0].id + ' .progress-remote').attr('hidden', true);
-                                    $('.remote-progress-span').attr('hidden', true);
+                                    $('.progress-remote, .remote-progress-span').attr('hidden', true);
 
                                     $('.' + $(element)[0].id + '-progress-span')
                                         .html(responseData['runners']['running']['text'] + ' (' + responseData['percentComplete'] + '%)');
@@ -11985,6 +12019,8 @@ var BazProgress = function() {
                                     $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', responseData['percentComplete']);
                                 }
                             }
+                        } else {
+                            $('.progress-remote, .remote-progress-span').attr('hidden', true);
                         }
 
                         if (online === false) {
@@ -12043,6 +12079,7 @@ var BazProgress = function() {
                         $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 0);
                         $('.' + $(element)[0].id + '-remote-bar').css('width', '0%');
                         $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
+                        $('.progress-remote, .remote-progress-span').attr('hidden', true);
                     } else {
                         resetProgressCounter();
                     }

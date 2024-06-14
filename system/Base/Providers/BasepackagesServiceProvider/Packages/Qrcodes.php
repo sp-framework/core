@@ -121,8 +121,6 @@ class Qrcodes extends BasePackage
         if ($this->qrcodesSettings['showLogo'] === 'true') {
             if ($this->qrcodesSettings['logo'] !== '') {
                 $logoPath = $this->basepackages->storages->getPublicLink($this->qrcodesSettings['logo'], $this->qrcodesSettings['logoWidth']);
-
-                $logoPath = base_path('public' . $path);
             } else {
                 $logoPath = base_path('public/core/default/images/baz/logo/justlogo110x110.png');
             }

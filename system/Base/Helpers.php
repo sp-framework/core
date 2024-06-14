@@ -7,7 +7,7 @@ if (!function_exists('base_path')) {
 }
 
 if (!function_exists('trace')) {
-    function trace(array $varsToDump = [], $exit = true, $args = false, $object = false, $file = true, $line = true, $class = true, $function = true) {
+    function trace(array $varsToDump = [], $exit = true, $args = false, $object = false, $file = true, $line = true, $class = true, $function = true, $returnTraces = false) {
         $backtrace = debug_backtrace();
 
         $traces = [];
@@ -31,6 +31,10 @@ if (!function_exists('trace')) {
             if ($object && isset($trace['object'])) {
                 $traces[$key]['object'] = $trace['object'];
             }
+        }
+
+        if ($returnTraces) {
+            return $traces;
         }
 
         $reversedTraces = array_reverse($traces);
@@ -69,6 +73,25 @@ if (!function_exists('trace')) {
     }
 }
 
+if (!function_exists('json_trace')) {
+    function json_trace($e) {
+        $json = [];
+        $json['class']   = $e::class;
+        $json['message'] = $e->getMessage();
+        $json['code']    = $e->getCode();
+        $json['file']    = $e->getFile();
+        $json['line']    = $e->getLine();
+
+        $json['originalTrace'] = [];
+        foreach ($e->getTrace() as $item) {
+            $item['args']            = [];
+            $json['originalTrace'][] = $item;
+        }
+
+        return json_encode($json, 16);
+    }
+}
+
 if (!function_exists('toBytes')) {
     function toBytes($from) {
         $type = substr($from, -1);
@@ -84,7 +107,9 @@ if (!function_exists('toBytes')) {
 
 if (!function_exists('json_decode_recursive')) {
     function json_decode_recursive(&$value, $key) {
-        if ($value !== null) {
+        if ($value !== null &&
+            (str_starts_with($value, '{') || str_starts_with($value, '['))
+        ) {
             $value_decoded = json_decode($value, true);
         }
 
@@ -399,5 +424,30 @@ if (!function_exists('recursive_array_search')) {
         }
 
         return false;
+    }
+}
+
+if (!function_exists('array_diff_assoc_recursive')) {
+    function array_diff_assoc_recursive($array1, $array2) {
+        foreach($array1 as $key => $value) {
+            if (is_array($value)) {
+                if (!isset($array2[$key])) {
+                    $difference[$key] = $value;
+                }
+                elseif (!is_array($array2[$key])) {
+                    $difference[$key] = $value;
+                } else {
+                    $new_diff = array_diff_assoc_recursive($value, $array2[$key]);
+
+                    if ($new_diff != FALSE) {
+                        $difference[$key] = $new_diff;
+                    }
+                }
+            } elseif (!isset($array2[$key]) || $array2[$key] != $value) {
+                $difference[$key] = $value;
+            }
+        }
+
+        return !isset($difference) ? 0 : $difference;
     }
 }

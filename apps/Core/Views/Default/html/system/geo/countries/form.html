@@ -448,7 +448,7 @@
     </fieldset>
 </form>
 <script>
-/* globals BazContentFieldsValidator PNotify */
+/* globals BazContentFieldsValidator paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -491,14 +491,14 @@ dataCollectionSection =
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     $.post(url, postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success({
+                            paginatedPNotify('success', {
                                 'title' : response.responseMessage
                             });
                             $('#{{componentId}}-{{sectionId}}-install-country').attr('hidden', true);
                             $('#{{componentId}}-{{sectionId}}-install-country').siblings().removeClass('d-none');
 
                         } else {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 'title' : response.responseMessage
                             });
                             $('#{{componentId}}-{{sectionId}}-install-country').removeClass('disabled');

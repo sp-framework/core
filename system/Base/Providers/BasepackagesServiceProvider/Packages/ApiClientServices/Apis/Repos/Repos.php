@@ -6,13 +6,13 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices
 
 class Repos extends Apis
 {
-    public function init($apiConfig = null, $api = null, $httpOptions = null)
+    public function init($apiConfig = null, $api = null, $httpOptions = null, $monitorProgress = null)
     {
         if (!isset($apiConfig['category'])) {
             $apiConfig['category'] = 'Repos';
         }
 
-        parent::init($apiConfig, $api, $httpOptions);
+        parent::init($apiConfig, $api, $httpOptions, $monitorProgress);
 
         return $this;
     }

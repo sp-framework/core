@@ -8,21 +8,25 @@ class BasepackagesApiClientServicesApisReposGitea extends BaseModel
 {
     public $id;
 
-    public $repo_url;
+    public $api_url;
 
-    public $site_url;
+    public $org_user;
+
+    public $repo_url;
 
     public $branch;
 
     public $auth_type;
 
-    public $authorization;
-
     public $username;
 
     public $password;
 
-    public $token;
+    public $access_token;
+
+    public $authorization;
+
+    public $sync;
 
     public function onConstruct()
     {

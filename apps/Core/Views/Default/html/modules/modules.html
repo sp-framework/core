@@ -1,8 +1,7 @@
-{# <div class="row">
-    <div id="repo" class="col">
-        {% include 'modules/repositories/list.html' %}
-    </div>
-</div> #}
+{% set fieldJstreeEmptyText = false %}
+{% if modulesError is defined %}
+    {% set fieldJstreeEmptyText = modulesError %}
+{% endif %}
 <div class="row vdivide">
     <div class="col-md-4 vdivide-resizable">
         {{adminltetags.useTag('fields',
@@ -39,6 +38,7 @@
                 'fieldJstreeSearchCaseSensitive'            : false,
                 'fieldJstreeSearchShowOnlyMatches'          : true,
                 'fieldJstreeSearchShowOnlyMatchesChildren'  : true,
+                'fieldJstreeEmptyText'                      : fieldJstreeEmptyText,
                 'fieldJstreeHideJstreeIcons'                : false,
                 'fieldJstreeAdditionalTools'                :
                     [
@@ -197,6 +197,11 @@
                                 [
                                     'tabTitle'          : 'Settings',
                                     'tabInclude'        : 'modules/modules/settings'
+                                ],
+                                'bundlemodules'   :
+                                [
+                                    'tabTitle'          : 'Bundle Modules',
+                                    'tabInclude'        : 'modules/modules/bundlemodules'
                                 ]
                             ]
                     ]
@@ -233,10 +238,15 @@
 <div class="row">
     <div class="col">
         <span class="text-uppercase">Queue:
-            <span style="top: -2px;position: relative;" class="badge badge-info" id="queue-counter">{{queue['tasks_count']}}</span>
+            <span style="top: -2px;position: relative;" class="badge badge-info" id="queue-counter">{{queue['total']}}</span>
         </span>
     </div>
-    {% set queue = json_encode(queue, 16) %}
+    {% set analyseDisabled = true %}
+    {% set clearDisabled = true %}
+    {% if queue['total'] > 0 %}
+        {% set analyseDisabled = false %}
+        {% set clearDisabled = false %}
+    {% endif %}
     <div class="col">
         {{adminltetags.useTag('buttons',
             [
@@ -251,25 +261,26 @@
                             'title'             : 'Analyse Queue',
                             'position'          : 'right',
                             'size'              : 'xs',
-                            'icon'              : 'fa-cog fa-spin',
-                            'iconHidden'        : true,
-                            'disabled'          : true
+                            'url'               : links.url('modules/q/queue/true'),
+                            'disabled'          : analyseDisabled
                         ],
                         'clear-queue'       : [
                             'title'             : 'Clear Queue',
                             'position'          : 'right',
                             'type'              : 'danger',
                             'size'              : 'xs',
-                            'disabled'          : true
+                            'disabled'          : clearDisabled
                         ]
                     ]
             ]
         )}}
     </div>
 </div>
+{% set queue = json_encode(queue, 16) %}
+{% set queue = str_replace('\\', '\\\\', queue) %}
 {% set modules = json_encode(modules, 16) %}
 <script>
-/*global PNotify BazProgress Swal BazContentFields BazHelpers */
+/*global BazProgress Swal BazContentFields BazHelpers BazContentLoader Pace BazCore paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -323,9 +334,9 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode == 0) {
-                            PNotify.success({text: response.responseMessage});
+                            paginatedPNotify('success', {text: response.responseMessage});
                         } else if (response.responseCode == 1) {
-                            PNotify.error({text: response.responseMessage});
+                            paginatedPNotify('error', {text: response.responseMessage});
                         }
 
                         $('#{{componentId}}-{{sectionId}}-save-settings').attr('disabled', false);
@@ -350,11 +361,6 @@ dataCollectionSectionForm['vars']['new_available'] = 0;
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modules}}');
 dataCollectionSectionForm['vars']['module'] = { };
 dataCollectionSectionForm['vars']['queue'] = JSON.parse('{{queue}}');
-// dataCollectionSectionForm['vars']['queue_data'] = { };
-// dataCollectionSectionForm['vars']['queue_data']['install'] = { };
-// dataCollectionSectionForm['vars']['queue_data']['uninstall'] = { };
-// dataCollectionSectionForm['vars']['queue_data']['update'] = { };
-// dataCollectionSectionForm['vars']['queue_data']['remove'] = { };
 dataCollectionSectionForm['vars']['initJstree'] = false;
 dataCollectionSectionForm['vars']['syncInfo'] = '';
 
@@ -362,7 +368,7 @@ dataCollectionSectionForm['funcs'] = { };
 
 dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
     $('#{{componentId}}-{{sectionId}}-modules').off('ready.jstree');
-    $('#{{componentId}}-{{sectionId}}-modules').on('ready.jstree', function() {
+    $('#{{componentId}}-{{sectionId}}-modules').on('ready.jstree', function(e) {
         dataCollectionSectionForm['vars']['rootTree'] = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {flat:true});
 
         var selected;
@@ -399,16 +405,21 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
             dataCollectionSectionForm['vars']['org_update_available'] = res.nodes.length;
             dataCollectionSectionForm['vars']['update_available'] = res.nodes.length;
             dataCollectionSectionForm['vars']['initJstree'] = false;
-            PNotify.info({
-                text        : dataCollectionSectionForm['vars']['syncInfo'],
-                textTrusted : true
-            });
+            if (!window.stackPaginate ||
+                (window.stackPaginate && window.stackPaginate.length === 0)
+            ) {
+                paginatedPNotify('info', {
+                    text        : dataCollectionSectionForm['vars']['syncInfo'],
+                    textTrusted : true
+                });
+            }
+
         }
 
         dataCollectionSectionForm['vars']['syncInfo'] = '';
 
         if (dataCollectionSectionForm['vars']['update_available'] > 0) {
-            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', 'warning', false);
+            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', 'info', false);
         }
     });
 
@@ -547,7 +558,7 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
                     dataCollectionSectionForm['vars']['modules'][nD.apiid]['childs'][nD.apptype]['childs'][nD.moduletype]['childs'][node.id]['name'];
             }
 
-            if (dataCollectionSectionForm['vars']['queue']['tasks_count'] > 0) {
+            if (dataCollectionSectionForm['vars']['queue']['total'] > 0) {
                 var tasks = ['install', 'update', 'uninstall', 'remove'];
 
                 $(tasks).each(function(i, task) {
@@ -557,10 +568,10 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
                         ) {
                             if (task === 'install') {
                                 install = true;
-                                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install', 'info', false);
+                                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install', 'primary', false);
                             } else if (task === 'uninstall') {
                                 uninstall = true;
-                                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall', 'danger', false);
+                                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall', 'warning', false);
                             } else if (task === 'remove') {
                                 remove = true;
                                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove', 'danger', false);
@@ -576,20 +587,19 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
             }
 
             if (install === true) {
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-plus text-primary');
+
                 if (nD.update_available && nD.update_available == 1) {
-                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-plus text-info');
                     $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Update)');
                     updateAvailable = true;
-                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', 'warning', false);
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', 'info', false);
                 } else {
-                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-square-plus text-info');
-
                     if (nD.isnew && nD.isnew == 1) {
                         $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(
                             node,
                             nT +
                             ' (In Queue:Install) ' +
-                            ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-info">NEW</span></span>'
+                            ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-primary">NEW</span></span>'
                         );
                         dataCollectionSectionForm['vars']['new_available'] = 1;
                     } else {
@@ -597,7 +607,7 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
                     }
                 }
             } else if (uninstall === true) {
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-minus text-danger');
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-minus text-warning');
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Uninstall)');
             } else if (remove === true) {
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-xmark text-danger');
@@ -607,25 +617,26 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
                     $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-check text-success');
                     $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
                 } else {
-                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fa fa-fw fa-circle-dot');
                     if (nD.isnew && nD.isnew == 1) {
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fa fa-fw fa-star text-primary');
                         $('#{{componentId}}-{{sectionId}}-modules')
                         .jstree()
                         .set_text(
                             node,
                             nT +
-                                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-info">NEW</span></span>'
+                                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-primary">NEW</span></span>'
                         );
                         dataCollectionSectionForm['vars']['new_available'] = 1;
                     } else {
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fa fa-fw fa-circle-dot text-primary');
                         $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT);
                     }
                 }
 
                 if (nD.update_available && nD.update_available == 1) {
                     updateAvailable = true;
-                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', 'warning', false);
-                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-warning');
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', 'info', false);
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-info');
                     $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (Update Available)');
 
                     if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][nD.moduletype] &&
@@ -635,7 +646,7 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
 
                         $('#{{componentId}}-{{sectionId}}-modules').jstree().set_icon(node, 'fas fa-fw fa-circle-up text-info');
                         $('#{{componentId}}-{{sectionId}}-modules').jstree().set_text(node, nT + ' (In Queue:Update)');
-                        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update', 'warning', false);
+                        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update', 'info', false);
                     }
                 }
             }
@@ -657,13 +668,13 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
             $('#{{componentId}}-{{sectionId}}-modules').jstree().search('new');
         }
 
-        if (dataCollectionSectionForm['vars']['queue']['tasks_count'] > 0) {
+        if (dataCollectionSectionForm['vars']['queue']['total'] > 0) {
             dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
             dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-clear', 'primary', false);
         }
 
         if (dataCollectionSectionForm['vars']['new_available'] > 0) {
-            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-new-available', 'info', false);
+            dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-new-available', 'primary', false);
             dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-clear', 'primary', false);
         }
 }
@@ -734,11 +745,21 @@ dataCollectionSectionForm['funcs']['toggleJstreeTool'] = function(toolId, textCo
         }
     }
 }
-dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], showButtons = ['cancel'], showSettings = true) {
+dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], showButtons = ['cancel'], showSettings = true, showBundleModules = false) {
+    $('#{{componentId}}-{{sectionId}}-tabs-tabLinks a').removeClass('active');
+    $('#{{componentId}}-{{sectionId}}-tabs-tabContent .tab-pane').removeClass('active show');
+    $('#{{componentId}}-{{sectionId}}-tabs-info').addClass('active show');
+    $('a[href*="#{{componentId}}-{{sectionId}}-tabs-info"]').addClass('active');
+
     if (!showSettings) {
         $('a[href*="#{{componentId}}-{{sectionId}}-tabs-settings"]').parent().addClass('d-none');
     } else {
         $('a[href*="#{{componentId}}-{{sectionId}}-tabs-settings"]').parent().removeClass('d-none');
+    }
+    if (!showBundleModules) {
+        $('a[href*="#{{componentId}}-{{sectionId}}-tabs-bundlemodules"]').parent().addClass('d-none');
+    } else {
+        $('a[href*="#{{componentId}}-{{sectionId}}-tabs-bundlemodules"]').parent().removeClass('d-none');
     }
 
     if (show.length > 0) {
@@ -824,7 +845,7 @@ dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, modul
         } else if (response.responseCode == 1) {
             dataCollectionSectionForm['funcs']['moduleinfo'](['error']);
         } else if (response.responseCode == 2) {
-            PNotify.error({text: response.responseMessage});
+            paginatedPNotify('error', {text: response.responseMessage});
             if (response.responseData.module) {
                 dataCollectionSectionForm['vars']['module'] = response.responseData.module;
                 dataCollectionSectionForm['funcs']['processModuleInfo'](response.responseData.module);
@@ -847,19 +868,19 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     }
 
     if (moduleData['installed'] == 1) {
-        moduleData['installed'] = '<span class="badge badge-success">Yes</span>';
+        moduleData['installed'] = '<span class="badge badge-success text-xs">Yes</span>';
     } else {
-        moduleData['installed'] = '<span class="badge badge-secondary">No</span>';
+        moduleData['installed'] = '<span class="badge badge-secondary text-xs">No</span>';
     }
 
     if (moduleData['update_available'] !== '-' && moduleData['update_available'] == 1) {
-        moduleData['update_available'] = '<span class="badge badge-warning">Yes</span>';
+        moduleData['update_available'] = '<span class="badge badge-info text-xs">Yes</span>';
     }
     if (moduleData['update_version'] !== '-') {
-        moduleData['update_version'] = '<span class="badge badge-warning">' + moduleData['update_version'] + '</span>';
+        moduleData['update_version'] = '<span class="badge badge-info text-xs">' + moduleData['update_version'] + '</span>';
     }
 
-    moduleData['version'] = '<span class="badge badge-info">' + moduleData['version'] + '</span>';
+    moduleData['version'] = '<span class="badge badge-info text-xs">' + moduleData['version'] + '</span>';
 
     $('#app_type').html(moduleData.app_type);
     $('#category').html(moduleData.category);
@@ -879,17 +900,16 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     $('#module_id').html(moduleData.id);
     $('#description').html(moduleData.description);
 
-    //This is for Gitea, github will change
     if (moduleData.repo_details.latestRelease && moduleData.repo_details.latestRelease.body) {
         var changelogText;
         if (moduleData.repo_details.latestRelease.prerelease === false) {
             changelogText =
-                'Version: ' + moduleData.repo_details.latestRelease.name +
-                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-success">STABLE</span></span>';
+                'VERSION: ' + moduleData.repo_details.latestRelease.name +
+                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-success text-xs">STABLE</span></span>';
         } else {
             changelogText =
-                'Version: ' + moduleData.repo_details.latestRelease.name +
-                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-danger">UNSTABLE</span></span>';
+                'VERSION: ' + moduleData.repo_details.latestRelease.name +
+                ' <span class="text-uppercase" style="top: -1px;position: relative;"><span class="badge badge-danger text-xs">UNSTABLE</span></span>';
         }
         $('#changelogs-version').html(changelogText);
         $('#changelogs').html(moduleData.repo_details.latestRelease.body);
@@ -911,7 +931,7 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     if (moduleInfo.installed == '1') {
         if (moduleInfo.update_available == '1') {
             if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type] &&
-                dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type].includes(moduleInfo.id)
+                (BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type], moduleInfo.id) > -1)
             ) {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
             } else {
@@ -919,7 +939,7 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
             }
         } else {
             if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
-                dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type].includes(moduleInfo.id)
+                (BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type], moduleInfo.id) > -1)
             ) {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
             } else {
@@ -941,23 +961,84 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
         }
     }
 
-    dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], []);
+    if (moduleData['module_type'] === 'bundles') {
+        var bundleModuleHtml = '';
 
-    if (moduleData['app_type'] === 'core') {
-        if (moduleInfo['name'] !== 'Core') {
-            dataCollectionSectionForm['funcs']['moduleinfo'](['info'], [], false);
-        } else {
-            if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type]) {
-                index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type], moduleData.id);
-            }
-
-            if (index !== 'undefined' && index > -1) {
-                dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
-            } else {
-                if (moduleInfo.update_available == '1') {
-                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'repo-sync']);
+        if (moduleData.bundle_modules && Object.keys(moduleData.bundle_modules).length > 0) {
+            for (var bundleModuleType in moduleData.bundle_modules) {
+                if (bundleModuleType === 'core' || bundleModuleType === 'apptype') {
+                    bundleModuleHtml +=
+                    '       <tr>' +
+                    '           <td>' +  moduleData.bundle_modules[bundleModuleType]['name'] + '</td>' +
+                    '           <td>' +  bundleModuleType + '</td>' +
+                    '           <td>' +  moduleData.bundle_modules[bundleModuleType]['version'] + '</td>' +
+                    '           <td>' +  moduleData.bundle_modules[bundleModuleType]['repo'] + '</td>' +
+                    '       </tr>';
+                } else if(bundleModuleType === 'external' &&
+                          moduleData.bundle_modules[bundleModuleType]['composer'] &&
+                          moduleData.bundle_modules[bundleModuleType]['composer']['require'] &&
+                          Object.keys(moduleData.bundle_modules[bundleModuleType]['composer']['require']).length > 0
+                ) {
+                    for (var composerPackage in moduleData.bundle_modules[bundleModuleType]['composer']['require']) {
+                        bundleModuleHtml +=
+                        '       <tr>' +
+                        '           <td>' +  composerPackage + '</td>' +
+                        '           <td>' +  bundleModuleType + '</td>' +
+                        '           <td>' +  moduleData.bundle_modules[bundleModuleType]['composer']['require'][composerPackage] + '</td>' +
+                        '           <td>Via composer</td>' +
+                        '       </tr>';
+                    }
                 } else {
-                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['repo-sync']);
+                    if (Array.isArray(moduleData.bundle_modules[bundleModuleType]) && moduleData.bundle_modules[bundleModuleType].length > 0) {
+                        $(moduleData.bundle_modules[bundleModuleType]).each(function(i, v) {
+                            bundleModuleHtml +=
+                            '       <tr>' +
+                            '           <td>' +  v['name'] + '</td>' +
+                            '           <td>' +  bundleModuleType + '</td>' +
+                            '           <td>' +  v['version'] + '</td>' +
+                            '           <td>' +  v['repo'] + '</td>' +
+                            '       </tr>';
+                        });
+                    }
+                }
+            }
+        }
+
+        $('#{{componentId}}-{{sectionId}}-bundle-table tbody').empty().html(bundleModuleHtml);
+
+        $(window).on('load', function() {
+            if (!$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-bundle-table')) {
+                $('#{{componentId}}-{{sectionId}}-bundle-table').DataTable({
+                      columns: [
+                        null,
+                        null,
+                        null,
+                        null,
+                      ]
+                    }
+                );
+            }
+        });
+        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], [], true, true);
+    } else {
+        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], []);
+
+        if (moduleData['app_type'] === 'core') {
+            if (moduleInfo['name'] !== 'Core') {
+                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], [], false);
+            } else {
+                if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type]) {
+                    index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type], moduleData.id);
+                }
+
+                if (index !== 'undefined' && index > -1) {
+                    dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
+                } else {
+                    if (moduleInfo.update_available == '1') {
+                        dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'repo-sync']);
+                    } else {
+                        dataCollectionSectionForm['funcs']['moduleinfo']([], ['repo-sync']);
+                    }
                 }
             }
         }
@@ -1054,30 +1135,26 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
         }
 
         if (response.responseCode == 0) {
-            PNotify.success({
+            paginatedPNotify('success', {
                 text        : response.responseMessage,
             });
 
             var index;
 
-            if (response.responseData.queue) {
+            if (response.responseData.queue.tasks != null && response.responseData.queue.total != null) {
                 dataCollectionSectionForm['vars']['queue']['tasks'] = response.responseData.queue.tasks;
-                dataCollectionSectionForm['vars']['queue']['tasks_count'] = response.responseData.queue.tasks_count;
+                dataCollectionSectionForm['vars']['queue']['total'] = response.responseData.queue.total;
+            } else {
+                paginatedPNotify('error', {
+                    text        : 'Incorrect information received from queue manager. Please contact administrator.',
+                });
             }
 
-            // if (task !== 'cancel' && task !== 'clearQueue') {
-            //     if (!dataCollectionSectionForm['vars']['queue_data'][task][moduleType]) {
-            //         dataCollectionSectionForm['vars']['queue_data'][task][moduleType] = { };
-            //     }
-
-            //     dataCollectionSectionForm['vars']['queue_data'][task][moduleType][id] = dataCollectionSectionForm['vars']['module'];
-            // }
-
-            $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['tasks_count']);
+            $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['total']);
 
             if (task === 'install') {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install', 'info', false);
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install', 'primary', false);
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
                 dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, true);
             } else if (task === 'update') {
@@ -1087,7 +1164,7 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
                 dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id);
             } else if (task === 'uninstall') {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall', 'danger', false);
+                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall', 'warning', false);
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
                 dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, false, true);
             } else if (task === 'remove') {
@@ -1098,6 +1175,12 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
             } else if (task === 'cancel') {
                 dataCollectionSectionForm['funcs']['processModuleInfo'](dataCollectionSectionForm['vars']['module']);
 
+                for (var queueTask in dataCollectionSectionForm['vars']['queue']['tasks']) {
+                    if (dataCollectionSectionForm['vars']['queue']['tasks'][queueTask].length === 0) {
+                        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-' + queueTask);
+                    }
+                }
+
                 dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](
                     dataCollectionSectionForm['vars']['module']['module_type'] + '-' + dataCollectionSectionForm['vars']['module']['id']
                 );
@@ -1105,7 +1188,7 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
                 dataCollectionSectionForm['funcs']['clearQueue']();
             }
         } else {
-            PNotify.error({
+            paginatedPNotify('error', {
                 text        : response.responseMessage,
             });
         }
@@ -1114,13 +1197,11 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
 
 dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
     if (init) {
-        $('#{{componentId}}-{{sectionId}}-analyse-queue').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-analyse-queue').removeClass('disabled');
         $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', false);
 
         $('#{{componentId}}-{{sectionId}}-analyse-queue, ' +
-          '#{{componentId}}-{{sectionId}}-clear-queue, ' +
-          '#{{componentId}}-{{sectionId}}-perform-precheck, ' +
-          '#{{componentId}}-{{sectionId}}-process-queue'
+          '#{{componentId}}-{{sectionId}}-clear-queue'
           ).off();
 
         $('#{{componentId}}-{{sectionId}}-clear-queue').click(function(e) {
@@ -1132,214 +1213,93 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
         $('#{{componentId}}-{{sectionId}}-analyse-queue').click(function(e) {
             e.preventDefault();
 
-            dataCollectionSectionForm['funcs']['analyseQueue']();
+            BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-analyse-queue'), {
+                ajaxBefore                      : function () {
+                                                    Pace.restart();
+                                                    $("#baz-content").empty();
+                                                    $("#loader").attr('hidden', false);
+                                                },
+                ajaxFinished                    : function () {
+                                                    BazCore.updateBreadcrumb();
+                                                    $("#loader").attr('hidden', true);
+                                                },
+                ajaxError                       : function () {
+                                                    $("#loader").attr('hidden', true);
+                                                    BazCore.updateBreadcrumb();
+                                                }
+            });
+            // dataCollectionSectionForm['funcs']['analyseQueue']();
         });
 
-        $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
-            e.preventDefault();
+        // $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
+        //     e.preventDefault();
 
-            dataCollectionSectionForm['funcs']['processQueue']();
-        });
+        //     dataCollectionSectionForm['funcs']['processQueue']();
+        // });
 
-        $('#{{componentId}}-{{sectionId}}-process-queue').click(function(e) {
-            e.preventDefault();
+        // $('#{{componentId}}-{{sectionId}}-process-queue').click(function(e) {
+        //     e.preventDefault();
 
-            dataCollectionSectionForm['funcs']['processQueue']('process');
-        });
+        //     dataCollectionSectionForm['funcs']['processQueue']('process');
+        // });
     } else {
-        $('#{{componentId}}-{{sectionId}}-analyse-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-analyse-queue').addClass('disabled');
         $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
     }
 }
-dataCollectionSectionForm['funcs']['analyseQueue'] = function() {
-    var moduleHtml = '';
-    for (var q in dataCollectionSectionForm['vars']['queue']['tasks']) {
-        var count = 0;
 
-        if (q === 'install' || q === 'uninstall' || q === 'update' || q === 'remove') {
-            if (Object.keys(dataCollectionSectionForm['vars']['queue']['tasks'][q]).length > 0) {
-                for (var installTypes in dataCollectionSectionForm['vars']['queue']['tasks'][q]) {
-                    if (dataCollectionSectionForm['vars']['queue']['tasks'][q][installTypes].length > 0) {
-                        count = count + dataCollectionSectionForm['vars']['queue']['tasks'][q][installTypes].length;
-
-                        $(dataCollectionSectionForm['vars']['queue']['tasks'][q][installTypes]).each(function(i, id) {
-                            var name = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['name'];
-                            var moduleType = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['module_type'];
-                            var repo = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['repo'];
-                            var color = 'info';
-
-                            if (dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['display_name']) {
-                                name = dataCollectionSectionForm['vars']['queue_data'][q][installTypes][id]['display_name'];
-                            }
-
-                            if (q === 'update') {
-                                color = 'warning';
-                            } else if (q === 'uninstall' || q === 'remove') {
-                                color = 'danger';
-                            }
-                            moduleHtml +=
-                            '       <tr>' +
-                            '           <td>' +  name + '</td>' +
-                            '           <td>' +  moduleType + '</td>' +
-                            '           <td>' +  repo + '</td>' +
-                            '           <td>' +  '<span class="badge badge-' + color + ' mt-1 text-xs text-uppercase">' + q + '</span></td>' +
-                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-precheck-' + id + '"></td>' +
-                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-completed-' + id + '"></td>' +
-                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' + id + '"></td>' +
-                            '       </tr>';
-
-                        });
-                    }
-                }
-            }
-
-            $('#{{componentId}}-{{sectionId}}-queue-' + q).children('span').html(count);
-        }
-    }
-
-    $('#{{componentId}}-{{sectionId}}-queue-table tbody').empty().html(moduleHtml);
-    $('#{{componentId}}-{{sectionId}}-queue-analyse-modal').modal('show');
-}
 dataCollectionSectionForm['funcs']['clearQueue'] = function() {
-    // var index;
-    //This should be done via modifyQueue
-    // if (clearAll) {
-        dataCollectionSectionForm['vars']['sync'] = false;
-        dataCollectionSectionForm['vars']['initJstree'] = false;
-        dataCollectionSectionForm['vars']['filter'] = false;
-        dataCollectionSectionForm['vars']['module'] = { };
-        dataCollectionSectionForm['vars']['update_available'] = 0;
-        dataCollectionSectionForm['vars']['new_available'] = 0;
-        // dataCollectionSectionForm['vars']['queue_data'] = { };
-        // dataCollectionSectionForm['vars']['queue_data']['install'] = { };
-        // dataCollectionSectionForm['vars']['queue_data']['uninstall'] = { };
-        // dataCollectionSectionForm['vars']['queue_data']['update'] = { };
-        // dataCollectionSectionForm['vars']['queue_data']['remove'] = { };
-        dataCollectionSectionForm['vars']['syncInfo'] = '';
-        dataCollectionSectionForm['funcs']['initQueueButtons'](false);
-        dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](null, false, false, false, true);
-        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install');
-        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update');
-        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove');
-        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall');
-        dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue');
-        dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
-        $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
-    // } else {
-    //     if (id && moduleType) {
-    //         var actionTypes = ['install', 'update', 'uninstall', 'remove'];
-
-    //         var foundIn;
-    //         var disableFilterIcons = [];
-
-    //         $(actionTypes).each(function(i, actionType) {
-    //             if (dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType]) {
-    //                 if (dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType].includes(id)) {
-    //                     index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType], id);
-
-    //                     if (index > -1) {
-    //                         dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType].splice(index, 1);
-
-    //                         foundIn = actionType;
-    //                     }
-    //                 }
-
-    //                 if (dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType].length === 0) {
-    //                     delete dataCollectionSectionForm['vars']['queue']['tasks'][actionType][moduleType];
-    //                 }
-
-    //                 if (Object.keys(dataCollectionSectionForm['vars']['queue']['tasks'][actionType]).length === 0) {
-    //                     disableFilterIcons.push(actionType);
-    //                 }
-    //             }
-
-    //             if (dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType] &&
-    //                 dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType][id]
-    //             ) {
-    //                 delete dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType][id];
-
-    //                 if (Object.keys(dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType]).length === 0) {
-    //                     delete dataCollectionSectionForm['vars']['queue_data'][actionType][moduleType];
-    //                 }
-    //             }
-    //         });
-
-    //         if (foundIn) {
-    //             if (foundIn === 'install') {
-    //                 dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
-    //             } else if (foundIn === 'update') {
-    //                 dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'remove', 'repo-sync']);
-    //             } else if (foundIn === 'uninstall') {
-    //                 if (dataCollectionSectionForm['vars']['module']['update_available'] == '1') {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'remove', 'repo-sync']);
-    //                 } else {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['uninstall', 'remove', 'repo-sync']);
-    //                 }
-    //             } else if (foundIn === 'remove') {
-    //                 if (dataCollectionSectionForm['vars']['module']['update_available'] == '1') {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'remove', 'repo-sync']);
-    //                 } else if (dataCollectionSectionForm['vars']['module']['installed'] == '1') {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['uninstall', 'remove', 'repo-sync']);
-    //                 } else {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
-    //                 }
-    //             }
-
-    //             if (dataCollectionSectionForm['vars']['module']['app_type'] === 'core') {
-    //                 if (dataCollectionSectionForm['vars']['module']['name'] !== 'Core') {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo'](['info'], []);
-    //                 } else {
-    //                     dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['update', 'repo-sync']);
-    //                 }
-    //             }
-    //         }
-
-    //         if (disableFilterIcons.length > 0) {
-    //             $(disableFilterIcons).each(function(i, filterIcon) {
-    //                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-' + filterIcon);
-    //             });
-    //         }
-    //     }
-
-    //     dataCollectionSectionForm['vars']['queue']['count'] = dataCollectionSectionForm['vars']['queue']['count'] - 1;
-    // }
-
-    // $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['count']);
-
-    dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText']();
+    dataCollectionSectionForm['vars']['sync'] = false;
+    dataCollectionSectionForm['vars']['initJstree'] = false;
+    dataCollectionSectionForm['vars']['filter'] = false;
+    dataCollectionSectionForm['vars']['module'] = { };
+    dataCollectionSectionForm['vars']['update_available'] = 0;
+    dataCollectionSectionForm['vars']['new_available'] = 0;
+    dataCollectionSectionForm['vars']['syncInfo'] = '';
+    dataCollectionSectionForm['funcs']['initQueueButtons'](false);
+    dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](null, false, false, false, true);
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install');
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update');
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove');
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall');
+    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue');
+    dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
+    $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
 }
-dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
-    var postData = { };
-    postData[$('#security-token').attr('name')] = $('#security-token').val();
-    postData['queue'] = dataCollectionSectionForm['vars']['queue']['tasks'];
-    postData['process'] = 'runprecheck';
-    if (task === 'process') {
-        postData['process'] = 'runprocess';
-    }
+// dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
+//     var postData = { };
+//     postData[$('#security-token').attr('name')] = $('#security-token').val();
+//     postData['queue'] = dataCollectionSectionForm['vars']['queue']['tasks'];
+//     postData['process'] = 'runprecheck';
+//     if (task === 'process') {
+//         postData['process'] = 'runprocess';
+//     }
 
-    $.post('{{links.url("modules/processQueue")}}', postData, function(response) {
-        if (response.tokenKey && response.token) {
-            $('#security-token').attr('name', response.tokenKey);
-            $('#security-token').val(response.token);
-        }
+//     $.post('{{links.url("modules/processQueue")}}', postData, function(response) {
+//         if (response.tokenKey && response.token) {
+//             $('#security-token').attr('name', response.tokenKey);
+//             $('#security-token').val(response.token);
+//         }
 
-        if (response.responseCode == 0) {
-            PNotify.success({
-                text        : response.responseMessage,
-                textTrusted : true
-            });
-        } else {
-            PNotify.error({
-                text        : response.responseMessage,
-                textTrusted : true
-            });
-        }
-    }, 'json');
-}
+//         if (response.responseCode == 0) {
+//             paginatedPNotify('success', {
+//                 text        : response.responseMessage,
+//                 textTrusted : true
+//             });
+//         } else {
+//             paginatedPNotify('error', {
+//                 text        : response.responseMessage,
+//                 textTrusted : true
+//             });
+//         }
+//     }, 'json');
+// }
 
 dataCollectionSectionForm['funcs']['initSync'] = function(val) {
     dataCollectionSectionForm['vars']['sync'] = true;
     $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
+    $('#{{componentId}}-{{sectionId}}-analyse-queue').addClass('disabled');
+    $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
 
     dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update-available', null, true);
     dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-new-available', null, true);
@@ -1378,87 +1338,10 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
             $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
 
             if (response.responseData) {
-                var text = 'Sync Complete.<br>';
-                var newCounter = 0;
-                var updatesCounter = 0;
-                var newModule = 'new module';
-                var update = 'update';
-
-                if (response.responseData.counter.new && response.responseData.counter.new.count) {
-                    newCounter = response.responseData.counter.new.count;
-
-                    if (response.responseData.counter.new.api && response.responseData.counter.new.api.name) {
-                            text += response.responseData.counter.new.api.name + ' has '
-                    }
-                }
-
-                if (response.responseData.counter.updates && response.responseData.counter.updates.count) {
-                    updatesCounter = response.responseData.counter.updates.count;
-
-                    if (response.responseData.counter.updates.api && response.responseData.counter.updates.api.name) {
-                        text += response.responseData.counter.updates.api.name + ' has '
-                    }
-                }
-
-                if (newCounter > 0 || updatesCounter > 0) {
-                    if (newCounter > 1) {
-                        newModule = 'new modules';
-                    }
-                    if (updatesCounter > 1) {
-                        update = 'updates';
-                    }
-                    if (newCounter !== 0 && updatesCounter === 0) {
-                        dataCollectionSectionForm['vars']['new_available'] = newCounter;
-                        text += newCounter + ' ' + newModule + ' available.<br> No ' + update + ' available.';
-                    } else if (newCounter === 0 && updatesCounter !== 0) {
-                        text += updatesCounter + ' new ' + update + ' available.<br> No ' + newModule + ' available.';
-                    } else if (newCounter !== 0 && updatesCounter !== 0) {
-                        text += updatesCounter + ' new ' + update + ' available.<br>' + newCounter + ' ' + newModule + ' available.';
-                    }
-                } else {
-                    text = 'Sync Complete.<br>No ' + newModule + ' or ' + update + ' available.';
-                }
-
-                if (response.responseData.modules) {
-                    dataCollectionSectionForm['vars']['modules'] = response.responseData.modules;
-                }
-                if (response.responseData.modules_html && response.responseData.modules_html !== '') {
-                    var modulesHtml =
-                        '<div id="{{componentId}}-{{sectionId}}-modules" data-bazscantype="jstree">' +
-                            '<ul>' +
-                                response.responseData.modules_html +
-                            '</ul>' +
-                        '</div>';
-
-                    $('#{{componentId}}-{{sectionId}}-modules-tree-div').empty().html(modulesHtml);
-                }
-
-                BazContentFields.init({
-                    'componentId'   : '{{componentId}}',
-                    'sectionId'     : '{{componentId}}-{{sectionId}}',
-                    'fieldId'       : '{{componentId}}-{{sectionId}}-modules'
-                });
-
-                dataCollectionSectionForm['funcs']['jstreeSelectNode']();
-                dataCollectionSectionForm['funcs']['jstreeReady']();
-
-                dataCollectionSectionForm['vars']['syncInfo'] = text;
-
-                if (updatesCounter > 0) {
-                    dataCollectionSectionForm['vars']['update_available'] = 1;
-                    dataCollectionSectionForm['vars']['filter'] = true;
-                    dataCollectionSectionForm['vars']['initJstree'] = false;
-                    // $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
-                    // $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
-                } else {
-                    PNotify.info({
-                        text        : dataCollectionSectionForm['vars']['syncInfo'],
-                        textTrusted : true
-                    });
-                }
+                dataCollectionSectionForm['funcs']['processSync'](response);
             }
         } else {
-            PNotify.error({
+            paginatedPNotify('error', {
                 text        : response.responseMessage,
                 textTrusted : true
             });
@@ -1474,9 +1357,114 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
     }, 'json');
 }
 
-$(document).ready(function() {
-    BazProgress.buildProgressBar($('#installer-progress'));
+dataCollectionSectionForm['funcs']['processSync'] = function(response) {
+    var text = 'Sync Complete.<br>';
+    var newCounter = 0;
+    var updatesCounter = 0;
+    var noReleaseCounter = 0;
+    var newModule = 'new module';
+    var update = 'update';
+    var noRelease = ' module with no release. It was ignored.';
 
+    if (response.responseData.counter.new && response.responseData.counter.new.count) {
+        newCounter = response.responseData.counter.new.count;
+
+        if (response.responseData.counter.new.api && response.responseData.counter.new.api.name) {
+                text += response.responseData.counter.new.api.name + ' has '
+        }
+    }
+
+    if (response.responseData.counter.updates && response.responseData.counter.updates.count) {
+        updatesCounter = response.responseData.counter.updates.count;
+
+        if (response.responseData.counter.updates.api && response.responseData.counter.updates.api.name) {
+            text += response.responseData.counter.updates.api.name + ' has '
+        }
+    }
+
+    if (response.responseData.counter.noRelease && response.responseData.counter.noRelease.count) {
+        noReleaseCounter = response.responseData.counter.noRelease.count;
+
+        if (response.responseData.counter.noRelease.api && response.responseData.counter.noRelease.api.name) {
+            text += response.responseData.counter.noRelease.api.name + ' has '
+        }
+    }
+
+    if (newCounter > 0 || updatesCounter > 0 || noReleaseCounter > 0) {
+        if (newCounter > 1) {
+            newModule = 'new modules';
+        }
+        if (updatesCounter > 1) {
+            update = 'updates';
+        }
+        if (noReleaseCounter > 1) {
+            noRelease = ' modules with no release. They were ignored.';
+        }
+        if (newCounter !== 0 && updatesCounter === 0) {
+            dataCollectionSectionForm['vars']['new_available'] = newCounter;
+            text += newCounter + ' ' + newModule + ' available.<br> No ' + update + ' available.';
+        } else if (newCounter === 0 && updatesCounter !== 0) {
+            text += updatesCounter + ' new ' + update + ' available.<br> No ' + newModule + ' available.';
+        } else if (newCounter !== 0 && updatesCounter !== 0) {
+            text += updatesCounter + ' new ' + update + ' available.<br>' + newCounter + ' ' + newModule + ' available.';
+        }
+
+        if ((newCounter !== 0 || updatesCounter !== 0) && noReleaseCounter !== 0) {
+            text += '<br>'  + noReleaseCounter + noRelease + '<br>';
+        } else if (noReleaseCounter !== 0) {
+            text += noReleaseCounter + noRelease + '<br>';
+        }
+    } else {
+        text = 'Sync Complete.<br>No ' + newModule + ' or ' + update + ' available.';
+    }
+
+    if (response.responseData.modules) {
+        dataCollectionSectionForm['vars']['modules'] = response.responseData.modules;
+    }
+    if (response.responseData.modules_html && response.responseData.modules_html !== '') {
+        var modulesHtml =
+            '<div id="{{componentId}}-{{sectionId}}-modules" data-bazscantype="jstree">' +
+                '<ul>' +
+                    response.responseData.modules_html +
+                '</ul>' +
+            '</div>';
+
+        $('#{{componentId}}-{{sectionId}}-modules-tree-div').empty().html(modulesHtml);
+    }
+
+    BazContentFields.init({
+        'componentId'   : '{{componentId}}',
+        'sectionId'     : '{{componentId}}-{{sectionId}}',
+        'fieldId'       : '{{componentId}}-{{sectionId}}-modules'
+    });
+
+    dataCollectionSectionForm['funcs']['jstreeSelectNode']();
+    dataCollectionSectionForm['funcs']['jstreeReady']();
+
+    dataCollectionSectionForm['vars']['syncInfo'] = text;
+
+    if (updatesCounter > 0) {
+        dataCollectionSectionForm['vars']['update_available'] = 1;
+        dataCollectionSectionForm['vars']['filter'] = true;
+        dataCollectionSectionForm['vars']['initJstree'] = false;
+    } else {
+        var notificationClass = 'info';
+        if (noReleaseCounter > 0) {
+            notificationClass = 'notice';
+        }
+        paginatedPNotify(notificationClass, {
+            text        : dataCollectionSectionForm['vars']['syncInfo'],
+            textTrusted : true
+        });
+    }
+
+    if (dataCollectionSectionForm['vars']['queue']['total'] > 0) {
+        $('#{{componentId}}-{{sectionId}}-analyse-queue').removeClass('disabled');
+        $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', false);
+    }
+}
+
+$(document).ready(function() {
     $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').on('keyup', function() {
         var term = $(this).val();
         if (term === '') {
@@ -1489,46 +1477,3 @@ $(document).ready(function() {
     });
 });
 </script>
-<div>
-    {{adminltetags.useTag('modal',
-        [
-            'component'                 : component,
-            'componentName'             : componentName,
-            'componentId'               : componentId,
-            'sectionId'                 : sectionId,
-            'modalId'                   : 'queue-analyse-modal',
-            'modalBodyInclude'          : 'modules/analyse/view',
-            'modalSize'                 : 'xl',
-            'modalHeader'               : true,
-            'modalFooter'               : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> MODULES IN QUEUE',
-            'modalFooterButtons'        :
-                [
-                'component'                     : component,
-                'componentName'                 : componentName,
-                'componentId'                   : componentId,
-                'parentComponentId'             : parent,
-                'sectionId'                     : sectionId,
-                'buttonType'                    : 'button',
-                'buttons'                       :
-                        [
-                            'perform-precheck' : [
-                                'title'                   : 'Perform Precheck',
-                                'type'                    : 'primary',
-                                'position'                : 'right',
-                                'icon'                    : 'cog fa-spin',
-                                'iconHidden'              : true
-                            ],
-                            'process-queue' : [
-                                'title'                   : 'Process Queue',
-                                'type'                    : 'primary',
-                                'position'                : 'right',
-                                'icon'                    : 'cog fa-spin',
-                                'iconHidden'              : true,
-                                'hidden'                  : true
-                            ]
-                        ]
-                ]
-        ]
-    )}}
-</div>

@@ -60,7 +60,7 @@
 )}}
 {% set widgetsData = json_encode(widget, 16) %}
 <script>
-/* globals BazContentFields showPaginate BazHelpers */
+/* globals BazContentFields paginatedPNotify BazHelpers */
 var dataCollectionComponent, dataCollectionSection;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -138,7 +138,7 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-' + widgetsData[
                             }
 
                             if (response.responseCode === 0) {
-                                showPaginate('success', {'text' : responseMessage});
+                                paginatedPNotify('success', {'text' : responseMessage});
                                 $('.modal-backdrop').remove();
 
                                 var items = [];
@@ -151,11 +151,11 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-' + widgetsData[
 
                                 $('body').trigger('widgetUpdate', {'items' : items});
                             } else {
-                                showPaginate('error', {'text' : response.responseMessage});
+                                paginatedPNotify('error', {'text' : response.responseMessage});
                             }
                         }, 'json');
                     } else {
-                        showPaginate('error', {'text' : response.responseMessage});
+                        paginatedPNotify('error', {'text' : response.responseMessage});
                     }
                 }, 'json');
             });

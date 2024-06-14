@@ -13,11 +13,6 @@ class GeoCities extends BasePackage
 
     public $geoCities;
 
-    /**
-     * @notification(name=add)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function addCity(array $data)
     {
         if ($this->add($data)) {
@@ -51,11 +46,6 @@ class GeoCities extends BasePackage
         $this->db->execute($sql, [100001, $this->packagesData->last['id']]);
     }
 
-    /**
-     * @notification(name=update)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function updateCity(array $data)
     {
         if ($this->update($data)) {

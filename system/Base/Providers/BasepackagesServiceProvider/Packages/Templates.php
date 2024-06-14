@@ -137,7 +137,7 @@ class Templates extends BasePackage
             if ($e->getCode() === 8) {
                 $message = 'Please add test data with key: ' . str_replace('Undefined variable: ', '', $e->getMessage());
             } else {
-                $this->logger->logExceptions->debug($e);
+                $this->logger->logExceptions->critical(json_trace($e));
 
                 $message = 'Error Contact Administrator';
             }
@@ -234,7 +234,7 @@ class Templates extends BasePackage
 
             return $this->renderer->entry(base_path($file))->render();
         } catch (\Exception $e) {
-            $this->logger->logExceptions->debug($e);
+            $this->logger->logExceptions->critical(json_trace($e));
 
             return false;
         }

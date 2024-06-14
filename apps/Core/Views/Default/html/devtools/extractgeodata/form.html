@@ -116,7 +116,7 @@
 <br>
 <div id="download-progress" hidden></div>
 <script>
-/* globals BazProgress PNotify */
+/* globals BazProgress paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -175,14 +175,14 @@ dataCollectionSection =
 
                     $.post(url, postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success({
+                            paginatedPNotify('success', {
                                 'title' : response.responseMessage
                             });
                             $('#{{componentId}}-{{sectionId}}-download-extract').removeClass('disabled');
                             $('#{{componentId}}-{{sectionId}}-download-extract').siblings().removeClass('d-none');
 
                         } else {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 'title' : response.responseMessage
                             });
                             $('#{{componentId}}-{{sectionId}}-download-extract').removeClass('disabled');

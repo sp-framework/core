@@ -82,12 +82,12 @@ class PusherTask extends Task
         }
 
         if (!file_exists(base_path('var/log/pusher-info.log'))) {
-            $file = fopen(base_path('var/log/pusher-info.log'));
+            $file = fopen(base_path('var/log/pusher-info.log'), 'a+');
             fclose($file);
         }
 
         if (!file_exists(base_path('var/log/pusher-error.log'))) {
-            $file = fopen(base_path('var/log/pusher-error.log'));
+            $file = fopen(base_path('var/log/pusher-error.log'), 'a+');
             fclose($file);
         }
 

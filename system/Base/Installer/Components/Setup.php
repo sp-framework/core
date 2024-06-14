@@ -144,8 +144,8 @@ Class Setup
 
 			$container->setShared(
 				'localContent',
-				function () use ($container) {
-					return (new LocalContent($container))->init();
+				function () {
+					return (new LocalContent())->init();
 				}
 			);
 
@@ -222,7 +222,20 @@ Class Setup
 			}
 
 			$this->view->responseCode = 1;
-			$this->view->responseMessage = $e->getMessage();
+
+			$message = $e->getMessage();
+
+			if (str_contains($message, "SQLSTATE[HY000] [2002] No such file or directory")) {
+				$message = 'Database not available on entered Host : ' . $e->getMessage();
+			} else if (str_contains($message, "SQLSTATE[HY000] [2002] Connection refused")) {
+				$message = 'Database not available on entered Port : ' . $e->getMessage();
+			} else if (str_contains($message, "SQLSTATE[HY000] [1044]")) {
+				$message = 'Database not available on server : ' . $e->getMessage();
+			} else if (str_contains($message, "SQLSTATE[HY000] [1045]")) {
+				$message = 'Authentication Error : ' . $e->getMessage();
+			}
+
+			$this->view->responseMessage = $message;
 
 			if ($this->response->isSent() !== true) {
 				$this->response->setJsonContent($this->view->getParamsToView());
@@ -809,7 +822,7 @@ Class Setup
 		} catch (\throwable $exception) {
 			$this->view->responseCode = 1;
 
-			$this->view->responseMessage = 'Error reading Composer Json File. Please download Core again from repository.';
+			$this->view->responseMessage = 'Error reading composer json file. Please download Core again from repository.';
 		}
 
 		try {
@@ -847,6 +860,5 @@ Class Setup
 
 			$this->view->responseMessage = 'Error reading Core Json File. Please download Core again from repository.';
 		}
-
 	}
 }

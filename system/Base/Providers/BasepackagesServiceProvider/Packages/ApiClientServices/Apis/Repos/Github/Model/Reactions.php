@@ -410,33 +410,6 @@ class Reactions implements ModelInterface, ArrayAccess, \JsonSerializable
     }
 
     /**
-     * Gets _1
-     *
-     * @return int
-     */
-    public function get1()
-    {
-        return $this->container['_1'];
-    }
-
-    /**
-     * Sets _1
-     *
-     * @param int $_1 _1
-     *
-     * @return self
-     */
-    public function set1($_1)
-    {
-        if (is_null($_1)) {
-            throw new \InvalidArgumentException('non-nullable _1 cannot be null');
-        }
-        $this->container['_1'] = $_1;
-
-        return $this;
-    }
-
-    /**
      * Gets confused
      *
      * @return int

@@ -215,7 +215,7 @@
     </div>
 </div>
 <script>
-/* global PNotify Swal */
+/* global paginatedPNotify Swal */
 var countDownTimer;
 $('#{{componentId}}-{{sectionId}}-twofa_email-email_code').click(function(e) {
     e.preventDefault();
@@ -235,7 +235,7 @@ $('#{{componentId}}-{{sectionId}}-twofa_email-email_code').click(function(e) {
                 setEmailTimer(response.responseData.code_sent_on, response.responseData.email_timeout);
             }
 
-            PNotify.error(response.responseMessage);
+            paginatedPNotify('error', response.responseMessage);
         }
 
         if (response.tokenKey && response.token) {
@@ -318,9 +318,9 @@ $('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
             } else if ($('#twofa-email').attr('hidden') === 'hidden') {
                 $('#{{componentId}}-{{sectionId}}-twofa_otp').val('');
             }
-            PNotify.success(response.responseMessage);
+            paginatedPNotify('success', response.responseMessage);
         } else {
-            PNotify.error(response.responseMessage);
+            paginatedPNotify('error', response.responseMessage);
 
             if (response.responseData && response.responseData.passwordPolicyErrors) {
                 if (Object.keys(response.responseData.passwordPolicyErrors).length > 0) {
@@ -374,7 +374,7 @@ $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').click(function(e) {
                 '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> REGENERATE TWO FACTOR AUTHENTICATION QR CODE'
             );
         } else {
-            PNotify.error({
+            paginatedPNotify('error', {
                 'title' : response.responseMessage
             });
         }
@@ -412,7 +412,7 @@ $('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
 
     $.post(url, postData, function(response) {
         if (response.responseCode === 0) {
-            PNotify.success({
+            paginatedPNotify('success', {
                 'title' : response.responseMessage
             });
 
@@ -426,7 +426,7 @@ $('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
                 '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> ENABLE TWO FACTOR AUTHENTICATION'
             );
         } else {
-            PNotify.error({
+            paginatedPNotify('error', {
                 'title' : response.responseMessage
             });
         }
@@ -482,11 +482,11 @@ $('#{{componentId}}-{{sectionId}}-disable-twofa-otp-button').click(function(e) {
                 if (response.responseCode === 0) {
                     $('#{{componentId}}-{{sectionId}}-disable-twofa-otp-button').attr('hidden', true);
                     $('#{{componentId}}-{{sectionId}}-enable-twofa-otp-button').attr('hidden', false);
-                    PNotify.success({
+                    paginatedPNotify('success', {
                         'title' : response.responseMessage
                     });
                 } else {
-                    PNotify.error({
+                    paginatedPNotify('error', {
                         'title' : response.responseMessage
                     });
                 }

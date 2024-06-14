@@ -1,0 +1,433 @@
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+{% set queueTasksCounterInstall = 0 %}
+{% set queueTasksCounterUpdate = 0 %}
+{% set queueTasksCounterUninstall = 0 %}
+{% set queueTasksCounterRemove = 0 %}
+{% if queue['tasks_count']['install'] is defined %}
+    {% set queueTasksCounterInstall = queue['tasks_count']['install'] %}
+{% endif %}
+{% if queue['tasks_count']['update'] is defined %}
+    {% set queueTasksCounterUpdate = queue['tasks_count']['update'] %}
+{% endif %}
+{% if queue['tasks_count']['uninstall'] is defined %}
+    {% set queueTasksCounterUninstall = queue['tasks_count']['uninstall'] %}
+{% endif %}
+{% if queue['tasks_count']['remove'] is defined %}
+    {% set queueTasksCounterRemove = queue['tasks_count']['remove'] %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'fieldId'                       : 'queue',
+                'fieldLabel'                    : false,
+                'fieldType'                     : 'counters',
+                'fieldCountersPlacementType'    : 'horizontal',
+                'fieldCounters'                 :
+                    [
+                        'install'       :
+                            [
+                                'id'        : 'install',
+                                'title'     : 'Install',
+                                'type'      : 'primary',
+                                'value'     : queueTasksCounterInstall
+                            ],
+                        'update'        :
+                            [
+                                'id'        : 'update',
+                                'title'     : 'Update',
+                                'type'      : 'info',
+                                'value'     : queueTasksCounterUpdate
+                            ],
+                        'uninstall'     :
+                            [
+                                'id'        : 'uninstall',
+                                'title'     : 'Uninstall',
+                                'type'      : 'warning',
+                                'value'     : queueTasksCounterUninstall
+                            ],
+                        'remove'        :
+                            [
+                                'id'        : 'remove',
+                                'title'     : 'Remove',
+                                'type'      : 'danger',
+                                'value'     : queueTasksCounterRemove
+                            ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+{% set moduleHtml = '' %}
+{% set hasAnalysisError = 'false' %}
+{% if queue['tasks']['analysed']|length > 0 %}
+    {% for task, queueTaskModules in queue['tasks']['analysed'] %}
+        {% if task === 'first' or task === 'install' or task === 'uninstall' or task === 'update' or task === 'remove' %}
+            {% if queueTaskModules|length > 0 %}
+                {% for modulesType, modules in queueTaskModules %}
+                    {% if modules|length > 0 %}
+                        {% for moduleId, module in modules %}
+                            {% set error = 'false' %}
+                            {% set color = 'primary' %}
+                            {% if task === 'update' or (task === 'first' and modulesType === 'packages') %}
+                                {% set color = 'info' %}
+                            {% elseif task === 'uninstall' %}
+                                {% set color = 'warning' %}
+                            {% elseif task === 'remove' %}
+                                {% set color = 'danger' %}
+                            {% endif %}
+                            {% if task === 'first' and modulesType === 'packages' %}
+                                {% set taskName = 'update' %}
+                            {% elseif task === 'first' and modulesType === 'external' %}
+                                {% set taskName = 'install' %}
+                            {% else %}
+                                {% set taskName = task %}
+                            {% endif %}
+
+                            {% set errorClass = '' %}
+                            {% if queue['results'][task][modulesType][module['name']]['analyse'] is defined and queue['results'][task][modulesType][module['name']]['analyse'] === 'fail' %}
+                                {% set module['id'] = module['name'] %}
+                                {% set hasAnalysisError = 'true' %}
+                                {% set error = 'true' %}
+                                {% set errorClass = ' class="bg-danger"' %}
+                            {% endif %}
+                            {% set moduleHtml = moduleHtml ~ '<tr' ~ errorClass ~ '>' ~
+                            '           <td>' ~  module['name'] ~ '</td>' ~
+                            '           <td>' ~  module['module_type'] ~ '</td>' ~
+                            '           <td>' ~  module['version'] ~ '</td>' ~
+                            '           <td>' ~  module['repo'] ~ '</td>' ~
+                            '           <td>' ~  '<span class="badge badge-' ~ color ~ ' mt-1 text-xs text-uppercase">' ~ taskName ~ '</span></td>' ~
+                            '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' ~ module['id'] ~ '">' ~
+                            '               <a href="#" type="button" data-error="' ~ error ~ '" data-task="' ~ taskName ~ '" data-moduletype="' ~ modulesType ~ '" data-id="' ~ module['id'] ~ '" class="ml-1 mr-1 text-white btn btn-info btn-xs viewLogs">' ~
+                            '                   <i class="fas fa-fw fa-xs fa-eye"></i>' ~
+                            '               </a>' ~
+                            '           </td>' ~
+                            '       </tr>' %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{% if moduleHtml !== '' %}
+    <div class="row">
+        <div class="col height-control-400">
+            <table id="{{componentId}}-{{sectionId}}-queue-table" class="table table-sm table-hover responsive nowrap mb-0" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th class="text-uppercase">Name</th>
+                        <th class="text-uppercase">Module Type</th>
+                        <th class="text-uppercase">Version</th>
+                        <th class="text-uppercase">Repository</th>
+                        <th class="text-uppercase">Task</th>
+                        <th class="text-uppercase">Logs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{moduleHtml}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <div id="installer-progress" class="mb-3"></div>
+        </div>
+    </div>
+{% endif %}
+{% set queue = json_encode(queue, 16) %}
+{% set queue = str_replace('\\', '\\\\', queue) %}
+<script>
+/*global paginatedPNotify BazProgress BazContentFields BazHelpers BazContentLoader Pace BazCore */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+if (!window['dataCollection']) {
+    window['dataCollection'] = { };
+}
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['queue'] = JSON.parse('{{queue}}');
+dataCollectionSectionForm['funcs'] = { };
+
+dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
+    if (task === 'precheck') {
+        $('#{{componentId}}-{{sectionId}}-re-analyse').addClass('disabled');
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').children('i').attr('hidden', false);
+    } else if (task === 'process') {
+        $('#{{componentId}}-{{sectionId}}-re-analyse').addClass('disabled');
+        $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', false);
+    }
+
+    $('tr').removeClass('bg-danger');
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['process'] = 'runprecheck';
+    if (task === 'process') {
+        postData['process'] = 'runprocess';
+    }
+
+    $.post('{{links.url("modules/processQueue")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseData && response.responseData.queue) {
+            dataCollectionSectionForm['vars']['queue'] = response.responseData.queue;
+        }
+
+        if (response.responseCode == 0) {
+            paginatedPNotify('success', {
+                text        : response.responseMessage,
+                textTrusted : true
+            });
+
+            if (postData['process'] === 'runprecheck') {
+                $('#{{componentId}}-{{sectionId}}-re-analyse').removeClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').text(' RE-PERFORM PRECHECK');
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').children('i').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', false);
+            } else if (postData['process'] === 'runprocess') {
+                $('#{{componentId}}-{{sectionId}}-re-analyse').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', true);
+            }
+        } else {
+            paginatedPNotify('error', {
+                text        : response.responseMessage,
+                textTrusted : true
+            });
+
+            if (dataCollectionSectionForm['vars']['queue']['results'] &&
+                Object.keys(dataCollectionSectionForm['vars']['queue']['results']).length > 0
+            ) {
+                for (var task in dataCollectionSectionForm['vars']['queue']['results']) {
+                    if (Array.isArray(dataCollectionSectionForm['vars']['queue']['results'][task]) &&
+                        dataCollectionSectionForm['vars']['queue']['results'][task].length === 0
+                    ) {
+                        continue;
+                    }
+
+                    if (Object.keys(dataCollectionSectionForm['vars']['queue']['results'][task]).length > 0) {
+                        for (var moduleType in dataCollectionSectionForm['vars']['queue']['results'][task]) {
+                            if (Object.keys(dataCollectionSectionForm['vars']['queue']['results'][task][moduleType]).length > 0) {
+                                for (var taskModule in dataCollectionSectionForm['vars']['queue']['results'][task][moduleType]) {
+                                    if (dataCollectionSectionForm['vars']['queue']['results'][task][moduleType][taskModule]['precheck'] === 'fail') {
+                                        var moduleLogs = document.querySelectorAll("[data-id='" + taskModule + "']");
+
+                                        if (moduleLogs.length === 1) {
+                                            $(moduleLogs).parents('tr').addClass('bg-danger');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (postData['process'] === 'runprecheck') {
+                $('#{{componentId}}-{{sectionId}}-re-analyse').removeClass('disabled');
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').text(' RE-PERFORM PRECHECK');
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').children('i').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+                $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
+            } else if (postData['process'] === 'runprocess') {
+                $('#{{componentId}}-{{sectionId}}-re-analyse').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', true);
+            }
+        }
+    }, 'json');
+}
+
+dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
+    if (dataCollectionSectionForm['vars']['hasAnalysisError']) {
+        $('#{{componentId}}-{{sectionId}}-perform-precheck, ' +
+          '#{{componentId}}-{{sectionId}}-process-queue, ' +
+          '#{{componentId}}-{{sectionId}}-result-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-perform-precheck, ' +
+          '#{{componentId}}-{{sectionId}}-process-queue, ' +
+          '#{{componentId}}-{{sectionId}}-result-queue').attr('hidden', true);
+    }
+
+    $('#{{componentId}}-{{sectionId}}-cancel, #{{componentId}}-{{sectionId}}-re-analyse').click(function(e) {
+        e.preventDefault();
+
+        BazContentLoader.loadAjax($('#' + $(this)[0].id), {
+            ajaxBefore                      : function () {
+                                                Pace.restart();
+                                                $("#baz-content").empty();
+                                                $("#loader").attr('hidden', false);
+                                            },
+            ajaxFinished                    : function () {
+                                                BazCore.updateBreadcrumb();
+                                                $("#loader").attr('hidden', true);
+                                            },
+            ajaxError                       : function () {
+                                                $("#loader").attr('hidden', true);
+                                                BazCore.updateBreadcrumb();
+                                            }
+        });
+    });
+
+    $('#{{componentId}}-{{sectionId}}-perform-precheck, ' +
+      '#{{componentId}}-{{sectionId}}-process-queue'
+      ).off();
+    $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
+        e.preventDefault();
+
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
+
+        dataCollectionSectionForm['funcs']['processQueue']();
+    });
+
+    $('#{{componentId}}-{{sectionId}}-process-queue').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['processQueue']('process');
+    });
+
+    $('.viewLogs').off();
+    $('.viewLogs').click(function(e) {
+        e.preventDefault();
+
+        var logObject;
+
+        if ($(this).data()['moduletype'] === 'external' &&
+            dataCollectionSectionForm['vars']['queue']['results']['first']['external'][$(this).data()['id']]
+        ) {
+            logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results']['first']['external'][$(this).data()['id']]);
+        } else if ($(this).data()['moduletype'] === 'packages' &&
+                   $(this).data()['task'] === 'update' &&
+                   dataCollectionSectionForm['vars']['queue']['results']['first']['packages'][$(this).data()['id']]
+        ) {
+            logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results']['first']['packages'][$(this).data()['id']]);
+        } else {
+            logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results'][$(this).data()['task']][$(this).data()['moduletype']][$(this).data()['id']]);
+        }
+
+        for (var object in logObject) {
+            if (object === 'analyse' || object === 'precheck' || object === 'result') {
+                if (logObject[object] === 'pass') {
+                    logObject[object] = '<span class="badge badge-success mt-1 text-xs text-uppercase">pass</span>';
+                } else if (logObject[object] === 'fail') {
+                    logObject[object] = '<span class="badge badge-danger mt-1 text-xs text-uppercase">fail</span>';
+                } else {
+                    logObject[object] = '-';
+                }
+            }
+
+            if (object === 'analyse_logs' || object === 'precheck_logs' || object === 'result_logs') {
+                if (logObject[object] !== '-') {
+                    logObject[object] = '<pre>' + logObject[object] + '</pre>';
+                }
+            }
+        }
+
+        var html = '<strong class="text-uppercase">Logs: </strong>' +
+            BazHelpers.createHtmlList({'obj': logObject});
+
+        $('#{{componentId}}-{{sectionId}}-queue-logs').empty().html(html);
+        $('#{{componentId}}-{{sectionId}}-queue-logs-modal').modal('show');
+    });
+}
+
+$(document).ready(function() {
+    dataCollectionSectionForm['vars']['hasAnalysisError'] = BazHelpers.stringToBoolean("{{hasAnalysisError}}");
+
+    dataCollectionSectionForm['funcs']['initQueueButtons']();
+
+    BazProgress.buildProgressBar($('#installer-progress'), false, false, true);
+
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
+        $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
+            columns: [
+                null,
+                null,
+                null,
+                null,
+                null,
+                { orderable: false }
+            ],
+            lengthMenu: [
+                [25, 50, 100, -1],
+                [25, 50, 100, 'All']
+            ]
+        });
+    }
+});
+
+$(window).on('load', function() {
+    BazProgress.buildProgressBar($('#installer-progress'), false, false, true);
+
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
+        $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
+            columns: [
+                null,
+                null,
+                null,
+                null,
+                null,
+                { orderable: false }
+            ],
+            lengthMenu: [
+                [25, 50, 100, -1],
+                [25, 50, 100, 'All']
+            ]
+        });
+    }
+});
+</script>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'queue-logs-modal',
+            'modalBodyInclude'          : 'modules/logs',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> LOGS'
+        ]
+    )}}
+</div>
+<!-- htmlmin:ignore -->

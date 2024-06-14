@@ -198,7 +198,7 @@ class Packages
 					new Column(
 						'notification_subscriptions',
 						[
-							'type'    => Column::TYPE_TEXT,
+							'type'    => Column::TYPE_JSON,
 							'notNull' => false,
 						]
 					),

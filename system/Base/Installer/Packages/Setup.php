@@ -2,13 +2,7 @@
 
 namespace System\Base\Installer\Packages;
 
-use Apps\Core\Packages\Devtools\Api\Contracts\Install\Schema\DevtoolsApiContracts;
-use Apps\Core\Packages\Devtools\Api\Contracts\Model\AppsDashDevtoolsApiContracts;
-use Apps\Core\Packages\Devtools\Api\Enums\Install\Schema\DevtoolsApiEnums;
-use Apps\Core\Packages\Devtools\Api\Enums\Model\AppsDashDevtoolsApiEnums;
-use Apps\Core\Packages\Devtools\Modules\Install\Schema\DevtoolsModulesBundles;
 use League\Flysystem\FilesystemException;
-use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
@@ -600,10 +594,6 @@ class Setup
 			'basepackages_geo_cities_ip2locationv6' 	=> [
 					'schema'	=> new CitiesIp2LocationV6,
 					'model'		=> new BasepackagesGeoCitiesIp2locationv6,
-				],
-			'basepackages_geo_cities' 					=> [
-					'schema'	=> new Cities,
-					'model'		=> new BasepackagesGeoCities,
 				],
 			'basepackages_geo_timezones' 				=> [
 					'schema'	=> new Timezones,

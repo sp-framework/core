@@ -22,8 +22,8 @@ class Repos
                 'description'       => 'Bazaari Core Repository',
                 'category'          => 'repos',
                 'provider'          => 'Gitea',
-                'in_use'            => 1,
-                'used_by'           => json_encode(['modules']),
+                'in_use'            => 0,
+                'used_by'           => json_encode([]),
                 'setup'             => 4,
                 'location'          => 'basepackages'
             ];
@@ -44,8 +44,8 @@ class Repos
                 'description'           => 'Bazaari Modules Repository',
                 'category'              => 'repos',
                 'provider'              => 'Gitea',
-                'in_use'                => 1,
-                'used_by'               => json_encode(['modules']),
+                'in_use'                => 0,
+                'used_by'               => json_encode([]),
                 'setup'                 => 4,
                 'location'              => 'basepackages'
             ];
@@ -54,7 +54,7 @@ class Repos
             [
                 'api_url'               => 'https://api.github.com',
                 'org_user'              => 'sp-modules',
-                'repo_url'              => 'https://www.github.com/sp-modules',
+                'repo_url'              => 'https://github.com/sp-modules',
                 'branch'                => 'main',
                 'auth_type'             => 'autho',
                 'authorization'         => ''//github Token
@@ -66,8 +66,8 @@ class Repos
                 'description'           => 'Github Modules Repository',
                 'category'              => 'repos',
                 'provider'              => 'Github',
-                'in_use'                => 1,
-                'used_by'               => json_encode(['modules']),
+                'in_use'                => 0,
+                'used_by'               => json_encode([]),
                 'setup'                 => 4,
                 'location'              => 'basepackages'
             ];

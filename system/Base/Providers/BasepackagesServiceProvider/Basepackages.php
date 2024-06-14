@@ -17,6 +17,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ImportExport;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Maintenance;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Messenger;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Murls;
@@ -99,6 +100,8 @@ class Basepackages
 	protected $utils;
 
 	protected $murls;
+
+	protected $maintenance;
 
 	public function __construct()
 	{
@@ -330,5 +333,12 @@ class Basepackages
 		$this->murls = (new Murls())->init();
 
 		return $this->murls;
+	}
+
+	protected function initMaintenance()
+	{
+		$this->maintenance = (new Maintenance())->init();
+
+		return $this->maintenance;
 	}
 }

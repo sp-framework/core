@@ -440,7 +440,7 @@ class Tree extends Adminltetags
                             // $hasValue = $itemValue;
                             // $hasValueText = $itemValue;
                         }
-                        // var_dump($itemValue['data']);
+
                         if (isset($itemValue['data'])) {
                             $dataAttr = '';
                             foreach ($itemValue['data'] as $dataKey => $dataValue) {
@@ -448,6 +448,14 @@ class Tree extends Adminltetags
                             }
                         } else {
                             $dataAttr = '';
+                        }
+
+                        if (isset($this->fieldParams['fieldDataSelect' . $selectType . 'AddDataAttrFromData'])) {
+                            foreach ($this->fieldParams['fieldDataSelect' . $selectType . 'AddDataAttrFromData'] as $dataValue) {
+                                if (isset($itemValue[$dataValue])) {
+                                    $dataAttr .= 'data-' . $dataValue . '="' . $itemValue[$dataValue] . '" ';
+                                }
+                            }
                         }
                         // if (isset($itemValue['dataType'])) {
                         //     $dataType = 'data-datatype="' . $itemValue['dataType'] . '"';

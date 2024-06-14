@@ -65,7 +65,7 @@ class Error
 		}
 
 		if ($this->config->logs->exceptions) {
-			$this->logger->logExceptions->critical($exception);
+			$this->logger->logExceptions->critical(json_trace($exception));
 
 			if ($this->config->logs->emergencyLogsEmail &&
 				($this->class === 'Exception' || !$this->emailClass($this->class))

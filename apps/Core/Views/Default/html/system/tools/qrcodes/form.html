@@ -482,7 +482,7 @@
     </fieldset>
 </form>
 <script>
-/* globals PNotify */
+/* globals paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -587,7 +587,7 @@ dataCollectionSection =
                                 '<img src="' + response.qrcode + '" />'
                             );
                         } else {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 'title' : response.responseMessage
                             });
                         }

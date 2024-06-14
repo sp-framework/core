@@ -57,9 +57,9 @@ class Jstree
             <div ' . $this->fieldParams['fieldId'] . '-tree-tools" class="mb-2 float-right">';
 
             if (isset($this->params['fieldJstreeAdditionalTools']) && is_array($this->params['fieldJstreeAdditionalTools'])) {
-
                 foreach ($this->params['fieldJstreeAdditionalTools'] as $fieldKey => $field) {
                     $fieldDisabled = '';
+
                     if (isset($field['disabled']) && $field['disabled'] === true) {
                         $fieldDisabled = 'disabled';
                     }
@@ -375,6 +375,11 @@ class Jstree
             $this->params['fieldJstreeReplaceIdWithDataField'] :
             false;
 
+        $this->fieldParams['fieldJstreeEmptyText'] =
+            isset($this->params['fieldJstreeEmptyText']) ?
+            $this->params['fieldJstreeEmptyText'] :
+            false;
+
         $this->fieldParams['fieldJstreePlugins'] =
             isset($this->params['fieldJstreePlugins']) ?
             $this->adminLTETags->helper->encode($this->params['fieldJstreePlugins']) :
@@ -409,7 +414,8 @@ class Jstree
                         "inclRoot": "' . $this->fieldParams['fieldJstreeIncludeRootInPath'] . '",
                         "selectEndNodeOnly": "' . $this->fieldParams['fieldJstreeSelectEndNodeOnly'] . '",
                         "hideJstreeIcon": "' . $this->fieldParams['fieldJstreeHideJstreeIcons'] . '",
-                        "replaceIdWithDataField": "' . $this->fieldParams['fieldJstreeReplaceIdWithDataField'] . '"
+                        "replaceIdWithDataField": "' . $this->fieldParams['fieldJstreeReplaceIdWithDataField'] . '",
+                        "treeEmptyText": "' . $this->fieldParams['fieldJstreeEmptyText'] . '",
                     },
                     "core": {
                         "themes": {

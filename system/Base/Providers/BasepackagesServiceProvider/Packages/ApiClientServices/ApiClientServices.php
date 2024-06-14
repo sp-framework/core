@@ -24,6 +24,10 @@ class ApiClientServices extends BasePackage
 
     public $apiStats;
 
+    public $httpOptions;
+
+    public $monitorProgress;
+
     public function init()
     {
         $this->packageName = 'apiClientServices';
@@ -39,6 +43,21 @@ class ApiClientServices extends BasePackage
         }
 
         $this->apiStats = new ApiClientServicesStats;
+
+        return $this;
+    }
+
+    public function setHttpOptions(array $options)
+    {
+        $this->httpOptions = $options;
+
+        return $this;
+    }
+
+    public function setMonitorProgress($monitorProgressSink, $method)
+    {
+        $this->monitorProgress['sink'] = $monitorProgressSink;
+        $this->monitorProgress['method'] = $method;
 
         return $this;
     }
@@ -149,14 +168,13 @@ class ApiClientServices extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=add)
-     */
     public function addApi(array $data)
     {
-        $data = $this->encryptPassToken($data);
-
+        $data['location'] = strtolower($data['location']);
+        $data['category'] = strtolower($data['category']);
         $data['provider'] = strtolower($data['provider']);
+
+        $data = $this->encryptPassToken($data);
 
         $this->switchApiModel($data);
 
@@ -180,14 +198,13 @@ class ApiClientServices extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=update)
-     */
     public function updateApi(array $data)
     {
-        $data = $this->encryptPassToken($data);
-
+        $data['location'] = strtolower($data['location']);
+        $data['category'] = strtolower($data['category']);
         $data['provider'] = strtolower($data['provider']);
+
+        $data = $this->encryptPassToken($data);
 
         $this->switchApiModel($data);
 
@@ -213,9 +230,6 @@ class ApiClientServices extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=remove)
-     */
     public function removeApi(array $data)
     {
         $api = $this->getById($data['id'], false, false);
@@ -246,7 +260,7 @@ class ApiClientServices extends BasePackage
 
     /**
      * @notification(name=warning)
-     * @notification_allowed_methods(email, sms)
+     * @notification_allowed_methods(email)
      */
     public function warningApi($messageTitle = null, $messageDetails = null, $id = null)
     {
@@ -259,7 +273,7 @@ class ApiClientServices extends BasePackage
 
     /**
      * @notification(name=error)
-     * @notification_allowed_methods(email, sms)
+     * @notification_allowed_methods(email)
      */
     public function errorApi($messageTitle = null, $messageDetails = null, $id = null)
     {
@@ -363,7 +377,7 @@ class ApiClientServices extends BasePackage
 
         if ($apiClass) {
             try {
-                return (new $apiClass())->init($config, $this);
+                return (new $apiClass())->init($config, $this, $this->httpOptions, $this->monitorProgress);
             } catch (\Exception $e) {
                 throw $e;
             }
@@ -412,6 +426,31 @@ class ApiClientServices extends BasePackage
         }
 
         return $apis;
+    }
+
+    public function getApiByRepoUrl($url, $getApiClientServiceInfo = true)
+    {
+        $this->getAll();
+
+        foreach ($this->apiClientServices as $api) {
+            if ($api['category'] === strtolower('repos')) {
+                $this->switchApiModel($api);
+
+                $apiData = $this->getById($api['api_category_id'], false, false);
+
+                if ($apiData && isset($apiData['repo_url']) && $apiData['repo_url'] === $url) {
+                    if ($getApiClientServiceInfo) {
+                        $api['api_category'] = $apiData;
+
+                        return $api;
+                    }
+
+                    return $apiData;
+                }
+            }
+        }
+
+        return false;
     }
 
     protected function encryptPassToken(array $data)

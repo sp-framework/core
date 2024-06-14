@@ -24,7 +24,42 @@ class ModulesComponent extends BaseComponent
 	 */
 	public function viewAction()
 	{
+		if (isset($this->getData()['queue'])) {
+			if (isset($this->getData()['id']) && $this->getData()['id'] != 0) {
+				$queue = $this->modules->queues->getById($this->getData()['id']);
+			} else {
+				$queue = $this->modules->queues->getActiveQueue();
+			}
+
+			if (!$queue) {
+				return $this->throwIdNotFound();
+			}
+
+			try {
+				$reanalyse = false;
+				if (isset($this->getData()['reanalyse']) && $this->getData()['reanalyse'] == true) {
+					$reanalyse = true;
+				}
+
+				$this->modules->queues->analyseQueue($queue, $reanalyse);
+			} catch (\Exception $e) {
+				trace([$e]);
+			}
+
+			if ($queue['total'] !== 0) {
+				$this->view->queues = true;
+				$this->view->queue = $queue;
+
+				return;
+			}
+		}
+
 		$this->view->modules = $this->modulesManager->getRepositoryModules();
+
+		if (!$this->view->modules) {
+			$this->view->modules = ['modules' => []];
+			$this->view->modulesError = $this->modulesManager->packagesData->responseMessage;
+		}
 
 		$queue = $this->modules->queues->getActiveQueue();
 
@@ -226,16 +261,38 @@ class ModulesComponent extends BaseComponent
 		);
 	}
 
-	public function processQueueAction()
+	public function analyseQueueAction()
 	{
 		$this->requestIsPost();
 
-		$this->modules->installer->init($this->postData()['process'])->runProcess($this->postData());
+		$this->modules->queues->analyseQueue();
 
 		$this->addResponse(
-			$this->modules->installer->packagesData->responseMessage,
-			$this->modules->installer->packagesData->responseCode
+			$this->modules->queues->packagesData->responseMessage,
+			$this->modules->queues->packagesData->responseCode,
+			$this->modules->queues->packagesData->responseData ?? []
 		);
+	}
+
+	public function processQueueAction()
+	{
+		try {
+			$this->requestIsPost();
+
+			$installer = $this->modules->installer->init($this->postData()['process']);
+
+			if ($installer) {
+				$installer->runProcess($this->postData());
+			}
+
+			$this->addResponse(
+				$this->modules->installer->packagesData->responseMessage,
+				$this->modules->installer->packagesData->responseCode,
+				$this->modules->installer->packagesData->responseData ?? []
+			);
+		} catch (\Exception $e) {
+			trace([$e]);
+		}
 	}
 
 	public function saveModuleSettingsAction()

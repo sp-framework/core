@@ -30,7 +30,11 @@
                     )}}
                 </div>
                 {% if type === 'views' %}
-                    <div class="col">
+                    {% set subviewChecked = false %}
+                    {% if subview is defined and subview === true %}
+                        {% set subviewChecked = true %}
+                    {% endif %}
+                    <div class="col d-none">
                         {% set baseViewChecked = false %}
                         {% set baseViewDisabled = true %}
                         {% set baseViewModuleId = '0' %}
@@ -40,6 +44,8 @@
                                 {% set baseViewDisabled = false %}
                             {% endif %}
                             {% set baseViewModuleId = module['module_details']['base_view_module_id'] %}
+                        {% else %}
+                            {% set baseViewChecked = true %}
                         {% endif %}
                         {{adminltetags.useTag('fields',
                             [
@@ -78,6 +84,29 @@
                                 'fieldCheckboxChecked'           : baseViewChecked,
                                 'fieldCheckboxType'              : 'primary',
                                 'fieldBazJstreeSearch'           : false,
+                                'fieldBazScan'                   : true
+                            ]
+                        )}}
+                    </div>
+                    <div class="col d-none">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'is_subview',
+                                'fieldLabel'                     : 'is Subview?',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'is view module subview. checkbox should be automatically checked via script.',
+                                'fieldDisabled'                  : true,
+                                'fieldHidden'                    : false,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxChecked'           : subviewChecked,
+                                'fieldCheckboxType'              : 'primary',
+                                'fieldBazJstreeSearch'           : false,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
                                 'fieldBazScan'                   : true
                             ]
                         )}}
@@ -166,15 +195,15 @@
                                         'size'                    : 'xs',
                                         'disabled'                : true,
                                         'type'                    : 'danger',
-                                        'icon'                    : 'trash'
+                                        'icon'                    : 'trash',
+                                        'position'                : 'right'
                                     ],
                                     'dependencies-add'    : [
                                         'title'                   : 'Add',
                                         'size'                    : 'xs',
                                         'disabled'                : true,
                                         'type'                    : 'primary',
-                                        'icon'                    : 'plus',
-                                        'position'                : 'right'
+                                        'icon'                    : 'plus'
                                     ]
                                 ]
                         ]

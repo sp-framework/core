@@ -20,9 +20,6 @@ class Scopes extends BasePackage
         return $this;
     }
 
-    /**
-     * @notification(name=add)
-     */
     public function addScope(array $data)
     {
         if (!isset($data['scope_name']) ||
@@ -38,9 +35,6 @@ class Scopes extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=update)
-     */
     public function updateScope(array $data)
     {
         if (!isset($data['scope_name']) ||
@@ -69,9 +63,6 @@ class Scopes extends BasePackage
         return $data;
     }
 
-    /**
-     * @notification(name=remove)
-     */
     public function removeScope(array $data)
     {
         if (isset($data['id'])) {

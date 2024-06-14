@@ -39,7 +39,9 @@ try {
 				return;
 			}
 
-			if ($bootstrap->config && $bootstrap->config->debug) {
+			if ($bootstrap->config === null ||
+				($bootstrap->config && $bootstrap->config->debug)
+			) {
 				$traces = [];
 
 				foreach ($exception->getTrace() as $key => $trace) {

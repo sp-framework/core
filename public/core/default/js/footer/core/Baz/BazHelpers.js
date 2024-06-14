@@ -144,6 +144,8 @@ var BazHelpers = function() {
         } else if (Array.isArray(objectOrArray)) {
             return objectOrArray.indexOf(value);
         }
+
+        return false;
     }
 
     function bazHelpersConstructor() {
@@ -517,6 +519,26 @@ var BazHelpers = function() {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
+    function stringToBoolean(string) {
+        switch (string.toLowerCase().trim()) {
+            case "true":
+            case "yes":
+            case "1":
+              return true;
+
+            case "false":
+            case "no":
+            case "0":
+            case null:
+            case undefined:
+            case 'undefined':
+              return false;
+
+            default:
+              return JSON.parse(string);
+        }
+    }
+
     function setup(BazHelpersConstructor) {
         BazHelpers = BazHelpersConstructor;
 
@@ -610,6 +632,10 @@ var BazHelpers = function() {
 
         BazHelpers.capitalizeFirstLetter = function(string) {
             return capitalizeFirstLetter(string);
+        }
+
+        BazHelpers.stringToBoolean = function(string) {
+            return stringToBoolean(string);
         }
     }
 

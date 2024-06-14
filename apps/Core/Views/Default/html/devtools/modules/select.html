@@ -118,6 +118,7 @@
                 'fieldBazScan'                         : true,
                 'fieldBazPostOnCreate'                 : true,
                 'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2AddDataAttrFromData'  : ['installed'],
                 'fieldDataSelect2Options'              : modules,
                 'fieldDataSelect2OptionsKey'           : 'id',
                 'fieldDataSelect2OptionsValue'         : 'display_name:app_type|name:app_type',
@@ -200,7 +201,7 @@
     </div>
 </div>
 <script>
-/* globals BazContentLoader Pace BazCore PNotify */
+/* globals BazContentLoader Pace BazCore paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -261,9 +262,15 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', true);
                         }
                     }
-                    // if (label === 'bundles') {
-                    //     $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', true);
-                    // }
+
+                    if ('installed' in $(e.params.data.element).data() &&
+                        $(e.params.data.element).data()['installed'] == 0
+                    ) {
+                        $('#{{componentId}}-{{sectionId}}-clone-module, ' +
+                          '#{{componentId}}-{{sectionId}}-edit-module, ' +
+                          '#{{componentId}}-{{sectionId}}-generate-new-release, ' +
+                          '#{{componentId}}-{{sectionId}}-commit-bundle-json').attr('disabled', true);
+                    }
                 });
 
                 $('#{{componentId}}-{{sectionId}}-include_core_modules').click(function() {
@@ -306,14 +313,14 @@ dataCollectionSection =
                         }
 
                         if (response.responseCode == 0) {
-                            PNotify.success({'text': response.responseMessage});
+                            paginatedPNotify('success', {'text': response.responseMessage});
                             if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
                                 dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
                             } else {
                                 dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
                             }
                         } else {
-                            PNotify.error({'text': response.responseMessage});
+                            paginatedPNotify('error', {'text': response.responseMessage});
                         }
                     }, 'json');
                 });

@@ -13,11 +13,6 @@ class GeoTimezones extends BasePackage
 
     public $geoTimezones;
 
-    /**
-     * @notification(name=add)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function addTimezone(array $data)
     {
         if ($this->add($data)) {
@@ -27,11 +22,6 @@ class GeoTimezones extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=update)
-     * notification_allowed_methods(email, sms)//Example
-     * @notification_allowed_methods(email, sms)
-     */
     public function updateTimezone(array $data)
     {
         if ($this->update($data)) {

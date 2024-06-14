@@ -2,9 +2,9 @@
 
 namespace Apps\Core\Packages\Devtools\Modules;
 
-use Apps\Core\Packages\Devtools\Modules\Model\AppsCoreDevtoolsModulesBundles;
 use Apps\Core\Packages\Devtools\Modules\Settings;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
@@ -17,12 +17,6 @@ use z4kn4fein\SemVer\Version;
 
 class DevtoolsModules extends BasePackage
 {
-    protected $modelToUse = AppsCoreDevtoolsModulesBundles::class;
-
-    protected $packageName = 'bundles';
-
-    public $bundles;
-
     protected $apiClient;
 
     protected $apiClientConfig;
@@ -143,7 +137,7 @@ class DevtoolsModules extends BasePackage
 
         try {
             if ($this->modules->{$data['module_type']}->add($data) &&
-                $this->updateModuleJson($data) &&
+                $this->updateModuleJson($data, false, true) &&
                 $this->generateNewFiles($data)
             ) {
                 if ($data['createrepo'] == true) {
@@ -278,7 +272,7 @@ class DevtoolsModules extends BasePackage
                 $module = array_merge($module, $data);
 
                 if ($this->modules->{$data['module_type']}->update($module) &&
-                    $this->updateModuleJson($data)
+                    $this->updateModuleJson($data, false, true)
                 ) {
                     if ($data['module_type'] === 'components') {
                         $this->addUpdateComponentMenu($data);
@@ -300,17 +294,41 @@ class DevtoolsModules extends BasePackage
                     }
 
                     if ($data['createrepo'] == true && strtolower($data['name']) !== 'core') {
-                        if (!$this->checkRepo($data)) {
-                            $newRepo = $this->createRepo($data);
+                        if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {//Create public repository as well
+                            if (!$this->checkRepo($data)) {
+                                $newRepo['base'] = $this->createRepo($data);
+                            }
+
+                            $data['repo'] = $data['repo'] . '-public';
+                            if (!$this->checkRepo($data)) {
+                                $newRepo['public'] = $this->createRepo($data);
+                            }
 
                             $this->addResponse('Module updated & created new repo.',
                                                0,
                                                [
+                                                'newFiles'  => $this->newFiles,
+                                                'newDirs'   => $this->newDirs,
                                                 'newRepo'   => $newRepo
                                                ]
                                             );
 
                             return;
+                        } else {
+                            if (!$this->checkRepo($data)) {
+                                $newRepo = $this->createRepo($data);
+
+                                $this->addResponse('Module updated & created new repo.',
+                                                   0,
+                                                   [
+                                                    'newFiles'  => $this->newFiles,
+                                                    'newDirs'   => $this->newDirs,
+                                                    'newRepo'   => $newRepo
+                                                   ]
+                                                );
+
+                                return;
+                            }
                         }
                     }
 
@@ -341,7 +359,7 @@ class DevtoolsModules extends BasePackage
     public function removeModule($data)
     {
         if ($data['module_type'] !== 'core') {
-            if ($data['module_type'] === 'apptypes') {
+            if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
                 $this->apps->types->removeAppType($data);
                 $this->addResponse('Removed app type from DB. Remove files manually...');
 
@@ -394,7 +412,9 @@ class DevtoolsModules extends BasePackage
                             'description'   => 'Added via devtools module add.',
                             'version'       => $data['version'],
                             'api_id'        => $data['api_id'],
-                            'repo'          => $data['repo']
+                            'repo'          => $data['repo'],
+                            'updated_by'    => '0',
+                            'installed'     => '1'
                         ];
 
                     $this->apps->types->add($appType);
@@ -432,6 +452,8 @@ class DevtoolsModules extends BasePackage
                 $this->addResponse('Updated new app type');
             } else {
                 $data['app_type'] = strtolower($data['app_type']);
+                $data['updated_by'] = '0';
+                $data['installed'] = '1';
 
                 $this->apps->types->add($data);
 
@@ -466,7 +488,7 @@ class DevtoolsModules extends BasePackage
                     $this->localContent->write($path . '/.gitkeep', '');
                 }
             } catch (FilesystemException | UnableToCheckExistence | UnableToWriteFile $exception) {
-                $this->addResponse('Unable to write json content to file: ' . $jsonFile);
+                $this->addResponse('Unable to write json content to file: .gitkeep for apptypes');
 
                 return false;
             }
@@ -566,13 +588,23 @@ class DevtoolsModules extends BasePackage
     {
         $defaultDependencies =
             [
-                'core'              => [],
-                'apptype'           => [],
-                'components'        => [],
-                'packages'          => [],
-                'middlewares'       => [],
-                'views'             => [],
-                'external'          => []
+                'core'                      => [],
+                'apptype'                   => [],
+                'components'                => [],
+                'packages'                  => [],
+                'middlewares'               => [],
+                'views'                     => [],
+                'external'                  => [
+                    'composer'              => [
+                        'require'           => []
+                    ],
+                    'config'                => [
+                        'allow-plugins'     => []
+                    ],
+                    'extra'                 => [
+                        'patches'           => []
+                    ]
+                ]
             ];
 
         if ($type && $type === 'views') {
@@ -634,6 +666,7 @@ class DevtoolsModules extends BasePackage
                 ) {
                     $data = $this->mergeViewSettings($data);
                 }
+                $jsonContent["is_subview"] = $data["is_subview"] == '0' ? false : true;
             }
 
             $jsonContent["settings"] = $data["settings"];
@@ -653,7 +686,7 @@ class DevtoolsModules extends BasePackage
         try {
             $this->localContent->write($jsonFile, $jsonContent);
 
-            if ($viewPublic) {
+            if ($data['module_type'] === 'views' && $viewPublic) {
                 $jsonFile = $this->getNewFilesLocation($data, true);
 
                 if (!str_contains($data['repo'], '-public')) {
@@ -800,7 +833,7 @@ class DevtoolsModules extends BasePackage
                 ucfirst($data['name']) . '/' .
                 substr($data['module_type'], 0, -1) . '.json';
         } else {
-            if ($data['module_type'] === 'apptypes') {
+            if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
                 return $moduleLocation . 'Install/type.json';
             } else if ($data['module_type'] === 'components') {
                 $routeArr = explode('/', $data['route']);
@@ -1060,7 +1093,9 @@ $file .= '
         }
 
         $data['class'] = explode('\\', $data['class']);
-        unset($data['class'][$this->helper->lastKey($data['class'])]);
+        if (!str_starts_with($data['category'], 'basepackages')) {
+            unset($data['class'][$this->helper->lastKey($data['class'])]);
+        }
         $namespaceClass = implode('\\', $data['class']);
 
         $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass . ';', $file);
@@ -1127,31 +1162,33 @@ $file .= '
             return false;
         }
 
-        //Package Installer File
-        try {
-            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/PackageInstallPackage.txt');
-        } catch (FilesystemException | UnableToReadFile $exception) {
-            $this->addResponse('Unable to read module base package file.');
-
-            return false;
-        }
-
-        if ($data['category'] !== str_starts_with($data['category'], 'basepackages') && $data['category'] !== 'providers') {
-            $moduleFilesLocation = str_replace('/Schema', '', $moduleFilesLocation);
-            $fileName = $moduleFilesLocation . '/' . 'Package.php';
-            $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-            $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
-            $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
-            $file = str_replace('"PACKAGESCHEMACLASS"', $moduleSchemaClass . ';', $file);
-            $file = str_replace('"PACKAGESCHEMANAME"', $data['name'], $file);
-
+        //Package Installer File only for apps.
+        if (!str_starts_with($data['category'], 'basepackages') && $data['category'] !== 'providers') {
             try {
-                $this->localContent->write($fileName, $file);
-                array_push($this->newFiles, $fileName);
-            } catch (FilesystemException | UnableToWriteFile $exception) {
-                $this->addResponse('Unable to write module package file');
+                $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/PackageInstallPackage.txt');
+            } catch (FilesystemException | UnableToReadFile $exception) {
+                $this->addResponse('Unable to read module base package file.');
 
                 return false;
+            }
+
+            if ($data['category'] !== str_starts_with($data['category'], 'basepackages') && $data['category'] !== 'providers') {
+                $moduleFilesLocation = str_replace('/Schema', '', $moduleFilesLocation);
+                $fileName = $moduleFilesLocation . '/' . 'Package.php';
+                $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+                $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+                $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
+                $file = str_replace('"PACKAGESCHEMACLASS"', $moduleSchemaClass . ';', $file);
+                $file = str_replace('"PACKAGESCHEMANAME"', $data['name'], $file);
+
+                try {
+                    $this->localContent->write($fileName, $file);
+                    array_push($this->newFiles, $fileName);
+                } catch (FilesystemException | UnableToWriteFile $exception) {
+                    $this->addResponse('Unable to write module package file');
+
+                    return false;
+                }
             }
         }
 
@@ -1184,7 +1221,6 @@ $file .= '
 
                 $fileName = $moduleFilesLocation . '/Basepackages' . $data['name'] . '.php';
                 $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-                $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
                 $className = 'Basepackages' . $data['name'];
             } else if ($data['category'] === 'providers') {
                 $moduleFilesLocation = 'system/Base/Providers/' . $data['name'] . 'ServiceProvider/Model/';
@@ -1332,7 +1368,9 @@ $file .= '
 
     public function syncLabels($data)
     {
-        if ($data['module_type'] === 'apptypes') {
+        if (isset($data['module_type']) &&
+            $data['module_type'] === 'apptypes'
+        ) {
             $module = $this->apps->types->getAppTypeById($data['id']);
         } else {
             $module = $this->modules->{$data['module_type']}->getById($data['id']);
@@ -1389,7 +1427,7 @@ $file .= '
             $module = $data;
             $status = 'open';
         } else {
-            if ($data['module_type'] === 'apptypes') {
+            if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
                 $module = $this->apps->types->getAppTypeById($data['id']);
             } else {
                 $module = $this->modules->{$data['module_type']}->getById($data['id']);
@@ -1411,6 +1449,32 @@ $file .= '
             $this->getReleases($module, true);
 
             $status = 'closed';
+        }
+
+        $currentMilestones = $this->syncMilestones($data);
+
+        $found = false;
+
+        if ($currentMilestones && isset($currentMilestones['milestones'])) {
+            array_walk($currentMilestones['milestones'], function($milestone) use(&$found, $data) {
+                if ((int) $data['milestone'] !== 0) {
+                    $milestoneIdentifier = $milestone['number'] ?? $milestone['id'];
+
+                    if ((int) $milestoneIdentifier === (int) $data['milestone']) {
+                        $found = true;
+                    }
+                } else {
+                    if ($milestone['title'] === $data['milestone']) {
+                        $found = true;
+                    }
+                }
+            });
+        }
+
+        if (!$found) {
+            $this->addResponse('Error syncing issues as milestone does not exists', 1);
+
+            return false;
         }
 
         if (!$this->latestRelease) {
@@ -1436,7 +1500,7 @@ $file .= '
                     $data['label'],
                     null,
                     null,
-                    $data['milestone'],
+                    (int) $data['milestone'],
                     $since
                 ];
         } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
@@ -1446,7 +1510,7 @@ $file .= '
                 [
                     $this->apiClientConfig['org_user'],
                     strtolower($this->helper->last(explode('/', $module['repo']))),
-                    $data['milestone'],
+                    (int) $data['milestone'],
                     $status,
                     null,
                     null,
@@ -1458,15 +1522,23 @@ $file .= '
                 ];
         }
 
-        $issues = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+        try {
+            $issues = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
 
-        if ($issues) {
-            $this->addResponse('Issues Synced', 0, ['issues' => $issues]);
+            if ($issues) {
+                $this->addResponse('Issues Synced', 0, ['issues' => $issues]);
 
-            return $issues;
+                return $issues;
+            }
+
+            $this->addResponse('No issues found with selected milestone/label', 1);
+        } catch (\Exception $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
         }
 
-        $this->addResponse('Error syncing issues or No issues found with selected milestone/label', 1);
+        return true;
     }
 
     protected function getReleases($module, $getLatestRelease = false)
@@ -1521,6 +1593,7 @@ $file .= '
         }
 
         $this->apiClient = $this->basepackages->apiClientServices->useApi($data['api_id'], true);
+
         $this->apiClientConfig = $this->apiClient->getApiConfig();
 
         if ($this->apiClientConfig['auth_type'] === 'auth' &&
@@ -1560,7 +1633,7 @@ $file .= '
         }
 
         if (!isset($data['repo'])) {
-            if ($data['module_type'] === 'apptypes') {
+            if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
                 $module = $this->apps->types->getAppTypeById($data['id']);
             } else {
                 $module = $this->modules->{$data['module_type']}->getById($data['id']);
@@ -1627,8 +1700,20 @@ $file .= '
                     $module['buildMetaPrefix'] = explode('.', $module['buildMetaPrefix']);
 
                     array_walk($module['buildMetaPrefix'], function(&$prefix) {
-                        if ($prefix === 'now') {
+                        if ($prefix === 'now') {//now
                             $prefix = time();
+                        }
+                        if ($prefix === 'dom') {//day of month
+                            $prefix = (\Carbon\Carbon::now())->day;
+                        }
+                        if ($prefix === 'moy') {//month of year
+                            $prefix = (\Carbon\Carbon::now())->month;
+                        }
+                        if ($prefix === 'wom') {//week of month
+                            $prefix = (\Carbon\Carbon::now())->weekOfMonth;
+                        }
+                        if ($prefix === 'woy') {//week of year
+                            $prefix = (\Carbon\Carbon::now())->weekOfYear;
                         }
                     });
                     $parsedVersionString = $parsedVersionString . '+' . implode('.', $module['buildMetaPrefix']);
@@ -1719,8 +1804,20 @@ $file .= '
                     $module['buildMetaPrefix'] = explode('.', $module['buildMetaPrefix']);
 
                     array_walk($module['buildMetaPrefix'], function(&$prefix) {
-                        if ($prefix === 'now') {
+                        if ($prefix === 'now') {//now
                             $prefix = time();
+                        }
+                        if ($prefix === 'dom') {//day of month
+                            $prefix = (\Carbon\Carbon::now())->day;
+                        }
+                        if ($prefix === 'moy') {//month of year
+                            $prefix = (\Carbon\Carbon::now())->month;
+                        }
+                        if ($prefix === 'wom') {//week of month
+                            $prefix = (\Carbon\Carbon::now())->weekOfMonth;
+                        }
+                        if ($prefix === 'woy') {//week of year
+                            $prefix = (\Carbon\Carbon::now())->weekOfYear;
                         }
                     });
 
@@ -1739,8 +1836,20 @@ $file .= '
                     $newVersion = explode('+', $newVersion)[0];
 
                     array_walk($module['buildMetaPrefix'], function(&$prefix) {
-                        if ($prefix === 'now') {
+                        if ($prefix === 'now') {//now
                             $prefix = time();
+                        }
+                        if ($prefix === 'dom') {//day of month
+                            $prefix = (\Carbon\Carbon::now())->day;
+                        }
+                        if ($prefix === 'moy') {//month of year
+                            $prefix = (\Carbon\Carbon::now())->month;
+                        }
+                        if ($prefix === 'wom') {//week of month
+                            $prefix = (\Carbon\Carbon::now())->weekOfMonth;
+                        }
+                        if ($prefix === 'woy') {//week of year
+                            $prefix = (\Carbon\Carbon::now())->weekOfYear;
                         }
                     });
 
@@ -1780,7 +1889,7 @@ $file .= '
 
     public function syncBranches($data)
     {
-        if ($data['module_type'] === 'apptypes') {
+        if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
             $module = $this->apps->types->getAppTypeById($data['id']);
         } else {
             $module = $this->modules->{$data['module_type']}->getById($data['id']);
@@ -1849,7 +1958,7 @@ $file .= '
 
     public function syncMilestones($data)
     {
-        if ($data['module_type'] === 'apptypes') {
+        if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
             $module = $this->apps->types->getAppTypeById($data['id']);
         } else {
             $module = $this->modules->{$data['module_type']}->getById($data['id']);
@@ -1890,9 +1999,9 @@ $file .= '
         }
 
         if ($milestones) {
-            $this->addResponse('Labels Synced', 0, ['milestones' => $milestones]);
+            $this->addResponse('Milestones Synced', 0, ['milestones' => $milestones]);
 
-            return $milestones;
+            return ['milestones' => $milestones];
         }
 
         $this->addResponse('Error syncing milestones or no milestones configured.', 1);
@@ -1902,6 +2011,7 @@ $file .= '
     {
         if ($data['module_type'] === 'apptypes') {
             $module = $this->apps->types->getAppTypeById($data['id']);
+            $module['module_type'] = 'apptypes';
         } else {
             $module = $this->modules->{$data['module_type']}->getById($data['id']);
         }
@@ -1959,9 +2069,6 @@ $file .= '
         if (!$this->latestRelease ||
             ($this->latestRelease && $data['mark-as-draft'] == 'false')
         ) {
-            $module['version'] = $name;
-            $module['branch'] = $data['branch'];
-
             //Check for any open issues against the milestone that was created during draft creation.
             if ($this->getMilestoneLabelIssues($module, true)) {
                 $this->addResponse('Milestone ' . $module['version'] . ' has a issues open. Please close those issues before generating release.', 1);
@@ -1969,6 +2076,8 @@ $file .= '
                 return false;
             }
 
+            $module['version'] = $name;
+            $module['branch'] = $data['branch'];
             //Check for any open pull request against the branch we have to create release from.
             if (!$this->checkPullRequests($module)) {
                 return false;
@@ -1985,7 +2094,11 @@ $file .= '
             } else {
                 $reposArr = [$module['repo']];
 
-                $fileLocation = explode('/Install/', $this->getModuleJsonFileLocation($module));
+                if ($data['module_type'] === 'views') {
+                    $fileLocation = explode('/Default/', $this->getModuleJsonFileLocation($module));
+                } else {
+                    $fileLocation = explode('/Install/', $this->getModuleJsonFileLocation($module));
+                }
 
                 if (count($fileLocation) > 1) {
                     $fileLocation = $data['module_type'] === 'views' ? 'view.json' : 'Install/' . $fileLocation[1];
@@ -2083,8 +2196,8 @@ $file .= '
 
         if (isset($data['module_type']) &&
             $data['module_type'] === 'views' &&
-            isset($data['base_view_module_id']) &&
-            $data['base_view_module_id'] == 0
+            isset($module['base_view_module_id']) &&
+            $module['base_view_module_id'] == 0
         ) {
             array_push($reposArr, $module['repo'] . '-public');
         }
@@ -2147,7 +2260,7 @@ $file .= '
                         ) {
                             $core = $this->core->core;
 
-                            $core['version'] = $data['version'];
+                            $core['version'] = $module['version'];
 
                             $this->core->update($core);
                         }
@@ -2162,9 +2275,11 @@ $file .= '
                     if (isset($data['mark-as-draft']) && $data['mark-as-draft'] == 'true') {
                         $newMilestone = $this->createReleaseMilestone($versionData, $data, $module, $repo);
 
-                        if ($newMilestone) {
+                        if ($newMilestone && is_array($newMilestone) && isset($newMilestone['newMilestone'])) {
                             $releaseData = array_merge($releaseData, $newMilestone);
                         }
+                    } else {
+                        $this->closeReleaseMilestone($versionData, $data, $module, $repo);
                     }
                 }
             } catch (\throwable $e) {
@@ -2196,9 +2311,9 @@ $file .= '
         $found = false;
 
         if ($currentMilestones && isset($currentMilestones['milestones'])) {
-            array_walk($currentMilestones['milestones'], function($label) use(&$found, $versionData) {
-                if ($label['name'] === $version) {
-                    $found = true;
+            array_walk($currentMilestones['milestones'], function($milestone) use(&$found, $version) {
+                if ($milestone['title'] === $version) {
+                    $found = $milestone['number'] ?? $milestone['id'];
                 }
             });
         }
@@ -2222,19 +2337,73 @@ $file .= '
                         'description'   => 'Tracking milestone for version ' . $version
                     ]
                 ];
+
+            try {
+                $newMilestone = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+                return ['newMilestone' => $newMilestone];
+            } catch (\throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+
+            $this->addResponse('Error generating new label', 1);
         }
 
-        try {
-            $newMilestone = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+        return true;
+    }
 
-            return ['newMilestone' => $newMilestone];
-        } catch (\throwable $e) {
-            $this->addResponse($e->getMessage(), 1);
-
-            return false;
+    protected function closeReleaseMilestone($versionData, $data, $module, $repo)
+    {
+        if (isset($versionData['newVersion'])) {
+            $version = $versionData['newVersion'];
+        } else if (isset($versionData['release'])) {
+            $version = $versionData['release'];
         }
 
-        $this->addResponse('Error generating new label', 1);
+        $currentMilestones = $this->syncMilestones($data);
+
+        $found = false;
+
+        if ($currentMilestones && isset($currentMilestones['milestones'])) {
+            array_walk($currentMilestones['milestones'], function($milestone) use(&$found, $version) {
+                if ($milestone['title'] === $version) {
+                    $found = $milestone['number'] ?? $milestone['id'];
+                }
+            });
+        }
+
+        if ($found) {
+            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                $collection = 'IssueApi';
+                $method = 'issueEditMilestone';
+            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                $collection = 'IssuesApi';
+                $method = 'issuesUpdateMilestone';
+            }
+
+            $args =
+                [
+                    $this->apiClientConfig['org_user'],
+                    strtolower($this->helper->last(explode('/', $repo))),
+                    $found,
+                    [
+                        'state'         => 'closed',
+                    ]
+                ];
+            try {
+                $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+            } catch (\throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function commitBundleJson($data)
@@ -2300,8 +2469,6 @@ $file .= '
 
                 return;
             }
-
-            throw $e;
         }
 
         $jsonContent = [];
@@ -2695,7 +2862,7 @@ $file .= '
                 $this->validation->add('category', PresenceOf::class, ["message" => "Please provide category."]);
             }
 
-            if ($data['module_type'] === 'views' && isset($data['subview']) && $data['subview'] == 'true') {
+            if ($data['module_type'] === 'views' && isset($data['is_subview']) && $data['is_subview'] == 'true') {
                 $this->validation->add('base_view_module_id', PresenceOf::class, ["message" => "Please provide main view module id."]);
             }
 
@@ -2711,7 +2878,7 @@ $file .= '
                 return false;
             }
 
-            if ($data['module_type'] === 'views' && isset($data['subview']) && $data['subview'] == 'true') {
+            if ($data['module_type'] === 'views' && isset($data['is_subview']) && $data['is_subview'] == 'true') {
                 $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
             }
 

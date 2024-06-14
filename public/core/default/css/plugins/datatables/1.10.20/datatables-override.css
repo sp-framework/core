@@ -64,3 +64,6 @@ table.dataTable > tbody > tr.child span.dtr-title {
     min-width: 20% !important;
     text-transform: uppercase;
 }
+div.dataTables_wrapper div.dataTables_length select {
+    padding: 0.5rem 1rem 0.5rem 1rem;
+}

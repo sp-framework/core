@@ -137,7 +137,7 @@
     </div>
 </div>
 <script>
-/* globals PNotify Swal dataCollection */
+/* globals paginatedPNotify Swal dataCollection */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -205,7 +205,7 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-ip_address-prepend-dropdown-button').attr("disabled", false);
 
                         if (response.responseCode != 0) {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 title   : response.responseMessage
                             });
 
@@ -220,7 +220,7 @@ dataCollectionSection =
                             return;
                         }
 
-                        PNotify.success({
+                        paginatedPNotify('success', {
                             title   : 'Filter added.'
                         });
 
@@ -356,14 +356,14 @@ dataCollectionSection =
 
                                         $.post(url, postData, function(response) {
                                             if (response.responseCode != 0) {
-                                                PNotify.error({
+                                                paginatedPNotify('error', {
                                                     title   : response.responseMessage
                                                 });
 
                                                 return;
                                             }
 
-                                            PNotify.success({
+                                            paginatedPNotify('success', {
                                                 title   : 'Filter removed.'
                                             });
 
@@ -402,14 +402,14 @@ dataCollectionSection =
 
                                     $.post(url, postData, function(response) {
                                         if (response.responseCode != 0) {
-                                            PNotify.error({
+                                            paginatedPNotify('error', {
                                                 title   : response.responseMessage
                                             });
 
                                             return;
                                         }
 
-                                        PNotify.success({
+                                        paginatedPNotify('success', {
                                             title   : 'IP Blocked.'
                                         });
 
@@ -454,7 +454,7 @@ dataCollectionSection =
 
                                     $.post(url, postData, function(response) {
                                         if (response.responseCode != 0) {
-                                            PNotify.error({
+                                            paginatedPNotify('error', {
                                                 title   : response.responseMessage
                                             });
 

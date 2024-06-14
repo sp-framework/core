@@ -34,3 +34,5 @@ system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/*
 .api/
 phpstan.neon
 psalm.xml
+docker*
+phpunit*

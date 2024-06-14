@@ -76,7 +76,7 @@
     </table>
 </div>
 <script>
-/* global PNotify Swal */
+/* global paginatedPNotify Swal */
 var staleCount = parseInt('{{stale}}');
 var verifiedCount = parseInt('{{verified}}');
 var url = '{{links.url("system/users/profile/removeAccountAgents")}}';
@@ -99,7 +99,7 @@ $('.clearRow').click(function(e) {
 
     $.post(url, removeAccountAgentsData, function(response) {
         if (response.responseCode == 0) {
-            PNotify.success(response.responseMessage);
+            paginatedPNotify('success', response.responseMessage);
             $(thisRow).remove();
             if (verified === false) {
                 if (staleCount > 0) {
@@ -120,7 +120,7 @@ $('.clearRow').click(function(e) {
                 }
             }
         } else {
-            PNotify.error(response.responseMessage);
+            paginatedPNotify('error', response.responseMessage);
         }
 
         if (response.tokenKey && response.token) {
@@ -163,12 +163,12 @@ $('#{{componentId}}-{{sectionId}}-clear-all-verified, #{{componentId}}-{{section
 
                 $.post(url, removeAccountAgentsData, function(response) {
                     if (response.responseCode === 0) {
-                        PNotify.success(response.responseMessage);
+                        paginatedPNotify('success', response.responseMessage);
                         $('#{{componentId}}-{{sectionId}}-verified-count').html(1);
                         $('.rowVerified').parents('tr').remove();
                         $('#{{componentId}}-{{sectionId}}-clear-all-verified').attr('hidden', true);
                     } else {
-                        PNotify.error(response.responseMessage);
+                        paginatedPNotify('error', response.responseMessage);
                     }
 
                     if (response.tokenKey && response.token) {
@@ -208,12 +208,12 @@ $('#{{componentId}}-{{sectionId}}-clear-all-verified, #{{componentId}}-{{section
 
                 $.post(url, removeAccountAgentsData, function(response) {
                     if (response.responseCode === 0) {
-                        PNotify.success(response.responseMessage);
+                        paginatedPNotify('success', response.responseMessage);
                         $('#{{componentId}}-{{sectionId}}-stale-count').parents('strong').remove();
                         $('.rowStale').parents('tr').remove();
                         $('#{{componentId}}-{{sectionId}}-clear-all-stale').attr('hidden', true);
                     } else {
-                        PNotify.error(response.responseMessage);
+                        paginatedPNotify('error', response.responseMessage);
                     }
 
                     if (response.tokenKey && response.token) {

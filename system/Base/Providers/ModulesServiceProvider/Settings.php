@@ -6,6 +6,19 @@ use System\Base\BasePackage;
 
 class Settings extends BasePackage
 {
+    public function beforeUpdate($packageClass, $package, $data)
+    {
+        if (isset($data['reset_last_sync_at']) && $data['reset_last_sync_at'] != 0) {
+            $apiClientServices = $this->basepackages->apiClientServices->getById($data['reset_last_sync_at']);
+
+            if (isset($apiClientServices['sync']['modules']['last_sync'])) {
+                unset($apiClientServices['sync']['modules']['last_sync']);
+
+                $this->basepackages->apiClientServices->update($apiClientServices);
+            }
+        }
+    }
+
     public function afterUpdate($packageClass, $package, $data)
     {
         if (is_string($package['settings'])) {

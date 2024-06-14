@@ -87,7 +87,7 @@
     </div>
 </div>
 <script>
-/* globals PNotify Swal */
+/* globals paginatedPNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -259,21 +259,21 @@ dataCollectionSection =
                     e.preventDefault();
 
                     if ($('#{{componentId}}-{{sectionId}}-client_id').val() === '') {
-                        PNotify.error('Url generator needs client ID');
+                        paginatedPNotify('error', 'Url generator needs client ID');
 
                         $('#{{componentId}}-{{sectionId}}-client_id').focus();
 
                         return;
                     } else if ($('#{{componentId}}-{{sectionId}}-app_id').val() === '') {
-                        PNotify.error('Url generator needs App. Please select app');
+                        paginatedPNotify('error', 'Url generator needs App. Please select app');
 
                         return;
                     } else if ($('#{{componentId}}-{{sectionId}}-domain_id').val() === '') {
-                        PNotify.error('Url generator needs Domain. Please select domain');
+                        paginatedPNotify('error', 'Url generator needs Domain. Please select domain');
 
                         return;
                     } else if ($('#{{componentId}}-{{sectionId}}-scope_id').val() === '') {
-                        PNotify.error('Url generator needs Scope. Please select scope');
+                        paginatedPNotify('error', 'Url generator needs Scope. Please select scope');
 
                         return;
                     }
@@ -372,7 +372,7 @@ function generateClientId(force = false) {
 
     $.post('{{links.url("system/api/server/clients/generateclientidandsecret")}}', postData, function(response) {
         if (response.responseCode == 0) {
-            PNotify.success(response.responseMessage);
+            paginatedPNotify('success', response.responseMessage);
 
             if (response.responseData && response.responseData.client_id) {
                 $('#{{componentId}}-{{sectionId}}-client_id').val(response.responseData.client_id);
@@ -386,7 +386,7 @@ function generateClientId(force = false) {
             $('#{{componentId}}-{{sectionId}}-generate-client-id').attr('hidden', true);
             $('#{{componentId}}-{{sectionId}}-regenerate-client-id').attr('hidden', false);
         } else {
-            PNotify.error(response.responseMessage);
+            paginatedPNotify('error', response.responseMessage);
         }
 
         if (response.tokenKey && response.token) {
@@ -416,7 +416,7 @@ function generateRedirectUrl(id) {
 
     $.post('{{links.url("system/api/server/services/generateapiurl")}}', postData, function(response) {
         if (response.responseCode == 0) {
-            PNotify.success(response.responseMessage);
+            paginatedPNotify('success', response.responseMessage);
 
             if (response.responseData && response.responseData.url) {
                 if (id === '{{componentId}}-{{sectionId}}-generate-redirect-url') {
@@ -426,7 +426,7 @@ function generateRedirectUrl(id) {
                 }
             }
         } else {
-            PNotify.error(response.responseMessage);
+            paginatedPNotify('error', response.responseMessage);
         }
 
         if (response.tokenKey && response.token) {

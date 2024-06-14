@@ -22578,7 +22578,8 @@ class ReposApi
      */
     public function reposDownloadZipballArchive($owner, $repo, $ref, string $contentType = self::contentTypes['reposDownloadZipballArchive'][0])
     {
-        $this->reposDownloadZipballArchiveWithHttpInfo($owner, $repo, $ref, $contentType);
+        list($response) = $this->reposDownloadZipballArchiveWithHttpInfo($owner, $repo, $ref, $contentType);
+        return $response;
     }
 
     /**
@@ -22634,7 +22635,7 @@ class ReposApi
                 );
             }
 
-            return [null, $statusCode, $response->getHeaders()];
+            return [$response, $statusCode, $response->getHeaders()];
 
         } catch (ApiException $e) {
             switch ($e->getCode()) {

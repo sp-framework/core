@@ -102,6 +102,11 @@ class Select2
             $this->params['fieldDataSelect2OptionsSelected'] :
             '';
 
+        $this->fieldParams['fieldDataSelect2AddDataAttrFromData'] =
+            isset($this->params['fieldDataSelect2AddDataAttrFromData']) ?
+            $this->params['fieldDataSelect2AddDataAttrFromData'] :
+            null;
+
         if (isset($this->params['fieldGroupPreAddonText']) ||
             isset($this->params['fieldGroupPreAddonIcon']) ||
             isset($this->params['fieldGroupPreAddonDropdown']) ||

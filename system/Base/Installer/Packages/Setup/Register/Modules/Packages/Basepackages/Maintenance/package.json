@@ -1,0 +1,43 @@
+{
+	"name" : "Maintenance",
+	"display_name" : "Scheduled Maintenance",
+	"description" : "<p>Package for managing schedule maintenance<br></p>",
+	"module_type" : "packages",
+	"app_type" : "core",
+	"category" : "basepackages",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : 
+		[
+			{
+				"name" : "Maintenance",
+				"version" : "0.0.0",
+				"repo" : "https://.../"
+			}
+		],
+		"packages" : [],
+		"middlewares" : 
+		[
+			{
+				"name" : "Maintenance",
+				"version" : "0.0.0",
+				"repo" : "https://.../"
+			}
+		],
+		"views" : [],
+		"external" : []
+	},
+	"settings" : 
+	{
+		"componentRoute" : "system/tools/maintenance"
+	}
+}

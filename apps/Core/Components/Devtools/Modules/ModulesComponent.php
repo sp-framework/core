@@ -130,7 +130,8 @@ class ModulesComponent extends BaseComponent
 					$modulesJson[$moduleKey][$child['id']] =
 						array_merge($modulesJson[$moduleKey][$child['id']],
 							[
-								'base_view_module_id' => $child['base_view_module_id']
+								'base_view_module_id' 	=> $child['base_view_module_id'],
+								'is_subview' 			=> $child['is_subview'] ?? false
 							]
 						);
 				}
@@ -229,9 +230,7 @@ class ModulesComponent extends BaseComponent
 
 									$routePath = implode('/', $pathArr) . '/Install/';
 								} else if ($module['module_details']['module_type'] === 'views') {
-									if (!$module['module_details']['view_modules_version'] ||
-										($module['module_details']['base_view_module_id'] && $module['module_details']['base_view_module_id'] != '0')
-									) {
+									if (isset($module['module_details']['base_view_module_id']) && $module['module_details']['base_view_module_id'] != 0) {
 										$baseView = $this->modules->views->getViewById($module['module_details']['base_view_module_id']);
 
 										$pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['module_details']['name']), -1, PREG_SPLIT_NO_EMPTY);
@@ -281,7 +280,7 @@ class ModulesComponent extends BaseComponent
 					if (isset($module['settings']) && is_array($module['settings'])) {
 						$this->view->moduleSettings = $module['settings'] = $this->helper->encode($module['settings']);
 					}
-					if (isset($module['settings']) && is_array($module['dependencies'])) {
+					if (isset($module['dependencies']) && is_array($module['dependencies'])) {
 						$this->view->moduleDependencies = $module['dependencies'] = $this->helper->encode($module['dependencies']);
 					}
 				} else {

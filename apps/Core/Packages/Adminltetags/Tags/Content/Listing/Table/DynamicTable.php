@@ -51,7 +51,6 @@ class DynamicTable
 
     protected function generateTableContent()
     {
-
         if (isset($this->params['dtPrimaryButtons']) ||
             isset($this->params['dtSecondaryButtons']) ||
             isset($this->params['dtFilter'])

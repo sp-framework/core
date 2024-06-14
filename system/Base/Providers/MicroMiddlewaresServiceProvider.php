@@ -125,7 +125,7 @@ class MicroMiddlewaresServiceProvider extends Injectable
                     $mw = (new $middleware['class']())->process($this->data);
                 } catch (\Exception $e) {
                     if ($this->config->logs->exceptions) {
-                        $this->logger->logExceptions->debug($e);
+                        $this->logger->logExceptions->critical(json_trace($e));
                     }
 
                     if (str_contains(strtolower($e->getMessage()), 'denied') || str_contains(strtolower($e->getMessage()), 'expired')) {

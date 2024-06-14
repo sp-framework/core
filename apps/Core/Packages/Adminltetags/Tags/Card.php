@@ -54,7 +54,7 @@ class Card extends Adminltetags
         $cardRefreshSource = "";
 
         isset($this->params['cardAnimationSpeed']) ?
-        $cardAnimationSpeed = "data-animation-speed=" . $cardAnimationSpeed :
+        $cardAnimationSpeed = "data-animation-speed=" . $this->params['cardAnimationSpeed'] :
         $cardAnimationSpeed = "data-animation-speed=300";
 
         isset($this->params['cardRefreshParams']) ?
@@ -164,49 +164,49 @@ class Card extends Adminltetags
                         '<button type="button" class="btn btn-tool btn-tool-widgetRemove" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Remove" data-card-widget="widgetRemove">
                             <i class="fas fa-fw fa-times"></i>
                         </button>';
+                } else if ($tool === "packageSettings") {
+                    if ($this->view->canMsv && $this->view->usedModules) {
+                        $url = $this->links->url($this->params['component']['route'] . '/q/settings/true');
+                        $tools .=
+                            '<a href="' . $url . '" class="btn btn-tool btn-tool-package-settings-link disabled" role="button" hidden="">Package Settings Link</a>' .
+                            '<script>
+                                $(document).ready(function() {
+                                    $(".btn-tool-package-settings").click(function() {
+                                        BazContentLoader.loadAjax($(".btn-tool-package-settings-link"), {
+                                            ajaxBefore                      : function () {
+                                                                                Pace.restart();
+                                                                                $("#baz-content").empty();
+                                                                                $("#loader").attr("hidden", false);
+                                                                            },
+                                            ajaxFinished                    : function () {
+                                                                                BazCore.updateBreadcrumb();
+                                                                                $("#loader").attr("hidden", true);
+                                                                                $(".tooltip").remove();
+                                                                            },
+                                            ajaxError                       : function () {
+                                                                                $("#loader").attr("hidden", true);
+                                                                                BazCore.updateBreadcrumb();
+                                                                            }
+                                        });
+                                        BazContentLoader.init();
+                                    });
+                                });
+                            </script>
+                            <button type="button" class="btn btn-tool btn-tool-package-settings" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Package Settings" data-card-widget="package-settings">
+                                <i class="fas fa-fw fa-gears"></i>
+                            </button>';
+                    }
+                } else if ($tool === "cacheReset") {
+                    if ($this->config->cache->enabled) {
+                        $tools .=
+                            '<button type="button" class="btn btn-tool btn-tool-reset-cache" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Reset Cache">
+                                <i class="fas fa-fw fa-database"></i>
+                            </button>';
+                    }
                 }
             }
         } else {
             $tools = '';
-        }
-
-        if ($this->view->canMsv && $this->view->usedModules) {
-            $url = $this->links->url($this->params['component']['route'] . '/q/settings/true');
-            $tools .=
-                '<a href="' . $url . '" class="btn btn-tool btn-tool-package-settings-link disabled" role="button" hidden="">Package Settings Link</a>' .
-                '<script>
-                    $(document).ready(function() {
-                        $(".btn-tool-package-settings").click(function() {
-                            BazContentLoader.loadAjax($(".btn-tool-package-settings-link"), {
-                                ajaxBefore                      : function () {
-                                                                    Pace.restart();
-                                                                    $("#baz-content").empty();
-                                                                    $("#loader").attr("hidden", false);
-                                                                },
-                                ajaxFinished                    : function () {
-                                                                    BazCore.updateBreadcrumb();
-                                                                    $("#loader").attr("hidden", true);
-                                                                    $(".tooltip").remove();
-                                                                },
-                                ajaxError                       : function () {
-                                                                    $("#loader").attr("hidden", true);
-                                                                    BazCore.updateBreadcrumb();
-                                                                }
-                            });
-                            BazContentLoader.init();
-                        });
-                    });
-                </script>
-                <button type="button" class="btn btn-tool btn-tool-package-settings" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Package Settings" data-card-widget="package-settings">
-                    <i class="fas fa-fw fa-gears"></i>
-                </button>';
-        }
-
-        if ($this->config->cache->enabled) {
-            $tools .=
-                '<button type="button" class="btn btn-tool btn-tool-reset-cache" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Reset Cache">
-                    <i class="fas fa-fw fa-database"></i>
-                </button>';
         }
 
         $cardBodyAdditionalClass =

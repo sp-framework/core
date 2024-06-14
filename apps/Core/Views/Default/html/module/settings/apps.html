@@ -15,7 +15,7 @@
     </div>
 </div>
 <script>
-/*global PNotify Swal */
+/*global paginatedPNotify Swal */
 $('.mode-options').each(function(index, option) {
 
     $($(option).parent()).click(function() {
@@ -99,7 +99,7 @@ $('#modal-save').click(function() {
                             if (data && data.responseCode === 0) {
                                 location.reload();
                             } else if (data && data.responseCode === 1) {
-                                PNotify.error({
+                                paginatedPNotify('error', {
                                     text            : data.responseMessage,
                                     textTrusted     : true
                                 });
@@ -114,7 +114,7 @@ $('#modal-save').click(function() {
                             if (data && data.responseCode === 0) {
                                 location.reload();
                             } else if (data && data.responseCode === 1) {
-                                PNotify.error({
+                                paginatedPNotify('error', {
                                     text        : data.responseMessage,
                                     textTrusted : true
                                 });
@@ -128,7 +128,7 @@ $('#modal-save').click(function() {
                     title   : data.responseMessage
                 });
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     text        : data.responseMessage,
                     textTrusted : true
                 });

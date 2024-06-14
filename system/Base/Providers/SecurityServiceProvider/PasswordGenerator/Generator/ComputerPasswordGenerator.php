@@ -141,8 +141,6 @@ class ComputerPasswordGenerator extends AbstractPasswordGenerator
 
     /**
      * Password length.
-     *
-     * @return int
      */
     public function getLength($lenType)
     {

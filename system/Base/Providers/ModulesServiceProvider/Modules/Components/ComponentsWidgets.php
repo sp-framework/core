@@ -12,6 +12,8 @@ class ComponentsWidgets
 
     protected $view;
 
+    protected $views;
+
     public function init($componentObj, $component)//Init from Basecomponent
     {
         $this->componentObj = $componentObj;
@@ -31,20 +33,20 @@ class ComponentsWidgets
 
         $this->view->sectionId = 'main';
 
-        $reflection = $this->helper->sliceRight(explode('\\', $this->componentObj->reflection->getName()), 3);
+        $reflection = $this->componentObj->helper->sliceRight(explode('\\', $this->componentObj->reflection->getName()), 3);
 
         if (count($reflection) === 1) {
-            $parents = str_replace('Component', '', $this->helper->last($reflection));
+            $parents = str_replace('Component', '', $this->componentObj->helper->last($reflection));
             $this->view->parents = $parents;
             $this->view->parent = strtolower($parents);
         } else {
-            $reflection[$this->helper->lastKey($reflection)] =
-                str_replace('Component', '', $this->helper->last($reflection));
+            $reflection[$this->componentObj->helper->lastKey($reflection)] =
+                str_replace('Component', '', $this->componentObj->helper->last($reflection));
 
             $parents = $reflection;
 
             $this->view->parents = $parents;
-            $this->view->parent = strtolower($this->helper->last($parents));
+            $this->view->parent = strtolower($this->componentObj->helper->last($parents));
         }
 
         $this->views = $this->componentObj->modules->views;

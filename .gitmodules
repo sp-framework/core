@@ -1,0 +1,3 @@
+[submodule "phpunit"]
+	path = phpunit
+	url = https://dev.bazaari.com.au/sp-core/phpunit.git

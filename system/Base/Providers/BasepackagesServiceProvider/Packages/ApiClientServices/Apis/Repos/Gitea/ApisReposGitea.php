@@ -6,7 +6,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices
 
 class ApisReposGitea extends Repos
 {
-    public function init($apiConfig = null, $api = null, $httpOptions = null)
+    public function init($apiConfig = null, $api = null, $httpOptions = null, $monitorProgress = null)
     {
         if (!isset($apiConfig['category'])) {
             $apiConfig['category'] = 'Repos';
@@ -15,7 +15,7 @@ class ApisReposGitea extends Repos
             $apiConfig['provider'] = 'Gitea';
         }
 
-        parent::init($apiConfig, $api, $httpOptions);
+        parent::init($apiConfig, $api, $httpOptions, $monitorProgress);
 
         return $this;
     }

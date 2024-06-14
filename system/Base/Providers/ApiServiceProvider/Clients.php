@@ -137,9 +137,6 @@ class Clients extends BasePackage
         }
     }
 
-    /**
-     * @notification(name=update)
-     */
     public function updateClient(array $data)
     {
         if ($this->update($data)) {
@@ -400,7 +397,7 @@ class Clients extends BasePackage
         return $this->basepackages->emailqueue->addToQueue($emailData);
     }
 
-    public function checkCallCount($types = [], &$client)
+    public function checkCallCount(&$client, $types = [])
     {
         $toResetCallCount = [];
 
@@ -436,7 +433,7 @@ class Clients extends BasePackage
         }
     }
 
-    public function incrementCallCount($types = [], &$client, $api)
+    public function incrementCallCount(&$client, $api, $types = [])
     {
         if (in_array('per_minute_calls_count', $types)) {
             if ($client['per_minute_calls_count'] < (int) $api['per_minute_calls_limit']) {

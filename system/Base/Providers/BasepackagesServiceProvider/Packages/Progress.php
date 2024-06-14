@@ -6,6 +6,7 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToWriteFile;
+use Mattiasgeniar\Percentage\Percentage;
 use System\Base\BasePackage;
 
 class Progress extends BasePackage
@@ -13,6 +14,8 @@ class Progress extends BasePackage
     protected $notificationsTunnel;
 
     protected $progressFileName;
+
+    protected $remoteWebCountersTimer;
 
     public function init($container = null, $fileName = null)
     {
@@ -214,7 +217,7 @@ class Progress extends BasePackage
             $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult, $child, $remoteWebCounters);
 
             if ($callResult === true) {
-                $this->sendNotification($callResult);
+                $this->sendNotification($callResult, $remoteWebCounters);
             }
 
             return true;
@@ -236,8 +239,22 @@ class Progress extends BasePackage
         }
     }
 
-    protected function sendNotification($callResult)
+    protected function sendNotification($callResult, $remoteWebCounters = null)
     {
+        if ($remoteWebCounters &&
+            $remoteWebCounters['downloadTotal'] !== $remoteWebCounters['downloadedBytes']
+        ) {//only for remoteWebCounters
+            if (!$this->remoteWebCountersTimer) {
+                $this->remoteWebCountersTimer = time();
+            } else {
+                if ((time() - $this->remoteWebCountersTimer) < 1) {
+                    return false;//To minimize chatting on ws, we add a 1 second delay.
+                } else {
+                    $this->remoteWebCountersTimer = time();
+                }
+            }
+        }
+
         if ($this->notificationsTunnel !== null) {
             $progressFile = $this->readProgressFile();
 
@@ -270,18 +287,16 @@ class Progress extends BasePackage
         $percentComplete = (float) number_format(($progressFile['completed'] * 100) / $progressFile['total']);
 
         if (isset($progressFile['runners']['running']['remoteWebCounters'])) {
-            $methodPercent = (float) number_format(100 / $progressFile['total']);
-
             $webProgress = 0;
 
             if (isset($progressFile['runners']['running']['remoteWebCounters']['downloadTotal']) && $progressFile['runners']['running']['remoteWebCounters']['downloadTotal'] > 0) {
-                $webProgress = (float) number_format(($progressFile['runners']['running']['remoteWebCounters']['downloadedBytes'] * 100) / $progressFile['runners']['running']['remoteWebCounters']['downloadTotal']);
+                $webProgress = Percentage::calculate($progressFile['runners']['running']['remoteWebCounters']['downloadedBytes'], $progressFile['runners']['running']['remoteWebCounters']['downloadTotal']);
             } else if (isset($progressFile['runners']['running']['remoteWebCounters']['uploadTotal']) && $progressFile['runners']['running']['remoteWebCounters']['uploadTotal'] > 0) {
-                $webProgress = (float) number_format(($progressFile['runners']['running']['remoteWebCounters']['uploadedBytes'] * 100) / $progressFile['runners']['running']['remoteWebCounters']['uploadTotal']);
+                $webProgress = Percentage::calculate($progressFile['runners']['running']['remoteWebCounters']['uploadedBytes'], $progressFile['runners']['running']['remoteWebCounters']['uploadTotal']);
             }
 
-            if ($webProgress > 0) {
-                $percentComplete = $webProgress;
+            if ($webProgress > -1) {
+                $percentComplete = (float) number_format($webProgress);
             }
         }
 

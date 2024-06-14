@@ -226,11 +226,16 @@ class Modal extends Adminltetags
                 '<div class="modal-footer ' . $this->modalParams['modalFooterAdditionalClasses'] . '">';
 
             if (isset($this->params['modalFooterButtons'])) {
+            $this->content .=
+                '<div class="mr-auto">';
+
                 $this->content .=
                     $this->useTag(
                         'buttons',
                         $this->params['modalFooterButtons']
                     );
+            $this->content .=
+                '</div>';
             }
             $this->content .=
                 '<button type="button" id="' . $this->modalParams['modalId'] . '-button-close" class="btn btn-secondary btn-' . $this->modalParams['modalCloseButtonSize'] . ' modal-close text-uppercase ' . $this->params['modalId'] . '-close" data-dismiss="modal">' . $this->modalParams['modalCloseButtonTitle'] . '</button>';
