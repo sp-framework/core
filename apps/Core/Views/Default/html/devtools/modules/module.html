@@ -11,7 +11,7 @@
     </div>
     {% set moduleId = module['id'] %}
     <script>
-/* globals paginatedPNotify BazContentLoader Pace BazCore */
+/* globals paginatedPNotify BazContentLoader Pace BazCore Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -375,41 +375,74 @@ dataCollectionSection =
                         postData['force-mark-prerelease'] = $('#{{componentId}}-{{sectionId}}-force-mark-prerelease')[0].checked;
                         postData['mark-as-draft'] = $('#{{componentId}}-{{sectionId}}-mark-as-draft')[0].checked;
 
-                        $.post('{{links.url("devtools/modules/generateRelease")}}', postData, function(response) {
-                            if (response.tokenKey && response.token) {
-                                $('#security-token').attr('name', response.tokenKey);
-                                $('#security-token').val(response.token);
-                            }
-
-                            if (response.responseCode == 0) {
-                                paginatedPNotify('success', {'text': response.responseMessage});
-
-                                if (response.responseData && response.responseData.newRelease && $('#release-details').length > 0) {
-                                    $('#release_url').html(response.responseData.newRelease.html_url);
-                                    $('#release_url_a').attr('href', response.responseData.newRelease.html_url);
-                                    if (response.responseData && response.responseData.newReleasePublic) {
-                                        $('#release_url_public').html(response.responseData.newReleasePublic.html_url);
-                                        $('#release_url_a_public').attr('href', response.responseData.newReleasePublic.html_url);
-                                    }
-                                    $('#release-details').attr('hidden', false);
-                                    $('#release-module-details').attr('hidden', true);
-                                    $('.addData').attr('hidden', true);
-                                    $('.updateData').attr('hidden', true);
-                                    $('.cancelForm').attr('hidden', true);
-                                    $('.closeForm').attr('hidden', false);
+                        if (postData['branch'] !== 'main') {
+                            Swal.fire({
+                                title                       : '<span class="text-danger"> Generate release from branch ' + postData['branch'] + '?</span>',
+                                icon                        : 'question',
+                                background                  : 'rgba(0,0,0,.8)',
+                                backdrop                    : 'rgba(0,0,0,.6)',
+                                buttonsStyling              : false,
+                                confirmButtonText           : 'Generate',
+                                customClass                 : {
+                                    'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                                    'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                                },
+                                showCancelButton            : true,
+                                keydownListenerCapture      : true,
+                                allowOutsideClick           : true,
+                                allowEscapeKey              : true,
+                                didOpen                     : function() {
+                                    window['dataCollection'].env.sounds.swalSound.play();
                                 }
-
-                                $('#generate').attr('hidden', true);
-                            } else {
-                                paginatedPNotify('error', {'text': response.responseMessage});
-
-                                $('#generate').attr('disabled', false);
-                            }
-
-                            $('#generate').children('i').removeClass('fa-spin fa-cog').addClass('fa-wand-sparkles');
-                        }, 'json');
+                            }).then((result) => {
+                                if (result.value) {
+                                    generateRelease(postData);
+                                } else {
+                                    $('#generate').attr('disabled', false);
+                                    $('#generate').children('i').removeClass('fa-spin fa-cog').addClass('fa-wand-sparkles');
+                                }
+                            });
+                        } else {
+                            generateRelease(postData);
+                        }
                     }
                 });
+
+                function generateRelease(postData) {
+                    $.post('{{links.url("devtools/modules/generateRelease")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            paginatedPNotify('success', {'text': response.responseMessage});
+
+                            if (response.responseData && response.responseData.newRelease && $('#release-details').length > 0) {
+                                $('#release_url').html(response.responseData.newRelease.html_url);
+                                $('#release_url_a').attr('href', response.responseData.newRelease.html_url);
+                                if (response.responseData && response.responseData.newReleasePublic) {
+                                    $('#release_url_public').html(response.responseData.newReleasePublic.html_url);
+                                    $('#release_url_a_public').attr('href', response.responseData.newReleasePublic.html_url);
+                                }
+                                $('#release-details').attr('hidden', false);
+                                $('#release-module-details').attr('hidden', true);
+                                $('.addData').attr('hidden', true);
+                                $('.updateData').attr('hidden', true);
+                                $('.cancelForm').attr('hidden', true);
+                                $('.closeForm').attr('hidden', false);
+                            }
+
+                            $('#generate').attr('hidden', true);
+                        } else {
+                            paginatedPNotify('error', {'text': response.responseMessage});
+
+                            $('#generate').attr('disabled', false);
+                        }
+
+                        $('#generate').children('i').removeClass('fa-spin fa-cog').addClass('fa-wand-sparkles');
+                    }, 'json');
+                }
             }
         },
         '{{componentId}}-{{sectionId}}-pre-release-prefix'                      : { },

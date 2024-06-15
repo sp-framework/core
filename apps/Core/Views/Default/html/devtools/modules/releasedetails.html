@@ -5,6 +5,11 @@
             <p><a id="release_url_a" href="#" target="_blank"><strong><span id="release_url"></span></strong></a></p>
             <p><a id="release_url_a_public" href="#" target="_blank"><strong><span id="release_url_public"></span></strong></a></p>
         </div>
+        <div class="callout callout-warning">
+            <h5>NOTE</h5>
+            <p>Non draft releases updates json file associated with the module type. <br>Example: If the module being release is core, release tool will update
+system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json file with the released version. This tool will also update your local system package.json file with the new version. So, this process can cause a conflict in the git branch you are working on. Before you proceed with the next release, you need to resolve this conflict by stashing your current work and pulling the latest release code from remote.</p>
+        </div>
     </div>
 </div>
 
