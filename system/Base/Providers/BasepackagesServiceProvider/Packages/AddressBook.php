@@ -52,6 +52,8 @@ class AddressBook extends BasePackage
         } else {
             $this->addResponse('Error adding new address.', 1);
         }
+
+        return $this->packagesData->last;
     }
 
     public function updateAddress(array $data)
@@ -74,7 +76,7 @@ class AddressBook extends BasePackage
 
     public function mergeAndUpdate(array $data)
     {
-        $address = $this->getById($data['address_id']);
+        $address = $this->getById($data['contact_address_id']);
 
         unset($data['id']);
 

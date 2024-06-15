@@ -266,11 +266,11 @@ class Notifications extends BasePackage
     {
         $profile = $this->basepackages->profile->profile();
 
-        if (!is_array($profile['settings'])) {
+        if ($profile['settings'] && !is_array($profile['settings'])) {
             $profile['settings'] = $this->helper->decode($profile['settings'], true);
         }
 
-        if (isset($profile['settings']['notifications']['mute'])) {
+        if ($profile['settings'] && isset($profile['settings']['notifications']['mute'])) {
             if ($data['changestate'] == 1) {
                 $profile['settings']['notifications']['mute'] = true;
             } else if ($data['changestate'] == 0) {
