@@ -2196,7 +2196,7 @@ abstract class BasePackage extends Controller
 								$appId,
 								$aId,
 								null,
-								$package['name'],
+								$package['display_name'] ?? $package['name'],
 								$packageRowId,
 								$notificationType
 							);
@@ -2223,7 +2223,7 @@ abstract class BasePackage extends Controller
 							$domainId,
 							$appId,
 							null,
-							$package['name'],
+							$package['display_name'] ?? $package['name'],
 							$packageRowId,
 							$notificationType
 						);
