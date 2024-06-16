@@ -18,8 +18,44 @@ class MaintenanceComponent extends BaseComponent
      */
     public function viewAction()
     {
-        trace([$this->maintenancePackage], true, false, true);
-        return;
+        //Visibility of a maintenance can only be seen by admin users. Rest of the users can only see specific fields.
+        if (isset($this->getData()['id'])) {
+            if ($this->getData()['id'] != 0) {
+                $maintenance = $this->maintenancePackage->getById($this->getData()['id']);
+
+                if (!$maintenance) {
+                    return $this->throwIdNotFound();
+                }
+
+                $this->view->maintenance = $maintenance;
+            }
+
+            return;
+        }
+
+        $controlActions =
+            [
+                'actionsToEnable'       =>
+                [
+                    'edit'      => 'system/tools/maintenances',
+                    'remove'    => 'system/tools/maintenances/remove'
+                ]
+            ];
+
+        $this->generateDTContent(
+            $this->maintenancePackage,
+            'system/tools/maintenances/view',
+            null,
+            ['maintenance'],
+            false,
+            ['maintenance'],
+            $controlActions,
+            null,
+            null,
+            'maintenance'
+        );
+
+        $this->view->pick('maintenances/list');
     }
 
     /**

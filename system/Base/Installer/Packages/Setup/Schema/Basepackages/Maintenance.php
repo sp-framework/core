@@ -22,7 +22,7 @@ class Maintenance
                     ]
                 ),
                 new Column(
-                    'first_name',
+                    'name',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 50,
@@ -30,21 +30,111 @@ class Maintenance
                     ]
                 ),
                 new Column(
-                    'last_name',
+                    'description',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => true,
+                        'size'          => 2048,
+                        'notNull'       => false,
                     ]
-                )
-            ],
-            'indexes' => [
-                new Index(
-                    'column_UNIQUE',
+                ),
+                new Column(
+                    'status',
                     [
-                        'last_name'
-                    ],
-                    'UNIQUE'
+                        'type'              => Column::TYPE_BOOLEAN,
+                        'notNull'           => true
+                    ]
+                ),
+                new Column(
+                    'state',// - Scheduled, running, complete'
+                    [
+                        'type'              => Column::TYPE_TINYINTEGER,
+                        'notNull'           => true
+                    ]
+                ),
+                new Column(
+                    'Reference',// - External reference when running maintenance on core'
+                    [
+                        'type'              => Column::TYPE_VARCHAR,
+                        'size'              => 50,
+                        'notNull'           => false
+                    ]
+                ),
+                new Column(
+                    'start_at',
+                    [
+                        'type'              => Column::TYPE_VARCHAR,
+                        'size'              => 50,
+                        'notNull'           => true
+                    ]
+                ),
+                new Column(
+                    'end_at',
+                    [
+                        'type'              => Column::TYPE_VARCHAR,
+                        'size'              => 50,
+                        'notNull'           => true
+                    ]
+                ),
+                new Column(
+                    'level_of_maintenance',// Core, AppType, App, Component',
+                    [
+                        'type'              => Column::TYPE_TINYINTEGER,
+                        'notNull'           => true
+                    ]
+                ),
+                new Column(
+                    'level_of_maintenance_modules',// Core, AppType, App, Component',
+                    [
+                        'type'              => Column::TYPE_VARCHAR,
+                        'size'              => 1024,
+                        'notNull'           => false
+                    ]
+                ),
+                new Column(
+                    'allow_from_ip_addresses',
+                    [
+                        'type'              => Column::TYPE_VARCHAR,
+                        'size'              => 2048,
+                        'notNull'           => true
+                    ]
+                ),
+                new Column(
+                    'notification_email_groups',
+                    [
+                        'type'              => Column::TYPE_VARCHAR,
+                        'size'              => 1024,
+                        'notNull'           => false
+                    ]
+                ),
+                new Column(
+                    'notification_email_users',
+                    [
+                        'type'              => Column::TYPE_VARCHAR,
+                        'size'              => 1024,
+                        'notNull'           => false
+                    ]
+                ),
+                new Column(
+                    'notification_email_others',
+                    [
+                        'type'              => Column::TYPE_VARCHAR,
+                        'size'              => 2048,
+                        'notNull'           => false
+                    ]
+                ),
+                new Column(
+                    'maintenance_template_id',//default will be used if not provided.
+                    [
+                        'type'              => Column::TYPE_INTEGER,
+                        'notNull'           => false
+                    ]
+                ),
+                new Column(
+                    'maintenance_email_template_id',//default will be used if not provided.
+                    [
+                        'type'              => Column::TYPE_INTEGER,
+                        'notNull'           => false
+                    ]
                 )
             ],
             'options' => [
@@ -58,12 +148,12 @@ class Maintenance
         return
         [
             new Index(
-                'column_first_name_index',
+                'status_index',
                 [
-                    'first_name'
+                    'status'
                 ],
                 'INDEX'
-            )
+            ),
         ];
     }
 }

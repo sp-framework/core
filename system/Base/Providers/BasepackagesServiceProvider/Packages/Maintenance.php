@@ -28,7 +28,7 @@ class Maintenance extends BasePackage
 
     public function addMaintenance($data)
     {
-        //
+        //Maintenances can only be added via Core app and by Admin group users.
     }
 
     public function updateMaintenance($data)
