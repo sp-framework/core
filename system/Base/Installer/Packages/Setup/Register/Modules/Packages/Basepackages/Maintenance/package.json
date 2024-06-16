@@ -7,7 +7,7 @@
 	"category" : "basepackages",
 	"version" : "0.0.0",
 	"repo" : "https://.../",
-	"class" : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages",
+	"class" : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Maintenance",
 	"dependencies" : 
 	{
 		"core" : 
