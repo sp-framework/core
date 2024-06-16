@@ -71,7 +71,7 @@
                                                             <div class="form-group">
                                                                 <label class="text-uppercase text-xs" for="host">Host *</label>
                                                                 <div class="input-group input-group-sm">
-                                                                    <input type="text" name="host" id="host" class="form-control rounded-0" value="localhost">
+                                                                    <input type="text" name="host" id="host" class="form-control rounded-0" value="mysql">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -853,6 +853,7 @@
                         $('#auto-encrypt-level')[0].checked = false;
                         $('#pwf').val('2');
                         $('#cwf').val('2');
+                        $('#dbname').val('spdev');
                     }
                 });
 
