@@ -224,7 +224,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
                     return false;
                 }
 
-                $this->account['profile'] = $this->basepackages->profile->getProfile($this->account['id']);
+                $this->account['profile'] = $this->basepackages->profiles->getProfile($this->account['id']);
             } else {
                 $this->basepackages->accounts->setFFRelations(true);
 
@@ -354,20 +354,54 @@ class Pusher extends WebsocketBase implements WampServerInterface
         //if someone closes their browser and hits refresh.
         $account = $this->basepackages->accounts->checkAccountByNotificationsTunnelId($resourceId);
 
-        if ($account) {
-            $account['notifications_tunnel_id'] = null;
+        if ($account && $this->config->databasetype === 'db') {
+            $this->db->connect();
 
-            $this->basepackages->accounts->update($account);
+            $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($account['id']);
 
-            $profile = $this->basepackages->profile->getProfile($account['id']);
-
-            if (isset($profile['settings']['messenger']['status'])) {
-                if ($profile['settings']['messenger']['status'] == 4) {
-                    return;
-                }
+            if ($this->accountsObj && $this->accountsObj->count() > 0) {
+                $this->account = $this->accountsObj->toArray();
             }
 
-            $this->basepackages->messenger->changeStatus(['user' => $account['id'], 'status' => 2]);
+            if (!$this->account) {
+                return false;
+            }
+
+            $this->account['profile'] = $this->basepackages->profiles->getProfile($this->account['id']);
+
+            if ($this->accountsObj->tunnels) {
+                $this->accountsObj->tunnels->assign(['notifications_tunnel'  => null])->update();
+            }
+        } else {
+            $this->basepackages->accounts->setFFRelations(true);
+
+            $this->accountsObj = $this->basepackages->accounts->getFirst('id', (int) $account['id']);
+
+            $this->account = $this->accountsObj->data;
+
+            if (!$this->account) {
+                return false;
+            }
+
+            $tunnelsStore = $this->ff->store($this->tunnelsObj->getSource());
+
+            if (isset($this->account['tunnels']) &&
+                count($this->account['tunnels']) === 1
+            ) {
+                $tunnels = $tunnelsStore->findOneBy(['account_id', '=', $this->account['id']]);
+
+                $tunnels['notifications_tunnel'] = null;
+
+                $tunnelsStore->update($tunnels);
+            }
         }
+        //Change Messenger Status
+        // if (isset($profile['settings']['messenger']['status'])) {
+        //     if ($profile['settings']['messenger']['status'] == 4) {
+        //         return;
+        //     }
+        // }
+
+        // $this->basepackages->messenger->changeStatus(['user' => $account['id'], 'status' => 2]);
     }
 }
