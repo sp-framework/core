@@ -25,7 +25,7 @@ class AccessServiceProvider implements ServiceProviderInterface
                 $logger = $container->getShared('logger');
                 $links = $container->getShared('links');
                 $accounts = $container->getShared('basepackages')->accounts;
-                $profile = $container->getShared('basepackages')->profile;
+                $profile = $container->getShared('basepackages')->profiles;
                 $roles = $container->getShared('basepackages')->roles;
                 $email = $container->getShared('basepackages')->email;
                 $emailQueue = $container->getShared('basepackages')->emailqueue;

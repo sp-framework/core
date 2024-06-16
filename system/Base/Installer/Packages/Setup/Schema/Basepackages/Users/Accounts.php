@@ -53,7 +53,7 @@ class Accounts
                         ]
                     ),
                     new Column(
-                        'package_name',
+                        'profile_package_name',
                         [
                             'type'          => Column::TYPE_VARCHAR,
                             'size'          => 100,
@@ -61,7 +61,7 @@ class Accounts
                         ]
                     ),
                     new Column(
-                        'package_row_id',
+                        'profile_package_row_id',
                         [
                             'type'          => Column::TYPE_INTEGER,
                             'notNull'       => true

@@ -8,12 +8,12 @@ class Account
     {
         $account =
             [
-                'status'                => '1',
-                'email'                 => $email,
-                'username'              => explode('@', $email)[0],
-                'domain'                => explode('@', $email)[1],
-                'package_name'          => 'profiles',
-                'package_row_id'        => 1
+                'status'                    => '1',
+                'email'                     => $email,
+                'username'                  => explode('@', $email)[0],
+                'domain'                    => explode('@', $email)[1],
+                'profile_package_name'      => 'UsersProfiles',
+                'profile_package_row_id'    => 1
             ];
 
         if ($db) {

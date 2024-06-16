@@ -1,7 +1,3 @@
-{% set account = auth.account() %}
-{#     {% set profileSkills = profile['skills'] %}
-{% set profileSkillsAttachments = profile['skills_attachments'] %} #}
-
 <div class="row vdivide">
     <div class="col-md-2">
         {{adminltetags.useTag('fields',
@@ -791,64 +787,3 @@ dataCollectionSection =
         }
     });
 </script>
-{#
-    Skills will be added by the Employee himself. There will be a verification process of each skill, example if someone says they are CCIE, they should be able to upload a certificate and that should be processed by the HR department to confirm. Once confirmed a verified tick can show next to their skill.
-    If its a non certified skill, example Juggling, they should get one of their peers to confirm/vouch for them.
-                            'skills'   :
-                                [
-                                    'tabTitle'          : 'Skills',
-                                    'tabInclude'        : 'profile/form/skills',
-                                    'tabIncludeParams'  :
-                                    [
-                                        'profileSkills'                : profileSkills,
-                                        'profileSkillsAttachments'     : profileSkillsAttachments
-                                    ]
-                                ],
-                        'employmentdetails'   :
-                        [
-                            'tabTitle'          : 'Employment Details',
-                            'tabInclude'        : 'profile/form/employmentdetails',
-                            'tabIncludeParams'  :
-                            [
-                                'profileDesignation'          : profileDesignation,
-                                'profileManagerId'            : profileManagerId,
-                                'profileManager'              : profileManager,
-                                'profileType'                 : profileType,
-                                'profileHireDate'             : profileHireDate,
-                                'profileTerminateDate'        : profileTerminateDate,
-                                'profileHireManagerId'        : profileHireManagerId,
-                                'profileHireManager'          : profileHireManager,
-                                'profileHireReferrerId'       : profileHireReferrerId,
-                                'profileHireReferrer'         : profileHireReferrer,
-                                'profileEmploymentAttachments': profileEmploymentAttachments,
-                                'profileEmploymentNotes'      : profileEmploymentNotes
-                            ]
-                        ],
-                        'contactdetails'   :
-                        [
-                            'tabTitle'          : 'Contact Details',
-                            'tabInclude'        : 'profile/form/contactdetails',
-                            'tabIncludeParams'  :
-                            [
-                                'profileContactPhone'              : profileContactPhone,
-                                'profileContactPhoneExt'           : profileContactPhoneExt,
-                                'profileContactMobile'             : profileContactMobile,
-                                'profileContactFax'                : profileContactFax,
-                                'profileContactOther'              : profileContactOther,
-                                'profileWorkType'                  : profileWorkType,
-                                'profileContactLocationId'         : profileContactLocationId,
-                                'profileContactAddressId'          : profileContactAddressId,
-                                'profileContactStreetAddress'      : profileContactStreetAddress,
-                                'profileContactStreetAddress2'     : profileContactStreetAddress2,
-                                'profileContactCityId'             : profileContactCityId,
-                                'profileContactCity'               : profileContactCity,
-                                'profileContactPostCode'           : profileContactPostCode,
-                                'profileContactStateId'            : profileContactStateId,
-                                'profileContactState'              : profileContactState,
-                                'profileContactCountryId'          : profileContactCountryId,
-                                'profileContactCountry'            : profileContactCountry,
-                                'profileContactNotes'              : profileContactNotes
-                            ]
-                        ]
-
-                                #}

@@ -9,7 +9,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Basep
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
 
-class Profile extends BasePackage
+class Profiles extends BasePackage
 {
     protected $modelToUse = BasepackagesUsersProfiles::class;
 
@@ -40,8 +40,15 @@ class Profile extends BasePackage
         return $this->profile;
     }
 
-    public function getProfile(int $accountId)
+    public function getProfile($account)
     {
+        if (is_array($account)) {
+            $accountId = $account['id'];
+            $accountRoleId = $account['role']['id'];
+        } else {
+            $accountId = $account;
+        }
+
         if ($this->config->databasetype === 'db') {
             $profileObj = $this->getFirst('account_id', $accountId);
 
@@ -65,21 +72,21 @@ class Profile extends BasePackage
                     $profile['address'] = $addressObj->toArray();
                 }
 
-                if (isset($this->auth)) {
-                    $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
+                if (isset($accountRoleId)) {
+                    $profile['role'] = $this->basepackages->roles->getById($accountRoleId)['name'];
                 }
 
                 return $profile;
             }
         } else {
             $this->setFFRelations(true);
-            $this->setFFRelationsConditions(['address' => ['package_name', '=', 'profile']]);
+            $this->setFFRelationsConditions(['address' => ['package_name', '=', 'UsersProfiles']]);
 
             $profile = $this->getFirst('account_id', $accountId, false, true, null, [], true);
 
             if ($profile) {
-                if (isset($this->auth)) {
-                    $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role']['id'])['name'];
+                if (isset($accountRoleId)) {
+                    $profile['role'] = $this->basepackages->roles->getById($accountRoleId)['name'];
                 }
 
                 return $profile;
@@ -114,7 +121,7 @@ class Profile extends BasePackage
             $profile['state_name']          = '';
             $profile['country_id']          = null;
             $profile['country_name']        = '';
-            $profile['package_name']        = 'profile';
+            $profile['package_name']        = 'UsersProfiles';
             $profile['package_row_id']      = $profile['id'];
 
             $profile['contact_address_id'] = $this->addProfileAddress($profile);
@@ -129,7 +136,7 @@ class Profile extends BasePackage
 
     public function updateProfileViaAccount(array $data)
     {
-        $profile = $this->getProfile($data['id']);
+        $profile = $this->getProfile($data['profile_package_row_id']);
 
         if (isset($data['first_name']) && isset($data['last_name'])) {
             if (($data['first_name'] !== $profile['first_name'] ||
@@ -168,7 +175,7 @@ class Profile extends BasePackage
 
     public function updateProfile(array $data)
     {
-        if (!$this->auth->account()) {
+        if (!isset($data['account_id']) && !$this->auth->account()) {
             return;
         }
 
@@ -179,7 +186,11 @@ class Profile extends BasePackage
             unset($data['subscriptions']);
         }
 
-        $profile = $this->getProfile($this->auth->account()['id']);
+        if (isset($data['account_id'])) {
+            $profile = $this->getProfile((int) $data['account_id']);
+        } else {
+            $profile = $this->getProfile($this->auth->account()['id']);
+        }
 
         if (($data['first_name'] !== $profile['first_name'] ||
             $data['last_name'] !== $profile['last_name']) ||
@@ -333,9 +344,15 @@ class Profile extends BasePackage
         return true;
     }
 
-    public function generateViewData()
+    public function generateViewData($accountId = null)
     {
-        $this->packagesData->profile = $this->getProfile($this->auth->account()['id']);
+        if ($accountId) {
+            $this->packagesData->account = $this->basepackages->accounts->getAccountById($accountId);
+        } else {
+            $this->packagesData->account = $this->auth->account();
+        }
+
+        $this->packagesData->profile = $this->getProfile($this->packagesData->account);
 
         if ($this->config->databasetype === 'db') {
             $accountObj = $this->basepackages->accounts->getFirst('id', $this->auth->account()['id']);

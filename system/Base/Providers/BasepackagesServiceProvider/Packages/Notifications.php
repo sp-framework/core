@@ -146,7 +146,7 @@ class Notifications extends BasePackage
             $now = date("F j, Y, g:i a");
 
             if ($createdBy != 0) {
-                $profile = $this->basepackages->profile->getProfile($createdBy);
+                $profile = $this->basepackages->profiles->getProfile($createdBy);
 
                 if ($profile) {
                     $body .= 'Notification By: ' . $profile['full_name'] . ' (' . $now . ')<br>';
@@ -264,7 +264,7 @@ class Notifications extends BasePackage
 
     public function changeNotificationState(array $data)
     {
-        $profile = $this->basepackages->profile->profile();
+        $profile = $this->basepackages->profiles->profile();
 
         if ($profile['settings'] && !is_array($profile['settings'])) {
             $profile['settings'] = $this->helper->decode($profile['settings'], true);
@@ -286,7 +286,7 @@ class Notifications extends BasePackage
 
         $profile['settings'] = $this->helper->encode($profile['settings']);
 
-        $this->basepackages->profile->updateProfile($profile);
+        $this->basepackages->profiles->updateProfile($profile);
 
         $this->addResponse('Changed');
     }

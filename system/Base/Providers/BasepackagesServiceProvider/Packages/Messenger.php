@@ -137,7 +137,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
             return false;
         }
 
-        $this->account['profile'] = $this->basepackages->profile->getProfile($this->account['id']);
+        $this->account['profile'] = $this->basepackages->profiles->getProfile($this->account['id']);
 
         if ($this->checkSession($cookies)) {
             if (!$this->accountsObj->tunnels) {
@@ -185,7 +185,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
             $account = $this->auth->account();
         }
 
-        $profile = $this->basepackages->profile->getProfile($account['id']);
+        $profile = $this->basepackages->profiles->getProfile($account['id']);
 
         if ($profile && $this->accountsObj->tunnels) {
             if (isset($profile['settings']['messenger'])) {
@@ -197,7 +197,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
 
             $profile['settings'] = $this->helper->encode($profile['settings']);
 
-            $this->basepackages->profile->update($profile);
+            $this->basepackages->profiles->update($profile);
 
             $this->pushNotification(
                 'messengerNotifications',
@@ -298,7 +298,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
             }
         }
 
-        $profile = $this->basepackages->profile->getProfile($this->auth->account()['id']);
+        $profile = $this->basepackages->profiles->getProfile($this->auth->account()['id']);
 
         if ($profile['settings'] && isset($profile['settings']['messenger']['members'])) {
             $membersArr = $profile['settings']['messenger']['members'];
@@ -367,7 +367,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
         $toAccount = $toAccountsObj->toArray();
 
         if ($toAccount) {
-            $toProfile = $this->basepackages->profile->getProfile($data['user']);
+            $toProfile = $this->basepackages->profiles->getProfile($data['user']);
 
             $offline = false;
 
@@ -396,7 +396,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
 
             $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($this->auth->account()['id']);
 
-            $profile = $this->basepackages->profile->getProfile($this->auth->account()['id']);
+            $profile = $this->basepackages->profiles->getProfile($this->auth->account()['id']);
 
             $userData['id'] = $profile['id'];
             $userData['portrait'] = $profile['portrait'];
@@ -459,7 +459,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
 
     public function changeSettings(array $data)
     {
-        $profile = $this->basepackages->profile->profile();
+        $profile = $this->basepackages->profiles->profile();
 
         if (isset($profile['settings']['messenger']['mute'])) {
             if ($data['changestate'] == 1) {
@@ -477,7 +477,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
 
         $profile['settings'] = $this->helper->encode($profile['settings']);
 
-        $this->basepackages->profile->updateProfile($profile);
+        $this->basepackages->profiles->updateProfile($profile);
 
         $this->addResponse('Changed');
     }

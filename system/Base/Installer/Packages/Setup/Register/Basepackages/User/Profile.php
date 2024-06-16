@@ -34,7 +34,7 @@ class Profile
                 'state_name'          => null,
                 'country_id'          => null,
                 'country_name'        => null,
-                'package_name'        => 'profile',
+                'package_name'        => 'UsersProfiles',
                 'package_row_id'      => 1
             ];
 

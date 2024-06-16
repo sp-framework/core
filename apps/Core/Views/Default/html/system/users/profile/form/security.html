@@ -222,7 +222,7 @@ $('#{{componentId}}-{{sectionId}}-twofa_email-email_code').click(function(e) {
 
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
-    postData['user']  = '{{auth.account()["username"]}}';
+    postData['user']  = '{{account["username"]}}';
     postData['pass']  = $('#{{componentId}}-{{sectionId}}-current_password').val().trim();
 
     $.post('{{links.url("auth/sendtwofaemail")}}', postData, function(response) {

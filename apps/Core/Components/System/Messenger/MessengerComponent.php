@@ -195,7 +195,7 @@ class MessengerComponent extends BaseComponent
                                 continue;
                             }
 
-                            $profile = $this->basepackages->profile->getProfile($account['id']);
+                            $profile = $this->basepackages->profiles->getProfile($account['id']);
 
                             $account['name'] = $profile['full_name'];
                             $account['portrait'] = $profile['portrait'];
@@ -241,11 +241,11 @@ class MessengerComponent extends BaseComponent
                 return;
             }
 
-            $this->basepackages->profile->addUserToMembersUsers($this->postData());
+            $this->basepackages->profiles->addUserToMembersUsers($this->postData());
 
             $this->addResponse(
-                $this->basepackages->profile->packagesData->responseMessage,
-                $this->basepackages->profile->packagesData->responseCode
+                $this->basepackages->profiles->packagesData->responseMessage,
+                $this->basepackages->profiles->packagesData->responseCode
             );
 
         } else {

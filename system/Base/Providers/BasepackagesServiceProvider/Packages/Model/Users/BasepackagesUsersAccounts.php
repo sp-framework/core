@@ -28,9 +28,9 @@ class BasepackagesUsersAccounts extends BaseModel
 
     public $domain;
 
-    public $package_name;
+    public $profile_package_name;
 
-    public $package_row_id;
+    public $profile_package_row_id;
 
     public function initialize()
     {

@@ -6,11 +6,11 @@ use System\Base\BaseComponent;
 
 class ProfileComponent extends BaseComponent
 {
-    protected $profile;
+    protected $profiles;
 
     public function initialize()
     {
-        $this->profile = $this->basepackages->profile;
+        $this->profiles = $this->basepackages->profiles;
     }
 
     /**
@@ -18,15 +18,19 @@ class ProfileComponent extends BaseComponent
      */
     public function viewAction()
     {
-        if (!$this->auth->account()) {
-            return;
-        }
-
         $this->getNewToken();
 
         $this->useStorage('private');
 
-        $profile = $this->profile->generateViewData();
+        if (isset($this->getData()['aid'])) {
+            $profile = $this->profiles->generateViewData($this->getData()['aid']);
+        } else {
+            if (!$this->auth->account()) {
+                return;
+            }
+
+            $profile = $this->profiles->generateViewData();
+        }
 
         if ($profile) {
             $app = $this->apps->getAppInfo();
@@ -38,21 +42,23 @@ class ProfileComponent extends BaseComponent
                         $app['id']
                     ), 'sequence');
 
-            $this->view->profile = $this->profile->packagesData->profile;
+            $this->view->account = $this->profiles->packagesData->account;
 
-            $this->view->notifications_modules = $this->profile->packagesData->notifications_modules;
+            $this->view->profile = $this->profiles->packagesData->profile;
 
-            $this->view->subscriptions = $this->profile->packagesData->subscriptions;
+            $this->view->notifications_modules = $this->profiles->packagesData->notifications_modules;
 
-            $this->view->notifications = $this->profile->packagesData->notifications;
+            $this->view->subscriptions = $this->profiles->packagesData->subscriptions;
 
-            $this->view->canEmail = $this->profile->packagesData->canEmail;
+            $this->view->notifications = $this->profiles->packagesData->notifications;
 
-            $this->view->sessions = $this->profile->packagesData->sessions;
+            $this->view->canEmail = $this->profiles->packagesData->canEmail;
 
-            $this->view->coreSettings = $this->profile->packagesData->coreSettings;
+            $this->view->sessions = $this->profiles->packagesData->sessions;
 
-            $this->view->canUse2fa = $this->profile->packagesData->canUse2fa;
+            $this->view->coreSettings = $this->profiles->packagesData->coreSettings;
+
+            $this->view->canUse2fa = $this->profiles->packagesData->canUse2fa;
 
             $apis = $this->api->getApiInfo(false, true);
             $passwordApis = [];
@@ -80,11 +86,11 @@ class ProfileComponent extends BaseComponent
                 return;
             }
 
-            $this->profile->updateProfile($this->postData());
+            $this->profiles->updateProfile($this->postData());
 
             $this->addResponse(
-                $this->profile->packagesData->responseMessage,
-                $this->profile->packagesData->responseCode
+                $this->profiles->packagesData->responseMessage,
+                $this->profiles->packagesData->responseCode
             );
         } else {
             $this->addResponse('Method Not Allowed', 1);
@@ -185,19 +191,19 @@ class ProfileComponent extends BaseComponent
             }
 
             if (isset($this->postData()['avatarfile'])) {
-                $generateAvatar = $this->profile->generateAvatar($this->postData()['avatarfile']);
+                $generateAvatar = $this->profiles->generateAvatar($this->postData()['avatarfile']);
             } else if (isset($this->postData()['gender'])) {
-                $generateAvatar = $this->profile->generateAvatar(null, $this->postData()['gender']);
+                $generateAvatar = $this->profiles->generateAvatar(null, $this->postData()['gender']);
             } else {
-                $generateAvatar = $this->profile->generateAvatar();//Default Male
+                $generateAvatar = $this->profiles->generateAvatar();//Default Male
             }
 
             if ($generateAvatar) {
-                $this->view->responseCode = $this->profile->packagesData->responseCode;
+                $this->view->responseCode = $this->profiles->packagesData->responseCode;
 
-                $this->view->avatar = $this->profile->packagesData->avatar;
+                $this->view->avatar = $this->profiles->packagesData->avatar;
 
-                $this->view->avatarName = $this->profile->packagesData->avatarName;
+                $this->view->avatarName = $this->profiles->packagesData->avatarName;
 
                 return;
             }

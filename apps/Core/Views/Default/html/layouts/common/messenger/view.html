@@ -21,7 +21,7 @@
         ]
     ]
 %}
-{% set messengerSettings = basepackages.profile.getMessengerSettings() %}
+{% set messengerSettings = basepackages.profiles.getMessengerSettings() %}
 {% if messengerSettings %}
     {% if messengerSettings['status'] is defined %}
         {% set status = messengerSettings['status'] %}

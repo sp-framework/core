@@ -234,7 +234,7 @@ class NotificationsComponent extends BaseComponent
     protected function generateUserInfo($rowId, $data)
     {
         if ($data['created_by'] && $data['created_by'] != '0') {
-            $profile = $this->basepackages->profile->getProfile($data['created_by']);
+            $profile = $this->basepackages->profiles->getProfile($data['created_by']);
 
             if ($profile) {
                 $data['created_by'] = $profile['full_name'];

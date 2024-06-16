@@ -3,13 +3,6 @@
 {% set canUpload = true %}
 {% set canAvatar = true %}
 {% set canRemove = true %}
-{% if account['package_name'] === 'employees' %}
-    {% set firstNameDisabled = true %}
-    {% set lastNameDisabled = true %}
-    {% set canUpload = false %}
-    {% set canAvatar = false %}
-    {% set canRemove = false %}
-{% endif %}
 <div class="row vdivide">
     <div class="col-md-3 col-sm-12">
         {% if profile['portrait'] is defined and profile['portrait'] !== '' %}

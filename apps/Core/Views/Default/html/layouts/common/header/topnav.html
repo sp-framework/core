@@ -15,7 +15,7 @@
         {% if modules.components.getComponentByNameForAppId('Messenger', apps.getAppInfo()['id']) %}
             <li class="nav-item">
                 {% set statusIcon = 'comment' %}
-                {% set messengerSettings = basepackages.profile.getMessengerSettings() %}
+                {% set messengerSettings = basepackages.profiles.getMessengerSettings() %}
                 {% if messengerSettings['mute'] is defined %}
                     {% if messengerSettings['mute'] == true %}
                         {% set statusIcon = 'comment-slash' %}
