@@ -206,7 +206,7 @@ class Profiles extends BasePackage
         if ($profile['contact_address_id']) {
             $address = $profile;
 
-            $address['package_name'] = $this->packageName;
+            $address['package_name'] = 'UsersProfiles';
 
             $address['package_row_id'] = $profile['id'];
 
