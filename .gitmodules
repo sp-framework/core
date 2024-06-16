@@ -1,3 +1,6 @@
 [submodule "phpunit"]
 	path = phpunit
 	url = https://dev.bazaari.com.au/sp-core/phpunit.git
+[submodule "apps/Core/Packages/Devtools/GeoExtractData/Data"]
+	path = apps/Core/Packages/Devtools/GeoExtractData/Data
+	url = https://dev.bazaari.com.au/sp-core/geodata.git
