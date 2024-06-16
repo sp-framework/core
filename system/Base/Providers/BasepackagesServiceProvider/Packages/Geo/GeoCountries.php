@@ -17,15 +17,19 @@ class GeoCountries extends BasePackage
 
     public function searchCountries(string $countryQueryString, $all = false)
     {
-        $searchCountries =
-            $this->getByParams(
-                [
-                    'conditions'    => 'name LIKE :cName:',
-                    'bind'          => [
-                        'cName'     => '%' . $countryQueryString . '%'
+        if ($this->config->databasetype === 'db') {
+            $searchCountries =
+                $this->getByParams(
+                    [
+                        'conditions'    => 'name LIKE :cName:',
+                        'bind'          => [
+                            'cName'     => '%' . $countryQueryString . '%'
+                        ]
                     ]
-                ]
-            );
+                );
+        } else {
+            $searchCountries = $this->getByParams(['conditions' => ['name', 'LIKE', '%' . $countryQueryString . '%']]);
+        }
 
         if ($searchCountries) {
             $countries = [];

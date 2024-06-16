@@ -497,19 +497,6 @@ dataCollectionSection =
                 function toggleGridCell(dataGridId, dataNodeId, bulk, bulkState) {
                     // Only run on columns that have data and are not empty or na (N/A)
                     if (!$('#' + dataGridId).children('span').hasClass('empty') && !$('#' + dataGridId).children('span').hasClass('na')) {
-                        // parents = gridData[dataNodeId]['parents'];
-                        // children = gridData[dataNodeId]['children'];
-                        // var siblings = findSiblings(dataNodeId);
-                        // var viewId, viewState, myState;
-
-                        // viewId = $(siblings)[0].id;
-
-                        // if ($('#' + viewId).children('span').hasClass('text-danger')) {
-                        //     viewState = 'deny';
-                        // } else if ($('#' + viewId).children('span').hasClass('text-success')) {
-                        //     viewState = 'permit';
-                        // }
-
                         // We only need this to store data at the moment. If the array is going to be named array like view => 0, then we dont need this.
                         var subscription, spanClass, spanData;
                         var spanClasses = $('#' + dataGridId).children('span').attr("class").split(/\s+/);
@@ -545,84 +532,6 @@ dataCollectionSection =
                                 gridData[dataNodeId]['subscriptions'][subscription] = 0;
                             }
                         }
-
-                        // if (bulkState === true) {
-                        //     viewState = 'deny';
-                        // } else if (bulkState === false) {
-                        //     viewState = 'permit';
-                        // }
-                        //We only need this to store data at the moment. If the array is going to be named array like view => 0, then we dont need this.
-                        // var permission, spanClass, spanData;
-                        // var spanClasses = $('#' + dataGridId).children('span').attr("class").split(/\s+/);
-                        // $(spanClasses).each(function(index, sclass) {
-                        //     if (sclass.search(/NOTIFICATION-.*/) === 0) {
-                        //         permission = sclass.replace('NOTIFICATION-', '');
-                        //         spanClass = permission + ' ';
-                        //     }
-                        // });
-                        // if (viewState === 'deny' && myState === 'deny') {
-                        //     $('#' + dataGridId).children('span').removeClass('text-danger').addClass('text-success');
-                        //     $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
-                        //     $('#' + viewId).children('span').removeClass('text-danger').addClass('text-success');
-                        //     $('#' + viewId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
-                        //     // gridData[dataNodeId]['subscriptions']['view'] = 1;
-                        //     gridData[dataNodeId]['subscriptions'][permission] = 1;
-                        // } else if (viewState === 'permit' && myState === 'permit') {
-                        //     $('#' + dataGridId).children('span').removeClass('text-success').addClass('text-danger');
-                        //     $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
-                        //     gridData[dataNodeId]['subscriptions'][permission] = 0;
-                        // } else if (viewState === 'permit' && myState === 'deny') {
-                        //     $('#' + dataGridId).children('span').removeClass('text-danger').addClass('text-success');
-                        //     $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
-                        //     gridData[dataNodeId]['subscriptions'][permission] = 1;
-                        // }
-
-                        // Disable all siblings if view is disabled
-                        // if ($('#' + dataGridId)[0].id === viewId) {
-                        //     if (children.length === 0) {
-                        //         if (!bulk) {
-                        //             if (viewState === 'permit') {
-                        //                 $.each(siblings, function(index, sibl) {
-                        //                     if (index > 0) {
-                        //                         if (!$(sibl).children('span').hasClass('empty') && !$(sibl).children('span').hasClass('na')) {
-                        //                             var permission, spanClass, spanData;
-                        //                             var spanClasses = $(sibl).children('span').attr("class").split(/\s+/);
-                        //                             $(spanClasses).each(function(index, sclass) {
-                        //                                 if (sclass.search(/NOTIFICATION-.*/) === 0) {
-                        //                                     permission = sclass.replace('NOTIFICATION-', '');
-                        //                                     spanClass = permission + ' ';
-                        //                                 }
-                        //                                 gridData[dataNodeId]['subscriptions'][permission] = 0;
-                        //                             });
-                        //                             $(sibl).children('span').removeClass('text-success').addClass('text-danger');
-                        //                             $(sibl).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
-                        //                         }
-                        //                     }
-                        //                 });
-                        //             } else if (viewState === 'deny') {
-                        //                 $.each(siblings, function(index, sibl) {
-                        //                     if (index > 0) {
-                        //                         if (!$(sibl).children('span').hasClass('empty') && !$(sibl).children('span').hasClass('na')) {
-                        //                             var permission, spanClass, spanData;
-                        //                             var spanClasses = $(sibl).children('span').attr("class").split(/\s+/);
-                        //                             $(spanClasses).each(function(index, sclass) {
-                        //                                 if (sclass.search(/NOTIFICATION-.*/) === 0) {
-                        //                                     permission = sclass.replace('NOTIFICATION-', '');
-                        //                                     spanClass = permission + ' ';
-                        //                                 }
-                        //                                 gridData[dataNodeId]['subscriptions'][permission] = 0;
-                        //                             });
-                        //                             $(sibl).children('span').removeClass('text-success').addClass('text-danger');
-                        //                             $(sibl).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
-                        //                         }
-                        //                     }
-                        //                 });
-                        //             }
-                        //         } else {
-                        //             //
-                        //         }
-                        //     }
-                        // }
                     }
                     extractData();
                 }
@@ -729,31 +638,6 @@ dataCollectionSection =
                 }
             }
         }),
-        // '{{componentId}}-{{sectionId}}-form-fields'                   :
-        // $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-form-fields'], {
-        //     afterInit : function() {
-        //         //Fix Grid Width
-        //         function fixGrid() {
-        //             var gridCount = $('.jstree-grid-column').length - 1;
-        //             var gridWidth = $('.jstree-grid-wrapper').width();
-        //             var colWidth = (gridWidth - 300) / gridCount;
-
-        //             $('.jstree-grid-column').each(function(index,grid) {
-        //                 if (index !== 0) {
-        //                     $(grid).css({
-        //                         width: colWidth
-        //                     });
-        //                 }
-        //             });
-        //         }
-
-        //         $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
-        //             if (e.target.hash === '#core-profile-main-tabs-notifications') {
-        //                 fixGrid();
-        //             }
-        //         });
-        //     }
-        // }),
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules       : {

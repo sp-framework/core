@@ -57,15 +57,19 @@ class GeoStates extends BasePackage
 
     public function searchStates(string $stateQueryString)
     {
-        $searchStates =
-            $this->getByParams(
-                [
-                    'conditions'    => 'name LIKE :sName:',
-                    'bind'          => [
-                        'sName'     => '%' . $stateQueryString . '%'
+        if ($this->config->databasetype === 'db') {
+            $searchStates =
+                $this->getByParams(
+                    [
+                        'conditions'    => 'name LIKE :sName:',
+                        'bind'          => [
+                            'sName'     => '%' . $stateQueryString . '%'
+                        ]
                     ]
-                ]
-            );
+                );
+        } else {
+            $searchStates = $this->getByParams(['conditions' => ['name', 'LIKE', '%' . $stateQueryString . '%']]);
+        }
 
         if ($searchStates) {
             $states = [];

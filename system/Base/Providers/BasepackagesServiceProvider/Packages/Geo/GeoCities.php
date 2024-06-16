@@ -57,8 +57,8 @@ class GeoCities extends BasePackage
 
     public function searchCities(string $cityQueryString)
     {
-        $searchCities =
-            $this->getByParams(
+        if ($this->config->databasetype === 'db') {
+            $searchCities = $this->getByParams(
                 [
                     'conditions'    => 'name LIKE :cName:',
                     'bind'          => [
@@ -66,6 +66,9 @@ class GeoCities extends BasePackage
                     ]
                 ]
             );
+        } else {
+            $searchCities = $this->getByParams(['conditions' => ['name', 'LIKE', '%' . $cityQueryString . '%']]);
+        }
 
         if ($searchCities) {
             $cities = [];
@@ -86,6 +89,47 @@ class GeoCities extends BasePackage
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->cities = $cities;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function searchPostCodes(string $postCodeQueryString)
+    {
+        if ($this->config->databasetype === 'db') {
+            $searchPostCodes = $this->getByParams(
+                [
+                    'conditions'    => 'postcode LIKE :cPostCode:',
+                    'bind'          => [
+                        'cPostCode'     => '%' . $postCodeQueryString . '%'
+                    ]
+                ]
+            );
+        } else {
+            $searchPostCodes = $this->getByParams(['conditions' => ['postcode', 'LIKE', '%' . $postCodeQueryString . '%']]);
+        }
+
+        if ($searchPostCodes) {
+            $postCodes = [];
+
+            foreach ($searchPostCodes as $postCodeKey => $postCodeValue) {
+                $country = $this->basepackages->geoCountries->getById($postCodeValue['country_id']);
+
+                if ($country['enabled'] == 1 && $country['installed'] == 1) {
+                    $postCodes[$postCodeKey] = $postCodeValue;
+                    $state = $this->basepackages->geoStates->getById($postCodeValue['state_id']);
+                    $postCodes[$postCodeKey]['state_id'] = $state['id'];
+                    $postCodes[$postCodeKey]['state_name'] = $state['name'];
+                    $postCodes[$postCodeKey]['country_id'] = $country['id'];
+                    $postCodes[$postCodeKey]['country_name'] = $country['name'];
+                }
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->postCodes = $postCodes;
 
             return true;
         }

@@ -164,4 +164,27 @@ class CitiesComponent extends BaseComponent
             }
         }
     }
+
+    public function searchPostCodeAction()
+    {
+        if ($this->request->isPost()) {
+            if ($this->postData()['search']) {
+                $searchQuery = $this->postData()['search'];
+
+                if (strlen($searchQuery) < 3) {
+                    return;
+                }
+
+                $searchPostCodes = $this->basepackages->geoCities->searchPostCodes($searchQuery);
+
+                if ($searchPostCodes) {
+                    $this->view->responseCode = $this->basepackages->geoCities->packagesData->responseCode;
+
+                    $this->view->postCodes = $this->basepackages->geoCities->packagesData->postCodes;
+                }
+            } else {
+                $this->addResponse('Search Query Missing', 1);
+            }
+        }
+    }
 }

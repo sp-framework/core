@@ -11,6 +11,10 @@ class ConditionsHandler
 {
     public static function verifyCondition(string $condition, $fieldValue, $value): bool
     {
+        if (!$fieldValue) {
+            return false;
+        }
+
         if ($value instanceof DateTime) {
             if (empty($fieldValue)) {
                 return false;
