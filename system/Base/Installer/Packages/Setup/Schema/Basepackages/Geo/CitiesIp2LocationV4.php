@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class CitiesIp2LocationV4
 {
@@ -28,16 +29,46 @@ class CitiesIp2LocationV4
                     ]
                 ),
                 new Column(
-                    'ip2locationv4',
+                    'range_start',
                     [
-                        'type'          => Column::TYPE_JSON,
-                        'notNull'       => false,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
+                    'range_end',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
+                        'notNull'       => true,
                     ]
                 ),
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
             ]
+        ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_range_start_index',
+                [
+                    'range_start'
+                ],
+                'INDEX'
+            ),
+            new Index(
+                'column_range_end_index',
+                [
+                    'range_end'
+                ],
+                'INDEX'
+            )
         ];
     }
 }

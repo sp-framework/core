@@ -19,12 +19,29 @@ class DevtoolsGeoExtractData extends BasePackage
 
     public $method;
 
+    protected $zip;
+
     public function onConstruct()
     {
         if (!is_dir(base_path($this->sourceDir))) {
             if (!mkdir(base_path($this->sourceDir), 0777, true)) {
                 return false;
             }
+        }
+
+        $this->zip = new \ZipArchive;
+
+        // /etc/apache2.conf - Change the timeout to 3600 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
+        // Timeout 3600
+
+        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
+        if ((int) ini_get('max_execution_time') < 3600) {
+            set_time_limit(3600);
+        }
+
+        //Increase memory_limit to 2G as the process takes a bit of memory to process the array.
+        if ((int) ini_get('memory_limit') < 2048) {
+            ini_set('memory_limit', '2048M');
         }
 
         parent::onConstruct();
@@ -61,19 +78,6 @@ class DevtoolsGeoExtractData extends BasePackage
 
     protected function processGeoData()
     {
-        // /etc/apache2.conf - Change the timeout to 1800 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
-        // Timeout 1800
-
-        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
-        if ((int) ini_get('max_execution_time') < 1800) {
-            set_time_limit(1800);
-        }
-
-        //Increase memory_limit to 2G as the process takes a bit of memory to process the array.
-        if ((int) ini_get('memory_limit') < 2048) {
-            ini_set('memory_limit', '2048M');
-        }
-
         $countries = [];
 
         try {
@@ -146,26 +150,26 @@ class DevtoolsGeoExtractData extends BasePackage
     {
         set_time_limit(120);
 
-        $zip = new \ZipArchive;
+        if ($this->zip->open(base_path($sourceFile)) === true) {
+            $this->zip->extractTo(base_path($this->sourceDir));
 
-        if ($zip->open(base_path($sourceFile))) {
-            $zip->extractTo(base_path($this->sourceDir));
+            $this->zip->close();
+
+            return true;
         }
 
-        $zip->close();
+        $this->addResponse('Not able to extract file: ' . $sourceFile . ' Check the file.', 1);
 
-        return true;
+        return false;
     }
 
     protected function compressZip($sourceFile)
     {
-        $zip = new \ZipArchive;
+        $this->zip->open(base_path($this->sourceDir . $sourceFile . '.zip'), $this->zip::CREATE);
 
-        $zip->open(base_path($this->sourceDir . $sourceFile . '.zip'), $zip::CREATE);
+        $this->zip->addFile(base_path($this->sourceDir . $sourceFile . '.json'), $sourceFile . '.json');
 
-        $zip->addFile(base_path($this->sourceDir . $sourceFile . '.json'), $sourceFile . '.json');
-
-        $zip->close();
+        $this->zip->close();
     }
 
     protected function downloadTimezoneData()
@@ -274,19 +278,6 @@ class DevtoolsGeoExtractData extends BasePackage
 
     protected function processCSV($ipType)
     {
-        // /etc/apache2.conf - Change the timeout to 1800 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
-        // Timeout 1800
-
-        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
-        if ((int) ini_get('max_execution_time') < 1800) {
-            set_time_limit(1800);
-        }
-
-        //Increase memory_limit to 2G as the process takes a bit of memory to process the array.
-        if ((int) ini_get('memory_limit') < 2048) {
-            ini_set('memory_limit', '2048M');
-        }
-
         $countries = [];
         $countryKeys = [];
 
@@ -336,19 +327,6 @@ class DevtoolsGeoExtractData extends BasePackage
 
     protected function mergeGeoIpData()
     {
-        // /etc/apache2.conf - Change the timeout to 1800 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
-        // Timeout 1800
-
-        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
-        if ((int) ini_get('max_execution_time') < 1800) {
-            set_time_limit(1800);
-        }
-
-        //Increase memory_limit to 2G as the process takes a bit of memory to process the array.
-        if ((int) ini_get('memory_limit') < 2048) {
-            ini_set('memory_limit', '2048M');
-        }
-
         try {
             $allCountries = $this->helper->decode($this->localContent->read($this->sourceDir . 'ip2location/AllCountries.json'), true);
 

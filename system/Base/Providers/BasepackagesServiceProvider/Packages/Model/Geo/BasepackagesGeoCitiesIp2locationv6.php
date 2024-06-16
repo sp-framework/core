@@ -10,5 +10,7 @@ class BasepackagesGeoCitiesIp2locationv6 extends BaseModel
 
     public $city_id;
 
-    public $ip2locationv6;
+    public $range_start;
+
+    public $range_end;
 }

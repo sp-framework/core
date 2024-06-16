@@ -25,21 +25,19 @@ class ExtractgeodataComponent extends BaseComponent
     //Ip2Location data from ip2location.com (lite version)
     public function processAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->basepackages->progress->checkProgressFile()) {
-                $this->basepackages->progress->deleteProgressFile();
-            }
+        if ($this->basepackages->progress->checkProgressFile()) {
+            $this->basepackages->progress->deleteProgressFile();
+        }
 
-            if (!$this->registerProgressMethods()) {
-                $this->addResponse('No Methods Selected', 1);
+        if (!$this->registerProgressMethods()) {
+            $this->addResponse('No Methods Selected', 1);
 
-                return;
-            }
+            return;
+        }
 
+        try {
             if (isset($this->postData()['geo']) && $this->postData()['geo'] == 'true') {
                 $this->geoExtractDataPackage->downloadGeoData();
                 $this->geoExtractDataPackage->processGeoData();
@@ -66,8 +64,12 @@ class ExtractgeodataComponent extends BaseComponent
                 $this->geoExtractDataPackage->packagesData->responseMessage,
                 $this->geoExtractDataPackage->packagesData->responseCode
             );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
+        } catch (\throwable $e) {
+            $this->basepackages->progress->preCheckComplete(false);
+
+            $this->basepackages->progress->resetProgress();
+
+            $this->addResponse($e->getMessage(), 1);
         }
     }
 
@@ -110,28 +112,28 @@ class ExtractgeodataComponent extends BaseComponent
         if (isset($this->postData()['ip']) && $this->postData()['ip'] == 'true') {
             $methods = array_merge($methods,
                 [
-                    [
-                        'method'    => 'downloadGeoIpv4Data',
-                        'text'      => 'Download Geo Location IPv4 Data...',
-                        'remoteWeb' => true
-                    ],
-                    [
-                        'method'    => 'unzipGeoIpv4Data',
-                        'text'      => 'Unzip Geo Location IPv4 Data...',
-                    ],
+                    // [
+                    //     'method'    => 'downloadGeoIpv4Data',
+                    //     'text'      => 'Download Geo Location IPv4 Data...',
+                    //     'remoteWeb' => true
+                    // ],
+                    // [
+                    //     'method'    => 'unzipGeoIpv4Data',
+                    //     'text'      => 'Unzip Geo Location IPv4 Data...',
+                    // ],
                     [
                         'method'    => 'processGeoIpv4Data',
                         'text'      => 'Process Geo Location IPv4 Data. This will take a while...',
                     ],
-                    [
-                        'method'    => 'downloadGeoIpv6Data',
-                        'text'      => 'Download Geo Location IPv6 Data...',
-                        'remoteWeb' => true
-                    ],
-                    [
-                        'method'    => 'unzipGeoIpv6Data',
-                        'text'      => 'Unzip Geo Location IPv6 Data...',
-                    ],
+                    // [
+                    //     'method'    => 'downloadGeoIpv6Data',
+                    //     'text'      => 'Download Geo Location IPv6 Data...',
+                    //     'remoteWeb' => true
+                    // ],
+                    // [
+                    //     'method'    => 'unzipGeoIpv6Data',
+                    //     'text'      => 'Unzip Geo Location IPv6 Data...',
+                    // ],
                     [
                         'method'    => 'processGeoIpv6Data',
                         'text'      => 'Process Geo Location IPv6 Data. This will take a while...',

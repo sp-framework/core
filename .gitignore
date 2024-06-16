@@ -30,7 +30,6 @@ apps/*
 !apps/Core/
 .ff/*
 .sql/*
-system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/*
 .api/
 phpstan.neon
 psalm.xml
