@@ -69,7 +69,13 @@ class Accounts extends BasePackage
                     $account['profile'] = $this->model->getProfile()->toArray();
                 }
             } else {
-                //We grab the profile package information from packages
+                $profilePackage = $this->modules->packages->getPackageByName($account['profile_package_name']);
+
+                if ($profilePackage) {
+                    $profilePackageClass = new $profilePackage['class']();
+
+                    $account['profile'] = $profilePackageClass->getById((int) $account['profile_package_row_id']);
+                }
             }
 
             $account['role'] = [];
@@ -98,7 +104,13 @@ class Accounts extends BasePackage
         } else {
             if ($this->ffData) {
                 if ($this->ffData['profile_package_name'] !== 'UsersProfiles') {
-                    //We grab the profile package information from packages
+                    $profilePackage = $this->modules->packages->getPackageByName($this->ffData['profile_package_name']);
+
+                    if ($profilePackage) {
+                        $profilePackageClass = new $profilePackage['class']();
+
+                        $this->ffData['profile'] = $profilePackageClass->getById((int) $this->ffData['profile_package_row_id']);
+                    }
                 }
 
                 if ($this->ffData['api_clients'] && is_array($this->ffData['api_clients']) && count($this->ffData['api_clients']) > 0) {
