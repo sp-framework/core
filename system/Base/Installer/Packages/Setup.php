@@ -185,6 +185,8 @@ class Setup
 
 	protected $onlyUpdateDb = false;
 
+	protected $storesToIndex = [];
+
 	public function __construct($container, $postData, $precheckFail = false, $onlyUpdateDb = false)
 	{
 		$this->container = $container;
@@ -726,6 +728,10 @@ class Setup
 				$this->ff->store($tableName, $config, $schema, $this->ff)->deleteStore();
 
 				$this->ff->store($tableName, $config, $schema, $this->ff);
+
+				if (method_exists($tableClass['schema'], 'indexes')) {
+					array_push($this->storesToIndex, $tableName);
+				}
 			}
 		}
 
@@ -1081,6 +1087,22 @@ class Setup
 	protected function registerTasks()
 	{
 		(new RegisterTasks())->register($this->db, $this->ff);
+
+		return true;
+	}
+
+	protected function performIndexing()
+	{
+		if (isset($this->postData['databasetype']) &&
+			$this->postData['databasetype'] !== 'db' &&
+			count($this->storesToIndex) > 0
+		) {
+			foreach ($this->storesToIndex as $storeToIndex) {
+				$store = $this->ff->store($storeToIndex);
+
+				$store->reIndexStore();
+			}
+		}
 
 		return true;
 	}

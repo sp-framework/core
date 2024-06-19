@@ -12057,29 +12057,29 @@ var BazProgress = function() {
                             }).addClass('bg-success');
                             $('#' + $(element)[0].id + ' .progress-child').attr('hidden', true);
                             $('.child-progress-span').attr('hidden', true);
-                        }
 
-                        if (manualShowHide) {
-                            $(element).attr('hidden', true);
-                        } else {
-                            $(element).attr('hidden', false);
-                        }
+                            if (manualShowHide) {
+                                $(element).attr('hidden', true);
+                            } else {
+                                $(element).attr('hidden', false);
+                            }
 
-                        if (callableFunc && callableFunc['onComplete']) {
-                            callableFunc['onComplete'](response);
-                        }
+                            if (callableFunc && callableFunc['onComplete']) {
+                                callableFunc['onComplete'](response);
+                            }
 
-                        downloadTotal = 0;
-                        downloadedBytes = 0;
-                        uploadTotal = 0;
-                        uploadedBytes = 0;
-                        isUpload = false;
-                        isDownload = false;
-                        $('.' + $(element)[0].id + '-child-bar').css('width', '0%');
-                        $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 0);
-                        $('.' + $(element)[0].id + '-remote-bar').css('width', '0%');
-                        $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
-                        $('.progress-remote, .remote-progress-span').attr('hidden', true);
+                            downloadTotal = 0;
+                            downloadedBytes = 0;
+                            uploadTotal = 0;
+                            uploadedBytes = 0;
+                            isUpload = false;
+                            isDownload = false;
+                            $('.' + $(element)[0].id + '-child-bar').css('width', '0%');
+                            $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 0);
+                            $('.' + $(element)[0].id + '-remote-bar').css('width', '0%');
+                            $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
+                            $('.progress-remote, .remote-progress-span').attr('hidden', true);
+                        }
                     } else {
                         resetProgressCounter();
                     }
