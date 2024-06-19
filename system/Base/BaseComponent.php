@@ -140,7 +140,9 @@ abstract class BaseComponent extends Controller
 		if (!$this->component) {
 			$this->component = $componentByRoute;
 		} else {
-			if ($this->component['route'] !== $componentByRoute['route']) {//Incorrect component captured due to same shortname grabbed via reflection
+			if ($componentByRoute &&
+				($this->component['route'] !== $componentByRoute['route'])
+			) {//Incorrect component captured due to same shortname grabbed via reflection
 				$this->component = $componentByRoute;
 			}
 		}
