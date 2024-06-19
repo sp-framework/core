@@ -51,7 +51,7 @@ class Countries
             if ($ff) {
                 $countryStore = $ff->store('basepackages_geo_countries');
 
-                $countryStore->updateOrInsert($countryToInsert);
+                $countryStore->updateOrInsert($countryToInsert, false);
             }
         }
 

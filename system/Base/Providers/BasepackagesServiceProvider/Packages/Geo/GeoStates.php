@@ -15,8 +15,9 @@ class GeoStates extends BasePackage
 
     public function addState(array $data)
     {
-        if ($this->add($data)) {
+        $data['id'] = $this->getNextIdFromDB();
 
+        if ($this->add($data)) {
             if (!isset($data['id'])) {
                 if ($this->config->databasetype === 'db') {
                     $this->updateSeq();
@@ -29,21 +30,34 @@ class GeoStates extends BasePackage
         }
     }
 
-    protected function updateSeq()
+    protected function getNextIdFromDB()
     {
-        $lastStateId = $this->modelToUse::maximum(['column' => 'id']);
+        if ($this->config->databasetype === 'db') {
+            $model = new $this->modelToUse;
+            $table = $model->getSource();
+            $sql = "SELECT id FROM {$table} ORDER BY id DESC LIMIT 1";
 
-        if ($lastStateId && (int) $lastStateId > 100000) {
-            return;
+            $lastDBId = $this->executeSql($sql);
+            $lastDBId->setFetchMode(\Phalcon\Db\Enum::FETCH_ASSOC);
+
+            if ((int) $lastDBId->fetch()['id'] < 1000) {
+                return 1001;
+            } else {
+                return (int) $lastDBId->fetch()['id'] + 1;
+            }
+        } else {
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+            $this->ffStore->count(true);
+
+            $this->setFFAddUsingUpdateOrInsert(true);
+
+            if ((int) $this->ffStore->getLastInsertedId() < 10000) {
+                return 10001;
+            } else {
+                return (int) $this->ffStore->getLastInsertedId() + 1;
+            }
         }
-
-        $model = new $this->modelToUse;
-
-        $table = $model->getSource();
-
-        $sql = "UPDATE `{$table}` SET `id` = ? WHERE `{$table}`.`id` = ?";
-
-        $this->db->execute($sql, [100001, $this->packagesData->last['id']]);
     }
 
     public function updateState(array $data)

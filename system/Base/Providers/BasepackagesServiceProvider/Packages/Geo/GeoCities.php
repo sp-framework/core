@@ -15,8 +15,9 @@ class GeoCities extends BasePackage
 
     public function addCity(array $data)
     {
-        if ($this->add($data)) {
+        $this->setFFAddUsingUpdateOrInsert(true);
 
+        if ($this->add($data)) {
             if (!isset($data['id'])) {
                 if ($this->config->databasetype === 'db') {
                     $this->updateSeq();

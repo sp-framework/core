@@ -61,12 +61,11 @@ class GeoCountries extends BasePackage
             $data['installed'] = '1';
         }
 
-        if ($this->add($data)) {
+        $data['id'] = $this->getNextIdFromDB();
 
-            if (!isset($data['id'])) {
-                if ($this->config->databasetype === 'db') {
-                    $this->updateSeq();
-                }
+        if ($this->add($data)) {
+            if ($this->config->databasetype !== 'db') {
+                $this->ffStore->count(true);
             }
 
             $this->addResponse('Added country ' . $data['name']);
@@ -75,21 +74,34 @@ class GeoCountries extends BasePackage
         }
     }
 
-    protected function updateSeq()
+    protected function getNextIdFromDB()
     {
-        $lastCountryId = $this->modelToUse::maximum(['column' => 'id']);
+        if ($this->config->databasetype === 'db') {
+            $model = new $this->modelToUse;
+            $table = $model->getSource();
+            $sql = "SELECT id FROM {$table} ORDER BY id DESC LIMIT 1";
 
-        if ($lastCountryId && (int) $lastCountryId > 1000) {
-            return;
+            $lastDBId = $this->executeSql($sql);
+            $lastDBId->setFetchMode(\Phalcon\Db\Enum::FETCH_ASSOC);
+
+            if ((int) $lastDBId->fetch()['id'] < 1000) {
+                return 1001;
+            } else {
+                return (int) $lastDBId->fetch()['id'] + 1;
+            }
+        } else {
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+            $this->ffStore->count(true);
+
+            $this->setFFAddUsingUpdateOrInsert(true);
+
+            if ((int) $this->ffStore->getLastInsertedId() < 1000) {
+                return 1001;
+            } else {
+                return (int) $this->ffStore->getLastInsertedId() + 1;
+            }
         }
-
-        $model = new $this->modelToUse;
-
-        $table = $model->getSource();
-
-        $sql = "UPDATE `{$table}` SET `id` = ? WHERE `{$table}`.`id` = ?";
-
-        $this->db->execute($sql, [1001, $this->packagesData->last['id']]);
     }
 
     public function updateCountry(array $data)
@@ -140,7 +152,7 @@ class GeoCountries extends BasePackage
                 $this->remoteWebContent
                     ->request(
                         'GET',
-                        'https://dev.bazaari.com.au/sp-public/geodata/raw/branch/master/' . $country . '.zip',
+                        'https://github.com/oyeaussie/sp-geodata/raw/main/' . $country . '.zip',
                         ['verify' => false]
                     )->getBody()->getContents()
                 );
@@ -160,7 +172,7 @@ class GeoCountries extends BasePackage
 
         try {
             if ($zip->open(base_path($this->sourceDir . $country . '.zip'))) {
-                if (!$zip->extractTo('/')) {
+                if (!$zip->extractTo(base_path($this->sourceDir))) {
                     $this->addResponse('Country zip file corrupt.', 1);
 
                     return false;
@@ -180,21 +192,6 @@ class GeoCountries extends BasePackage
             return false;
         }
     }
-
-    // protected function registerTimezones($timezonesData, $country_id)
-    // {
-    //     foreach ($timezonesData as $key => $timezone) {
-    //         $geoTimezone = [];
-    //         $geoTimezone['country_id'] = $country_id;
-    //         $geoTimezone['zone_name'] = $timezone['zoneName'];
-    //         $geoTimezone['gmt_offset'] = $timezone['gmtOffset'];
-    //         $geoTimezone['gmt_offset_name'] = $timezone['gmtOffsetName'];
-    //         $geoTimezone['abbreviation'] = $timezone['abbreviation'];
-    //         $geoTimezone['tz_name'] = $timezone['tzName'];
-
-    //         $this->basepackages->geoTimezones->add($geoTimezone);
-    //     }
-    // }
 
     protected function registerStates($statesData, $country_id)
     {
