@@ -112,28 +112,28 @@ class ExtractgeodataComponent extends BaseComponent
         if (isset($this->postData()['ip']) && $this->postData()['ip'] == 'true') {
             $methods = array_merge($methods,
                 [
-                    // [
-                    //     'method'    => 'downloadGeoIpv4Data',
-                    //     'text'      => 'Download Geo Location IPv4 Data...',
-                    //     'remoteWeb' => true
-                    // ],
-                    // [
-                    //     'method'    => 'unzipGeoIpv4Data',
-                    //     'text'      => 'Unzip Geo Location IPv4 Data...',
-                    // ],
+                    [
+                        'method'    => 'downloadGeoIpv4Data',
+                        'text'      => 'Download Geo Location IPv4 Data...',
+                        'remoteWeb' => true
+                    ],
+                    [
+                        'method'    => 'unzipGeoIpv4Data',
+                        'text'      => 'Unzip Geo Location IPv4 Data...',
+                    ],
                     [
                         'method'    => 'processGeoIpv4Data',
                         'text'      => 'Process Geo Location IPv4 Data. This will take a while...',
                     ],
-                    // [
-                    //     'method'    => 'downloadGeoIpv6Data',
-                    //     'text'      => 'Download Geo Location IPv6 Data...',
-                    //     'remoteWeb' => true
-                    // ],
-                    // [
-                    //     'method'    => 'unzipGeoIpv6Data',
-                    //     'text'      => 'Unzip Geo Location IPv6 Data...',
-                    // ],
+                    [
+                        'method'    => 'downloadGeoIpv6Data',
+                        'text'      => 'Download Geo Location IPv6 Data...',
+                        'remoteWeb' => true
+                    ],
+                    [
+                        'method'    => 'unzipGeoIpv6Data',
+                        'text'      => 'Unzip Geo Location IPv6 Data...',
+                    ],
                     [
                         'method'    => 'processGeoIpv6Data',
                         'text'      => 'Process Geo Location IPv6 Data. This will take a while...',

@@ -161,21 +161,14 @@ class DomainsComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-            $this->domains->addDomain($this->postData());
+        $this->requestIsPost();
 
-            $this->view->responseCode = $this->domains->packagesData->responseCode;
+        $this->domains->addDomain($this->postData());
 
-            $this->view->responseMessage = $this->domains->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->domains->packagesData->responseMessage,
+            $this->domains->packagesData->responseCode
+        );
     }
 
     /**
@@ -183,21 +176,14 @@ class DomainsComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-            $this->domains->updateDomain($this->postData());
+        $this->requestIsPost();
 
-            $this->view->responseCode = $this->domains->packagesData->responseCode;
+        $this->domains->updateDomain($this->postData());
 
-            $this->view->responseMessage = $this->domains->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->domains->packagesData->responseMessage,
+            $this->domains->packagesData->responseCode
+        );
     }
 
     /**
@@ -205,56 +191,38 @@ class DomainsComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            $this->domains->removeDomain($this->postData());
+        $this->domains->removeDomain($this->postData());
 
-            $this->view->responseCode = $this->domains->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->domains->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->domains->packagesData->responseMessage,
+            $this->domains->packagesData->responseCode
+        );
     }
 
     public function validateDomainAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
+        $this->requestIsPost();
+
+        if ($this->postData()['name']) {
+            $domainDetails = $this->domains->validateDomain($this->postData()['name']);
+
+            if ($domainDetails) {
+                $this->view->domainDetails = $this->domains->packagesData->domainDetails;
+
+                if ($this->view->domainDetails['internal'] === true) {
+                    $this->addResponse('Domain details not found on the internet.', 3);
+                } else if ($this->view->domainDetails['internal'] === false && $this->view->domainDetails['matched'] === false) {
+                    $this->addResponse('Domain details found on the internet, but did not match.', 4);
+                } else {
+                    $this->addResponse('Domain details found on the internet.');
+                }
+
                 return;
             }
 
-            if ($this->postData()['name']) {
-                $domainDetails = $this->domains->validateDomain($this->postData()['name']);
-
-                if ($domainDetails) {
-                    $this->view->domainDetails = $this->domains->packagesData->domainDetails;
-
-                    if ($this->view->domainDetails['internal'] === true) {
-                        $this->view->responseMessage = 'Domain details not found on the internet.';
-                        $this->view->responseCode = 3;
-                    } else if ($this->view->domainDetails['internal'] === false && $this->view->domainDetails['matched'] === false) {
-                        $this->view->responseMessage = 'Domain details found on the internet, but did not match.';
-                        $this->view->responseCode = 4;
-                    } else {
-                        $this->view->responseCode = 0;
-                        $this->view->responseMessage = 'Domain details found on the internet.';
-                    }
-
-                    return;
-                }
-
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'Domain details not found!';
-            }
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Domain details not found!', 1);
         }
     }
 }

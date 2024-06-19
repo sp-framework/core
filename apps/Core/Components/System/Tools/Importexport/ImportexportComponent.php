@@ -191,20 +191,14 @@ class ImportexportComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->importexport->addImportExport($this->postData());
+        $this->basepackages->importexport->addImportExport($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->importexport->packagesData->responseMessage,
-                $this->basepackages->importexport->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->importexport->packagesData->responseMessage,
+            $this->basepackages->importexport->packagesData->responseCode
+        );
     }
 
     /**
@@ -212,27 +206,21 @@ class ImportexportComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->importexport->updateImportExport($this->postData());
+        $this->basepackages->importexport->updateImportExport($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->importexport->packagesData->responseMessage,
-                $this->basepackages->importexport->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->importexport->packagesData->responseMessage,
+            $this->basepackages->importexport->packagesData->responseCode
+        );
     }
 
     public function getPackageFieldsAction($componentId = null)
     {
         if ($this->request->isPost() || $componentId) {
-            if ($this->request->isPost() && !$this->checkCSRF()) {
-                return;
+            if ($this->request->isPost()) {
+                $this->requestIsPost();
             }
 
             if (!$componentId && $this->postData()['id']) {
@@ -262,65 +250,45 @@ class ImportexportComponent extends BaseComponent
             );
 
             return $responseData;
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
     public function getStructureFileLinkAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->importexport->getStructureFileLink($this->postData());
+        $this->basepackages->importexport->getStructureFileLink($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->importexport->packagesData->responseMessage,
-                $this->basepackages->importexport->packagesData->responseCode,
-                $this->basepackages->importexport->packagesData->responseData,
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->importexport->packagesData->responseMessage,
+            $this->basepackages->importexport->packagesData->responseCode,
+            $this->basepackages->importexport->packagesData->responseData,
+        );
     }
 
     public function readFileAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->importexport->readFile($this->postData());
+        $this->basepackages->importexport->readFile($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->importexport->packagesData->responseMessage,
-                $this->basepackages->importexport->packagesData->responseCode,
-                $this->basepackages->importexport->packagesData->responseData,
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->importexport->packagesData->responseMessage,
+            $this->basepackages->importexport->packagesData->responseCode,
+            $this->basepackages->importexport->packagesData->responseData,
+        );
     }
 
     public function processFileAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->importexport->processFile($this->postData());
+        $this->basepackages->importexport->processFile($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->importexport->packagesData->responseMessage,
-                $this->basepackages->importexport->packagesData->responseCode,
-                $this->basepackages->importexport->packagesData->responseData,
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->importexport->packagesData->responseMessage,
+            $this->basepackages->importexport->packagesData->responseCode,
+            $this->basepackages->importexport->packagesData->responseData,
+        );
     }
 }

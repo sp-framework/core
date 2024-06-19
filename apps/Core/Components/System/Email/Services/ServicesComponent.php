@@ -85,22 +85,14 @@ class ServicesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->emailservices->addEmailService($this->postData());
+        $this->emailservices->addEmailService($this->postData());
 
-            $this->view->responseCode = $this->emailservices->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->emailservices->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->emailservices->packagesData->responseMessage,
+            $this->emailservices->packagesData->responseCode
+        );
     }
 
     /**
@@ -108,22 +100,14 @@ class ServicesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->emailservices->updateEmailService($this->postData());
+        $this->emailservices->updateEmailService($this->postData());
 
-            $this->view->responseCode = $this->emailservices->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->emailservices->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->emailservices->packagesData->responseMessage,
+            $this->emailservices->packagesData->responseCode
+        );
     }
 
     /**
@@ -131,36 +115,25 @@ class ServicesComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            $this->emailservices->removeEmailService($this->postData());
+        $this->emailservices->removeEmailService($this->postData());
 
-            $this->view->responseCode = $this->emailservices->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->emailservices->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->emailservices->packagesData->responseMessage,
+            $this->emailservices->packagesData->responseCode
+        );
     }
 
     public function testEmailServiceAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-            $this->emailservices->testEmailService($this->postData());
+        $this->requestIsPost();
 
-            $this->view->responseCode = $this->emailservices->packagesData->responseCode;
+        $this->emailservices->testEmailService($this->postData());
 
-            $this->view->responseMessage = $this->emailservices->packagesData->responseMessage;
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->emailservices->packagesData->responseMessage,
+            $this->emailservices->packagesData->responseCode
+        );
     }
 }

@@ -122,20 +122,14 @@ class RolesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->roles->addRole($this->postData());
+        $this->roles->addRole($this->postData());
 
-            $this->addResponse(
-                $this->roles->packagesData->responseMessage,
-                $this->roles->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->roles->packagesData->responseMessage,
+            $this->roles->packagesData->responseCode
+        );
     }
 
     /**
@@ -143,20 +137,14 @@ class RolesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->roles->updateRole($this->postData());
+        $this->roles->updateRole($this->postData());
 
-            $this->addResponse(
-                $this->roles->packagesData->responseMessage,
-                $this->roles->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->roles->packagesData->responseMessage,
+            $this->roles->packagesData->responseCode
+        );
     }
 
     /**
@@ -164,16 +152,13 @@ class RolesComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            $this->roles->removeRole($this->postData());
+        $this->roles->removeRole($this->postData());
 
-            $this->addResponse(
-                $this->roles->packagesData->responseMessage,
-                $this->roles->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->roles->packagesData->responseMessage,
+            $this->roles->packagesData->responseCode
+        );
     }
 }

@@ -120,8 +120,9 @@ class TemplatesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->hasFiles()) {
+        $this->requestIsPost();
 
+        if ($this->request->hasFiles()) {
             if ($this->templates->storeFile()) {
                 $this->view->templateData = $this->templates->packagesData->templateData;
             }
@@ -134,20 +135,12 @@ class TemplatesComponent extends BaseComponent
             return;
         }
 
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->templates->addTemplate($this->postData());
 
-            $this->templates->addTemplate($this->postData());
-
-            $this->addResponse(
-                $this->templates->packagesData->responseMessage,
-                $this->templates->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->templates->packagesData->responseMessage,
+            $this->templates->packagesData->responseCode
+        );
     }
 
     /**
@@ -155,20 +148,14 @@ class TemplatesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->templates->updateTemplate($this->postData());
+        $this->templates->updateTemplate($this->postData());
 
-            $this->addResponse(
-                $this->templates->packagesData->responseMessage,
-                $this->templates->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->templates->packagesData->responseMessage,
+            $this->templates->packagesData->responseCode
+        );
     }
 
     /**
@@ -176,38 +163,26 @@ class TemplatesComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->templates->removeTemplate($this->postData());
+        $this->templates->removeTemplate($this->postData());
 
-            $this->addResponse(
-                $this->templates->packagesData->responseMessage,
-                $this->templates->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->templates->packagesData->responseMessage,
+            $this->templates->packagesData->responseCode
+        );
     }
 
     public function testTemplateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->templates->testTemplate($this->postData());
+        $this->templates->testTemplate($this->postData());
 
-            $this->addResponse(
-                $this->templates->packagesData->responseMessage,
-                $this->templates->packagesData->responseCode,
-                $this->templates->packagesData->responseData
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->templates->packagesData->responseMessage,
+            $this->templates->packagesData->responseCode,
+            $this->templates->packagesData->responseData
+        );
     }
 }

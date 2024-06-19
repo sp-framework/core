@@ -207,21 +207,14 @@ class AccountsComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->accounts->addAccount($this->postData());
 
-            $this->accounts->addAccount($this->postData());
-
-            $this->addResponse(
-                $this->accounts->packagesData->responseMessage,
-                $this->accounts->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->accounts->packagesData->responseMessage,
+            $this->accounts->packagesData->responseCode
+        );
     }
 
     /**
@@ -229,26 +222,14 @@ class AccountsComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->accounts->updateAccount($this->postData());
 
-            try {
-            $this->accounts->updateAccount($this->postData());
-
-        }catch (\Exception $e) {
-            trace([$e]);
-        }
-
-            $this->addResponse(
-                $this->accounts->packagesData->responseMessage,
-                $this->accounts->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->accounts->packagesData->responseMessage,
+            $this->accounts->packagesData->responseCode
+        );
     }
 
     /**
@@ -256,20 +237,13 @@ class AccountsComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->accounts->removeAccount($this->postData());
 
-            $this->accounts->removeAccount($this->postData());
-
-            $this->addResponse(
-                $this->accounts->packagesData->responseMessage,
-                $this->accounts->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->accounts->packagesData->responseMessage,
+            $this->accounts->packagesData->responseCode
+        );
     }
 }

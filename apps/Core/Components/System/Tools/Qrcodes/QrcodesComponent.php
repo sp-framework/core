@@ -52,41 +52,31 @@ class QrcodesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->qrcodes->updateQrcodesSettings($this->postData());
+        $this->qrcodes->updateQrcodesSettings($this->postData());
 
-            $this->addResponse(
-                $this->qrcodes->packagesData->responseMessage,
-                $this->qrcodes->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->qrcodes->packagesData->responseMessage,
+            $this->qrcodes->packagesData->responseCode
+        );
     }
 
     public function testQrcodeAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->generateQrcodeAction();
+        $this->generateQrcodeAction();
 
-            if ($this->qrcodes->packagesData->responseCode === 0) {
-                $this->view->qrcode = $this->qrcodes->packagesData->qrcode;
-            }
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
+        if ($this->qrcodes->packagesData->responseCode === 0) {
+            $this->view->qrcode = $this->qrcodes->packagesData->qrcode;
         }
     }
 
     public function generateQrcodeAction()
     {
+        $this->requestIsPost();
+
         $this->qrcodes->generateQrcode($this->postData()['qrcode'], $this->postData());
 
         $this->addResponse(

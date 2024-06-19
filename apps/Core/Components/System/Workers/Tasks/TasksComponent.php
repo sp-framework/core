@@ -231,20 +231,14 @@ class TasksComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->tasks->addTask($this->postData());
+        $this->tasks->addTask($this->postData());
 
-            $this->addResponse(
-                $this->tasks->packagesData->responseMessage,
-                $this->tasks->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->tasks->packagesData->responseMessage,
+            $this->tasks->packagesData->responseCode
+        );
     }
 
     /**
@@ -252,20 +246,14 @@ class TasksComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->tasks->updateTask($this->postData());
+        $this->tasks->updateTask($this->postData());
 
-            $this->addResponse(
-                $this->tasks->packagesData->responseMessage,
-                $this->tasks->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->tasks->packagesData->responseMessage,
+            $this->tasks->packagesData->responseCode
+        );
     }
 
     /**
@@ -273,31 +261,25 @@ class TasksComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            $this->tasks->removeTask($this->postData());
+        $this->tasks->removeTask($this->postData());
 
-            $this->addResponse(
-                $this->tasks->packagesData->responseMessage,
-                $this->tasks->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->tasks->packagesData->responseMessage,
+            $this->tasks->packagesData->responseCode
+        );
     }
 
     public function forceNextRunAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            $this->tasks->forceNextRun($this->postData());
+        $this->tasks->forceNextRun($this->postData());
 
-            $this->addResponse(
-                $this->tasks->packagesData->responseMessage,
-                $this->tasks->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->tasks->packagesData->responseMessage,
+            $this->tasks->packagesData->responseCode
+        );
     }
 }

@@ -77,20 +77,14 @@ class SchedulesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->schedules->addSchedule($this->postData());
+        $this->schedules->addSchedule($this->postData());
 
-            $this->addResponse(
-                $this->schedules->packagesData->responseMessage,
-                $this->schedules->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->schedules->packagesData->responseMessage,
+            $this->schedules->packagesData->responseCode
+        );
     }
 
     /**
@@ -98,20 +92,14 @@ class SchedulesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->schedules->updateSchedule($this->postData());
+        $this->schedules->updateSchedule($this->postData());
 
-            $this->addResponse(
-                $this->schedules->packagesData->responseMessage,
-                $this->schedules->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->schedules->packagesData->responseMessage,
+            $this->schedules->packagesData->responseCode
+        );
     }
 
     /**
@@ -119,16 +107,13 @@ class SchedulesComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            $this->schedules->removeSchedule($this->postData());
+        $this->schedules->removeSchedule($this->postData());
 
-            $this->addResponse(
-                $this->schedules->packagesData->responseMessage,
-                $this->schedules->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->schedules->packagesData->responseMessage,
+            $this->schedules->packagesData->responseCode
+        );
     }
 }

@@ -222,20 +222,14 @@ class ViewssettingsComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->modules->viewsSettings->addViewsSettings($this->postData());
+        $this->modules->viewsSettings->addViewsSettings($this->postData());
 
-            $this->addResponse(
-                $this->modules->viewsSettings->packagesData->responseMessage,
-                $this->modules->viewsSettings->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->modules->viewsSettings->packagesData->responseMessage,
+            $this->modules->viewsSettings->packagesData->responseCode
+        );
     }
 
     /**
@@ -243,20 +237,14 @@ class ViewssettingsComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->modules->viewsSettings->updateViewsSettings($this->postData());
+        $this->modules->viewsSettings->updateViewsSettings($this->postData());
 
-            $this->addResponse(
-                $this->modules->viewsSettings->packagesData->responseMessage,
-                $this->modules->viewsSettings->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->modules->viewsSettings->packagesData->responseMessage,
+            $this->modules->viewsSettings->packagesData->responseCode
+        );
     }
 
     /**
@@ -264,77 +252,61 @@ class ViewssettingsComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->modules->viewsSettings->removeViewsSettings($this->postData());
+        $this->modules->viewsSettings->removeViewsSettings($this->postData());
 
-            $this->addResponse(
-                $this->modules->viewsSettings->packagesData->responseMessage,
-                $this->modules->viewsSettings->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->modules->viewsSettings->packagesData->responseMessage,
+            $this->modules->viewsSettings->packagesData->responseCode
+        );
     }
 
     public function getViewsSettingsByViewIdDomainIdAndAppIdAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
+        $this->requestIsPost();
+
+        if ($this->postData()['domain_id'] &&
+            $this->postData()['app_id'] &&
+            $this->postData()['view_id']
+        ) {
+            $viewsSettings =
+                $this->modules->viewsSettings->getViewsSettingsByViewIdDomainIdAndAppId(
+                    $this->postData()['domain_id'],
+                    $this->postData()['app_id'],
+                    $this->postData()['view_id']
+                );
+
+            if ($viewsSettings) {
+                $this->addResponse('Settings for this view is already defined.', 1);
+
                 return;
             }
 
-            if ($this->postData()['domain_id'] &&
-                $this->postData()['app_id'] &&
-                $this->postData()['view_id']
-            ) {
-                $viewsSettings =
-                    $this->modules->viewsSettings->getViewsSettingsByViewIdDomainIdAndAppId(
-                        $this->postData()['domain_id'],
-                        $this->postData()['app_id'],
-                        $this->postData()['view_id']
-                    );
-
-                if ($viewsSettings) {
-                    $this->addResponse('Settings for this view is already defined.', 1);
-
-                    return;
-                }
-
-                $this->addResponse('No settings for this view found.');
-            }
+            $this->addResponse('No settings for this view found.');
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse('Please provide domain, app, view Ids.', 1);
         }
     }
 
     public function getViewsSettingsFromViewModuleAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
+        $this->requestIsPost();
+
+        if (isset($this->postData()['viewsettings_id']) || isset($this->postData()['view_id'])) {
+            $viewsSettings = $this->modules->viewsSettings->getViewsSettingsFromViewModule($this->postData());
+
+            if ($viewsSettings) {
+                $this->addResponse(
+                    $this->modules->viewsSettings->packagesData->responseMessage,
+                    0,
+                    $this->modules->viewsSettings->packagesData->responseData,
+                );
+
                 return;
             }
 
-            if (isset($this->postData()['viewsettings_id']) || isset($this->postData()['view_id'])) {
-                $viewsSettings = $this->modules->viewsSettings->getViewsSettingsFromViewModule($this->postData());
-
-                if ($viewsSettings) {
-                    $this->addResponse(
-                        $this->modules->viewsSettings->packagesData->responseMessage,
-                        0,
-                        $this->modules->viewsSettings->packagesData->responseData,
-                    );
-
-                    return;
-                }
-
-                $this->addResponse('No settings for this view found.', 1, []);
-            }
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse('No settings for this view found.', 1, []);
         }
     }
 }

@@ -59,22 +59,14 @@ class NotesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->notes->addNote($this->postData()['package_name'], $this->postData());
+        $this->notes->addNote($this->postData()['package_name'], $this->postData());
 
-            $this->view->responseCode = $this->notes->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->notes->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->notes->packagesData->responseMessage,
+            $this->notes->packagesData->responseCode
+        );
     }
 
     /**
@@ -82,22 +74,14 @@ class NotesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->notes->updateNote($this->postData());
+        $this->notes->updateNote($this->postData());
 
-            $this->view->responseCode = $this->notes->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->notes->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        $this->addResponse(
+            $this->notes->packagesData->responseMessage,
+            $this->notes->packagesData->responseCode
+        );
     }
 
     /**
@@ -106,22 +90,14 @@ class NotesComponent extends BaseComponent
     public function removeAction()
     {
         if ($this->app['id'] === 1) {
-            if ($this->request->isPost()) {
-                if (!$this->checkCSRF()) {
-                    return;
-                }
+            $this->requestIsPost();
 
-                $this->notes->removeNote($this->postData());
+            $this->notes->removeNote($this->postData());
 
-                $this->view->responseCode = $this->notes->packagesData->responseCode;
-
-                $this->view->responseMessage = $this->notes->packagesData->responseMessage;
-
-            } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'Method Not Allowed';
-            }
+            $this->addResponse(
+                $this->notes->packagesData->responseMessage,
+                $this->notes->packagesData->responseCode
+            );
         }
     }
 }

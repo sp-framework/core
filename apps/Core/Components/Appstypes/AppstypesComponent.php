@@ -66,20 +66,13 @@ class AppstypesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->appsTypes->updateAppType($this->postData());
 
-            $this->appsTypes->updateAppType($this->postData());
-
-            $this->addResponse(
-                $this->apps->packagesData->responseMessage,
-                $this->apps->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->apps->packagesData->responseMessage,
+            $this->apps->packagesData->responseCode
+        );
     }
 }

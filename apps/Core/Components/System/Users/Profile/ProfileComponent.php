@@ -80,155 +80,112 @@ class ProfileComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->profiles->updateProfile($this->postData());
 
-            $this->profiles->updateProfile($this->postData());
-
-            $this->addResponse(
-                $this->profiles->packagesData->responseMessage,
-                $this->profiles->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->profiles->packagesData->responseMessage,
+            $this->profiles->packagesData->responseCode
+        );
     }
 
     public function pwresetAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $user['user'] = $this->auth->account()['email'];
+        $user['user'] = $this->auth->account()['email'];
 
-            $user = array_merge($user, $this->postData());
+        $user = array_merge($user, $this->postData());
 
-            $this->auth->resetPassword($user, true);
+        $this->auth->resetPassword($user, true);
 
-            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
-            $this->view->responseCode = $this->auth->packagesData->responseCode;
+        $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+        $this->view->responseCode = $this->auth->packagesData->responseCode;
 
-            if (isset($this->auth->packagesData->redirectUrl)) {
-                $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
-            }
-            if (isset($this->auth->packagesData->responseData)) {
-                $this->view->responseData = $this->auth->packagesData->responseData;
-            }
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
+        if (isset($this->auth->packagesData->redirectUrl)) {
+            $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+        }
+        if (isset($this->auth->packagesData->responseData)) {
+            $this->view->responseData = $this->auth->packagesData->responseData;
         }
     }
 
     public function enableTwoFaOtpAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->auth->enableTwoFaOtp()) {
-                $this->view->provisionUrl = $this->auth->packagesData->provisionUrl;
+        if ($this->auth->enableTwoFaOtp()) {
+            $this->view->provisionUrl = $this->auth->packagesData->provisionUrl;
 
-                $this->view->qrcode = $this->auth->packagesData->qrcode;
+            $this->view->qrcode = $this->auth->packagesData->qrcode;
 
-                $this->view->secret = $this->auth->packagesData->secret;
-            } else {
-                $this->view->responseMessage = $this->auth->packagesData->responseMessage;
-            }
-
-            $this->view->responseCode = $this->auth->packagesData->responseCode;
+            $this->view->secret = $this->auth->packagesData->secret;
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
         }
+
+        $this->view->responseCode = $this->auth->packagesData->responseCode;
     }
 
     public function verifyTwoFaOtpAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->auth->verifyTwoFaOtp($this->postData());
+        $this->auth->verifyTwoFaOtp($this->postData());
 
-            $this->addResponse(
-                $this->auth->packagesData->responseMessage,
-                $this->auth->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->auth->packagesData->responseMessage,
+            $this->auth->packagesData->responseCode
+        );
     }
 
     public function disableTwoFaOtpAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->auth->disableTwoFaOtp($this->postData()['code']);
+        $this->auth->disableTwoFaOtp($this->postData()['code']);
 
-            $this->addResponse(
-                $this->auth->packagesData->responseMessage,
-                $this->auth->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->auth->packagesData->responseMessage,
+            $this->auth->packagesData->responseCode
+        );
     }
 
     public function generateAvatarAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if (isset($this->postData()['avatarfile'])) {
-                $generateAvatar = $this->profiles->generateAvatar($this->postData()['avatarfile']);
-            } else if (isset($this->postData()['gender'])) {
-                $generateAvatar = $this->profiles->generateAvatar(null, $this->postData()['gender']);
-            } else {
-                $generateAvatar = $this->profiles->generateAvatar();//Default Male
-            }
-
-            if ($generateAvatar) {
-                $this->view->responseCode = $this->profiles->packagesData->responseCode;
-
-                $this->view->avatar = $this->profiles->packagesData->avatar;
-
-                $this->view->avatarName = $this->profiles->packagesData->avatarName;
-
-                return;
-            }
-
-            $this->addResponse('Error Generating Avatar', 1);
+        if (isset($this->postData()['avatarfile'])) {
+            $generateAvatar = $this->profiles->generateAvatar($this->postData()['avatarfile']);
+        } else if (isset($this->postData()['gender'])) {
+            $generateAvatar = $this->profiles->generateAvatar(null, $this->postData()['gender']);
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $generateAvatar = $this->profiles->generateAvatar();//Default Male
         }
+
+        if ($generateAvatar) {
+            $this->view->responseCode = $this->profiles->packagesData->responseCode;
+
+            $this->view->avatar = $this->profiles->packagesData->avatar;
+
+            $this->view->avatarName = $this->profiles->packagesData->avatarName;
+
+            return;
+        }
+
+        $this->addResponse('Error Generating Avatar', 1);
     }
 
     public function removeAccountAgentsAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->accounts->removeAccountAgents($this->postData());
+        $this->basepackages->accounts->removeAccountAgents($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->accounts->packagesData->responseMessage,
-                $this->basepackages->accounts->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->accounts->packagesData->responseMessage,
+            $this->basepackages->accounts->packagesData->responseCode
+        );
     }
 }

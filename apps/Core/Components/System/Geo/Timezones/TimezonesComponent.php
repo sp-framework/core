@@ -93,20 +93,14 @@ class TimezonesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->geoTimezones->addTimezone($this->postData());
+        $this->geoTimezones->addTimezone($this->postData());
 
-            $this->addResponse(
-                $this->geoTimezones->packagesData->responseMessage,
-                $this->geoTimezones->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->geoTimezones->packagesData->responseMessage,
+            $this->geoTimezones->packagesData->responseCode
+        );
     }
 
     /**
@@ -114,42 +108,36 @@ class TimezonesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->geoTimezones->updateTimezone($this->postData());
+        $this->geoTimezones->updateTimezone($this->postData());
 
-            $this->addResponse(
-                $this->geoStates->packagesData->responseMessage,
-                $this->geoStates->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->geoStates->packagesData->responseMessage,
+            $this->geoStates->packagesData->responseCode
+        );
     }
 
     public function searchTimezonesAction()
     {
-        if ($this->request->isPost()) {
-            if ($this->postData()['search']) {
-                $searchQuery = $this->postData()['search'];
+        $this->requestIsPost();
 
-                if (strlen($searchQuery) < 3) {
-                    return;
-                }
+        if ($this->postData()['search']) {
+            $searchQuery = $this->postData()['search'];
 
-                $searchTimezones = $this->basepackages->geoTimezones->searchTimezones($searchQuery);
-
-                if ($searchTimezones) {
-                    $this->view->responseCode = $this->basepackages->geoTimezones->packagesData->responseCode;
-
-                    $this->view->timezones = $this->basepackages->geoTimezones->packagesData->timezones;
-                }
-            } else {
-                $this->addResponse('Search Query Missing', 1);
+            if (strlen($searchQuery) < 3) {
+                return;
             }
+
+            $searchTimezones = $this->basepackages->geoTimezones->searchTimezones($searchQuery);
+
+            if ($searchTimezones) {
+                $this->view->responseCode = $this->basepackages->geoTimezones->packagesData->responseCode;
+
+                $this->view->timezones = $this->basepackages->geoTimezones->packagesData->timezones;
+            }
+        } else {
+            $this->addResponse('Search Query Missing', 1);
         }
     }
 }
