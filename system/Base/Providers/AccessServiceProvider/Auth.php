@@ -1847,7 +1847,7 @@ class Auth
         if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpSecretSize'])) {
             $secretSize = $this->core->core['settings']['security']['twofaSettings']['twofaOtpSecretSize'];
         }
-        $twoFaSecret = strtoupper($this->secTools->random->base62($secretSize));
+        $twoFaSecret = trim(Base32::encodeUpper(random_bytes($secretSize)), '=');
 
         $security = $this->getAccountSecurityObject();
 
