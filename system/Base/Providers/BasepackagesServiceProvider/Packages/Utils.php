@@ -13,6 +13,8 @@ class Utils extends BasePackage
 {
     protected $microtime = 0;
 
+    protected $memoryusage = 0;
+
     protected $microTimers = [];
 
     public function init($container = null)
@@ -472,17 +474,28 @@ class Utils extends BasePackage
         return $data['json'];
     }
 
-    public function setMicroTimer($reference)
+    public function setMicroTimer($reference, $calculateMemoryUsage = false)
     {
         $microtime['reference'] = $reference;
 
         if ($this->microtime === 0) {
-            $microtime['difference'] = '-';
+            $microtime['difference'] = 0;
             $this->microtime = microtime(true);
         } else {
             $now = microtime(true);
             $microtime['difference'] = $now - $this->microtime;
             $this->microtime = $now;
+        }
+
+        if ($calculateMemoryUsage) {
+            if ($this->memoryusage === 0) {
+                $microtime['memoryusage'] = 0;
+                $this->memoryusage = memory_get_usage();
+            } else {
+                $currentMemoryUsage = memory_get_usage();
+                $microtime['memoryusage'] = $this->getMemUsage($currentMemoryUsage - $this->memoryusage);
+                $this->memoryusage = $currentMemoryUsage;
+            }
         }
 
         array_push($this->microTimers, $microtime);
@@ -491,5 +504,12 @@ class Utils extends BasePackage
     public function getMicroTimer()
     {
         return $this->microTimers;
+    }
+
+    protected function getMemUsage($bytes)
+    {
+        $unit=array('b','kb','mb','gb','tb','pb');
+
+        return @round($bytes/pow(1024,($i=floor(log($bytes,1024)))),2).' '.$unit[$i];
     }
 }
