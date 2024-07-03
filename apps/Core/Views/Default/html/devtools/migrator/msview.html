@@ -1,0 +1,24 @@
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'gears',
+        'cardTitle'                     : 'Module Settings',
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'migrator/ms/form',
+        'formButtons'                   :
+        [
+            'updateActionUrl'               : 'devtools/migrator/msupdate',
+            'updateSuccessRedirectUrl'      : 'devtools/migrator',
+            'cancelActionUrl'               : 'devtools/migrator',
+            'closeActionUrl'                : 'devtools/migrator'
+        ]
+    ]
+)}}

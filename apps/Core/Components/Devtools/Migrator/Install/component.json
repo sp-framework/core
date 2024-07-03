@@ -1,0 +1,45 @@
+{
+	"name" : "Devtools Migrator",
+	"route" : "devtools/migrator",
+	"description" : "<p>Migrate from gitea to github<br></p>",
+	"module_type" : "components",
+	"app_type" : "core",
+	"category" : "devtools",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "Apps\\Core\\Components\\Devtools\\Migrator\\MigratorComponent",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : [],
+		"packages" : [],
+		"middlewares" : [],
+		"views" : [],
+		"external" : []
+	},
+	"menu" : 
+	{
+		"devtools" : 
+		{
+			"title" : "devtools",
+			"icon" : "code",
+			"childs" : 
+			{
+				"migrate" : 
+				{
+					"title" : "migrate",
+					"icon" : "circle-dot",
+					"link" : "devtools/migrator"
+				}
+			}
+		},
+		"seq" : "0"
+	},
+	"settings" : [],
+	"widgets" : []
+}
