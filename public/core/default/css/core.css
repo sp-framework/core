@@ -41898,6 +41898,18 @@ a.text-muted:hover {
   border-color: #E74C3C;
 }
 
+.input-group > .select2-container--default {
+  width: auto;
+  flex: 1 1 auto;
+}
+
+.input-group > .select2-container--default .select2-selection--single,
+.input-group > .select2-container--default .select2-selection--multiple {
+  height: 100%;
+  line-height: inherit;
+  padding: 0.5rem 1rem;
+}
+
 /* VERTICAL DIVIDER */
 .vdivide-resizable {
   flex: auto !important;

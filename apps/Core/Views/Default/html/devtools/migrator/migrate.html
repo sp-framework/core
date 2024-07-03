@@ -117,198 +117,34 @@
             </div>
         </div>
         <hr>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
+        {{adminltetags.useTag('tabs',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : 'main',
+                'tabsId'                        : 'tabs',
+                'tabsStyle'                     : 'card-outline-tabs',
+                'tabsData'                      :
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'source_milestones',
-                        'fieldLabel'                     : 'Source Milestones',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select milestones',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldGroupPreAddonButtons'      :
+                        'milestones'   :
                             [
-                                'sync-source-milestones'   : [
-                                    'title'                   : false,
-                                    'icon'                    : 'sync-alt',
-                                    'noMargin'                : true,
-                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
-                                    'position'                : 'right'
-                                ]
+                                'tabTitle'          : 'Milestones',
+                                'tabInclude'        : 'migrator/milestones'
                             ],
-                        'fieldGroupPostAddonButtons'    :
+                        'labels'   :
                             [
-                                'migrate-milestones'   : [
-                                    'title'                   : false,
-                                    'icon'                    : 'arrow-right',
-                                    'noMargin'                : true,
-                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
-                                    'position'                : 'right'
-                                ]
+                                'tabTitle'          : 'Lables',
+                                'tabInclude'        : 'migrator/labels'
                             ],
-                        'fieldDisabled'                  : false,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldDataSelect2Multiple'       : true,
-                        'fieldDataSelect2Options'        : [],
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': ''
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'destination_milestones',
-                        'fieldLabel'                     : 'Destination Milestones',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Verify Milestones.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldGroupPreAddonButtons'      :
+                        'issues'   :
                             [
-                                'sync-destination-milestones'   : [
-                                    'title'                   : false,
-                                    'icon'                    : 'sync-alt',
-                                    'noMargin'                : true,
-                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
-                                    'position'                : 'right'
-                                ]
-                            ],
-                        'fieldDisabled'                  : false,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldDataSelect2Multiple'       : true,
-                        'fieldDataSelect2Options'        : [],
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': ''
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'source_labels',
-                        'fieldLabel'                     : 'Source Labels',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select labels',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldRequired'                  : false,
-                        'fieldDisabled'                  : false,
-                        'fieldGroupPreAddonButtons'      :
-                            [
-                                'sync-source-labels'   : [
-                                    'title'                   : false,
-                                    'icon'                    : 'sync-alt',
-                                    'noMargin'                : true,
-                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
-                                    'position'                : 'right'
-                                ]
-                            ],
-                        'fieldGroupPostAddonButtons'    :
-                            [
-                                'migrate-labels'   : [
-                                    'title'                   : false,
-                                    'icon'                    : 'arrow-right',
-                                    'noMargin'                : true,
-                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
-                                    'position'                : 'right'
-                                ]
-                            ],
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldDataSelect2Multiple'       : true,
-                        'fieldDataSelect2Options'        : [],
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': ''
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'destination_labels',
-                        'fieldLabel'                     : 'Destination Labels',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Verify labels',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : false,
-                        'fieldRequired'                  : false,
-                        'fieldDisabled'                  : false,
-                        'fieldGroupPreAddonButtons'      :
-                            [
-                                'sync-destination-labels'   : [
-                                    'title'                   : false,
-                                    'icon'                    : 'sync-alt',
-                                    'noMargin'                : true,
-                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
-                                    'position'                : 'right'
-                                ]
-                            ],
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldDataSelect2Multiple'       : true,
-                        'fieldDataSelect2Options'        : [],
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': ''
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('buttons',
-                    [
-                        'componentId'           : componentId,
-                        'sectionId'             : sectionId,
-                        'buttonType'            : 'button',
-                        'buttons'               :
-                            [
-                                'import-issues' : [
-                                    'label'                   : '',
-                                    'title'                   : 'Import Issues',
-                                    'size'                    : 'xs',
-                                    'type'                    : 'primary',
-                                    'position'                : 'right',
-                                    'icon'                    : 'list-check'
-                                ]
+                                'tabTitle'          : 'Issues',
+                                'tabInclude'        : 'migrator/issues'
                             ]
                     ]
-                )}}
-            </div>
-        </div>
+            ]
+        )}}
     </fieldset>
 </form>
 <script>
