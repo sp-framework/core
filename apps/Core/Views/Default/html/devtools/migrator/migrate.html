@@ -518,6 +518,107 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-destination_labels'                      : {
             placeholder : "VERIFY LABELS"
         },
+        '{{componentId}}-{{sectionId}}-exclude_labels'                          : {
+            placeholder : "EXCLUDE LABELS",
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-sync-exclude-labels').off();
+                $('#{{componentId}}-{{sectionId}}-sync-exclude-labels').click(function(e) {
+                    e.preventDefault();
+
+                    var thisButton = this;
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-source_api_client').val();
+                    postData['repository_id'] = $('#{{componentId}}-{{sectionId}}-source_repository').val();
+
+                    if (postData['api_id'] === '' || postData['repository_id'] === '') {
+                        paginatedPNotify('error', {'text': 'Select API/Repository'});
+
+                        return false;
+                    }
+
+                    // $('#{{componentId}}-{{sectionId}}-sync-exclude-labels').attr('disabled', true);
+                    // $('#{{componentId}}-{{sectionId}}-sync-exclude-labels').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+
+                    $.post('{{links.url("devtools/migrator/syncLabels")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.labels) {
+                                if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-labels') {
+                                    $('#{{componentId}}-{{sectionId}}-source_labels').empty().trigger('change');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-destination_labels').empty().trigger('change');
+                                }
+                                for (var label in response.responseData.labels) {
+                                    var newOption
+                                        = new Option(
+                                            response.responseData.labels[label]['name'],
+                                            response.responseData.labels[label]['id'], false, false
+                                        );
+
+                                    $('#{{componentId}}-{{sectionId}}-exclude_labels').append(newOption).trigger('change');
+                                }
+                            }
+                            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.labels.length + ' labels.'});
+                        } else {
+                            paginatedPNotify('error', {'text': response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-sync-exclude-labels').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-sync-exclude-labels').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                    }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-import-issues').off();
+                $('#{{componentId}}-{{sectionId}}-import-issues').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-source_api_client').val();
+                    postData['repository_id'] = $('#{{componentId}}-{{sectionId}}-source_repository').val();
+                    postData['labels'] = $('#{{componentId}}-{{sectionId}}-exclude_labels').val();
+
+                    // $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', true);
+                    // $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-list-check').addClass('fa-spin fa-cog');
+
+                    $.post('{{links.url("devtools/migrator/syncIssues")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.issues) {
+                                var html = ''
+
+                                $(response.responseData.issues).each(function(i, issues) {
+                                    html += '<span>#' + issues['number'] + ' : ' + issues['title'] + '</span><br>';
+                                })
+
+                                $('#{{componentId}}-{{sectionId}}-issues-list').html(html);
+                            }
+                            paginatedPNotify('success', {'text': 'Got ' + response.responseData.issues.length + ' issues.'});
+                        } else {
+                            paginatedPNotify('error', {'text': response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-spin fa-cog').addClass('fa-list-check');
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-migrate_issues'                          : {
+            afterInit: function() {
+                //
+            }
+        },
         '{{componentId}}-{{sectionId}}-form'                                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-source_api_client'               : 'required',

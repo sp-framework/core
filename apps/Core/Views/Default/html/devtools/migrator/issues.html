@@ -1,22 +1,97 @@
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('buttons',
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'exclude_labels',
+                'fieldLabel'                     : 'Source Labels',
+                'fieldType'                      : 'select2',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select labels to exclude issues of.',
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldRequired'                  : false,
+                'fieldDisabled'                  : false,
+                'fieldGroupPreAddonButtons'      :
                     [
-                        'componentId'           : componentId,
-                        'sectionId'             : sectionId,
-                        'buttonType'            : 'button',
-                        'buttons'               :
-                            [
-                                'import-issues' : [
-                                    'label'                   : '',
-                                    'title'                   : 'Import Issues',
-                                    'size'                    : 'xs',
-                                    'type'                    : 'primary',
-                                    'position'                : 'right',
-                                    'icon'                    : 'list-check'
-                                ]
-                            ]
+                        'sync-exclude-labels'   : [
+                            'title'                   : false,
+                            'icon'                    : 'sync-alt',
+                            'noMargin'                : true,
+                            'buttonAdditionalClass'   : 'rounded-0 text-white',
+                            'position'                : 'right'
+                        ]
+                    ],
+                'fieldBazJstreeSearch'           : true,
+                'fieldDataSelect2Multiple'       : true,
+                'fieldDataSelect2Options'        : [],
+                'fieldDataSelect2OptionsKey'     : 'id',
+                'fieldDataSelect2OptionsValue'   : 'name',
+                'fieldDataSelect2OptionsArray'   : true,
+                'fieldDataSelect2OptionsSelected': ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'migrate_issues',
+                'fieldLabel'                     : 'Migrate issues',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Migrate issues, comma saperated or ranges.',
+                'fieldBazScan'                   : true,
+                'fieldGroupPostAddonButtons'    :
+                    [
+                        'migrate-issues'   : [
+                            'title'                   : false,
+                            'icon'                    : 'arrow-right',
+                            'noMargin'                : true,
+                            'buttonAdditionalClass'   : 'rounded-0 text-white',
+                            'position'                : 'right'
+                        ]
+                    ],
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 1024,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'componentId'           : componentId,
+                'sectionId'             : sectionId,
+                'buttonType'            : 'button',
+                'buttons'               :
+                    [
+                        'import-issues' : [
+                            'label'                   : '',
+                            'title'                   : 'Import Issues',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'position'                : 'right',
+                            'icon'                    : 'list-check'
+                        ]
                     ]
-                )}}
-            </div>
-        </div>
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div id="issues-list"></div>
+    </div>
+</div>

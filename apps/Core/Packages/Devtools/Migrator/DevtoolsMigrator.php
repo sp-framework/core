@@ -149,6 +149,10 @@ class DevtoolsMigrator extends BasePackage
                     try {
                         $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
                     } catch (\throwable $e) {
+                        if ($e->getCode() === 422) {//Ignore if already exists
+                            continue;
+                        }
+
                         $this->addResponse($e->getMessage(), 1);
 
                         return false;
@@ -261,7 +265,11 @@ class DevtoolsMigrator extends BasePackage
                     try {
                         $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
                     } catch (\throwable $e) {
-                        $this->addResponse($e->getMessage(), 1);
+                        if ($e->getCode() === 422) {//Ignore if already exists
+                            continue;
+                        }
+
+                        $this->addResponse($e->getStatuscode(), 1);
 
                         return false;
                     }
@@ -278,7 +286,53 @@ class DevtoolsMigrator extends BasePackage
 
     public function syncIssues($data)
     {
-        //
+        if (!$this->initApi($data)) {
+            return false;
+        }
+
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+            $collection = 'IssueApi';
+            $method = 'issueListIssues';
+            $args =
+                [
+                    $this->apiClientConfig['org_user'],
+                    $data['repository_id'],
+                    null,
+                    implode(',', $data['labels'])
+                ];
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+            $collection = 'IssuesApi';
+            $method = 'issuesListForRepo';
+            $args =
+                [
+                    $this->apiClientConfig['org_user'],
+                    $data['repository_id'],
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    implode(',', $data['labels'])
+                ];
+        }
+
+        try {
+            $issues = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+            if ($issues) {
+                $this->addResponse('Issues Synced', 0, ['issues' => $issues]);
+
+                return $issues;
+            }
+
+            $this->addResponse('No issues found with selected milestone/label', 1);
+        } catch (\Exception $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        return true;
     }
 
     public function getAvailableApis($getAll = false, $returnApis = true)

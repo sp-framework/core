@@ -131,4 +131,44 @@ class MigratorComponent extends BaseComponent
             $this->migratorPackage->packagesData->responseCode
         );
     }
+
+    public function syncIssuesAction()
+    {
+        $this->requestIsPost();
+
+        if ($this->migratorPackage->syncIssues($this->postData())) {
+            $this->addResponse(
+                $this->migratorPackage->packagesData->responseMessage,
+                $this->migratorPackage->packagesData->responseCode,
+                $this->migratorPackage->packagesData->responseData
+            );
+
+            return;
+        }
+
+        $this->addResponse(
+            $this->migratorPackage->packagesData->responseMessage,
+            $this->migratorPackage->packagesData->responseCode
+        );
+    }
+
+    public function migrateIssuesAction()
+    {
+        $this->requestIsPost();
+
+        if ($this->migratorPackage->migrateIssues($this->postData())) {
+            $this->addResponse(
+                $this->migratorPackage->packagesData->responseMessage,
+                $this->migratorPackage->packagesData->responseCode,
+                $this->migratorPackage->packagesData->responseData
+            );
+
+            return;
+        }
+
+        $this->addResponse(
+            $this->migratorPackage->packagesData->responseMessage,
+            $this->migratorPackage->packagesData->responseCode
+        );
+    }
 }

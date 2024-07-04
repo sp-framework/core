@@ -41898,6 +41898,10 @@ a.text-muted:hover {
   border-color: #E74C3C;
 }
 
+.input-group {
+  flex-wrap: nowrap;
+}
+
 .input-group > .select2-container--default {
   width: auto;
   flex: 1 1 auto;
