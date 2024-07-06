@@ -6,7 +6,7 @@
 	"app_type" : "core",
 	"category" : "providers",
 	"version" : "0.0.0-rc.2",
-	"repo" : "https://dev.bazaari.com.au/sp-core/core",
+	"repo" : "https://github.com/sp-framework/core",
 	"class" : "System\\Base\\Providers\\CoreServiceProvider\\Core",
 	"dependencies" : 
 	{

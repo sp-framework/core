@@ -27,9 +27,18 @@ class MigratorComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $this->view->apis = $this->migratorPackage->getAvailableApis(false, true);
+        if (isset($this->getData()['installpackage'])) {
+            $redoDb = false;
+            if (isset($this->getData()['redodb'])) {
+                $redoDb = true;
+            }
 
-        return;
+            $this->migratorPackage->installPackage($redoDb);
+
+            return false;
+        }
+
+        $this->view->apis = $this->migratorPackage->getAvailableApis(false, true);
     }
 
     public function syncRepositoriesAction()
@@ -132,11 +141,11 @@ class MigratorComponent extends BaseComponent
         );
     }
 
-    public function syncIssuesAction()
+    public function importIssuesAction()
     {
         $this->requestIsPost();
 
-        if ($this->migratorPackage->syncIssues($this->postData())) {
+        if ($this->migratorPackage->importIssues($this->postData())) {
             $this->addResponse(
                 $this->migratorPackage->packagesData->responseMessage,
                 $this->migratorPackage->packagesData->responseCode,

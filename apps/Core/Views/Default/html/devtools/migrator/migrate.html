@@ -173,10 +173,89 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
 
+function importIssues(button) {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-source_api_client').val();
+    postData['repository_id'] = $('#{{componentId}}-{{sectionId}}-source_repository').val();
+    if (postData['api_id'] === '' || postData['repository_id'] === '') {
+        paginatedPNotify('error', {'text': 'Select API/Repository'});
+
+        return false;
+    }
+    postData['import_from'] = $('#{{componentId}}-{{sectionId}}-import_issues_from').val();
+
+    $('#{{componentId}}-{{sectionId}}-issues').parents('.form-group').addClass('d-none');
+    $('#issues-loader').attr('hidden', false);
+    $('#issues-loader-text').empty().text('Importing issues ...');
+    if (button === '{{componentId}}-{{sectionId}}-import-issues') {
+        $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+    }
+    $.post('{{links.url("devtools/migrator/importIssues")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            paginatedPNotify('success', {'text': response.responseMessage});
+
+            if (response.responseData.issues) {
+                dataCollectionSection['{{componentId}}-{{sectionId}}-issues']['issues'] = response.responseData.issues;
+
+                var table =
+                    '<table id="{{componentId}}-{{sectionId}}-issues-table" class="table compact table-striped dt-responsive dataTable no-footer dtr-inline" style="width:100%">' +
+                        '<thead>' +
+                            '<tr>' +
+                                '<th class="text-uppercase text-truncate dt-colTextTruncate pb-1 pt-1">Issue #</th>' +
+                                '<th class="text-uppercase text-truncate dt-colTextTruncate pb-1 pt-1">Title</th>' +
+                                '<th class="text-uppercase text-truncate dt-colTextTruncate pb-1 pt-1">Migrated</th>' +
+                            '</tr>' +
+                        '</thead>' +
+                        '<tbody>';
+
+                for (var issue in response.responseData.issues) {
+                    table += '<tr data-index="' + response.responseData.issues[issue]['number'] + '" class="process-row-' + response.responseData.issues[issue]['number'] + '">';
+                    table += '<td class="text-truncate dt-colTextTruncate pb-1 pt-1"><a target="_blank" href="' + response.responseData.issues[issue]['html_url'] + '">' +
+                            response.responseData.issues[issue]['number'] + '</a></td>';
+                    table += '<td class="text-truncate dt-colTextTruncate pb-1 pt-1">' + response.responseData.issues[issue]['title'] + '</td>';
+                    table += '<td class="text-truncate dt-colTextTruncate pb-1 pt-1">' + response.responseData.issues[issue]['migrated'] + '</td>';
+                    table += '</tr>';
+                }
+            }
+
+            $('#{{componentId}}-{{sectionId}}-issues').empty().append(table);
+
+            if (!$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-issues-table')) {
+                dataCollectionSection['{{componentId}}-{{sectionId}}-issues-table'] = $('#{{componentId}}-{{sectionId}}-issues-table').on('init.dt', function() {
+                    $('#issues-loader').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-issues').parents('.form-group').removeClass('d-none');
+                }).dataTable({
+                    "lengthMenu": [10, 25, 50, 100],
+                    "select": 'multi'
+                });
+            }
+        } else {
+            $('#issues-loader').attr('hidden', true);
+
+            paginatedPNotify('error', {'text': response.responseMessage});
+        }
+
+        if (button === '{{componentId}}-{{sectionId}}-import-issues') {
+            $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+        } else {
+            $('#{{componentId}}-{{sectionId}}-migrate-issues').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-migrate-issues').children('i').removeClass('fa-spin fa-cog').addClass('fa-arrow-right');
+        }
+    }, 'json');
+}
+
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-source_api_client'                       : {
-            placeholder : "SELECT API"
+            placeholder : "SELECT API",
         },
         '{{componentId}}-{{sectionId}}-destination_api_client'                  : {
             placeholder : "SELECT API"
@@ -221,7 +300,11 @@ dataCollectionSection =
 
                         if (response.responseCode == 0) {
                             if (response.responseData && response.responseData.repositories) {
-                                $('#{{componentId}}-{{sectionId}}-repository').empty().trigger('change');
+                                if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-repositories') {
+                                    $('#{{componentId}}-{{sectionId}}-source_repository').empty().trigger('change');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-destination_repository').empty().trigger('change');
+                                }
                                 for (var repository in response.responseData.repositories) {
                                     var newOption
                                         = new Option(
@@ -518,105 +601,52 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-destination_labels'                      : {
             placeholder : "VERIFY LABELS"
         },
-        '{{componentId}}-{{sectionId}}-exclude_labels'                          : {
-            placeholder : "EXCLUDE LABELS",
-            afterInit : function() {
-                $('#{{componentId}}-{{sectionId}}-sync-exclude-labels').off();
-                $('#{{componentId}}-{{sectionId}}-sync-exclude-labels').click(function(e) {
-                    e.preventDefault();
-
-                    var thisButton = this;
-
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-source_api_client').val();
-                    postData['repository_id'] = $('#{{componentId}}-{{sectionId}}-source_repository').val();
-
-                    if (postData['api_id'] === '' || postData['repository_id'] === '') {
-                        paginatedPNotify('error', {'text': 'Select API/Repository'});
-
-                        return false;
-                    }
-
-                    // $('#{{componentId}}-{{sectionId}}-sync-exclude-labels').attr('disabled', true);
-                    // $('#{{componentId}}-{{sectionId}}-sync-exclude-labels').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
-
-                    $.post('{{links.url("devtools/migrator/syncLabels")}}', postData, function(response) {
-                        if (response.tokenKey && response.token) {
-                            $('#security-token').attr('name', response.tokenKey);
-                            $('#security-token').val(response.token);
-                        }
-
-                        if (response.responseCode == 0) {
-                            if (response.responseData && response.responseData.labels) {
-                                if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-labels') {
-                                    $('#{{componentId}}-{{sectionId}}-source_labels').empty().trigger('change');
-                                } else {
-                                    $('#{{componentId}}-{{sectionId}}-destination_labels').empty().trigger('change');
-                                }
-                                for (var label in response.responseData.labels) {
-                                    var newOption
-                                        = new Option(
-                                            response.responseData.labels[label]['name'],
-                                            response.responseData.labels[label]['id'], false, false
-                                        );
-
-                                    $('#{{componentId}}-{{sectionId}}-exclude_labels').append(newOption).trigger('change');
-                                }
-                            }
-                            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.labels.length + ' labels.'});
-                        } else {
-                            paginatedPNotify('error', {'text': response.responseMessage});
-                        }
-
-                        $('#{{componentId}}-{{sectionId}}-sync-exclude-labels').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-sync-exclude-labels').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
-                    }, 'json');
-                });
-
+        '{{componentId}}-{{sectionId}}-issues'                                  : { },
+        '{{componentId}}-{{sectionId}}-import_issues_from'                      : {
+            afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-import-issues').off();
                 $('#{{componentId}}-{{sectionId}}-import-issues').click(function(e) {
                     e.preventDefault();
 
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-source_api_client').val();
-                    postData['repository_id'] = $('#{{componentId}}-{{sectionId}}-source_repository').val();
-                    postData['labels'] = $('#{{componentId}}-{{sectionId}}-exclude_labels').val();
-
-                    // $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', true);
-                    // $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-list-check').addClass('fa-spin fa-cog');
-
-                    $.post('{{links.url("devtools/migrator/syncIssues")}}', postData, function(response) {
-                        if (response.tokenKey && response.token) {
-                            $('#security-token').attr('name', response.tokenKey);
-                            $('#security-token').val(response.token);
-                        }
-
-                        if (response.responseCode == 0) {
-                            if (response.responseData && response.responseData.issues) {
-                                var html = ''
-
-                                $(response.responseData.issues).each(function(i, issues) {
-                                    html += '<span>#' + issues['number'] + ' : ' + issues['title'] + '</span><br>';
-                                })
-
-                                $('#{{componentId}}-{{sectionId}}-issues-list').html(html);
-                            }
-                            paginatedPNotify('success', {'text': 'Got ' + response.responseData.issues.length + ' issues.'});
-                        } else {
-                            paginatedPNotify('error', {'text': response.responseMessage});
-                        }
-
-                        $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-spin fa-cog').addClass('fa-list-check');
-                    }, 'json');
+                    importIssues('{{componentId}}-{{sectionId}}-import-issues');
                 });
             }
         },
         '{{componentId}}-{{sectionId}}-migrate_issues'                          : {
             afterInit: function() {
-                //
+                $('#{{componentId}}-{{sectionId}}-migrate-issues').off();
+                $('#{{componentId}}-{{sectionId}}-migrate-issues').click(function(e) {
+                    e.preventDefault();
+
+                    // $('#{{componentId}}-{{sectionId}}-migrate-issues').attr('disabled', true);
+                    // $('#{{componentId}}-{{sectionId}}-migrate-issues').children('i').removeClass('fa-arrow-right').addClass('fa-spin fa-cog');
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-destination_api_client').val();
+                    postData['repository_id'] = $('#{{componentId}}-{{sectionId}}-destination_repository').val();
+
+                    if (postData['api_id'] === '' || postData['repository_id'] === '') {
+                        paginatedPNotify('error', {'text': 'Select Destination API/Repository'});
+
+                        return false;
+                    }
+                    postData['migrate_issues'] = $('#{{componentId}}-{{sectionId}}-migrate_issues').val();
+
+                    $.post('{{links.url("devtools/migrator/migrateIssues")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            paginatedPNotify('success', {'text': response.responseMessage});
+
+                        } else {
+                            paginatedPNotify('error', {'text': response.responseMessage});
+                        }
+                    }, 'json');
+                });
             }
         },
         '{{componentId}}-{{sectionId}}-form'                                    : {

@@ -11,12 +11,12 @@ class ConditionsHandler
 {
     public static function verifyCondition(string $condition, $fieldValue, $value): bool
     {
-        if (!$fieldValue) {
+        if (is_null($fieldValue)) {
             return false;
         }
 
         if ($value instanceof DateTime) {
-            if (empty($fieldValue)) {
+            if (is_null($fieldValue)) {
                 return false;
             }
 

@@ -152,7 +152,7 @@ class GeoCountries extends BasePackage
                 $this->remoteWebContent
                     ->request(
                         'GET',
-                        'https://github.com/oyeaussie/sp-geodata/raw/main/' . $country . '.zip',
+                        'https://github.com/sp-framework/geodata/raw/main/' . $country . '.zip',
                         ['verify' => false]
                     )->getBody()->getContents()
                 );

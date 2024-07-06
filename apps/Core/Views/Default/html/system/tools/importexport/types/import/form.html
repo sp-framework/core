@@ -458,7 +458,7 @@ dataCollectionSection =
                                         '<th class="text-uppercase text-truncate dt-colTextTruncate pb-1 pt-1">' + response.responseData.rows[0][th] + '</th>';
                             }
 
-                            table += '</tr><tbody>';
+                            table += '</tr></thead><tbody>';
 
                             $(response.responseData.rows).each(function(index, row) {
                                 if (index !== 0) {

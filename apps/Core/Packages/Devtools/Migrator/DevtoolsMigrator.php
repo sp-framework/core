@@ -2,10 +2,14 @@
 
 namespace Apps\Core\Packages\Devtools\Migrator;
 
+use Apps\Core\Packages\Devtools\Migrator\Install\Package;
+use Apps\Core\Packages\Devtools\Migrator\Model\DevtoolsMigrator as DevtoolsMigratorModel;
 use System\Base\BasePackage;
 
 class DevtoolsMigrator extends BasePackage
 {
+    protected $modelToUse = DevtoolsMigratorModel::class;
+
     protected $settings = Settings::class;
 
     protected $packageName = 'devtoolsmigrator';
@@ -15,6 +19,13 @@ class DevtoolsMigrator extends BasePackage
     protected $apiClientConfig;
 
     public $devtoolsmigrator;
+
+    public function installPackage($redoDb = false)
+    {
+        $packageInstaller = new Package;
+
+        return $packageInstaller->install($redoDb);
+    }
 
     public function syncRepositories($data)
     {
@@ -284,55 +295,354 @@ class DevtoolsMigrator extends BasePackage
         $this->addResponse('Error migrating labels.', 1);
     }
 
-    public function syncIssues($data)
+    public function importIssues($data)
     {
+        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
+        if ((int) ini_get('max_execution_time') < 3600) {
+            set_time_limit(3600);
+        }
+
+        $this->setFFAddUsingUpdateOrInsert(true);
+
+        $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
         if (!$this->initApi($data)) {
             return false;
         }
 
-        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
-            $collection = 'IssueApi';
-            $method = 'issueListIssues';
-            $args =
-                [
-                    $this->apiClientConfig['org_user'],
-                    $data['repository_id'],
-                    null,
-                    implode(',', $data['labels'])
-                ];
-        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
-            $collection = 'IssuesApi';
-            $method = 'issuesListForRepo';
-            $args =
-                [
-                    $this->apiClientConfig['org_user'],
-                    $data['repository_id'],
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    implode(',', $data['labels'])
-                ];
+        $issue = true;
+
+        // foreach ($this->getAll()->devtoolsmigrator as $issue) {
+        //     $issue['migrated'] = false;
+        //     $this->update($issue);
+        // }
+        // $this->addResponse('Updated');
+        // return true;
+
+        if (isset($data['import_from']) && (int) $data['import_from'] > 0) {
+            $issueCounter = $data['import_from'];
+        } else {
+            $issueCounter = $this->ffStore->count(true);
+
+            if ($issueCounter === 0) {
+                $issueCounter = 1;
+            } else if ($issueCounter > 1) {
+                $issueCounter = $this->ffStore->getLastInsertedId() + 1;
+            }
         }
 
-        try {
-            $issues = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
-
-            if ($issues) {
-                $this->addResponse('Issues Synced', 0, ['issues' => $issues]);
-
-                return $issues;
+        while ($issue !== false) {
+            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                $collection = 'IssueApi';
+                $method = 'issueGetIssue';
+                $args =
+                    [
+                        $this->apiClientConfig['org_user'],
+                        $data['repository_id'],
+                        $issueCounter
+                    ];
+            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                $collection = 'IssuesApi';
+                $method = 'issuesGet';
+                $args =
+                    [
+                        $this->apiClientConfig['org_user'],
+                        $data['repository_id'],
+                        $issueCounter
+                    ];
             }
 
-            $this->addResponse('No issues found with selected milestone/label', 1);
-        } catch (\Exception $e) {
-            $this->addResponse($e->getMessage(), 1);
+            try {
+                $issue = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+                if ($issue && isset($issue['pull_request'])) {
+                    $issueCounter++;
+
+                    continue;
+                }
+
+                if ($issue) {
+                    $newIssue['id'] = $issue['number'];
+                    $newIssue['api_id'] = $data['api_id'];
+                    $newIssue['repository_id'] = $data['repository_id'];
+                    $newIssue['source_issue_id'] = $issue['number'];
+                    $newIssue['issue_details'] = $issue;
+                    if (isset($issue['comments']) && $issue['comments'] > 0) {
+                        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                            $collection = 'IssueApi';
+                            $method = 'issueGetComments';
+                            $args =
+                                [
+                                    $this->apiClientConfig['org_user'],
+                                    $data['repository_id'],
+                                    $issue['number']
+                                ];
+                        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                            $collection = 'IssuesApi';
+                            $method = 'issuesListComments';
+                            $args =
+                                [
+                                    $this->apiClientConfig['org_user'],
+                                    $data['repository_id'],
+                                    $issue['number']
+                                ];
+                        }
+
+                        $newIssue['issue_comments'] = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+                    }
+
+                    if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                        $collection = 'IssueApi';
+                        $method = 'issueGetCommentsAndTimeline';
+                        $args =
+                            [
+                                $this->apiClientConfig['org_user'],
+                                $data['repository_id'],
+                                $issue['number']
+                            ];
+                    } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                        $collection = 'IssuesApi';
+                        $method = 'issuesListEventsForTimeline';
+                        $args =
+                            [
+                                $this->apiClientConfig['org_user'],
+                                $data['repository_id'],
+                                $issue['number']
+                            ];
+                    }
+
+                    $newIssue['issue_timeline'] = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+                    $this->add($newIssue);
+                }
+            } catch (\Exception $e) {
+                if ($e->getCode() === 404) {
+                    $issuesArr = $this->getPaged([
+                        'conditions'    => '-|migrated|equals|0&',
+                        'limit'         => 100
+                    ])->getItems();
+
+                    $issues = [];
+
+                    if ($issuesArr && count($issuesArr) > 0) {
+                        foreach ($issuesArr as $issue) {
+                            $issues[$issue['issue_details']['number']]['number'] = $issue['issue_details']['number'];
+                            $issues[$issue['issue_details']['number']]['html_url'] = $issue['issue_details']['html_url'];
+                            $issues[$issue['issue_details']['number']]['title'] = $issue['issue_details']['title'];
+                            $issues[$issue['issue_details']['number']]['migrated'] = $issue['migrated'];
+                        }
+                    }
+
+                    $this->addResponse('Imported ' . ($issueCounter - 1). ' issues. If this is incorrect, import again!', 0, ['issues' => $issues]);
+
+                    return true;
+                }
+
+                $this->addResponse('Issue at : ' . $issueCounter . '. ' . $e->getMessage(), 1);
+
+                return false;
+            }
+
+            $issueCounter++;
+        }
+
+        return true;
+    }
+
+    public function migrateIssues($data)
+    {
+        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
+        if ((int) ini_get('max_execution_time') < 3600) {
+            set_time_limit(3600);
+        }
+
+        $this->setFFAddUsingUpdateOrInsert(true);
+
+        $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+        if (!$this->initApi($data)) {
+            return false;
+        }
+
+        if (empty($data['migrate_issues'])) {
+            $this->addResponse('Provide issues to migrate.', 1);
 
             return false;
         }
 
-        return true;
+        $data['migrate_issues'] = explode(',', trim($data['migrate_issues']));
+
+        try {
+            foreach ($data['migrate_issues'] as $key => $issue) {
+                if (str_contains($issue, '-')) {
+                    $issuesRange = explode('-', $issue);
+
+                    if (count($issuesRange) !== 2) {
+                        $this->addResponse('Incorrect Range', 1);
+
+                        return false;
+                    }
+
+                    for ($issueRange = (int) $issuesRange[0]; $issueRange <= $issuesRange[1]; $issueRange++) {
+                        $this->processMigrateIssue($data, (int) $issueRange);
+                    }
+                } else {
+                    $this->processMigrateIssue($data, (int) $issue);
+                }
+            }
+
+            $this->addResponse('Migrated all entered issues.');
+        } catch (\throwable $e) {
+            dump($e);die();
+            $this->addResponse('Issue at : ' . $issueRange ?? $issue . '. ' . $e->getMessage(), 1);
+        }
+    }
+
+    protected function processMigrateIssue($data, $issueNumber)
+    {
+        sleep(2);//github rate limit issue
+
+        $issue = $this->getById($issueNumber);
+
+        if ($issue && $issue['migrated'] !== true) {
+            $issueDetails = '######## Issue imported from Gitea ########' . PHP_EOL;
+            $issueDetails .= '# Details' . PHP_EOL;
+            $issueDetails .= 'Gitea Issue ID : ' . $issue['issue_details']['number'] . PHP_EOL;
+            $issueDetails .= 'State : ' . $issue['issue_details']['state'] . PHP_EOL;
+            $issueDetails .= 'Created : ' . $issue['issue_details']['created_at'] . PHP_EOL;
+            if ($issue['issue_details']['state'] === 'closed') {
+                $issueDetails .= 'Closed : ' . $issue['issue_details']['closed_at'] . PHP_EOL . PHP_EOL;
+            }
+            $issueDetails .= '# Issue Description' . PHP_EOL;
+            $issueDetails .= $issue['issue_details']['body'] . PHP_EOL . PHP_EOL;
+            $issueDetails .= '# Timeline' . PHP_EOL;
+
+            if ($issue['issue_timeline']) {
+                foreach ($issue['issue_timeline'] as $timeline) {
+                    if (isset($timeline['body']) && $timeline['body'] !== '') {
+                        if ($timeline['type'] === 'label' && isset($timeline['label'])) {
+                            $issueDetails .= 'Label : Added ' . $timeline['label']['name'] . ' on ' . $timeline['updated_at'] . '.' . PHP_EOL;
+                        }
+                        if ($timeline['type'] === 'commit_ref') {
+                            if (str_contains($timeline['body'], '/sp-core/core')) {
+                                $issueDetails .= 'Commit Reference: ' . str_replace('/sp-core/core', '/' . $this->apiClientConfig['org_user'] . '/' . $data['repository_id'], $timeline['body']) . PHP_EOL;
+                            } else if (str_contains($timeline['body'], '/sp/core')) {
+                                $issueDetails .= 'Commit Reference: ' . str_replace('/sp/core', '/' . $this->apiClientConfig['org_user'] . '/' . $data['repository_id'], $timeline['body']) . PHP_EOL;
+                            }
+                        }
+                        if ($timeline['type'] === 'comment') {
+                            //replace images to github repo images.
+                            $timeline['body'] = str_replace('![image](/attachments/', '![image](https://github.com/sp-framework/gitea/raw/dev/images/', $timeline['body']);
+
+                            $issueDetails .= 'Commented : ' . $timeline['body'] . PHP_EOL;
+                        }
+                    } else {
+                        if (isset($timeline['type']) && $timeline['type'] === 'label' && isset($timeline['label'])) {
+                            $issueDetails .= 'Label : Removed ' . $timeline['label']['name'] . ' on ' . $timeline['updated_at'] . '.' . PHP_EOL;
+                        }
+                        if (isset($timeline['type']) && $timeline['type'] === 'milestone' && isset($timeline['milestone'])) {
+                            if (isset($timeline['old_milestone'])) {
+                                $issueDetails .= 'Milestone : Changed from ' . $timeline['old_milestone']['title'] . ' to ' . $timeline['milestone']['title'] . ' on ' . $timeline['updated_at'] . '.' . PHP_EOL;
+                            } else {
+                                $issueDetails .= 'Milestone : Added ' . $timeline['milestone']['title'] . ' on ' . $timeline['updated_at'] . '.' . PHP_EOL;
+                            }
+                        }
+                        if (isset($timeline['type']) && $timeline['type'] === 'close') {
+                            $issueDetails .= 'Issue Closed on ' . $timeline['updated_at'] . '.' . PHP_EOL;
+                        }
+                    }
+                }
+            }
+
+            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                $collection = 'IssueApi';
+                $method = 'issueCreateIssue';
+                $args =
+                    [
+                        $this->apiClientConfig['org_user'],
+                        $data['repository_id'],
+                        // []
+                    ];
+            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                $issueLabels = [];
+                if (isset($issue['issue_details']['labels']) && count($issue['issue_details']['labels']) > 0) {
+                    foreach ($issue['issue_details']['labels'] as $label) {
+                        array_push($issueLabels, $label['name']);
+                    }
+                }
+
+                $issueMilestones = [];
+                $milestones = $this->syncMilestones($data);
+                if ($milestones && isset($milestones['milestones'])) {
+                    foreach ($milestones['milestones'] as $milestone) {
+                        $issueMilestones[$milestone['title']] = $milestone['number'];
+                    }
+                }
+
+                $collection = 'IssuesApi';
+                $method = 'issuesCreate';
+                $args =
+                    [
+                        $this->apiClientConfig['org_user'],
+                        $data['repository_id'],
+                        [
+                            'title'     => $issue['issue_details']['title'],
+                            'body'      => $issue['issue_details']['body'] . PHP_EOL . PHP_EOL . $issueDetails,
+                            'assignee'  => 'oyeaussie',
+                            'milestone' =>
+                                isset($issue['issue_details']['milestone']) && isset($issueMilestones[$issue['issue_details']['milestone']['title']]) ?
+                                $issueMilestones[$issue['issue_details']['milestone']['title']] :
+                                null,
+                            'labels'    => $issueLabels
+                        ]
+                    ];
+            }
+
+            try {
+                $migratedIssue = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+                if ($migratedIssue) {
+                    if ($issue['issue_details']['state'] === 'closed') {
+                        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                            $collection = 'IssueApi';
+                            $method = 'issueEditIssue';
+                            $args =
+                                [
+                                    $this->apiClientConfig['org_user'],
+                                    $data['repository_id'],
+                                    // []
+                                ];
+                        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                            $collection = 'IssuesApi';
+                            $method = 'issuesUpdate';
+                            $args =
+                                [
+                                    $this->apiClientConfig['org_user'],
+                                    $data['repository_id'],
+                                    $migratedIssue['number'],
+                                    [
+                                        'state'     => 'closed'
+                                    ]
+                                ];
+                        }
+
+                        $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+                    }
+
+                    $issue['migrated'] = true;
+
+                    $this->update($issue);
+                }
+
+                return true;
+            } catch (\Exception $e) {
+                throw $e;
+            }
+        }
+
+        if ($issueNumber > $this->ffStore->getLastInsertedId()) {
+            throw new \Exception('Issue with ID ' . $issueNumber . ' not found in local database, please import issue to migrate');
+        }
     }
 
     public function getAvailableApis($getAll = false, $returnApis = true)

@@ -76,7 +76,7 @@ class Countries
             $downloadCountry =
                 $remoteWebContent->request(
                     'GET',
-                    'https://github.com/oyeaussie/sp-geodata/raw/main/' . $country['iso2'] . '.zip',
+                    'https://github.com/sp-framework/geodata/raw/main/' . $country['iso2'] . '.zip',
                     [
                         'progress' => function(
                             $downloadTotal,

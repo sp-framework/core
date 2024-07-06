@@ -6,19 +6,19 @@
                 'componentName'                  : componentName,
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
-                'fieldId'                        : 'exclude_labels',
-                'fieldLabel'                     : 'Source Labels',
-                'fieldType'                      : 'select2',
+                'fieldId'                        : 'import_issues_from',
+                'fieldLabel'                     : 'Import Issues From Issue #',
+                'fieldType'                      : 'input',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Select labels to exclude issues of.',
+                'fieldHelpTooltipContent'        : 'Import issues from issue #',
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : false,
                 'fieldBazPostOnUpdate'           : false,
                 'fieldRequired'                  : false,
                 'fieldDisabled'                  : false,
-                'fieldGroupPreAddonButtons'      :
+                'fieldGroupPostAddonButtons'     :
                     [
-                        'sync-exclude-labels'   : [
+                        'import-issues'   : [
                             'title'                   : false,
                             'icon'                    : 'sync-alt',
                             'noMargin'                : true,
@@ -26,13 +26,7 @@
                             'position'                : 'right'
                         ]
                     ],
-                'fieldBazJstreeSearch'           : true,
-                'fieldDataSelect2Multiple'       : true,
-                'fieldDataSelect2Options'        : [],
-                'fieldDataSelect2OptionsKey'     : 'id',
-                'fieldDataSelect2OptionsValue'   : 'name',
-                'fieldDataSelect2OptionsArray'   : true,
-                'fieldDataSelect2OptionsSelected': ''
+                'fieldBazJstreeSearch'           : true
             ]
         )}}
     </div>
@@ -47,9 +41,13 @@
                 'fieldLabel'                     : 'Migrate issues',
                 'fieldType'                      : 'input',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Migrate issues, comma saperated or ranges.',
+                'fieldHelpTooltipContent'        : 'Migrate issues comma saperated ids or ranges',
                 'fieldBazScan'                   : true,
-                'fieldGroupPostAddonButtons'    :
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldRequired'                  : false,
+                'fieldDisabled'                  : false,
+                'fieldGroupPostAddonButtons'     :
                     [
                         'migrate-issues'   : [
                             'title'                   : false,
@@ -59,39 +57,39 @@
                             'position'                : 'right'
                         ]
                     ],
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldDataInputMinLength'        : 1,
-                'fieldDataInputMaxLength'        : 1024,
-                'fieldValue'                     : ''
+                'fieldBazJstreeSearch'           : true
             ]
         )}}
     </div>
 </div>
+<div class="row m-2 text-center" id="issues-loader" hidden>
+    <div class="col">
+        <div class="fa-2x">
+            <i class="fa fa-cog fa-spin"></i> <span id="issues-loader-text"></span>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col">
-        {{adminltetags.useTag('buttons',
+        {{adminltetags.useTag('fields',
             [
-                'componentId'           : componentId,
-                'sectionId'             : sectionId,
-                'buttonType'            : 'button',
-                'buttons'               :
-                    [
-                        'import-issues' : [
-                            'label'                   : '',
-                            'title'                   : 'Import Issues',
-                            'size'                    : 'xs',
-                            'type'                    : 'primary',
-                            'position'                : 'right',
-                            'icon'                    : 'list-check'
-                        ]
-                    ]
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'issues',
+                'fieldLabel'                     : 'Issues',
+                'fieldType'                      : 'html',
+                'fieldHelp'                      : true,
+                'fieldHidden'                    : true,
+                'fieldHelpTooltipContent'        : 'Imported Issues.',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldHtmlContent'               : '',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false
             ]
         )}}
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        <div id="issues-list"></div>
     </div>
 </div>
