@@ -33,7 +33,7 @@ class Domains extends BasePackage
 	public function getDomain()
 	{
 		if (PHP_SAPI === 'cli') {
-			return $this->domains[0];
+			return $this->helper->first($this->domains);
 		}
 
 		if (!$this->domain) {

@@ -1,1 +1,4 @@
-/usr/bin/php /var/www/html/sp/public/index.php terminal run
+php=$(which php)
+dir=$(pwd)
+
+$php $dir/public/index.php terminal run
