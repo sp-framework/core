@@ -175,19 +175,13 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        if ($this->auth->checkPwStrength($this->postData()['pass']) !== false) {
-            $this->addResponse(
-                $this->auth->packagesData->responseMessage,
-                $this->auth->packagesData->responseCode,
-                $this->auth->packagesData->responseData
-            );
-
-            return;
+        if ($this->basepackages->utils->checkPwStrength($this->postData()['pass']) !== false) {
+            $this->view->responseData = $this->basepackages->utils->packagesData->responseData;
         }
 
         $this->addResponse(
-            $this->auth->packagesData->responseMessage,
-            $this->auth->packagesData->responseCode,
+            $this->basepackages->utils->packagesData->responseMessage,
+            $this->basepackages->utils->packagesData->responseCode
         );
     }
 
@@ -195,12 +189,12 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->auth->generateNewPassword();
+        $this->basepackages->utils->generateNewPassword($this->postData());
 
         $this->addResponse(
-            $this->auth->packagesData->responseMessage,
-            $this->auth->packagesData->responseCode,
-            $this->auth->packagesData->responseData
+            $this->basepackages->utils->packagesData->responseMessage,
+            $this->basepackages->utils->packagesData->responseCode,
+            $this->basepackages->utils->packagesData->responseData
         );
     }
 

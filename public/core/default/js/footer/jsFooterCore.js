@@ -8948,7 +8948,7 @@ var BazContentFields = function() {
                     fieldId.id + '-strength-meter'
             ) {
                 $('#' + fieldId.id + '-strength-meter').strengthMeter({
-                    "url" : dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/checkPwStrength'
+                    "url" : dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/auth/checkPwStrength'
                 });
             }
 
@@ -9044,7 +9044,7 @@ var BazContentFields = function() {
                         }
                     }
 
-                    var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/generatePw'
+                    var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/auth/generatePw'
                     $.post(url, postData, function(response) {
                         if (response.responseCode == 0) {
                             PNotify.success(response.responseMessage);

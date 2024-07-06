@@ -312,45 +312,6 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	public function checkPwStrengthAction()
-	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
-
-			if ($this->basepackages->utils->checkPwStrength($this->postData()['pass']) !== false) {
-				$this->view->responseData = $this->basepackages->utils->packagesData->responseData;
-			}
-
-			$this->addResponse(
-				$this->basepackages->utils->packagesData->responseMessage,
-				$this->basepackages->utils->packagesData->responseCode
-			);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
-		}
-	}
-
-	public function generatePwAction()
-	{
-		if ($this->request->isPost()) {
-			if (!$this->checkCSRF()) {
-				return;
-			}
-
-			$this->basepackages->utils->generateNewPassword($this->postData());
-
-			$this->addResponse(
-				$this->basepackages->utils->packagesData->responseMessage,
-				$this->basepackages->utils->packagesData->responseCode,
-				$this->basepackages->utils->packagesData->responseData
-			);
-		} else {
-			$this->addResponse('Method Not Allowed', 1);
-		}
-	}
-
 	protected function checkPermissions()
 	{
 		if ($this->auth->account()) {
