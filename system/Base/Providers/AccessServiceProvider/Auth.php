@@ -1260,7 +1260,7 @@ class Auth
     {
         $this->passwordPolicyErrors['passwordPolicySimpleAcceptableLevel'] = false;
 
-        $checkPwStrength = $this->checkPwStrength($data['newpass']);
+        $checkPwStrength = $this->basepackages->utils->checkPwStrength($data['newpass']);
 
         if (isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel']) &&
             (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel'] > 0
@@ -1549,34 +1549,6 @@ class Auth
         }
 
         return true;
-    }
-
-    public function checkPwStrength(string $pass)
-    {
-        $checkingTool = new \ZxcvbnPhp\Zxcvbn();
-
-        $result = $checkingTool->passwordStrength($pass);
-
-        if ($result && is_array($result) && isset($result['score'])) {
-            $this->addResponse('Checking Password Strength Success', 0, $result['score']);
-
-            return $result['score'];
-        }
-
-        $this->addResponse('Error Checking Password Strength', 1);
-
-        return false;
-    }
-
-    public function generateNewPassword()
-    {
-        $this->basepackages->utils->generateNewPassword();
-
-        $this->addResponse(
-            $this->basepackages->utils->packagesData->responseMessage,
-            $this->basepackages->utils->packagesData->responseCode,
-            $this->basepackages->utils->packagesData->responseData['password']
-        );
     }
 
     protected function initOtp($secret, $verify = false)
