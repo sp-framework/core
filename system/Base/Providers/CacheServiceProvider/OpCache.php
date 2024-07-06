@@ -26,12 +26,12 @@ class OpCache
         $this->setDirectory($directory);
 
         try {
-            include base_path($this->storagePath . $this->directory . '/' . $key);
+            include base_path($this->storagePath . $this->directory . '/' . $key . '.php');
         } catch (\throwable $e) {
             return false;
         }
 
-        return isset($value) ? $value : false;
+        return ${"value_".$key} ?? false;
     }
 
     public function setCache($key, $value, $directory = null)
@@ -42,7 +42,7 @@ class OpCache
 
         $value = str_replace('stdClass::__set_state', '(object)', $value);
 
-        file_put_contents(base_path($this->storagePath . $this->directory . '/' . $key), '<?php $value = ' . $value . ';', LOCK_EX);
+        file_put_contents(base_path($this->storagePath . $this->directory . '/' . $key . '.php'), '<?php $value_' . $key . ' = ' . $value . ';', LOCK_EX);
 
         return $this->getCache($key, $directory);
     }
@@ -52,14 +52,14 @@ class OpCache
         $this->setDirectory($directory);
 
         if ($key) {
-            if (opcache_is_script_cached(base_path($this->storagePath . $this->directory . '/' . $key))) {
-                if (!opcache_invalidate(base_path($this->storagePath . $this->directory . '/' . $key), true)) {
+            if (opcache_is_script_cached(base_path($this->storagePath . $this->directory . '/' . $key . '.php'))) {
+                if (!opcache_invalidate(base_path($this->storagePath . $this->directory . '/' . $key . '.php'), true)) {
                     return false;
                 }
             }
 
             try {
-                if (!unlink(base_path($this->storagePath . $this->directory . '/' . $key))) {
+                if (!unlink(base_path($this->storagePath . $this->directory . '/' . $key . '.php'))) {
                     return false;
                 }
             } catch (\throwable $e) {
@@ -74,14 +74,13 @@ class OpCache
 
             try {
                 if ($directory) {
-                    $files = scanAllDir(base_path($this->storagePath . $this->directory . '/'));
+                    $dirContent = scanAllDir(base_path($this->storagePath . $this->directory . '/'));
                 } else {
-                    $files = scanAllDir(base_path($this->storagePath));
+                    $dirContent = scanAllDir(base_path($this->storagePath));
                 }
 
-                foreach ($files as $file) {
-                    deleteFiles(base_path($this->storagePath . $this->directory . '/' . $file));
-                }
+                deleteFilesFolders($dirContent['files']);
+                deleteFilesFolders($dirContent['dirs']);
             } catch (\throwable $e) {
                 return false;
             }
