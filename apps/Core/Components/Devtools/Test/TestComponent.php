@@ -14,6 +14,10 @@ class TestComponent extends BaseComponent
      */
     public function viewAction()
     {
+        // var_dump($this->opCache->setCache('guru', ['guru'=>123], 'guru'));
+        // var_dump($this->opCache->getCache('guru', 'guru'));
+        // var_dump($this->opCache->removeCache());
+
         // $dicData = new DevtoolsDicExtractData;
 
         // $dicData->processDicData();
