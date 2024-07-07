@@ -171,6 +171,8 @@ dataCollectionSection =
                           '#{{componentId}}-{{sectionId}}-password_policy_force_relogin_after_pwreset, ' +
                           '#{{componentId}}-{{sectionId}}-password_policy_force_pwreset_after, ' +
                           '#{{componentId}}-{{sectionId}}-password_policy_block_previous_passwords, ' +
+                          '#{{componentId}}-{{sectionId}}-password_check_hibp, ' +
+                          '#{{componentId}}-{{sectionId}}-test_password_with_hibp, ' +
                           '#{{componentId}}-{{sectionId}}-password_policy_forgotten_password_timeout'
                           ).attr('disabled', false);
                         if ($('#{{componentId}}-{{sectionId}}-password_policy_complexity').val() === 'simple') {
@@ -185,6 +187,8 @@ dataCollectionSection =
                           '#{{componentId}}-{{sectionId}}-password_policy_force_relogin_after_pwreset, ' +
                           '#{{componentId}}-{{sectionId}}-password_policy_force_pwreset_after, ' +
                           '#{{componentId}}-{{sectionId}}-password_policy_block_previous_passwords, ' +
+                          '#{{componentId}}-{{sectionId}}-password_check_hibp, ' +
+                          '#{{componentId}}-{{sectionId}}-test_password_with_hibp, ' +
                           '#{{componentId}}-{{sectionId}}-password_policy_forgotten_password_timeout'
                           ).attr('disabled', true);
                         $('#simple-div').attr('hidden', true);
@@ -196,6 +200,66 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-password_policy_force_relogin_after_pwreset'     : { },
         '{{componentId}}-{{sectionId}}-password_policy_force_pwreset_after'             : { },
         '{{componentId}}-{{sectionId}}-password_policy_block_previous_passwords'        : { },
+        '{{componentId}}-{{sectionId}}-password_check_hibp'                             : { },
+        '{{componentId}}-{{sectionId}}-test_password_with_hibp'                         : {
+            afterInit : function() {
+                var hibpElement = $('#{{componentId}}-{{sectionId}}-test_password_with_hibp').parents('.form-group').siblings('.input-small-text');
+
+                $('#{{componentId}}-{{sectionId}}-test_password_with_hibp').off();
+                $('#{{componentId}}-{{sectionId}}-test_password_with_hibp').change(function() {
+                    hibpElement.removeClass(function (index, className) {
+                        return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                    }).addClass('text-uppercase text-info');
+                    hibpElement.children().html(
+                        'Enter Password to check with HIBP Database.'
+                    );
+                });
+
+                $('#{{componentId}}-{{sectionId}}-check-hibp').off();
+                $('#{{componentId}}-{{sectionId}}-check-hibp').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['pass'] = $('#{{componentId}}-{{sectionId}}-test_password_with_hibp').val();
+
+                    if (postData['pass'] === '') {
+                        paginatedPNotify('error', {text : 'Enter password'});
+
+                        return false;
+                    }
+
+                    $.post('{{links.url("auth/checkPwHibp")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData.pwned && response.responseData.amount) {
+                                hibpElement.removeClass(function (index, className) {
+                                    return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                                }).addClass('text-uppercase text-danger');
+                                hibpElement.children().html(
+                                    'Alert: Password is pwned ' + response.responseData.amount + ' times. Do not use this password in production.'
+                                );
+                            } else if (!response.responseData.pwned && response.responseData.amount == 0) {
+                                hibpElement.removeClass(function (index, className) {
+                                    return (className.match (/(^|\s)text-\S+/g) || []).join(' ');
+                                }).addClass('text-uppercase text-success');
+                                hibpElement.children().html(
+                                    'Success: Password is not pwned'
+                                );
+                            }
+
+                            paginatedPNotify('success', {text : response.responseMessage});
+                        } else {
+                            paginatedPNotify('error', {text : response.responseMessage});
+                        }
+                    }, 'json');
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-password_policy_forgotten_password_timeout'      : { },
         '{{componentId}}-{{sectionId}}-password_policy_complexity'                      : {
             placeholder : 'SELECT PASSWORD COMPLEXITY',

@@ -171,6 +171,20 @@ class AuthComponent extends BaseComponent
         }
     }
 
+    public function checkPwHibpAction()
+    {
+        $this->requestIsPost();
+
+        if ($this->basepackages->utils->checkPwHibp($this->postData()['pass']) !== false) {
+            $this->view->responseData = $this->basepackages->utils->packagesData->responseData;
+        }
+
+        $this->addResponse(
+            $this->basepackages->utils->packagesData->responseMessage,
+            $this->basepackages->utils->packagesData->responseCode
+        );
+    }
+
     public function checkPwStrengthAction()
     {
         $this->requestIsPost();

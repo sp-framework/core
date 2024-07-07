@@ -17,6 +17,8 @@ class Utils extends BasePackage
 
     protected $microTimers = [];
 
+    protected $hibpUri = 'https://api.pwnedpasswords.com/range/';
+
     public function init($container = null)
     {
         if ($container) {
@@ -68,6 +70,67 @@ class Utils extends BasePackage
         } else {
             return null;
         }
+    }
+
+    public function checkPwHibp(string $pass)
+    {
+        if ($pass === '') {
+            $this->addResponse('Enter correct password', 1);
+
+            return false;
+        }
+
+        $hash = strtoupper(sha1(trim($pass)));
+
+        $hashFile = substr($hash, 0, 5);
+
+        $hash = str_replace($hashFile, '', $hash);
+
+        try {
+            $apiResponse =
+                $this->remoteWebContent->request(
+                    'GET',
+                    $this->hibpUri . $hashFile,
+                        [
+                            'debug'           => false,
+                            'http_errors'     => true,
+                            'timeout'         => 10,
+                            'verify'          => false
+                        ]
+                );
+
+            if ($apiResponse->getStatusCode() === 200) {
+                $hibpData = $apiResponse->getBody()->getContents();
+
+                $hibpArr = [];
+
+                if ($hibpData !== '') {
+                    $hibpDataArr = explode(PHP_EOL, trim($hibpData));
+
+                    foreach ($hibpDataArr as $hibpDataLine) {
+                        $hibpDataLineArr = explode(':', trim($hibpDataLine));
+
+                        $hibpArr[$hibpDataLineArr[0]] = (int) $hibpDataLineArr[1];
+                    }
+                }
+
+                if (isset($hibpArr[$hash])) {
+                    $this->addResponse('Check Ok', 0, ['pwned' => true, 'amount' => $hibpArr[$hash]]);
+                } else {
+                    $this->addResponse('Check Ok', 0, ['pwned' => false, 'amount' => 0]);
+                }
+
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        $this->addResponse('Error Checking Password', 1);
+
+        return false;
     }
 
     public function checkPwStrength(string $pass)

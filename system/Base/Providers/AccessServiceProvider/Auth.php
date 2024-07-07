@@ -1098,7 +1098,7 @@ class Auth
             return false;
         }
 
-        if (!$this->account['security']['force_pwreset']) {
+        if (!$this->account['security']['force_pwreset'] && !$this->account()) {
             $this->addResponse('Cannot reset password using this tool. Please login and reset using profile.', 1);
 
             return false;
@@ -1135,6 +1135,20 @@ class Auth
         $security->password_set_on = time();
 
         if ($passwordPolicy) {
+            if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordCheckHibp'] == true) {
+                $this->passwordPolicyErrors['passwordCheckHibp'] = false;
+
+                if ($this->basepackages->utils->checkPwHibp($data['newpass']) !== false) {
+                    if ($this->basepackages->utils->packagesData->responseData['pwned']) {
+                        $this->passwordPolicyErrors['passwordCheckHibp'] = true;
+
+                        $this->addResponse('New password failed password policy. Please try again...', 1, ['passwordPolicyErrors' => $this->passwordPolicyErrors]);
+
+                        return false;
+                    }
+                }
+            }
+
             $security = $this->setPasswordHistory($data, $security);
         }
 

@@ -55,6 +55,11 @@ BazCore.header({
                             )}}
                         </div>
                     </div>
+                    {% if coreSettings['security']['passwordPolicySettings']['passwordCheckHibp'] is defined  %}
+                        {% if coreSettings['security']['passwordPolicySettings']['passwordCheckHibp'] == true %}
+                            {% include 'auth/pwreset/hibp.html' %}
+                        {% endif %}
+                    {% endif %}
                     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] is defined  %}
                         {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'simple' %}
                             {% include 'auth/pwreset/simple.html' %}
