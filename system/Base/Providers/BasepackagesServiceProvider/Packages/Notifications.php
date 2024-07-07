@@ -79,25 +79,29 @@ class Notifications extends BasePackage
 
     protected function pushNotification($notification)
     {
-        $account = $this->basepackages->accounts->getFirst('id', $notification['account_id'], true);
+        $account = $this->basepackages->accounts->getAccountById($notification['account_id']);
 
-        if (!$account || ($account && !$account->tunnels)) {
-            return;
+        if ($account && $account['tunnels']) {
+            $tunnels = $account['tunnels'];
         } else {
-            $tunnels = $account->tunnels->toArray();
+            return;
         }
 
         if ($tunnels['notifications_tunnel']) {
-            $count =
-                $this->modelToUse::count(
-                    [
-                        'conditions' => 'account_id = :aid: AND read = :r:',
-                        'bind'  => [
-                            'aid' => $notification['account_id'],
-                            'r' => 0
+            if ($this->config->databasetype === 'db') {
+                $count =
+                    $this->modelToUse::count(
+                        [
+                            'conditions' => 'account_id = :aid: AND read = :r:',
+                            'bind'  => [
+                                'aid' => $notification['account_id'],
+                                'r' => 0
+                            ]
                         ]
-                    ]
-            );
+                );
+            } else {
+                $count = $this->ffStore->count(false, [['account_id', '=', $notification['account_id']], ['read', '=', 0]]);
+            }
 
             if ($count && $count > 0) {
                 $this->wss->send(
@@ -106,10 +110,7 @@ class Notifications extends BasePackage
                         'to'                => $tunnels['notifications_tunnel'],
                         'response'          => [
                             'responseCode'      => 0,
-                            'responseData'      =>
-                                [
-                                    "count" => $count
-                                ]
+                            'responseData'      => $this->fetchNewNotificationsCount()
                         ]
                     ]
                 );
@@ -216,9 +217,7 @@ class Notifications extends BasePackage
             }
         }
 
-        $this->addResponse(
-            'Ok',
-            0,
+        $count =
             [
                 'count' =>
                     [
@@ -228,8 +227,11 @@ class Notifications extends BasePackage
                         'error'     => $error
                     ],
                 'mute'  => $isMute
-            ]
-        );
+            ];
+
+        $this->addResponse('Ok', 0, $count);
+
+        return $count;
     }
 
     protected function getNotificationsCount()

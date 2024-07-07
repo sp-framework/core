@@ -2220,7 +2220,10 @@ abstract class BasePackage extends Controller
 						}
 					}
 
-					if (isset($subscriptions['email']) && count($subscriptions['email']) > 0) {
+					if ($package['name'] !== 'EmailServices' &&
+						isset($subscriptions['email']) &&
+						count($subscriptions['email']) > 0
+					) {
 						$domainId = '1';//Default Domain for system generated Notifications (like API)
 
 						if ($this->packageName === 'domains') {
