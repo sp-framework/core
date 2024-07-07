@@ -1,0 +1,30 @@
+{% set hibp =
+    '<div class="col">
+        <span class="text-info mr-1 policy passwordCheckHibp">
+            <i class="fa fas fa-exclamation-circle"></i>
+        </span>
+        <span class="mb-1">Check new password with Have I been Pwned database</span>
+    </div>'
+%}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : 'form',
+                'fieldId'                               : 'password-policy-hibp',
+                'fieldLabel'                            : 'Have I Been Pwned Policy',
+                'fieldLabelLegend'                      : false,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldHtmlContent'                      : '<div class="row">' ~ hibp ~ '</div>'
+            ]
+        )}}
+    </div>
+</div>

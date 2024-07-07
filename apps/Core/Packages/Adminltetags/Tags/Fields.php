@@ -115,7 +115,8 @@ class Fields extends Adminltetags
                     'fieldBazScan'                          => false,
                     'fieldBazPostOnCreate'                  => false,
                     'fieldBazPostOnUpdate'                  => false,
-                    'fieldAdditionalClass'                  => 'mb-0 input-small-text text-xs text-info'
+                    'fieldAdditionalClass'                  => 'mb-0 mt-1 input-small-text text-xs text-info text-uppercase',
+                    'fieldHtmlContent'                      => $this->params['fieldInputInfoTextContent'] ?? ''
                 ]
             );
         }

@@ -59,6 +59,11 @@
             )}}
         </div>
     </div>
+    {% if coreSettings['security']['passwordPolicySettings']['passwordCheckHibp'] is defined  %}
+        {% if coreSettings['security']['passwordPolicySettings']['passwordCheckHibp'] == true %}
+            {% include 'profile/form/security/pwhibp.html' %}
+        {% endif %}
+    {% endif %}
     {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] is defined  %}
         {% if coreSettings['security']['passwordPolicySettings']['passwordPolicyComplexity'] === 'simple' %}
             {% include 'profile/form/security/pwresetsimple.html' %}
