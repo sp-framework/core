@@ -78,14 +78,7 @@ var BazNotifications = function() {
 
     //Notifications
     function getNotificationsCount(responseData = null) {
-        //eslint-disable-next-line
-        console.log(responseData);
         if (responseData && Object.keys(responseData).length > 0) {
-            if (responseData.responseData) {
-                responseData = responseData.responseData;
-            }
-            //eslint-disable-next-line
-            console.log(responseData);
             processResponseData(responseData);
         } else {
             var url = dataCollection.env.rootPath + appRoute + 'system/notifications/fetchNewNotificationsCount';
@@ -259,8 +252,8 @@ var BazNotifications = function() {
         BazNotifications.getNotificationsCount = function() {
             getNotificationsCount();
         }
-        BazNotifications.getPullNotifications = function(options) {
-            return getPullNotifications(_extends(BazNotifications.defaults, options));
+        BazNotifications.getPullNotifications = function() {
+            return getPullNotifications();
         }
         BazNotifications.setPromiseInit = function(options) {
             return setPromiseInit(options);
