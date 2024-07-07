@@ -5,7 +5,7 @@
 	"module_type" : "packages",
 	"app_type" : "core",
 	"category" : "providers",
-	"version" : "0.0.0-rc.2",
+	"version" : "0.0.0-rc.5",
 	"repo" : "https://github.com/sp-framework/core",
 	"class" : "System\\Base\\Providers\\CoreServiceProvider\\Core",
 	"dependencies" : 
