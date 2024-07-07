@@ -175,17 +175,44 @@ class IpFilter extends BasePackage
             return;
         }
 
-        $app = $this->apps->getFirst('id', $data['app_id']);
+        if ($this->config->databasetype === 'db') {
+            $app = $this->apps->getFirst('id', $data['app_id']);
 
-        $filtersObj = $app->getIpFilters();
+            $filtersObj = $app->getIpFilters();
 
-        if ($filtersObj && $filtersObj->count() > 0) {
-            $filtersObj->delete();
+            if ($filtersObj && $filtersObj->count() > 0) {
+                $filtersObj->delete();
+            }
+
+            $app->assign(['incorrect_login_attempt_block_ip' => 0, 'ip_filter_default_action' => 'allow']);
+
+            $app->update();
+
+            return true;
+        } else {
+            $this->apps->setFFRelations(true);
+
+            $app = $this->apps->getFirst('id', (int) $data['app_id']);
+
+            if ($app->data['ipFilters'] && count($app->data['ipFilters']) > 0) {
+                foreach ($app->data['ipFilters'] as $filter) {
+                    $this->removeFilter(['id' => $filter['id']]);
+                }
+            }
+
+            $app = $app->toArray();
+
+            $app['incorrect_login_attempt_block_ip'] = 0;
+            $app['ip_filter_default_action'] = 'allow';
+
+            $this->apps->update($app);
+
+            return true;
         }
 
-        $app->assign(['incorrect_login_attempt_block_ip' => 0, 'ip_filter_default_action' => 0]);
+        $this->addResponse('Incorrect App ID', 1);
 
-        $app->update();
+        return;
     }
 
     public function setClientAddress($clientAddress = null)
@@ -295,11 +322,11 @@ class IpFilter extends BasePackage
         }
 
         if ($this->config->databasetype === 'db') {
-            if ($app->ip_filter_default_action == '0') {
+            if ($app->ip_filter_default_action === 'block') {
                 return false;
             }
         } else {
-            if ($app['ip_filter_default_action'] === false) {
+            if ($app['ip_filter_default_action'] === 'block') {
                 return false;
             }
         }
