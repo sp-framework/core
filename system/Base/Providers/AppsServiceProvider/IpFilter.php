@@ -108,7 +108,9 @@ class IpFilter extends BasePackage
         } else if ($data['filter_type'] === 'monitor') {
             $data['filter_type'] = 3;
         }
-        $data['added_by'] = $this->auth->account()['id'];
+        if (!isset($data['added_by'])) {
+            $data['added_by'] = $this->auth->account()['id'];
+        }
 
         try {
             $this->add($data);
@@ -140,6 +142,12 @@ class IpFilter extends BasePackage
 
         $filter = $this->getById($data['id']);
 
+        if ($filter['ip_address'] === $this->getClientAddress()) {
+            $this->addResponse('Cannot remove your own IP!', 1);
+
+            return false;
+        }
+
         if ($this->remove($filter['id'])) {
             $this->addResponse('Filter removed.');
         } else {
@@ -147,7 +155,7 @@ class IpFilter extends BasePackage
         }
     }
 
-    public function blockMonitorFilter(array $data)
+    public function allowFilter(array $data)
     {
         if (!isset($data['id'])) {
             $this->addResponse('Please provide correct filter ID', 1);
@@ -155,13 +163,42 @@ class IpFilter extends BasePackage
             return false;
         }
 
-        $monitorFilter = $this->getFirst('id', $data['id'], false, true, null, [], true);
-        $monitorFilter['filter_type'] = 2;
-        $monitorFilter['added_by'] = $this->auth->account()['id'];
-        $monitorFilter['incorrect_attempts'] = null;
+        $filter = $this->getFirst('id', $data['id'], false, true, null, [], true);
+        $filter['filter_type'] = 1;
+        $filter['added_by'] = $this->auth->account()['id'];
+        $filter['incorrect_attempts'] = null;
+        $filter['hit_count'] = null;
 
-        if ($this->update($monitorFilter)) {
-            $this->addResponse('Filter moved from monitor to block.', 0);
+        if ($this->update($filter)) {
+            $this->addResponse('Filter moved to allow.', 0);
+        } else {
+            $this->addResponse('Error allowing filter.', 1);
+        }
+    }
+
+    public function blockFilter(array $data)
+    {
+        if (!isset($data['id'])) {
+            $this->addResponse('Please provide correct filter ID', 1);
+
+            return false;
+        }
+
+        $filter = $this->getFirst('id', $data['id'], false, true, null, [], true);
+
+        if ($filter['ip_address'] === $this->getClientAddress()) {
+            $this->addResponse('Cannot block your own IP!', 1);
+
+            return false;
+        }
+
+        $filter['filter_type'] = 2;
+        $filter['added_by'] = $this->auth->account()['id'];
+        $filter['incorrect_attempts'] = null;
+        $filter['hit_count'] = null;
+
+        if ($this->update($filter)) {
+            $this->addResponse('Filter moved to block.', 0);
         } else {
             $this->addResponse('Error blocking filter.', 1);
         }
@@ -387,43 +424,43 @@ class IpFilter extends BasePackage
 
         if ($updateIncorrectAttempts) {
             if (!$filterObj) {
-                $filter = [];
-
                 $filterObj = $this->getFirst('ip_address', $this->clientAddress);
+            }
 
-                if ($filterObj) {
-                    $filter = $filterObj->toArray();
-                }
+            $filter = [];
 
-                if (count($filter) === 0) {
-                    $newFilter =
-                        [
-                            'app_id'                => $this->app['id'],
-                            'ip_address'            => $this->clientAddress,
-                            'address_type'          => 1,
-                            'filter_type'           => 'monitor',
-                            'added_by'              => 0,
-                            'incorrect_attempts'    => 1
-                        ];
+            if ($filterObj) {
+                $filter = $filterObj->toArray();
+            }
 
-                    $this->addFilter($newFilter);
+            if (count($filter) === 0) {
+                $newFilter =
+                    [
+                        'app_id'                => $this->app['id'],
+                        'ip_address'            => $this->clientAddress,
+                        'address_type'          => 1,
+                        'filter_type'           => 'monitor',
+                        'added_by'              => 0,
+                        'incorrect_attempts'    => 1
+                    ];
+
+                $this->addFilter($newFilter);
+            } else {
+                if ($filter['incorrect_attempts'] !== null) {
+                    $incorrectAttempt = (int) $filter['incorrect_attempts'];
+
+                    $incorrectAttempt = $incorrectAttempt + 1;
                 } else {
-                    if ($filter['incorrect_attempts'] !== null) {
-                        $incorrectAttempt = (int) $filter['incorrect_attempts'];
-
-                        $incorrectAttempt = $incorrectAttempt + 1;
-                    } else {
-                        $incorrectAttempt = 1;
-                    }
-
-                    if ($incorrectAttempt >= (int) $this->app['incorrect_login_attempt_block_ip']) {
-                        $filter['filter_type'] = 2;
-                    }
-
-                    $filter['incorrect_attempts'] = $incorrectAttempt;
-
-                    $this->update($filter);
+                    $incorrectAttempt = 1;
                 }
+
+                if ($incorrectAttempt >= (int) $this->app['incorrect_login_attempt_block_ip']) {
+                    $filter['filter_type'] = 2;
+                }
+
+                $filter['incorrect_attempts'] = $incorrectAttempt;
+
+                $this->update($filter);
             }
 
             return true;
@@ -449,7 +486,7 @@ class IpFilter extends BasePackage
                 $filter->delete();
             }
         } else {
-            $filter = $filterStore->findOneBy(['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()]);
+            $filter = $filterStore->findOneBy([['ip_address', '=', $this->getDi()->getRequest()->getClientAddress()], ['added_by', '=', 0]]);
 
             if ($filter && count($filter) > 0) {
                 $filterStore->deleteById($filter['id']);
