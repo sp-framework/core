@@ -101,8 +101,8 @@ class BasepackagesUsersAccounts extends BaseModel
         );
 
         $account_id = '0';
-        if (isset($this->auth) && $this->auth->account()) {
-            $account_id = $this->auth->account()['id'];
+        if (isset($this->access->auth) && $this->access->auth->account()) {
+            $account_id = $this->access->auth->account()['id'];
         }
         $this->modelRelations['api_clients']['relationObj'] = $this->hasMany(
             'id',

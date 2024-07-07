@@ -1,10 +1,10 @@
 <?php
 
-namespace System\Base\Providers\AppsServiceProvider\Model;
+namespace System\Base\Providers\AccessServiceProvider\Model;
 
 use System\Base\BaseModel;
 
-class ServiceProviderAppsIpFilter extends BaseModel
+class ServiceProviderAccessIpFilter extends BaseModel
 {
     public $id;
 

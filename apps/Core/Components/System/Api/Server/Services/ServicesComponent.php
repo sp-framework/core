@@ -90,11 +90,11 @@ class ServicesComponent extends BaseComponent
                 ]
             ];
 
-        if ($this->auth->account()['security']['role_id'] != '1') {
+        if ($this->access->auth->account()['security']['role_id'] != '1') {
             $conditions =
                 [
                     'conditions'    =>
-                        '-|account_id|equals|' . $this->auth->account()['id'] . '&',
+                        '-|account_id|equals|' . $this->access->auth->account()['id'] . '&',
                     'order'         => 'id desc'
                 ];
         } else {

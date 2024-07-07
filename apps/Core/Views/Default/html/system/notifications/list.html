@@ -1,8 +1,8 @@
-{% if auth.account()['profile']['settings']['notifications']['mute'] is defined %}
-    {% if auth.account()['profile']['settings']['notifications']['mute'] == true %}
+{% if access.auth.account()['profile']['settings']['notifications']['mute'] is defined %}
+    {% if access.auth.account()['profile']['settings']['notifications']['mute'] == true %}
         {% set muteEnabled = true %}
         {% set unmuteEnabled = false %}
-    {% elseif auth.account()['profile']['settings']['notifications']['mute'] == false %}
+    {% elseif access.auth.account()['profile']['settings']['notifications']['mute'] == false %}
         {% set muteEnabled = false %}
         {% set unmuteEnabled = true %}
     {% else %}

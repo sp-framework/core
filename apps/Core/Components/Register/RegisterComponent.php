@@ -136,7 +136,7 @@ class RegisterComponent extends BaseComponent
             return;
         }
 
-        if ($this->auth->hasUserInSession() || $this->auth->hasRecaller()) {
+        if ($this->access->auth->hasUserInSession() || $this->access->auth->hasRecaller()) {
             return $this->response->redirect('/' . strtolower($this->app['route']));
         }
 

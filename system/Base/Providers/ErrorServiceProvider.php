@@ -18,7 +18,7 @@ class ErrorServiceProvider implements ServiceProviderInterface
 				$logger = $container->getShared('logger');
 				$request = $container->getShared('request');
 				$response = $container->getShared('response');
-				$auth = $container->getShared('auth');
+				$auth = $container->getShared('access')->auth;
 				return (new Error($appInfo, $config, $logger, $request, $response, $auth))->init();
 			}
 		);

@@ -235,8 +235,8 @@ class Accounts extends BasePackage
             $data['status'] = '0';
         }
 
-        if ($this->auth->account() &&
-            $data['id'] == $this->auth->account()['id']
+        if ($this->access->auth->account() &&
+            $data['id'] == $this->access->auth->account()['id']
         ) {
             if ($data['status'] == '0') {
                 $data['status'] = 1;//Cannot disable own account
@@ -273,8 +273,8 @@ class Accounts extends BasePackage
             $data['permissions'] = $this->helper->encode([]);
         } else if (isset($data['override_role']) && $data['override_role'] == 1) {
             //Prevent lockout of logged in user
-            if ($this->auth->account() &&
-                $data['id'] == $this->auth->account()['id']
+            if ($this->access->auth->account() &&
+                $data['id'] == $this->access->auth->account()['id']
             ) {
                 if (is_string($data['permissions'])) {
                     $data['permissions'] = $this->helper->decode($data['permissions'], true);
@@ -333,8 +333,8 @@ class Accounts extends BasePackage
 
             $this->addResponse('Updated account for ID: ' . $data['email'], 0, null, true);
 
-            if ($this->auth->account() &&
-                $data['id'] == $this->auth->account()['id']
+            if ($this->access->auth->account() &&
+                $data['id'] == $this->access->auth->account()['id']
             ) {//Cannot logout yourself!
                 $data['force_logout'] = '0';
             }
@@ -352,7 +352,7 @@ class Accounts extends BasePackage
     public function removeAccount(array $data)
     {
         if (isset($data['id']) && $data['id'] != 1) {
-            if ($this->auth->account()['id'] === $data['id']) {
+            if ($this->access->auth->account()['id'] === $data['id']) {
                 $this->addResponse('Cannot remove own account!', 1);
 
                 return;
@@ -437,7 +437,7 @@ class Accounts extends BasePackage
 
         if ($validation === true) {
             if ($this->addAccount($data)) {
-                $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+                $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
 
                 $this->packagesData->redirectUrl = $this->links->url('auth');
             }
@@ -1092,7 +1092,7 @@ class Accounts extends BasePackage
                 }
             }
         } else if (isset($data['verified'])) {
-            if (!$this->auth->account()) {
+            if (!$this->access->auth->account()) {
                 $this->addResponse('Account Not Found!');
 
                 return;
@@ -1103,7 +1103,7 @@ class Accounts extends BasePackage
                     [
                         'conditions'    => 'account_id = :aid: AND verified = :v:',
                         'bind'          => [
-                            'aid'       => $this->auth->account()['id'],
+                            'aid'       => $this->access->auth->account()['id'],
                             'v'         => $data['verified']
                         ]
                     ]
@@ -1139,7 +1139,7 @@ class Accounts extends BasePackage
                             [
                                 'conditions'    => 'account_id = :aid:',
                                 'bind'          => [
-                                    'aid'       => $this->auth->account()['id'],
+                                    'aid'       => $this->access->auth->account()['id'],
                                 ]
                             ]
                         );
@@ -1167,7 +1167,7 @@ class Accounts extends BasePackage
                     return;
                 }
             } else {
-                $agents = $agentStore->findBy([['account_id', '=', $this->auth->account()['id']], ['verified', '=', $data['verified']]]);
+                $agents = $agentStore->findBy([['account_id', '=', $this->access->auth->account()['id']], ['verified', '=', $data['verified']]]);
 
                 if ($agents) {
                     $removed = true;
@@ -1190,7 +1190,7 @@ class Accounts extends BasePackage
                     }
 
                     if ($data['verified'] == '1') {
-                        $sessions = $sessionStore->findBy(['account_id', '=', $this->auth->account()['id']]);
+                        $sessions = $sessionStore->findBy(['account_id', '=', $this->access->auth->account()['id']]);
 
                         if ($sessions) {
                             foreach ($sessions as $session) {

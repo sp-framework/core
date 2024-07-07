@@ -55,8 +55,8 @@ class Notifications extends BasePackage
         if ($createdBy) {
             $newNotification['created_by'] = $createdBy;
         } else {
-            if (isset($this->auth) && $this->auth->account()) {
-                $newNotification['created_by'] = $this->auth->account()['id'];
+            if (isset($this->access->auth) && $this->access->auth->account()) {
+                $newNotification['created_by'] = $this->access->auth->account()['id'];
             } else {
                 $newNotification['created_by'] = 0;
             }
@@ -182,8 +182,8 @@ class Notifications extends BasePackage
 
     public function fetchNewNotificationsCount($type = 0)
     {
-        if (isset($this->auth->account()['profile']['settings']['notifications']['mute'])) {
-            if ($this->auth->account()['profile']['settings']['notifications']['mute'] == true) {
+        if (isset($this->access->auth->account()['profile']['settings']['notifications']['mute'])) {
+            if ($this->access->auth->account()['profile']['settings']['notifications']['mute'] == true) {
                 $isMute = true;
             } else {
                 $isMute = false;
@@ -244,7 +244,7 @@ class Notifications extends BasePackage
                     'bind'          =>
                         [
                             'appId'         => $this->apps->getAppInfo()['id'],
-                            'aId'           => $this->auth->account()['id'],
+                            'aId'           => $this->access->auth->account()['id'],
                             'read'          => 0,
                             'archive'       => 0
                         ]
@@ -254,7 +254,7 @@ class Notifications extends BasePackage
                 [
                     'conditions'    => [
                         ['app_id', '=', $this->apps->getAppInfo()['id']],
-                        ['account_id', '=', $this->auth->account()['id']],
+                        ['account_id', '=', $this->access->auth->account()['id']],
                         ['read', '=', 0],
                         ['archive', '=', 0]
                     ]
@@ -303,7 +303,7 @@ class Notifications extends BasePackage
                     [
                         'type'          => $type,
                         'appId'         => $this->apps->getAppInfo()['id'],
-                        'aId'           => $this->auth->account()['id'],
+                        'aId'           => $this->access->auth->account()['id'],
                         'read'          => 0,
                         'archive'       => 0
                     ], true, false
@@ -360,12 +360,12 @@ class Notifications extends BasePackage
                     'bind'          =>
                         [
                             'id'            => $data['id'],
-                            'aId'           => $this->auth->account()['id'],
+                            'aId'           => $this->access->auth->account()['id'],
                             'read'          => 0,
                         ]
                 ];
         } else {
-            $params = ['conditions' => [['id', '=', (int) $data['id']], ['account_id', '=', $this->auth->account()['id']], ['read', '=', 0]]];
+            $params = ['conditions' => [['id', '=', (int) $data['id']], ['account_id', '=', $this->access->auth->account()['id']], ['read', '=', 0]]];
         }
 
         $notification = $this->getByParams($params);
@@ -393,12 +393,12 @@ class Notifications extends BasePackage
                     'bind'          =>
                         [
                             'id'            => $data['id'],
-                            'aId'           => $this->auth->account()['id'],
+                            'aId'           => $this->access->auth->account()['id'],
                             'archive'       => 0,
                         ]
                 ];
         } else {
-            $params = ['conditions' => [['id', '=', (int) $data['id']], ['account_id', '=', $this->auth->account()['id']], ['archive', '=', 0]]];
+            $params = ['conditions' => [['id', '=', (int) $data['id']], ['account_id', '=', $this->access->auth->account()['id']], ['archive', '=', 0]]];
         }
 
         $notification = $this->getByParams($params);
@@ -427,11 +427,11 @@ class Notifications extends BasePackage
                     'bind'          =>
                         [
                             'id'            => $data['id'],
-                            'aId'           => $this->auth->account()['id']
+                            'aId'           => $this->access->auth->account()['id']
                         ]
                 ];
         } else {
-            $params = ['conditions' => [['id', '=', (int) $data['id']], ['account_id', '=', $this->auth->account()['id']]]];
+            $params = ['conditions' => [['id', '=', (int) $data['id']], ['account_id', '=', $this->access->auth->account()['id']]]];
         }
 
         $notification = $this->getByParams($params);

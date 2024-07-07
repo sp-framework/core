@@ -76,6 +76,7 @@ use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Queues;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Views\Settings;
+use System\Base\Installer\Packages\Setup\Schema\Providers\Access\IpFilter;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api as SPApi;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AccessTokens;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\AuthorizationCodes;
@@ -83,7 +84,6 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Clients;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\RefreshTokens;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Api\Scopes;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps;
-use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\IpFilter;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Apps\Types;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Core;
@@ -91,6 +91,7 @@ use System\Base\Installer\Packages\Setup\Schema\Providers\Domains;
 use System\Base\Installer\Packages\Setup\Schema\Providers\Logs;
 use System\Base\Installer\Packages\Setup\Write\Configs;
 use System\Base\Installer\Packages\Setup\Write\Pdo;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilter;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApi;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAccessTokens;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiAuthorizationCodes;
@@ -98,7 +99,6 @@ use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiRefreshTokens;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiScopes;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderApps;
-use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsIpFilter;
 use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsTypes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\ApiClientServices\BasepackagesApiClientServices;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\ApiClientServices\BasepackagesApiClientServicesCalls;
@@ -485,9 +485,9 @@ class Setup
 					'schema'	=> new Types,
 					'model'		=> new ServiceProviderAppsTypes,
 				],
-			'service_provider_apps_ip_filter' 			=> [
+			'service_provider_access_ip_filter' 		=> [
 					'schema'	=> new IpFilter,
-					'model'		=> new ServiceProviderAppsIpFilter,
+					'model'		=> new ServiceProviderAccessIpFilter,
 				],
 			'service_provider_domains' 					=> [
 					'schema'	=> new Domains,

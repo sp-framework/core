@@ -30,7 +30,7 @@ class Profiles extends BasePackage
     public function profile(int $accountId = null)
     {
         if (!$accountId) {
-            $accountId = $this->auth->account()['id'];
+            $accountId = $this->access->auth->account()['id'];
         }
 
         if (!$this->profile) {
@@ -175,7 +175,7 @@ class Profiles extends BasePackage
 
     public function updateProfile(array $data)
     {
-        if (!isset($data['account_id']) && !$this->auth->account()) {
+        if (!isset($data['account_id']) && !$this->access->auth->account()) {
             return;
         }
 
@@ -189,7 +189,7 @@ class Profiles extends BasePackage
         if (isset($data['account_id'])) {
             $profile = $this->getProfile((int) $data['account_id']);
         } else {
-            $profile = $this->getProfile($this->auth->account()['id']);
+            $profile = $this->getProfile($this->access->auth->account()['id']);
         }
 
         if (($data['first_name'] !== $profile['first_name'] ||
@@ -215,7 +215,7 @@ class Profiles extends BasePackage
             $profile['contact_address_id'] = $this->addProfileAddress($profile);
         }
 
-        $portrait = $this->getProfile($this->auth->account()['id'])['portrait'];
+        $portrait = $this->getProfile($this->access->auth->account()['id'])['portrait'];
 
         if (is_array($profile['settings'])) {
             $profile['settings'] = $this->helper->encode($profile['settings']);
@@ -349,19 +349,19 @@ class Profiles extends BasePackage
         if ($accountId) {
             $this->packagesData->account = $this->basepackages->accounts->getAccountById($accountId);
         } else {
-            $this->packagesData->account = $this->auth->account();
+            $this->packagesData->account = $this->access->auth->account();
         }
 
         $this->packagesData->profile = $this->getProfile($this->packagesData->account);
 
         if ($this->config->databasetype === 'db') {
-            $accountObj = $this->basepackages->accounts->getFirst('id', $this->auth->account()['id']);
+            $accountObj = $this->basepackages->accounts->getFirst('id', $this->access->auth->account()['id']);
 
             $canLoginArr = $accountObj->canlogin->toArray();
 
             $account = $accountObj->toArray();
         } else {
-            $account = $this->basepackages->accounts->getAccountById($this->auth->account()['id']);
+            $account = $this->basepackages->accounts->getAccountById($this->access->auth->account()['id']);
 
             $canLoginArr = $account['canlogin'];
         }
@@ -501,7 +501,7 @@ class Profiles extends BasePackage
         $identifiersModel = new BasepackagesUsersAccountsIdentifiers;
 
         if ($this->config->databasetype === 'db') {
-            $agentsObj = $agentsModel->findByaccount_id($this->auth->account()['id']);
+            $agentsObj = $agentsModel->findByaccount_id($this->access->auth->account()['id']);
 
             if ($agentsObj) {
                 $agents = $agentsObj->toArray();
@@ -535,7 +535,7 @@ class Profiles extends BasePackage
 
         $this->packagesData->coreSettings = $this->core->core['settings'];
 
-        $this->packagesData->canUse2fa = $this->auth->canUse2fa();
+        $this->packagesData->canUse2fa = $this->access->auth->canUse2fa();
 
         return true;
     }

@@ -9,7 +9,7 @@ class IpFilter extends BaseMiddleware
 {
     public function process($data)
     {
-        if ($this->apps->ipFilter->checkList()) {
+        if ($this->access->ipFilter->checkList()) {
             return true;
         }
 

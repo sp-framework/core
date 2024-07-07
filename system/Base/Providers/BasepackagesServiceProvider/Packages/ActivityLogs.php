@@ -49,7 +49,7 @@ class ActivityLogs extends BasePackage
         if (PHP_SAPI === 'cli') {
             $log['account_id'] = 0;//System
         } else {
-            $account = $this->auth->account();
+            $account = $this->access->auth->account();
 
             if ($account) {
                 $log['account_id'] = $account['id'];//User

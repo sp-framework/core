@@ -1,4 +1,4 @@
-<input id="security-token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
+<input id="security-token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
 {% if activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
     {% if activeLayout === 'topnav' %}
         <nav class="main-header navbar navbar-expand-lg navbar-light bg-light" id="main_navbar">
@@ -37,7 +37,7 @@
                     </li>
                 </ul>
             {% endif %}
-            {% if auth.account() %}
+            {% if access.auth.account() %}
                 <ul class="navbar-nav ml-auto">
                     {% if modules.components.getComponentByNameForAppId('Messenger', apps.getAppInfo()['id']) %}
                         <li class="nav-item">
@@ -73,10 +73,10 @@
                         </li>
                     {% endif %}
                     <li class="nav-item">
-                        {% if auth.account()['profile']['settings']['notifications']['mute'] is defined %}
-                            {% if auth.account()['profile']['settings']['notifications']['mute'] == true %}
+                        {% if access.auth.account()['profile']['settings']['notifications']['mute'] is defined %}
+                            {% if access.auth.account()['profile']['settings']['notifications']['mute'] == true %}
                                 {% set notificationIcon = 'bell-slash' %}
-                            {% elseif auth.account()['profile']['settings']['notifications']['mute'] == false %}
+                            {% elseif access.auth.account()['profile']['settings']['notifications']['mute'] == false %}
                                 {% set notificationIcon = 'bell' %}
                             {% else %}
                                 {% set notificationIcon = 'bell' %}
@@ -90,7 +90,7 @@
                         </a>
                     </li>
                     <li id="profile-dropdown" class="nav-item dropdown text-uppercase">
-                        {% set profile = auth.account()['profile'] %}
+                        {% set profile = access.auth.account()['profile'] %}
                         <a id="profile-portrait" class="nav-link" data-toggle="dropdown" href="#" aria-expanded="true">
                             {% if profile['portrait'] is defined and profile['portrait'] !== '' %}
                                 <img src="{{links.url('system/storages/q/uuid/' ~ profile['portrait'] ~ '/w/30')}}" class="rounded-sm" style="position:relative;top: -3px; width:25px;" alt="User Image">
@@ -128,7 +128,7 @@
                                 <a href="{{links.url('system/users/profile')}}" id="profile" class="dropdown-item contentAjaxLink">
                                     <i class="fa fa-fw fa-id-card mr-2"></i> Profile
                                 </a>
-                                {% if auth.account() %}
+                                {% if access.auth.account() %}
                                     <div class="dropdown-divider"></div>
                                     <a href="{{links.url('auth/logout')}}" id="logout" class="dropdown-item text-danger">
                                         <i class="fa fa-fw fa-sign-out-alt mr-2"></i> Logout
@@ -152,12 +152,12 @@
 </nav>
 {% endif %}
 {% if activeLayout === 'default' or activeLayout === 'topnavsidebar' %}
-    {% if auth.account() %}
+    {% if access.auth.account() %}
         <script>
 /* globals BazCore */
 window.dataCollection.env.profile = { };
-window.dataCollection.env.profile.email = "{{auth.account()['email']}}";
-window.dataCollection.env.profile.fullName = "{{auth.account()['profile']['full_name']}}";
+window.dataCollection.env.profile.email = "{{access.auth.account()['email']}}";
+window.dataCollection.env.profile.fullName = "{{access.auth.account()['profile']['full_name']}}";
 window.dataCollection.env.profile.portrait = "{{profilePortrait}}";
 
 $('#logout').click(function(e) {

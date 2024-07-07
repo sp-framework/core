@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Base\Providers\AccessServiceProvider;
+namespace System\Base\Providers\AccessServiceProvider\Access;
 
 use Carbon\Carbon;
 use OTPHP\HOTP;
@@ -10,71 +10,25 @@ use Phalcon\Filter\Validation\Validator\Confirmation;
 use Phalcon\Filter\Validation\Validator\PresenceOf;
 use Phalcon\Filter\Validation\Validator\StringLength;
 use Phalcon\Filter\Validation\Validator\StringLength\Min;
+use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
-use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
-class Auth
+class Auth extends BasePackage
 {
     protected $key = null;
 
     protected $separator = '|';
 
-    protected $request;
-
-    protected $config;
-
-    protected $session;
-
     protected $oldSessionId;
-
-    protected $sessionTools;
-
-    protected $cookies;
 
     protected $cookieKey;
 
-    protected $accounts;
-
     protected $account = null;
 
-    protected $apps;
-
     protected $app;
-
-    protected $secTools;
-
-    protected $validation;
-
-    protected $logger;
-
-    protected $links;
-
-    protected $profile;
-
-    protected $roles;
-
-    protected $email;
-
-    protected $emailQueue;
-
-    protected $domains;
-
-    protected $ff;
-
-    protected $core;
-
-    protected $basepackages;
-
-    protected $helper;
-
-    public $packagesData;
-
-    public $agent;
-
-    public $blackWhiteList;
 
     protected $otp;
 
@@ -82,75 +36,10 @@ class Auth
 
     protected $passwordPolicyErrors = [];
 
-    public function __construct(
-        $request,
-        $config,
-        $session,
-        $sessionTools,
-        $cookies,
-        $apps,
-        $secTools,
-        $validation,
-        $logger,
-        $links,
-        $accounts,
-        $profile,
-        $roles,
-        $email,
-        $emailQueue,
-        $domains,
-        $ff,
-        $core,
-        $basepackages,
-        $helper
-    ) {
-        $this->request = $request;
-
-        $this->config = $config;
-
-        $this->session = $session;
-
-        $this->sessionTools = $sessionTools;
-
-        $this->cookies = $cookies;
-
-        $this->apps = $apps;
-
-        $this->app = $apps->getAppInfo();
-
-        $this->secTools = $secTools;
-
-        $this->validation = $validation;
-
-        $this->logger = $logger;
-
-        $this->links = $links;
-
-        $this->accounts = $accounts;
-
-        $this->profile = $profile;
-
-        $this->roles = $roles;
-
-        $this->email = $email;
-
-        $this->emailQueue = $emailQueue;
-
-        $this->domains = $domains;
-
-        $this->ff = $ff;
-
-        $this->core = $core;
-
-        $this->basepackages = $basepackages;
-
-        $this->helper = $helper;
-
-        $this->packagesData = new PackagesData;
-    }
-
     public function init()
     {
+        $this->app = $this->apps->getAppInfo();
+
         $this->cookieKey = 'remember_' . $this->getKey();
 
         $this->cookieTimeout = time() + $this->config->timeout->cookies;
@@ -308,12 +197,12 @@ class Auth
         }
 
         if (!$this->checkAccount($data)) {
-            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+            $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
 
             return false;
         }
 
-        $this->apps->ipFilter->removeFromMonitoring();
+        $this->access->ipFilter->removeFromMonitoring();
 
         $security = $this->getAccountSecurityObject();
 
@@ -365,7 +254,7 @@ class Auth
             $this->account['security']['force_pwreset_after'] = null;
         }
 
-        $this->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
+        $this->basepackages->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
 
         $this->setSessionAndRecaller($data);
 
@@ -382,7 +271,7 @@ class Auth
 
     protected function checkAccount(array $data, $viaProfile = null)
     {
-        $this->account = $this->accounts->checkAccount($data['user'], true);
+        $this->account = $this->basepackages->accounts->checkAccount($data['user'], true);
 
         if ($this->account) {
             if ($this->account['status'] != '1') {
@@ -394,7 +283,7 @@ class Auth
             }
 
             //New App OR New account via rego
-            $canLogin = $this->accounts->canLogin($this->account['id'], $this->app['id']);
+            $canLogin = $this->basepackages->accounts->canLogin($this->account['id'], $this->app['id']);
 
             if ($canLogin === false) {
                 if ($this->app['can_login_role_ids']) {
@@ -456,7 +345,7 @@ class Auth
                         $this->account['security']['forgotten_request_agent'] = null;
                         $this->account['security']['forgotten_request_code'] = null;
                         $this->account['security']['forgotten_request_sent_on'] = null;
-                        $this->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
+                        $this->basepackages->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
                         $this->addResponse('Code Expired! Request new code...', 1);
 
                         return false;
@@ -478,7 +367,7 @@ class Auth
                         $this->account['security']['forgotten_request_agent'] = null;
                         $this->account['security']['forgotten_request_code'] = null;
                         $this->account['security']['forgotten_request_sent_on'] = null;
-                        $this->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
+                        $this->basepackages->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
 
                         return true;
                     }
@@ -501,7 +390,7 @@ class Auth
                 $this->account['security']['forgotten_request_ip'] = null;
                 $this->account['security']['forgotten_request_agent'] = null;
                 $this->account['security']['forgotten_request_code'] = null;
-                $this->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
+                $this->basepackages->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
             }
         } else {
             $this->secTools->hashPassword(rand());//Randomize so we take same time to respond as if the account exists.
@@ -515,43 +404,6 @@ class Auth
 
         return true;
     }
-
-    // protected function validateTwoFa($security, $data)
-    // {
-    //     if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
-    //         if (isset($data['twofa_using'])) {
-    //             return $this->validateTwoFaCode($security, $data, true);
-    //         }
-
-    //         if (isset($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) &&
-    //             $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] !== ''
-    //         ) {
-    //             if (!is_array($this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
-    //                 $this->core->core['settings']['security']['twofaSettings']['twofaUsing'] = $this->helper->decode($this->core->core['settings']['security']['twofaSettings']['twofaUsing'], true);
-    //             }
-    //         }
-
-    //         if (count($this->core->core['settings']['security']['twofaSettings']['twofaUsing']) === 0) {//if otp is not set and email service is not configured, we authenticate.
-    //             return true;
-    //         }
-
-    //         if (in_array('email', $this->core->core['settings']['security']['twofaSettings']['twofaUsing']) && !$this->email->setup()) {
-    //             unset($this->core->core['settings']['security']['twofaSettings']['twofaUsing'][array_keys($this->core->core['settings']['security']['twofaSettings']['twofaUsing'], 'email')[0]]);
-    //         }
-
-    //         $responseData = ['allowed_methods' => $this->core->core['settings']['security']['twofaSettings']['twofaUsing']];
-
-    //         if (in_array('otp', $this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
-    //             $responseData = array_merge($responseData, ['otp_status' => $security->twofa_otp_status]);
-    //         }
-
-    //         $this->addResponse('2FA Code Required!', 3, $responseData);
-
-    //         return false;
-    //     }
-
-    //     return true;
-    // }
 
     protected function validateTwoFaCode($security, $data, $viaLogin = false)
     {
@@ -598,16 +450,7 @@ class Auth
 
             return false;
         } else if ($data['twofa_using'] === 'otp' && in_array('otp', $this->core->core['settings']['security']['twofaSettings']['twofaUsing'])) {
-            // if (($security->twofa_otp_status == '1' && !isset($data['code'])) ||
-            //     ($security->twofa_otp_status == '1' && isset($data['code']) && $data['code'] === '')
-            // ) {
-            //     $this->addResponse('2FA Code Required', 3);
-
-            //     return false;
-            // }
-
             if ($viaLogin &&
-                // ($security->twofa_otp_status == '1' && isset($data['code'])) &&
                 (isset($security->twofa_otp_secret) && !$this->verifyOtp($data['code'], $security->twofa_otp_secret))
             ) {
                 $this->addResponse('Error: Username/Password/2FA Code incorrect!', 1);
@@ -699,7 +542,7 @@ class Auth
     {
         list($identifier, $token) = explode($this->separator, $this->cookies->get($this->cookieKey)->getValue());
 
-        $hasIdentifier = $this->accounts->hasIdentifier($this->app['route'], $identifier);
+        $hasIdentifier = $this->basepackages->accounts->hasIdentifier($this->app['route'], $identifier);
 
         if (!$this->secTools->checkPassword($token, $hasIdentifier['token'])) {
             $this->clearAccountRecaller($this->cookieKey);
@@ -713,14 +556,10 @@ class Auth
             throw new \Exception('Cannot set account from cookie');
         }
 
-        $this->account = $this->accounts->getAccountById($hasIdentifier['account_id']);
+        $this->account = $this->basepackages->accounts->getAccountById($hasIdentifier['account_id']);
 
         if ($this->account) {
             $this->updateSessionIdForSessionAndIdentifier($hasIdentifier);
-
-            // $this->setAccountProfile();
-
-            // $this->setAccountRole();
 
             return true;
         }
@@ -909,7 +748,7 @@ class Auth
     public function setUserFromSession()
     {
         if ($this->session->get($this->getKey())) {
-            $this->account = $this->accounts->getAccountById($this->session->get($this->getKey()));
+            $this->account = $this->basepackages->accounts->getAccountById($this->session->get($this->getKey()));
 
             if (!$this->account) {
                 $this->logger->log->debug($this->account['email'] . ' not found in session for app: ' . $this->app['name']);
@@ -1057,7 +896,7 @@ class Auth
             return false;
         }
 
-        $account = $this->accounts->checkAccount($data['user'], true);
+        $account = $this->basepackages->accounts->checkAccount($data['user'], true);
 
         if ($account) {
             $account['email_new_password'] = '1';
@@ -1067,7 +906,7 @@ class Auth
             $account['forgotten_request_agent'] = $this->request->getUserAgent();
             $account['forgotten_request_sent_on'] = time();
 
-            if ($this->accounts->updateAccount($account)) {
+            if ($this->basepackages->accounts->updateAccount($account)) {
                 $this->logger->log->info('New password requested for account ' . $account['email'] . ' via forgot password. New password was emailed to the account.');
             } else {
                 $this->logger->log->critical('Trying to send new password for ' . $account['email'] . ' via forgot password failed.');
@@ -1152,7 +991,7 @@ class Auth
             $security = $this->setPasswordHistory($data, $security);
         }
 
-        if ($this->accounts->addUpdateSecurity($this->account['id'], (array) $security)) {
+        if ($this->basepackages->accounts->addUpdateSecurity($this->account['id'], (array) $security)) {
             $this->logger->log->info('Password reset successful for account ' . $this->account['email'] . ' via pwreset.');
 
 
@@ -1182,7 +1021,7 @@ class Auth
 
             return true;
         } else {
-            $this->addResponse($this->accounts->packagesData->responseMessage, 1);
+            $this->addResponse($this->basepackages->accounts->packagesData->responseMessage, 1);
 
             return false;
         }
@@ -1655,7 +1494,7 @@ class Auth
         }
 
         if ($data && !$this->checkAccount($data)) {
-            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+            $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
 
             return false;
         }
@@ -1745,7 +1584,7 @@ class Auth
         }
 
         if (isset($data['user']) && isset($data['pass']) && !$this->checkAccount($data)) {
-            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+            $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
 
             return false;
         }
@@ -1852,7 +1691,7 @@ class Auth
 
     protected function getAccountSecurityObject()
     {
-        $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
+        $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
 
         if ($this->config->databasetype === 'db') {
             return $accountsObj->getSecurity();
@@ -1879,10 +1718,10 @@ class Auth
         $sessionId = $this->session->getId();
         $agent = [];
 
-        $this->accounts->setFFRelations(true);
+        $this->basepackages->accounts->setFFRelations(true);
         $agentStore = $this->ff->store('basepackages_users_accounts_agents');
 
-        $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
+        $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
 
         if ($this->config->databasetype === 'db') {
             if ($accountsObj->agents) {
@@ -1933,7 +1772,7 @@ class Auth
                 $agent['account_id'] === $this->account()['id'] &&
                 $agent['verified'] == '0'
             ) {
-                if (!$this->email->setup()) {
+                if (!$this->basepackages->email->setup()) {
                     return true;
                 }
 
@@ -1954,7 +1793,7 @@ class Auth
 
                 $this->account['force_logout'] = '1';
 
-                $this->accounts->update($this->account);
+                $this->basepackages->accounts->update($this->account);
 
                 $this->logout();
 
@@ -1966,7 +1805,7 @@ class Auth
 
                 $this->account['force_logout'] = '1';
 
-                $this->accounts->update($this->account);
+                $this->basepackages->accounts->update($this->account);
 
                 $this->logout();
 
@@ -1976,7 +1815,7 @@ class Auth
 
         //If Email is not configured, we cannot send new passcodes.
         //User has remember Identifier set and sessionID has changed.
-        if (!$this->email->setup() || $update === true) {
+        if (!$this->basepackages->email->setup() || $update === true) {
             return true;
         }
 
@@ -1985,7 +1824,7 @@ class Auth
 
     protected function addUpdateAgent($sessionId, $clientAddress, $userAgent)
     {
-        if (!$this->email->setup() || $this->oldSessionId) {
+        if (!$this->basepackages->email->setup() || $this->oldSessionId) {
             $verified = 1;
         } else {
             $verified = 0;
@@ -2068,10 +1907,10 @@ class Auth
             $this->setUserFromSession();
         }
 
-        $this->accounts->setFFRelations(true);
+        $this->basepackages->accounts->setFFRelations(true);
         $agentStore = $this->ff->store('basepackages_users_accounts_agents');
 
-        $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
+        $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
 
         if ($this->config->databasetype === 'db') {
             if ($accountsObj->agents) {
@@ -2156,7 +1995,7 @@ class Auth
         $emailData['subject'] = 'Agent verification code for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $verificationCode;
 
-        return $this->emailQueue->addToQueue($emailData);
+        return $this->basepackages->emailQueue->addToQueue($emailData);
     }
 
     public function verifyVerficationCode(array $data)
@@ -2177,10 +2016,10 @@ class Auth
         $userAgent = $this->request->getUserAgent();
         $sessionId = $this->session->getId();
 
-        $this->accounts->setFFRelations(true);
+        $this->basepackages->accounts->setFFRelations(true);
         $agentStore = $this->ff->store('basepackages_users_accounts_agents');
 
-        $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
+        $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
 
         if ($this->config->databasetype === 'db') {
             if ($accountsObj->agents) {
@@ -2348,18 +2187,7 @@ class Auth
         $emailData['subject'] = '2FA code for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $twofaCode;
 
-        return $this->emailQueue->addToQueue($emailData);
-    }
-
-    protected function addResponse($responseMessage, int $responseCode = 0, $responseData = null)
-    {
-        $this->packagesData->responseMessage = $responseMessage;
-
-        $this->packagesData->responseCode = $responseCode;
-
-        if ($responseData !== null) {
-            $this->packagesData->responseData = $responseData;
-        }
+        return $this->basepackages->emailQueue->addToQueue($emailData);
     }
 
     public function canUse2fa()

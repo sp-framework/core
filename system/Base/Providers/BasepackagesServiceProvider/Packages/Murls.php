@@ -36,7 +36,7 @@ class Murls extends BasePackage
             return false;
         }
 
-        $data['account_id'] = $this->auth->account()['id'];
+        $data['account_id'] = $this->access->auth->account()['id'];
 
         if (isset($data['api_id']) && $data['api_id'] != 0) {
             $api = $this->api->getById($data['api_id']);

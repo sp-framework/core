@@ -97,7 +97,7 @@ class Core extends BasePackage
 		$this->now = Carbon::now();
 		$this->backupInfo['request'] = $data;
 		$this->backupInfo['takenAt'] = $this->now->format('Y-m-d H:i:s');
-		$this->backupInfo['createdBy'] = $this->auth->account() ? $this->auth->account()['email'] : 'System';
+		$this->backupInfo['createdBy'] = $this->access->auth->account() ? $this->access->auth->account()['email'] : 'System';
 		$this->backupInfo['backupName'] = 'db' . $data['db'] . $this->now->getTimestamp() . '.zip';
 
 		$this->zip->open(base_path($this->backupDbLocation . $this->backupInfo['backupName']), $this->zip::CREATE);
@@ -596,7 +596,7 @@ class Core extends BasePackage
 		$this->now = Carbon::now();
 		$this->backupInfo['request'] = $data;
 		$this->backupInfo['takenAt'] = $this->now->format('Y-m-d H:i:s');
-		$this->backupInfo['createdBy'] = $this->auth->account() ? $this->auth->account()['email'] : 'System';
+		$this->backupInfo['createdBy'] = $this->access->auth->account() ? $this->access->auth->account()['email'] : 'System';
 		$this->backupInfo['backupName'] = 'ff' . $data['ff'] . $this->now->getTimestamp() . '.zip';
 
 		$this->zip->open(base_path($this->backupFfLocation . $this->backupInfo['backupName']), $this->zip::CREATE);

@@ -233,7 +233,7 @@ class ImportexportComponent extends BaseComponent
                 $fields = null;
             }
 
-            $account = $this->auth->account();
+            $account = $this->access->auth->account();
 
             if ($account) {
                 $filters = $this->basepackages->filters->getFiltersForAccountAndComponent($account, $componentId);

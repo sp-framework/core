@@ -34,7 +34,7 @@ class AuthComponent extends BaseComponent
 
         $domain = $this->domains->getDomain();
 
-        if ($this->auth->check()) {
+        if ($this->access->auth->check()) {
             if (isset($domain['exclusive_to_default_app']) &&
                 $domain['exclusive_to_default_app'] == 1
             ) {
@@ -47,7 +47,7 @@ class AuthComponent extends BaseComponent
         if (isset($this->getData()['pwreset']) && $this->getData()['pwreset'] === 'true') {
             $this->view->coreSettings = $this->core->core['settings'];
 
-            $this->view->canUse2fa = $this->auth->canUse2fa();
+            $this->view->canUse2fa = $this->access->auth->canUse2fa();
 
             $this->view->pick('auth/pwreset');
 
@@ -88,23 +88,23 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $auth = $this->auth->attempt($this->postData());
+        $auth = $this->access->auth->attempt($this->postData());
 
-        if (isset($this->auth->packagesData->responseData)) {
-            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode, $this->auth->packagesData->responseData);
+        if (isset($this->access->auth->packagesData->responseData)) {
+            $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode, $this->access->auth->packagesData->responseData);
         } else {
-            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+            $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode);
         }
 
         if ($auth) {
-            $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+            $this->view->redirectUrl = $this->access->auth->packagesData->redirectUrl;
         }
     }
 
     public function logoutAction()
     {
-        if ($this->auth->logout()) {
-            $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+        if ($this->access->auth->logout()) {
+            $this->view->redirectUrl = $this->access->auth->packagesData->redirectUrl;
 
             $this->addResponse('Ok');
         }
@@ -114,25 +114,25 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->auth->forgotPassword($this->postData());
+        $this->access->auth->forgotPassword($this->postData());
 
-        $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+        $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode);
     }
 
     public function pwresetAction()
     {
         $this->requestIsPost();
 
-        $this->auth->resetPassword($this->postData());
+        $this->access->auth->resetPassword($this->postData());
 
-        $this->view->responseMessage = $this->auth->packagesData->responseMessage;
-        $this->view->responseCode = $this->auth->packagesData->responseCode;
+        $this->view->responseMessage = $this->access->auth->packagesData->responseMessage;
+        $this->view->responseCode = $this->access->auth->packagesData->responseCode;
 
-        if (isset($this->auth->packagesData->redirectUrl)) {
-            $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+        if (isset($this->access->auth->packagesData->redirectUrl)) {
+            $this->view->redirectUrl = $this->access->auth->packagesData->redirectUrl;
         }
-        if (isset($this->auth->packagesData->responseData)) {
-            $this->view->responseData = $this->auth->packagesData->responseData;
+        if (isset($this->access->auth->packagesData->responseData)) {
+            $this->view->responseData = $this->access->auth->packagesData->responseData;
         }
     }
 
@@ -140,12 +140,12 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->auth->sendVerificationEmail();
+        $this->access->auth->sendVerificationEmail();
 
-        if (isset($this->auth->packagesData->responseData)) {
-            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode, $this->auth->packagesData->responseData);
+        if (isset($this->access->auth->packagesData->responseData)) {
+            $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode, $this->access->auth->packagesData->responseData);
         } else {
-            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+            $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode);
         }
     }
 
@@ -153,21 +153,21 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->auth->verifyVerficationCode($this->postData());
+        $this->access->auth->verifyVerficationCode($this->postData());
 
-        $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+        $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode);
     }
 
     public function sendTwoFaEmailAction()
     {
         $this->requestIsPost();
 
-        $this->auth->sendTwoFaEmail($this->postData());
+        $this->access->auth->sendTwoFaEmail($this->postData());
 
-        if (isset($this->auth->packagesData->responseData)) {
-            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode, $this->auth->packagesData->responseData);
+        if (isset($this->access->auth->packagesData->responseData)) {
+            $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode, $this->access->auth->packagesData->responseData);
         } else {
-            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+            $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode);
         }
     }
 
@@ -216,32 +216,32 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        if ($this->auth->enableTwoFaOtp($this->postData())) {
-            $this->view->provisionUrl = $this->auth->packagesData->provisionUrl;
+        if ($this->access->auth->enableTwoFaOtp($this->postData())) {
+            $this->view->provisionUrl = $this->access->auth->packagesData->provisionUrl;
 
-            $this->view->qrcode = $this->auth->packagesData->qrcode;
+            $this->view->qrcode = $this->access->auth->packagesData->qrcode;
 
-            $this->view->secret = $this->auth->packagesData->secret;
+            $this->view->secret = $this->access->auth->packagesData->secret;
 
-            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            $this->view->responseMessage = $this->access->auth->packagesData->responseMessage;
         } else {
-            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            $this->view->responseMessage = $this->access->auth->packagesData->responseMessage;
         }
 
-        $this->view->responseCode = $this->auth->packagesData->responseCode;
+        $this->view->responseCode = $this->access->auth->packagesData->responseCode;
     }
 
     public function verifyTwoFaOtpAction()
     {
         $this->requestIsPost();
 
-        if ($this->auth->verifyTwoFaOtp($this->postData())) {
+        if ($this->access->auth->verifyTwoFaOtp($this->postData())) {
             $this->view->redirectUrl = $this->links->url('/');
         }
 
         $this->addResponse(
-            $this->auth->packagesData->responseMessage,
-            $this->auth->packagesData->responseCode
+            $this->access->auth->packagesData->responseMessage,
+            $this->access->auth->packagesData->responseCode
         );
     }
 }

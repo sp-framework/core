@@ -25,7 +25,7 @@ class ProfileComponent extends BaseComponent
         if (isset($this->getData()['aid'])) {
             $profile = $this->profiles->generateViewData($this->getData()['aid']);
         } else {
-            if (!$this->auth->account()) {
+            if (!$this->access->auth->account()) {
                 return;
             }
 
@@ -94,20 +94,20 @@ class ProfileComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $user['user'] = $this->auth->account()['email'];
+        $user['user'] = $this->access->auth->account()['email'];
 
         $user = array_merge($user, $this->postData());
 
-        $this->auth->resetPassword($user, true);
+        $this->access->auth->resetPassword($user, true);
 
-        $this->view->responseMessage = $this->auth->packagesData->responseMessage;
-        $this->view->responseCode = $this->auth->packagesData->responseCode;
+        $this->view->responseMessage = $this->access->auth->packagesData->responseMessage;
+        $this->view->responseCode = $this->access->auth->packagesData->responseCode;
 
-        if (isset($this->auth->packagesData->redirectUrl)) {
-            $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+        if (isset($this->access->auth->packagesData->redirectUrl)) {
+            $this->view->redirectUrl = $this->access->auth->packagesData->redirectUrl;
         }
-        if (isset($this->auth->packagesData->responseData)) {
-            $this->view->responseData = $this->auth->packagesData->responseData;
+        if (isset($this->access->auth->packagesData->responseData)) {
+            $this->view->responseData = $this->access->auth->packagesData->responseData;
         }
     }
 
@@ -115,28 +115,28 @@ class ProfileComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        if ($this->auth->enableTwoFaOtp()) {
-            $this->view->provisionUrl = $this->auth->packagesData->provisionUrl;
+        if ($this->access->auth->enableTwoFaOtp()) {
+            $this->view->provisionUrl = $this->access->auth->packagesData->provisionUrl;
 
-            $this->view->qrcode = $this->auth->packagesData->qrcode;
+            $this->view->qrcode = $this->access->auth->packagesData->qrcode;
 
-            $this->view->secret = $this->auth->packagesData->secret;
+            $this->view->secret = $this->access->auth->packagesData->secret;
         } else {
-            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            $this->view->responseMessage = $this->access->auth->packagesData->responseMessage;
         }
 
-        $this->view->responseCode = $this->auth->packagesData->responseCode;
+        $this->view->responseCode = $this->access->auth->packagesData->responseCode;
     }
 
     public function verifyTwoFaOtpAction()
     {
         $this->requestIsPost();
 
-        $this->auth->verifyTwoFaOtp($this->postData());
+        $this->access->auth->verifyTwoFaOtp($this->postData());
 
         $this->addResponse(
-            $this->auth->packagesData->responseMessage,
-            $this->auth->packagesData->responseCode
+            $this->access->auth->packagesData->responseMessage,
+            $this->access->auth->packagesData->responseCode
         );
     }
 
@@ -144,11 +144,11 @@ class ProfileComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->auth->disableTwoFaOtp($this->postData()['code']);
+        $this->access->auth->disableTwoFaOtp($this->postData()['code']);
 
         $this->addResponse(
-            $this->auth->packagesData->responseMessage,
-            $this->auth->packagesData->responseCode
+            $this->access->auth->packagesData->responseMessage,
+            $this->access->auth->packagesData->responseCode
         );
     }
 

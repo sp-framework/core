@@ -39,7 +39,7 @@ class NotificationsComponent extends BaseComponent
         $conditions =
             [
                 'conditions'    =>
-                    '-|app_id|equals|' . $this->apps->getAppInfo()['id'] . '&and|account_id|equals|' . $this->auth->account()['id'] . '&and|read|equals|0&and|archive|equals|0&',
+                    '-|app_id|equals|' . $this->apps->getAppInfo()['id'] . '&and|account_id|equals|' . $this->access->auth->account()['id'] . '&and|read|equals|0&and|archive|equals|0&',
                 'order'         => 'id desc'
             ];
 

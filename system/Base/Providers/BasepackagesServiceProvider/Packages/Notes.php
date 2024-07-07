@@ -103,8 +103,8 @@ class Notes extends BasePackage
 
                 $note['note_type'] = $data['note_type'];
 
-                if (isset($this->auth)) {
-                    $account = $this->auth->account();
+                if (isset($this->access->auth)) {
+                    $account = $this->access->auth->account();
 
                     $note['account_id'] = $account['id'];//User
                 } else {
@@ -200,7 +200,7 @@ class Notes extends BasePackage
                     }
 
                     if ($note['is_private'] == '1' &&
-                        $note['account_id'] != $this->auth->account()['id']
+                        $note['account_id'] != $this->access->auth->account()['id']
                     ) {
                         unset($notesArr[$key]);
                     }
