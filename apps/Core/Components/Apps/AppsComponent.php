@@ -464,11 +464,23 @@ class AppsComponent extends BaseComponent
         );
     }
 
-    public function blockMonitorFilterAction()
+    public function allowFilterAction()
     {
         $this->requestIsPost();
 
-        $this->apps->ipFilter->blockMonitorFilter($this->postData());
+        $this->apps->ipFilter->allowFilter($this->postData());
+
+        $this->addResponse(
+            $this->apps->ipFilter->packagesData->responseMessage,
+            $this->apps->ipFilter->packagesData->responseCode
+        );
+    }
+
+    public function blockFilterAction()
+    {
+        $this->requestIsPost();
+
+        $this->apps->ipFilter->blockFilter($this->postData());
 
         $this->addResponse(
             $this->apps->ipFilter->packagesData->responseMessage,

@@ -69,9 +69,10 @@ class ServiceProviderApps extends BaseModel
                 'params'        => function() use ($clientAddress) {
                     return
                     [
-                        'conditions'        => 'ip_address = :ipaddress:',
+                        'conditions'        => 'ip_address = :ipaddress: AND added_by = :addedby:',
                         'bind'              => [
-                            'ipaddress'     => $clientAddress
+                            'ipaddress'     => $clientAddress,
+                            'addedby'       => 0
                         ]
                     ];
                 }
