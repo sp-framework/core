@@ -128,7 +128,8 @@ class Apps
 				new Column(
 					'ip_filter_default_action',
 					[
-						'type'    => Column::TYPE_BOOLEAN,
+						'type'    => Column::TYPE_VARCHAR,
+						'size'    => 10,
 						'notNull' => true,
 					]
 				),

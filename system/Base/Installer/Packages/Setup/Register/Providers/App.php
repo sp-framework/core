@@ -18,7 +18,7 @@ class App
 				'errors_component'			=> 0,
 				'can_login_role_ids'		=> $helper->encode(['1']),
 				'acceptable_usernames'		=> $helper->encode(["email", "username"]),
-				'ip_filter_default_action'	=> 0,
+				'ip_filter_default_action'	=> 'allow',
 				'settings'					=> $helper->encode(["defaultDashboard" => 1])
 			];
 
