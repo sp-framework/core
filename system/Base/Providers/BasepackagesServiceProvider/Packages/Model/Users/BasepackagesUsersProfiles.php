@@ -64,7 +64,7 @@ class BasepackagesUsersProfiles extends BaseModel
                 'params'                => [
                     'conditions'        => 'package_name = :package_name:',
                     'bind'              => [
-                        'package_name'  => 'profile'
+                        'package_name'  => 'UsersProfiles'
                     ]
                 ]
             ]

@@ -435,6 +435,8 @@ Class Setup
 
 				$this->setupPackage->registerTasks();
 
+				$this->setupPackage->performIndexing();
+
 				// $this->setupPackage->removeInstaller();
 
 				$this->setupPackage->cleanOldAPIKeys();
@@ -642,6 +644,10 @@ Class Setup
 				[
 					'method'	=> 'registerTasks',
 					'text'		=> 'Registering tasks...'
+				],
+				[
+					'method'	=> 'performIndexing',
+					'text'		=> 'Indexing Database...'
 				],
 				[
 					'method'	=> 'cleanVar',

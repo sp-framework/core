@@ -31,6 +31,8 @@ apps/*
 .ff/*
 .sql/*
 system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/*
+!system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json
+!system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/TimeZones.json
 .api/
 phpstan.neon
 psalm.xml

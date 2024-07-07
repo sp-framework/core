@@ -378,13 +378,13 @@ class Store
 
         $data = $this->writeNewDocumentToStore($data);
 
-        $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
-
-        $this->data = $data;
-
         if ($this->ff->mode === 'hybrid') {
             $this->ff->addToSync($this->model, $data[$this->primaryKey]);
         }
+
+        $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
+
+        $this->data = $data;
 
         return $this->data;
     }
@@ -454,7 +454,15 @@ class Store
                                     please provide a valid PHP associative array');
         }
 
-        IoHelper::writeContentToFile($this->getDataPath() . $data[$this->primaryKey] . '.json', $dataJSON, true, $this);
+        try {
+            IoHelper::writeContentToFile($this->getDataPath() . $data[$this->primaryKey] . '.json', $dataJSON, true, $this);
+        } catch (\Exception $e) {
+            if ($insert) {
+                $this->decreaseCounter();
+            }
+
+            throw $e;
+        }
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
@@ -518,7 +526,15 @@ class Store
                                         please provide a valid PHP associative array');
             }
 
-            IoHelper::writeContentToFile($this->getDataPath() . $document[$this->primaryKey] . '.json', $documentJSON, true, $this);
+            try {
+                IoHelper::writeContentToFile($this->getDataPath() . $document[$this->primaryKey] . '.json', $documentJSON, true, $this);
+            } catch (\Exception $e) {
+                if ($insert) {
+                    $this->decreaseCounter();
+                }
+
+                throw $e;
+            }
 
             if ($this->ff->mode === 'hybrid') {
                 if ($insert) {
@@ -1049,8 +1065,16 @@ class Store
         return $this->primaryKey;
     }
 
-    public function count($recount = false): int
+    public function count($recount = false, $criteria = null): int
     {
+        if ($criteria) {
+            $data = $this->findBy($criteria);
+
+            if ($data && is_array($data)) {
+                return count($data);
+            }
+        }
+
         if ($this->useCache === true) {
             $cacheTokenArray = ["count" => true];
 
@@ -1302,7 +1326,13 @@ class Store
                                     please provide a valid PHP associative array');
         }
 
-        IoHelper::writeContentToFile($this->getDataPath() . "$id.json", $storableJSON, true, $this);
+        try {
+            IoHelper::writeContentToFile($this->getDataPath() . "$id.json", $storableJSON, true, $this);
+        } catch (\Exception $e) {
+            $this->decreaseCounter();
+
+            throw $e;
+        }
 
         return $storeData;
     }

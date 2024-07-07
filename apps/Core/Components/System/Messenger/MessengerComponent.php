@@ -19,237 +19,174 @@ class MessengerComponent extends BaseComponent
 
     public function getMessagesAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->messenger->getMessages($this->postData());
+        $this->basepackages->messenger->getMessages($this->postData());
 
+        $this->addResponse(
+            $this->basepackages->messenger->packagesData->responseMessage,
+            $this->basepackages->messenger->packagesData->responseCode,
+            $this->basepackages->messenger->packagesData->responseData
+        );
+    }
+
+    public function getUnreadMessagesCountAction()
+    {
+        $this->requestIsPost();
+
+        if ($this->basepackages->messenger->getUnreadMessagesCount()) {
             $this->addResponse(
                 $this->basepackages->messenger->packagesData->responseMessage,
                 $this->basepackages->messenger->packagesData->responseCode,
                 $this->basepackages->messenger->packagesData->responseData
             );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
-    }
-
-    public function getUnreadMessagesCountAction()
-    {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-
-            if ($this->basepackages->messenger->getUnreadMessagesCount()) {
-                $this->addResponse(
-                    $this->basepackages->messenger->packagesData->responseMessage,
-                    $this->basepackages->messenger->packagesData->responseCode,
-                    $this->basepackages->messenger->packagesData->responseData
-                );
-            }
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
     public function markAllMessagesReadAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->messenger->markAllMessagesRead($this->postData());
+        $this->basepackages->messenger->markAllMessagesRead($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->messenger->packagesData->responseMessage,
-                $this->basepackages->messenger->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->messenger->packagesData->responseMessage,
+            $this->basepackages->messenger->packagesData->responseCode
+        );
     }
 
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->messenger->addMessage($this->postData());
+        $this->basepackages->messenger->addMessage($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->messenger->packagesData->responseMessage,
-                $this->basepackages->messenger->packagesData->responseCode,
-                $this->basepackages->messenger->packagesData->responseData
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->messenger->packagesData->responseMessage,
+            $this->basepackages->messenger->packagesData->responseCode,
+            $this->basepackages->messenger->packagesData->responseData
+        );
     }
 
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->messenger->updateMessage($this->postData());
+        $this->basepackages->messenger->updateMessage($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->messenger->packagesData->responseMessage,
-                $this->basepackages->messenger->packagesData->responseCode,
-                $this->basepackages->messenger->packagesData->responseData
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->messenger->packagesData->responseMessage,
+            $this->basepackages->messenger->packagesData->responseCode,
+            $this->basepackages->messenger->packagesData->responseData
+        );
     }
 
     public function removeAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->messenger->removeMessage($this->postData());
+        $this->basepackages->messenger->removeMessage($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->messenger->packagesData->responseMessage,
-                $this->basepackages->messenger->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->messenger->packagesData->responseMessage,
+            $this->basepackages->messenger->packagesData->responseCode
+        );
     }
 
     public function changeStatusAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->messenger->changeStatus($this->postData());
+        $this->basepackages->messenger->changeStatus($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->messenger->packagesData->responseMessage,
-                $this->basepackages->messenger->packagesData->responseCode
-            );
-
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->messenger->packagesData->responseMessage,
+            $this->basepackages->messenger->packagesData->responseCode
+        );
     }
 
     public function changeSettingsAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->messenger->changeSettings($this->postData());
+        $this->basepackages->messenger->changeSettings($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->messenger->packagesData->responseMessage,
-                $this->basepackages->messenger->packagesData->responseCode
-            );
-
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->messenger->packagesData->responseMessage,
+            $this->basepackages->messenger->packagesData->responseCode
+        );
     }
 
     public function searchAccountAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
+        $this->requestIsPost();
+
+        if ($this->postData()['search']) {
+            $searchQuery = $this->postData()['search'];
+
+            if (strlen($searchQuery) < 3) {
                 return;
             }
 
-            if ($this->postData()['search']) {
-                $searchQuery = $this->postData()['search'];
+            $searchAccounts = $this->accounts->searchAccountInternal($searchQuery);
 
-                if (strlen($searchQuery) < 3) {
-                    return;
-                }
+            if ($searchAccounts) {
+                $currentAccount = $this->auth->account();
 
-                $searchAccounts = $this->accounts->searchAccountInternal($searchQuery);
+                if ($currentAccount) {
+                    $accounts = $this->accounts->packagesData->accounts;
 
-                if ($searchAccounts) {
-                    $currentAccount = $this->auth->account();
-
-                    if ($currentAccount) {
-                        $accounts = $this->accounts->packagesData->accounts;
-
-                        foreach ($accounts as $accountKey => &$account) {
-                            if ($account['id'] == $currentAccount['id']) {
-                                unset($accounts[$accountKey]);
-                                continue;
-                            }
-
-                            $profile = $this->basepackages->profile->getProfile($account['id']);
-
-                            $account['name'] = $profile['full_name'];
-                            $account['portrait'] = $profile['portrait'];
-                            if (isset($profile['settings']['messenger']['status'])) {
-                                $account['status'] = $profile['settings']['messenger']['status'];
-                            } else {
-                                $account['status'] = 4;
-                            }
-                            $account['user'] = $account['id'];
+                    foreach ($accounts as $accountKey => &$account) {
+                        if ($account['id'] == $currentAccount['id']) {
+                            unset($accounts[$accountKey]);
+                            continue;
                         }
 
-                        $this->addResponse(
-                            $this->accounts->packagesData->responseMessage,
-                            $this->accounts->packagesData->responseCode,
-                            ['accounts' => $accounts]
-                        );
-                    } else {
-                        $this->addResponse(
-                            $this->accounts->packagesData->responseMessage,
-                            $this->accounts->packagesData->responseCode,
-                            ['accounts' => $this->accounts->packagesData->accounts]
-                        );
+                        $profile = $this->basepackages->profiles->getProfile($account['id']);
+
+                        $account['name'] = $profile['full_name'];
+                        $account['portrait'] = $profile['portrait'];
+                        if (isset($profile['settings']['messenger']['status'])) {
+                            $account['status'] = $profile['settings']['messenger']['status'];
+                        } else {
+                            $account['status'] = 4;
+                        }
+                        $account['user'] = $account['id'];
                     }
+
+                    $this->addResponse(
+                        $this->accounts->packagesData->responseMessage,
+                        $this->accounts->packagesData->responseCode,
+                        ['accounts' => $accounts]
+                    );
                 } else {
                     $this->addResponse(
                         $this->accounts->packagesData->responseMessage,
                         $this->accounts->packagesData->responseCode,
-                        ['accounts' => []]
+                        ['accounts' => $this->accounts->packagesData->accounts]
                     );
                 }
             } else {
-                $this->addResponse('search query missing', 1);
+                $this->addResponse(
+                    $this->accounts->packagesData->responseMessage,
+                    $this->accounts->packagesData->responseCode,
+                    ['accounts' => []]
+                );
             }
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse('search query missing', 1);
         }
     }
 
     public function addUserToMembersUsersAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->profile->addUserToMembersUsers($this->postData());
+        $this->basepackages->profiles->addUserToMembersUsers($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->profile->packagesData->responseMessage,
-                $this->basepackages->profile->packagesData->responseCode
-            );
-
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->profiles->packagesData->responseMessage,
+            $this->basepackages->profiles->packagesData->responseCode
+        );
     }
 }

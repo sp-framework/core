@@ -121,7 +121,8 @@ if (!function_exists('json_decode_recursive')) {
 
 if (!function_exists('scanAllDir')) {
     function scanAllDir($dir) {
-        $result = [];
+        $result['files'] = [];
+        $result['dirs'] = [];
 
         foreach(scandir($dir) as $filename) {
             if ($filename[0] === '.') continue;
@@ -129,11 +130,11 @@ if (!function_exists('scanAllDir')) {
             $filePath = $dir . '/' . $filename;
 
             if (is_dir($filePath)) {
-                foreach (scanAllDir($filePath) as $childFilename) {
-                    $result[] = $filename . '/' . $childFilename;
-                }
+                array_push($result['dirs'], $dir . $filename);
+
+                $result = array_merge_recursive($result, scanAllDir($filePath));
             } else {
-                $result[] = $filename;
+                array_push($result['files'], $dir . '/' . $filename);
             }
         }
 
@@ -141,19 +142,19 @@ if (!function_exists('scanAllDir')) {
     }
 }
 
-if (!function_exists('deleteFiles')) {
-    function deleteFiles($target) {
-        if (is_dir($target)) {
-            $files = glob($target . '*', GLOB_MARK);
-
-            foreach ($files as $file ) {
-                deleteFiles( $file );
+if (!function_exists('deleteFilesFolders')) {
+    function deleteFilesFolders($filePaths) {
+        foreach ($filePaths as $filePath){
+            if (true === file_exists($filePath) && is_file($filePath)) {
+                if (false === @unlink($filePath) || file_exists($filePath)) {
+                    return false;
+                }
+            } else if (is_dir($filePath)) {
+                rmdir($filePath);
             }
-
-            rmdir($target);
-        } else {
-            unlink($target);
         }
+
+        return true;
     }
 }
 

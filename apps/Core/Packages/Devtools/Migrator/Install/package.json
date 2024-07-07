@@ -1,0 +1,29 @@
+{
+	"name" : "DevtoolsMigrator",
+	"display_name" : "Devtools Migrator",
+	"description" : "<p>Package for Migrator component</p>",
+	"module_type" : "packages",
+	"app_type" : "core",
+	"category" : "devtools",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "Apps\\Core\\Packages\\Devtools\\Migrator\\DevtoolsMigrator",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : [],
+		"packages" : [],
+		"middlewares" : [],
+		"views" : [],
+		"external" : []
+	},
+	"settings" : 
+	{
+		"api_clients" : []
+	}
+}

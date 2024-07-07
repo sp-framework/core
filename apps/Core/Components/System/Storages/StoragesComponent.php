@@ -116,9 +116,9 @@ class StoragesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost() &&
-            isset($this->postData()['upload']) && $this->postData()['upload'] == true
-        ) {
+        $this->requestIsPost();
+
+        if (isset($this->postData()['upload']) && $this->postData()['upload'] == true) {
             if ($this->request->hasFiles()) {
                 if ($this->storages->storeFile()) {
                     $this->view->responseData = $this->storages->packagesData->responseData;
@@ -135,20 +135,12 @@ class StoragesComponent extends BaseComponent
             return;
         }
 
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->storages->addStorage($this->postData());
 
-            $this->storages->addStorage($this->postData());
-
-            $this->addResponse(
-                $this->storages->packagesData->responseMessage,
-                $this->storages->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->storages->packagesData->responseMessage,
+            $this->storages->packagesData->responseCode
+        );
     }
 
     /**
@@ -156,20 +148,14 @@ class StoragesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->storages->updateStorage($this->postData());
+        $this->storages->updateStorage($this->postData());
 
-            $this->addResponse(
-                $this->storages->packagesData->responseMessage,
-                $this->storages->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->storages->packagesData->responseMessage,
+            $this->storages->packagesData->responseCode
+        );
     }
 
     /**
@@ -177,8 +163,9 @@ class StoragesComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost() && isset($this->postData()['uuid'])) {
+        $this->requestIsPost();
 
+        if (sset($this->postData()['uuid'])) {
             $this->storages->removeFile($this->postData()['uuid']);
 
             $this->addResponse(
@@ -190,20 +177,12 @@ class StoragesComponent extends BaseComponent
         }
 
         if ($this->app['id'] == '1') {
-            if ($this->request->isPost()) {
-                if (!$this->checkCSRF()) {
-                    return;
-                }
+            $this->storages->removeStorage($this->postData());
 
-                $this->storages->removeStorage($this->postData());
-
-                $this->addResponse(
-                    $this->storages->packagesData->responseMessage,
-                    $this->storages->packagesData->responseCode
-                );
-            } else {
-                $this->addResponse('Method Not Allowed', 1);
-            }
+            $this->addResponse(
+                $this->storages->packagesData->responseMessage,
+                $this->storages->packagesData->responseCode
+            );
         }
     }
 }

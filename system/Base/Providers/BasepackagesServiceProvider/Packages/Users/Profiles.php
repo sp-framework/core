@@ -9,7 +9,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Basep
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
 
-class Profile extends BasePackage
+class Profiles extends BasePackage
 {
     protected $modelToUse = BasepackagesUsersProfiles::class;
 
@@ -40,8 +40,15 @@ class Profile extends BasePackage
         return $this->profile;
     }
 
-    public function getProfile(int $accountId)
+    public function getProfile($account)
     {
+        if (is_array($account)) {
+            $accountId = $account['id'];
+            $accountRoleId = $account['role']['id'];
+        } else {
+            $accountId = $account;
+        }
+
         if ($this->config->databasetype === 'db') {
             $profileObj = $this->getFirst('account_id', $accountId);
 
@@ -65,21 +72,21 @@ class Profile extends BasePackage
                     $profile['address'] = $addressObj->toArray();
                 }
 
-                if (isset($this->auth)) {
-                    $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
+                if (isset($accountRoleId)) {
+                    $profile['role'] = $this->basepackages->roles->getById($accountRoleId)['name'];
                 }
 
                 return $profile;
             }
         } else {
             $this->setFFRelations(true);
-            $this->setFFRelationsConditions(['address' => ['package_name', '=', 'profile']]);
+            $this->setFFRelationsConditions(['address' => ['package_name', '=', 'UsersProfiles']]);
 
             $profile = $this->getFirst('account_id', $accountId, false, true, null, [], true);
 
             if ($profile) {
-                if (isset($this->auth)) {
-                    $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role']['id'])['name'];
+                if (isset($accountRoleId)) {
+                    $profile['role'] = $this->basepackages->roles->getById($accountRoleId)['name'];
                 }
 
                 return $profile;
@@ -101,6 +108,26 @@ class Profile extends BasePackage
         $data['contact_mobile'] = '0';
 
         if ($this->add($data)) {
+            //To Update Address Book
+            $profile = $this->packagesData->last;
+            $profile['address_type']        = 1;
+            $profile['is_primary']          = 1;
+            $profile['street_address']      = null;
+            $profile['street_address_2']    = null;
+            $profile['city_id']             = null;
+            $profile['city_name']           = '';
+            $profile['post_code']           = null;
+            $profile['state_id']            = null;
+            $profile['state_name']          = '';
+            $profile['country_id']          = null;
+            $profile['country_name']        = '';
+            $profile['package_name']        = 'UsersProfiles';
+            $profile['package_row_id']      = $profile['id'];
+
+            $profile['contact_address_id'] = $this->addProfileAddress($profile);
+
+            $this->update($profile);
+
             $this->addResponse('Profile added');
         } else {
             $this->addResponse('Error adding profile.', 1);
@@ -109,7 +136,7 @@ class Profile extends BasePackage
 
     public function updateProfileViaAccount(array $data)
     {
-        $profile = $this->getProfile($data['id']);
+        $profile = $this->getProfile($data['profile_package_row_id']);
 
         if (isset($data['first_name']) && isset($data['last_name'])) {
             if (($data['first_name'] !== $profile['first_name'] ||
@@ -148,7 +175,7 @@ class Profile extends BasePackage
 
     public function updateProfile(array $data)
     {
-        if (!$this->auth->account()) {
+        if (!isset($data['account_id']) && !$this->auth->account()) {
             return;
         }
 
@@ -159,7 +186,11 @@ class Profile extends BasePackage
             unset($data['subscriptions']);
         }
 
-        $profile = $this->getProfile($this->auth->account()['id']);
+        if (isset($data['account_id'])) {
+            $profile = $this->getProfile((int) $data['account_id']);
+        } else {
+            $profile = $this->getProfile($this->auth->account()['id']);
+        }
 
         if (($data['first_name'] !== $profile['first_name'] ||
             $data['last_name'] !== $profile['last_name']) ||
@@ -172,31 +203,16 @@ class Profile extends BasePackage
 
         $profile['full_name'] = $profile['first_name'] . ' ' . $profile['last_name'];
 
-        if (isset($profile['address']['id']) &&
-             $profile['address']['id'] != 0 &&
-             $profile['address']['id'] !== ''
-        ) {
+        if ($profile['contact_address_id']) {
             $address = $profile;
 
-            $address['package_name'] = $this->packageName;
+            $address['package_name'] = 'UsersProfiles';
 
             $address['package_row_id'] = $profile['id'];
-
-            $address['address_id'] = $profile['address']['id'];
 
             $this->basepackages->addressbook->mergeAndUpdate($address);
         } else {
-            $address = $profile;
-
-            $address['package_name'] = $this->packageName;
-
-            $address['package_row_id'] = $profile['id'];
-
-            if (isset($address['id'])) {
-                unset($address['id']);
-            }
-
-            $this->basepackages->addressbook->addAddress($address);
+            $profile['contact_address_id'] = $this->addProfileAddress($profile);
         }
 
         $portrait = $this->getProfile($this->auth->account()['id'])['portrait'];
@@ -212,6 +228,27 @@ class Profile extends BasePackage
         } else {
             $this->addResponse('Error updating profile.', 1);
         }
+    }
+
+    protected function addProfileAddress($profile)
+    {
+        $address = $profile;
+
+        $address['package_name'] = $this->packageName;
+
+        $address['package_row_id'] = $profile['id'];
+
+        if (isset($address['id'])) {
+            unset($address['id']);
+        }
+
+        $profileAddress = $this->basepackages->addressbook->addAddress($address);
+
+        if ($profileAddress) {
+            return $profileAddress['id'];
+        }
+
+        return null;
     }
 
     public function generateAvatar(string $regenerateUsingFile = null, string $gender = 'M')
@@ -307,9 +344,15 @@ class Profile extends BasePackage
         return true;
     }
 
-    public function generateViewData()
+    public function generateViewData($accountId = null)
     {
-        $this->packagesData->profile = $this->getProfile($this->auth->account()['id']);
+        if ($accountId) {
+            $this->packagesData->account = $this->basepackages->accounts->getAccountById($accountId);
+        } else {
+            $this->packagesData->account = $this->auth->account();
+        }
+
+        $this->packagesData->profile = $this->getProfile($this->packagesData->account);
 
         if ($this->config->databasetype === 'db') {
             $accountObj = $this->basepackages->accounts->getFirst('id', $this->auth->account()['id']);

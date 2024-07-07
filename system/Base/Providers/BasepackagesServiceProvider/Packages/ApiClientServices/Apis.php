@@ -162,7 +162,7 @@ class Apis extends BasePackage
 
         if ($this->response && is_array($this->response)) {
             foreach ($this->response as $key => $response) {
-                $responseArr[$key] = $this->helper->decode($response->__toString(), true);
+                $responseArr[$key] = ($response !== null) ? $this->helper->decode($response->__toString(), true) : null;
             }
         } else {
             $responseArr = $this->helper->decode($this->response->__toString(), true);

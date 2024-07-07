@@ -105,36 +105,29 @@ class FiltersComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        if ($this->app['id'] === 1) {
+            $this->filters->addFilter($this->postData());
 
-            if ($this->app['id'] === 1) {
-                $this->filters->addFilter($this->postData());
-
-                $this->view->filters = $this->filters->packagesData->filters;
-            } else {
-                //Adding close in add as cloning requires add permission so both add and clone can be performed in same action.
-                if (isset($this->postData()['clone']) && $this->postData()['clone']) {
-                    $this->filters->cloneFilter($this->postData());
-                } else {
-                    $this->filters->addFilter($this->postData());
-                }
-
-                if (isset($this->postData()['component_id'])) {
-                    $this->view->filters = $this->filters->packagesData->filters;
-                }
-            }
-
-            $this->addResponse(
-                $this->filters->packagesData->responseMessage,
-                $this->filters->packagesData->responseCode
-            );
+            $this->view->filters = $this->filters->packagesData->filters;
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            //Adding close in add as cloning requires add permission so both add and clone can be performed in same action.
+            if (isset($this->postData()['clone']) && $this->postData()['clone']) {
+                $this->filters->cloneFilter($this->postData());
+            } else {
+                $this->filters->addFilter($this->postData());
+            }
+
+            if (isset($this->postData()['component_id'])) {
+                $this->view->filters = $this->filters->packagesData->filters;
+            }
         }
+
+        $this->addResponse(
+            $this->filters->packagesData->responseMessage,
+            $this->filters->packagesData->responseCode
+        );
     }
 
     /**
@@ -142,50 +135,36 @@ class FiltersComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->filters->updateFilter($this->postData());
 
-            $this->filters->updateFilter($this->postData());
-
-            if ($this->app['id'] == 1) {
-                $this->view->filters = $this->filters->packagesData->filters;
-            } else {
-                if (isset($this->postData()['component_id'])) {
-                    $this->view->filters = $this->filters->packagesData->filters;
-                }
-            }
-
-            $this->addResponse(
-                $this->filters->packagesData->responseMessage,
-                $this->filters->packagesData->responseCode
-            );
+        if ($this->app['id'] == 1) {
+            $this->view->filters = $this->filters->packagesData->filters;
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            if (isset($this->postData()['component_id'])) {
+                $this->view->filters = $this->filters->packagesData->filters;
+            }
         }
+
+        $this->addResponse(
+            $this->filters->packagesData->responseMessage,
+            $this->filters->packagesData->responseCode
+        );
     }
 
     protected function cloneAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->filters->cloneFilter($this->postData());
 
-            $this->filters->cloneFilter($this->postData());
+        $this->view->filters = $this->filters->packagesData->filters;
 
-            $this->view->filters = $this->filters->packagesData->filters;
-
-            $this->addResponse(
-                $this->filters->packagesData->responseMessage,
-                $this->filters->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->filters->packagesData->responseMessage,
+            $this->filters->packagesData->responseCode
+        );
     }
 
     /**
@@ -193,47 +172,37 @@ class FiltersComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $removeFilter = $this->filters->removeFilter($this->postData());
 
-            $removeFilter = $this->filters->removeFilter($this->postData());
+        $this->addResponse(
+            $this->filters->packagesData->responseMessage,
+            $this->filters->packagesData->responseCode
+        );
 
-            $this->addResponse(
-                $this->filters->packagesData->responseMessage,
-                $this->filters->packagesData->responseCode
-            );
-
-            if ($removeFilter) {
-                if ($this->app['id'] === 1) {
+        if ($removeFilter) {
+            if ($this->app['id'] === 1) {
+                $this->view->filters = $this->filters->packagesData->filters;
+            } else {
+                if (isset($this->postData()['component_id'])) {
                     $this->view->filters = $this->filters->packagesData->filters;
-                } else {
-                    if (isset($this->postData()['component_id'])) {
-                        $this->view->filters = $this->filters->packagesData->filters;
-                    }
                 }
             }
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
     public function getdefaultfilterAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if ($this->filters->getDefaultFilter($this->postData()['component_id'])) {
-                $this->view->defaultFilter = $this->filters->packagesData->defaultFilter;
-            }
-
-            $this->addResponse(
-                $this->filters->packagesData->responseMessage,
-                $this->filters->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
+        if ($this->filters->getDefaultFilter($this->postData()['component_id'])) {
+            $this->view->defaultFilter = $this->filters->packagesData->defaultFilter;
         }
+
+        $this->addResponse(
+            $this->filters->packagesData->responseMessage,
+            $this->filters->packagesData->responseCode
+        );
     }
 }

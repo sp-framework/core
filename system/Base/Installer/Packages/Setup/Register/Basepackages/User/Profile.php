@@ -15,19 +15,43 @@ class Profile
                 'last_name'             => 'Administrator',
                 'full_name'             => 'System Administrator',
                 'contact_phone'         => '0',
-                'contact_mobile'        => '0'
+                'contact_mobile'        => '0',
+                'contact_address_id'    => 1
             ];
 
         $profile['initials_avatar'] = json_encode($this->generateInitialsAvatar($profile));
 
+        $profileAddress =
+            [
+                'address_type'        => 1,
+                'is_primary'          => 1,
+                'street_address'      => null,
+                'street_address_2'    => null,
+                'city_id'             => null,
+                'city_name'           => null,
+                'post_code'           => null,
+                'state_id'            => null,
+                'state_name'          => null,
+                'country_id'          => null,
+                'country_name'        => null,
+                'package_name'        => 'UsersProfiles',
+                'package_row_id'      => 1
+            ];
+
         if ($db) {
             $db->insertAsDict('basepackages_users_profiles', $profile);
+
+            $db->insertAsDict('basepackages_address_book', $profileAddress);
         }
 
         if ($ff) {
             $profileStore = $ff->store('basepackages_users_profiles');
 
             $profileStore->updateOrInsert($profile);
+
+            $addressStore = $ff->store('basepackages_address_book');
+
+            $addressStore->updateOrInsert($profileAddress);
         }
     }
 

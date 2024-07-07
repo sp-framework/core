@@ -1,0 +1,667 @@
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'source_api_client',
+                        'fieldLabel'                           : 'Source API Client',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select API client to grab the source repositories from.',
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2Options'              : apis,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsSelected'      : ''
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'destination_api_client',
+                        'fieldLabel'                           : 'Destination API Client',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select API client to grab the destination repositories from.',
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2Options'              : apis,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsSelected'      : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'source_repository',
+                        'fieldLabel'                           : 'Source Repository',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select Repository to grab the source repositories from.',
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldGroupPreAddonButtons'      :
+                            [
+                                'sync-source-repositories'   : [
+                                    'title'                   : false,
+                                    'icon'                    : 'sync-alt',
+                                    'noMargin'                : true,
+                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                    'position'                : 'right'
+                                ]
+                            ],
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2Options'              : [],
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsSelected'      : ''
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'destination_repository',
+                        'fieldLabel'                           : 'Destination Repository',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select Repository to send data to.',
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldGroupPreAddonButtons'      :
+                            [
+                                'sync-destination-repositories'   : [
+                                    'title'                   : false,
+                                    'icon'                    : 'sync-alt',
+                                    'noMargin'                : true,
+                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                    'position'                : 'right'
+                                ]
+                            ],
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2Options'              : [],
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsSelected'      : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        {{adminltetags.useTag('tabs',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : 'main',
+                'tabsId'                        : 'tabs',
+                'tabsStyle'                     : 'card-outline-tabs',
+                'tabsData'                      :
+                    [
+                        'milestones'   :
+                            [
+                                'tabTitle'          : 'Milestones',
+                                'tabInclude'        : 'migrator/milestones'
+                            ],
+                        'labels'   :
+                            [
+                                'tabTitle'          : 'Lables',
+                                'tabInclude'        : 'migrator/labels'
+                            ],
+                        'issues'   :
+                            [
+                                'tabTitle'          : 'Issues',
+                                'tabInclude'        : 'migrator/issues'
+                            ]
+                    ]
+            ]
+        )}}
+    </fieldset>
+</form>
+<script>
+/* globals paginatedPNotify BazHelpers */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+function importIssues(button) {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-source_api_client').val();
+    postData['repository_id'] = $('#{{componentId}}-{{sectionId}}-source_repository').val();
+    if (postData['api_id'] === '' || postData['repository_id'] === '') {
+        paginatedPNotify('error', {'text': 'Select API/Repository'});
+
+        return false;
+    }
+    postData['import_from'] = $('#{{componentId}}-{{sectionId}}-import_issues_from').val();
+
+    $('#{{componentId}}-{{sectionId}}-issues').parents('.form-group').addClass('d-none');
+    $('#issues-loader').attr('hidden', false);
+    $('#issues-loader-text').empty().text('Importing issues ...');
+    if (button === '{{componentId}}-{{sectionId}}-import-issues') {
+        $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', true);
+        $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+    }
+    $.post('{{links.url("devtools/migrator/importIssues")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            paginatedPNotify('success', {'text': response.responseMessage});
+
+            if (response.responseData.issues) {
+                dataCollectionSection['{{componentId}}-{{sectionId}}-issues']['issues'] = response.responseData.issues;
+
+                var table =
+                    '<table id="{{componentId}}-{{sectionId}}-issues-table" class="table compact table-striped dt-responsive dataTable no-footer dtr-inline" style="width:100%">' +
+                        '<thead>' +
+                            '<tr>' +
+                                '<th class="text-uppercase text-truncate dt-colTextTruncate pb-1 pt-1">Issue #</th>' +
+                                '<th class="text-uppercase text-truncate dt-colTextTruncate pb-1 pt-1">Title</th>' +
+                                '<th class="text-uppercase text-truncate dt-colTextTruncate pb-1 pt-1">Migrated</th>' +
+                            '</tr>' +
+                        '</thead>' +
+                        '<tbody>';
+
+                for (var issue in response.responseData.issues) {
+                    table += '<tr data-index="' + response.responseData.issues[issue]['number'] + '" class="process-row-' + response.responseData.issues[issue]['number'] + '">';
+                    table += '<td class="text-truncate dt-colTextTruncate pb-1 pt-1"><a target="_blank" href="' + response.responseData.issues[issue]['html_url'] + '">' +
+                            response.responseData.issues[issue]['number'] + '</a></td>';
+                    table += '<td class="text-truncate dt-colTextTruncate pb-1 pt-1">' + response.responseData.issues[issue]['title'] + '</td>';
+                    table += '<td class="text-truncate dt-colTextTruncate pb-1 pt-1">' + response.responseData.issues[issue]['migrated'] + '</td>';
+                    table += '</tr>';
+                }
+            }
+
+            $('#{{componentId}}-{{sectionId}}-issues').empty().append(table);
+
+            if (!$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-issues-table')) {
+                dataCollectionSection['{{componentId}}-{{sectionId}}-issues-table'] = $('#{{componentId}}-{{sectionId}}-issues-table').on('init.dt', function() {
+                    $('#issues-loader').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-issues').parents('.form-group').removeClass('d-none');
+                }).dataTable({
+                    "lengthMenu": [10, 25, 50, 100],
+                    "select": 'multi'
+                });
+            }
+        } else {
+            $('#issues-loader').attr('hidden', true);
+
+            paginatedPNotify('error', {'text': response.responseMessage});
+        }
+
+        if (button === '{{componentId}}-{{sectionId}}-import-issues') {
+            $('#{{componentId}}-{{sectionId}}-import-issues').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-import-issues').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+        } else {
+            $('#{{componentId}}-{{sectionId}}-migrate-issues').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-migrate-issues').children('i').removeClass('fa-spin fa-cog').addClass('fa-arrow-right');
+        }
+    }, 'json');
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-source_api_client'                       : {
+            placeholder : "SELECT API",
+        },
+        '{{componentId}}-{{sectionId}}-destination_api_client'                  : {
+            placeholder : "SELECT API"
+        },
+        '{{componentId}}-{{sectionId}}-source_repository'                       : {
+            placeholder : "SELECT REPOSITORY",
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-sync-source-repositories, #{{componentId}}-{{sectionId}}-sync-destination-repositories').off();
+                $('#{{componentId}}-{{sectionId}}-sync-source-repositories, #{{componentId}}-{{sectionId}}-sync-destination-repositories').click(function(e) {
+                    e.preventDefault();
+
+                    var thisButton = this;
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-repositories') {
+                        postData['api_id'] = $('#{{componentId}}-{{sectionId}}-source_api_client').val();
+                    } else {
+                        postData['api_id'] = $('#{{componentId}}-{{sectionId}}-destination_api_client').val();
+                    }
+
+                    if (postData['api_id'] === '') {
+                        paginatedPNotify('error', {'text': 'Select API'});
+
+                        return false;
+                    }
+
+                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-repositories') {
+                        $('#{{componentId}}-{{sectionId}}-sync-source-repositories').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-sync-source-repositories').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-sync-destination-repositories').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-sync-destination-repositories').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+                    }
+
+                    $.post('{{links.url("devtools/migrator/syncRepositories")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.repositories) {
+                                if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-repositories') {
+                                    $('#{{componentId}}-{{sectionId}}-source_repository').empty().trigger('change');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-destination_repository').empty().trigger('change');
+                                }
+                                for (var repository in response.responseData.repositories) {
+                                    var newOption
+                                        = new Option(
+                                            response.responseData.repositories[repository]['name'],
+                                            response.responseData.repositories[repository]['name'], false, false
+                                        );
+
+                                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-repositories') {
+                                        $('#{{componentId}}-{{sectionId}}-source_repository').append(newOption).trigger('change');
+                                    } else {
+                                        $('#{{componentId}}-{{sectionId}}-destination_repository').append(newOption).trigger('change');
+                                    }
+                                }
+                            }
+                            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.repositories.length + ' repositories.'});
+                        } else {
+                            paginatedPNotify('error', {'text': response.responseMessage});
+                        }
+
+                        if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-repositories') {
+                            $('#{{componentId}}-{{sectionId}}-sync-source-repositories').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-sync-source-repositories').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-sync-destination-repositories').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-sync-destination-repositories').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-destination_repository'                  : {
+            placeholder : "SELECT REPOSITORY"
+        },
+        '{{componentId}}-{{sectionId}}-source_milestones'                       : {
+            placeholder : "SELECT MILESTONES",
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-sync-source-milestones, #{{componentId}}-{{sectionId}}-sync-destination-milestones').off();
+                $('#{{componentId}}-{{sectionId}}-sync-source-milestones, #{{componentId}}-{{sectionId}}-sync-destination-milestones').click(function(e) {
+                    e.preventDefault();
+
+                    var thisButton = this;
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-milestones') {
+                        postData['api_id'] = $('#{{componentId}}-{{sectionId}}-source_api_client').val();
+                        postData['repository_id'] = $('#{{componentId}}-{{sectionId}}-source_repository').val();
+                    } else {
+                        postData['api_id'] = $('#{{componentId}}-{{sectionId}}-destination_api_client').val();
+                        postData['repository_id'] = $('#{{componentId}}-{{sectionId}}-destination_repository').val();
+                    }
+
+                    if (postData['api_id'] === '' || postData['repository_id'] === '') {
+                        paginatedPNotify('error', {'text': 'Select API/Repository'});
+
+                        return false;
+                    }
+
+                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-milestones') {
+                        $('#{{componentId}}-{{sectionId}}-sync-source-milestones').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-sync-source-milestones').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-sync-destination-milestones').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-sync-destination-milestones').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+                    }
+
+                    $.post('{{links.url("devtools/migrator/syncMilestones")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.milestones) {
+                                if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-milestones') {
+                                    $('#{{componentId}}-{{sectionId}}-source_milestones').empty().trigger('change');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-destination_milestones').empty().trigger('change');
+                                }
+                                for (var milestone in response.responseData.milestones) {
+                                    var milestoneNumber = 1;
+
+                                    if (response.responseData.milestones[milestone]['number']) {
+                                        milestoneNumber = response.responseData.milestones[milestone]['number'];
+                                    } else if (response.responseData.milestones[milestone]['id']) {
+                                        milestoneNumber = response.responseData.milestones[milestone]['id'];
+                                    }
+                                    var newOption
+                                        = new Option(
+                                            response.responseData.milestones[milestone]['title'],
+                                            milestoneNumber, false, false
+                                        );
+
+                                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-milestones') {
+                                        $('#{{componentId}}-{{sectionId}}-source_milestones').append(newOption).trigger('change');
+                                    } else {
+                                        $('#{{componentId}}-{{sectionId}}-destination_milestones').append(newOption).trigger('change');
+                                    }
+
+                                    milestoneNumber++;
+                                }
+
+                                if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-milestones') {
+                                    $('#{{componentId}}-{{sectionId}}-source_milestones > option').prop('selected', 'selected');
+                                    $('#{{componentId}}-{{sectionId}}-source_milestones').trigger('change');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-destination_milestones > option').prop('selected', 'selected');
+                                    $('#{{componentId}}-{{sectionId}}-destination_milestones').trigger('change');
+                                }
+                            }
+                            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.milestones.length + ' milestones.'});
+                        } else {
+                            paginatedPNotify('error', {'text': response.responseMessage});
+                        }
+
+                        if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-milestones') {
+                            $('#{{componentId}}-{{sectionId}}-sync-source-milestones').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-sync-source-milestones').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-sync-destination-milestones').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-sync-destination-milestones').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                        }
+                    }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-migrate-milestones').off();
+                $('#{{componentId}}-{{sectionId}}-migrate-milestones').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    postData['source_api_id'] = $('#{{componentId}}-{{sectionId}}-source_api_client').val();
+                    postData['destination_api_id'] = $('#{{componentId}}-{{sectionId}}-destination_api_client').val();
+                    postData['source_repository_id'] = $('#{{componentId}}-{{sectionId}}-source_repository').val();
+                    postData['destination_repository_id'] = $('#{{componentId}}-{{sectionId}}-destination_repository').val();
+                    postData['milestones'] = $('#{{componentId}}-{{sectionId}}-source_milestones').val();
+
+                    if (postData['api_id'] === '' || postData['repository_id'] === '' || postData['milestones'].length === 0) {
+                        paginatedPNotify('error', {'text': 'Select API/Repository/Milestones'});
+
+                        return false;
+                    }
+
+                    $('#{{componentId}}-{{sectionId}}-migrate-milestones').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-migrate-milestones').children('i').removeClass('fa-arrow-right').addClass('fa-spin fa-cog');
+
+                    $.post('{{links.url("devtools/migrator/migrateMilestones")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            paginatedPNotify('success', {'text': 'Migrated milestones.'});
+                        } else {
+                            paginatedPNotify('error', {'text': response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-migrate-milestones').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-migrate-milestones').children('i').removeClass('fa-spin fa-cog').addClass('fa-arrow-right');
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-destination_milestones'                  : {
+            placeholder : "VERIFY MILESTONES"
+        },
+        '{{componentId}}-{{sectionId}}-source_labels'                           : {
+            placeholder : "SELECT LABELS",
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-sync-source-labels, #{{componentId}}-{{sectionId}}-sync-destination-labels').off();
+                $('#{{componentId}}-{{sectionId}}-sync-source-labels, #{{componentId}}-{{sectionId}}-sync-destination-labels').click(function(e) {
+                    e.preventDefault();
+
+                    var thisButton = this;
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-labels') {
+                        postData['api_id'] = $('#{{componentId}}-{{sectionId}}-source_api_client').val();
+                        postData['repository_id'] = $('#{{componentId}}-{{sectionId}}-source_repository').val();
+                    } else {
+                        postData['api_id'] = $('#{{componentId}}-{{sectionId}}-destination_api_client').val();
+                        postData['repository_id'] = $('#{{componentId}}-{{sectionId}}-destination_repository').val();
+                    }
+
+                    if (postData['api_id'] === '' || postData['repository_id'] === '') {
+                        paginatedPNotify('error', {'text': 'Select API/Repository'});
+
+                        return false;
+                    }
+
+                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-labels') {
+                        $('#{{componentId}}-{{sectionId}}-sync-source-labels').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-sync-source-labels').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-sync-destination-labels').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-sync-destination-labels').children('i').removeClass('fa-sync-alt').addClass('fa-spin fa-cog');
+                    }
+
+                    $.post('{{links.url("devtools/migrator/syncLabels")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            if (response.responseData && response.responseData.labels) {
+                                if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-labels') {
+                                    $('#{{componentId}}-{{sectionId}}-source_labels').empty().trigger('change');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-destination_labels').empty().trigger('change');
+                                }
+                                for (var label in response.responseData.labels) {
+                                    var newOption
+                                        = new Option(
+                                            response.responseData.labels[label]['name'],
+                                            response.responseData.labels[label]['id'], false, false
+                                        );
+
+                                    if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-labels') {
+                                        $('#{{componentId}}-{{sectionId}}-source_labels').append(newOption).trigger('change');
+                                    } else {
+                                        $('#{{componentId}}-{{sectionId}}-destination_labels').append(newOption).trigger('change');
+                                    }
+                                }
+
+                                if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-labels') {
+                                    $('#{{componentId}}-{{sectionId}}-source_labels > option').prop('selected', 'selected');
+                                    $('#{{componentId}}-{{sectionId}}-source_labels').trigger('change');
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-destination_labels > option').prop('selected', 'selected');
+                                    $('#{{componentId}}-{{sectionId}}-destination_labels').trigger('change');
+                                }
+                            }
+                            paginatedPNotify('success', {'text': 'Synced ' + response.responseData.labels.length + ' labels.'});
+                        } else {
+                            paginatedPNotify('error', {'text': response.responseMessage});
+                        }
+
+                        if ($(thisButton)[0].id === '{{componentId}}-{{sectionId}}-sync-source-labels') {
+                            $('#{{componentId}}-{{sectionId}}-sync-source-labels').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-sync-source-labels').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-sync-destination-labels').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-sync-destination-labels').children('i').removeClass('fa-spin fa-cog').addClass('fa-sync-alt');
+                        }
+                    }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-migrate-labels').off();
+                $('#{{componentId}}-{{sectionId}}-migrate-labels').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    postData['source_api_id'] = $('#{{componentId}}-{{sectionId}}-source_api_client').val();
+                    postData['destination_api_id'] = $('#{{componentId}}-{{sectionId}}-destination_api_client').val();
+                    postData['source_repository_id'] = $('#{{componentId}}-{{sectionId}}-source_repository').val();
+                    postData['destination_repository_id'] = $('#{{componentId}}-{{sectionId}}-destination_repository').val();
+                    postData['labels'] = $('#{{componentId}}-{{sectionId}}-source_labels').val();
+
+                    if (postData['api_id'] === '' || postData['repository_id'] === '' || postData['labels'].length === 0) {
+                        paginatedPNotify('error', {'text': 'Select API/Repository/Labels'});
+
+                        return false;
+                    }
+
+                    $('#{{componentId}}-{{sectionId}}-migrate-labels').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-migrate-labels').children('i').removeClass('fa-arrow-right').addClass('fa-spin fa-cog');
+
+                    $.post('{{links.url("devtools/migrator/migrateLabels")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            paginatedPNotify('success', {'text': 'Migrated labels.'});
+                        } else {
+                            paginatedPNotify('error', {'text': response.responseMessage});
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-migrate-labels').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-migrate-labels').children('i').removeClass('fa-spin fa-cog').addClass('fa-arrow-right');
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-destination_labels'                      : {
+            placeholder : "VERIFY LABELS"
+        },
+        '{{componentId}}-{{sectionId}}-issues'                                  : { },
+        '{{componentId}}-{{sectionId}}-import_issues_from'                      : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-import-issues').off();
+                $('#{{componentId}}-{{sectionId}}-import-issues').click(function(e) {
+                    e.preventDefault();
+
+                    importIssues('{{componentId}}-{{sectionId}}-import-issues');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-migrate_issues'                          : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-migrate-issues').off();
+                $('#{{componentId}}-{{sectionId}}-migrate-issues').click(function(e) {
+                    e.preventDefault();
+
+                    // $('#{{componentId}}-{{sectionId}}-migrate-issues').attr('disabled', true);
+                    // $('#{{componentId}}-{{sectionId}}-migrate-issues').children('i').removeClass('fa-arrow-right').addClass('fa-spin fa-cog');
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-destination_api_client').val();
+                    postData['repository_id'] = $('#{{componentId}}-{{sectionId}}-destination_repository').val();
+
+                    if (postData['api_id'] === '' || postData['repository_id'] === '') {
+                        paginatedPNotify('error', {'text': 'Select Destination API/Repository'});
+
+                        return false;
+                    }
+                    postData['migrate_issues'] = $('#{{componentId}}-{{sectionId}}-migrate_issues').val();
+
+                    $.post('{{links.url("devtools/migrator/migrateIssues")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 0) {
+                            paginatedPNotify('success', {'text': response.responseMessage});
+
+                        } else {
+                            paginatedPNotify('error', {'text': response.responseMessage});
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-source_api_client'               : 'required',
+                '{{componentId}}-{{sectionId}}-destination_api_client'          : 'required',
+                '{{componentId}}-{{sectionId}}-source_repository'               : 'required',
+                '{{componentId}}-{{sectionId}}-destination_repository'          : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-source_api_client'               : 'Please select source api',
+                '{{componentId}}-{{sectionId}}-destination_api_client'          : 'Please select destination api',
+                '{{componentId}}-{{sectionId}}-source_repository'               : 'Please select source repository',
+                '{{componentId}}-{{sectionId}}-destination_repository'          : 'Please select destination repository',
+            }
+        }
+    });
+</script>

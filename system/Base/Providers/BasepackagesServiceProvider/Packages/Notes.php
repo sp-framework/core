@@ -191,7 +191,7 @@ class Notes extends BasePackage
                     $account = $this->basepackages->accounts->getById($note['account_id']);
                     $note['account_email'] = $account['email'];
 
-                    $profile = $this->basepackages->profile->getProfile($note['account_id']);
+                    $profile = $this->basepackages->profiles->getProfile($note['account_id']);
 
                     if ($profile) {
                         $note['account_full_name'] = $profile['full_name'];

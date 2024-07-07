@@ -1207,17 +1207,17 @@ $file .= '
         }
 
         if (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'providers') {
-            $nameArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
+            // $nameArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
 
             if (str_starts_with($data['category'], 'basepackages')) {
                 $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/';
 
-                if (count($nameArr) === 1) {
-                    $moduleFilesLocation = $moduleFilesLocation . $nameArr[0];
-                } else {
-                    unset($nameArr[$this->helper->lastKey($nameArr)]);
-                    $moduleFilesLocation = $moduleFilesLocation . implode('/', $nameArr);
-                }
+                // if (count($nameArr) === 1) {
+                //     $moduleFilesLocation = $moduleFilesLocation . $nameArr[0];
+                // } else {
+                //     unset($nameArr[$this->helper->lastKey($nameArr)]);
+                //     $moduleFilesLocation = $moduleFilesLocation . implode('/', $nameArr);
+                // }
 
                 $fileName = $moduleFilesLocation . '/Basepackages' . $data['name'] . '.php';
                 $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
@@ -1987,7 +1987,8 @@ $file .= '
         $args =
             [
                 $this->apiClientConfig['org_user'],
-                strtolower($this->helper->last(explode('/', $module['repo'])))
+                strtolower($this->helper->last(explode('/', $module['repo']))),
+                'open'
             ];
 
         try {

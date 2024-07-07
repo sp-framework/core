@@ -145,20 +145,14 @@ class CountriesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->geoCountries->addCountry($this->postData());
+        $this->geoCountries->addCountry($this->postData());
 
-            $this->addResponse(
-                $this->geoCountries->packagesData->responseMessage,
-                $this->geoCountries->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->geoCountries->packagesData->responseMessage,
+            $this->geoCountries->packagesData->responseCode
+        );
     }
 
     /**
@@ -166,38 +160,26 @@ class CountriesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->geoCountries->updateCountry($this->postData());
+        $this->geoCountries->updateCountry($this->postData());
 
-            $this->addResponse(
-                $this->geoCountries->packagesData->responseMessage,
-                $this->geoCountries->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->geoCountries->packagesData->responseMessage,
+            $this->geoCountries->packagesData->responseCode
+        );
     }
 
     public function installAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->geoCountries->installCountry($this->postData());
+        $this->geoCountries->installCountry($this->postData());
 
-            $this->addResponse(
-                $this->geoCountries->packagesData->responseMessage,
-                $this->geoCountries->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->geoCountries->packagesData->responseMessage,
+            $this->geoCountries->packagesData->responseCode
+        );
     }
 
     public function uninstallAction()
@@ -207,28 +189,28 @@ class CountriesComponent extends BaseComponent
 
     public function searchCountryAction()
     {
-        if ($this->request->isPost()) {
-            if ($this->postData()['search']) {
-                $searchQuery = $this->postData()['search'];
+        $this->requestIsPost();
 
-                if (strlen($searchQuery) < 3) {
-                    return;
-                }
+        if ($this->postData()['search']) {
+            $searchQuery = $this->postData()['search'];
 
-                $searchCountries = $this->geoCountries->searchCountries($searchQuery);
-
-                if ($searchCountries) {
-                    $this->view->responseCode = $this->geoCountries->packagesData->responseCode;
-
-                    $countries = $this->geoCountries->packagesData->countries;
-
-                    $countries = msort($countries, 'id');
-
-                    $this->view->countries = $countries;
-                }
-            } else {
-                $this->addResponse('Search Query Missing', 1);
+            if (strlen($searchQuery) < 3) {
+                return;
             }
+
+            $searchCountries = $this->geoCountries->searchCountries($searchQuery);
+
+            if ($searchCountries) {
+                $this->view->responseCode = $this->geoCountries->packagesData->responseCode;
+
+                $countries = $this->geoCountries->packagesData->countries;
+
+                $countries = msort($countries, 'id');
+
+                $this->view->countries = $countries;
+            }
+        } else {
+            $this->addResponse('Search Query Missing', 1);
         }
     }
 }

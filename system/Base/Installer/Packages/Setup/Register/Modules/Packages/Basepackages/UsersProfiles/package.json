@@ -1,0 +1,30 @@
+{
+    "name"          : "UsersProfiles",
+    "display_name"  : "Users Profiles",
+    "description"   : "Basepackage Users Profiles",
+    "module_type"   : "packages",
+    "app_type"      : "core",
+    "category"      : "basepackages",
+    "version"       : "0.0.0",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Users\\Profiles",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.0",
+            "repo"      : "https://.../"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : [],
+        "external"      : []
+    },
+    "settings"      : {
+        "componentRoute": "system/users/profile",
+        "import": true,
+        "export": true,
+        "importAddMethod": "addProfile",
+        "importUpdateMethod": "updateProfile"
+    }
+}

@@ -204,13 +204,11 @@ class IoHelper
         if ($recount && $count['totalEntries'] > 0) {
             $files = iterator_to_array($fi);
 
-            $ids = [];
-
-            foreach ($files as $key => $file) {
-                array_push($ids, (int) str_replace('.json', '', $file->getFileName()));
+            foreach ($files as $key => &$file) {
+                $file = (int) str_replace('.json', '', $file->getFileName());
             }
 
-            $count['lastId'] = max($ids);
+            $count['lastId'] = max($files);
         }
 
         return $count;

@@ -65,7 +65,11 @@ class Acl extends BaseMiddleware
         }
 
         if ($this->account) {
-            $this->accountPermissions = $this->helper->decode($this->account['security']['permissions'], true);
+            if (!is_array($this->account['security']['permissions'])) {
+                $this->account['security']['permissions'] = $this->helper->decode($this->account['security']['permissions'], true);
+            }
+
+            $this->accountPermissions = $this->account['security']['permissions'];
 
             //System Admin bypasses the ACL if they don't have any permissions defined.
             if ($this->account['id'] == '1' &&

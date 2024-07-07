@@ -79,25 +79,29 @@ class Notifications extends BasePackage
 
     protected function pushNotification($notification)
     {
-        $account = $this->basepackages->accounts->getFirst('id', $notification['account_id'], true);
+        $account = $this->basepackages->accounts->getAccountById($notification['account_id']);
 
-        if (!$account || ($account && !$account->tunnels)) {
-            return;
+        if ($account && $account['tunnels']) {
+            $tunnels = $account['tunnels'];
         } else {
-            $tunnels = $account->tunnels->toArray();
+            return;
         }
 
         if ($tunnels['notifications_tunnel']) {
-            $count =
-                $this->modelToUse::count(
-                    [
-                        'conditions' => 'account_id = :aid: AND read = :r:',
-                        'bind'  => [
-                            'aid' => $notification['account_id'],
-                            'r' => 0
+            if ($this->config->databasetype === 'db') {
+                $count =
+                    $this->modelToUse::count(
+                        [
+                            'conditions' => 'account_id = :aid: AND read = :r:',
+                            'bind'  => [
+                                'aid' => $notification['account_id'],
+                                'r' => 0
+                            ]
                         ]
-                    ]
-            );
+                );
+            } else {
+                $count = $this->ffStore->count(false, [['account_id', '=', $notification['account_id']], ['read', '=', 0]]);
+            }
 
             if ($count && $count > 0) {
                 $this->wss->send(
@@ -106,10 +110,7 @@ class Notifications extends BasePackage
                         'to'                => $tunnels['notifications_tunnel'],
                         'response'          => [
                             'responseCode'      => 0,
-                            'responseData'      =>
-                                [
-                                    "count" => $count
-                                ]
+                            'responseData'      => $this->fetchNewNotificationsCount()
                         ]
                     ]
                 );
@@ -146,7 +147,7 @@ class Notifications extends BasePackage
             $now = date("F j, Y, g:i a");
 
             if ($createdBy != 0) {
-                $profile = $this->basepackages->profile->getProfile($createdBy);
+                $profile = $this->basepackages->profiles->getProfile($createdBy);
 
                 if ($profile) {
                     $body .= 'Notification By: ' . $profile['full_name'] . ' (' . $now . ')<br>';
@@ -216,9 +217,7 @@ class Notifications extends BasePackage
             }
         }
 
-        $this->addResponse(
-            'Ok',
-            0,
+        $count =
             [
                 'count' =>
                     [
@@ -228,8 +227,11 @@ class Notifications extends BasePackage
                         'error'     => $error
                     ],
                 'mute'  => $isMute
-            ]
-        );
+            ];
+
+        $this->addResponse('Ok', 0, $count);
+
+        return $count;
     }
 
     protected function getNotificationsCount()
@@ -264,9 +266,13 @@ class Notifications extends BasePackage
 
     public function changeNotificationState(array $data)
     {
-        $profile = $this->basepackages->profile->profile();
+        $profile = $this->basepackages->profiles->profile();
 
-        if (isset($profile['settings']['notifications']['mute'])) {
+        if ($profile['settings'] && !is_array($profile['settings'])) {
+            $profile['settings'] = $this->helper->decode($profile['settings'], true);
+        }
+
+        if ($profile['settings'] && isset($profile['settings']['notifications']['mute'])) {
             if ($data['changestate'] == 1) {
                 $profile['settings']['notifications']['mute'] = true;
             } else if ($data['changestate'] == 0) {
@@ -282,7 +288,7 @@ class Notifications extends BasePackage
 
         $profile['settings'] = $this->helper->encode($profile['settings']);
 
-        $this->basepackages->profile->updateProfile($profile);
+        $this->basepackages->profiles->updateProfile($profile);
 
         $this->addResponse('Changed');
     }
@@ -346,18 +352,23 @@ class Notifications extends BasePackage
 
     public function markRead(array $data)
     {
-        $notification = $this->getByParams(
-            [
-                'conditions'    =>
-                    'id = :id: AND account_id = :aId: AND read = :read:',
-                'bind'          =>
-                    [
-                        'id'            => $data['id'],
-                        'aId'           => $this->auth->account()['id'],
-                        'read'          => 0,
-                    ]
-            ]
-        );
+        if ($this->config->databasetype === 'db') {
+            $params =
+                [
+                    'conditions'    =>
+                        'id = :id: AND account_id = :aId: AND read = :read:',
+                    'bind'          =>
+                        [
+                            'id'            => $data['id'],
+                            'aId'           => $this->auth->account()['id'],
+                            'read'          => 0,
+                        ]
+                ];
+        } else {
+            $params = ['conditions' => [['id', '=', (int) $data['id']], ['account_id', '=', $this->auth->account()['id']], ['read', '=', 0]]];
+        }
+
+        $notification = $this->getByParams($params);
 
         if (count($notification) === 1) {
             $notification[0]['read'] = 1;
@@ -374,18 +385,23 @@ class Notifications extends BasePackage
 
     public function markArchive(array $data)
     {
-        $notification = $this->getByParams(
-            [
-                'conditions'    =>
-                    'id = :id: AND account_id = :aId: AND archive = :archive:',
-                'bind'          =>
-                    [
-                        'id'            => $data['id'],
-                        'aId'           => $this->auth->account()['id'],
-                        'archive'       => 0,
-                    ]
-            ]
-        );
+        if ($this->config->databasetype === 'db') {
+            $params =
+                [
+                    'conditions'    =>
+                        'id = :id: AND account_id = :aId: AND archive = :archive:',
+                    'bind'          =>
+                        [
+                            'id'            => $data['id'],
+                            'aId'           => $this->auth->account()['id'],
+                            'archive'       => 0,
+                        ]
+                ];
+        } else {
+            $params = ['conditions' => [['id', '=', (int) $data['id']], ['account_id', '=', $this->auth->account()['id']], ['archive', '=', 0]]];
+        }
+
+        $notification = $this->getByParams($params);
 
         if (count($notification) === 1) {
             $notification[0]['read'] = 1;
@@ -403,17 +419,22 @@ class Notifications extends BasePackage
 
     public function removeNotification(array $data)
     {
-        $notification = $this->getByParams(
-            [
-                'conditions'    =>
-                    'id = :id: AND account_id = :aId:',
-                'bind'          =>
-                    [
-                        'id'            => $data['id'],
-                        'aId'           => $this->auth->account()['id']
-                    ]
-            ]
-        );
+        if ($this->config->databasetype === 'db') {
+            $params =
+                [
+                    'conditions'    =>
+                        'id = :id: AND account_id = :aId:',
+                    'bind'          =>
+                        [
+                            'id'            => $data['id'],
+                            'aId'           => $this->auth->account()['id']
+                        ]
+                ];
+        } else {
+            $params = ['conditions' => [['id', '=', (int) $data['id']], ['account_id', '=', $this->auth->account()['id']]]];
+        }
+
+        $notification = $this->getByParams($params);
 
         if (count($notification) === 1) {
             $this->remove($notification[0]['id']);

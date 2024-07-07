@@ -1,0 +1,95 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'import_issues_from',
+                'fieldLabel'                     : 'Import Issues From Issue #',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Import issues from issue #',
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldRequired'                  : false,
+                'fieldDisabled'                  : false,
+                'fieldGroupPostAddonButtons'     :
+                    [
+                        'import-issues'   : [
+                            'title'                   : false,
+                            'icon'                    : 'sync-alt',
+                            'noMargin'                : true,
+                            'buttonAdditionalClass'   : 'rounded-0 text-white',
+                            'position'                : 'right'
+                        ]
+                    ],
+                'fieldBazJstreeSearch'           : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'migrate_issues',
+                'fieldLabel'                     : 'Migrate issues',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Migrate issues comma saperated ids or ranges',
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldRequired'                  : false,
+                'fieldDisabled'                  : false,
+                'fieldGroupPostAddonButtons'     :
+                    [
+                        'migrate-issues'   : [
+                            'title'                   : false,
+                            'icon'                    : 'arrow-right',
+                            'noMargin'                : true,
+                            'buttonAdditionalClass'   : 'rounded-0 text-white',
+                            'position'                : 'right'
+                        ]
+                    ],
+                'fieldBazJstreeSearch'           : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row m-2 text-center" id="issues-loader" hidden>
+    <div class="col">
+        <div class="fa-2x">
+            <i class="fa fa-cog fa-spin"></i> <span id="issues-loader-text"></span>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'issues',
+                'fieldLabel'                     : 'Issues',
+                'fieldType'                      : 'html',
+                'fieldHelp'                      : true,
+                'fieldHidden'                    : true,
+                'fieldHelpTooltipContent'        : 'Imported Issues.',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldHtmlContent'               : '',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false
+            ]
+        )}}
+    </div>
+</div>

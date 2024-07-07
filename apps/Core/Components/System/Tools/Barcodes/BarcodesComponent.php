@@ -32,42 +32,31 @@ class BarcodesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->barcodes->updateBarcodesSettings($this->postData());
+        $this->barcodes->updateBarcodesSettings($this->postData());
 
-            $this->addResponse(
-                $this->barcodes->packagesData->responseMessage,
-                $this->barcodes->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->barcodes->packagesData->responseMessage,
+            $this->barcodes->packagesData->responseCode
+        );
     }
 
     public function testBarcodeAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->generateBarcodeAction(false);
+        $this->generateBarcodeAction(false);
 
-            if ($this->barcodes->packagesData->responseCode === 0) {
-                $this->view->barcode = $this->barcodes->packagesData->barcode;
-            }
-
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
+        if ($this->barcodes->packagesData->responseCode === 0) {
+            $this->view->barcode = $this->barcodes->packagesData->barcode;
         }
     }
 
     public function generateBarcodeAction($test = false)
     {
+        $this->requestIsPost();
+
         $this->barcodes->generateBarcode(
             $this->postData()['barcode'],
             $this->postData()['barcodeType'],

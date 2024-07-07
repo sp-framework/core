@@ -1098,7 +1098,7 @@ class Auth
             return false;
         }
 
-        if (!$this->account['security']['force_pwreset']) {
+        if (!$this->account['security']['force_pwreset'] && !$this->account()) {
             $this->addResponse('Cannot reset password using this tool. Please login and reset using profile.', 1);
 
             return false;
@@ -1135,6 +1135,20 @@ class Auth
         $security->password_set_on = time();
 
         if ($passwordPolicy) {
+            if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordCheckHibp'] == true) {
+                $this->passwordPolicyErrors['passwordCheckHibp'] = false;
+
+                if ($this->basepackages->utils->checkPwHibp($data['newpass']) !== false) {
+                    if ($this->basepackages->utils->packagesData->responseData['pwned']) {
+                        $this->passwordPolicyErrors['passwordCheckHibp'] = true;
+
+                        $this->addResponse('New password failed password policy. Please try again...', 1, ['passwordPolicyErrors' => $this->passwordPolicyErrors]);
+
+                        return false;
+                    }
+                }
+            }
+
             $security = $this->setPasswordHistory($data, $security);
         }
 
@@ -1260,7 +1274,7 @@ class Auth
     {
         $this->passwordPolicyErrors['passwordPolicySimpleAcceptableLevel'] = false;
 
-        $checkPwStrength = $this->checkPwStrength($data['newpass']);
+        $checkPwStrength = $this->basepackages->utils->checkPwStrength($data['newpass']);
 
         if (isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel']) &&
             (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySimpleAcceptableLevel'] > 0
@@ -1551,34 +1565,6 @@ class Auth
         return true;
     }
 
-    public function checkPwStrength(string $pass)
-    {
-        $checkingTool = new \ZxcvbnPhp\Zxcvbn();
-
-        $result = $checkingTool->passwordStrength($pass);
-
-        if ($result && is_array($result) && isset($result['score'])) {
-            $this->addResponse('Checking Password Strength Success', 0, $result['score']);
-
-            return $result['score'];
-        }
-
-        $this->addResponse('Error Checking Password Strength', 1);
-
-        return false;
-    }
-
-    public function generateNewPassword()
-    {
-        $this->basepackages->utils->generateNewPassword();
-
-        $this->addResponse(
-            $this->basepackages->utils->packagesData->responseMessage,
-            $this->basepackages->utils->packagesData->responseCode,
-            $this->basepackages->utils->packagesData->responseData['password']
-        );
-    }
-
     protected function initOtp($secret, $verify = false)
     {
         if ((!isset($this->core->core['settings']['security']['twofa']) ||
@@ -1847,7 +1833,7 @@ class Auth
         if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpSecretSize'])) {
             $secretSize = $this->core->core['settings']['security']['twofaSettings']['twofaOtpSecretSize'];
         }
-        $twoFaSecret = strtoupper($this->secTools->random->base62($secretSize));
+        $twoFaSecret = trim(Base32::encodeUpper(random_bytes($secretSize)), '=');
 
         $security = $this->getAccountSecurityObject();
 

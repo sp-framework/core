@@ -69,21 +69,15 @@ class DashboardsComponent extends BaseComponent
      */
     public function addWidgetToDashboardAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->dashboards->addWidgetToDashboard($this->postData());
+        $this->basepackages->dashboards->addWidgetToDashboard($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->dashboards->packagesData->responseMessage,
-                $this->basepackages->dashboards->packagesData->responseCode,
-                $this->basepackages->dashboards->packagesData->responseData
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->dashboards->packagesData->responseMessage,
+            $this->basepackages->dashboards->packagesData->responseCode,
+            $this->basepackages->dashboards->packagesData->responseData
+        );
     }
 
     /**
@@ -91,20 +85,14 @@ class DashboardsComponent extends BaseComponent
      */
     public function updateWidgetToDashboardAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->dashboards->updateWidgetToDashboard($this->postData());
+        $this->basepackages->dashboards->updateWidgetToDashboard($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->dashboards->packagesData->responseMessage,
-                $this->basepackages->dashboards->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->dashboards->packagesData->responseMessage,
+            $this->basepackages->dashboards->packagesData->responseCode
+        );
     }
 
     /**
@@ -112,38 +100,26 @@ class DashboardsComponent extends BaseComponent
      */
     public function removeWidgetFromDashboardAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->dashboards->removeWidgetFromDashboard($this->postData());
+        $this->basepackages->dashboards->removeWidgetFromDashboard($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->dashboards->packagesData->responseMessage,
-                $this->basepackages->dashboards->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->dashboards->packagesData->responseMessage,
+            $this->basepackages->dashboards->packagesData->responseCode
+        );
     }
 
     public function getWidgetContentAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->dashboards->getWidgetContent($this->postData());
+        $this->basepackages->dashboards->getWidgetContent($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->dashboards->packagesData->responseMessage,
-                $this->basepackages->dashboards->packagesData->responseCode,
-                $this->basepackages->dashboards->packagesData->responseData
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->dashboards->packagesData->responseMessage,
+            $this->basepackages->dashboards->packagesData->responseCode,
+            $this->basepackages->dashboards->packagesData->responseData
+        );
     }
 }

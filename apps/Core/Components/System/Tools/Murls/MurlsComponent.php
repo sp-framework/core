@@ -113,7 +113,10 @@ class MurlsComponent extends BaseComponent
 
         $this->murls->addMurl($this->postData());
 
-        $this->addResponse($this->murls->packagesData->responseMessage, $this->murls->packagesData->responseCode);
+        $this->addResponse(
+            $this->murls->packagesData->responseMessage,
+            $this->murls->packagesData->responseCode
+        );
     }
 
     /**
@@ -125,7 +128,10 @@ class MurlsComponent extends BaseComponent
 
         $this->murls->updateMurl($this->postData());
 
-        $this->addResponse($this->murls->packagesData->responseMessage, $this->murls->packagesData->responseCode);
+        $this->addResponse(
+            $this->murls->packagesData->responseMessage,
+            $this->murls->packagesData->responseCode
+        );
     }
 
     /**
@@ -137,7 +143,10 @@ class MurlsComponent extends BaseComponent
 
         $this->murls->removeMurl($this->postData());
 
-        $this->addResponse($this->murls->packagesData->responseMessage, $this->murls->packagesData->responseCode);
+        $this->addResponse(
+            $this->murls->packagesData->responseMessage,
+            $this->murls->packagesData->responseCode
+        );
     }
 
     public function generateMurlAction()
@@ -146,10 +155,10 @@ class MurlsComponent extends BaseComponent
 
         $this->murls->generateMurl($this->postData());
 
-        if ($this->murls->packagesData->responseData) {
-            $this->addResponse($this->murls->packagesData->responseMessage, $this->murls->packagesData->responseCode, $this->murls->packagesData->responseData);
-        } else {
-            $this->addResponse($this->murls->packagesData->responseMessage, $this->murls->packagesData->responseCode);
-        }
+        $this->addResponse(
+            $this->murls->packagesData->responseMessage,
+            $this->murls->packagesData->responseCode,
+            $this->murls->packagesData->responseData ?? []
+        );
     }
 }

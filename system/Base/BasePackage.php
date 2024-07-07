@@ -50,6 +50,8 @@ abstract class BasePackage extends Controller
 
 	protected $ffRelationsConditions = false;
 
+	protected $ffAddUsingUpdateOrInsert = false;
+
 	public function onConstruct()
 	{
 		$this->packagesData = new PackagesData;
@@ -86,7 +88,14 @@ abstract class BasePackage extends Controller
 	{
 		$this->ffRelations = $set;
 
-		return $set;
+		return $this->ffRelations;
+	}
+
+	public function setFFAddUsingUpdateOrInsert(bool $set)
+	{
+		$this->ffAddUsingUpdateOrInsert = $set;
+
+		return $this->ffAddUsingUpdateOrInsert;
 	}
 
 	public function setFFRelationsConditions(array $conditions)
@@ -1220,7 +1229,15 @@ abstract class BasePackage extends Controller
 			} else {
 				$this->ffStore = $this->ff->store($this->ffStoreToUse);
 
-				$create = $this->ffData = $this->ffStore->insert($data);
+				if ($this->ffAddUsingUpdateOrInsert) {
+					if (isset($data['id']) && (int) $data['id'] !== 0) {
+						$create = $this->ffData = $this->ffStore->updateOrInsert($data, false);
+					} else {
+						$create = $this->ffData = $this->ffStore->updateOrInsert($data);
+					}
+				} else {
+					$create = $this->ffData = $this->ffStore->insert($data);
+				}
 
 				$this->setFfStoreToUse();
 			}
@@ -2196,14 +2213,17 @@ abstract class BasePackage extends Controller
 								$appId,
 								$aId,
 								null,
-								$package['name'],
+								$package['display_name'] ?? $package['name'],
 								$packageRowId,
 								$notificationType
 							);
 						}
 					}
 
-					if (isset($subscriptions['email']) && count($subscriptions['email']) > 0) {
+					if ($package['name'] !== 'EmailServices' &&
+						isset($subscriptions['email']) &&
+						count($subscriptions['email']) > 0
+					) {
 						$domainId = '1';//Default Domain for system generated Notifications (like API)
 
 						if ($this->packageName === 'domains') {
@@ -2223,7 +2243,7 @@ abstract class BasePackage extends Controller
 							$domainId,
 							$appId,
 							null,
-							$package['name'],
+							$package['display_name'] ?? $package['name'],
 							$packageRowId,
 							$notificationType
 						);

@@ -51,7 +51,7 @@ class Countries
             if ($ff) {
                 $countryStore = $ff->store('basepackages_geo_countries');
 
-                $countryStore->updateOrInsert($countryToInsert);
+                $countryStore->updateOrInsert($countryToInsert, false);
             }
         }
 
@@ -76,7 +76,7 @@ class Countries
             $downloadCountry =
                 $remoteWebContent->request(
                     'GET',
-                    'https://dev.bazaari.com.au/sp-public/geodata/raw/branch/master/' . $country['iso2'] . '.zip',
+                    'https://github.com/sp-framework/geodata/raw/main/' . $country['iso2'] . '.zip',
                     [
                         'progress' => function(
                             $downloadTotal,
@@ -157,10 +157,9 @@ class Countries
         $ipv6Store = $ff->store('basepackages_geo_cities_ip2locationv6');
 
         try {
-            set_time_limit(300);//5Mins
 
-            if ($ip2location) {
-                set_time_limit(900);//15Mins
+            if (!$ip2location) {
+                set_time_limit(300);//5Mins
             }
 
             $countryData = $helper->decode($localContent->read($this->sourceDir . $country['iso2'] . '.json'), true);
@@ -187,15 +186,33 @@ class Countries
                         if ($ip2location == 'true' && isset($city['ip2locationv4'])) {
                             $ip2locationv4['id'] = $city['id'];
                             $ip2locationv4['city_id'] = $city['id'];
-                            $ip2locationv4['ip2locationv4'] = $city['ip2locationv4'];
-                            $ipv4Store->updateOrInsert($ip2locationv4, false);
+                            $ip2v4chunks = $helper->chunk($city['ip2locationv4'], 2);
+                            foreach ($ip2v4chunks as $chunk) {
+                                if (count($chunk) !== 2) {
+                                    continue;
+                                }
+
+                                $ip2locationv4['range_start'] = $chunk[0];
+                                $ip2locationv4['range_end'] = $chunk[1];
+
+                                $ipv4Store->updateOrInsert($ip2locationv4, false);
+                            }
                         }
 
                         if ($ip2location == 'true' && isset($city['ip2locationv6'])) {
                             $ip2locationv6['id'] = $city['id'];
                             $ip2locationv6['city_id'] = $city['id'];
-                            $ip2locationv6['ip2locationv6'] = $city['ip2locationv6'];
-                            $ipv6Store->updateOrInsert($ip2locationv6, false);
+                            $ip2v6chunks = $helper->chunk($city['ip2locationv6'], 2);
+                            foreach ($ip2v6chunks as $chunk) {
+                                if (count($chunk) !== 2) {
+                                    continue;
+                                }
+
+                                $ip2locationv6['range_start'] = $chunk[0];
+                                $ip2locationv6['range_end'] = $chunk[1];
+
+                                $ipv6Store->updateOrInsert($ip2locationv6, false);
+                            }
                         }
 
                         unset($city['ip2locationv4']);

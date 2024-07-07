@@ -979,6 +979,9 @@ class Core extends BasePackage
 		if (isset($data['password_policy_forgotten_password_timeout'])) {
 			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyForgottenPasswordTimeout'] = $data['password_policy_forgotten_password_timeout'];
 		}
+		if (isset($data['password_check_hibp'])) {
+			$this->core['settings']['security']['passwordPolicySettings']['passwordCheckHibp'] = $data['password_check_hibp'];
+		}
 		if (isset($data['password_policy_complexity'])) {
 			$this->core['settings']['security']['passwordPolicySettings']['passwordPolicyComplexity'] = $data['password_policy_complexity'];
 		}

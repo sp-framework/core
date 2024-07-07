@@ -16,85 +16,6 @@ class NotificationsComponent extends BaseComponent
         $this->notifications = $this->basepackages->notifications;
     }
 
-    public function fetchNewNotificationsCountAction()
-    {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-            $this->notifications->fetchNewNotificationsCount();
-
-            $this->addResponse(
-                $this->notifications->packagesData->responseMessage,
-                $this->notifications->packagesData->responseCode,
-                $this->notifications->packagesData->responseData
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
-    }
-
-    public function changeStateAction()
-    {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-            $this->notifications->changeNotificationState($this->postData());
-
-            $this->addResponse(
-                $this->notifications->packagesData->responseMessage,
-                $this->notifications->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
-    }
-
-    public function markReadAction()
-    {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-
-            if (isset($this->postData()['bulk'])) {
-                $this->notifications->bulk($this->postData());
-            } else {
-                $this->notifications->markRead($this->postData());
-            }
-
-            $this->addResponse(
-                $this->notifications->packagesData->responseMessage,
-                $this->notifications->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
-    }
-
-    public function markArchiveAction()
-    {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-
-            if (isset($this->postData()['bulk'])) {
-                $this->notifications->bulk($this->postData());
-            } else {
-                $this->notifications->markArchive($this->postData());
-            }
-
-            $this->addResponse(
-                $this->notifications->packagesData->responseMessage,
-                $this->notifications->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
-    }
-
     /**
      * @acl(name=view)
      */
@@ -135,9 +56,9 @@ class NotificationsComponent extends BaseComponent
             $this->notifications,
             'system/notifications/view',
             $conditions,
-            ['package_row_id', 'read', '[notification_type]', '[notification_details]', '[notification_title]', 'created_by', 'created_at', 'package_name', 'archive'],
+            ['package_row_id', 'read', 'notification_type', 'notification_details', 'notification_title', 'created_by', 'created_at', 'package_name', 'archive'],
             true,
-            ['package_row_id', 'read', '[notification_type]', '[notification_details]', '[notification_title]', 'created_by', 'created_at', 'package_name', 'archive'],
+            ['package_row_id', 'read', 'notification_type', 'notification_details', 'notification_title', 'created_by', 'created_at', 'package_name', 'archive'],
             null,
             [
                 'package_row_id'        => 'link',
@@ -165,24 +86,18 @@ class NotificationsComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if (isset($this->postData()['bulk'])) {
-                $this->notifications->bulk($this->postData());
-            } else {
-                $this->notifications->removeNotification($this->postData());
-            }
-
-            $this->addResponse(
-                $this->notifications->packagesData->responseMessage,
-                $this->notifications->packagesData->responseCode
-            );
+        if (isset($this->postData()['bulk'])) {
+            $this->notifications->bulk($this->postData());
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->notifications->removeNotification($this->postData());
         }
+
+        $this->addResponse(
+            $this->notifications->packagesData->responseMessage,
+            $this->notifications->packagesData->responseCode
+        );
     }
 
     protected function replaceColumns($dataArr)
@@ -202,11 +117,11 @@ class NotificationsComponent extends BaseComponent
 
     protected function generateType($rowId, $data)
     {
-        if ($data['notification_type'] === '0') {
+        if ($data['notification_type'] == '0') {
             $data['notification_type'] = '<span class="badge badge-info text-uppercase">INFO</span>';
-        } else if ($data['notification_type'] === '1') {
+        } else if ($data['notification_type'] == '1') {
             $data['notification_type'] = '<span class="badge badge-warning text-uppercase">WARNING</span>';
-        } else if ($data['notification_type'] === '2') {
+        } else if ($data['notification_type'] == '2') {
             $data['notification_type'] = '<span class="badge badge-danger text-uppercase">ERROR</span>';
         }
 
@@ -219,7 +134,9 @@ class NotificationsComponent extends BaseComponent
 
         foreach ($this->modules->packages->packages as $packageKey => $package) {
             if ($package['settings'] && $package['settings'] !== '' && $package['settings'] !== '[]') {
-                $package['settings'] = $this->helper->decode($package['settings'], true);
+                if (!is_array($package['settings'])) {
+                    $package['settings'] = $this->helper->decode($package['settings'], true);
+                }
                 if (isset($package['settings']['componentRoute'])) {
                     $routeLinks[$package['name']] = $package['settings']['componentRoute'];
                 }
@@ -232,7 +149,7 @@ class NotificationsComponent extends BaseComponent
     protected function generateUserInfo($rowId, $data)
     {
         if ($data['created_by'] && $data['created_by'] != '0') {
-            $profile = $this->basepackages->profile->getProfile($data['created_by']);
+            $profile = $this->basepackages->profiles->getProfile($data['created_by']);
 
             if ($profile) {
                 $data['created_by'] = $profile['full_name'];
@@ -303,11 +220,68 @@ class NotificationsComponent extends BaseComponent
     {
         if ($data['notification_details'] !== '') {
             $data['notification_details'] =
-                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-view-__control-' . $rowId . '" href="' . $this->links->url('system/notifications/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-primary btn-xs rowView text-uppercase contentAjaxLink" data-notificationtextfromcolumn="notification_title">
+                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-view-__control-' . $rowId . '" href="' . $this->links->url('system/notifications/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-primary btn-xs rowView text-uppercase contentAjaxLink">
                     <i class="fas fa-fw fa-xs fa-eye"></i>
                 </a>';
         }
 
         return $data;
+    }
+
+    public function fetchNewNotificationsCountAction()
+    {
+        $this->requestIsPost();
+
+        $this->notifications->fetchNewNotificationsCount();
+
+        $this->addResponse(
+            $this->notifications->packagesData->responseMessage,
+            $this->notifications->packagesData->responseCode,
+            $this->notifications->packagesData->responseData
+        );
+    }
+
+    public function changeStateAction()
+    {
+        $this->requestIsPost();
+
+        $this->notifications->changeNotificationState($this->postData());
+
+        $this->addResponse(
+            $this->notifications->packagesData->responseMessage,
+            $this->notifications->packagesData->responseCode
+        );
+    }
+
+    public function markReadAction()
+    {
+        $this->requestIsPost();
+
+        if (isset($this->postData()['bulk'])) {
+            $this->notifications->bulk($this->postData());
+        } else {
+            $this->notifications->markRead($this->postData());
+        }
+
+        $this->addResponse(
+            $this->notifications->packagesData->responseMessage,
+            $this->notifications->packagesData->responseCode
+        );
+    }
+
+    public function markArchiveAction()
+    {
+        $this->requestIsPost();
+
+        if (isset($this->postData()['bulk'])) {
+            $this->notifications->bulk($this->postData());
+        } else {
+            $this->notifications->markArchive($this->postData());
+        }
+
+        $this->addResponse(
+            $this->notifications->packagesData->responseMessage,
+            $this->notifications->packagesData->responseCode
+        );
     }
 }

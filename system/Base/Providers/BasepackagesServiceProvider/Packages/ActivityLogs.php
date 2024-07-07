@@ -112,7 +112,7 @@ class ActivityLogs extends BasePackage
                     $account = $this->basepackages->accounts->getById($log['account_id']);
                     $log['account_email'] = $account['email'];
 
-                    $profile = $this->basepackages->profile->getProfile($log['account_id']);
+                    $profile = $this->basepackages->profiles->getProfile($log['account_id']);
                     $log['account_full_name'] = $profile['full_name'];
 
                     unset($log['account_id']);

@@ -64,8 +64,18 @@ class Accounts extends BasePackage
             }
 
             $account['profile'] = [];
-            if ($this->model->getProfile()) {
-                $account['profile'] = $this->model->getProfile()->toArray();
+            if ($account['profile_package_name'] === 'UsersProfiles') {
+                if ($this->model->getProfile()) {
+                    $account['profile'] = $this->model->getProfile()->toArray();
+                }
+            } else {
+                $profilePackage = $this->modules->packages->getPackageByName($account['profile_package_name']);
+
+                if ($profilePackage) {
+                    $profilePackageClass = new $profilePackage['class']();
+
+                    $account['profile'] = $profilePackageClass->getById((int) $account['profile_package_row_id']);
+                }
             }
 
             $account['role'] = [];
@@ -93,6 +103,16 @@ class Accounts extends BasePackage
             return $account;
         } else {
             if ($this->ffData) {
+                if ($this->ffData['profile_package_name'] !== 'UsersProfiles') {
+                    $profilePackage = $this->modules->packages->getPackageByName($this->ffData['profile_package_name']);
+
+                    if ($profilePackage) {
+                        $profilePackageClass = new $profilePackage['class']();
+
+                        $this->ffData['profile'] = $profilePackageClass->getById((int) $this->ffData['profile_package_row_id']);
+                    }
+                }
+
                 if ($this->ffData['api_clients'] && is_array($this->ffData['api_clients']) && count($this->ffData['api_clients']) > 0) {
                     foreach ($this->ffData['api_clients'] as &$client) {
                         if (isset($client['client_secret']) && $client['client_secret'] !== '') {
@@ -100,6 +120,8 @@ class Accounts extends BasePackage
                         }
                     }
                 }
+
+                $this->ffData = $this->jsonData($this->ffData, true);
 
                 return $this->ffData;
             }
@@ -128,7 +150,7 @@ class Accounts extends BasePackage
         $account = $this->checkAccountBy($data['email']);
 
         if ($account) {
-            if (isset($data['package_name']) && $data['package_name'] !== 'profiles') {
+            if (isset($data['profile_package_name']) && $data['profile_package_name'] !== 'UsersProfiles') {
                 $account = array_merge($account, $data);
 
                 $account['account_id'] = $account['id'];
@@ -157,11 +179,11 @@ class Accounts extends BasePackage
 
         $data['password_set_on'] = time();
 
-        if (!isset($data['package_name'])) {
-            $data['package_name'] = 'profiles';
+        if (!isset($data['profile_package_name'])) {
+            $data['profile_package_name'] = 'UsersProfiles';
         }
-        if (!isset($data['package_row_id'])) {
-            $data['package_row_id'] = '0';
+        if (!isset($data['profile_package_row_id'])) {
+            $data['profile_package_row_id'] = '0';
         }
 
         if ($this->add($data)) {
@@ -173,10 +195,10 @@ class Accounts extends BasePackage
 
             $this->addUpdateSecurity($id, $data);
 
-            $this->basepackages->profile->addProfile($data);
+            $this->basepackages->profiles->addProfile($data);
 
-            if ($data['package_name'] === 'profiles') {
-                $data['package_row_id'] = $this->basepackages->profile->packagesData->responseData['id'];
+            if ($data['profile_package_name'] === 'UsersProfiles') {
+                $data['profile_package_row_id'] = $this->basepackages->profiles->packagesData->last['id'];
 
                 $this->update($data);
             }
@@ -285,10 +307,13 @@ class Accounts extends BasePackage
             $data['twofa_otp_secret'] = null;
         }
 
-        if (!isset($data['package_name']) ||
-            $data['package_name'] === ''
+        if (!isset($data['profile_package_name']) ||
+            $data['profile_package_name'] === ''
         ) {
-            $data['package_name'] = 'profiles';
+            $data['profile_package_name'] = 'UsersProfiles';
+        }
+        if (!isset($data['profile_package_row_id'])) {
+            $data['profile_package_row_id'] = (int) $account['profile_package_row_id'];
         }
 
         if ($this->update($data)) {
@@ -300,9 +325,7 @@ class Accounts extends BasePackage
                 $this->emailNewPassword($data['email'], $password);
             }
 
-            if ($this->auth->account()) {
-                $this->basepackages->profile->updateProfileViaAccount($data);
-            }
+            $this->basepackages->profiles->updateProfileViaAccount($data);
 
             $this->addUpdateSecurity($account['id'], $data);
 
@@ -1292,7 +1315,7 @@ class Accounts extends BasePackage
                 $this->packagesData->acls = $this->helper->encode($acls);
 
                 $account['security']['permissions'] = $this->helper->encode($permissions);
-                $account['profile'] = $this->basepackages->profile->getProfile($account['id']);
+                $account['profile'] = $this->basepackages->profiles->getProfile($account['id']);
 
                 $this->packagesData->account = $account;
             } else {

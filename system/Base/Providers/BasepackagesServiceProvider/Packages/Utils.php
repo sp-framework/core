@@ -13,7 +13,11 @@ class Utils extends BasePackage
 {
     protected $microtime = 0;
 
+    protected $memoryusage = 0;
+
     protected $microTimers = [];
+
+    protected $hibpUri = 'https://api.pwnedpasswords.com/range/';
 
     public function init($container = null)
     {
@@ -66,6 +70,67 @@ class Utils extends BasePackage
         } else {
             return null;
         }
+    }
+
+    public function checkPwHibp(string $pass)
+    {
+        if ($pass === '') {
+            $this->addResponse('Enter correct password', 1);
+
+            return false;
+        }
+
+        $hash = strtoupper(sha1(trim($pass)));
+
+        $hashFile = substr($hash, 0, 5);
+
+        $hash = str_replace($hashFile, '', $hash);
+
+        try {
+            $apiResponse =
+                $this->remoteWebContent->request(
+                    'GET',
+                    $this->hibpUri . $hashFile,
+                        [
+                            'debug'           => false,
+                            'http_errors'     => true,
+                            'timeout'         => 10,
+                            'verify'          => false
+                        ]
+                );
+
+            if ($apiResponse->getStatusCode() === 200) {
+                $hibpData = $apiResponse->getBody()->getContents();
+
+                $hibpArr = [];
+
+                if ($hibpData !== '') {
+                    $hibpDataArr = explode(PHP_EOL, trim($hibpData));
+
+                    foreach ($hibpDataArr as $hibpDataLine) {
+                        $hibpDataLineArr = explode(':', trim($hibpDataLine));
+
+                        $hibpArr[$hibpDataLineArr[0]] = (int) $hibpDataLineArr[1];
+                    }
+                }
+
+                if (isset($hibpArr[$hash])) {
+                    $this->addResponse('Check Ok', 0, ['pwned' => true, 'amount' => $hibpArr[$hash]]);
+                } else {
+                    $this->addResponse('Check Ok', 0, ['pwned' => false, 'amount' => 0]);
+                }
+
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        $this->addResponse('Error Checking Password', 1);
+
+        return false;
     }
 
     public function checkPwStrength(string $pass)
@@ -472,17 +537,28 @@ class Utils extends BasePackage
         return $data['json'];
     }
 
-    public function setMicroTimer($reference)
+    public function setMicroTimer($reference, $calculateMemoryUsage = false)
     {
         $microtime['reference'] = $reference;
 
         if ($this->microtime === 0) {
-            $microtime['difference'] = '-';
+            $microtime['difference'] = 0;
             $this->microtime = microtime(true);
         } else {
             $now = microtime(true);
             $microtime['difference'] = $now - $this->microtime;
             $this->microtime = $now;
+        }
+
+        if ($calculateMemoryUsage) {
+            if ($this->memoryusage === 0) {
+                $microtime['memoryusage'] = 0;
+                $this->memoryusage = memory_get_usage();
+            } else {
+                $currentMemoryUsage = memory_get_usage();
+                $microtime['memoryusage'] = $this->getMemUsage($currentMemoryUsage - $this->memoryusage);
+                $this->memoryusage = $currentMemoryUsage;
+            }
         }
 
         array_push($this->microTimers, $microtime);
@@ -491,5 +567,12 @@ class Utils extends BasePackage
     public function getMicroTimer()
     {
         return $this->microTimers;
+    }
+
+    protected function getMemUsage($bytes)
+    {
+        $unit=array('b','kb','mb','gb','tb','pb');
+
+        return @round($bytes/pow(1024,($i=floor(log($bytes,1024)))),2).' '.$unit[$i];
     }
 }

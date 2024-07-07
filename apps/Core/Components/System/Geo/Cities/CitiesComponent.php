@@ -105,20 +105,14 @@ class CitiesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->geoCities->addCity($this->postData());
+        $this->geoCities->addCity($this->postData());
 
-            $this->addResponse(
-                $this->geoCities->packagesData->responseMessage,
-                $this->geoCities->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->geoCities->packagesData->responseMessage,
+            $this->geoCities->packagesData->responseCode
+        );
     }
 
     /**
@@ -126,42 +120,59 @@ class CitiesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->geoCities->updateCity($this->postData());
+        $this->geoCities->updateCity($this->postData());
 
-            $this->addResponse(
-                $this->geoCities->packagesData->responseMessage,
-                $this->geoCities->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->geoCities->packagesData->responseMessage,
+            $this->geoCities->packagesData->responseCode
+        );
     }
 
     public function searchCityAction()
     {
-        if ($this->request->isPost()) {
-            if ($this->postData()['search']) {
-                $searchQuery = $this->postData()['search'];
+        $this->requestIsPost();
 
-                if (strlen($searchQuery) < 3) {
-                    return;
-                }
+        if ($this->postData()['search']) {
+            $searchQuery = $this->postData()['search'];
 
-                $searchCities = $this->basepackages->geoCities->searchCities($searchQuery);
-
-                if ($searchCities) {
-                    $this->view->responseCode = $this->basepackages->geoCities->packagesData->responseCode;
-
-                    $this->view->cities = $this->basepackages->geoCities->packagesData->cities;
-                }
-            } else {
-                $this->addResponse('Search Query Missing', 1);
+            if (strlen($searchQuery) < 3) {
+                return;
             }
+
+            $searchCities = $this->basepackages->geoCities->searchCities($searchQuery);
+
+            if ($searchCities) {
+                $this->view->responseCode = $this->basepackages->geoCities->packagesData->responseCode;
+
+                $this->view->cities = $this->basepackages->geoCities->packagesData->cities;
+            }
+        } else {
+            $this->addResponse('Search Query Missing', 1);
+        }
+    }
+
+    public function searchPostCodeAction()
+    {
+        $this->requestIsPost();
+
+        if ($this->postData()['search']) {
+            $searchQuery = $this->postData()['search'];
+
+            if (strlen($searchQuery) < 3) {
+                return;
+            }
+
+            $searchPostCodes = $this->basepackages->geoCities->searchPostCodes($searchQuery);
+
+            if ($searchPostCodes) {
+                $this->view->responseCode = $this->basepackages->geoCities->packagesData->responseCode;
+
+                $this->view->postCodes = $this->basepackages->geoCities->packagesData->postCodes;
+            }
+        } else {
+            $this->addResponse('Search Query Missing', 1);
         }
     }
 }

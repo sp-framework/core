@@ -674,7 +674,6 @@ class Single
             '"' . $this->compSecId . '-city_id"         : { },
             "' . $this->compSecId . '-city_name"        : {
                 afterInit   : function() {
-
                     dataCollectionSection["' . $this->compSecId . '-form"]["autoCompleteCities"] =
                         new autoComplete({
                             data: {
@@ -799,7 +798,124 @@ class Single
     protected function inclPostCodeJs()
     {
         return
-            '"' . $this->compSecId . '-post_code"        : { },';
+            '"' . $this->compSecId . '-post_code"        : {
+                afterInit   : function() {
+                    dataCollectionSection["' . $this->compSecId . '-form"]["autoCompleteCities"] =
+                        new autoComplete({
+                            data: {
+                                src: async() => {
+                                    const url = "' . $this->links->url("system/geo/cities/searchPostCode") . '";
+
+                                    var myHeaders = new Headers();
+                                    myHeaders.append("accept", "application/json");
+
+                                    var formdata = new FormData();
+                                    formdata.append("search", document.querySelector("#' . $this->compSecId . '-post_code").value);
+                                    formdata.append($("#security-token").attr("name"), $("#security-token").val());
+
+                                    var requestOptions = {
+                                        method: "POST",
+                                        headers: myHeaders,
+                                        body: formdata
+                                    };
+
+                                    const responseData = await fetch(url, requestOptions);
+
+                                    const response = await responseData.json();
+
+                                    if (response.tokenKey && response.token) {
+                                        $("#security-token").attr("postcode", response.tokenKey);
+                                        $("#security-token").val(response.token);
+                                    }
+                                    if (response.postCodes) {
+                                        return response.postCodes;
+                                    } else {
+                                        return [];
+                                    }
+                                },
+                                key: ["postcode"],
+                                cache: false
+                            },
+                            selector: "#' . $this->compSecId . '-post_code",
+                            threshold : 4,
+                            debounce: 500,
+                            searchEngine: "strict",
+                            resultsList: {
+                                render: true,
+                                container: source => {
+                                    source.setAttribute("id", "' . $this->compSecId . '-post_code_list");
+                                    source.setAttribute("class", "autoComplete_results");
+                                },
+                                destination: "#' . $this->compSecId . '-post_code",
+                                position: "afterend",
+                                element: "div",
+                                className: "autoComplete_results"
+                            },
+                            maxResults: 5,
+                            highlight: true,
+                            resultItem: {
+                                content: (data, source) => {
+                                    var cityName = "";
+
+                                    if (data.value.name) {
+                                        cityName = data.value.name;
+                                    }
+
+                                    source.innerHTML = data.match + " <span>(City: " + cityName + ", State: " + data.value.state_name + ", Country: " + data.value.country_name + ")</span>";
+                                },
+                                element: "div"
+                            },
+                            noResults: () => {
+                                const result = document.createElement("li");
+                                result.setAttribute("class", "autoComplete_result text-danger");
+                                result.setAttribute("tabindex", "1");
+                                result.innerHTML = "No search results. Click field help for more information.";
+
+                                if (document.querySelector("#' . $this->compSecId . '-post_code_list")) {
+                                    $("#' . $this->compSecId . '-post_code_list").empty().append(result);
+                                } else {
+                                    $("#' . $this->compSecId . '-post_code").parent(".form-group").append(
+                                        \'<div id="' . $this->compSecId . '-post_code_list" class="autoComplete_results"></div>\'
+                                    );
+                                    document.querySelector("#' . $this->compSecId . '-post_code_list").appendChild(result);
+                                }
+                            },
+                            onSelection: feedback => {
+                                $("#' . $this->compSecId . '-city_id").val(feedback.selection.value.id);
+                                $("#' . $this->compSecId . '-city_id").attr("value", feedback.selection.value.id);
+                                $("#' . $this->compSecId . '-city_name").blur();
+                                $("#' . $this->compSecId . '-city_name").val(feedback.selection.value.name);
+                                $("#' . $this->compSecId . '-post_code").val(feedback.selection.value.postcode);
+                                $("#' . $this->compSecId . '-post_code").attr("value", feedback.selection.value.postcode);
+                                $("#' . $this->compSecId . '-state_id").val(feedback.selection.value.state_id);
+                                $("#' . $this->compSecId . '-state_id").attr("value", feedback.selection.value.state_id);
+                                $("#' . $this->compSecId . '-state_name").val(feedback.selection.value.state_name);
+                                $("#' . $this->compSecId . '-state_name").attr("value", feedback.selection.value.state_name);
+                                $("#' . $this->compSecId . '-country_id").val(feedback.selection.value.country_id);
+                                $("#' . $this->compSecId . '-country_id").attr("value", feedback.selection.value.country_id);
+                                $("#' . $this->compSecId . '-country_name").val(feedback.selection.value.country_name);
+                                $("#' . $this->compSecId . '-country_name").attr("value", feedback.selection.value.country_name);
+                            }
+                    });
+                    // On delete
+                    $("#' . $this->compSecId . '-post_code").on("input propertychange", function() {
+                        $("#' . $this->compSecId . '-city_id").val(0);
+                        $("#' . $this->compSecId . '-city_id").attr("value", 0);
+                        $("#' . $this->compSecId . '-state_id").val(0);
+                        $("#' . $this->compSecId . '-state_id").attr("value", 0);
+                        $("#' . $this->compSecId . '-state_name").val("");
+                        $("#' . $this->compSecId . '-state_name").attr("value", "");
+                        $("#' . $this->compSecId . '-country_id").val(0);
+                        $("#' . $this->compSecId . '-country_id").attr("value", 0);
+                        $("#' . $this->compSecId . '-country_name").val("");
+                        $("#' . $this->compSecId . '-country_name").attr("value", "");
+                    });
+
+                    $("#' . $this->compSecId . '-post_code").focusout(function() {
+                        $("#' . $this->compSecId . '-post_code_list").children("li").remove();
+                    });
+                }
+            },';
     }
 
     protected function inclStateJs()
@@ -808,7 +924,6 @@ class Single
             '"' . $this->compSecId . '-state_id"         : { },
             "' . $this->compSecId . '-state_name"       : {
                 afterInit   : function() {
-
                     dataCollectionSection["' . $this->compSecId . '-form"]["autoCompleteStates"] =
                         new autoComplete({
                             data: {
@@ -872,7 +987,15 @@ class Single
                                 result.setAttribute("class", "autoComplete_result text-danger");
                                 result.setAttribute("tabindex", "1");
                                 result.innerHTML = "No search results. Click field help for more information.";
-                                document.querySelector("#' . $this->compSecId . '-state_name_list").appendChild(result);
+
+                                if (document.querySelector("#' . $this->compSecId . '-state_name_list")) {
+                                    $("#' . $this->compSecId . '-state_name_list").empty().append(result);
+                                } else {
+                                    $("#' . $this->compSecId . '-state_name").parent(".form-group").append(
+                                        \'<div id="' . $this->compSecId . '-state_name_list" class="autoComplete_results"></div>\'
+                                    );
+                                    document.querySelector("#' . $this->compSecId . '-state_name_list").appendChild(result);
+                                }
                             },
                             onSelection: feedback => {
                                 $("#' . $this->compSecId . '-state_id").val(feedback.selection.value.id);
@@ -911,7 +1034,6 @@ class Single
             '"' . $this->compSecId . '-country_id"       : { },
             "' . $this->compSecId . '-country_name"     : {
                 afterInit   : function() {
-
                     dataCollectionSection["' . $this->compSecId . '-form"]["autoCompleteCountries"] =
                         new autoComplete({
                             data: {
@@ -976,7 +1098,14 @@ class Single
                                 result.setAttribute("class", "autoComplete_result text-danger");
                                 result.setAttribute("tabindex", "1");
                                 result.innerHTML = "No search results. Click field help for more information.";
-                                document.querySelector("#' . $this->compSecId . '-country_name_list").appendChild(result);
+                                if (document.querySelector("#' . $this->compSecId . '-country_name_list")) {
+                                    $("#' . $this->compSecId . '-country_name_list").empty().append(result);
+                                } else {
+                                    $("#' . $this->compSecId . '-country_name").parent(".form-group").append(
+                                        \'<div id="' . $this->compSecId . '-country_name_list" class="autoComplete_results"></div>\'
+                                    );
+                                    document.querySelector("#' . $this->compSecId . '-country_name_list").appendChild(result);
+                                }
                             },
                             onSelection: feedback => {
                                 $("#' . $this->compSecId . '-country_id").val(feedback.selection.value.id);

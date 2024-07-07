@@ -191,252 +191,186 @@ class CoreComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->core->updateCore($this->postData());
+        $this->core->updateCore($this->postData());
 
-            $this->addResponse(
-                $this->core->packagesData->responseMessage,
-                $this->core->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->core->packagesData->responseMessage,
+            $this->core->packagesData->responseCode
+        );
     }
 
     public function resetAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->core->reset()) {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode
-                );
-            }
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
+        if ($this->core->reset()) {
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode
+            );
         }
     }
 
     public function backupDbAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->core->backupDb($this->postData())) {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode,
-                    $this->core->packagesData->responseData,
-                );
-            } else {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode
-                );
-            }
+        if ($this->core->backupDb($this->postData())) {
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode,
+                $this->core->packagesData->responseData,
+            );
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode
+            );
         }
     }
 
     public function restoreDbAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->core->restoreDb($this->postData())) {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode,
-                    $this->core->packagesData->responseData,
-                );
-            } else {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode
-                );
-            }
+        if ($this->core->restoreDb($this->postData())) {
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode,
+                $this->core->packagesData->responseData,
+            );
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode
+            );
         }
     }
 
     public function removeDbAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->core->removeDb($this->postData())) {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode,
-                    $this->core->packagesData->responseData,
-                );
-            } else {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode
-                );
-            }
+        if ($this->core->removeDb($this->postData())) {
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode,
+                $this->core->packagesData->responseData,
+            );
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode
+            );
         }
     }
 
     public function updateDbAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->core->updateDb($this->postData())) {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode,
-                    $this->core->packagesData->responseData,
-                );
-            } else {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode
-                );
-            }
+        if ($this->core->updateDb($this->postData())) {
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode,
+                $this->core->packagesData->responseData,
+            );
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode
+            );
         }
     }
 
     public function maintainFfAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->core->maintainFf($this->postData())) {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode
-                );
-            } else {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode
-                );
-            }
+        if ($this->core->maintainFf($this->postData())) {
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode
+            );
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode
+            );
         }
     }
 
     public function backupFfAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->core->backupFf($this->postData())) {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode,
-                    $this->core->packagesData->responseData,
-                );
-            } else {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode
-                );
-            }
+        if ($this->core->backupFf($this->postData())) {
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode,
+                $this->core->packagesData->responseData,
+            );
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode
+            );
         }
     }
 
     public function restoreFfAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->core->restoreFf($this->postData())) {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode,
-                    $this->core->packagesData->responseData,
-                );
-            } else {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode
-                );
-            }
+        if ($this->core->restoreFf($this->postData())) {
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode,
+                $this->core->packagesData->responseData,
+            );
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode
+            );
         }
     }
 
     public function removeFfAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->core->removeFf($this->postData())) {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode,
-                    $this->core->packagesData->responseData,
-                );
-            } else {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode
-                );
-            }
+        if ($this->core->removeFf($this->postData())) {
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode,
+                $this->core->packagesData->responseData,
+            );
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode
+            );
         }
     }
 
     public function updateFfAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->core->updateFf($this->postData())) {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode,
-                    $this->core->packagesData->responseData,
-                );
-            } else {
-                $this->addResponse(
-                    $this->core->packagesData->responseMessage,
-                    $this->core->packagesData->responseCode
-                );
-            }
+        if ($this->core->updateFf($this->postData())) {
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode,
+                $this->core->packagesData->responseData,
+            );
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse(
+                $this->core->packagesData->responseMessage,
+                $this->core->packagesData->responseCode
+            );
         }
     }
 }

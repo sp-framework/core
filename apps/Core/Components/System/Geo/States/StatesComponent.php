@@ -92,20 +92,14 @@ class StatesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->geoStates->addState($this->postData());
+        $this->geoStates->addState($this->postData());
 
-            $this->addResponse(
-                $this->geoStates->packagesData->responseMessage,
-                $this->geoStates->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->geoStates->packagesData->responseMessage,
+            $this->geoStates->packagesData->responseCode
+        );
     }
 
     /**
@@ -113,42 +107,36 @@ class StatesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->geoStates->updateState($this->postData());
+        $this->geoStates->updateState($this->postData());
 
-            $this->addResponse(
-                $this->geoStates->packagesData->responseMessage,
-                $this->geoStates->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->geoStates->packagesData->responseMessage,
+            $this->geoStates->packagesData->responseCode
+        );
     }
 
     public function searchStateAction()
     {
-        if ($this->request->isPost()) {
-            if ($this->postData()['search']) {
-                $searchQuery = $this->postData()['search'];
+        $this->requestIsPost();
 
-                if (strlen($searchQuery) < 3) {
-                    return;
-                }
+        if ($this->postData()['search']) {
+            $searchQuery = $this->postData()['search'];
 
-                $searchStates = $this->basepackages->geoStates->searchStates($searchQuery);
-
-                if ($searchStates) {
-                    $this->view->responseCode = $this->basepackages->geoStates->packagesData->responseCode;
-
-                    $this->view->states = $this->basepackages->geoStates->packagesData->states;
-                }
-            } else {
-                $this->addResponse('Search Query Missing', 1);
+            if (strlen($searchQuery) < 3) {
+                return;
             }
+
+            $searchStates = $this->basepackages->geoStates->searchStates($searchQuery);
+
+            if ($searchStates) {
+                $this->view->responseCode = $this->basepackages->geoStates->packagesData->responseCode;
+
+                $this->view->states = $this->basepackages->geoStates->packagesData->states;
+            }
+        } else {
+            $this->addResponse('Search Query Missing', 1);
         }
     }
 }

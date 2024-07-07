@@ -70,43 +70,31 @@ class BackuprestoreComponent extends BaseComponent
 
     public function backupAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            if ($this->basepackages->backuprestore->init()->backup($this->postData())) {
-                $this->addResponse(
-                    $this->basepackages->backuprestore->packagesData->responseMessage,
-                    $this->basepackages->backuprestore->packagesData->responseCode,
-                    $this->basepackages->backuprestore->packagesData->responseData,
-                );
-            } else {
-                $this->addResponse(
-                    $this->basepackages->backuprestore->packagesData->responseMessage,
-                    $this->basepackages->backuprestore->packagesData->responseCode
-                );
-            }
+        if ($this->basepackages->backuprestore->init()->backup($this->postData())) {
+            $this->addResponse(
+                $this->basepackages->backuprestore->packagesData->responseMessage,
+                $this->basepackages->backuprestore->packagesData->responseCode,
+                $this->basepackages->backuprestore->packagesData->responseData,
+            );
         } else {
-            $this->addResponse('Method Not Allowed', 1);
+            $this->addResponse(
+                $this->basepackages->backuprestore->packagesData->responseMessage,
+                $this->basepackages->backuprestore->packagesData->responseCode
+            );
         }
     }
 
     public function restoreAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->basepackages->backuprestore->init('restore')->restore($this->postData());
+        $this->basepackages->backuprestore->init('restore')->restore($this->postData());
 
-            $this->addResponse(
-                $this->basepackages->backuprestore->packagesData->responseMessage,
-                $this->basepackages->backuprestore->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->basepackages->backuprestore->packagesData->responseMessage,
+            $this->basepackages->backuprestore->packagesData->responseCode
+        );
     }
 }

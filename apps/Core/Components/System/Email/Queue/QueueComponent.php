@@ -172,20 +172,14 @@ class QueueComponent extends BaseComponent
      */
     public function changePriorityAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->emailqueue->changePriority($this->postData());
+        $this->emailqueue->changePriority($this->postData());
 
-            $this->addResponse(
-                $this->emailqueue->packagesData->responseMessage,
-                $this->emailqueue->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->emailqueue->packagesData->responseMessage,
+            $this->emailqueue->packagesData->responseCode
+        );
     }
 
     /**
@@ -193,68 +187,53 @@ class QueueComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            $this->emailqueue->removeEmailService($this->postData());
+        $this->emailqueue->removeEmailService($this->postData());
 
-            $this->addResponse(
-                $this->emailqueue->packagesData->responseMessage,
-                $this->emailqueue->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->emailqueue->packagesData->responseMessage,
+            $this->emailqueue->packagesData->responseCode
+        );
     }
 
     public function processQueueAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $priority = 0;
-            $confidential = false;
-            $id = null;
+        $priority = 0;
+        $confidential = false;
+        $id = null;
 
-            if (isset($this->postData()['priority'])) {
-                $priority = $this->postData()['priority'];
-            }
-
-            if (isset($this->postData()['confidential'])) {
-                $confidential = $this->postData()['confidential'];
-            }
-
-            if (isset($this->postData()['id'])) {
-                $id = $this->postData()['id'];
-            }
-
-            $this->emailqueue->processQueue($priority, $confidential, $id);
-
-            $this->addResponse(
-                $this->emailqueue->packagesData->responseMessage,
-                $this->emailqueue->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
+        if (isset($this->postData()['priority'])) {
+            $priority = $this->postData()['priority'];
         }
+
+        if (isset($this->postData()['confidential'])) {
+            $confidential = $this->postData()['confidential'];
+        }
+
+        if (isset($this->postData()['id'])) {
+            $id = $this->postData()['id'];
+        }
+
+        $this->emailqueue->processQueue($priority, $confidential, $id);
+
+        $this->addResponse(
+            $this->emailqueue->packagesData->responseMessage,
+            $this->emailqueue->packagesData->responseCode
+        );
     }
 
     public function requeueAction()
     {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->requestIsPost();
 
-            $this->emailqueue->reQueue($this->postData());
+        $this->emailqueue->reQueue($this->postData());
 
-            $this->addResponse(
-                $this->emailqueue->packagesData->responseMessage,
-                $this->emailqueue->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->emailqueue->packagesData->responseMessage,
+            $this->emailqueue->packagesData->responseCode
+        );
     }
 }

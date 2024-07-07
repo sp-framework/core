@@ -29,7 +29,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Qrcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Templates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profile;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profiles;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Utils;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Widgets;
@@ -41,7 +41,7 @@ class Basepackages
 
 	protected $roles;
 
-	protected $profile;
+	protected $profiles;
 
 	protected $email;
 
@@ -132,11 +132,11 @@ class Basepackages
 		return $this->roles;
 	}
 
-	protected function initProfile()
+	protected function initProfiles()
 	{
-		$this->profile = (new Profile())->init();
+		$this->profiles = (new Profiles())->init();
 
-		return $this->profile;
+		return $this->profiles;
 	}
 
 	protected function initEmail()

@@ -14,7 +14,6 @@ class ClientsComponent extends BaseComponent
      */
     public function viewAction()
     {
-
         if (isset($this->getData()['id'])) {
             $this->view->availableAPIServices =
                 array_merge(
@@ -70,7 +69,6 @@ class ClientsComponent extends BaseComponent
 
         $this->view->pick('clients/list');
     }
-
 
     protected function replaceColumns($dataArr)
     {
@@ -190,10 +188,6 @@ class ClientsComponent extends BaseComponent
             }
 
            $data['concurrent_calls_count'] = $callsCounter;
- // '   concurrent_calls_limit' => int 3
- //  per_minute_calls_limit' => int 0
- //  per_hour_calls_limit' => int 0
- //  per_day_calls_limit' => int 0
         }
 
         return $dataArr;
@@ -219,12 +213,12 @@ class ClientsComponent extends BaseComponent
      */
     public function updateAction()
     {
-        return false;
+        return;
     }
 
     public function removeAction()
     {
-        return false;
+        return;
     }
 
     public function forceRevokeAction()

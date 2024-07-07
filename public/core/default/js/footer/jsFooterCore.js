@@ -8948,7 +8948,7 @@ var BazContentFields = function() {
                     fieldId.id + '-strength-meter'
             ) {
                 $('#' + fieldId.id + '-strength-meter').strengthMeter({
-                    "url" : dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/checkPwStrength'
+                    "url" : dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/auth/checkPwStrength'
                 });
             }
 
@@ -9044,7 +9044,7 @@ var BazContentFields = function() {
                         }
                     }
 
-                    var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/generatePw'
+                    var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/auth/generatePw'
                     $.post(url, postData, function(response) {
                         if (response.responseCode == 0) {
                             PNotify.success(response.responseMessage);
@@ -10360,65 +10360,79 @@ var BazNotifications = function() {
     }
 
     //Notifications
-    function getNotificationsCount() {
-        var url = dataCollection.env.rootPath + appRoute + 'system/notifications/fetchNewNotificationsCount';
-
-        var postData = { };
-        postData[$('#security-token').attr('name')] = $('#security-token').val();
-
-        $.post(url, postData, function(response) {
-            if (response.tokenKey && response.token) {
-                $('#security-token').attr('name', response.tokenKey);
-                $('#security-token').val(response.token);
+    function getNotificationsCount(responseData = null) {
+        //eslint-disable-next-line
+        console.log(responseData);
+        if (responseData && Object.keys(responseData).length > 0) {
+            if (responseData.responseData) {
+                responseData = responseData.responseData;
             }
+            //eslint-disable-next-line
+            console.log(responseData);
+            processResponseData(responseData);
+        } else {
+            var url = dataCollection.env.rootPath + appRoute + 'system/notifications/fetchNewNotificationsCount';
 
-            if (response.responseCode == 0 && response.responseData) {
-                if (!Number.isInteger(response.responseData.count.total)) {
-                    parseInt(response.responseData.count.total);
+            var postData = { };
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+            $.post(url, postData, function(response) {
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
                 }
 
-                if (window.dataCollection.env.notifications.count) {
-                    if (response.responseData.count.total === window.dataCollection.env.notifications.count.total) {
-                        return;
-                    } else if (response.responseData.count.total < window.dataCollection.env.notifications.count.total) {
-                        window.dataCollection.env.notifications.count.total = response.responseData.count.total;
-                        updateCounter(response);
-                        return;
-                    }
-
-                    window.dataCollection.env.notifications.count.total = response.responseData.count.total;
-                    updateCounter(response);
-                } else {
-                    window.dataCollection.env.notifications.count = response.responseData.count;
-                    updateCounter(response);
+                if (response.responseCode == 0 && response.responseData) {
+                    processResponseData(response.responseData);
                 }
-
-                if (response.responseData.count.total > 0 && !response.responseData.mute) {
-                    window.dataCollection.env.sounds.notificationSound.play();
-                }
-            }
-
-        }, 'json');
+            }, 'json');
+        }
     }
 
-    function updateCounter(response) {
+    function processResponseData(responseData) {
+        if (!Number.isInteger(responseData.count.total)) {
+            parseInt(responseData.count.total);
+        }
+
+        if (window.dataCollection.env.notifications.count) {
+            if (responseData.count.total === window.dataCollection.env.notifications.count.total) {
+                return;
+            } else if (responseData.count.total < window.dataCollection.env.notifications.count.total) {
+                window.dataCollection.env.notifications.count.total = responseData.count.total;
+                updateCounter(responseData);
+                return;
+            }
+
+            window.dataCollection.env.notifications.count.total = responseData.count.total;
+            updateCounter(responseData);
+        } else {
+            window.dataCollection.env.notifications.count = responseData.count;
+            updateCounter(responseData);
+        }
+
+        if (responseData.count.total > 0 && !responseData.mute) {
+            window.dataCollection.env.sounds.notificationSound.play();
+        }
+    }
+
+    function updateCounter(responseData) {
         var notificationCount = 0;
 
-        if (response.responseData.count.error > 0) {
-            notificationCount = response.responseData.count.error;
+        if (responseData.count.error > 0) {
+            notificationCount = responseData.count.error;
             $('#notifications-button-counter').removeClass(function (index, className) {
                 return (className.match (/(^|\s)badge-\S+/g) || []).join(' ');
             }).addClass('badge-danger');
-        } else if (response.responseData.count.warning > 0) {
+        } else if (responseData.count.warning > 0) {
             $('#notifications-button-counter').removeClass(function (index, className) {
                 return (className.match (/(^|\s)badge-\S+/g) || []).join(' ');
             }).addClass('badge-warning');
-            notificationCount = response.responseData.count.warning;
+            notificationCount = responseData.count.warning;
         } else {
             $('#notifications-button-counter').removeClass(function (index, className) {
                 return (className.match (/(^|\s)badge-\S+/g) || []).join(' ');
             }).addClass('badge-info');
-            notificationCount = response.responseData.count.total;
+            notificationCount = responseData.count.total;
         }
 
         if (notificationCount === 0) {
@@ -10480,10 +10494,18 @@ var BazNotifications = function() {
         }, 10000);
     }
 
-    function onMessage(type, data) {
+    function onMessage(type, response) {
         //eslint-disable-next-line
-        console.log(type, data);
-        getNotificationsCount();
+        console.log(type, response);
+        if (response.responseCode == 0) {
+            if (response.responseData && response.responseData.count && response.responseData.mute !== 'undefined') {
+                getNotificationsCount(response.responseData);
+            } else {
+                getNotificationsCount();
+            }
+        } else {
+            getNotificationsCount();
+        }
 
         if ($('#baz-content section').length > 0) {
             var section = $('#baz-content section')[0].id.match(/notifications-listing/g);
@@ -10517,8 +10539,8 @@ var BazNotifications = function() {
         BazNotifications.onMessage = function(type, options) {
             onMessage(type, _extends(BazNotifications.defaults, options));
         }
-        BazNotifications.getNotificationsCount = function(options) {
-            getNotificationsCount(_extends(BazNotifications.defaults, options));
+        BazNotifications.getNotificationsCount = function() {
+            getNotificationsCount();
         }
         BazNotifications.getPullNotifications = function(options) {
             return getPullNotifications(_extends(BazNotifications.defaults, options));
@@ -12057,29 +12079,29 @@ var BazProgress = function() {
                             }).addClass('bg-success');
                             $('#' + $(element)[0].id + ' .progress-child').attr('hidden', true);
                             $('.child-progress-span').attr('hidden', true);
-                        }
 
-                        if (manualShowHide) {
-                            $(element).attr('hidden', true);
-                        } else {
-                            $(element).attr('hidden', false);
-                        }
+                            if (manualShowHide) {
+                                $(element).attr('hidden', true);
+                            } else {
+                                $(element).attr('hidden', false);
+                            }
 
-                        if (callableFunc && callableFunc['onComplete']) {
-                            callableFunc['onComplete'](response);
-                        }
+                            if (callableFunc && callableFunc['onComplete']) {
+                                callableFunc['onComplete'](response);
+                            }
 
-                        downloadTotal = 0;
-                        downloadedBytes = 0;
-                        uploadTotal = 0;
-                        uploadedBytes = 0;
-                        isUpload = false;
-                        isDownload = false;
-                        $('.' + $(element)[0].id + '-child-bar').css('width', '0%');
-                        $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 0);
-                        $('.' + $(element)[0].id + '-remote-bar').css('width', '0%');
-                        $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
-                        $('.progress-remote, .remote-progress-span').attr('hidden', true);
+                            downloadTotal = 0;
+                            downloadedBytes = 0;
+                            uploadTotal = 0;
+                            uploadedBytes = 0;
+                            isUpload = false;
+                            isDownload = false;
+                            $('.' + $(element)[0].id + '-child-bar').css('width', '0%');
+                            $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 0);
+                            $('.' + $(element)[0].id + '-remote-bar').css('width', '0%');
+                            $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
+                            $('.progress-remote, .remote-progress-span').attr('hidden', true);
+                        }
                     } else {
                         resetProgressCounter();
                     }

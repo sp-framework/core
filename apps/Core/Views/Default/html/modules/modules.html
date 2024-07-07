@@ -1,6 +1,112 @@
 {% set fieldJstreeEmptyText = false %}
+{% set fieldJstreeAdditionalTools =
+    [
+        'repo-add' :
+            [
+                'id'        : 'repo-add',
+                'tooltip'   : 'Repo Add',
+                'icon'      : 'circle-plus',
+                'iconColor' : 'success',
+                'disabled'  : true,
+                'url'       : links.url('system/api/client/services')
+            ],
+        'repo-update' :
+            [
+                'id'        : 'repo-update',
+                'tooltip'   : 'Repo Update',
+                'icon'      : 'edit',
+                'iconColor' : 'warning',
+                'disabled'  : true,
+                'url'       : links.url('system/api/client/services/q/id/')
+            ],
+        'repo-sync' :
+            [
+                'id'        : 'repo-sync',
+                'tooltip'   : 'Repo Sync',
+                'icon'      : 'sync-alt',
+                'iconColor' : 'secondary',
+                'disabled'  : true
+            ],
+        '0'       :
+            [
+                'id'        : 'divider'
+            ],
+        'filter-update-available' :
+            [
+                'id'        : 'filter-update-available',
+                'tooltip'   : 'Apply Filter (update)',
+                'icon'      : 'circle-up',
+                'iconColor' : 'secondary',
+                'disabled'  : true
+            ],
+        'filter-new-available' :
+            [
+                'id'        : 'filter-new-available',
+                'tooltip'   : 'Apply Filter (new)',
+                'icon'      : 'star',
+                'iconColor' : 'secondary',
+                'disabled'  : true
+            ],
+        '1'       :
+            [
+                'id'        : 'divider'
+            ],
+        'filter-update' :
+            [
+                'id'        : 'filter-update',
+                'tooltip'   : 'Apply Filter (:update)',
+                'icon'      : 'circle-up',
+                'iconColor' : 'secondary',
+                'disabled'  : true
+            ],
+        'filter-install' :
+            [
+                'id'        : 'filter-install',
+                'tooltip'   : 'Apply Filter Install/Update (:install)',
+                'icon'      : 'circle-plus',
+                'iconColor' : 'secondary',
+                'disabled'  : true
+            ],
+        'filter-uninstall' :
+            [
+                'id'        : 'filter-uninstall',
+                'tooltip'   : 'Apply Filter Uninstall (:uninstall)',
+                'icon'      : 'circle-minus',
+                'iconColor' : 'secondary',
+                'disabled'  : true
+            ],
+        'filter-remove' :
+            [
+                'id'        : 'filter-remove',
+                'tooltip'   : 'Apply Filter Remove (:remove)',
+                'icon'      : 'circle-xmark',
+                'iconColor' : 'secondary',
+                'disabled'  : true
+            ],
+        '2'       :
+            [
+                'id'        : 'divider'
+            ],
+        'filter-queue' :
+            [
+                'id'        : 'filter-queue',
+                'tooltip'   : 'Apply Filter In Queue (queue:)',
+                'icon'      : 'list',
+                'iconColor' : 'secondary',
+                'disabled'  : true
+            ],
+        'filter-clear' :
+            [
+                'id'        : 'filter-clear',
+                'tooltip'   : 'Clear all filters',
+                'icon'      : 'times',
+                'iconColor' : 'primary'
+            ]
+    ]
+%}
 {% if modulesError is defined %}
     {% set fieldJstreeEmptyText = modulesError %}
+    {% set fieldJstreeAdditionalTools = false %}
 {% endif %}
 <div class="row vdivide">
     <div class="col-md-4 vdivide-resizable">
@@ -40,110 +146,7 @@
                 'fieldJstreeSearchShowOnlyMatchesChildren'  : true,
                 'fieldJstreeEmptyText'                      : fieldJstreeEmptyText,
                 'fieldJstreeHideJstreeIcons'                : false,
-                'fieldJstreeAdditionalTools'                :
-                    [
-                        'repo-add' :
-                            [
-                                'id'        : 'repo-add',
-                                'tooltip'   : 'Repo Add',
-                                'icon'      : 'circle-plus',
-                                'iconColor' : 'success',
-                                'disabled'  : true,
-                                'url'       : links.url('system/api/client/services')
-                            ],
-                        'repo-update' :
-                            [
-                                'id'        : 'repo-update',
-                                'tooltip'   : 'Repo Update',
-                                'icon'      : 'edit',
-                                'iconColor' : 'warning',
-                                'disabled'  : true,
-                                'url'       : links.url('system/api/client/services/q/id/')
-                            ],
-                        'repo-sync' :
-                            [
-                                'id'        : 'repo-sync',
-                                'tooltip'   : 'Repo Sync',
-                                'icon'      : 'sync-alt',
-                                'iconColor' : 'secondary',
-                                'disabled'  : true
-                            ],
-                        '0'       :
-                            [
-                                'id'        : 'divider'
-                            ],
-                        'filter-update-available' :
-                            [
-                                'id'        : 'filter-update-available',
-                                'tooltip'   : 'Apply Filter (update)',
-                                'icon'      : 'circle-up',
-                                'iconColor' : 'secondary',
-                                'disabled'  : true
-                            ],
-                        'filter-new-available' :
-                            [
-                                'id'        : 'filter-new-available',
-                                'tooltip'   : 'Apply Filter (new)',
-                                'icon'      : 'star',
-                                'iconColor' : 'secondary',
-                                'disabled'  : true
-                            ],
-                        '1'       :
-                            [
-                                'id'        : 'divider'
-                            ],
-                        'filter-update' :
-                            [
-                                'id'        : 'filter-update',
-                                'tooltip'   : 'Apply Filter (:update)',
-                                'icon'      : 'circle-up',
-                                'iconColor' : 'secondary',
-                                'disabled'  : true
-                            ],
-                        'filter-install' :
-                            [
-                                'id'        : 'filter-install',
-                                'tooltip'   : 'Apply Filter Install/Update (:install)',
-                                'icon'      : 'circle-plus',
-                                'iconColor' : 'secondary',
-                                'disabled'  : true
-                            ],
-                        'filter-uninstall' :
-                            [
-                                'id'        : 'filter-uninstall',
-                                'tooltip'   : 'Apply Filter Uninstall (:uninstall)',
-                                'icon'      : 'circle-minus',
-                                'iconColor' : 'secondary',
-                                'disabled'  : true
-                            ],
-                        'filter-remove' :
-                            [
-                                'id'        : 'filter-remove',
-                                'tooltip'   : 'Apply Filter Remove (:remove)',
-                                'icon'      : 'circle-xmark',
-                                'iconColor' : 'secondary',
-                                'disabled'  : true
-                            ],
-                        '2'       :
-                            [
-                                'id'        : 'divider'
-                            ],
-                        'filter-queue' :
-                            [
-                                'id'        : 'filter-queue',
-                                'tooltip'   : 'Apply Filter In Queue (queue:)',
-                                'icon'      : 'list',
-                                'iconColor' : 'secondary',
-                                'disabled'  : true
-                            ],
-                        'filter-clear' :
-                            [
-                                'id'        : 'filter-clear',
-                                'tooltip'   : 'Clear all filters',
-                                'icon'      : 'times',
-                                'iconColor' : 'primary'
-                            ]
-                    ],
+                'fieldJstreeAdditionalTools'                : fieldJstreeAdditionalTools,
                 'fieldJstreeReplaceIdWithDataField'         : 'moduleid',
                 'fieldJstreePlugins'                        : ["search", "types"],
                 'fieldJstreeAdditionalClass'                : 'text-uppercase'

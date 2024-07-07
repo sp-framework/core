@@ -120,11 +120,11 @@ class AccountsComponent extends BaseComponent
             $this->accounts,
             'system/users/accounts/view',
             null,
-            ['package_row_id', 'status', 'email', 'username', 'role_id', 'first_name', 'last_name', 'package_name'],
+            ['profile_package_row_id', 'status', 'email', 'username', 'role_id', 'first_name', 'last_name', 'profile_package_name'],
             true,
             ['status', 'email', 'username', 'role_id', 'first_name', 'last_name'],
             $controlActions,
-            ['role_id' => 'role (ID)', 'package_name' => 'Used By', 'package_row_id' => 'link'],
+            ['role_id' => 'role (ID)', 'profile_package_name' => 'Used By', 'profile_package_row_id' => 'link'],
             $replaceColumns,
             'email'
         );
@@ -142,25 +142,7 @@ class AccountsComponent extends BaseComponent
 
         foreach ($dataArr as $dataKey => &$data) {
             $data = $this->formatRoles($data, $roles);
-
-            if ($data['package_name'] === 'contacts' &&
-                $this->checkPackage('Apps\Core\Packages\Business\Directory\Contacts\Contacts')
-            ) {
-                $data = $this->getContactsData($data, $dataKey);
-            } else if ($data['package_name'] === 'employees' &&
-                       $this->checkPackage('Apps\Core\Packages\Hrms\Employees\Employees')
-            ) {
-                $data = $this->getEmployeesData($data, $dataKey);
-            } else if ($data['package_name'] === 'customers' &&
-                       $this->checkPackage('Apps\Core\Packages\Crms\Customers\Customers')
-            ) {
-                $data = $this->getCustomersData($data, $dataKey);
-            } else {
-                $data['package_row_id'] = '-';
-                $data['package_name'] = '-';
-            }
-
-            $data['package_name'] = ucfirst($data['package_name']);
+            $data = $this->getProfilesData($data, $dataKey);
 
             if ($data['status'] != '1') {
                 $data['status'] = '<span class="badge badge-secondary text-uppercase">DISABLED</span>';
@@ -183,67 +165,38 @@ class AccountsComponent extends BaseComponent
         return $data;
     }
 
-    protected function getContactsData($data, $rowId = null)
+    protected function getProfilesData($data, $rowId = null)
     {
-        $contact = $this->contacts->getById($data['package_row_id']);
+        $profile = null;
+        $componentRoute = null;
 
-        if ($contact) {
-            $data['first_name'] = $contact['first_name'];
-            $data['last_name'] = $contact['last_name'];
+        $profilePackage = $this->modules->packages->getPackageByName($data['profile_package_name']);
 
-            if (isset($rowId)) {
-                $data['package_row_id'] =
-                    '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url('business/directory/contacts/q/id/' . $data['package_row_id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase contentAjaxLink">
-                        <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
-                    </a>';
-            }
-        } else {
-            $data['package_row_id'] = '-';
-            $data['package_name'] = '-';
+        if ($data['profile_package_name'] === 'UsersProfiles') {
+            $profile = $this->basepackages->profiles->getById($data['profile_package_row_id']);
+        } else if ($profilePackage) {
+            //Get profile information from packages class.
         }
 
-        return $data;
-    }
-
-    protected function getEmployeesData($data, $rowId = null)
-    {
-        $employee = $this->employees->getById($data['package_row_id']);
-
-        if ($employee) {
-            $data['first_name'] = $employee['first_name'];
-            $data['last_name'] = $employee['last_name'];
-
-            if (isset($rowId)) {
-                $data['package_row_id'] =
-                    '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url('hrms/employees/q/id/' . $data['package_row_id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase contentAjaxLink">
-                        <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
-                    </a>';
+        if ($profilePackage) {
+            if (!is_array($profilePackage['settings'])) {
+                $profilePackage['settings'] = $this->helper->decode($profilePackage['settings'], true);
             }
-        } else {
-            $data['package_row_id'] = '-';
-            $data['package_name'] = '-';
+            if (isset($profilePackage['settings']['componentRoute'])) {
+                $componentRoute = $profilePackage['settings']['componentRoute'];
+            }
         }
 
-        return $data;
-    }
-
-    protected function getCustomersData($data, $rowId = null)
-    {
-        $customer = $this->customers->getById($data['package_row_id']);
-
-        if ($customer) {
-            $data['first_name'] = $customer['first_name'];
-            $data['last_name'] = $customer['last_name'];
-
+        if ($profile && $componentRoute) {
             if (isset($rowId)) {
-                $data['package_row_id'] =
-                    '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url('crms/customers/q/id/' . $data['package_row_id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase contentAjaxLink">
+                $data['profile_package_row_id'] =
+                    '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url($componentRoute . '/q/aid/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase contentAjaxLink">
                         <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
                     </a>';
             }
         } else {
-            $data['package_row_id'] = '-';
-            $data['package_name'] = '-';
+            $data['profile_package_row_id'] = '-';
+            $data['profile_package_name'] = '-';
         }
 
         return $data;
@@ -254,21 +207,14 @@ class AccountsComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->accounts->addAccount($this->postData());
 
-            $this->accounts->addAccount($this->postData());
-
-            $this->addResponse(
-                $this->accounts->packagesData->responseMessage,
-                $this->accounts->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->accounts->packagesData->responseMessage,
+            $this->accounts->packagesData->responseCode
+        );
     }
 
     /**
@@ -276,21 +222,14 @@ class AccountsComponent extends BaseComponent
      */
     public function updateAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->accounts->updateAccount($this->postData());
 
-            $this->accounts->updateAccount($this->postData());
-
-            $this->addResponse(
-                $this->accounts->packagesData->responseMessage,
-                $this->accounts->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->accounts->packagesData->responseMessage,
+            $this->accounts->packagesData->responseCode
+        );
     }
 
     /**
@@ -298,20 +237,13 @@ class AccountsComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if ($this->request->isPost()) {
+        $this->requestIsPost();
 
-            if (!$this->checkCSRF()) {
-                return;
-            }
+        $this->accounts->removeAccount($this->postData());
 
-            $this->accounts->removeAccount($this->postData());
-
-            $this->addResponse(
-                $this->accounts->packagesData->responseMessage,
-                $this->accounts->packagesData->responseCode
-            );
-        } else {
-            $this->addResponse('Method Not Allowed', 1);
-        }
+        $this->addResponse(
+            $this->accounts->packagesData->responseMessage,
+            $this->accounts->packagesData->responseCode
+        );
     }
 }
