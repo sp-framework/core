@@ -860,11 +860,9 @@ class Dropzone
                             }
 
                             function deleteFile(uuid) {
-                                var tokenName = $("#security-token").attr("name");
-                                var token = $("#security-token").val();
                                 var postData = { };
                                 postData["uuid"] = uuid;
-                                postData[tokenName] = token;
+                                postData[$("#security-token").attr("name")] = $("#security-token").val();
                                 postData["storagetype"]  = "' . $this->params['storage']['permission'] . '";
 
                                 $.post("' . $this->links->url('system/storages/remove') . '", postData, function(response) {
