@@ -20,8 +20,6 @@ class Apps extends BasePackage
 
 	public $types;
 
-	public $ipFilter;
-
 	protected $reservedRoutes;
 
 	protected $appInfo = null;
@@ -38,8 +36,6 @@ class Apps extends BasePackage
 
 		$this->app = $this->getAppInfo();
 
-		$this->ipFilter = (new IpFilter())->init($this, $this->app);
-
 		return $this;
 	}
 
@@ -51,8 +47,6 @@ class Apps extends BasePackage
 			}
 
 			$this->appInfo = $this->getAppByRoute($route);
-
-			$this->ipFilter = (new IpFilter())->init($this, $this->appInfo);
 
 			return;
 		}

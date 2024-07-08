@@ -1,15 +1,15 @@
 <?php
 
-namespace System\Base\Providers\AppsServiceProvider;
+namespace System\Base\Providers\AccessServiceProvider\Access;
 
 use Phalcon\Filter\Validation\Validator\Ip;
 use System\Base\BasePackage;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilter;
 use System\Base\Providers\AppsServiceProvider\Exceptions\IpFilterBlockedException;
-use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsIpFilter;
 
 class IpFilter extends BasePackage
 {
-    protected $modelToUse = ServiceProviderAppsIpFilter::class;
+    protected $modelToUse = ServiceProviderAccessIpFilter::class;
 
     protected $packageName = 'ipfilter';
 
@@ -17,15 +17,11 @@ class IpFilter extends BasePackage
 
     public $clientAddress;
 
-    protected $apps;
-
     protected $app;
 
-    public function init($apps = null, $app = null)
+    public function init()
     {
-        $this->apps = $apps;
-
-        $this->app = $app;
+        $this->app = $this->apps->getAppInfo();
 
         return $this;
     }
@@ -109,7 +105,7 @@ class IpFilter extends BasePackage
             $data['filter_type'] = 3;
         }
         if (!isset($data['added_by'])) {
-            $data['added_by'] = $this->auth->account()['id'];
+            $data['added_by'] = $this->access->auth->account()['id'];
         }
 
         try {
@@ -165,7 +161,7 @@ class IpFilter extends BasePackage
 
         $filter = $this->getFirst('id', $data['id'], false, true, null, [], true);
         $filter['filter_type'] = 1;
-        $filter['added_by'] = $this->auth->account()['id'];
+        $filter['added_by'] = $this->access->auth->account()['id'];
         $filter['incorrect_attempts'] = null;
         $filter['hit_count'] = null;
 
@@ -193,7 +189,7 @@ class IpFilter extends BasePackage
         }
 
         $filter['filter_type'] = 2;
-        $filter['added_by'] = $this->auth->account()['id'];
+        $filter['added_by'] = $this->access->auth->account()['id'];
         $filter['incorrect_attempts'] = null;
         $filter['hit_count'] = null;
 

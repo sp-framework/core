@@ -14,25 +14,25 @@ class Auth extends BaseMiddleware
         }
 
         // Authenticate if in session
-        if ($this->auth->hasUserInSession()) {
+        if ($this->access->auth->hasUserInSession()) {
             try {
-                $this->auth->setUserFromSession();
+                $this->access->auth->setUserFromSession();
             } catch (\Exception $e) {
-                $this->auth->logout();
+                $this->access->auth->logout();
             }
         }
 
         //Authenticate via Cookie
-        if ($this->auth->hasRecaller()) {
+        if ($this->access->auth->hasRecaller()) {
             try {
-                $this->auth->setUserFromRecaller();
+                $this->access->auth->setUserFromRecaller();
             } catch (\Exception $e) {
-                $this->auth->logout();
+                $this->access->auth->logout();
             }
         }
 
         //Authenticated
-        if (!$this->auth->check()) {
+        if (!$this->access->auth->check()) {
             $this->session->set('redirectUrl', $this->request->getUri());
             return $this->response->redirect($data['appRoute'] . '/auth');
         }

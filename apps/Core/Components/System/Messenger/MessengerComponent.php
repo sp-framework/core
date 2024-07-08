@@ -131,7 +131,7 @@ class MessengerComponent extends BaseComponent
             $searchAccounts = $this->accounts->searchAccountInternal($searchQuery);
 
             if ($searchAccounts) {
-                $currentAccount = $this->auth->account();
+                $currentAccount = $this->access->auth->account();
 
                 if ($currentAccount) {
                     $accounts = $this->accounts->packagesData->accounts;

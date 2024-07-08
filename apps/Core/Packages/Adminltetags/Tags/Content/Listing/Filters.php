@@ -30,11 +30,11 @@ class Filters extends Adminltetags
     {
         $defaultFilter = null;
 
-        $account = $this->auth->account();
+        $account = $this->access->auth->account();
 
         $filters = [];
 
-        if (!$this->auth->account()) {
+        if (!$this->access->auth->account()) {
             $sharedHidden = true;
         } else {
             $sharedHidden = false;
@@ -72,7 +72,7 @@ class Filters extends Adminltetags
             // } else if ($filter['filter_type'] === '1') {
             //     $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (Shared)';
             } else if ($filter['shared'] == '1' && $filter['shared_ids']) {
-                if ($this->auth->account()['id'] != $filter['account_id']) {
+                if ($this->access->auth->account()['id'] != $filter['account_id']) {
                     // if ($employeesPackage) {
                     //     $employee = $employeesPackage->searchByAccountId($filter['account_id']);
 

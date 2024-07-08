@@ -73,8 +73,8 @@ class Installer extends BasePackage
             $this->registerRunProcessProgressMethods();
         }
 
-        if ($this->auth->account()) {//For Autoupdate
-            $this->updatedBy = $this->auth->account()['id'];
+        if ($this->access->auth->account()) {//For Autoupdate
+            $this->updatedBy = $this->access->auth->account()['id'];
         } else {
             $this->updatedBy = '0';
         }

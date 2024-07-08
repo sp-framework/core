@@ -238,13 +238,13 @@ class Clients extends BasePackage
                 }
             }
 
-            $apiName = $api['id'] . '_' . $api['app_id'] . '_' . $api['domain_id'] . '_' . ($account['id'] ?? $this->auth->account()['id']);
+            $apiName = $api['id'] . '_' . $api['app_id'] . '_' . $api['domain_id'] . '_' . ($account['id'] ?? $this->access->auth->account()['id']);
             if ($account || $api['client_keys_generation_allowed'] == true) {
                 $newClient['api_id'] = $api['id'];
                 $newClient['app_id'] = $api['app_id'];
                 $newClient['domain_id'] = $api['domain_id'];
-                $newClient['account_id'] = $account['id'] ?? $this->auth->account()['id'];
-                $newClient['email'] = $account['email'] ?? $this->auth->account()['email'];
+                $newClient['account_id'] = $account['id'] ?? $this->access->auth->account()['id'];
+                $newClient['email'] = $account['email'] ?? $this->access->auth->account()['email'];
                 $newClient['name'] = $apiName;
                 $newClient['client_id'] = $data['client_id'] ?? $this->random->base58(isset($api['client_id_length']) ? $api['client_id_length'] : 8);
                 $client_secret = $data['client_secret'] ?? $this->random->base58(isset($api['client_secret_length']) ? $api['client_secret_length'] : 32);
@@ -293,7 +293,7 @@ class Clients extends BasePackage
                     'conditions'    => 'email = :email: AND revoked = :revoked: AND device = :device: AND api_id = :api_id:',
                     'bind'          =>
                         [
-                            'email'         => ($account['email'] ?? $this->auth->account()['email']),
+                            'email'         => ($account['email'] ?? $this->access->auth->account()['email']),
                             'revoked'       => '0',
                             'device_id'     => ($account['device_id'] ?? null),
                             'api_id'        => $api['id']
@@ -305,7 +305,7 @@ class Clients extends BasePackage
                 [
                     'conditions' =>
                         [
-                            ['email', '=', ($account['email'] ?? $this->auth->account()['email'])],
+                            ['email', '=', ($account['email'] ?? $this->access->auth->account()['email'])],
                             ['revoked', '=', false],
                             ['device_id', '=', ($account['device_id'] ?? null)],
                             ['api_id', '=', $api['id']]

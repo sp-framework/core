@@ -314,30 +314,30 @@ abstract class BaseComponent extends Controller
 
 	protected function checkPermissions()
 	{
-		if ($this->auth->account()) {
-			if ($this->auth->account()['security']['override_role'] == '1') {
-				if (is_string($this->auth->account()['security']['permissions']) &&
-					$this->auth->account()['security']['permissions'] !== ''
+		if ($this->access->auth->account()) {
+			if ($this->access->auth->account()['security']['override_role'] == '1') {
+				if (is_string($this->access->auth->account()['security']['permissions']) &&
+					$this->access->auth->account()['security']['permissions'] !== ''
 				) {
-					$permissions = $this->helper->decode($this->auth->account()['security']['permissions'], true);
+					$permissions = $this->helper->decode($this->access->auth->account()['security']['permissions'], true);
 				} else {
-					$permissions = $this->auth->account()['security']['permissions'];
+					$permissions = $this->access->auth->account()['security']['permissions'];
 				}
 			}
 
 			if (!isset($permissions) ||
 				isset($permissions) && count($permissions) === 0
 			) {
-				if ($this->auth->account()['role']['id'] == '1') {
+				if ($this->access->auth->account()['role']['id'] == '1') {
 					return 'sysAdmin';
 				}
 
-				if (is_string($this->auth->account()['role']['permissions']) &&
-					$this->auth->account()['role']['permissions'] !== ''
+				if (is_string($this->access->auth->account()['role']['permissions']) &&
+					$this->access->auth->account()['role']['permissions'] !== ''
 				) {
-					$permissions = $this->helper->decode($this->auth->account()['role']['permissions'], true);
+					$permissions = $this->helper->decode($this->access->auth->account()['role']['permissions'], true);
 				} else {
-					$permissions = $this->auth->account()['role']['permissions'];
+					$permissions = $this->access->auth->account()['role']['permissions'];
 				}
 			}
 

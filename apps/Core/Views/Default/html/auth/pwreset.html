@@ -414,8 +414,14 @@ $(document).ready(function(){
     }
 
     function twoFa(response) {
+        var textColor = 'info';
+
+        if ($('.login-box-msg').text().includes('Error:')) {
+            textColor = 'danger';
+        }
+
         $('.login-spinner').attr('hidden', true);
-        $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+        $('.login-box-msg').removeClass('fadeIn').addClass('text-' + textColor + ' animated fadeIn');
 
         if (response.responseData['allowed_methods'].includes('otp')) {
             $('#{{componentId}}-form :input').prop('disabled', false);
@@ -429,7 +435,7 @@ $(document).ready(function(){
         }
 
         setTimeout(function () {
-            $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+            $('.login-box-msg').removeClass('text-' + textColor + ' text-success animated fadeIn');
 
             if ($('#{{componentId}}-form-auth').length > 0) {
                 $('.login-box-msg').text('Login to start {{appRoute}} session');

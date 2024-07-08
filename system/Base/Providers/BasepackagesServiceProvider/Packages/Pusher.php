@@ -139,7 +139,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
     {
         //Someone trying to connect without proper cookies
         if (!isset($conn->httpRequest->getHeader('Cookie')[0])) {
-            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
+            $this->access->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
 
             $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' Cookie misuse. Disconnecting websocket.');
 
@@ -173,7 +173,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
         }
 
         if (!isset($cookies['Bazaari'])) {
-            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
+            $this->access->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
 
             $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' Bazaari Cookie not set. Disconnecting websocket.');
 
@@ -200,9 +200,9 @@ class Pusher extends WebsocketBase implements WampServerInterface
 
             $ipFilterMiddleware = $this->modules->middlewares->getMiddlewareByNameForAppId('IpFilter', $app['id']);
             if ($ipFilterMiddleware) {
-                $this->apps->ipFilter->setClientAddress($conn->httpRequest->getHeader('X-Forwarded-For')[0]);
+                $this->access->ipFilter->setClientAddress($conn->httpRequest->getHeader('X-Forwarded-For')[0]);
 
-                if (!$this->apps->ipFilter->checkList()) {//IP Is Blocked
+                if (!$this->access->ipFilter->checkList()) {//IP Is Blocked
                     $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' IP is blocked.');
 
                     return false;

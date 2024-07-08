@@ -388,7 +388,7 @@ class Components extends BasePackage
 
 	public function updateNotificationSubscriptions(array $subscriptions)
 	{
-		$account = $this->auth->account();
+		$account = $this->access->auth->account();
 
 		if (!$account) {
 			return;

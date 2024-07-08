@@ -700,8 +700,8 @@ class Manager extends BasePackage
 
                     $registerRemotePackage['installed'] = 0;
 
-                    if ($this->auth->account()) {
-                        $registerRemotePackage['updated_by'] = $this->auth->account()['id'];
+                    if ($this->access->auth->account()) {
+                        $registerRemotePackage['updated_by'] = $this->access->auth->account()['id'];
                     } else {
                         $registerRemotePackage['updated_by'] = 0;
                     }
