@@ -56,14 +56,7 @@ class Auth extends BasePackage
         $validate = $this->validateData($data, 'auth');
 
         if ($validate !== true) {
-            if (str_contains(strtolower($validate), '2fa code')) {
-                if (str_contains(strtolower($validate), 'please contact administrator')) {
-                    $validate = str_replace('Error! Please contact administrator.', '', $validate);
-                }
-                $this->addResponse($validate, 3, ['allowed_methods' => $this->core->core['settings']['security']['twofaSettings']['twofaUsing']]);
-            } else {
-                $this->addResponse($validate, 1);
-            }
+            $this->addResponse($validate, 1);
 
             return false;
         }
@@ -78,6 +71,21 @@ class Auth extends BasePackage
 
         if (!$this->checkAccount($data)) {
             $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
+
+            return false;
+        }
+
+        $validate = $this->validateData($data, 'auth2fa');
+
+        if ($validate !== true) {
+            if (str_contains(strtolower($validate), '2fa code')) {
+                if (str_contains(strtolower($validate), 'please contact administrator')) {
+                    $validate = str_replace('Error! Please contact administrator.', '', $validate);
+                }
+                $this->addResponse($validate, 3, ['allowed_methods' => $this->core->core['settings']['security']['twofaSettings']['twofaUsing']]);
+            } else {
+                $this->addResponse($validate, 1);
+            }
 
             return false;
         }
@@ -275,7 +283,7 @@ class Auth extends BasePackage
             $sessionStore->findOneBy([['session_id', '=', $this->session->getId()], "AND", ['app', '=', $this->getKey()]]);
 
             if ($sessionStore->toArray()) {
-                $sessionStore->deleteById($sessionStore->toArray()['id']);
+                $sessionStore->deleteById($sessionStore->toArray()['id'], true, false, ['agents']);
             }
         }
 
@@ -733,34 +741,36 @@ class Auth extends BasePackage
 
     public function validateData(array $data, $task)
     {
-        if ($task === 'auth') {
+        if ($task === 'auth' || $task === 'auth2fa') {
             $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid user name."]);
             $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
-            if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
-                $this->validation->add('twofa_using', PresenceOf::class, ["message" => "Error! Please contact administrator."]);
-                $this->validation->add('code', PresenceOf::class, ["message" => "Enter valid 2FA code"]);
-                if (isset($data['twofa_using'])) {
-                    if ($data['twofa_using'] === 'otp') {
-                        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'])) {
-                            $this->validation->add('code',
-                                                   Min::class,
-                                                   [
-                                                        "min" => $this->core->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'],
-                                                        "message" => "Error: Enter valid 2FA code.",
-                                                        "included" => false
-                                                    ]
-                                                );
-                        }
-                    } else if ($data['twofa_using'] === 'email') {
-                        if (isset($this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'])) {
-                            $this->validation->add('code',
-                                                   Min::class,
-                                                   [
-                                                        "min" => $this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'],
-                                                        "message" => "Error: Enter valid 2FA code.",
-                                                        "included" => false
-                                                    ]
-                                                );
+            if ($task === 'auth2fa') {
+                if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
+                    $this->validation->add('twofa_using', PresenceOf::class, ["message" => "Error! Please contact administrator."]);
+                    $this->validation->add('code', PresenceOf::class, ["message" => "Enter valid 2FA code"]);
+                    if (isset($data['twofa_using'])) {
+                        if ($data['twofa_using'] === 'otp') {
+                            if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'])) {
+                                $this->validation->add('code',
+                                                       Min::class,
+                                                       [
+                                                            "min" => $this->core->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'],
+                                                            "message" => "Error: Enter valid 2FA code.",
+                                                            "included" => false
+                                                        ]
+                                                    );
+                            }
+                        } else if ($data['twofa_using'] === 'email') {
+                            if (isset($this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'])) {
+                                $this->validation->add('code',
+                                                       Min::class,
+                                                       [
+                                                            "min" => $this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'],
+                                                            "message" => "Error: Enter valid 2FA code.",
+                                                            "included" => false
+                                                        ]
+                                                    );
+                            }
                         }
                     }
                 }
