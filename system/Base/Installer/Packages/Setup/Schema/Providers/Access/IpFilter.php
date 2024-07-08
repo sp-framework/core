@@ -70,6 +70,13 @@ class IpFilter
                         'type'    => Column::TYPE_TINYINTEGER,
                         'notNull' => false,
                     ]
+                ),
+                new Column(
+                    'updated_at',//for auto unblock
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
                 )
             ],
             'indexes' => [
