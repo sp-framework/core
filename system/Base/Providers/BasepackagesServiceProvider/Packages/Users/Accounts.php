@@ -1079,13 +1079,11 @@ class Accounts extends BasePackage
                     $session = $sessionStore->findOneBy(['session_id', '=', $agent['session_id']]);
 
                     if ($session) {
-                        $sessionStore->deleteById($session['id']);
-                    }
-
-                    if ($agentStore->deleteById($agent['id'])) {
-                        $this->addResponse('Removed!');
-                    } else {
-                        $this->addResponse('Error removing', 1);
+                        if ($sessionStore->deleteById($session['id'])) {//Agent removed via related
+                            $this->addResponse('Removed!');
+                        } else {
+                            $this->addResponse('Error removing', 1);
+                        }
                     }
 
                     return;
@@ -1098,7 +1096,7 @@ class Accounts extends BasePackage
                 return;
             }
 
-            if ($this->config->databasetype === 'db') {
+            if ($this->config->databasetype === 'db') {//Need rework
                 $agentObj = $agentModel::find(
                     [
                         'conditions'    => 'account_id = :aid: AND verified = :v:',
@@ -1113,10 +1111,7 @@ class Accounts extends BasePackage
                     $removed = true;
 
                     foreach ($agentObj as $agent) {
-                        if ($agent->session_id !== $this->session->getId() ||
-                            ($agent->session_id === $this->session->getId() &&
-                             $agent->verified == '0')
-                        ) {
+                        if ($agent->session_id !== $this->session->getId() && $agent->verified == $data['verified']) {
                             $sessionObj = $sessionModel::findFirstBysession_id($agent->session_id);
 
                             if ($sessionObj) {
@@ -1167,38 +1162,18 @@ class Accounts extends BasePackage
                     return;
                 }
             } else {
-                $agents = $agentStore->findBy([['account_id', '=', $this->access->auth->account()['id']], ['verified', '=', $data['verified']]]);
+                $agents = $agentStore->findBy([['account_id', '=', $this->access->auth->account()['id']], ['verified', '=', (bool) $data['verified']]]);
 
                 if ($agents) {
                     $removed = true;
 
                     foreach ($agents as $key => $agent) {
-                        if ($agent['session_id'] !== $this->session->getId() ||
-                            ($agent['session_id'] === $this->session->getId() &&
-                             $agent['verified'] == '0')
-                        ) {
+                        if ($agent['session_id'] !== $this->session->getId() && $agent['verified'] == (bool) $data['verified']) {
                             $session = $sessionStore->findOneBy(['session_id', '=', $agent['session_id']]);
 
                             if ($session) {
-                                $sessionStore->deleteById($session['id']);
-                            }
-
-                            if (!$agentStore->deleteById($agent['id'])) {
-                                $removed = false;
-                            }
-                        }
-                    }
-
-                    if ($data['verified'] == '1') {
-                        $sessions = $sessionStore->findBy(['account_id', '=', $this->access->auth->account()['id']]);
-
-                        if ($sessions) {
-                            foreach ($sessions as $session) {
-                                if ($session['session_id'] !== $this->session->getId()) {
-
-                                    if (!$sessionStore->deleteById($session['id'])) {
-                                        $removed = false;
-                                    }
+                                if (!$sessionStore->deleteById($session['id'])) {
+                                    $removed = false;
                                 }
                             }
                         }
@@ -1209,9 +1184,11 @@ class Accounts extends BasePackage
                     } else {
                         $this->addResponse('Error removing session', 1);
                     }
-
-                    return;
+                } else {
+                    $this->addResponse('No agents found!', 1);
                 }
+
+                return;
             }
         }
 
