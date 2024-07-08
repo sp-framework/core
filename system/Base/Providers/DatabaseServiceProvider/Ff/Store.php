@@ -654,20 +654,28 @@ class Store
         return $this->data;
     }
 
-    public function deleteBy(array $criteria, $deleteRelated = true, int $returnOption = Query::DELETE_RETURN_BOOL)
+    public function deleteBy(array $criteria, $deleteRelated = true, $relationsConditions = false, $exclude = [])
     {
-        $query = $this->createQueryBuilder()->where($criteria)->getQuery();
+        $dataArr = $this->findBy($criteria);
 
-        $query->getCache()->deleteAllWithNoLifetime();
+        if (count($dataAr) > 0) {
+            foreach ($dataArr as $data) {
+                if (isset($data['id'])) {
+                    if (!$this->deleteById($data['id'], $deleteRelated, $relationsConditions, $exclude)) {
+                        return false;
+                    }
+                }
+            }
+        }
 
-        return $query->delete($returnOption);
+        return true;
     }
 
-    public function deleteById($id, $deleteRelated = true, $relationsConditions = false): bool
+    public function deleteById($id, $deleteRelated = true, $relationsConditions = false, $exclude = []): bool
     {
         $id = $this->checkAndStripId($id);
 
-        if ($deleteRelated && !$this->deleteRelated($id, $relationsConditions)) {
+        if ($deleteRelated && !$this->deleteRelated($id, $relationsConditions, $exclude)) {
             return false;
         } else {
             $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
@@ -680,12 +688,12 @@ class Store
         }
     }
 
-    public function deleteRelated($id, $relationsConditions = false)
+    public function deleteRelated($id, $relationsConditions = false, $exclude = [])
     {
         $data = $this->findById((int) $id);
 
         if (!$data) {
-            throw new InvalidArgumentException('Record with ID' . $id . ' not found!');
+            throw new InvalidArgumentException('Record with ID ' . $id . ' not found!');
         }
 
         if (is_string($this->storeSchema)) {
@@ -702,6 +710,10 @@ class Store
                     $relation = explode('|', $property['relation']);
 
                     if (count($relation) > 0) {
+                        if (in_array($relation[0], $exclude)) {
+                            continue;
+                        }
+
                         if ($relation[1] === 'hasOne' || $relation[1] === 'hasMany') {
                             if ((in_array('hasParams', $relation) && $relationsConditions && count($relationsConditions) === 0) ||
                                 (in_array('hasParams', $relation) && $relationsConditions && count($relationsConditions) > 0 && !isset($relationsConditions[$relation[0]]))
