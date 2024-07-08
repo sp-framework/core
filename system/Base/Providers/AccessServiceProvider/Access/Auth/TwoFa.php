@@ -40,8 +40,8 @@ class TwoFa extends BasePackage
             }
 
             if ($this->secTools->checkPassword($data['code'], $security->twofa_email_code)) {
-                $this->access->auth->account['security']['twofa_email_code_sent_on'] = null;
-                $this->access->auth->account['security']['twofa_email_code'] = null;
+                $this->access->auth->account()['security']['twofa_email_code_sent_on'] = null;
+                $this->access->auth->account()['security']['twofa_email_code'] = null;
 
                 return true;
             }
@@ -90,8 +90,8 @@ class TwoFa extends BasePackage
             return false;
         }
 
-        if (!$this->access->auth->account) {
-            $this->checkAccount($data);
+        if (!$this->access->auth->account()) {
+            $this->access->auth->checkAccount($data);
         }
 
         $codeLength = 12;
@@ -136,7 +136,7 @@ class TwoFa extends BasePackage
         if ($this->emailTwoFaEmailCode($code)) {
             $this->logger->log
                 ->info('New 2FA code requested for account ' .
-                       $this->access->auth->account['email'] .
+                       $this->access->auth->account()['email'] .
                        ' via authentication. New code was emailed to the account.'
                 );
 
@@ -156,16 +156,16 @@ class TwoFa extends BasePackage
 
     protected function emailTwoFaEmailCode($twofaCode)
     {
-        $emailData['app_id'] = $this->app['id'];
+        $emailData['app_id'] = $this->apps->getAppInfo()['id'];
         $emailData['domain_id'] = $this->domains->getDomain()['id'];
         $emailData['status'] = 1;
         $emailData['priority'] = 1;
         $emailData['confidential'] = 1;
-        $emailData['to_addresses'] = $this->helper->encode([$this->access->auth->account['email']]);
+        $emailData['to_addresses'] = $this->helper->encode([$this->access->auth->account()['email']]);
         $emailData['subject'] = '2FA code for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $twofaCode;
 
-        return $this->basepackages->emailQueue->addToQueue($emailData);
+        return $this->basepackages->emailqueue->addToQueue($emailData);
     }
 
     public function canUse2fa()
@@ -245,7 +245,7 @@ class TwoFa extends BasePackage
             }
 
             if ($verify) {
-                $security = $this->getAccountSecurityObject();
+                $security = $this->access->auth->getAccountSecurityObject();
                 if ($security->twofa_otp_hotp_counter !== null) {
                     $this->otp->setCounter($security->twofa_otp_hotp_counter);
                 }
@@ -293,7 +293,7 @@ class TwoFa extends BasePackage
             return false;
         }
 
-        $security = $this->getAccountSecurityObject();
+        $security = $this->access->auth->getAccountSecurityObject();
 
         if ($security->twofa_otp_status && $security->twofa_otp_status == '1') {
             $this->addResponse('2FA already enabled! Contact Administrator.', 1);
@@ -307,7 +307,7 @@ class TwoFa extends BasePackage
             $this->packagesData->provisionUrl = $this->otp->getProvisioningUri();
 
             $this->packagesData->qrcode =
-                $this->basepackages->qrcodes->generateQrCode(
+                $this->basepackages->qrcodes->generateQrcode(
                     $this->otp->getProvisioningUri(),
                     [
                         'showLabel'     => 'true',
@@ -319,7 +319,8 @@ class TwoFa extends BasePackage
                             'g'         => '0',
                             'b'         => '0',
                             'a'         => '0'
-                        ]
+                        ],
+                        'logo'          => $this->core->core['settings']['security']['twofaSettings']['twofaOtpLogo'] ?? ''
                     ]
                 );
 
@@ -327,7 +328,7 @@ class TwoFa extends BasePackage
 
             $this->addResponse('Generated 2FA Code');
 
-            $security = $this->getAccountSecurityObject();
+            $security = $this->access->auth->getAccountSecurityObject();
 
             $security = $this->updateTwoFaOtpHotpCounter($security);
 
@@ -383,7 +384,7 @@ class TwoFa extends BasePackage
             return false;
         }
 
-        $security = $this->getAccountSecurityObject();
+        $security = $this->access->auth->getAccountSecurityObject();
 
         if ($security->twofa_otp_status && $security->twofa_otp_status == '1') {
             $this->addResponse('2FA already enabled! Contact Administrator.', 1);
@@ -410,7 +411,7 @@ class TwoFa extends BasePackage
 
     public function disableTwoFaOtp(int $code)
     {
-        $security = $this->getAccountSecurityObject();
+        $security = $this->access->auth->getAccountSecurityObject();
 
         try {
             $this->initOtp($security->twofa_otp_secret, true);
@@ -468,7 +469,7 @@ class TwoFa extends BasePackage
         }
         $twoFaSecret = trim(Base32::encodeUpper(random_bytes($secretSize)), '=');
 
-        $security = $this->getAccountSecurityObject();
+        $security = $this->access->auth->getAccountSecurityObject();
 
         $security->twofa_otp_secret = $twoFaSecret;
 

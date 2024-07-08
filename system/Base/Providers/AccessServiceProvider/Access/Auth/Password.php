@@ -64,7 +64,7 @@ class Password extends BasePackage
             return false;
         }
 
-        if (!$this->access->auth->account['security']['force_pwreset'] && !$this->access->auth->account()) {
+        if (!$this->access->auth->account()['security']['force_pwreset'] && !$this->access->auth->account()) {
             $this->addResponse('Cannot reset password using this tool. Please login and reset using profile.', 1);
 
             return false;
@@ -124,8 +124,8 @@ class Password extends BasePackage
             $security = $this->setPasswordHistory($data, $security);
         }
 
-        if ($this->basepackages->accounts->addUpdateSecurity($this->access->auth->account['id'], (array) $security)) {
-            $this->logger->log->info('Password reset successful for account ' . $this->access->auth->account['email'] . ' via pwreset.');
+        if ($this->basepackages->accounts->addUpdateSecurity($this->access->auth->account()['id'], (array) $security)) {
+            $this->logger->log->info('Password reset successful for account ' . $this->access->auth->account()['email'] . ' via pwreset.');
 
 
             if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {

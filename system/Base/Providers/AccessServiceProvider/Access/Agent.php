@@ -94,9 +94,9 @@ class Agent extends BasePackage
                     $agentStore->deleteById($agent['id'], false);
                 }
 
-                $this->access->auth->account['force_logout'] = '1';
+                $this->access->auth->account()['force_logout'] = '1';
 
-                $this->basepackages->accounts->update($this->access->auth->account);
+                $this->basepackages->accounts->update($this->access->auth->account());
 
                 $this->access->auth->logout();
 
@@ -106,9 +106,9 @@ class Agent extends BasePackage
             ) {
                 $this->logger->log->emergency('Same session being used by another browser! Probably session hijack!');
 
-                $this->access->auth->account['force_logout'] = '1';
+                $this->access->auth->account()['force_logout'] = '1';
 
-                $this->basepackages->accounts->update($this->access->auth->account);
+                $this->basepackages->accounts->update($this->access->auth->account());
 
                 $this->access->auth->logout();
 
@@ -127,7 +127,9 @@ class Agent extends BasePackage
 
     protected function addUpdateAgent($sessionId, $clientAddress, $userAgent)
     {
-        if (!$this->basepackages->email->setup() || $this->oldSessionId) {
+        $oldSessionId = $this->access->auth->getOldSessionId();
+
+        if (!$this->basepackages->email->setup() || $oldSessionId) {
             $verified = 1;
         } else {
             $verified = 0;
@@ -138,15 +140,15 @@ class Agent extends BasePackage
 
         $oldAgent = [];
 
-        if ($this->oldSessionId) {
+        if ($oldSessionId) {
             if ($this->config->databasetype === 'db') {
-                $oldAgentObj = $agentsObj->findFirstBysession_id($this->oldSessionId);
+                $oldAgentObj = $agentsObj->findFirstBysession_id($oldSessionId);
 
                 if ($oldAgentObj) {
                     $oldAgent = $oldAgentObj->toArray();
                 }
             } else {
-                $oldAgent = $agentsStore->findOneBy(['session_id', '=', $this->oldSessionId]);
+                $oldAgent = $agentsStore->findOneBy(['session_id', '=', $oldSessionId]);
             }
 
             if ($oldAgent && count($oldAgent) > 0) {
@@ -163,7 +165,7 @@ class Agent extends BasePackage
                         $agentsStore->update($oldAgent);
                     }
 
-                    $this->oldSessionId = null;
+                    $oldSessionId = null;
 
                     return true;
                 } catch (\Exception $e) {
@@ -172,14 +174,14 @@ class Agent extends BasePackage
                     throw $e;
                 }
             } else {
-                $this->oldSessionId = null;
+                $oldSessionId = null;
 
                 return $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
             }
         } else {
             $newAgent =
                 [
-                    'account_id'        => $this->access->auth->account['id'],
+                    'account_id'        => $this->access->auth->account()['id'],
                     'session_id'        => $sessionId,
                     'client_address'    => $clientAddress,
                     'user_agent'        => $userAgent,
@@ -195,6 +197,8 @@ class Agent extends BasePackage
                     $agentsStore->insert($newAgent);
                 }
 
+                $this->sendVerificationEmail();
+
                 return false;
             } catch (\Exception $e) {
                 $this->access->auth->logout();
@@ -206,10 +210,9 @@ class Agent extends BasePackage
 
     public function sendVerificationEmail()
     {
-        if (!$this->access->auth->account) {
+        if (!$this->access->auth->account()) {
             $this->access->auth->setUserFromSession();
         }
-
         $this->basepackages->accounts->setFFRelations(true);
         $agentStore = $this->ff->store('basepackages_users_accounts_agents');
 
@@ -264,16 +267,16 @@ class Agent extends BasePackage
 
         $agent['verification_code'] = $this->secTools->hashPassword($code, $this->config->security->passwordWorkFactor);
 
-        if ($this->config->databasetype === 'db') {
-            $agentObj->assign($agent)->update();
-        } else {
-            $agentStore->update($agent);
-        }
-
         if ($this->emailVerificationCode($code)) {
+            if ($this->config->databasetype === 'db') {
+                $agentObj->assign($agent)->update();
+            } else {
+                $agentStore->update($agent);
+            }
+
             $this->logger->log
                 ->info('New verification code requested for account ' .
-                       $this->access->auth->account['email'] .
+                       $this->access->auth->account()['email'] .
                        ' via authentication agent. New code was emailed to the account.'
                 );
 
@@ -289,16 +292,16 @@ class Agent extends BasePackage
 
     protected function emailVerificationCode($verificationCode)
     {
-        $emailData['app_id'] = $this->app['id'];
+        $emailData['app_id'] = $this->apps->getAppInfo()['id'];
         $emailData['domain_id'] = $this->domains->getDomain()['id'];
         $emailData['status'] = 1;
         $emailData['priority'] = 1;
         $emailData['confidential'] = 1;
-        $emailData['to_addresses'] = $this->helper->encode([$this->access->auth->account['email']]);
+        $emailData['to_addresses'] = $this->helper->encode([$this->access->auth->account()['email']]);
         $emailData['subject'] = 'Agent verification code for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $verificationCode;
 
-        return $this->basepackages->emailQueue->addToQueue($emailData);
+        return $this->basepackages->emailqueue->addToQueue($emailData);
     }
 
     public function verifyVerficationCode(array $data)
@@ -311,7 +314,7 @@ class Agent extends BasePackage
             return false;
         }
 
-        if (!$this->access->auth->account) {
+        if (!$this->access->auth->account()) {
             $this->access->auth->setUserFromSession();
         }
 

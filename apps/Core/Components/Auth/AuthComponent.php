@@ -168,7 +168,11 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->auth->twoFa->sendTwoFaEmail($this->postData());
+        try {
+            $this->access->auth->twoFa->sendTwoFaEmail($this->postData());
+        } catch (\Exception $e) {
+            var_dump($e);die();
+        }
 
         $this->addResponse(
             $this->access->auth->twoFa->packagesData->responseMessage,
@@ -223,18 +227,18 @@ class AuthComponent extends BaseComponent
         $this->requestIsPost();
 
         if ($this->access->auth->twoFa->enableTwoFaOtp($this->postData())) {
-            $this->view->provisionUrl = $this->access->auth->packagesData->provisionUrl;
+            $this->view->provisionUrl = $this->access->auth->twoFa->packagesData->provisionUrl;
 
-            $this->view->qrcode = $this->access->auth->packagesData->qrcode;
+            $this->view->qrcode = $this->access->auth->twoFa->packagesData->qrcode;
 
-            $this->view->secret = $this->access->auth->packagesData->secret;
+            $this->view->secret = $this->access->auth->twoFa->packagesData->secret;
 
-            $this->view->responseMessage = $this->access->auth->packagesData->responseMessage;
+            $this->view->responseMessage = $this->access->auth->twoFa->packagesData->responseMessage;
         } else {
-            $this->view->responseMessage = $this->access->auth->packagesData->responseMessage;
+            $this->view->responseMessage = $this->access->auth->twoFa->packagesData->responseMessage;
         }
 
-        $this->view->responseCode = $this->access->auth->packagesData->responseCode;
+        $this->view->responseCode = $this->access->auth->twoFa->packagesData->responseCode;
     }
 
     public function verifyTwoFaOtpAction()
@@ -246,8 +250,8 @@ class AuthComponent extends BaseComponent
         }
 
         $this->addResponse(
-            $this->access->auth->packagesData->responseMessage,
-            $this->access->auth->packagesData->responseCode
+            $this->access->auth->twoFa->packagesData->responseMessage,
+            $this->access->auth->twoFa->packagesData->responseCode
         );
     }
 }

@@ -116,16 +116,16 @@ class ProfileComponent extends BaseComponent
         $this->requestIsPost();
 
         if ($this->access->auth->twoFa->enableTwoFaOtp()) {
-            $this->view->provisionUrl = $this->access->auth->packagesData->provisionUrl;
+            $this->view->provisionUrl = $this->access->auth->twoFa->packagesData->provisionUrl;
 
-            $this->view->qrcode = $this->access->auth->packagesData->qrcode;
+            $this->view->qrcode = $this->access->auth->twoFa->packagesData->qrcode;
 
-            $this->view->secret = $this->access->auth->packagesData->secret;
+            $this->view->secret = $this->access->auth->twoFa->packagesData->secret;
         } else {
-            $this->view->responseMessage = $this->access->auth->packagesData->responseMessage;
+            $this->view->responseMessage = $this->access->auth->twoFa->packagesData->responseMessage;
         }
 
-        $this->view->responseCode = $this->access->auth->packagesData->responseCode;
+        $this->view->responseCode = $this->access->auth->twoFa->packagesData->responseCode;
     }
 
     public function verifyTwoFaOtpAction()
@@ -135,8 +135,8 @@ class ProfileComponent extends BaseComponent
         $this->access->auth->twoFa->verifyTwoFaOtp($this->postData());
 
         $this->addResponse(
-            $this->access->auth->packagesData->responseMessage,
-            $this->access->auth->packagesData->responseCode
+            $this->access->auth->twoFa->packagesData->responseMessage,
+            $this->access->auth->twoFa->packagesData->responseCode
         );
     }
 
@@ -147,8 +147,8 @@ class ProfileComponent extends BaseComponent
         $this->access->auth->twoFa->disableTwoFaOtp($this->postData()['code']);
 
         $this->addResponse(
-            $this->access->auth->packagesData->responseMessage,
-            $this->access->auth->packagesData->responseCode
+            $this->access->auth->twoFa->packagesData->responseMessage,
+            $this->access->auth->twoFa->packagesData->responseCode
         );
     }
 

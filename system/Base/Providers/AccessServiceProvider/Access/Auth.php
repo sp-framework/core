@@ -16,6 +16,10 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accou
 
 class Auth extends BasePackage
 {
+    public $twoFa;
+
+    public $password;
+
     protected $key = null;
 
     protected $separator = '|';
@@ -31,10 +35,6 @@ class Auth extends BasePackage
     protected $otp;
 
     protected $cookieTimeout = 0;
-
-    protected $twoFa;
-
-    protected $password;
 
     public function init()
     {
@@ -56,7 +56,10 @@ class Auth extends BasePackage
         $validate = $this->validateData($data, 'auth');
 
         if ($validate !== true) {
-            if (str_contains($validate, 'Enter valid 2FA code')) {
+            if (str_contains(strtolower($validate), '2fa code')) {
+                if (str_contains(strtolower($validate), 'please contact administrator')) {
+                    $validate = str_replace('Error! Please contact administrator.', '', $validate);
+                }
                 $this->addResponse($validate, 3, ['allowed_methods' => $this->core->core['settings']['security']['twofaSettings']['twofaUsing']]);
             } else {
                 $this->addResponse($validate, 1);
@@ -279,7 +282,7 @@ class Auth extends BasePackage
         $this->sessionTools->removeSessionKey($this->getKey());
     }
 
-    protected function checkAccount(array $data, $viaProfile = null)
+    public function checkAccount(array $data, $viaProfile = null)
     {
         $this->account = $this->basepackages->accounts->checkAccount($data['user'], true);
 
@@ -506,6 +509,11 @@ class Auth extends BasePackage
         return false;
     }
 
+    public function getoldSessionId()
+    {
+        return $this->oldSessionId;
+    }
+
     //Old session expired in browser, update session ids in db, else we will get stale entry in db during logout.
     protected function updateSessionIdForSessionAndIdentifier($identifier)
     {
@@ -723,14 +731,14 @@ class Auth extends BasePackage
         return true;
     }
 
-    protected function validateData(array $data, $task)
+    public function validateData(array $data, $task)
     {
         if ($task === 'auth') {
             $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid user name."]);
             $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
             if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
                 $this->validation->add('twofa_using', PresenceOf::class, ["message" => "Error! Please contact administrator."]);
-                $this->validation->add('code', PresenceOf::class, ["message" => "2FA code required."]);
+                $this->validation->add('code', PresenceOf::class, ["message" => "Enter valid 2FA code"]);
                 if (isset($data['twofa_using'])) {
                     if ($data['twofa_using'] === 'otp') {
                         if (isset($this->core->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'])) {
@@ -738,7 +746,7 @@ class Auth extends BasePackage
                                                    Min::class,
                                                    [
                                                         "min" => $this->core->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'],
-                                                        "message" => "Enter valid 2FA code.",
+                                                        "message" => "Error: Enter valid 2FA code.",
                                                         "included" => false
                                                     ]
                                                 );
@@ -749,7 +757,7 @@ class Auth extends BasePackage
                                                    Min::class,
                                                    [
                                                         "min" => $this->core->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'],
-                                                        "message" => "Enter valid 2FA code.",
+                                                        "message" => "Error: Enter valid 2FA code.",
                                                         "included" => false
                                                     ]
                                                 );
@@ -812,7 +820,7 @@ class Auth extends BasePackage
         $validated = $this->validation->validate($data)->jsonSerialize();
 
         if (count($validated) > 0) {
-            $messages = 'Error: ';
+            $messages = '';
 
             foreach ($validated as $key => $value) {
                 $messages .= $value['message'] . ' ';
@@ -823,7 +831,7 @@ class Auth extends BasePackage
         }
     }
 
-    protected function getAccountSecurityObject()
+    public function getAccountSecurityObject()
     {
         $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
 
