@@ -134,6 +134,13 @@ class Apps
 					]
 				),
 				new Column(
+					'auto_unblock_ip_minutes',
+					[
+						'type'    => Column::TYPE_INTEGER,
+						'notNull' => false,
+					]
+				),
+				new Column(
 					'incorrect_login_attempt_block_ip',
 					[
 						'type'    => Column::TYPE_TINYINTEGER,

@@ -2,28 +2,6 @@
     <div class="col">
         {{adminltetags.useTag('fields',
             [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'incorrect_login_attempt_block_ip',
-                'fieldLabel'                            : 'Incorrect Login Attempt Block IP',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Block IP after # of incorrect login attempts. 0 is for not blocking. Note: Authentication middleware should be enabled for this to work.',
-                'fieldInputTypeTextFilter'              : 'positiveInt',
-                'fieldRequired'                         : false,
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldBazPostOnUpdate'                  : true,
-                'fieldDataInputMaxLength'               : 2,
-                'fieldValue'                            : appIncorrectLoginAttemptBlockIp
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
                 'component'                      : component,
                 'componentName'                  : componentName,
                 'componentId'                    : componentId,
@@ -54,6 +32,50 @@
                             ]
                     ],
                 'fieldRadioChecked'              : appIpFilterDefaultAction
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'auto_unblock_ip_minutes',
+                'fieldLabel'                            : 'Auto Unblock IP after X minutes',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Auto unblock up after x amount of minutes.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMaxLength'               : 6,
+                'fieldValue'                            : appAutoUnblockIpMinutes
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'incorrect_login_attempt_block_ip',
+                'fieldLabel'                            : 'Incorrect Login Attempt Block IP',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Block IP after # of incorrect login attempts. 0 is for not blocking. Note: Authentication middleware should be enabled for this to work.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : appIncorrectLoginAttemptBlockIp
             ]
         )}}
     </div>
@@ -165,8 +187,9 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                              : { },
-        '{{componentId}}-{{sectionId}}-incorrect_login_attempt_block_ip': { },
         '{{componentId}}-{{sectionId}}-ip_filter_default_action'        : { },
+        '{{componentId}}-{{sectionId}}-auto_unblock_ip_minutes'         : { },
+        '{{componentId}}-{{sectionId}}-incorrect_login_attempt_block_ip': { },
         '{{componentId}}-{{sectionId}}-ip_address'                      : { },
         '{{componentId}}-{{sectionId}}-filters'                         : {
             afterInit: function() {

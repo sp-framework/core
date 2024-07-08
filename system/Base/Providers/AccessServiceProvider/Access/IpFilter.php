@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\AccessServiceProvider\Access;
 
+use Carbon\Carbon;
 use Phalcon\Filter\Validation\Validator\Ip;
 use System\Base\BasePackage;
 use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilter;
@@ -107,6 +108,7 @@ class IpFilter extends BasePackage
         if (!isset($data['added_by'])) {
             $data['added_by'] = $this->access->auth->account()['id'];
         }
+        $data['updated_at'] = time();
 
         try {
             $this->add($data);
@@ -164,6 +166,7 @@ class IpFilter extends BasePackage
         $filter['added_by'] = $this->access->auth->account()['id'];
         $filter['incorrect_attempts'] = null;
         $filter['hit_count'] = null;
+        $filter['updated_at'] = null;
 
         if ($this->update($filter)) {
             $this->addResponse('Filter moved to allow.', 0);
@@ -192,6 +195,7 @@ class IpFilter extends BasePackage
         $filter['added_by'] = $this->access->auth->account()['id'];
         $filter['incorrect_attempts'] = null;
         $filter['hit_count'] = null;
+        $filter['updated_at'] = null;
 
         if ($this->update($filter)) {
             $this->addResponse('Filter moved to block.', 0);
@@ -297,6 +301,19 @@ class IpFilter extends BasePackage
 
         if ($filter && count($filter) > 0) {
             if ($filter['filter_type'] == '2') {
+                if (isset($filter['updated_at']) &&
+                    isset($app['auto_unblock_ip_minutes']) &&
+                    ((int) $app['auto_unblock_ip_minutes'] > 0)
+                ) {
+                    $blockedAt = Carbon::parse($filter['updated_at']);
+
+                    if (time() > $blockedAt->addMinutes((int) $app['auto_unblock_ip_minutes'])->timestamp) {
+                        $this->removeFromMonitoring();
+
+                        return true;
+                    }
+                }
+
                 if ($this->config->databasetype === 'db') {
                     $this->bumpFilterHitCounter($filterObj);
                 } else {
@@ -450,7 +467,9 @@ class IpFilter extends BasePackage
                     $incorrectAttempt = 1;
                 }
 
-                if ($incorrectAttempt >= (int) $this->app['incorrect_login_attempt_block_ip']) {
+                if ((int) $this->app['incorrect_login_attempt_block_ip'] !== 0 &&
+                    $incorrectAttempt >= (int) $this->app['incorrect_login_attempt_block_ip']
+                ) {
                     $filter['filter_type'] = 2;
                 }
 
