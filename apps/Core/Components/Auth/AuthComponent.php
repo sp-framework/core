@@ -47,7 +47,7 @@ class AuthComponent extends BaseComponent
         if (isset($this->getData()['pwreset']) && $this->getData()['pwreset'] === 'true') {
             $this->view->coreSettings = $this->core->core['settings'];
 
-            $this->view->canUse2fa = $this->access->auth->canUse2fa();
+            $this->view->canUse2fa = $this->access->auth->twoFa->canUse2fa();
 
             $this->view->pick('auth/pwreset');
 
@@ -90,11 +90,11 @@ class AuthComponent extends BaseComponent
 
         $auth = $this->access->auth->attempt($this->postData());
 
-        if (isset($this->access->auth->packagesData->responseData)) {
-            $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode, $this->access->auth->packagesData->responseData);
-        } else {
-            $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode);
-        }
+        $this->addResponse(
+            $this->access->auth->packagesData->responseMessage,
+            $this->access->auth->packagesData->responseCode,
+            $this->access->auth->packagesData->responseData ?? []
+        );
 
         if ($auth) {
             $this->view->redirectUrl = $this->access->auth->packagesData->redirectUrl;
@@ -114,25 +114,28 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->auth->forgotPassword($this->postData());
+        $this->access->auth->password->forgotPassword($this->postData());
 
-        $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode);
+        $this->addResponse(
+            $this->access->auth->password->packagesData->responseMessage,
+            $this->access->auth->password->packagesData->responseCode
+        );
     }
 
     public function pwresetAction()
     {
         $this->requestIsPost();
 
-        $this->access->auth->resetPassword($this->postData());
+        $this->access->auth->password->resetPassword($this->postData());
 
-        $this->view->responseMessage = $this->access->auth->packagesData->responseMessage;
-        $this->view->responseCode = $this->access->auth->packagesData->responseCode;
+        $this->view->responseMessage = $this->access->auth->password->packagesData->responseMessage;
+        $this->view->responseCode = $this->access->auth->password->packagesData->responseCode;
 
-        if (isset($this->access->auth->packagesData->redirectUrl)) {
-            $this->view->redirectUrl = $this->access->auth->packagesData->redirectUrl;
+        if (isset($this->access->auth->password->packagesData->redirectUrl)) {
+            $this->view->redirectUrl = $this->access->auth->password->packagesData->redirectUrl;
         }
-        if (isset($this->access->auth->packagesData->responseData)) {
-            $this->view->responseData = $this->access->auth->packagesData->responseData;
+        if (isset($this->access->auth->password->packagesData->responseData)) {
+            $this->view->responseData = $this->access->auth->password->packagesData->responseData;
         }
     }
 
@@ -140,35 +143,38 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->auth->sendVerificationEmail();
+        $this->access->agent->sendVerificationEmail();
 
-        if (isset($this->access->auth->packagesData->responseData)) {
-            $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode, $this->access->auth->packagesData->responseData);
-        } else {
-            $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode);
-        }
+        $this->addResponse(
+            $this->access->agent->packagesData->responseMessage,
+            $this->access->agent->packagesData->responseCode,
+            $this->access->agent->packagesData->responseData ?? []
+        );
     }
 
     public function verifyAction()
     {
         $this->requestIsPost();
 
-        $this->access->auth->verifyVerficationCode($this->postData());
+        $this->access->agent->verifyVerficationCode($this->postData());
 
-        $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode);
+        $this->addResponse(
+            $this->access->agent->packagesData->responseMessage,
+            $this->access->agent->packagesData->responseCode
+        );
     }
 
     public function sendTwoFaEmailAction()
     {
         $this->requestIsPost();
 
-        $this->access->auth->sendTwoFaEmail($this->postData());
+        $this->access->auth->twoFa->sendTwoFaEmail($this->postData());
 
-        if (isset($this->access->auth->packagesData->responseData)) {
-            $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode, $this->access->auth->packagesData->responseData);
-        } else {
-            $this->addResponse($this->access->auth->packagesData->responseMessage, $this->access->auth->packagesData->responseCode);
-        }
+        $this->addResponse(
+            $this->access->auth->twoFa->packagesData->responseMessage,
+            $this->access->auth->twoFa->packagesData->responseCode,
+            $this->access->auth->twoFa->packagesData->responseData ?? []
+        );
     }
 
     public function checkPwHibpAction()
@@ -216,7 +222,7 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        if ($this->access->auth->enableTwoFaOtp($this->postData())) {
+        if ($this->access->auth->twoFa->enableTwoFaOtp($this->postData())) {
             $this->view->provisionUrl = $this->access->auth->packagesData->provisionUrl;
 
             $this->view->qrcode = $this->access->auth->packagesData->qrcode;
@@ -235,7 +241,7 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        if ($this->access->auth->verifyTwoFaOtp($this->postData())) {
+        if ($this->access->auth->twoFa->verifyTwoFaOtp($this->postData())) {
             $this->view->redirectUrl = $this->links->url('/');
         }
 

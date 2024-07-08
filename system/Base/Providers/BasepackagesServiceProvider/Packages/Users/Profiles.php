@@ -535,7 +535,7 @@ class Profiles extends BasePackage
 
         $this->packagesData->coreSettings = $this->core->core['settings'];
 
-        $this->packagesData->canUse2fa = $this->access->auth->canUse2fa();
+        $this->packagesData->canUse2fa = $this->access->auth->twoFa->canUse2fa();
 
         return true;
     }

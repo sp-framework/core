@@ -3,7 +3,7 @@
 namespace System\Base\Providers\AccessServiceProvider;
 
 use System\Base\Providers\AccessServiceProvider\Access\Acl;
-use System\Base\Providers\AccessServiceProvider\Access\AgentCheck;
+use System\Base\Providers\AccessServiceProvider\Access\Agent;
 use System\Base\Providers\AccessServiceProvider\Access\Auth;
 use System\Base\Providers\AccessServiceProvider\Access\IpFilter;
 
@@ -13,7 +13,7 @@ class Access
 
     protected $acl;
 
-    protected $agentCheck;
+    protected $agent;
 
     protected $ipFilter;
 
@@ -46,11 +46,11 @@ class Access
         return $this->acl;
     }
 
-    protected function initAgentCheck()
+    protected function initAgent()
     {
-        $this->agentCheck = (new AgentCheck())->init();
+        $this->agent = (new Agent())->init();
 
-        return $this->agentCheck;
+        return $this->agent;
     }
 
     protected function initIpFilter()

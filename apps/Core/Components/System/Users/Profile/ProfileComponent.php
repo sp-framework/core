@@ -98,16 +98,16 @@ class ProfileComponent extends BaseComponent
 
         $user = array_merge($user, $this->postData());
 
-        $this->access->auth->resetPassword($user, true);
+        $this->access->auth->password->resetPassword($user, true);
 
-        $this->view->responseMessage = $this->access->auth->packagesData->responseMessage;
-        $this->view->responseCode = $this->access->auth->packagesData->responseCode;
+        $this->view->responseMessage = $this->access->auth->password->packagesData->responseMessage;
+        $this->view->responseCode = $this->access->auth->password->packagesData->responseCode;
 
-        if (isset($this->access->auth->packagesData->redirectUrl)) {
-            $this->view->redirectUrl = $this->access->auth->packagesData->redirectUrl;
+        if (isset($this->access->auth->password->packagesData->redirectUrl)) {
+            $this->view->redirectUrl = $this->access->auth->password->packagesData->redirectUrl;
         }
-        if (isset($this->access->auth->packagesData->responseData)) {
-            $this->view->responseData = $this->access->auth->packagesData->responseData;
+        if (isset($this->access->auth->password->packagesData->responseData)) {
+            $this->view->responseData = $this->access->auth->password->packagesData->responseData;
         }
     }
 
@@ -115,7 +115,7 @@ class ProfileComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        if ($this->access->auth->enableTwoFaOtp()) {
+        if ($this->access->auth->twoFa->enableTwoFaOtp()) {
             $this->view->provisionUrl = $this->access->auth->packagesData->provisionUrl;
 
             $this->view->qrcode = $this->access->auth->packagesData->qrcode;
@@ -132,7 +132,7 @@ class ProfileComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->auth->verifyTwoFaOtp($this->postData());
+        $this->access->auth->twoFa->verifyTwoFaOtp($this->postData());
 
         $this->addResponse(
             $this->access->auth->packagesData->responseMessage,
@@ -144,7 +144,7 @@ class ProfileComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->access->auth->disableTwoFaOtp($this->postData()['code']);
+        $this->access->auth->twoFa->disableTwoFaOtp($this->postData()['code']);
 
         $this->addResponse(
             $this->access->auth->packagesData->responseMessage,
