@@ -23,6 +23,8 @@ class Barcodes extends BasePackage
                 $this->barcodesSettings = $this->barcodesPackage['settings'];
             }
 
+            $this->barcodesSettings['id'] = $this->barcodesPackage['id'];
+
             return $this;
         }
     }

@@ -4,6 +4,26 @@
             <div class="col-md-3 col-sm-12">
                 <div class="row">
                     <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'id',
+                                'fieldLabel'                     : 'Qrcode Package ID',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Qrcode Package ID',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldHidden'                    : true,
+                                'fieldDisabled'                  : true,
+                                'fieldValue'                     : qrcodesSettings['id']
+                            ]
+                        )}}
                         {% if qrcodesSettings['showLogo'] === true %}
                             {% set showLogoCheckbox = true %}
                         {% else %}
@@ -509,6 +529,7 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
         '{{componentId}}-{{sectionId}}-showLogo'                                : { },
         '{{componentId}}-{{sectionId}}-logoWidth'                               : { },
         '{{componentId}}-{{sectionId}}-defaultEncoding'                         : {

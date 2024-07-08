@@ -10,6 +10,26 @@
                                 'componentName'                  : componentName,
                                 'componentId'                    : componentId,
                                 'sectionId'                      : sectionId,
+                                'fieldId'                        : 'id',
+                                'fieldLabel'                     : 'Barcode Package ID',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Barcode Package ID',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldHidden'                    : true,
+                                'fieldDisabled'                  : true,
+                                'fieldValue'                     : barcodesSettings['id']
+                            ]
+                        )}}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
                                 'fieldId'                        : 'enabledCodes',
                                 'fieldLabel'                     : 'Available Codes',
                                 'fieldHelp'                      : true,
@@ -378,6 +398,7 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                   : { },
         '{{componentId}}-{{sectionId}}-enabledCodes'                         : {
             afterInit : function() {
                 var checkboxCodes = JSON.parse('{{checkboxCodes}}');
