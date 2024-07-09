@@ -28,7 +28,7 @@ class Tasks
         //Email High Priority (encrypted - with codes)
         $taskEntry =
             [
-                'name'              => 'Email (confidential)',
+                'name'              => 'Email (Confidential)',
                 'description'       => 'High priority emails that are confidential (with passwords or codes) that are time sensitive.',
                 'exec_type'         => 'php',
                 'call'              => 'processemailqueue',
