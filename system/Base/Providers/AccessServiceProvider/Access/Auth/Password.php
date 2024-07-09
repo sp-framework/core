@@ -26,20 +26,19 @@ class Password extends BasePackage
         $account = $this->basepackages->accounts->checkAccount($data['user'], true);
 
         if ($account) {
-            $account['email_new_password'] = '1';
-            $account['forgotten_request'] = '1';
-            $account['forgotten_request_session_id'] = $this->session->getId();
-            $account['forgotten_request_ip'] = $this->request->getClientAddress();
-            $account['forgotten_request_agent'] = $this->request->getUserAgent();
-            $account['forgotten_request_sent_on'] = time();
+            $security['forgotten_request'] = '1';
+            $security['forgotten_request_session_id'] = $this->session->getId();
+            $security['forgotten_request_ip'] = $this->request->getClientAddress();
+            $security['forgotten_request_agent'] = $this->request->getUserAgent();
+            $security['forgotten_request_sent_on'] = time();
 
-            if ($this->basepackages->accounts->updateAccount($account)) {
+            if ($this->basepackages->accounts->addUpdateSecurity($account['id'], $security)) {
                 $this->logger->log->info('New password requested for account ' . $account['email'] . ' via forgot password. New password was emailed to the account.');
             } else {
                 $this->logger->log->critical('Trying to send new password for ' . $account['email'] . ' via forgot password failed.');
             }
         }
-
+        //We show this message regardless.
         $this->addResponse('Email Sent. Please follow password reset instructions from the email.');
 
         return true;
