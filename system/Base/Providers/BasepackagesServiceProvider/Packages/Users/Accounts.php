@@ -369,7 +369,7 @@ class Accounts extends BasePackage
                     return false;
                 }
 
-                if ($this->remove($data['id'])) {
+                if ($this->remove($data['id'], true, true, ['role'])) {
                     $this->addResponse('Removed account for ID: ' . $account['email']);
 
                     return true;
@@ -385,10 +385,10 @@ class Accounts extends BasePackage
                     return false;
                 }
 
-                if ($this->remove($data['id'])) {
-                    $this->addResponse('Removed account for ID: ' . $account['email']);
+                $this->api->clients->forceRevoke(['account_id' => $data['id']]);
 
-                    $this->api->clients->forceRevoke(['account_id' => $data['id']]);
+                if ($this->remove($data['id'], true, true, ['role'])) {
+                    $this->addResponse('Removed account for ID: ' . $account['email']);
 
                     return true;
                 } else {
