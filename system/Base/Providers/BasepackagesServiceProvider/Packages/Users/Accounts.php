@@ -697,8 +697,7 @@ class Accounts extends BasePackage
             if (count($canLogin) > 0) {
                 $canloginModel = new BasepackagesUsersAccountsCanlogin;
 
-                if ($this->config->databasetype === 'db') {
-                } else {
+                if ($this->config->databasetype !== 'db') {
                     $canloginStore = $this->ff->store($canloginModel->getSource());
                 }
 
@@ -863,7 +862,7 @@ class Accounts extends BasePackage
     {
         $this->getById($id);
 
-        if ($this->model) {
+        if ($this->config->databasetype === 'db') {
             $canLogin =
                 $this->model->canlogin->filter(
                     function($allowed) use ($id, $appId) {
@@ -876,9 +875,7 @@ class Accounts extends BasePackage
                         }
                     }
                 );
-        }
-
-        if ($this->ffData) {
+        } else {
             $this->ffStoreToUse = 'basepackages_users_accounts_canlogin';
 
             $this->getByParams(['conditions' => [['account_id', '=', $id],['app_id', '=', $appId]]]);
@@ -894,7 +891,7 @@ class Accounts extends BasePackage
             ($canLogin[0]['allowed'] == '1' || $canLogin[0]['allowed'] == '2')
         ) {
             if ($canLogin[0]['allowed'] == '2') {
-                return false;
+                return $canLogin[0];
             }
 
             return true;
@@ -903,7 +900,16 @@ class Accounts extends BasePackage
         } else if (count($canLogin) > 1) {
             $this->logger->log->debug('Multiple login entries for user :' . $id . ' are wrong');
 
-            return true;//Sending true as we dont want to make more entries.
+            //delete all entries
+            if ($this->config->databasetype === 'db') {//Need work
+                //
+            } else {
+                foreach ($canLogin as $login) {
+                    $this->ffStoreToUse = 'basepackages_users_accounts_canlogin';
+
+                    $this->remove($login['id']);
+                }
+            }
         }
 
         return false;

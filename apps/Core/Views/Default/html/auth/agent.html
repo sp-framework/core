@@ -654,14 +654,23 @@ $(document).ready(function(){
         }, 1000);
     }
 
-    $('#{{componentId}}-form-current_password-visibility, ' +
+    $('#{{componentId}}-form-pass-visibility,' +
+      '#{{componentId}}-form-current_password-visibility, ' +
       '#{{componentId}}-form-new_password-visibility, ' +
       '#{{componentId}}-form-confirm_password-visibility').click(function(e) {
         e.preventDefault();
 
         var id = $(this)[0].id;
 
-        if (id === '{{componentId}}-form-current_password-visibility') {
+        if (id === '{{componentId}}-form-pass-visibility') {
+            if ($('#{{componentId}}-form-pass').attr('type') === 'password') {
+                $('#{{componentId}}-form-pass').attr('type', 'text');
+                $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+            } else if ($('#{{componentId}}-form-pass').attr('type') === 'text') {
+                $('#{{componentId}}-form-pass').attr('type', 'password');
+                $('#' + id).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        } else if (id === '{{componentId}}-form-current_password-visibility') {
             if ($('#{{componentId}}-form-current_password').attr('type') === 'password') {
                 $('#{{componentId}}-form-current_password').attr('type', 'text');
                 $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
@@ -701,8 +710,8 @@ $(document).ready(function(){
         $.post('{{links.url("auth/generatePw")}}', postData, function(response) {
             if (response.responseCode == 0) {
                 if (response.responseData) {
-                    $('#{{componentId}}-form-new_password').val(response.responseData).trigger('change');
-                    $('#{{componentId}}-form-confirm_password').val(response.responseData);
+                    $('#{{componentId}}-form-new_password').val(response.responseData.password).trigger('change');
+                    $('#{{componentId}}-form-confirm_password').val(response.responseData.password);
                     $('#{{componentId}}-form-new_password, #{{componentId}}-form-confirm_password').attr('type', 'text');
                     $('#{{componentId}}-form-new_password-visibility, #{{componentId}}-form-confirm_password-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
                 }
