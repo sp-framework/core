@@ -306,33 +306,37 @@ class Auth extends BasePackage
             //New App OR New account via rego
             $canLogin = $this->basepackages->accounts->canLogin($this->account['id'], $this->app['id']);
 
-            if ($canLogin === false) {
+            if ($canLogin === false ||
+                ($canLogin && is_array($canLogin) && $canLogin['allowed'] == '2')
+            ) {
                 if ($this->app['can_login_role_ids']) {
                     if (is_string($this->app['can_login_role_ids'])) {
                         $this->app['can_login_role_ids'] = $this->helper->decode($this->app['can_login_role_ids'], true);
                     }
 
                     if (in_array($this->account['security']['role_id'], $this->app['can_login_role_ids'])) {
-                        if ($this->config->databasetype === 'db') {
-                            $canloginModel = new BasepackagesUsersAccountsCanlogin;
+                        if ($canLogin === false) {
+                            if ($this->config->databasetype === 'db') {
+                                $canloginModel = new BasepackagesUsersAccountsCanlogin;
 
-                            $newLogin['account_id'] = $this->account['id'];
-                            $newLogin['app_id'] = $this->app['id'];
-                            $newLogin['allowed'] = '2';
+                                $newLogin['account_id'] = $this->account['id'];
+                                $newLogin['app_id'] = $this->app['id'];
+                                $newLogin['allowed'] = '2';
 
-                            $canloginModel->assign($newLogin);
+                                $canloginModel->assign($newLogin);
 
-                            $canloginModel->create();
-                        } else {
-                            $canloginStore = $this->ff->store('basepackages_users_accounts_canlogin');
+                                $canloginModel->create();
+                            } else {
+                                $canloginStore = $this->ff->store('basepackages_users_accounts_canlogin');
 
-                            $canloginStore->insert(
-                                [
-                                    'account_id'    => $this->account['id'],
-                                    'app_id'        => $this->app['id'],
-                                    'allowed'       => 2
-                                ]
-                            );
+                                $canloginStore->insert(
+                                    [
+                                        'account_id'    => $this->account['id'],
+                                        'app_id'        => $this->app['id'],
+                                        'allowed'       => 2
+                                    ]
+                                );
+                            }
                         }
                     } else {
                         $this->addResponse('Error: Contact System Administrator', 1);
