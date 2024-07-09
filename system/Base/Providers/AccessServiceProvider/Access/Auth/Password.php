@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\AccessServiceProvider\Access\Auth;
 
+use Phalcon\Filter\Validation\Validator\StringLength;
 use System\Base\BasePackage;
 
 class Password extends BasePackage
