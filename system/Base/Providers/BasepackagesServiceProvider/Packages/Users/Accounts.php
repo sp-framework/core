@@ -219,11 +219,7 @@ class Accounts extends BasePackage
 
     public function updateAccount(array $data)
     {
-        if (isset($data['forgotten_request']) && $data['forgotten_request'] == '1') {
-            $validation = $this->validateData($data, true);
-        } else {
-            $validation = $this->validateData($data);
-        }
+        $validation = $this->validateData($data);
 
         if ($validation !== true) {
             $this->addResponse($validation, 1);
@@ -293,11 +289,7 @@ class Accounts extends BasePackage
 
         $data['domain'] = explode('@', $data['email'])[1];
 
-        //We keep the old password intact. If user remembers their password and logs in with that, we destroy this code.
-        if (isset($data['forgotten_request']) && $data['forgotten_request'] == '1') {
-            $password = $this->basepackages->utils->generateNewPassword()['password'];
-            $data['forgotten_request_code'] = $this->secTools->hashPassword($password);
-        } else if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
+        if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
             $password = $this->basepackages->utils->generateNewPassword()['password'];
             $data['password'] = $this->secTools->hashPassword($password);
         }
@@ -621,21 +613,25 @@ class Accounts extends BasePackage
 
     public function addUpdateSecurity($id, $data)
     {
+        //We keep the old password intact. If user remembers their password and logs in with that, we destroy this code.
+        if (isset($data['forgotten_request']) && $data['forgotten_request'] == '1') {
+            $password = $this->basepackages->utils->generateNewPassword()['password'];
+
+            $data['forgotten_request_code'] = $this->secTools->hashPassword($password);
+        }
+
         $securityModel = new BasepackagesUsersAccountsSecurity;
 
         if ($this->config->databasetype === 'db') {
-            $account = $securityModel::findFirst(['account_id = ' . $id]);
+            $accountSecurity = $securityModel::findFirst(['account_id = ' . $id]);
         } else {
             $securityStore = $this->ff->store($securityModel->getSource());
 
-            $account = $securityStore->findOneBy(['account_id', '=', $id]);
+            $accountSecurity = $securityStore->findOneBy(['account_id', '=', $id]);
         }
 
-        $data['account_id'] = $id;
-
-        unset($data['id']);
-
-        if ($data['role_id'] != '1' && //Remove msview and msupdate permissions
+        if (isset($data['role_id']) &&
+            $data['role_id'] != '1' && //Remove msview and msupdate permissions
             isset($data['override_role']) &&
             $data['override_role'] == '1'
         ) {
@@ -654,36 +650,48 @@ class Accounts extends BasePackage
                         }
                     }
                 }
+
                 $data['permissions'] = $this->helper->encode($data['permissions']);
             }
         }
 
-        if ($account) {
-            if ($this->config->databasetype === 'db') {
-                $account->assign($data);
 
-                $account->update();
-
-                return true;
-            } else {
-                $data['id'] = $account['id'];
-
-                $securityStore->update($data);
-
-                return true;
+        if ($accountSecurity) {
+            if (isset($data['id'])) {
+                unset($data['id']);
             }
+
+            $accountSecurity = array_replace($accountSecurity, $data);
+
+            if ($this->config->databasetype === 'db') {
+                $accountSecurity->assign($accountSecurity);
+
+                $accountSecurity->update();
+            } else {
+                $data['id'] = $accountSecurity['id'];
+
+                $securityStore->update($accountSecurity);
+            }
+
+            $account = $this->getAccountById($id);
+
+            if (isset($data['forgotten_request']) && $data['forgotten_request'] == '1') {
+                $this->emailNewPassword($account['email'], $password);
+            }
+
+            return true;
         } else {
+            $data['account_id'] = $id;
+
             if ($this->config->databasetype === 'db') {
                 $securityModel->assign($data);
 
                 $securityModel->create();
-
-                return true;
             } else {
                 $securityStore->insert($data);
-
-                return true;
             }
+
+            return true;
         }
 
         return false;
