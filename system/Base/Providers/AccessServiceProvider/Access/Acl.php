@@ -9,11 +9,6 @@ class Acl extends BasePackage
 {
     protected $acl;
 
-    public function __construct()
-    {
-        //
-    }
-
     public function init()
     {
         $this->acl = new Memory();
