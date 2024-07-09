@@ -74,7 +74,6 @@ class EmailQueue extends BasePackage
 
             return;
         }
-
         if ($processPriority != 0) {
             $this->priorityToProcess = (int) $processPriority;
         } else {
@@ -82,8 +81,6 @@ class EmailQueue extends BasePackage
         }
 
         $this->queueLock = true;
-
-        $hadErrors = false;
 
         if ($this->config->databasetype === 'db') {
             if ($id) {
@@ -127,6 +124,7 @@ class EmailQueue extends BasePackage
         $queue = $this->getByParams($conditions, true, false);
 
         $queueProcessedIds = [];
+        $queueErrorIds = [];
 
         if ($queue && is_array($queue) && count($queue) > 0) {
             foreach ($queue as $key => $queueEmail) {
@@ -136,7 +134,7 @@ class EmailQueue extends BasePackage
 
                     $this->update($queueEmail);
 
-                    $hadErrors = true;
+                    array_push($queueErrorIds, $queueEmail['id']);
                 } else {
                     $queueEmailSettings = $this->basepackages->email->getEmailSettings();
 
@@ -179,10 +177,10 @@ class EmailQueue extends BasePackage
 
         $this->queueLock = false;
 
-        if ($hadErrors) {
-            $this->addResponse('Queue processed with some errors. Please check the email queue for details.', 1);
+        if (count($queueErrorIds) > 0) {
+            $this->addResponse('Queue processed with some errors. Please check the email queue for details.', 1, ['queueErrorIds' => $queueErrorIds]);
 
-            return;
+            return false;
         }
 
         $this->addResponse('Queue processed successfully.', 0, ['queueProcessedIds' => $queueProcessedIds]);
