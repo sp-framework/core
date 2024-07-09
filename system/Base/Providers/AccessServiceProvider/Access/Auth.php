@@ -195,7 +195,7 @@ class Auth extends BasePackage
 
         $this->packagesData->redirectUrl = $this->links->url('/');
 
-        $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->app['name']);
+        $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->apps->getAppInfo()['name']);
 
         return true;
     }
@@ -521,7 +521,7 @@ class Auth extends BasePackage
         return false;
     }
 
-    public function getoldSessionId()
+    public function getOldSessionId()
     {
         return $this->oldSessionId;
     }

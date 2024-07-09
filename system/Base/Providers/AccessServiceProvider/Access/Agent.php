@@ -125,9 +125,11 @@ class Agent extends BasePackage
         return false;
     }
 
-    protected function addUpdateAgent($sessionId, $clientAddress, $userAgent)
+    protected function addUpdateAgent($sessionId, $clientAddress, $userAgent, $oldSessionId = null)
     {
-        $oldSessionId = $this->access->auth->getOldSessionId();
+        if ($oldSessionId === null) {
+            $oldSessionId = $this->access->auth->getOldSessionId();
+        }
 
         if (!$this->basepackages->email->setup() || $oldSessionId) {
             $verified = 1;
@@ -174,9 +176,7 @@ class Agent extends BasePackage
                     throw $e;
                 }
             } else {
-                $oldSessionId = null;
-
-                return $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
+                return $this->addUpdateAgent($sessionId, $clientAddress, $userAgent, false);
             }
         } else {
             $newAgent =

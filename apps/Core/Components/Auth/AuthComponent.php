@@ -107,7 +107,11 @@ class AuthComponent extends BaseComponent
             $this->view->redirectUrl = $this->access->auth->packagesData->redirectUrl;
 
             $this->addResponse('Ok');
+
+            return true;
         }
+
+        $this->addResponse('Error Logging out!', 1);
     }
 
     public function forgotAction()
