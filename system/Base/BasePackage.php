@@ -1360,7 +1360,7 @@ abstract class BasePackage extends Controller
 		return $data;
 	}
 
-	public function remove(int $id, $resetCache = true, $removeRelated = true, $removeRelatedAliases = [])
+	public function remove(int $id, $resetCache = true, $removeRelated = true, $excludeRelatedAliases = [])
 	{
 		$this->getFirst('id', $id);
 
@@ -1380,17 +1380,13 @@ abstract class BasePackage extends Controller
 						$type = $modelRelation['relationObj']->getType();
 
 						if ($type !== 0) {//Other than belongsTo
-							$removeAlias = false;
-
 							$alias = $modelRelation['relationObj']->getOption('alias');
 
-							if (count($removeRelatedAliases) > 0 && in_array($alias, $removeRelatedAliases)) {
-								$removeAlias = true;
-							} else if (count($removeRelatedAliases) === 0) {
-								$removeAlias = true;
+							if (count($excludeRelatedAliases) > 0 && in_array($alias, $excludeRelatedAliases)) {
+								continue;
 							}
 
-							if ($removeAlias && $this->model->{$alias}) {
+							if ($this->model->{$alias}) {
 								$relationRowsData = $this->model->{$alias}->toArray();
 
 								if (!$this->model->{$alias}->delete()) {
@@ -1422,7 +1418,7 @@ abstract class BasePackage extends Controller
 				$this->addResponse("Could not delete " . ucfirst($this->packageNameS), 1);
 			}
 		} else if ($this->ffStore && $this->ffData && $this->ffData['id'] == $id) {
-			if ($this->ffStore->deleteById((int) $id, $removeRelated)) {
+			if ($this->ffStore->deleteById((int) $id, $removeRelated, $this->ffRelationsConditions, $excludeRelatedAliases)) {
 				$this->addResponse(ucfirst($this->packageNameS) . " Deleted!");
 
 				return true;
