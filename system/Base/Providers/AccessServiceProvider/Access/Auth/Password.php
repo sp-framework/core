@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\AccessServiceProvider\Access\Auth;
 
+use Phalcon\Filter\Validation\Validator\StringLength;
 use System\Base\BasePackage;
 
 class Password extends BasePackage
@@ -140,7 +141,7 @@ class Password extends BasePackage
                 if (isset($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyForceReloginAfterPwreset']) &&
                     $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyForceReloginAfterPwreset'] == true
                 ) {
-                    $this->logout();
+                    $this->access->auth->logout();
 
                     return true;
                 }

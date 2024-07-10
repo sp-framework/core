@@ -4,6 +4,7 @@ namespace System\Base\Providers\ApiServiceProvider\Repositories;
 
 use Carbon\Carbon;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
+use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Exception\UniqueTokenIdentifierConstraintViolationException;
 use League\OAuth2\Server\Grant\AbstractGrant;

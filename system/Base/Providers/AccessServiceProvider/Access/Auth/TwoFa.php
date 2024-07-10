@@ -278,7 +278,7 @@ class TwoFa extends BasePackage
     public function enableTwoFaOtp(array $data = null)
     {
         if ($data) {
-            $validate = $this->validateData($data, 'auth');
+            $validate = $this->access->auth->validateData($data, 'auth');
 
             if ($validate !== true) {
                 $this->addResponse($validate, 1);
@@ -287,7 +287,7 @@ class TwoFa extends BasePackage
             }
         }
 
-        if ($data && !$this->checkAccount($data)) {
+        if ($data && !$this->access->auth->checkAccount($data)) {
             $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
 
             return false;
@@ -369,7 +369,7 @@ class TwoFa extends BasePackage
     public function verifyTwoFaOtp(array $data)
     {
         if (isset($data['user']) && isset($data['pass'])) {
-            $validate = $this->validateData($data, 'auth');
+            $validate = $this->access->auth->validateData($data, 'auth');
 
             if ($validate !== true) {
                 $this->addResponse($validate, 1);
@@ -378,7 +378,7 @@ class TwoFa extends BasePackage
             }
         }
 
-        if (isset($data['user']) && isset($data['pass']) && !$this->checkAccount($data)) {
+        if (isset($data['user']) && isset($data['pass']) && !$this->access->auth->checkAccount($data)) {
             $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
 
             return false;

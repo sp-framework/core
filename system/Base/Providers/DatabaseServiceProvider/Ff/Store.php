@@ -658,7 +658,7 @@ class Store
     {
         $dataArr = $this->findBy($criteria);
 
-        if (count($dataAr) > 0) {
+        if (count($dataArr) > 0) {
             foreach ($dataArr as $data) {
                 if (isset($data['id'])) {
                     if (!$this->deleteById($data['id'], $deleteRelated, $relationsConditions, $exclude)) {

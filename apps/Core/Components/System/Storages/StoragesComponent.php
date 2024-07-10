@@ -165,7 +165,7 @@ class StoragesComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        if (sset($this->postData()['uuid'])) {
+        if (isset($this->postData()['uuid'])) {
             $this->storages->removeFile($this->postData()['uuid']);
 
             $this->addResponse(

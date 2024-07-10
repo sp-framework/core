@@ -729,164 +729,164 @@ class Installer extends BasePackage
         return $found;
     }
 
-    protected function getLatestRepositoryModulesData()
-    {
-        $repositories = getAllArr($this->repositories->getAll());
+    // protected function getLatestRepositoryModulesData()
+    // {
+    //     $repositories = getAllArr($this->repositories->getAll());
 
-        if (count($repositories) > 0) {
-            $modules = $this->packages->use(Modules::class);
+    //     if (count($repositories) > 0) {
+    //         $modules = $this->packages->use(Modules::class);
 
-            foreach ($repositories as $repositoryKey => $repositoryValue) {
-                $sync = $modules->syncRemoteWithLocal($repositoryValue['id']);
+    //         foreach ($repositories as $repositoryKey => $repositoryValue) {
+    //             $sync = $modules->syncRemoteWithLocal($repositoryValue['id']);
 
-                if ($sync->packagesData['responseCode'] === 1) {
-                    $this->packagesData->responseCode = 1;
+    //             if ($sync->packagesData['responseCode'] === 1) {
+    //                 $this->packagesData->responseCode = 1;
 
-                    $this->packagesData->responseMessage = 'Error Syncing with repository ' . $repositoryValue['name'];
+    //                 $this->packagesData->responseMessage = 'Error Syncing with repository ' . $repositoryValue['name'];
 
-                    return $this->packagesData;
-                }
-            }
-        }
-    }
+    //                 return $this->packagesData;
+    //             }
+    //         }
+    //     }
+    // }
 
-    protected function createBackup()
-    {
-        $this->backupLocation = '.backups/';
+    // protected function createBackup()
+    // {
+    //     $this->backupLocation = '.backups/';
 
-        $now = new \DateTime('now');
+    //     $now = new \DateTime('now');
 
-        $this->zip->open(base_path($this->backupLocation . '/' . $now->format('Y_m_d_H_i_s') . '.zip'), $this->zip::CREATE);
+    //     $this->zip->open(base_path($this->backupLocation . '/' . $now->format('Y_m_d_H_i_s') . '.zip'), $this->zip::CREATE);
 
-        $framework = [];
-        $framework['dir'] = [];
-        $framework['file'] = [];
+    //     $framework = [];
+    //     $framework['dir'] = [];
+    //     $framework['file'] = [];
 
-        $rootContents = $this->localContent->listContents('/');
+    //     $rootContents = $this->localContent->listContents('/');
 
-        foreach ($rootContents as $rootKey => $rootValue) {
-            if ($rootValue['type'] === 'dir') {
-                if ($rootValue['path'] !== '.backups' &&
-                    $rootValue['path'] !== '.git' &&
-                    $rootValue['path'] !== 'vendor'
-                ) {
-                    array_push($framework['dir'], $rootValue['path']);
-                }
-            } else if ($rootValue['type'] === 'file') {
-                if ($rootValue['path'] !== '.gitignore' &&
-                    $rootValue['path'] !== '.htaccess.example'
-                ) {
-                    array_push($framework['file'], $rootValue['path']);
-                }
-            }
-        }
+    //     foreach ($rootContents as $rootKey => $rootValue) {
+    //         if ($rootValue['type'] === 'dir') {
+    //             if ($rootValue['path'] !== '.backups' &&
+    //                 $rootValue['path'] !== '.git' &&
+    //                 $rootValue['path'] !== 'vendor'
+    //             ) {
+    //                 array_push($framework['dir'], $rootValue['path']);
+    //             }
+    //         } else if ($rootValue['type'] === 'file') {
+    //             if ($rootValue['path'] !== '.gitignore' &&
+    //                 $rootValue['path'] !== '.htaccess.example'
+    //             ) {
+    //                 array_push($framework['file'], $rootValue['path']);
+    //             }
+    //         }
+    //     }
 
-        foreach ($framework['dir'] as $dirKey => $dirValue) {
-            $rootDirContents[$dirValue] = $this->localContent->listContents($dirValue, true);
-        }
+    //     foreach ($framework['dir'] as $dirKey => $dirValue) {
+    //         $rootDirContents[$dirValue] = $this->localContent->listContents($dirValue, true);
+    //     }
 
-        foreach ($rootDirContents as $rootDirContentsKey => $rootDirContentsValue) {
-            if (count($rootDirContentsValue) > 0) {
-                foreach ($rootDirContentsValue as $subDirectoryKey => $subDirectory) {
-                    if ($subDirectory['type'] === 'dir') {
-                        $this->zip->addEmptyDir($subDirectory['dirname']);
-                    } else if ($subDirectory['type'] === 'file') {
-                        $this->zip->addFile($subDirectory['path']);
-                    }
-                }
-            } else {
-                $this->zip->addEmptyDir($rootDirContentsKey);
-            }
-        };
+    //     foreach ($rootDirContents as $rootDirContentsKey => $rootDirContentsValue) {
+    //         if (count($rootDirContentsValue) > 0) {
+    //             foreach ($rootDirContentsValue as $subDirectoryKey => $subDirectory) {
+    //                 if ($subDirectory['type'] === 'dir') {
+    //                     $this->zip->addEmptyDir($subDirectory['dirname']);
+    //                 } else if ($subDirectory['type'] === 'file') {
+    //                     $this->zip->addFile($subDirectory['path']);
+    //                 }
+    //             }
+    //         } else {
+    //             $this->zip->addEmptyDir($rootDirContentsKey);
+    //         }
+    //     };
 
-        foreach ($framework['file'] as $fileKey => $fileValue) {
-            $this->zip->addFile($fileValue);
-        }
+    //     foreach ($framework['file'] as $fileKey => $fileValue) {
+    //         $this->zip->addFile($fileValue);
+    //     }
 
-        $this->zip->close();
+    //     $this->zip->close();
 
-        $this->packagesData->backupFile = $now->format('Y_m_d_H_i_s') . '.zip';
+    //     $this->packagesData->backupFile = $now->format('Y_m_d_H_i_s') . '.zip';
 
-        $this->packagesData->responseCode = 0;
-    }
+    //     $this->packagesData->responseCode = 0;
+    // }
 
-    protected function processInstall()
-    {
-        foreach ($this->modulesToInstall as $moduleToInstallKey => $moduleToInstall) {
+    // protected function processInstall()
+    // {
+    //     foreach ($this->modulesToInstall as $moduleToInstallKey => $moduleToInstall) {
 
-            $repoNameArr = explode('/', $moduleToInstall['repo']);
-            $repoName = end($repoNameArr);
+    //         $repoNameArr = explode('/', $moduleToInstall['repo']);
+    //         $repoName = end($repoNameArr);
 
-            $this->downloadPackagesAndDependencies($moduleToInstall);
+    //         $this->downloadPackagesAndDependencies($moduleToInstall);
 
-            $contents = $this->extractDownloadedPackagesAndDependencies(
-                $moduleToInstall['name'],
-                $repoName,
-                $moduleToInstall['type']
-            );
+    //         $contents = $this->extractDownloadedPackagesAndDependencies(
+    //             $moduleToInstall['name'],
+    //             $repoName,
+    //             $moduleToInstall['type']
+    //         );
 
-            if ($contents) {
-                $files = $this->copyFilesToDestination(
-                    $contents,
-                    $moduleToInstall['name'],
-                    $repoName,
-                    $moduleToInstall['type']
-                );
-            }
-
-
-            $this->{$moduleToInstall['type']}->update(
-                [
-                    'id'        => $moduleToInstall['id'],
-                    'installed' => 1,
-                    'files'     => json_encode($files),
-                ]
-            );
-        }
-    }
-
-    protected function processUpdate()
-    {
-        $files = [];
-
-        foreach ($this->modulesToInstall as $moduleToInstallKey => $moduleToInstall) {
-            //
-            //Delete only files first
-            //Check if directory is empty, then delete directory
-            //check if directory is html_compiled, if so, then scan directory, delete all files first and then all directories.
-            //Copy all files.
-            //
-            var_dump(json_decode($this->{$moduleToInstall['type']}->getById($moduleToInstall['id'])->getAllArr()['files'], true));
-            // $repoNameArr = explode('/', $moduleToInstall['repo']);
-            // $repoName = end($repoNameArr);
-
-            // $this->downloadPackagesAndDependencies($moduleToInstall);
-
-            // $contents = $this->extractDownloadedPackagesAndDependencies(
-            //  $moduleToInstall['name'],
-            //  $repoName,
-            //  $moduleToInstall['type']
-            // );
-
-            // if ($contents) {
-            //  $files = $this->copyFilesToDestination(
-            //      $contents,
-            //      $moduleToInstall['name'],
-            //      $repoName,
-            //      $moduleToInstall['type']
-            //  );
-            // }
+    //         if ($contents) {
+    //             $files = $this->copyFilesToDestination(
+    //                 $contents,
+    //                 $moduleToInstall['name'],
+    //                 $repoName,
+    //                 $moduleToInstall['type']
+    //             );
+    //         }
 
 
-            // $this->{$moduleToInstall['type']}->update(
-            //  [
-            //      'id'        => $moduleToInstall['id'],
-            //      'installed' => 1,
-            //      'files'     => json_encode($files),
-            //  ]
-            // );
-        }
-    }
+    //         $this->{$moduleToInstall['type']}->update(
+    //             [
+    //                 'id'        => $moduleToInstall['id'],
+    //                 'installed' => 1,
+    //                 'files'     => json_encode($files),
+    //             ]
+    //         );
+    //     }
+    // }
+
+    // protected function processUpdate()
+    // {
+    //     $files = [];
+
+    //     foreach ($this->modulesToInstall as $moduleToInstallKey => $moduleToInstall) {
+    //         //
+    //         //Delete only files first
+    //         //Check if directory is empty, then delete directory
+    //         //check if directory is html_compiled, if so, then scan directory, delete all files first and then all directories.
+    //         //Copy all files.
+    //         //
+    //         var_dump(json_decode($this->{$moduleToInstall['type']}->getById($moduleToInstall['id'])->getAllArr()['files'], true));
+    //         // $repoNameArr = explode('/', $moduleToInstall['repo']);
+    //         // $repoName = end($repoNameArr);
+
+    //         // $this->downloadPackagesAndDependencies($moduleToInstall);
+
+    //         // $contents = $this->extractDownloadedPackagesAndDependencies(
+    //         //  $moduleToInstall['name'],
+    //         //  $repoName,
+    //         //  $moduleToInstall['type']
+    //         // );
+
+    //         // if ($contents) {
+    //         //  $files = $this->copyFilesToDestination(
+    //         //      $contents,
+    //         //      $moduleToInstall['name'],
+    //         //      $repoName,
+    //         //      $moduleToInstall['type']
+    //         //  );
+    //         // }
+
+
+    //         // $this->{$moduleToInstall['type']}->update(
+    //         //  [
+    //         //      'id'        => $moduleToInstall['id'],
+    //         //      'installed' => 1,
+    //         //      'files'     => json_encode($files),
+    //         //  ]
+    //         // );
+    //     }
+    // }
 
     protected function copyFilesToDestination($contents, $name, $repoName, $type)
     {
