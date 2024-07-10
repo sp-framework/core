@@ -19,8 +19,8 @@ class GeoStates extends BasePackage
 
         if ($this->add($data)) {
             if (!isset($data['id'])) {
-                if ($this->config->databasetype === 'db') {
-                    $this->updateSeq();
+                if ($this->config->databasetype !== 'db') {
+                    $this->ffStore->count(true);
                 }
             }
 
@@ -40,8 +40,8 @@ class GeoStates extends BasePackage
             $lastDBId = $this->executeSql($sql);
             $lastDBId->setFetchMode(\Phalcon\Db\Enum::FETCH_ASSOC);
 
-            if ((int) $lastDBId->fetch()['id'] < 1000) {
-                return 1001;
+            if ((int) $lastDBId->fetch()['id'] < 10000) {
+                return 10001;
             } else {
                 return (int) $lastDBId->fetch()['id'] + 1;
             }

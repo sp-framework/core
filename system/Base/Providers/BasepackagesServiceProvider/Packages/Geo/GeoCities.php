@@ -18,10 +18,8 @@ class GeoCities extends BasePackage
         $this->setFFAddUsingUpdateOrInsert(true);
 
         if ($this->add($data)) {
-            if (!isset($data['id'])) {
-                if ($this->config->databasetype === 'db') {
-                    $this->updateSeq();
-                }
+            if ($this->config->databasetype !== 'db') {
+                $this->ffStore->count(true);
             }
 
             $this->addResponse('Added ' . $data['name'] . ' city');
@@ -30,21 +28,34 @@ class GeoCities extends BasePackage
         }
     }
 
-    protected function updateSeq()
+    protected function getNextIdFromDB()
     {
-        $lastCityId = $this->modelToUse::maximum(['column' => 'id']);
+        if ($this->config->databasetype === 'db') {
+            $model = new $this->modelToUse;
+            $table = $model->getSource();
+            $sql = "SELECT id FROM {$table} ORDER BY id DESC LIMIT 1";
 
-        if ($lastCityId && (int) $lastCityId > 100000) {
-            return;
+            $lastDBId = $this->executeSql($sql);
+            $lastDBId->setFetchMode(\Phalcon\Db\Enum::FETCH_ASSOC);
+
+            if ((int) $lastDBId->fetch()['id'] < 100000) {
+                return 100001;
+            } else {
+                return (int) $lastDBId->fetch()['id'] + 1;
+            }
+        } else {
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+            $this->ffStore->count(true);
+
+            $this->setFFAddUsingUpdateOrInsert(true);
+
+            if ((int) $this->ffStore->getLastInsertedId() < 100000) {
+                return 100001;
+            } else {
+                return (int) $this->ffStore->getLastInsertedId() + 1;
+            }
         }
-
-        $model = new $this->modelToUse;
-
-        $table = $model->getSource();
-
-        $sql = "UPDATE `{$table}` SET `id` = ? WHERE `{$table}`.`id` = ?";
-
-        $this->db->execute($sql, [100001, $this->packagesData->last['id']]);
     }
 
     public function updateCity(array $data)
