@@ -47,4 +47,11 @@ class ErrorsComponent extends BaseComponent
 
         $this->addResponse('Server Error, contact administrator!', 1);
     }
+
+    public function invalidDataAction(...$params)
+    {
+        $this->view->pick('common/errors/servererror');
+
+        $this->addResponse('Invalid data provided. Error: ' . $params[0], 1);
+    }
 }

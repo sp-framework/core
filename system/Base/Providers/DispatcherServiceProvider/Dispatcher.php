@@ -75,11 +75,21 @@ class Dispatcher
                 $dispatcher->getDi()->getShared('logger')->logExceptions->critical(json_trace($exception));
 
                 if (!str_contains($exception->getMessage(), 'handler class cannot be loaded')) {//Handle any other exceptions, like variable not found, etc
+                    $class = (new \ReflectionClass($exception))->getShortName();
+
+                    if ($class === 'InvalidDataException') {
+                        $action = 'invalidData';
+                        $params = [$exception->getMessage()];
+                    } else {
+                        $action = 'serverError';
+                    }
+
                     $dispatcher->forward(
                         [
-                            'controller' => $errorComponent,
-                            'action'     => 'serverError',
-                            'namespace'  => $namespace
+                            'controller'    => $errorComponent,
+                            'action'        => $action,
+                            'namespace'     => $namespace,
+                            'params'        => $params ?? []
                         ]
                     );
 

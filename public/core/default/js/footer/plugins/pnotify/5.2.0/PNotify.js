@@ -38,6 +38,7 @@ function paginatedPNotify(type, opts) {
     opts['destroy'] = true;
     opts['delay'] = 2000;
     opts['destroy'] = true;
+    opts['titleTrusted'] = true;
     opts['modules'] = new Map([
       ...PNotify.defaultModules,
       [PNotifyPaginate, {}]
