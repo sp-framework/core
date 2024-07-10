@@ -262,14 +262,14 @@ class Storages extends BasePackage
     {
         $public = true;
 
-        if (isset($this->request->getPost()['storagetype'])) {
-            if ($this->request->getPost()['storagetype'] === 'private') {
-                $public = false;
-            }
-        } else if ($type) {
-            if ($type === 'private') {
-                $public = false;
-            }
+        if (isset($this->request->getPost()['storagetype']) &&
+            $this->request->getPost()['storagetype'] === 'private'
+        ) {
+            $public = false;
+        } else if ($type &&
+                   $type === 'private'
+        ) {
+            $public = false;
         }
 
         return $public;
@@ -279,14 +279,12 @@ class Storages extends BasePackage
     {
         $shouldPurge = false;
 
-        if (isset($this->request->getPost()['purge'])) {
-            if ($this->request->getPost()['purge'] == 'true') {
-                $shouldPurge = true;
-            }
-        } else if ($purge !== null) {
-            if ($purge === true) {
-                $shouldPurge = true;
-            }
+        if (isset($this->request->getPost()['purge']) &&
+            $this->request->getPost()['purge'] == 'true'
+        ) {
+            $shouldPurge = true;
+        } else if ($purge === true) {
+            $shouldPurge = true;
         }
 
         return $shouldPurge;

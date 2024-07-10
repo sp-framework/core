@@ -612,7 +612,6 @@ class Local extends BasePackage
         $file = $this->getFileInfo($uuid);
 
         if ($file && count($file) === 1) {
-
             if ($file[0]['uuid_location'] && $file[0]['uuid_location'] !== '') {
                 $fileLocation = $file[0]['uuid_location'];
                 $fileLocation = trim($fileLocation, '/');
@@ -620,6 +619,7 @@ class Local extends BasePackage
             } else {
                 $fileLocation = '';
             }
+
             if (in_array($file[0]['type'], $this->imageMimeTypes)) {
                 $fileRemovedFromDB = $this->removeFileFromDb($file[0]['id']);
 
@@ -636,25 +636,24 @@ class Local extends BasePackage
                 if (!$fileRemovedFromDB) {
                     $this->addResponse('Error deleting file from DB', 1);
 
-                    return true;
+                    return false;
                 }
 
                 if (!$fileDeleted) {
                     $this->addResponse('Error deleting file from location', 1);
 
-                    return true;
+                    return false;
                 }
 
                 if (!$fileCacheDeleted) {
                     $this->addResponse('Error deleting file from cache', 1);
 
-                    return true;
+                    return false;
                 }
 
                 $this->addResponse('File purged from DB, Location and cache');
 
                 return true;
-
             } else if (in_array($file[0]['type'], $this->fileMimeTypes)) {
                 $fileRemovedFromDB = $this->removeFileFromDb($file[0]['id']);
 
@@ -665,44 +664,24 @@ class Local extends BasePackage
                 if (!$fileRemovedFromDB) {
                     $this->addResponse('Error deleting file from DB', 1);
 
-                    return true;
+                    return false;
                 }
 
                 if (!$fileDeleted) {
                     $this->addResponse('Error deleting file from location', 1);
 
-                    return true;
+                    return false;
                 }
 
                 $this->addResponse('File removed from DB, Location and cache');
 
                 return true;
             }
-        } else if ($file && count($file) === 0) {
-            $fileImageDeleted = $this->removeFileFromLocation(
-                '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsImagesPath . $fileLocation . $file[0]['uuid']
-            );
-            $fileDataDeleted = $this->removeFileFromLocation(
-                '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsDataPath . $fileLocation . $file[0]['uuid']
-            );
-            $fileCacheDeleted = $this->removeFileCache(
-                '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsCachePath . $fileLocation . $file[0]['uuid']
-            );
-
-            if ($fileImageDeleted || $fileDataDeleted || $fileCacheDeleted) {
-                $this->addResponse('File not found in DB, but in location/cache. Files removed from location/cache.');
-
-                return true;
-            }
-
-            $this->addResponse('Incorrect UUID, Not in DB and/or location/cache.', 1);
-
-            return true;
         }
 
-        $this->addResponse('Incorrect UUID, Not in DB and/or location/cache.', 1);
+        $this->addResponse('Incorrect UUID, Not in DB.', 1);
 
-        return true;
+        return false;
     }
 
     protected function removeFileFromDb($id)
