@@ -40,4 +40,11 @@ class ErrorsComponent extends BaseComponent
 
         $this->addResponse('Id Not Found', 1);
     }
+
+    public function serverErrorAction()
+    {
+        $this->view->pick('common/errors/servererror');
+
+        $this->addResponse('Server Error, contact administrator!', 1);
+    }
 }

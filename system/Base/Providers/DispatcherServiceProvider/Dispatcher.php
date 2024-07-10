@@ -72,6 +72,20 @@ class Dispatcher
                 $dispatcher,
                 \Exception $exception
             ) use ($errorComponent, $namespace) {
+                $dispatcher->getDi()->getShared('logger')->logExceptions->critical(json_trace($exception));
+
+                if (!str_contains($exception->getMessage(), 'handler class cannot be loaded')) {//Handle any other exceptions, like variable not found, etc
+                    $dispatcher->forward(
+                        [
+                            'controller' => $errorComponent,
+                            'action'     => 'serverError',
+                            'namespace'  => $namespace
+                        ]
+                    );
+
+                    return false;
+                }
+
                 switch ($exception->getCode()) {
                     case PhalconDispatcherException::EXCEPTION_HANDLER_NOT_FOUND:
                         $dispatcher->forward(
