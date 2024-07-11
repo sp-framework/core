@@ -452,3 +452,17 @@ if (!function_exists('array_diff_assoc_recursive')) {
         return !isset($difference) ? 0 : $difference;
     }
 }
+
+if (!function_exists('array_get_values_recursive')) {
+    function array_get_values_recursive($keys = [], array $arr) {
+        $val = [];
+
+        array_walk_recursive($arr, function($v, $k) use($keys, &$val) {
+            if (in_array($k, $keys)) {
+                array_push($val, [$k => $v]);
+            }
+        });
+
+        return count($val) > 1 ? $val : array_pop($val);
+    }
+}
