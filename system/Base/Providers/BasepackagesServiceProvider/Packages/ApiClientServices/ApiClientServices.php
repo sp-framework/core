@@ -290,12 +290,6 @@ class ApiClientServices extends BasePackage
 
         if (is_array($data)) {
             if (isset($data['state'])) {
-                if (strpos($data['_url'], 'ebay')) {
-                    $this->switchApiModel(['provider' => 'ebay']);
-                } else if (strpos($data['_url'], 'xero')) {
-                    $this->switchApiModel(['provider' => 'xero']);
-                }
-
                 if ($this->config->databasetype === 'db') {
                     $conditions =
                         [

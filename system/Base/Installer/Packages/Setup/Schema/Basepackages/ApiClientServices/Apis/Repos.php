@@ -72,7 +72,7 @@ class Repos
                         'password',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 100,
+                            'size'    => 2048,
                             'notNull' => false,
                         ]
                     ),
