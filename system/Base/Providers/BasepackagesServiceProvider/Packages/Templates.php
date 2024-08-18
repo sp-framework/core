@@ -183,11 +183,11 @@ class Templates extends BasePackage
             <html lang="en">
                 <head>
                     <meta charset="UTF-8">
-                    <meta name="description" content="Bazaari">
+                    <meta name="description" content="SP Framework">
                     <meta name="keywords" content="HTML, CSS, JavaScript">
                     <meta name="author" content="Guru">
                     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                    <title>Bazaari</title>' .
+                    <title>SP Framework</title>' .
                     $css .
                     $js .
                 '</head>

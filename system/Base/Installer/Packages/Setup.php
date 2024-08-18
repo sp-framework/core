@@ -408,7 +408,7 @@ class Setup
 
 	protected function cleanOldCookies()
 	{
-		$cookieKey = 'Bazaari';
+		$cookieKey = 'SP';
 
 		//Set cookies to 1 second so browser removes them.
 		$this->cookies->set(

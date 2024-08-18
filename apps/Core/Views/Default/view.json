@@ -1,6 +1,6 @@
 {
     "name": "Default",
-    "display_name": "Bazaari Core Default View",
+    "display_name": "SP Framework Core Default View",
     "description": "Default Core View",
     "module_type": "views",
     "app_type": "core",
@@ -67,14 +67,14 @@
         "head":
         {
             "doctype": "XHTML5",
-            "title": "Bazaari Core",
+            "title": "SP Framework Core",
             "meta":
             {
                 "author": "guru@bazaari.com.au",
                 "charset": "UTF-8",
                 "keywords": "HTML, CSS, JavaScript",
                 "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
-                "description": "Bazaari Core Views"
+                "description": "SP Framework Core Views"
             },
             "link":
             {
@@ -126,8 +126,8 @@
             "copyright":
             {
                 "fromYear": "2014",
-                "site": "https://www.bazaari.com.au",
-                "name": "Bazaari E Trade Pty. Ltd."
+                "site": "https://github.com/sp-framework/core",
+                "name": "SP Framework"
             },
             "script":
             {

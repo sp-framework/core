@@ -164,7 +164,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
     {
         if ($this->accountsObj->sessions) {
             foreach ($this->accountsObj->sessions as $key => $session) {
-                if ($session->session_id === $cookies['Bazaari']) {
+                if ($session->session_id === $cookies['SP']) {
                     return true;
                 }
             }
