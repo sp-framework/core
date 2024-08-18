@@ -810,7 +810,9 @@ class DevtoolsModules extends BasePackage
                 (str_starts_with($data['category'], 'basepackages') ||
                  $data['category'] === 'providers')
             ) {
-                if (str_starts_with($data['category'], 'basepackages')) {
+                if ($data['category'] === 'basepackagesApis') {
+                    $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/ApiClientServices/Apis/';
+                } else if (str_starts_with($data['category'], 'basepackages')) {
                     $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/';
                 } else if ($data['category'] === 'providers') {
                     $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/';
@@ -898,10 +900,10 @@ class DevtoolsModules extends BasePackage
                 (str_starts_with($data['category'], 'basepackages') ||
                  $data['category'] === 'providers')
             ) {
-                if (str_starts_with($data['category'], 'basepackages')) {
-                    $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/';
-                } else if ($data['category'] === 'basepackages_apis') {
+                if ($data['category'] === 'basepackagesApis') {
                     $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/ApiClientServices/Apis/';
+                } else if (str_starts_with($data['category'], 'basepackages')) {
+                    $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/';
                 } else if ($data['category'] === 'providers') {
                     $moduleLocation = 'system/Base/Providers/';
                 }

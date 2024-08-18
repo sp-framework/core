@@ -189,10 +189,12 @@ class ModulesComponent extends BaseComponent
 								}
 							} else if ($module['module_details']['module_type'] === 'packages') {
 								if ($module['module_details']['app_type'] === 'core' &&
-									($module['module_details']['category'] === 'basepackages' ||
+									(str_starts_with($module['module_details']['category'], 'basepackages') ||
 									 $module['module_details']['category'] === 'providers')
 								) {
-									if ($module['module_details']['category'] === 'basepackages') {
+									if ($module['module_details']['category'] === 'basepackagesApis') {
+										$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/ApiClientServices/Apis/';
+									} else if (str_starts_with($module['module_details']['category'], 'basepackages')) {
 										$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/';
 									} else if ($module['module_details']['category'] === 'providers') {
 										$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/';
@@ -207,12 +209,16 @@ class ModulesComponent extends BaseComponent
 							}
 
 							if ($module['module_details']['module_type'] === 'packages' &&
-								($module['module_details']['category'] === 'basepackages' ||
+								(str_starts_with($module['module_details']['category'], 'basepackages') ||
 								 $module['module_details']['category'] === 'providers')
 							) {
+								$pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['module_details']['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+								$routePath = implode('/', $pathArr) . '/';
+
 								$jsonFile =
 									$moduleLocation .
-									ucfirst($module['module_details']['name']) . '/' .
+									$routePath .
 									substr($module['module_details']['module_type'], 0, -1) . '.json';
 							} else {
 								if ($module['module_details']['module_type'] === 'components') {
@@ -250,7 +256,6 @@ class ModulesComponent extends BaseComponent
 										$routePath = $module['module_details']['name'] . '/';
 									}
 								}
-
 								$jsonFile =
 									$moduleLocation .
 									$routePath .
