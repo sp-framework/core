@@ -121,10 +121,8 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
-        if ($data['module_type'] !== 'views' && $data['module_type'] !== 'components') {
-            $moduleLocation = $this->getNewFilesLocation($data);
-
-            $data['class'] = rtrim(str_replace('/', '\\', ucfirst($moduleLocation)), '\\');
+        if ($data['module_type'] !== 'views') {
+            $data['class'] = $this->generateModuleClass($data);
         }
 
         if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {
@@ -638,7 +636,6 @@ class DevtoolsModules extends BasePackage
             $repo = $jsonContent['repo'];
         } else {
             $data = $this->jsonData($data, true);
-
             $jsonContent = [];
             $jsonContent["name"] = $data["name"];
             if ($data['module_type'] === 'components') {
@@ -830,9 +827,16 @@ class DevtoolsModules extends BasePackage
             (str_starts_with($data['category'], 'basepackages') ||
             $data['category'] === 'providers')
         ) {
+            if ($data['category'] === 'basepackagesApis') {
+                $pathArr = preg_split('/(?=[A-Z])/', ucfirst($data['name']), -1, PREG_SPLIT_NO_EMPTY);
+                $path = implode('/', $pathArr);
+            } else {
+                $path = ucfirst($data['name']);
+            }
+
             return
                 $moduleLocation .
-                ucfirst($data['name']) . '/' .
+                $path . '/' .
                 substr($data['module_type'], 0, -1) . '.json';
         } else {
             if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
@@ -926,7 +930,7 @@ class DevtoolsModules extends BasePackage
             (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'providers')
         ) {
             if (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'basepackagesApis') {
-                $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
+                $pathArr = preg_split('/(?=[A-Z])/', ucfirst($data['name']), -1, PREG_SPLIT_NO_EMPTY);
 
                 if ($data['category'] !== 'basepackagesApis') {
                     unset($pathArr[$this->helper->lastKey($pathArr)]);
@@ -952,7 +956,7 @@ class DevtoolsModules extends BasePackage
             } else if ($data['module_type'] === 'middlewares') {
                 $routePath = $data['name'] . '/';
             } else if ($data['module_type'] === 'packages') {
-                $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
+                $pathArr = preg_split('/(?=[A-Z])/', ucfirst($data['name']), -1, PREG_SPLIT_NO_EMPTY);
 
                 $routePath = implode('/', $pathArr) . '/';
             } else if ($data['module_type'] === 'views') {
@@ -1103,13 +1107,21 @@ $file .= '
         $namespaceClass = implode('\\', $data['class']);
 
         $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass . ';', $file);
-        $file = str_replace('"PACKAGENAME"', $data['name'], $file);
+        if ($data['category'] === 'basepackagesApis') {
+            $file = str_replace('"PACKAGENAME"', 'Apis' . ucfirst($data['name']), $file);
+        } else {
+            $file = str_replace('"PACKAGENAME"', ucfirst($data['name']), $file);
+        }
         $file = str_replace('"PACKAGENAMELC"', strtolower($data['name']), $file);
 
         if (str_starts_with($data['category'], 'basepackages')) {
-            $fileName = $moduleFilesLocation . $this->helper->last(preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY)) . '.php';
+            if ($data['category'] === 'basepackagesApis') {
+                $fileName = $moduleFilesLocation . 'Apis' . ucfirst($data['name']) . '.php';
+            } else {
+                $fileName = $moduleFilesLocation . $this->helper->last(preg_split('/(?=[A-Z])/', ucfirst($data['name']), -1, PREG_SPLIT_NO_EMPTY)) . '.php';
+            }
         } else {
-            $fileName = $moduleFilesLocation . $data['name'] . '.php';
+            $fileName = $moduleFilesLocation . ucfirst($data['name']) . '.php';
         }
 
         try {
@@ -1128,6 +1140,10 @@ $file .= '
 
     protected function generateNewPackagesInstallFiles($data, $moduleFilesLocation)
     {
+        if ($data['category'] === 'basepackagesApis') {//We do not generate schema for Repositories as it already exists.
+            return true;
+        }
+
         //Install Schema File
         try {
             $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/PackageInstallSchema.txt');
@@ -1142,6 +1158,7 @@ $file .= '
             $moduleFilesLocation = $this->getModuleJsonFileLocation($data);
             $moduleFilesLocation = str_replace('Register/Modules/Packages', 'Schema', $moduleFilesLocation);
             $moduleFilesLocation = rtrim(str_replace('package.json', '', $moduleFilesLocation), '/');
+
             $fileName = $moduleFilesLocation . '.php';
             $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
             $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
@@ -1211,34 +1228,34 @@ $file .= '
         }
 
         if (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'providers') {
-            // $nameArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
-
             if (str_starts_with($data['category'], 'basepackages')) {
-                $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/';
+                if ($data['category'] === 'basepackagesApis') {
+                    $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/ApiClientServices/Apis/';
+                    $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
+                    unset($pathArr[$this->helper->lastKey($pathArr)]);
 
-                // if (count($nameArr) === 1) {
-                //     $moduleFilesLocation = $moduleFilesLocation . $nameArr[0];
-                // } else {
-                //     unset($nameArr[$this->helper->lastKey($nameArr)]);
-                //     $moduleFilesLocation = $moduleFilesLocation . implode('/', $nameArr);
-                // }
-
-                $fileName = $moduleFilesLocation . '/Basepackages' . $data['name'] . '.php';
-                $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-                $className = 'Basepackages' . $data['name'];
+                    $fileName = $moduleFilesLocation . implode('/', $pathArr) . '/' . '/BasepackagesApiClientServicesApis' . ucfirst($data['name']) . '.php';
+                    $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation) . '/' . implode('/', $pathArr) . '/');
+                    $className = 'BasepackagesApiClientServicesApis' . ucfirst($data['name']);
+                } else {
+                    $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/';
+                    $fileName = $moduleFilesLocation . '/Basepackages' . ucfirst($data['name']) . '.php';
+                    $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+                    $className = 'Basepackages' . ucfirst($data['name']);
+                }
             } else if ($data['category'] === 'providers') {
-                $moduleFilesLocation = 'system/Base/Providers/' . $data['name'] . 'ServiceProvider/Model/';
-                $fileName = $moduleFilesLocation . '/ServiceProvider' . $data['name'] . '.php';
+                $moduleFilesLocation = 'system/Base/Providers/' . ucfirst($data['name']) . 'ServiceProvider/Model/';
+                $fileName = $moduleFilesLocation . '/ServiceProvider' . ucfirst($data['name']) . '.php';
 
                 $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-                $className = 'ServiceProvider' . $data['name'];
+                $className = 'ServiceProvider' . ucfirst($data['name']);
             }
         } else {
             $moduleFilesLocation = $moduleFilesLocation . 'Model';
-            $fileName = $moduleFilesLocation . '/' . 'Apps' . ucfirst($data['app_type']) . $data['name'] . '.php';
+            $fileName = $moduleFilesLocation . '/' . 'Apps' . ucfirst($data['app_type']) . ucfirst($data['name']) . '.php';
             $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-            $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
-            $className = 'Apps' . ucfirst($data['app_type']) . $data['name'];
+            $moduleFilesLocationClass = str_replace('\\' . ucfirst($data['name']), '', $moduleFilesLocationClass);
+            $className = 'Apps' . ucfirst($data['app_type']) . ucfirst($data['name']);
         }
 
         $file = str_replace('"NAMESPACE"', 'namespace ' . rtrim($moduleFilesLocationClass, '\\') . ';', $file);
@@ -2843,7 +2860,7 @@ $file .= '
 
         $this->addResponse('Generated Class', 0, ['class' => $class]);
 
-        return true;
+        return $class;
     }
 
     public function generateModuleRepoUrl($data)
