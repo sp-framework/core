@@ -925,10 +925,12 @@ class DevtoolsModules extends BasePackage
         if ($data['module_type'] === 'packages' &&
             (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'providers')
         ) {
-            if (str_starts_with($data['category'], 'basepackages')) {
+            if (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'basepackagesApis') {
                 $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
 
-                unset($pathArr[$this->helper->lastKey($pathArr)]);
+                if ($data['category'] !== 'basepackagesApis') {
+                    unset($pathArr[$this->helper->lastKey($pathArr)]);
+                }
 
                 return
                     $moduleLocation .
@@ -2818,8 +2820,16 @@ $file .= '
 
             if ($data['category'] === 'providers') {
                 $class .= 'System\Base\Providers\\' . ucfirst($data['name']) . 'ServiceProvider' . '\\' . ucfirst($data['name']);
-            } else if (str_starts_with($data['category'], 'basepackages')) {
-                $class .= 'System\Base\Providers\BasepackagesServiceProvider\Packages\\' . ucfirst($data['name']);
+            } else if (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'basepackagesApis') {
+                if ($data['category'] === 'basepackagesApis') {
+                    $pathArr = preg_split('/(?=[A-Z])/', ucfirst($data['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+                    $routePath = implode('\\', $pathArr) . '\\Apis' . ucfirst($data['name']);
+
+                    $class .= 'System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\Apis\\' . $routePath;
+                } else {
+                    $class .= 'System\Base\Providers\BasepackagesServiceProvider\Packages\\' . ucfirst($data['name']);
+                }
             } else {
                 $name = lcfirst($data['name']);
                 $name = preg_split('/(?=[A-Z])/', $name);

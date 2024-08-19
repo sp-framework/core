@@ -1,6 +1,6 @@
 {
-    "name"          : "ApisReposGitea",
-    "display_name"  : "Gitea",
+    "name"          : "ReposGitea",
+    "display_name"  : "Gitea repositories API package",
     "description"   : "Package for connecting to Repository Gitea using API",
     "module_type"   : "packages",
     "app_type"      : "core",
