@@ -1,6 +1,6 @@
 {
     "name"          : "ApiClientServices",
-    "display_name"  : "Api Client Services Package",
+    "display_name"  : "Api Client Services",
     "description"   : "Package for connecting to external resources using API",
     "module_type"   : "packages",
     "app_type"      : "core",

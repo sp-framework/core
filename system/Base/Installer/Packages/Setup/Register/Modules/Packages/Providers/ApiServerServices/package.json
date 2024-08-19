@@ -1,6 +1,6 @@
 {
     "name"          : "ApiServerServices",
-    "display_name"  : "Api Server Services Package",
+    "display_name"  : "Api Server Services",
     "description"   : "Package for managing system api server services",
     "module_type"   : "packages",
     "app_type"      : "core",

@@ -1,6 +1,6 @@
 {
     "name"          : "ReposGithub",
-    "display_name"  : "Github repositories API package",
+    "display_name"  : "Github repositories API",
     "description"   : "Package for connecting to Repository Github using API",
     "module_type"   : "packages",
     "app_type"      : "core",

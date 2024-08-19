@@ -1,6 +1,6 @@
 {
     "name"          : "ApiServerClients",
-    "display_name"  : "Api Server Clients Package",
+    "display_name"  : "Api Server Clients",
     "description"   : "Package for managing system api server clients",
     "module_type"   : "packages",
     "app_type"      : "core",
