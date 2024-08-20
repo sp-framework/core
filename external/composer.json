@@ -15,13 +15,13 @@
     "extra": {
         "patches": {
             "react\/socket": {
-                "phpv8.3 support": "\/var\/www\/html\/sp\/system\/Base\/..\/..\/external\/patches\/react_socket_connection.patch"
+                "phpv8.3 support": "patches\/react_socket_connection.patch"
             },
             "cboden\/ratchet": {
-                "phpv8.3 support": "\/var\/www\/html\/sp\/system\/Base\/..\/..\/external\/patches\/cboden_ratchet_ioconnection.patch"
+                "phpv8.3 support": "patches\/cboden_ratchet_ioconnection.patch"
             },
             "league\/oauth2-server": {
-                "extract client_id": "\/var\/www\/html\/sp\/system\/Base\/..\/..\/external\/patches\/oauth2_server_bearertokenvalidator.patch"
+                "extract client_id": "patches\/league_oauth2_server_bearertokenvalidator.patch"
             }
         }
     }

@@ -73,15 +73,15 @@
 				{
 					"react/socket" : 
 					{
-						"phpv8.3 support" : "external/patches/react_socket_connection.patch"
+						"phpv8.3 support" : "patches/react_socket_connection.patch"
 					},
-					"cboden/ratchet" : 
+					"cboden/ratchet" :
 					{
-						"phpv8.3 support" : "external/patches/cboden_ratchet_ioconnection.patch"
+						"phpv8.3 support" : "patches/cboden_ratchet_ioconnection.patch"
 					},
-					"league/oauth2-server" : 
+					"league/oauth2-server" :
 					{
-						"extract client_id" : "external/patches/oauth2_server_bearertokenvalidator.patch"
+						"extract client_id" : "patches/league_oauth2_server_bearertokenvalidator.patch"
 					}
 				}
 			}
