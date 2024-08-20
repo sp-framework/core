@@ -1,6 +1,6 @@
 {
     "name"          : "ApiServerScopes",
-    "display_name"  : "Api Server Scopes Package",
+    "display_name"  : "Api Server Scopes",
     "description"   : "Package for managing system api server scopes",
     "module_type"   : "packages",
     "app_type"      : "core",

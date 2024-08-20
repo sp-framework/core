@@ -29,8 +29,12 @@ class Qrcodes extends BasePackage
                 $this->qrcodesSettings = $this->qrcodesPackage['settings'];
             }
 
+            $this->qrcodesSettings['id'] = $this->qrcodesPackage['id'];
+
             return $this;
         }
+
+        return false;
     }
 
     public function getQrcodesSettings()
@@ -77,12 +81,12 @@ class Qrcodes extends BasePackage
 
         $this->qrcodesPackage['settings'] = $this->helper->encode($this->qrcodesSettings);
 
-
         $this->modules->packages->updatePackages($this->qrcodesPackage);
 
-        $this->packagesData->responseCode = $this->modules->packages->packagesData->responseCode;
-
-        $this->packagesData->responseMessage = 'Updated Qrcodes Settings';
+        $this->addResponse(
+            $this->modules->packages->packagesData->responseMessage,
+            $this->modules->packages->packagesData->responseCode
+        );
     }
 
     public function generateQrcode(string $text, $settings = [])
@@ -117,10 +121,9 @@ class Qrcodes extends BasePackage
                 $this->qrcodesSettings['codeBackgroundColor']['a']
             )
         );
-
-        if ($this->qrcodesSettings['showLogo'] === 'true') {
+        if ($this->qrcodesSettings['showLogo'] == 'true') {
             if ($this->qrcodesSettings['logo'] !== '') {
-                $logoPath = $this->basepackages->storages->getPublicLink($this->qrcodesSettings['logo'], $this->qrcodesSettings['logoWidth']);
+                $logoPath = base_path($this->basepackages->storages->getPublicLink($this->qrcodesSettings['logo'], $this->qrcodesSettings['logoWidth']));
             } else {
                 $logoPath = base_path('public/core/default/images/baz/logo/justlogo110x110.png');
             }
@@ -131,7 +134,7 @@ class Qrcodes extends BasePackage
             $logo = null;
         }
 
-        if ($this->qrcodesSettings['showLabel'] === 'true') {
+        if ($this->qrcodesSettings['showLabel'] == 'true') {
             $label = Label::create($this->qrcodesSettings['labelText']);
             $alignment = ucfirst(strtolower($this->qrcodesSettings['defaultLabelAlignment']));
             $label->setAlignment(constant("\Endroid\QrCode\Label\LabelAlignment::$alignment"));
@@ -160,9 +163,7 @@ class Qrcodes extends BasePackage
             return $generatedQrcode->getDataUri();
         } catch (\Exception $e) {
             if ($e->getMessage() !== '') {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = $e->getMessage();
+                $this->addResponse($e->getMessage(), 1);
 
                 return;
             }

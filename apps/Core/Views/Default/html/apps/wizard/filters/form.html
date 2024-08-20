@@ -2,28 +2,6 @@
     <div class="col">
         {{adminltetags.useTag('fields',
             [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'incorrect_login_attempt_block_ip',
-                'fieldLabel'                            : 'Incorrect Login Attempt Block IP',
-                'fieldType'                             : 'input',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Block IP after # of incorrect login attempts. 0 is for not blocking. Note: Authentication middleware should be enabled for this to work.',
-                'fieldInputTypeTextFilter'              : 'positiveInt',
-                'fieldRequired'                         : false,
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldBazPostOnUpdate'                  : true,
-                'fieldDataInputMaxLength'               : 2,
-                'fieldValue'                            : appIncorrectLoginAttemptBlockIp
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
                 'component'                      : component,
                 'componentName'                  : componentName,
                 'componentId'                    : componentId,
@@ -44,16 +22,60 @@
                             [
                                 'title'                           : 'Allow All',
                                 'type'                            : 'success',
-                                'dataValue'                       : '1'
+                                'dataValue'                       : 'allow'
                             ],
                         'block' :
                             [
                                 'title'                           : 'Block All',
                                 'type'                            : 'danger',
-                                'dataValue'                       : '0'
+                                'dataValue'                       : 'block'
                             ]
                     ],
                 'fieldRadioChecked'              : appIpFilterDefaultAction
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'auto_unblock_ip_minutes',
+                'fieldLabel'                            : 'Auto Unblock IP after X minutes',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Auto unblock up after x amount of minutes.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMaxLength'               : 6,
+                'fieldValue'                            : appAutoUnblockIpMinutes
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'incorrect_login_attempt_block_ip',
+                'fieldLabel'                            : 'Incorrect Login Attempt Block IP',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Block IP after # of incorrect login attempts. 0 is for not blocking. Note: Authentication middleware should be enabled for this to work.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMaxLength'               : 2,
+                'fieldValue'                            : appIncorrectLoginAttemptBlockIp
             ]
         )}}
     </div>
@@ -165,8 +187,9 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                              : { },
-        '{{componentId}}-{{sectionId}}-incorrect_login_attempt_block_ip': { },
         '{{componentId}}-{{sectionId}}-ip_filter_default_action'        : { },
+        '{{componentId}}-{{sectionId}}-auto_unblock_ip_minutes'         : { },
+        '{{componentId}}-{{sectionId}}-incorrect_login_attempt_block_ip': { },
         '{{componentId}}-{{sectionId}}-ip_address'                      : { },
         '{{componentId}}-{{sectionId}}-filters'                         : {
             afterInit: function() {
@@ -290,18 +313,30 @@ dataCollectionSection =
                                                 json.data[i]['address_type'] = '<span class="badge badge-primary text-uppercase">Network</span>';
                                             }
 
-                                            json.data[i]['actions'] = '<a href="#" class="text-danger remove-filter" ' +
-                                                'data-toggle="tooltip" data-placement="left" title="Remove Filter"' +
-                                                'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-trash"></i></a>';
+                                            json.data[i]['actions'] = '';
 
-                                            if (json.data[i]['filter_type'] === 'monitor') {
-                                                json.data[i]['actions'] = '<a href="#" class="text-danger remove-filter" ' +
-                                                    'data-toggle="tooltip" data-placement="left" title="Remove Filter"' +
-                                                    'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-trash"></i></a>' +
+                                            if (json.data[i]['filter_type'] === 'monitor' && json.data[i]['added_by'] === 'System') {
+                                                json.data[i]['actions'] +=
                                                     '<a href="#" class="text-danger block-filter ml-1" ' +
                                                     'data-toggle="tooltip" data-placement="left" title="Block IP"' +
                                                     'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-times-circle"></i></a>';
+                                            } else {
+                                                if (json.data[i]['filter_type'] === 'allow') {
+                                                    json.data[i]['actions'] +=
+                                                        '<a href="#" class="text-danger block-filter ml-1" ' +
+                                                        'data-toggle="tooltip" data-placement="left" title="Block IP"' +
+                                                        'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-times-circle"></i></a>';
+                                                } else if (json.data[i]['filter_type'] === 'block') {
+                                                    json.data[i]['actions'] +=
+                                                        '<a href="#" class="text-success allow-filter ml-1" ' +
+                                                        'data-toggle="tooltip" data-placement="left" title="Allow IP"' +
+                                                        'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-check-circle"></i></a>';
+                                                }
                                             }
+
+                                            json.data[i]['actions'] += '<a href="#" class="text-danger remove-filter" ' +
+                                                'data-toggle="tooltip" data-placement="left" title="Remove Filter"' +
+                                                'data-id="' + json.data[i]['id'] + '"><i class="fas fa-fw fa-trash"></i></a>';
 
                                             if (json.data[i]['filter_type'] === 'allow') {
                                                 json.data[i]['filter_type'] = '<span class="badge badge-success text-uppercase">Allow</span>';
@@ -348,7 +383,6 @@ dataCollectionSection =
                                     }
                                 }).then((result) => {
                                     if (result.value) {
-
                                         var url = "{{links.url('apps/removeFilter')}}";
                                         var postData = { };
                                         postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -365,6 +399,53 @@ dataCollectionSection =
 
                                             paginatedPNotify('success', {
                                                 title   : 'Filter removed.'
+                                            });
+
+                                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+                                        }, "json");
+                                    }
+                                });
+                            });
+
+                            $('.allow-filter').click(function(e) {
+                                e.preventDefault();
+
+                                Swal.fire({
+                                    title                       : '<span class="text-success"> Allow IP?</span>',
+                                    icon                        : 'question',
+                                    background                  : 'rgba(0,0,0,.8)',
+                                    backdrop                    : 'rgba(0,0,0,.6)',
+                                    buttonsStyling              : false,
+                                    confirmButtonText           : 'Allow',
+                                    customClass                 : {
+                                        'confirmButton'             : 'btn btn-success btn-sm text-uppercase',
+                                        'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                                    },
+                                    showCancelButton            : true,
+                                    keydownListenerCapture      : true,
+                                    allowOutsideClick           : true,
+                                    allowEscapeKey              : true,
+                                    didOpen                     : function() {
+                                        dataCollection.env.sounds.swalSound.play();
+                                    }
+                                }).then((result) => {
+                                    if (result.value) {
+                                        var url = "{{links.url('apps/allowFilter')}}";
+                                        var postData = { };
+                                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                        postData["id"] = $(this).data('id');
+
+                                        $.post(url, postData, function(response) {
+                                            if (response.responseCode != 0) {
+                                                paginatedPNotify('error', {
+                                                    title   : response.responseMessage
+                                                });
+
+                                                return;
+                                            }
+
+                                            paginatedPNotify('success', {
+                                                title   : 'IP Allowed.'
                                             });
 
                                             dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
@@ -395,26 +476,28 @@ dataCollectionSection =
                                         dataCollection.env.sounds.swalSound.play();
                                     }
                                 }).then((result) => {
-                                    var url = "{{links.url('apps/blockMonitorFilter')}}";
-                                    var postData = { };
-                                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                                    postData["id"] = $(this).data('id');
+                                    if (result.value) {
+                                        var url = "{{links.url('apps/blockFilter')}}";
+                                        var postData = { };
+                                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                        postData["id"] = $(this).data('id');
 
-                                    $.post(url, postData, function(response) {
-                                        if (response.responseCode != 0) {
-                                            paginatedPNotify('error', {
-                                                title   : response.responseMessage
+                                        $.post(url, postData, function(response) {
+                                            if (response.responseCode != 0) {
+                                                paginatedPNotify('error', {
+                                                    title   : response.responseMessage
+                                                });
+
+                                                return;
+                                            }
+
+                                            paginatedPNotify('success', {
+                                                title   : 'IP Blocked.'
                                             });
 
-                                            return;
-                                        }
-
-                                        paginatedPNotify('success', {
-                                            title   : 'IP Blocked.'
-                                        });
-
-                                        dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
-                                    }, "json");
+                                            dataCollectionSection['{{componentId}}-{{sectionId}}-filters']['datatable'].ajax.reload();
+                                        }, "json");
+                                    }
                                 });
                             });
                         });

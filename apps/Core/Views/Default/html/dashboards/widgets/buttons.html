@@ -4,8 +4,8 @@
 {% set saveHidden = true %}
 {% set addDisabled = true %}
 {% set addHidden = true %}
-{% if auth.account() %}
-    {% if dashboard['created_by'] == auth.account()['id'] %}
+{% if access.auth.account() %}
+    {% if dashboard['created_by'] == access.auth.account()['id'] %}
         {% set addDisabled = false %}
         {% set addHidden = false %}
     {% endif %}

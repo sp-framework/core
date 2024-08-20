@@ -654,20 +654,28 @@ class Store
         return $this->data;
     }
 
-    public function deleteBy(array $criteria, $deleteRelated = true, int $returnOption = Query::DELETE_RETURN_BOOL)
+    public function deleteBy(array $criteria, $deleteRelated = true, $relationsConditions = false, $exclude = [])
     {
-        $query = $this->createQueryBuilder()->where($criteria)->getQuery();
+        $dataArr = $this->findBy($criteria);
 
-        $query->getCache()->deleteAllWithNoLifetime();
+        if (count($dataArr) > 0) {
+            foreach ($dataArr as $data) {
+                if (isset($data['id'])) {
+                    if (!$this->deleteById($data['id'], $deleteRelated, $relationsConditions, $exclude)) {
+                        return false;
+                    }
+                }
+            }
+        }
 
-        return $query->delete($returnOption);
+        return true;
     }
 
-    public function deleteById($id, $deleteRelated = true, $relationsConditions = false): bool
+    public function deleteById($id, $deleteRelated = true, $relationsConditions = false, $exclude = []): bool
     {
         $id = $this->checkAndStripId($id);
 
-        if ($deleteRelated && !$this->deleteRelated($id, $relationsConditions)) {
+        if ($deleteRelated && !$this->deleteRelated($id, $relationsConditions, $exclude)) {
             return false;
         } else {
             $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
@@ -680,12 +688,12 @@ class Store
         }
     }
 
-    public function deleteRelated($id, $relationsConditions = false)
+    public function deleteRelated($id, $relationsConditions = false, $exclude = [])
     {
         $data = $this->findById((int) $id);
 
         if (!$data) {
-            throw new InvalidArgumentException('Record with ID' . $id . ' not found!');
+            throw new InvalidArgumentException('Record with ID ' . $id . ' not found!');
         }
 
         if (is_string($this->storeSchema)) {
@@ -702,63 +710,11 @@ class Store
                     $relation = explode('|', $property['relation']);
 
                     if (count($relation) > 0) {
-                        if ($relation[1] === 'hasOne' || $relation[1] === 'hasMany') {
-                            if ((in_array('hasParams', $relation) && $relationsConditions && count($relationsConditions) === 0) ||
-                                (in_array('hasParams', $relation) && $relationsConditions && count($relationsConditions) > 0 && !isset($relationsConditions[$relation[0]]))
-                            ) {
-                                throw new InvalidArgumentException('Model has params(conditions) set for ' . $relation[0] . '. Please set ffRelationsConditions. Please refer to model file.');
-                            }
+                        if (in_array($relation[0], $exclude)) {
+                            continue;
+                        }
 
-                            if (isset($relation[4])) {
-                                if (isset($relationsConditions[$relation[0]])) {
-                                    try {
-                                        $store = new Store($relation[2], $this->databasePath, $this->ff);
-
-                                        $storeDataArr = $store->findBy($relationsConditions[$relation[0]]);
-
-                                        if ($storeDataArr && is_array($storeDataArr) && count($storeDataArr) > 0) {
-                                            foreach ($storeDataArr as $storeData) {
-                                                if (isset($storeData['id'])) {
-                                                    $store->model = $relation[3];
-
-                                                    $store->deleteById((int) $storeData['id'], false);
-                                                }
-                                            }
-                                        }
-                                    } catch (\Exception $e) {
-                                        continue;
-                                    }
-                                } else {
-                                    $fields = explode(':', $relation[4]);
-
-                                    if (count($fields) > 0 && count($fields) % 2 == 0) {
-                                        $fieldsArr = $this->ff->helper->chunk($fields, 2);
-                                        $criteria = [];
-
-                                        foreach ($fieldsArr as $fieldArr) {
-                                            array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
-                                        }
-
-                                        try {
-                                            $store = new Store($relation[2], $this->databasePath, $this->ff);
-
-                                            $storeDataArr = $store->findBy($criteria);
-                                            if ($storeDataArr && is_array($storeDataArr) && count($storeDataArr) > 0) {
-                                                foreach ($storeDataArr as $storeData) {
-                                                    if (isset($storeData['id'])) {
-                                                        $store->model = $relation[3];
-
-                                                        $store->deleteById((int) $storeData['id'], false);
-                                                    }
-                                                }
-                                            }
-                                        } catch (\Exception $e) {
-                                            continue;
-                                        }
-                                    }
-                                }
-                            }
-                        } else if ($relation[1] === 'hasOneThrough' || $relation[1] === 'hasManyThrough') {
+                        if ($relation[1] === 'hasOneThrough' || $relation[1] === 'hasManyThrough') {
                             if (isset($relation[2]) && isset($relation[3])) {
                                 $relation[2] = explode('+', $relation[2]);
                                 $relation[3] = explode('+', $relation[3]);
@@ -822,6 +778,80 @@ class Store
                                     }
                                 } catch (\Exception $e) {
                                     continue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach ($schema['properties'] as $propertyKey => $property) {
+                if (!is_array($property['type'])) {
+                    continue;
+                }
+
+                if (in_array('array', $property['type']) && isset($property['relation'])) {
+                    $relation = explode('|', $property['relation']);
+
+                    if (count($relation) > 0) {
+                        if (in_array($relation[0], $exclude)) {
+                            continue;
+                        }
+
+                        if ($relation[1] === 'hasOne' || $relation[1] === 'hasMany') {
+                            if ((in_array('hasParams', $relation) && $relationsConditions && count($relationsConditions) === 0) ||
+                                (in_array('hasParams', $relation) && $relationsConditions && count($relationsConditions) > 0 && !isset($relationsConditions[$relation[0]]))
+                            ) {
+                                throw new InvalidArgumentException('Model has params(conditions) set for ' . $relation[0] . '. Please set ffRelationsConditions. Please refer to model file.');
+                            }
+
+                            if (isset($relation[4])) {
+                                if (isset($relationsConditions[$relation[0]])) {
+                                    try {
+                                        $store = new Store($relation[2], $this->databasePath, $this->ff);
+
+                                        $storeDataArr = $store->findBy($relationsConditions[$relation[0]]);
+
+                                        if ($storeDataArr && is_array($storeDataArr) && count($storeDataArr) > 0) {
+                                            foreach ($storeDataArr as $storeData) {
+                                                if (isset($storeData['id'])) {
+                                                    $store->model = $relation[3];
+
+                                                    $store->deleteById((int) $storeData['id'], false);
+                                                }
+                                            }
+                                        }
+                                    } catch (\Exception $e) {
+                                        continue;
+                                    }
+                                } else {
+                                    $fields = explode(':', $relation[4]);
+
+                                    if (count($fields) > 0 && count($fields) % 2 == 0) {
+                                        $fieldsArr = $this->ff->helper->chunk($fields, 2);
+                                        $criteria = [];
+
+                                        foreach ($fieldsArr as $fieldArr) {
+                                            array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
+                                        }
+
+                                        try {
+                                            $store = new Store($relation[2], $this->databasePath, $this->ff);
+
+                                            $storeDataArr = $store->findBy($criteria);
+                                            if ($storeDataArr && is_array($storeDataArr) && count($storeDataArr) > 0) {
+                                                foreach ($storeDataArr as $storeData) {
+                                                    if (isset($storeData['id'])) {
+                                                        $store->model = $relation[3];
+
+                                                        $store->deleteById((int) $storeData['id'], false);
+                                                    }
+                                                }
+                                            }
+                                        } catch (\Exception $e) {
+                                            continue;
+                                        }
+                                    }
                                 }
                             }
                         }

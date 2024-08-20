@@ -33,4 +33,27 @@ class Core extends Commands
 
         return true;
     }
+
+    public function getCommands()
+    {
+        return
+            [
+                [
+                    "availableAt"   => "enable",
+                    "command"       => "show core",
+                    "description"   => "Show core information",
+                    "class"         => "\\System\\Base\\Providers\\TerminalServiceProvider\\Commands\\Show\\Core",
+                    "function"      => "run",
+                    "args"          => []
+                ],
+                [
+                    "availableAt"   => "enable",
+                    "command"       => "show core version",
+                    "description"   => "Show Core Version information",
+                    "class"         => "\\System\\Base\\Providers\\TerminalServiceProvider\\Commands\\Show\\Core",
+                    "function"      => "version",
+                    "args"          => []
+                ]
+            ];
+    }
 }

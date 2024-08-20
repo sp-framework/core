@@ -2,7 +2,9 @@
 
 namespace System\Base\Providers\TerminalServiceProvider;
 
+use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToReadFile;
+use ReflectionClass;
 use System\Base\BasePackage;
 use System\Base\Providers\TerminalServiceProvider\CliTable\CliTable;
 
@@ -20,7 +22,13 @@ class Terminal extends BasePackage
 
     protected $exit = 'Bye!';
 
-    protected $commands;
+    protected $commands = [];
+
+    protected $autoCompleteList = [];
+
+    protected $helpList = [];
+
+    protected $execCommandsList = [];
 
     protected $sessionTimeout = 3600;
 
@@ -28,10 +36,12 @@ class Terminal extends BasePackage
 
     protected $hasChilds = false;
 
+    protected $commandsDir = 'system/Base/Providers/TerminalServiceProvider/Commands/';
+
     public function init()
     {
         try {
-            $this->commands = $this->helper->decode($this->localContent->read('system/Base/Providers/TerminalServiceProvider/Commands.json'), true);
+            $this->getAllCommands();
 
             $this->apps->getAppInfo('core');
         } catch (\throwable | UnableToReadFile $e) {
@@ -49,72 +59,49 @@ class Terminal extends BasePackage
         return $this;
     }
 
-    public function run()
+    public function run($terminated = false)
     {
-        echo $this->hostname . $this->prompt;
+        $this->updateAutoComplete();
 
-        $cliHandle = fopen('php://stdin','r');
+        if (!pcntl_async_signals()) {
+            pcntl_async_signals(true);
+            pcntl_signal(SIGINT, function($signal) {
+                switch ($signal) {
+                    case SIGINT:
+                        $this->run(true);
+                }
+            });
+        }
 
-        $command = rtrim(fgets($cliHandle), "\r\n");
+        if ($terminated) {
+            $command = readline();
+        } else {
+            $command = readline($this->hostname . $this->prompt);
+        }
 
         while (true) {
             if ($command === 'exit') {
                 if ($this->whereAt === 'disable') {
                     break;
                 } else {
+                    if ($this->account && $this->checkHistoryPath()) {
+                        readline_write_history(base_path('var/terminal/history/' . $this->account['id']));
+                    }
+
                     $this->account = null;
                     $this->whereAt = 'disable';
                     $this->prompt = '> ';
                 }
             } else if (str_contains($command, '?') || $command === '?' || $command === 'help') {
-                if ($command === '?') {
-                    $this->showHelp($this->commands);
-                } else if (str_contains($command, '?')) {
-                    $command = trim(str_replace('?', '', $command));
-                    $command = explode(' ', $command);
-
-                    $commands = $this->commands;
-
-                    if (count($command) > 1) {
-                        $cmdPath = [];
-                        foreach ($command as $commandKey) {
-                            if (isset($commands[$commandKey]['childs']) &&
-                                is_array($commands[$commandKey]['childs']) &&
-                                count($commands[$commandKey]['childs']) > 0
-                            ) {
-                                array_push($cmdPath, $commandKey);
-
-                                $commands = $commands[$commandKey]['childs'];
-                            }
-                        }
-
-                        if (isset($commands[$this->helper->last($command)])) {
-                            $this->showHelp([$commands[$this->helper->last($command)]], $cmdPath);
-                        } else {
-                            $this->showHelp($commands, $cmdPath);
-                        }
-                    } else {
-                        if (isset($this->commands[$command[0]]) &&
-                            isset($this->commands[$command[0]]['childs']) &&
-                            is_array($this->commands[$command[0]]['childs']) &&
-                            count($this->commands[$command[0]]['childs']) > 0
-                        ) {
-                            $this->showHelp($this->commands[$command[0]]['childs'], [$command[0]]);
-                        } else if (isset($this->commands[$command[0]])) {
-                            $this->showHelp($this->commands, [$command[0]]);
-                        } else {
-                            if (!$this->searchCommand(trim(strtolower($command[0])))) {
-                                echo "Command " . $command[0] . "not found!\n";
-                            }
-                        }
-                    }
-                }
+                $this->showHelp();
             } else if (checkCtype($command)) {
                 if (!$this->searchCommand(trim(strtolower($command)))) {
-                    echo "Command " . $command . " not found!\n";
+                    echo "Command " . trim($command) . " not found!\n";
+                } else {
+                    readline_add_history($command);
                 }
             } else if ($command !== '') {
-                echo "Command " . $command . " not found!\n";
+                echo "Command " . trim($command) . " not found!\n";
             }
 
             $this->run();
@@ -131,26 +118,12 @@ class Terminal extends BasePackage
         exit;
     }
 
-    protected function showHelp($commands, $cmdPath = null)
+    protected function showHelp()
     {
-        if ($cmdPath) {
-            $cmdPath = implode(' ', $cmdPath) . ' ';
-        } else {
-            $cmdPath = '';
-        }
-
-        $availableCommands = [];
-
-        foreach ($commands as $command) {
-            if ($this->whereAt === $command['availableAt']) {
-                array_push($availableCommands, [$cmdPath . $command['command'], $command['description']]);
-            }
-        }
-
-        if (count($availableCommands) > 0) {
+        if (count($this->helpList[$this->whereAt]) > 0) {
             $table = new \cli\Table();
             $table->setHeaders(['Available Commands', 'Description']);
-            $table->setRows($availableCommands);
+            $table->setRows($this->helpList[$this->whereAt]);
             $table->setRenderer(new \cli\table\Ascii([25, 100]));
             $table->display();
         }
@@ -158,44 +131,10 @@ class Terminal extends BasePackage
 
     protected function searchCommand($command)
     {
-        $commandArr = explode(' ', $command);
-
-        if (count($commandArr) === 1 &&
-            isset($this->commands[$commandArr[0]])
-        ) {
-            if (isset($this->commands[$commandArr[0]]['childs']) &&
-                is_array($this->commands[$commandArr[0]]['childs']) &&
-                count($this->commands[$commandArr[0]]['childs']) > 0
-            ) {
-                return true;
-            }
-
-            if ($this->commands[$commandArr[0]]['availableAt'] === $this->whereAt) {
-                return $this->execCommand($this->commands[$commandArr[0]]);
-            }
-        } else if (count($commandArr) > 1) {
-            $commands = $this->commands;
-
-            foreach ($commandArr as $commandKey) {
-                if (isset($commands[$commandKey]['childs']) &&
-                    is_array($commands[$commandKey]['childs']) &&
-                    count($commands[$commandKey]['childs']) > 0
-                ) {
-                    if (isset($commands[$commandKey]) &&
-                        $commandKey === $this->helper->last($commandArr)
-                    ) {
-                        if ($commands[$commandKey]['availableAt'] === $this->whereAt) {
-                            return $this->execCommand($commands[$commandKey]);
-                        }
-                    }
-
-                    $commands = $commands[$commandKey]['childs'];
-                }
-            }
-
-            if (isset($commands[$this->helper->last($commandArr)])) {
-                if ($commands[$this->helper->last($commandArr)]['availableAt'] === $this->whereAt) {
-                    return $this->execCommand($commands[$this->helper->last($commandArr)]);
+        if (count($this->execCommandsList[$this->whereAt]) > 0) {
+            foreach ($this->execCommandsList[$this->whereAt] as $commands) {
+                if ($command === $commands['command']) {
+                    return $this->execCommand($commands);
                 }
             }
         }
@@ -242,10 +181,31 @@ class Terminal extends BasePackage
         return false;
     }
 
+    protected function updateAutoComplete()
+    {
+        readline_completion_function(function($input, $index) {
+            if ($input !== '') {
+                $rl_info = readline_info();
+                $full_input = substr($rl_info['line_buffer'], 0, $rl_info['end']);
+
+                $matches = [];
+
+                foreach ($this->autoCompleteList[$this->whereAt] as $list) {
+                    if (str_starts_with($list, $full_input)) {
+                        $matches[] = substr($list, $index);
+                    }
+                }
+                return $matches;
+            }
+
+            return [];
+        });
+    }
+
     protected function setBanner($banner = null)
     {
         $this->banner =
-            "%RWelcome to SP!\n\n" .
+            "%BWelcome to SP!\n\n" .
             "Type help or ? (question mark) for help at any time\n\n" .
             "Enter command and ? (question mark) for specific command help/options\n%W";
     }
@@ -302,5 +262,78 @@ class Terminal extends BasePackage
     public function getAccount()
     {
         return $this->account;
+    }
+
+    protected function getAllCommands()
+    {
+        $commandsArr =
+            $this->localContent->listContents($this->commandsDir, true)
+            ->filter(fn (StorageAttributes $attributes) => $attributes->isFile())
+            ->map(fn (StorageAttributes $attributes) => $attributes->path())
+            ->toArray();
+
+        $this->commands = [];
+
+        if (count($commandsArr) > 0) {
+            foreach ($commandsArr as $key => $command) {
+                $command = ucfirst($command);
+                $command = str_replace('/', '\\', $command);
+                $command = str_replace('.php', '', $command);
+
+                try {
+                    $command = new $command();
+
+                    if (method_exists($command, 'getCommands')) {
+                        $commandReflection = new ReflectionClass($command);
+
+                        $commandKey = str_replace('\\', '', $commandReflection->getName());
+
+                        $this->commands[$commandKey] = $command->getCommands();
+                    }
+                } catch (\throwable $e) {
+                    if ($this->config->logs->exceptions) {
+                        $this->logger->logExceptions->critical(json_trace($e));
+                    }
+                    continue;
+                }
+            }
+        }
+
+        foreach ($this->commands as $commandClass => $commandsArr) {
+            foreach ($commandsArr as $command) {
+                if (!isset($this->autoCompleteList[$command['availableAt']])) {
+                    $this->autoCompleteList[$command['availableAt']] = [];
+                }
+                array_push($this->autoCompleteList[$command['availableAt']], $command['command']);
+
+                if (!isset($this->helpList[$command['availableAt']])) {
+                    $this->helpList[$command['availableAt']] = [];
+
+                    if ($command['availableAt'] === 'disable') {
+                        array_push($this->helpList[$command['availableAt']], ['exit', 'Exit the terminal']);
+                    } else {
+                        array_push($this->helpList[$command['availableAt']], ['exit', 'Logout']);
+                    }
+                }
+
+                array_push($this->helpList[$command['availableAt']], [$command['command'], $command['description']]);
+
+                if (!isset($this->execCommandsList[$command['availableAt']])) {
+                    $this->execCommandsList[$command['availableAt']] = [];
+                }
+                array_push($this->execCommandsList[$command['availableAt']], $command);
+            }
+        }
+    }
+
+    protected function checkHistoryPath()
+    {
+        if (!is_dir(base_path('var/terminal/history/'))) {
+            if (!mkdir(base_path('var/terminal/history/'), 0777, true)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -232,7 +232,7 @@ class Workers extends BasePackage
     {
         try {
             $call->run($args)();
-        } catch (\Exception $e) {
+        } catch (\throwable $e) {
             $data['responseCode'] = ["1"];
             $data['responseMessage'] = [$e->getMessage()];
             $data['responseData'] = [];
@@ -261,11 +261,16 @@ class Workers extends BasePackage
                 }
 
                 if ($key !== array_key_last($seconds)) {
-                    sleep((int) $seconds[$key + 1] - (int) date('s'));
+                    $sleepSeconds = (int) $seconds[$key + 1] - (int) date('s');
+
+                    if ($sleepSeconds < 0) {
+                        $sleepSeconds = 15;
+                    }
+
+                    sleep($sleepSeconds);
                 }
             }
-
-        } catch (\Exception $e) {
+        } catch (\throwable $e) {
             $data['responseCode'] = ["1"];
             $data['responseMessage'] = [$e->getMessage()];
             $data['responseData'] = [];

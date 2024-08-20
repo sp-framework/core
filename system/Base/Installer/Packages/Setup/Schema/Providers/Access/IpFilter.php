@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Base\Installer\Packages\Setup\Schema\Providers\Apps;
+namespace System\Base\Installer\Packages\Setup\Schema\Providers\Access;
 
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;
@@ -68,6 +68,13 @@ class IpFilter
                     'incorrect_attempts',//for filter_type 3
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'updated_at',//for auto unblock
+                    [
+                        'type'    => Column::TYPE_INTEGER,
                         'notNull' => false,
                     ]
                 )

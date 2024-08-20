@@ -373,8 +373,14 @@ $(document).ready(function(){
     }
 
     function twoFa(response) {
+        var textColor = 'info';
+
+        if ($('.login-box-msg').text().includes('Error:')) {
+            textColor = 'danger';
+        }
+
         $('.login-spinner').attr('hidden', true);
-        $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+        $('.login-box-msg').removeClass('fadeIn').addClass('text-' + textColor + ' animated fadeIn');
 
         if (response.responseData['allowed_methods'].includes('otp')) {
             $('#{{componentId}}-form :input').prop('disabled', false);
@@ -388,7 +394,7 @@ $(document).ready(function(){
         }
 
         setTimeout(function () {
-            $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+            $('.login-box-msg').removeClass('text-' + textColor + ' text-success animated fadeIn');
 
             if ($('#{{componentId}}-form-auth').length > 0) {
                 $('.login-box-msg').text('Login to start {{appRoute}} session');
@@ -632,14 +638,23 @@ $(document).ready(function(){
         }, 1000);
     }
 
-    $('#{{componentId}}-form-current_password-visibility, ' +
+    $('#{{componentId}}-form-pass-visibility,' +
+      '#{{componentId}}-form-current_password-visibility, ' +
       '#{{componentId}}-form-new_password-visibility, ' +
       '#{{componentId}}-form-confirm_password-visibility').click(function(e) {
         e.preventDefault();
 
         var id = $(this)[0].id;
 
-        if (id === '{{componentId}}-form-current_password-visibility') {
+        if (id === '{{componentId}}-form-pass-visibility') {
+            if ($('#{{componentId}}-form-pass').attr('type') === 'password') {
+                $('#{{componentId}}-form-pass').attr('type', 'text');
+                $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+            } else if ($('#{{componentId}}-form-pass').attr('type') === 'text') {
+                $('#{{componentId}}-form-pass').attr('type', 'password');
+                $('#' + id).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+        } else if (id === '{{componentId}}-form-current_password-visibility') {
             if ($('#{{componentId}}-form-current_password').attr('type') === 'password') {
                 $('#{{componentId}}-form-current_password').attr('type', 'text');
                 $('#' + id).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
@@ -679,8 +694,8 @@ $(document).ready(function(){
         $.post('{{links.url("auth/generatePw")}}', postData, function(response) {
             if (response.responseCode == 0) {
                 if (response.responseData) {
-                    $('#{{componentId}}-form-new_password').val(response.responseData).trigger('change');
-                    $('#{{componentId}}-form-confirm_password').val(response.responseData);
+                    $('#{{componentId}}-form-new_password').val(response.responseData.password).trigger('change');
+                    $('#{{componentId}}-form-confirm_password').val(response.responseData.password);
                     $('#{{componentId}}-form-new_password, #{{componentId}}-form-confirm_password').attr('type', 'text');
                     $('#{{componentId}}-form-new_password-visibility, #{{componentId}}-form-confirm_password-visibility').children('i').removeClass('fa-eye-slash').addClass('fa-eye');
                 }

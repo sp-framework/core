@@ -3676,7 +3676,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
     }
 });
 
-/* globals define exports BazContentFieldsValidator BazContentFields PNotify Pace BazCore BazContentLoader */
+/* globals define exports BazContentFieldsValidator BazContentFields paginatedPNotify Pace BazCore BazContentLoader */
 /*
 * @title                    : BazContentSectionWithForm
 * @description              : Baz Lib for Content (Sections With Form)
@@ -4027,7 +4027,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
 
                                         if (response.responseCode == '0') {
                                             if ($(thisButtonId).data('successnotify') === true) {
-                                                PNotify.success({
+                                                paginatedPNotify('success', {
                                                     title   : response.responseMessage,
                                                 });
                                             }
@@ -4069,7 +4069,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                                             }
                                         } else {
                                             $(thisButtonId).attr('disabled', false);
-                                            PNotify.error({
+                                            paginatedPNotify('error', {
                                                 title   : response.responseMessage
                                             });
                                             dataCollection[componentId][sectionId]['dataToSubmit'] = { };
@@ -10361,14 +10361,7 @@ var BazNotifications = function() {
 
     //Notifications
     function getNotificationsCount(responseData = null) {
-        //eslint-disable-next-line
-        console.log(responseData);
         if (responseData && Object.keys(responseData).length > 0) {
-            if (responseData.responseData) {
-                responseData = responseData.responseData;
-            }
-            //eslint-disable-next-line
-            console.log(responseData);
             processResponseData(responseData);
         } else {
             var url = dataCollection.env.rootPath + appRoute + 'system/notifications/fetchNewNotificationsCount';
@@ -10542,8 +10535,8 @@ var BazNotifications = function() {
         BazNotifications.getNotificationsCount = function() {
             getNotificationsCount();
         }
-        BazNotifications.getPullNotifications = function(options) {
-            return getPullNotifications(_extends(BazNotifications.defaults, options));
+        BazNotifications.getPullNotifications = function() {
+            return getPullNotifications();
         }
         BazNotifications.setPromiseInit = function(options) {
             return setPromiseInit(options);

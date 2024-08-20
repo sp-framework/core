@@ -20,8 +20,6 @@ class Apps extends BasePackage
 
 	public $types;
 
-	public $ipFilter;
-
 	protected $reservedRoutes;
 
 	protected $appInfo = null;
@@ -38,8 +36,6 @@ class Apps extends BasePackage
 
 		$this->app = $this->getAppInfo();
 
-		$this->ipFilter = (new IpFilter())->init($this, $this->app);
-
 		return $this;
 	}
 
@@ -51,8 +47,6 @@ class Apps extends BasePackage
 			}
 
 			$this->appInfo = $this->getAppByRoute($route);
-
-			$this->ipFilter = (new IpFilter())->init($this, $this->appInfo);
 
 			return;
 		}
@@ -199,7 +193,9 @@ class Apps extends BasePackage
 
 		$data['default_component'] = 0;
 		$data['errors_component'] = 0;
-		$data['ip_filter_default_action'] = 0;
+		$data['incorrect_login_attempt_block_ip'] = 0;
+		$data['auto_unblock_ip_minutes'] = 0;
+		$data['ip_filter_default_action'] = 'allow';
 		$data['can_login_role_ids'] = $this->helper->encode(['1']);
 		$data['acceptable_usernames'] = $this->helper->encode(['email']);
 

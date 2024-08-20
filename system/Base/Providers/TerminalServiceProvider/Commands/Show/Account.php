@@ -40,4 +40,27 @@ class Account extends Commands
 
         return true;
     }
+
+    public function getCommands()
+    {
+        return
+            [
+                [
+                    "availableAt"   => "enable",
+                    "command"       => "show account",
+                    "description"   => "Show logged in account details",
+                    "class"         => "\\System\\Base\\Providers\\TerminalServiceProvider\\Commands\\Show\\Account",
+                    "function"      => "account",
+                    "args"          => []
+                ],
+                [
+                    "availableAt"   => "enable",
+                    "command"       => "whoami",
+                    "description"   => "Shows who you are",
+                    "class"         => "\\System\\Base\\Providers\\TerminalServiceProvider\\Commands\\Show\\Account",
+                    "function"      => "whoami",
+                    "args"          => []
+                ]
+            ];
+    }
 }

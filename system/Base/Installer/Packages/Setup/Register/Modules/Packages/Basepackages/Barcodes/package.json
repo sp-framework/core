@@ -1,6 +1,6 @@
 {
     "name"          : "Barcodes",
-    "display_name"  : "Barcodes Package",
+    "display_name"  : "Barcodes",
     "description"   : "Package for generating and validating Barcodes",
     "module_type"   : "packages",
     "app_type"      : "core",

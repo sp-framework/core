@@ -1,10 +1,10 @@
 <?php
 
-namespace System\Base\Providers\AppsServiceProvider\Model;
+namespace System\Base\Providers\AccessServiceProvider\Model;
 
 use System\Base\BaseModel;
 
-class ServiceProviderAppsIpFilter extends BaseModel
+class ServiceProviderAccessIpFilter extends BaseModel
 {
     public $id;
 
@@ -20,5 +20,7 @@ class ServiceProviderAppsIpFilter extends BaseModel
 
     public $hit_count;//Hit count on filter_type 1 or 2
 
-    public $invalid_attempts;//for filter_type 3
+    public $incorrect_attempts;//for filter_type 3
+
+    public $updated_at;//for auto unblock
 }

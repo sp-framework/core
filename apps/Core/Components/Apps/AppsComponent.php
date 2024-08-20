@@ -404,7 +404,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $filters = $this->apps->ipFilter->getFilters($this->postData());
+        $filters = $this->access->ipFilter->getFilters($this->postData());
 
         foreach ($filters as $key => &$filter) {
             unset ($filter['app_id']);
@@ -444,11 +444,11 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->apps->ipFilter->addFilter($this->postData());
+        $this->access->ipFilter->addFilter($this->postData());
 
         $this->addResponse(
-            $this->apps->ipFilter->packagesData->responseMessage,
-            $this->apps->ipFilter->packagesData->responseCode
+            $this->access->ipFilter->packagesData->responseMessage,
+            $this->access->ipFilter->packagesData->responseCode
         );
     }
 
@@ -456,23 +456,35 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->apps->ipFilter->removeFilter($this->postData());
+        $this->access->ipFilter->removeFilter($this->postData());
 
         $this->addResponse(
-            $this->apps->ipFilter->packagesData->responseMessage,
-            $this->apps->ipFilter->packagesData->responseCode
+            $this->access->ipFilter->packagesData->responseMessage,
+            $this->access->ipFilter->packagesData->responseCode
         );
     }
 
-    public function blockMonitorFilterAction()
+    public function allowFilterAction()
     {
         $this->requestIsPost();
 
-        $this->apps->ipFilter->blockMonitorFilter($this->postData());
+        $this->access->ipFilter->allowFilter($this->postData());
 
         $this->addResponse(
-            $this->apps->ipFilter->packagesData->responseMessage,
-            $this->apps->ipFilter->packagesData->responseCode
+            $this->access->ipFilter->packagesData->responseMessage,
+            $this->access->ipFilter->packagesData->responseCode
+        );
+    }
+
+    public function blockFilterAction()
+    {
+        $this->requestIsPost();
+
+        $this->access->ipFilter->blockFilter($this->postData());
+
+        $this->addResponse(
+            $this->access->ipFilter->packagesData->responseMessage,
+            $this->access->ipFilter->packagesData->responseCode
         );
     }
 
@@ -480,11 +492,11 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $this->apps->ipFilter->resetAppFilters($this->postData());
+        $this->access->ipFilter->resetAppFilters($this->postData());
 
         $this->addResponse(
-            $this->apps->ipFilter->packagesData->responseMessage,
-            $this->apps->ipFilter->packagesData->responseCode
+            $this->access->ipFilter->packagesData->responseMessage,
+            $this->access->ipFilter->packagesData->responseCode
         );
     }
 

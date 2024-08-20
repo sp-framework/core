@@ -105,8 +105,8 @@ class Api extends BasePackage
     {
         $data['account_id'] = 0;
 
-        if ($this->auth->account()) {
-            $data['account_id'] = $this->auth->account()['id'];
+        if ($this->access->auth->account()) {
+            $data['account_id'] = $this->access->auth->account()['id'];
         }
 
         $data['private_key_passphrase'] = '0';
@@ -149,7 +149,7 @@ class Api extends BasePackage
                             'client_secret' => $data['client_secret'],
                             'redirect_url'  => $data['redirect_url']
                         ],
-                        $this->auth->account(),
+                        $this->access->auth->account(),
                         null,
                         false
                     );
@@ -169,7 +169,7 @@ class Api extends BasePackage
                                 'redirect_url'  => $data['redirect_url'],
                                 'forceRegen'    => true
                             ],
-                            $this->auth->account(),
+                            $this->access->auth->account(),
                             null,
                             false,
                             $data['client_id'],
@@ -228,7 +228,7 @@ class Api extends BasePackage
                         'client_secret' => $data['client_secret'],
                         'redirect_url'  => $data['redirect_url']
                     ],
-                    $this->auth->account(),
+                    $this->access->auth->account(),
                     null,
                     false
                 );
@@ -246,7 +246,7 @@ class Api extends BasePackage
                             'redirect_url'  => $data['redirect_url'],
                             'forceRegen'    => true
                         ],
-                        $this->auth->account(),
+                        $this->access->auth->account(),
                         null,
                         false,
                         $data['client_id'],
@@ -916,7 +916,7 @@ class Api extends BasePackage
                     ]
             ];
 
-        if ($this->auth->account()['security']['role_id'] == '1') {
+        if ($this->access->auth->account()['security']['role_id'] == '1') {
             return array_merge($passwordGrant, $otherGrants);
         }
 

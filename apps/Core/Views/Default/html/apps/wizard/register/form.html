@@ -40,8 +40,9 @@
     {% set appGuestRoleId = app['guest_role_id'] %}
     {% set appCanLoginRoleIds = app['can_login_role_ids'] %}
     {% set appAcceptableUsernames = app['acceptable_usernames'] %}
-    {% set appIncorrectLoginAttemptBlockIp = app['incorrect_login_attempt_block_ip'] %}
     {% set appIpFilterDefaultAction = app['ip_filter_default_action'] %}
+    {% set appAutoUnblockIpMinutes = app['auto_unblock_ip_minutes'] %}
+    {% set appIncorrectLoginAttemptBlockIp = app['incorrect_login_attempt_block_ip'] %}
     {% set wizard = false %}
     {% if appType == 'core' or appType == 'dash' %}
         {% set defaultDashboardHidden = '' %}
@@ -62,8 +63,9 @@
     {% set appGuestRoleId = '' %}
     {% set appCanLoginRoleIds = [] %}
     {% set appAcceptableUsernames = '' %}
+    {% set appIpFilterDefaultAction = 'allow' %}
+    {% set appAutoUnblockIpMinutes = '' %}
     {% set appIncorrectLoginAttemptBlockIp = '' %}
-    {% set appIpFilterDefaultAction = '1' %}
     {% set wizard = true %}
     {% set defaultDashboard = '' %}
 {% endif %}

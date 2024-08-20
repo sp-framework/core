@@ -61,7 +61,7 @@ class Acl extends BaseMiddleware
         if ($this->isApi) {
             $this->role = $this->api->getScope();
         } else {
-            $this->account = $this->auth->account();
+            $this->account = $this->access->auth->account();
         }
 
         if ($this->account) {
@@ -94,9 +94,9 @@ class Acl extends BaseMiddleware
 
                 if ($this->localContent->fileExists($aclFileDir . $this->accountEmail . $this->account['id'])) {
 
-                    $this->acl = unserialize($this->localContent->read($aclFileDir . $this->accountEmail . $this->account['id']));
+                    $this->access->acl = unserialize($this->localContent->read($aclFileDir . $this->accountEmail . $this->account['id']));
                 } else {
-                    $this->acl->addRole(
+                    $this->access->acl->addRole(
                         new Role($this->accountEmail, 'User Override Role')
                     );
 
@@ -114,11 +114,11 @@ class Acl extends BaseMiddleware
                     }
 
                     if ($this->config->cache->enabled) {
-                        $this->localContent->write($aclFileDir . $this->accountEmail . $this->account['id'], serialize($this->acl));
+                        $this->localContent->write($aclFileDir . $this->accountEmail . $this->account['id'], serialize($this->access->acl));
                     }
                 }
 
-                if (!$this->acl->isAllowed($this->accountEmail, $this->controllerRoute, $this->action)) {
+                if (!$this->access->acl->isAllowed($this->accountEmail, $this->controllerRoute, $this->action)) {
                     throw new PermissionDeniedException();
                 }
 
@@ -138,7 +138,7 @@ class Acl extends BaseMiddleware
                     $aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action
                 )
         ) {
-            $this->acl =
+            $this->access->acl =
                 unserialize(
                     $this->localContent->read(
                         $aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action
@@ -147,7 +147,7 @@ class Acl extends BaseMiddleware
         } else {
             $this->generateComponentsArr();
 
-            $this->acl->addRole(
+            $this->access->acl->addRole(
                 new Role($this->roleName, $this->role['description'])
             );
 
@@ -174,13 +174,13 @@ class Acl extends BaseMiddleware
 
             if ($this->config->cache->enabled) {
                 $this->localContent->write(
-                    $aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action, serialize($this->acl)
+                    $aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action, serialize($this->access->acl)
                 );
             }
         }
 
         if ($this->found &&
-            !$this->acl->isAllowed($this->roleName, $this->controllerRoute, $this->action)
+            !$this->access->acl->isAllowed($this->roleName, $this->controllerRoute, $this->action)
         ) {
             throw new PermissionDeniedException();
         }
@@ -254,12 +254,12 @@ class Acl extends BaseMiddleware
             $componentAcls = $this->components[$componentKey]['api_acls'];
         }
 
-        $this->acl->addComponent(
+        $this->access->acl->addComponent(
             new Component($componentRoute, $componentDescription), $componentAcls
         );
 
         if ($permission[$this->action] === 1) {
-            $this->acl->allow($roleName, $componentRoute, $this->action);
+            $this->access->acl->allow($roleName, $componentRoute, $this->action);
             $this->logger->log->debug(
                 'User ' . $this->accountEmail . ' granted access to component ' . $componentRoute . ' for action ' . $this->action
             );

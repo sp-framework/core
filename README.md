@@ -1,3 +1,3 @@
-# Bazaari Core (SP)
+# SP Framework - Core
 
-Bazaari Core v3 Codename - SP
+Caution!!! - Do not use in production. A man from downunder is still working on it...

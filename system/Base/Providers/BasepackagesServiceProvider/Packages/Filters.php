@@ -350,9 +350,9 @@ class Filters extends BasePackage
     {
         $conditions =
             [
-                'all_unread'=> '-|app_id|equals|' . $this->app['id'] . '&and|account_id|equals|' . $this->auth->account()['id'] . '&and|read|equals|0&and|archive|equals|0&',
-                'read'      => '-|app_id|equals|' . $this->app['id'] . '&and|account_id|equals|' . $this->auth->account()['id'] . '&and|read|equals|1&and|archive|equals|0&',
-                'archive'   => '-|app_id|equals|' . $this->app['id'] . '&and|account_id|equals|' . $this->auth->account()['id'] . '&and|archive|equals|1&'
+                'all_unread'=> '-|app_id|equals|' . $this->app['id'] . '&and|account_id|equals|' . $this->access->auth->account()['id'] . '&and|read|equals|0&and|archive|equals|0&',
+                'read'      => '-|app_id|equals|' . $this->app['id'] . '&and|account_id|equals|' . $this->access->auth->account()['id'] . '&and|read|equals|1&and|archive|equals|0&',
+                'archive'   => '-|app_id|equals|' . $this->app['id'] . '&and|account_id|equals|' . $this->access->auth->account()['id'] . '&and|archive|equals|1&'
             ];
 
         foreach ($conditions as $conditionKey => $condition) {
@@ -529,7 +529,7 @@ class Filters extends BasePackage
         }
         if (!isset($data['account_id'])) {
             if ($data['filter_type'] !== 0) {
-                $account = $this->auth->account();
+                $account = $this->access->auth->account();
 
                 if ($account) {
                     $data['account_id'] = $account['id'];
@@ -545,7 +545,7 @@ class Filters extends BasePackage
             $add = $this->add($data);
 
             if ($add) {
-                $account = $this->auth->account();
+                $account = $this->access->auth->account();
 
                 if ($account) {
                     $this->packagesData->filters = $this->getFilters($data['component_id'], $account);
@@ -597,7 +597,7 @@ class Filters extends BasePackage
             $update = $this->update($data);
 
             if ($update) {
-                $account = $this->auth->account();
+                $account = $this->access->auth->account();
 
                 if ($account) {
                     $this->packagesData->filters = $this->getFiltersForAccountAndComponent($account, $data['component_id']);
@@ -637,7 +637,7 @@ class Filters extends BasePackage
         if ($remove) {
 
             if (isset($data['component_id'])) {
-                $account = $this->auth->account();
+                $account = $this->access->auth->account();
 
                 if ($account) {
                     $this->packagesData->filters = $this->getFiltersForAccountAndComponent($account, $data['component_id']);
@@ -666,7 +666,7 @@ class Filters extends BasePackage
         $filter['is_default'] = 0;
         $filter['shared_ids'] = null;
 
-        $account = $this->auth->account();
+        $account = $this->access->auth->account();
 
         if ($account) {
             $filter['account_id'] = $account['id'];
@@ -675,7 +675,7 @@ class Filters extends BasePackage
         $clone = $this->clone($data['id'], 'name', $filter);
 
         if ($clone) {
-            $account = $this->auth->account();
+            $account = $this->access->auth->account();
 
             if ($account) {
                 $this->packagesData->filters = $this->getFiltersForAccountAndComponent($account, $data['component_id']);
@@ -695,7 +695,7 @@ class Filters extends BasePackage
 
     public function getDefaultFilter(int $componentId)
     {
-        $account = $this->auth->account();
+        $account = $this->access->auth->account();
 
         if ($account) {
             if ($this->config->databasetype === 'db') {

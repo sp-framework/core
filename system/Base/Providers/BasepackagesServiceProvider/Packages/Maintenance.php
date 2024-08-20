@@ -33,29 +33,29 @@ class Maintenance extends BasePackage
 
     public function updateMaintenance($data)
     {
-        $maintenance = $this->getById($id);
+        // $maintenance = $this->getById($id);
 
-        if ($maintenance) {
-            //
-            $this->addResponse('Success');
+        // if ($maintenance) {
+        //     //
+        //     $this->addResponse('Success');
 
-            return;
-        }
+        //     return;
+        // }
 
-        $this->addResponse('Error', 1);
+        // $this->addResponse('Error', 1);
     }
 
     public function removeMaintenance($data)
     {
-        $maintenance = $this->getById($id);
+        // $maintenance = $this->getById($id);
 
-        if ($maintenance) {
-            //
-            $this->addResponse('Success');
+        // if ($maintenance) {
+        //     //
+        //     $this->addResponse('Success');
 
-            return;
-        }
+        //     return;
+        // }
 
-        $this->addResponse('Error', 1);
+        // $this->addResponse('Error', 1);
     }
 }

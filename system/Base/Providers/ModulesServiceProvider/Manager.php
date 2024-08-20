@@ -516,7 +516,8 @@ class Manager extends BasePackage
 
                 $names = explode('-', $module['name']);
 
-                if ($names[0] === 'core') {
+                if ($names && count($names) === 1 && $names[0] === 'core') {
+                    $this->remoteModules['packages'] = [];
                     $this->remoteModules['packages'] = [$module];
 
                     return true;
@@ -700,8 +701,8 @@ class Manager extends BasePackage
 
                     $registerRemotePackage['installed'] = 0;
 
-                    if ($this->auth->account()) {
-                        $registerRemotePackage['updated_by'] = $this->auth->account()['id'];
+                    if ($this->access->auth->account()) {
+                        $registerRemotePackage['updated_by'] = $this->access->auth->account()['id'];
                     } else {
                         $registerRemotePackage['updated_by'] = 0;
                     }

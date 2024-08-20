@@ -490,7 +490,6 @@ class Croppie
             </div>
         <div id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie" hidden></div>' .
 
-
         $this->inclJs();
     }
 
@@ -783,18 +782,18 @@ class Croppie
 
                             function processDeleteUUIDs() {
                                 if (deleteUUIDs.length > 0) {
-
                                     var url = "' . $this->links->url("system/storages/remove") . '";
 
                                     $(deleteUUIDs).each(function(index, uuid) {
+                                        var postData = { };
+                                        postData[$("#security-token").attr("name")] = $("#security-token").val();
+                                        postData["uuid"] = uuid;
+                                        postData["storagetype"] = "' . $this->params['storageType'] . '";
+
                                         $.ajax({
                                             type    : "POST",
                                             url     : url,
-                                            data    :
-                                                {
-                                                    "uuid"             : uuid,
-                                                    "storagetype"      : "' . $this->params['storageType'] . '"
-                                                },
+                                            data    : postData,
                                             dataType: "json"
                                         }).done(function (response) {
                                             if (response.tokenKey && response.token) {
@@ -820,6 +819,7 @@ class Croppie
                                 formData.append("setOrphan", "' . $this->params['setOrphan'] . '");
                                 formData.append("fileName", imageName);
                                 formData.append("storagetype", "' . $this->params['storageType'] . '");
+                                formData.append($("#security-token").attr("name"), $("#security-token").val());
 
                                 performUpload(formData);
                             }

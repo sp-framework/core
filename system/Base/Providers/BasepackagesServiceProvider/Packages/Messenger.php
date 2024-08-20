@@ -164,7 +164,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
     {
         if ($this->accountsObj->sessions) {
             foreach ($this->accountsObj->sessions as $key => $session) {
-                if ($session->session_id === $cookies['Bazaari']) {
+                if ($session->session_id === $cookies['SP']) {
                     return true;
                 }
             }
@@ -180,9 +180,9 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
 
             $account = $this->accountsObj->toArray();
         } else {
-            $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($this->auth->account()['id']);
+            $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($this->access->auth->account()['id']);
 
-            $account = $this->auth->account();
+            $account = $this->access->auth->account();
         }
 
         $profile = $this->basepackages->profiles->getProfile($account['id']);
@@ -253,8 +253,8 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
         $conditions =
             [
                 'conditions'    =>
-                    '-|from_account_id|equals|' . $data['user'] . '&and|to_account_id|equals|' . $this->auth->account()['id'] . '&' .
-                    'or|from_account_id|equals|' . $this->auth->account()['id'] . '&and|to_account_id|equals|' . $data['user'] . '&',
+                    '-|from_account_id|equals|' . $data['user'] . '&and|to_account_id|equals|' . $this->access->auth->account()['id'] . '&' .
+                    'or|from_account_id|equals|' . $this->access->auth->account()['id'] . '&and|to_account_id|equals|' . $data['user'] . '&',
                 'order'         => 'id desc'
             ];
 
@@ -284,21 +284,21 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
         if ($this->config->databasetype === 'db') {
             $conditions =
                 [
-                    'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND read = 0'
+                    'conditions'    => 'to_account_id = ' . $this->access->auth->account()['id'] . ' AND read = 0'
                 ];
 
             $total = $this->modelToUse::count($conditions);
         } else {
             $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
-            $this->ffData = $this->ffStore->findBy([['to_account_id', '=', $this->auth->account()['id']],['read', '=', 0]]);
+            $this->ffData = $this->ffStore->findBy([['to_account_id', '=', $this->access->auth->account()['id']],['read', '=', 0]]);
 
             if ($this->ffData) {
                 $total = count($this->ffData);
             }
         }
 
-        $profile = $this->basepackages->profiles->getProfile($this->auth->account()['id']);
+        $profile = $this->basepackages->profiles->getProfile($this->access->auth->account()['id']);
 
         if ($profile['settings'] && isset($profile['settings']['messenger']['members'])) {
             $membersArr = $profile['settings']['messenger']['members'];
@@ -311,14 +311,14 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
                 if ($this->config->databasetype === 'db') {
                     $conditions =
                         [
-                            'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND from_account_id = ' . $memberId . ' AND read = 0'
+                            'conditions'    => 'to_account_id = ' . $this->access->auth->account()['id'] . ' AND from_account_id = ' . $memberId . ' AND read = 0'
                         ];
 
                     $members[$key]['count'] = $this->modelToUse::count($conditions);
                 } else {
                     $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
-                    $this->ffData = $this->ffStore->findBy([['to_account_id', '=', $this->auth->account()['id']],['from_account_id', '=', (int) $memberId],['read', '=', 0]]);
+                    $this->ffData = $this->ffStore->findBy([['to_account_id', '=', $this->access->auth->account()['id']],['from_account_id', '=', (int) $memberId],['read', '=', 0]]);
 
                     if ($this->ffData) {
                         $members[$key]['count'] = count($this->ffData);
@@ -342,7 +342,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
     {
         $conditions =
             [
-                'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND from_account_id = ' . $data['user'] . ' AND read = 0'
+                'conditions'    => 'to_account_id = ' . $this->access->auth->account()['id'] . ' AND from_account_id = ' . $data['user'] . ' AND read = 0'
             ];
 
         $messages = $this->getByParams($conditions);
@@ -358,7 +358,7 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
 
     public function addMessage(array $data)
     {
-        $messageData['from_account_id'] = $this->auth->account()['id'];
+        $messageData['from_account_id'] = $this->access->auth->account()['id'];
         $messageData['to_account_id'] = $data['user'];
         $messageData['message'] = $data['message'];
 
@@ -394,9 +394,9 @@ class Messenger extends WebsocketBase implements MessageComponentInterface
                 return;
             }
 
-            $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($this->auth->account()['id']);
+            $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($this->access->auth->account()['id']);
 
-            $profile = $this->basepackages->profiles->getProfile($this->auth->account()['id']);
+            $profile = $this->basepackages->profiles->getProfile($this->access->auth->account()['id']);
 
             $userData['id'] = $profile['id'];
             $userData['portrait'] = $profile['portrait'];

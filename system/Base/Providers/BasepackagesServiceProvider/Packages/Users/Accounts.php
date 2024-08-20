@@ -219,11 +219,7 @@ class Accounts extends BasePackage
 
     public function updateAccount(array $data)
     {
-        if (isset($data['forgotten_request']) && $data['forgotten_request'] == '1') {
-            $validation = $this->validateData($data, true);
-        } else {
-            $validation = $this->validateData($data);
-        }
+        $validation = $this->validateData($data);
 
         if ($validation !== true) {
             $this->addResponse($validation, 1);
@@ -235,8 +231,8 @@ class Accounts extends BasePackage
             $data['status'] = '0';
         }
 
-        if ($this->auth->account() &&
-            $data['id'] == $this->auth->account()['id']
+        if ($this->access->auth->account() &&
+            $data['id'] == $this->access->auth->account()['id']
         ) {
             if ($data['status'] == '0') {
                 $data['status'] = 1;//Cannot disable own account
@@ -273,8 +269,8 @@ class Accounts extends BasePackage
             $data['permissions'] = $this->helper->encode([]);
         } else if (isset($data['override_role']) && $data['override_role'] == 1) {
             //Prevent lockout of logged in user
-            if ($this->auth->account() &&
-                $data['id'] == $this->auth->account()['id']
+            if ($this->access->auth->account() &&
+                $data['id'] == $this->access->auth->account()['id']
             ) {
                 if (is_string($data['permissions'])) {
                     $data['permissions'] = $this->helper->decode($data['permissions'], true);
@@ -293,11 +289,7 @@ class Accounts extends BasePackage
 
         $data['domain'] = explode('@', $data['email'])[1];
 
-        //We keep the old password intact. If user remembers their password and logs in with that, we destroy this code.
-        if (isset($data['forgotten_request']) && $data['forgotten_request'] == '1') {
-            $password = $this->basepackages->utils->generateNewPassword()['password'];
-            $data['forgotten_request_code'] = $this->secTools->hashPassword($password);
-        } else if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
+        if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
             $password = $this->basepackages->utils->generateNewPassword()['password'];
             $data['password'] = $this->secTools->hashPassword($password);
         }
@@ -333,8 +325,8 @@ class Accounts extends BasePackage
 
             $this->addResponse('Updated account for ID: ' . $data['email'], 0, null, true);
 
-            if ($this->auth->account() &&
-                $data['id'] == $this->auth->account()['id']
+            if ($this->access->auth->account() &&
+                $data['id'] == $this->access->auth->account()['id']
             ) {//Cannot logout yourself!
                 $data['force_logout'] = '0';
             }
@@ -352,7 +344,7 @@ class Accounts extends BasePackage
     public function removeAccount(array $data)
     {
         if (isset($data['id']) && $data['id'] != 1) {
-            if ($this->auth->account()['id'] === $data['id']) {
+            if ($this->access->auth->account()['id'] === $data['id']) {
                 $this->addResponse('Cannot remove own account!', 1);
 
                 return;
@@ -369,7 +361,7 @@ class Accounts extends BasePackage
                     return false;
                 }
 
-                if ($this->remove($data['id'])) {
+                if ($this->remove($data['id'], true, true, ['role'])) {
                     $this->addResponse('Removed account for ID: ' . $account['email']);
 
                     return true;
@@ -385,10 +377,10 @@ class Accounts extends BasePackage
                     return false;
                 }
 
-                if ($this->remove($data['id'])) {
-                    $this->addResponse('Removed account for ID: ' . $account['email']);
+                $this->api->clients->forceRevoke(['account_id' => $data['id']]);
 
-                    $this->api->clients->forceRevoke(['account_id' => $data['id']]);
+                if ($this->remove($data['id'], true, true, ['role'])) {
+                    $this->addResponse('Removed account for ID: ' . $account['email']);
 
                     return true;
                 } else {
@@ -437,7 +429,7 @@ class Accounts extends BasePackage
 
         if ($validation === true) {
             if ($this->addAccount($data)) {
-                $this->apps->ipFilter->bumpFilterHitCounter(null, false, true);
+                $this->access->ipFilter->bumpFilterHitCounter(null, false, true);
 
                 $this->packagesData->redirectUrl = $this->links->url('auth');
             }
@@ -621,21 +613,25 @@ class Accounts extends BasePackage
 
     public function addUpdateSecurity($id, $data)
     {
+        //We keep the old password intact. If user remembers their password and logs in with that, we destroy this code.
+        if (isset($data['forgotten_request']) && $data['forgotten_request'] == '1') {
+            $password = $this->basepackages->utils->generateNewPassword()['password'];
+
+            $data['forgotten_request_code'] = $this->secTools->hashPassword($password);
+        }
+
         $securityModel = new BasepackagesUsersAccountsSecurity;
 
         if ($this->config->databasetype === 'db') {
-            $account = $securityModel::findFirst(['account_id = ' . $id]);
+            $accountSecurity = $securityModel::findFirst(['account_id = ' . $id]);
         } else {
             $securityStore = $this->ff->store($securityModel->getSource());
 
-            $account = $securityStore->findOneBy(['account_id', '=', $id]);
+            $accountSecurity = $securityStore->findOneBy(['account_id', '=', $id]);
         }
 
-        $data['account_id'] = $id;
-
-        unset($data['id']);
-
-        if ($data['role_id'] != '1' && //Remove msview and msupdate permissions
+        if (isset($data['role_id']) &&
+            $data['role_id'] != '1' && //Remove msview and msupdate permissions
             isset($data['override_role']) &&
             $data['override_role'] == '1'
         ) {
@@ -654,36 +650,48 @@ class Accounts extends BasePackage
                         }
                     }
                 }
+
                 $data['permissions'] = $this->helper->encode($data['permissions']);
             }
         }
 
-        if ($account) {
-            if ($this->config->databasetype === 'db') {
-                $account->assign($data);
 
-                $account->update();
-
-                return true;
-            } else {
-                $data['id'] = $account['id'];
-
-                $securityStore->update($data);
-
-                return true;
+        if ($accountSecurity) {
+            if (isset($data['id'])) {
+                unset($data['id']);
             }
+
+            $accountSecurity = array_replace($accountSecurity, $data);
+
+            if ($this->config->databasetype === 'db') {
+                $accountSecurity->assign($accountSecurity);
+
+                $accountSecurity->update();
+            } else {
+                $data['id'] = $accountSecurity['id'];
+
+                $securityStore->update($accountSecurity);
+            }
+
+            $account = $this->getAccountById($id);
+
+            if (isset($data['forgotten_request']) && $data['forgotten_request'] == '1') {
+                $this->emailNewPassword($account['email'], $password);
+            }
+
+            return true;
         } else {
+            $data['account_id'] = $id;
+
             if ($this->config->databasetype === 'db') {
                 $securityModel->assign($data);
 
                 $securityModel->create();
-
-                return true;
             } else {
                 $securityStore->insert($data);
-
-                return true;
             }
+
+            return true;
         }
 
         return false;
@@ -697,8 +705,7 @@ class Accounts extends BasePackage
             if (count($canLogin) > 0) {
                 $canloginModel = new BasepackagesUsersAccountsCanlogin;
 
-                if ($this->config->databasetype === 'db') {
-                } else {
+                if ($this->config->databasetype !== 'db') {
                     $canloginStore = $this->ff->store($canloginModel->getSource());
                 }
 
@@ -863,7 +870,7 @@ class Accounts extends BasePackage
     {
         $this->getById($id);
 
-        if ($this->model) {
+        if ($this->config->databasetype === 'db') {
             $canLogin =
                 $this->model->canlogin->filter(
                     function($allowed) use ($id, $appId) {
@@ -876,9 +883,7 @@ class Accounts extends BasePackage
                         }
                     }
                 );
-        }
-
-        if ($this->ffData) {
+        } else {
             $this->ffStoreToUse = 'basepackages_users_accounts_canlogin';
 
             $this->getByParams(['conditions' => [['account_id', '=', $id],['app_id', '=', $appId]]]);
@@ -894,7 +899,7 @@ class Accounts extends BasePackage
             ($canLogin[0]['allowed'] == '1' || $canLogin[0]['allowed'] == '2')
         ) {
             if ($canLogin[0]['allowed'] == '2') {
-                return false;
+                return $canLogin[0];
             }
 
             return true;
@@ -903,7 +908,16 @@ class Accounts extends BasePackage
         } else if (count($canLogin) > 1) {
             $this->logger->log->debug('Multiple login entries for user :' . $id . ' are wrong');
 
-            return true;//Sending true as we dont want to make more entries.
+            //delete all entries
+            if ($this->config->databasetype === 'db') {//Need work
+                //
+            } else {
+                foreach ($canLogin as $login) {
+                    $this->ffStoreToUse = 'basepackages_users_accounts_canlogin';
+
+                    $this->remove($login['id']);
+                }
+            }
         }
 
         return false;
@@ -1079,31 +1093,29 @@ class Accounts extends BasePackage
                     $session = $sessionStore->findOneBy(['session_id', '=', $agent['session_id']]);
 
                     if ($session) {
-                        $sessionStore->deleteById($session['id']);
-                    }
-
-                    if ($agentStore->deleteById($agent['id'])) {
-                        $this->addResponse('Removed!');
-                    } else {
-                        $this->addResponse('Error removing', 1);
+                        if ($sessionStore->deleteById($session['id'])) {//Agent removed via related
+                            $this->addResponse('Removed!');
+                        } else {
+                            $this->addResponse('Error removing', 1);
+                        }
                     }
 
                     return;
                 }
             }
         } else if (isset($data['verified'])) {
-            if (!$this->auth->account()) {
+            if (!$this->access->auth->account()) {
                 $this->addResponse('Account Not Found!');
 
                 return;
             }
 
-            if ($this->config->databasetype === 'db') {
+            if ($this->config->databasetype === 'db') {//Need rework
                 $agentObj = $agentModel::find(
                     [
                         'conditions'    => 'account_id = :aid: AND verified = :v:',
                         'bind'          => [
-                            'aid'       => $this->auth->account()['id'],
+                            'aid'       => $this->access->auth->account()['id'],
                             'v'         => $data['verified']
                         ]
                     ]
@@ -1113,10 +1125,7 @@ class Accounts extends BasePackage
                     $removed = true;
 
                     foreach ($agentObj as $agent) {
-                        if ($agent->session_id !== $this->session->getId() ||
-                            ($agent->session_id === $this->session->getId() &&
-                             $agent->verified == '0')
-                        ) {
+                        if ($agent->session_id !== $this->session->getId() && $agent->verified == $data['verified']) {
                             $sessionObj = $sessionModel::findFirstBysession_id($agent->session_id);
 
                             if ($sessionObj) {
@@ -1139,7 +1148,7 @@ class Accounts extends BasePackage
                             [
                                 'conditions'    => 'account_id = :aid:',
                                 'bind'          => [
-                                    'aid'       => $this->auth->account()['id'],
+                                    'aid'       => $this->access->auth->account()['id'],
                                 ]
                             ]
                         );
@@ -1167,38 +1176,18 @@ class Accounts extends BasePackage
                     return;
                 }
             } else {
-                $agents = $agentStore->findBy([['account_id', '=', $this->auth->account()['id']], ['verified', '=', $data['verified']]]);
+                $agents = $agentStore->findBy([['account_id', '=', $this->access->auth->account()['id']], ['verified', '=', (bool) $data['verified']]]);
 
                 if ($agents) {
                     $removed = true;
 
                     foreach ($agents as $key => $agent) {
-                        if ($agent['session_id'] !== $this->session->getId() ||
-                            ($agent['session_id'] === $this->session->getId() &&
-                             $agent['verified'] == '0')
-                        ) {
+                        if ($agent['session_id'] !== $this->session->getId() && $agent['verified'] == (bool) $data['verified']) {
                             $session = $sessionStore->findOneBy(['session_id', '=', $agent['session_id']]);
 
                             if ($session) {
-                                $sessionStore->deleteById($session['id']);
-                            }
-
-                            if (!$agentStore->deleteById($agent['id'])) {
-                                $removed = false;
-                            }
-                        }
-                    }
-
-                    if ($data['verified'] == '1') {
-                        $sessions = $sessionStore->findBy(['account_id', '=', $this->auth->account()['id']]);
-
-                        if ($sessions) {
-                            foreach ($sessions as $session) {
-                                if ($session['session_id'] !== $this->session->getId()) {
-
-                                    if (!$sessionStore->deleteById($session['id'])) {
-                                        $removed = false;
-                                    }
+                                if (!$sessionStore->deleteById($session['id'])) {
+                                    $removed = false;
                                 }
                             }
                         }
@@ -1209,9 +1198,11 @@ class Accounts extends BasePackage
                     } else {
                         $this->addResponse('Error removing session', 1);
                     }
-
-                    return;
+                } else {
+                    $this->addResponse('No agents found!', 1);
                 }
+
+                return;
             }
         }
 

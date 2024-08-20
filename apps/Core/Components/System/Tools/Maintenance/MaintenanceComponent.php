@@ -2,10 +2,13 @@
 
 namespace Apps\Core\Components\System\Tools\Maintenance;
 
+use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use System\Base\BaseComponent;
 
 class MaintenanceComponent extends BaseComponent
 {
+    use DynamicTable;
+
     protected $maintenancePackage;
 
     public function initialize()

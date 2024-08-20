@@ -1,6 +1,6 @@
 {
     "name"          : "Qrcodes",
-    "display_name"  : "Qrcodes Package",
+    "display_name"  : "Qrcodes",
     "description"   : "Package for generating and validating Qrcodes",
     "module_type"   : "packages",
     "app_type"      : "core",

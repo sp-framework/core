@@ -3,7 +3,7 @@
 namespace System\Base\Providers\AppsServiceProvider\Model;
 
 use System\Base\BaseModel;
-use System\Base\Providers\AppsServiceProvider\Model\ServiceProviderAppsIpFilter;
+use System\Base\Providers\AccessServiceProvider\Model\ServiceProviderAccessIpFilter;
 
 class ServiceProviderApps extends BaseModel
 {
@@ -39,9 +39,11 @@ class ServiceProviderApps extends BaseModel
 
     public $acceptable_usernames;
 
-    public $ip_filter_default_action;
-
     public $incorrect_login_attempt_block_ip;
+
+    public $auto_unblock_ip_minutes;
+
+    public $ip_filter_default_action;
 
     public $menu_structure;
 
@@ -53,7 +55,7 @@ class ServiceProviderApps extends BaseModel
 
         $this->modelRelations['ipFilters']['relationObj'] = $this->hasMany(
             'id',
-            ServiceProviderAppsIpFilter::class,
+            ServiceProviderAccessIpFilter::class,
             'app_id',
             [
                 'alias'         => 'ipFilters'
@@ -62,16 +64,17 @@ class ServiceProviderApps extends BaseModel
 
         $this->modelRelations['monitorlist']['relationObj'] = $this->hasOne(
             'id',
-            ServiceProviderAppsIpFilter::class,
+            ServiceProviderAccessIpFilter::class,
             'app_id',
             [
                 'alias'         => 'monitorlist',
                 'params'        => function() use ($clientAddress) {
                     return
                     [
-                        'conditions'        => 'ip_address = :ipaddress:',
+                        'conditions'        => 'ip_address = :ipaddress: AND added_by = :addedby:',
                         'bind'              => [
-                            'ipaddress'     => $clientAddress
+                            'ipaddress'     => $clientAddress,
+                            'addedby'       => 0
                         ]
                     ];
                 }

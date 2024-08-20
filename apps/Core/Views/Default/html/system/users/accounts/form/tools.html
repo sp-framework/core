@@ -1,5 +1,5 @@
 {% if account['id'] is defined %}
-    {% if auth.account()['id'] === account['id'] %}
+    {% if access.auth.account()['id'] === account['id'] %}
         {% set emailCheck = true %}
     {% else %}
         {% set emailCheck = false %}

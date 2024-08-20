@@ -69,7 +69,7 @@ trait DynamicTable {
             if ($withFilter) {
                 $table['withFilter'] = $withFilter;
 
-                $account = $this->auth->account();
+                $account = $this->access->auth->account();
 
                 if ($account) {
                     $filtersArr = $this->basepackages->filters->getFiltersForAccountAndComponent($account, $componentId);

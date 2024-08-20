@@ -452,3 +452,62 @@ if (!function_exists('array_diff_assoc_recursive')) {
         return !isset($difference) ? 0 : $difference;
     }
 }
+
+if (!function_exists('array_get_values_recursive')) {
+    function array_get_values_recursive($keys = [], array $arr) {
+        $val = [];
+
+        array_walk_recursive($arr, function($v, $k) use($keys, &$val) {
+            if (in_array($k, $keys)) {
+                array_push($val, [$k => $v]);
+            }
+        });
+
+        return count($val) > 1 ? $val : array_pop($val);
+    }
+
+if (!function_exists('arraySqueeze')) {
+    //$task = keep - Keep the data of defined keys, remove rest
+    //$task = unset - remove data of defined keys
+    function arraySqueeze($array, array $keys, $task = 'keep')
+    {
+        array_walk($array, function($value, $key) use (&$array, $keys, $task) {
+            if ($task === 'keep') {
+                if (!in_array($key, $keys)) {
+                    unset($array[$key]);
+                }
+            } else if ($task === 'unset') {
+                if (in_array($key, $keys)) {
+                    unset($array[$key]);
+                }
+            }
+        });
+
+        return $array;
+    }
+}
+
+if (!function_exists('arrayFilterKeywords')) {
+    //$task = keep - Keep the data of defined keys, remove rest
+    //$task = unset - remove data of defined keys
+    function arrayFilterKeywords($array, array $keywords, $task = 'keep')
+    {
+        array_walk($array, function($value, $key) use (&$array, $keywords, $task) {
+            if ($task === 'keep') {
+                foreach ($keywords as $keyword) {
+                    if (!str_contains($value, $keyword)) {
+                        unset($array[$key]);
+                    }
+                }
+            } else if ($task === 'unset') {
+                foreach ($keywords as $keyword) {
+                    if (str_contains($value, $keyword)) {
+                        unset($array[$key]);
+                    }
+                }
+            }
+        });
+
+        return $array;
+    }
+}

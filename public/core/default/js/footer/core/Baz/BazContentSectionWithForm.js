@@ -1,4 +1,4 @@
-/* globals define exports BazContentFieldsValidator BazContentFields PNotify Pace BazCore BazContentLoader */
+/* globals define exports BazContentFieldsValidator BazContentFields paginatedPNotify Pace BazCore BazContentLoader */
 /*
 * @title                    : BazContentSectionWithForm
 * @description              : Baz Lib for Content (Sections With Form)
@@ -349,7 +349,7 @@
 
                                         if (response.responseCode == '0') {
                                             if ($(thisButtonId).data('successnotify') === true) {
-                                                PNotify.success({
+                                                paginatedPNotify('success', {
                                                     title   : response.responseMessage,
                                                 });
                                             }
@@ -391,7 +391,7 @@
                                             }
                                         } else {
                                             $(thisButtonId).attr('disabled', false);
-                                            PNotify.error({
+                                            paginatedPNotify('error', {
                                                 title   : response.responseMessage
                                             });
                                             dataCollection[componentId][sectionId]['dataToSubmit'] = { };

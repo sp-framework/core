@@ -128,8 +128,16 @@ class Apps
 				new Column(
 					'ip_filter_default_action',
 					[
-						'type'    => Column::TYPE_BOOLEAN,
+						'type'    => Column::TYPE_VARCHAR,
+						'size'    => 10,
 						'notNull' => true,
+					]
+				),
+				new Column(
+					'auto_unblock_ip_minutes',
+					[
+						'type'    => Column::TYPE_INTEGER,
+						'notNull' => false,
 					]
 				),
 				new Column(

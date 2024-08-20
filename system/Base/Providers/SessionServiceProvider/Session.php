@@ -30,7 +30,7 @@ class Session
         );
 
         $this->session->setAdapter($sessionFiles);
-        $this->session->setName('Bazaari');
+        $this->session->setName('SP');
 
         return $this->session;
     }

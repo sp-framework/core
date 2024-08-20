@@ -139,7 +139,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
     {
         //Someone trying to connect without proper cookies
         if (!isset($conn->httpRequest->getHeader('Cookie')[0])) {
-            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
+            $this->access->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
 
             $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' Cookie misuse. Disconnecting websocket.');
 
@@ -172,17 +172,17 @@ class Pusher extends WebsocketBase implements WampServerInterface
             // return false;//Disconnect as we didnt receive appRoute
         }
 
-        if (!isset($cookies['Bazaari'])) {
-            $this->apps->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
+        if (!isset($cookies['SP'])) {
+            $this->access->ipFilter->bumpFilterHitCounter(null, false, true, $this->appRoute);
 
-            $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' Bazaari Cookie not set. Disconnecting websocket.');
+            $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' SP Cookie not set. Disconnecting websocket.');
 
             return false;
         }
 
         //For Installer Progress
         if (isset($cookies['Installer']) &&
-            $cookies['Installer'] === $cookies['Bazaari']
+            $cookies['Installer'] === $cookies['SP']
         ) {
             $this->opCache->setCache('InstallerResourceId', $conn->resourceId, 'pusher');
 
@@ -200,9 +200,9 @@ class Pusher extends WebsocketBase implements WampServerInterface
 
             $ipFilterMiddleware = $this->modules->middlewares->getMiddlewareByNameForAppId('IpFilter', $app['id']);
             if ($ipFilterMiddleware) {
-                $this->apps->ipFilter->setClientAddress($conn->httpRequest->getHeader('X-Forwarded-For')[0]);
+                $this->access->ipFilter->setClientAddress($conn->httpRequest->getHeader('X-Forwarded-For')[0]);
 
-                if (!$this->apps->ipFilter->checkList()) {//IP Is Blocked
+                if (!$this->access->ipFilter->checkList()) {//IP Is Blocked
                     $this->logger->log->debug($conn->httpRequest->getHeader('X-Forwarded-For')[0] . ' IP is blocked.');
 
                     return false;
@@ -250,7 +250,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
                                         [
                                             'conditions'    => 'session_id = :sid: AND account_id = :aid: AND verified = :ver: user_agent AND :agent:',
                                             'bind'          => [
-                                                'sid'       => $cookies['Bazaari'],
+                                                'sid'       => $cookies['SP'],
                                                 'aid'       => $this->account['id'],
                                                 'ver'       => '1',
                                                 'user_agent'=> $agent
@@ -269,7 +269,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
 
                                 $agents = $agentsStore->findOneBy(
                                     [
-                                        ['session_id', '=', $cookies['Bazaari']],
+                                        ['session_id', '=', $cookies['SP']],
                                         ['account_id', '=', $this->account['id']],
                                         ['verified', '=', true],
                                         ['user_agent', '=', $agent]
@@ -331,7 +331,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
         if ($this->config->databasetype === 'db') {
             if ($this->accountsObj && $this->accountsObj->sessions) {
                 foreach ($this->accountsObj->sessions as $key => $session) {
-                    if ($session->session_id === $cookies['Bazaari']) {
+                    if ($session->session_id === $cookies['SP']) {
                         return true;
                     }
                 }
@@ -339,7 +339,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
         } else {
             if ($this->account && count($this->account['sessions']) > 0) {
                 foreach ($this->account['sessions'] as $key => $session) {
-                    if ($session['session_id'] === $cookies['Bazaari']) {
+                    if ($session['session_id'] === $cookies['SP']) {
                         return true;
                     }
                 }

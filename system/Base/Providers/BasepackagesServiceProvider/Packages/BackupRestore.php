@@ -97,7 +97,7 @@ class BackupRestore extends BasePackage
         $this->now = Carbon::now();
         $this->backupInfo['request'] = $data;
         $this->backupInfo['takenAt'] = $this->now->format('Y-m-d H:i:s');
-        $this->backupInfo['createdBy'] = $this->auth->account() ? $this->auth->account()['email'] : 'System';
+        $this->backupInfo['createdBy'] = $this->access->auth->account() ? $this->access->auth->account()['email'] : 'System';
         $this->backupInfo['backupName'] = 'backup-' . $this->now->getTimestamp() . '.zip';
         $this->backupInfo['dbs'] = [];
         $this->backupInfo['dirs'] = [];

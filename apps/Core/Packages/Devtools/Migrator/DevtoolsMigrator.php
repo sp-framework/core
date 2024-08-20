@@ -692,7 +692,7 @@ class DevtoolsMigrator extends BasePackage
             }
         }
 
-        if ($returnApis) {
+        if (isset($apis) && $returnApis) {
             return $apis;
         }
 

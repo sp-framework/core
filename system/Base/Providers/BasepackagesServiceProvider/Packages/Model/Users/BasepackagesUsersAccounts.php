@@ -5,6 +5,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users
 use System\Base\BaseModel;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiUsers;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
@@ -100,9 +101,21 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
+        $this->modelRelations['address']['relationObj'] = $this->hasOneThrough(
+            'id',
+            BasepackagesUsersProfiles::class,
+            'account_id',
+            'id',
+            BasepackagesAddressBook::class,
+            'package_row_id',
+            [
+                'alias'         => 'address'
+            ]
+        );
+
         $account_id = '0';
-        if (isset($this->auth) && $this->auth->account()) {
-            $account_id = $this->auth->account()['id'];
+        if (isset($this->access->auth) && $this->access->auth->account()) {
+            $account_id = $this->access->auth->account()['id'];
         }
         $this->modelRelations['api_clients']['relationObj'] = $this->hasMany(
             'id',

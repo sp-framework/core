@@ -30,7 +30,7 @@ class ImportExport extends BasePackage
             $data['domain_id'] = $this->domains->getDomain()['id'];
         }
 
-        $account = $this->auth->account();
+        $account = $this->access->auth->account();
 
         if ($account) {
             $data['account_id'] = $account['id'];

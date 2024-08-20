@@ -8,20 +8,20 @@ class Repos
     {
         $coreRepo =
             [
-                'api_url'               => 'https://dev.bazaari.com.au/api/v1',
-                'org_user'              => 'sp-core',
-                'repo_url'              => 'https://dev.bazaari.com.au/sp-core',
+                'api_url'               => 'https://api.github.com',
+                'org_user'              => 'sp-framework',
+                'repo_url'              => 'https://github.com/sp-framework/core',
                 'branch'                => 'main',
                 'auth_type'             => 'autho',
-                'authorization'         => ''//bcust Token
+                'authorization'         => ''
             ];
 
         $coreApi =
             [
-                'name'              => 'Bazaari Core (SP)',
-                'description'       => 'Bazaari Core Repository',
+                'name'              => 'SP Framework Core',
+                'description'       => 'SP Framework Core Repository',
                 'category'          => 'repos',
-                'provider'          => 'Gitea',
+                'provider'          => 'Github',
                 'in_use'            => 0,
                 'used_by'           => json_encode([]),
                 'setup'             => 4,
@@ -30,40 +30,18 @@ class Repos
 
         $modulesRepo =
             [
-                'api_url'               => 'https://dev.bazaari.com.au/api/v1',
-                'org_user'              => 'sp-modules',
-                'repo_url'              => 'https://dev.bazaari.com.au/sp-modules',
+                'api_url'               => 'https://api.github.com',
+                'org_user'              => 'sp-framework',
+                'repo_url'              => 'https://github.com/sp-framework/sp-modules',
                 'branch'                => 'main',
                 'auth_type'             => 'autho',
-                'authorization'         => ''//bcust Token
+                'authorization'         => ''
             ];
 
         $modulesApi =
             [
-                'name'                  => 'Bazaari Modules (SP)',
-                'description'           => 'Bazaari Modules Repository',
-                'category'              => 'repos',
-                'provider'              => 'Gitea',
-                'in_use'                => 0,
-                'used_by'               => json_encode([]),
-                'setup'                 => 4,
-                'location'              => 'basepackages'
-            ];
-
-        $githubModulesRepo =
-            [
-                'api_url'               => 'https://api.github.com',
-                'org_user'              => 'sp-modules',
-                'repo_url'              => 'https://github.com/sp-modules',
-                'branch'                => 'main',
-                'auth_type'             => 'autho',
-                'authorization'         => ''//github Token
-            ];
-
-        $githubModulesApi =
-            [
-                'name'                  => 'Github Modules (SP)',
-                'description'           => 'Github Modules Repository',
+                'name'                  => 'SP Framework Modules',
+                'description'           => 'SP Framework Modules Repository',
                 'category'              => 'repos',
                 'provider'              => 'Github',
                 'in_use'                => 0,
@@ -88,14 +66,6 @@ class Repos
 
                 $db->insertAsDict('basepackages_api_client_services', $modulesApi);
             }
-
-            $newRepo = $db->insertAsDict('basepackages_api_client_services_apis_repos', $githubModulesRepo);
-
-            if ($newRepo) {
-                $githubModulesApi['api_category_id'] = $db->lastInsertId();
-
-                $db->insertAsDict('basepackages_api_client_services', $githubModulesApi);
-            }
         }
 
         if ($ff) {
@@ -116,14 +86,6 @@ class Repos
                 $modulesApi['api_category_id'] = $apisReposStore->getLastInsertedId();
 
                 $apiStore->updateOrInsert($modulesApi);
-            }
-
-            $newRepo = $apisReposStore->updateOrInsert($githubModulesRepo);
-
-            if ($newRepo) {
-                $githubModulesApi['api_category_id'] = $apisReposStore->getLastInsertedId();
-
-                $apiStore->updateOrInsert($githubModulesApi);
             }
         }
     }
