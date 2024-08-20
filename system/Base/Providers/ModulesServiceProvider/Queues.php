@@ -233,6 +233,7 @@ class Queues extends BasePackage
 
         $this->queueTasks = [];
         $this->results = [];
+        $queue['tasks']['analysed'] = [];//Reset Analysed
 
         foreach ($queue['tasks'] as $taskName => $tasks) {
             if (isset($queue['tasks']['analysed']) &&
@@ -244,6 +245,7 @@ class Queues extends BasePackage
             if (!isset($this->queueTasks[$taskName])) {
                 $this->queueTasks[$taskName] = [];
             }
+
             if (!isset($this->results[$taskName])) {
                 $this->results[$taskName] = [];
             }
@@ -412,9 +414,12 @@ class Queues extends BasePackage
 
         $queue['results'] = $this->results;
         //Rearrange tasks to make sure we install externals first and then update core and then execute rest of the tasks.
-        if (isset($this->queueTasks['first'])) {
+        if (isset($this->queueTasks['first']['packages']) && count($this->queueTasks['first']['packages']) > 0) {
             $this->queueTasks = array_merge(array_flip(['first', 'update', 'install', 'uninstall', 'remove']), $this->queueTasks);
-            $this->queueTasks['first'] = array_merge(array_flip(['external', 'packages']), $this->queueTasks['first']);
+
+            if (isset($this->queueTasks['first']['external']) && count($this->queueTasks['first']['external']) > 0) {
+                $this->queueTasks['first'] = array_merge(array_flip(['external', 'packages']), $this->queueTasks['first']);
+            }
         }
 
         $queue['tasks']['analysed'] = $this->queueTasks;
@@ -539,7 +544,7 @@ class Queues extends BasePackage
 
         if (isset($composerPackages['composer']['require']) && count($composerPackages['composer']['require']) > 0) {
             $composerRequire = $composerPackages['composer']['require'];
-        } else if (isset($composerPackages['require']) && count($composerPackages['require']) === 0) {
+        } else if (isset($composerPackages['require']) && count($composerPackages['require']) > 0) {
             $composerRequire = $composerPackages['require'];
         }
 
@@ -564,18 +569,16 @@ class Queues extends BasePackage
                     $installExternal = true;
                 }
 
-                if (isset($composerPackages['config'])) {
-                    if (isset($composerPackages['config']['allow-plugins'][$composerPackage])) {
-                        $composerJsonFile['config']['allow-plugins'][$composerPackage] = $composerPackages['config']['allow-plugins'][$composerPackage];
-                        $hasConfigChange = true;
-                    }
+                if (isset($composerPackages['config']['allow-plugins'][$composerPackage]) &&
+                    !isset($composerJsonFile['config']['allow-plugins'][$composerPackage])
+                ) {
+                    $composerJsonFile['config']['allow-plugins'][$composerPackage] = $composerPackages['config']['allow-plugins'][$composerPackage];
+                    $hasConfigChange = true;
                 }
 
-                if (isset($composerPackages['extra'])) {
-                    if (isset($composerPackages['extra']['patches'][$composerPackage])) {
-                        $composerJsonFile['extra']['patches'][$composerPackage][$this->helper->firstKey($composerPackages['extra']['patches'][$composerPackage])] = base_path($this->helper->first($composerPackages['extra']['patches'][$composerPackage]));
-                        $hasPatch = true;
-                    }
+                if (isset($composerPackages['extra']['patches'][$composerPackage])) {
+                    $composerJsonFile['extra']['patches'][$composerPackage][$this->helper->firstKey($composerPackages['extra']['patches'][$composerPackage])] = base_path($this->helper->first($composerPackages['extra']['patches'][$composerPackage]));
+                    $hasPatch = true;
                 }
 
                 if ($installExternal || $hasConfigChange || $hasPatch) {
@@ -636,6 +639,22 @@ class Queues extends BasePackage
                     $this->queueTasks[$taskName][$moduleType][$module['id']]['hasPatch'] = true;
                 }
                 if (isset($module['root_module'])) {
+                    $module['root_module'] =
+                        arraySqueeze(
+                            $module['root_module'],
+                            ['id', 'name', 'display_name', 'module_type', 'repo', 'repo_details']
+                        );
+                    $module['root_module']['repo_details']['details'] =
+                        arraySqueeze(
+                            $module['root_module']['repo_details']['details'],
+                            ['name', 'internal', 'private']
+                        );
+                    $module['root_module']['repo_details']['latestRelease'] =
+                        arraySqueeze(
+                            $module['root_module']['repo_details']['latestRelease'],
+                            ['name', 'tag_name', 'published_at', 'zipball_url']
+                        );
+
                     $this->queueTasks[$taskName][$moduleType][$module['id']]['root_module'] = $module['root_module'];
                 }
             }

@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+<!-- htmlhint tag-pair:false -->
 {% set queueTasksCounterInstall = 0 %}
 {% set queueTasksCounterUpdate = 0 %}
 {% set queueTasksCounterUninstall = 0 %}
@@ -69,7 +69,7 @@
         {% if task === 'first' or task === 'install' or task === 'uninstall' or task === 'update' or task === 'remove' %}
             {% if queueTaskModules|length > 0 %}
                 {% for modulesType, modules in queueTaskModules %}
-                    {% if modules|length > 0 %}
+                    {% if is_array(modules) and modules|length > 0 %}
                         {% for moduleId, module in modules %}
                             {% set error = 'false' %}
                             {% set color = 'primary' %}
@@ -430,4 +430,3 @@ $(window).on('load', function() {
         ]
     )}}
 </div>
-<!-- htmlmin:ignore -->

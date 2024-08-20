@@ -4,6 +4,7 @@ namespace System\Base\Providers\ModulesServiceProvider;
 
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToCopyFile;
+use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
@@ -206,6 +207,8 @@ class Installer extends BasePackage
 
             if (isset($module['hasPatch']) && $module['hasPatch'] === true) {
                 if (!isset($module['composerJsonFile']['extra']['patches'][$module['name']])) {
+                    $this->cleanup(['composer']);
+
                     return $this->preCheckHasErrors(
                         'External packages should have package defined, but are missing from the composer json file for : ' . $module['name'],
                         $preCheckQueueLogs
@@ -220,14 +223,23 @@ class Installer extends BasePackage
                            false
                 );
 
+                $patches['files'] = arrayFilterKeywords($patches['files'], ['.patch']);
+
                 if (count($patches['files']) === 0) {
+                    $this->cleanup(['composer']);
+
                     return $this->preCheckHasErrors(
                         'External package requires a patch which is missing from the repository : ' . $module['root_module']['repo'],
                         $preCheckQueueLogs
                     );
                 }
 
+                $modulePatchName = str_replace(['/','-'], ['_','_'], $module['name']);
+                $patches['files'] = arrayFilterKeywords($patches['files'], [$modulePatchName]);
+
                 if (count($patches['files']) !== count($module['composerJsonFile']['extra']['patches'][$module['name']])) {
+                    $this->cleanup(['composer']);
+
                     return $this->preCheckHasErrors(
                         'External package number of patches do not match what is defined in the composer json file for repository : ' . $module['root_module']['repo'],
                         $preCheckQueueLogs
@@ -246,6 +258,8 @@ class Installer extends BasePackage
                 }
 
                 if (in_array('false', $foundAll)) {
+                    $this->cleanup(['composer']);
+
                     return $this->preCheckHasErrors(
                         'External package all patches not found in the external/patches directory as per the  composer json file for repository : ' . $module['root_module']['repo'],
                         $preCheckQueueLogs
@@ -259,6 +273,8 @@ class Installer extends BasePackage
                         $this->localContent->copy($file, 'external/patches/' . $fileName);
                     }
                 } catch (FilesystemException | UnableToCopyFile $e) {
+                    $this->cleanup(['composer']);
+
                     return $this->preCheckHasErrors('Error copying file : ' . $fileName, $preCheckQueueLogs);
                 }
             }
@@ -268,6 +284,8 @@ class Installer extends BasePackage
 
                 $this->localContent->write('external/' . $externalComposerFileName, $this->helper->encode($module['composerJsonFile']));
             } catch (FilesystemException | UnableToWriteFile $e) {
+                $this->cleanup(['composer']);
+
                 return $this->preCheckHasErrors(
                     'Error writing file external package composer file : ' . $externalComposerFileName,
                     $preCheckQueueLogs
@@ -292,13 +310,19 @@ class Installer extends BasePackage
                 $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck'] = 'pass';
                 $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $precheckLog;
             } catch (\throwable | UnableToReadFile $e) {
+                $this->cleanup(['composer']);
+
                 return $this->preCheckHasErrors($e->getMessage(), $preCheckQueueLogs);
             }
 
             if ($app !== 0) {
+                $this->cleanup(['composer']);
+
                 return $this->preCheckHasErrors('Precheck for composer package failed : ' . $module['name'], $preCheckQueueLogs);
             }
         } else {
+            $this->cleanup(['composer']);
+
             return $this->preCheckHasErrors('Incorrect external package type: ' . $module['name'], $preCheckQueueLogs);
         }
 
@@ -727,6 +751,27 @@ class Installer extends BasePackage
         }
 
         return $found;
+    }
+
+    protected function cleanup(array $what)
+    {
+        if (in_array('composer', $what)) {
+            $files = $this->basepackages->utils->scanDir('external', false);
+
+            foreach ($files['files'] as $file) {
+                if ($file === 'external/composer.json' || $file === 'external/composer.install') {
+                    continue;
+                }
+
+                if (str_contains($file, '.json')) {
+                    try {
+                        $this->localContent->delete($file);
+                    } catch (UnableToDeleteFile | FilesystemException | \throwable $e) {
+                        throw $e;
+                    }
+                }
+            }
+        }
     }
 
     // protected function getLatestRepositoryModulesData()
