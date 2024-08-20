@@ -516,7 +516,8 @@ class Manager extends BasePackage
 
                 $names = explode('-', $module['name']);
 
-                if ($names[0] === 'core') {
+                if ($names && count($names) === 1 && $names[0] === 'core') {
+                    $this->remoteModules['packages'] = [];
                     $this->remoteModules['packages'] = [$module];
 
                     return true;
