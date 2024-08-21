@@ -3,13 +3,16 @@
 namespace System\Base\Providers\ModulesServiceProvider;
 
 use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToCopyFile;
+use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
 use System\Base\BasePackage;
+use xobotyi\rsync\Rsync;
 use z4kn4fein\SemVer\Version;
 
 class Installer extends BasePackage
@@ -58,8 +61,12 @@ class Installer extends BasePackage
 
         $this->zip = new \ZipArchive;
 
-        if (!$this->localContent->fileExists($this->downloadLocation)) {
-            $this->localContent->createDirectory($this->downloadLocation);
+        try {
+            if (!$this->localContent->directoryExists($this->downloadLocation)) {
+                $this->localContent->createDirectory($this->downloadLocation);
+            }
+        } catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
+            throw $e;
         }
 
         $this->basepackages->progress->init(null, 'modulesinstaller');
@@ -524,16 +531,15 @@ class Installer extends BasePackage
             return false;
         }
 
-
         $files = $this->basepackages->utils->scanDir($this->zipFile['location'], false);
 
         if ($files && isset($files['dirs'][0])) {
             try {
                 $name = str_replace('.zip', '', $this->zipFile['name']);
 
-                $files['dirs'][0];
-
                 $this->localContent->move($files['dirs'][0], $this->downloadLocation . $name . '/' . $name);
+
+                $this->zip->close();
             } catch (FilesystemException | UnableToMoveFile $e) {
                 $this->addResponse('Error renaming extracted directory for : ' . $this->zipFile['name'], 1);
 
@@ -546,6 +552,100 @@ class Installer extends BasePackage
         }
 
         return false;
+    }
+
+    protected function dryRunRsync($args)
+    {
+        $taskName = $args[0];
+        $module = $args[1];
+
+        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
+
+        $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
+
+        try {
+            $rsync = new Rsync([
+                Rsync::CONF_CWD        => base_path('var/tmp/installer/' . $this->zipFile['name'] . '/' . $this->zipFile['name']),
+                Rsync::CONF_OPTIONS    =>
+                    [
+                        Rsync::OPT_DRY_RUN           => true,
+                        Rsync::OPT_VERBOSE           => true,
+                        Rsync::OPT_ARCHIVE           => true,
+                        Rsync::OPT_HUMAN_READABLE    => true,
+                        Rsync::OPT_CHECKSUM          => true,
+                        Rsync::OPT_DELETE_AFTER      => true,
+                        Rsync::OPT_INCLUDE           =>
+                            [
+                                'public',
+                                'public/index.php',
+                                'public/.htaccess_example',
+                                'public/core/***',
+                                'external',
+                                'external/patches',
+                                'external/patches/***',
+                                'apps',
+                                'apps/Core/***',
+                                'system/***'
+                            ],
+                        Rsync::OPT_EXCLUDE           => ['*'],
+                    ]
+            ]);
+
+            $rsync->sync('.', base_path(''));
+
+            if ($rsync->getExitCode() == 0) {
+                $outputArr = explode(PHP_EOL, $rsync->getStdout());
+                // trace([$outputArr], false, false, true);
+                $modifiedFiles = [];
+                $deleteFiles = [];
+
+                array_walk($outputArr, function($output) use (&$modifiedFiles, &$deleteFiles) {
+                    if (str_starts_with($output, 'apps') ||
+                        str_starts_with($output, 'system') ||
+                        str_starts_with($output, 'public') ||
+                        str_starts_with($output, 'external')
+                    ) {
+                        if (!str_ends_with($output, '/') &&
+                            !str_ends_with($output, '.git')
+                        ) {
+                            array_push($modifiedFiles, $output);
+                        }
+                    }
+
+                    if (str_starts_with($output, 'deleting')) {
+                        if (!str_ends_with($output, '/') &&
+                            !str_ends_with($output, '.git') &&
+                            !str_ends_with($output, 'keys')
+                        ) {
+                            $output = str_replace('deleting ', '', $output);
+                            array_push($deleteFiles, $output);
+                        }
+                    }
+                });
+            }
+
+            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'pass';
+
+            $preCheckQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles, 'deleteFiles' => $deleteFiles]);
+            // trace(varsToDump : [$modifiedFiles, $deleteFiles], object: true);
+
+            return true;
+        } catch (\throwable $e) {
+            if (str_contains($e->getMessage(), 'No such file or directory')) {
+                $rsyncError = 'Incorrect directory : ' . $rsync->getCWD();
+            } else {
+                $rsyncError = $e->getMessage();
+            }
+        }
+
+        if (!isset($rsyncError)) {
+            $rsyncError = $rsync->getStderr();
+        }
+
+        return $this->preCheckHasErrors(
+            $rsyncError,
+            $preCheckQueueLogs
+        );
     }
 
     protected function checkDependencies()
@@ -753,7 +853,7 @@ class Installer extends BasePackage
         return $found;
     }
 
-    protected function cleanup(array $what)
+    public function cleanup(array $what)
     {
         if (in_array('composer', $what)) {
             $files = $this->basepackages->utils->scanDir('external', false);
@@ -770,6 +870,16 @@ class Installer extends BasePackage
                         throw $e;
                     }
                 }
+            }
+        }
+
+        if (in_array('downloads', $what)) {
+            try {
+                if ($this->localContent->directoryExists($this->downloadLocation)) {
+                    $this->localContent->deleteDirectory($this->downloadLocation);
+                }
+            } catch (FilesystemException | UnableToCheckExistence | UnableToDeleteDirectory | \throwable $e) {
+                throw $e;
             }
         }
     }
@@ -1022,7 +1132,7 @@ class Installer extends BasePackage
     protected function registerRunProcessPrecheckProgressMethods()
     {
         $this->runProcessPrecheckProgressMethods = [];
-        // trace([$this->queue['tasks']['analysed']]);
+
         foreach ($this->queue['tasks']['analysed'] as $taskName => $modulesTypes) {
             if (($taskName === 'first' || $taskName === 'install' || $taskName === 'update') &&
                 count($modulesTypes) > 0
@@ -1094,6 +1204,13 @@ class Installer extends BasePackage
                                 [
                                     'method'    => 'extractModulesDownloadedFromRepo-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
                                     'text'      => 'Extracting downloaded module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...'
+                                ]
+                            );
+                            array_push($this->runProcessPrecheckProgressMethods,
+                                [
+                                    'method'    => 'dryRunRsync-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Running rsync --dry-run for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                    'args'      => [$taskName, $module],
                                 ]
                             );
                         }

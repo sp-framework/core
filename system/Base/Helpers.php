@@ -465,6 +465,8 @@ if (!function_exists('array_get_values_recursive')) {
 
         return count($val) > 1 ? $val : array_pop($val);
     }
+}
+
 
 if (!function_exists('arraySqueeze')) {
     //$task = keep - Keep the data of defined keys, remove rest

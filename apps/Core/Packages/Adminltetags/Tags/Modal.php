@@ -150,6 +150,10 @@ class Modal extends Adminltetags
             $this->params['modalEscClose'] :
             'false';
 
+        if ($this->modalParams['modalEscClose'] === true) {
+            $this->modalParams['modalEscClose'] = 'true';
+        }
+
         $this->modalParams['modalType'] =
             isset($this->params['modalType']) ?
             $this->params['modalType'] :

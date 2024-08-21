@@ -36,4 +36,9 @@ class PackagesData
 	{
 		return array_key_exists($key, $this->packagesData);
 	}
+
+	public function reset()
+	{
+		$this->packagesData = [];
+	}
 }

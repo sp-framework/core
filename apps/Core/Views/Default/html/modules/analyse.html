@@ -355,6 +355,11 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
 
             if (object === 'analyse_logs' || object === 'precheck_logs' || object === 'result_logs') {
                 if (logObject[object] !== '-') {
+                    if ($(this).data()['moduletype'] !== 'external') {
+                        logObject[object] = JSON.parse(logObject[object]);
+                        logObject[object] = BazHelpers.createHtmlList({'obj': logObject[object]});
+                    }
+
                     logObject[object] = '<pre>' + logObject[object] + '</pre>';
                 }
             }
@@ -426,6 +431,8 @@ $(window).on('load', function() {
             'modalSize'                 : 'xl',
             'modalHeader'               : true,
             'modalFooter'               : true,
+            'modalHeaderCloseButton'    : true,
+            'modalEscClose'             : true,
             'modalTitle'                : '<i class="fa fas fa-fw fa-th"></i> LOGS'
         ]
     )}}

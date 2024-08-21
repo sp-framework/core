@@ -231,6 +231,10 @@ class Queues extends BasePackage
             return true;
         }
 
+        if ($reAnalyse) {
+            $this->modules->installer->cleanup(['composer', 'downloads']);
+        }
+
         $this->queueTasks = [];
         $this->results = [];
         $queue['tasks']['analysed'] = [];//Reset Analysed
@@ -577,8 +581,12 @@ class Queues extends BasePackage
                 }
 
                 if (isset($composerPackages['extra']['patches'][$composerPackage])) {
-                    $composerJsonFile['extra']['patches'][$composerPackage][$this->helper->firstKey($composerPackages['extra']['patches'][$composerPackage])] = base_path($this->helper->first($composerPackages['extra']['patches'][$composerPackage]));
-                    $hasPatch = true;
+                    foreach ($composerPackages['extra']['patches'][$composerPackage] as $patchKey => $patchValue) {
+                        if (!isset($composerJsonFile['extra']['patches'][$composerPackage][$patchKey])) {
+                            $composerJsonFile['extra']['patches'][$composerPackage][$patchKey] = $patchValue;
+                            $hasPatch = true;
+                        }
+                    }
                 }
 
                 if ($installExternal || $hasConfigChange || $hasPatch) {
