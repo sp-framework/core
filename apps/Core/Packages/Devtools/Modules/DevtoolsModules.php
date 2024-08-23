@@ -485,6 +485,9 @@ class DevtoolsModules extends BasePackage
                 if (!$dirExists) {//addGitkeep
                     $this->localContent->write($path . '/.gitkeep', '');
                 }
+
+                $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ApptypesGitignore.txt');
+                $this->localContent->write('apps/' . ucfirst($appType['app_type']) . '/.gitignore', $file);
             } catch (FilesystemException | UnableToCheckExistence | UnableToWriteFile $exception) {
                 $this->addResponse('Unable to write json content to file: .gitkeep for apptypes');
 
@@ -2950,13 +2953,15 @@ $file .= '
             $name = preg_split('/(?=[A-Z])/', $name);
 
             if ($data['module_type'] !== 'bundles') {
-                if (isset($baseView) && isset($baseView['name'])) {
-                    $name = strtolower($baseView['name'] . '-' . implode('', $name));
-                } else {
-                    $name = strtolower(implode('', $name));
-                }
+                if ($name[0] !== 'core') {
+                    if (isset($baseView) && isset($baseView['name'])) {
+                        $name = strtolower($baseView['name'] . '-' . implode('', $name));
+                    } else {
+                        $name = strtolower(implode('', $name));
+                    }
 
-                $url .= '/' . $data['app_type'] . '-' . $data['module_type'] . '-' . $data['category'] . '-' . $name;
+                    $url .= '/' . $data['app_type'] . '-' . $data['module_type'] . '-' . $data['category'] . '-' . $name;
+                }
             } else {
                 $url .= '/' . $data['app_type'] . '-' . $data['module_type'] . '-' . strtolower(implode('', $name));
             }
