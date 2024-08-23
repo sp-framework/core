@@ -473,28 +473,45 @@ class Manager extends BasePackage
 
     protected function getRemoteModules()
     {
-        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
-            $collection = 'OrganizationApi';
-            $method = 'orgListRepos';
-            $args = [$this->apiClientConfig['org_user']];
-        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
-            $collection = 'ReposApi';
-            $method = 'reposListForOrg';
-            $args = [$this->apiClientConfig['org_user']];
-        }
+        $this->apiClientConfig['repo_url'] = rtrim($this->apiClientConfig['repo_url'], '/');
+        //Get one or core repo details, no need to loop through all repos in the org.
+        if (str_ends_with($this->apiClientConfig['repo_url'], '/core')) {
+            return $this->getRemoteModule('core');
+        } else if (!str_ends_with($this->apiClientConfig['repo_url'], '/' . $this->apiClientConfig['org_user'])) {
+            $repoUrlArr = explode('/', $this->apiClientConfig['repo_url']);
 
-        try {
-            $modulesArr = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
-        } catch (\throwable | ClientException $e) {
-            $this->addResponse($e->getMessage(), 1);
+            $remoteModule = $this->getRemoteModule($this->helper->last($repoUrlArr));
 
-            if ($e->getCode() === 401) {
-                $this->addResponse('API Authentication failed.', 1);
-            } else if (str_contains($e->getMessage(), 'Connection timed out')) {
-                $this->addResponse('Error connecting to the repository.', 1);
+            if (!$remoteModule) {
+                return false;
             }
 
-            return false;
+            $modulesArr = [$remoteModule];
+        } else {
+            //Process all repositories in the org as repourl and org name is the same
+            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                $collection = 'OrganizationApi';
+                $method = 'orgListRepos';
+                $args = [$this->apiClientConfig['org_user']];
+            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                $collection = 'ReposApi';
+                $method = 'reposListForOrg';
+                $args = [$this->apiClientConfig['org_user']];
+            }
+
+            try {
+                $modulesArr = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+            } catch (\throwable | ClientException $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                if ($e->getCode() === 401) {
+                    $this->addResponse('API Authentication failed.', 1);
+                } else if (str_contains($e->getMessage(), 'Connection timed out')) {
+                    $this->addResponse('Error connecting to the repository.', 1);
+                }
+
+                return false;
+            }
         }
 
         if ($modulesArr) {
@@ -515,13 +532,6 @@ class Manager extends BasePackage
                 }
 
                 $names = explode('-', $module['name']);
-
-                if ($names && count($names) === 1 && $names[0] === 'core') {
-                    $this->remoteModules['packages'] = [];
-                    $this->remoteModules['packages'] = [$module];
-
-                    return true;
-                }
 
                 if (strtolower($this->apiClientConfig['provider']) === 'github') {//Github does not have release_counter set
                     $collection = 'ReposApi';
@@ -571,6 +581,57 @@ class Manager extends BasePackage
         $this->addResponse('Unable to Sync with remote server', 1);
 
         return false;
+    }
+
+    protected function getRemoteModule($moduleName)
+    {
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoGet';
+            $args = [$this->apiClientConfig['org_user']];
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+            $collection = 'ReposApi';
+            $method = 'reposGet';
+            $args = [$this->apiClientConfig['org_user'], $moduleName];
+        }
+
+        try {
+            $module = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+        } catch (\throwable | ClientException $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            if ($e->getCode() === 401) {
+                $this->addResponse('API Authentication failed.', 1);
+            } else if (str_contains($e->getMessage(), 'Connection timed out')) {
+                $this->addResponse('Error connecting to the repository.', 1);
+            }
+
+            return false;
+        }
+
+        if ($moduleName !== 'core') {
+            return $module;
+        }
+
+        if ($this->apiClientConfig['sync'] &&
+            isset($this->apiClientConfig['sync']['modules']['last_sync']) &&
+            $this->apiClientConfig['sync']['modules']['last_sync'] !== ''
+        ) {
+            $lastSync = \Carbon\Carbon::parse($this->apiClientConfig['sync']['modules']['last_sync']);
+        }
+
+        if (isset($lastSync) && isset($module['updated_at']) && $module['updated_at'] !== '') {
+            $updatedAt = \Carbon\Carbon::parse($module['updated_at']);
+
+            if ($lastSync->greaterThan($updatedAt)) {//Only process if its updated.
+                return true;
+            }
+        }
+
+        $this->remoteModules['packages'] = [];
+        $this->remoteModules['packages'] = [$module];
+
+        return true;
     }
 
     protected function getRemoteModuleJson($moduleType, $module, $onlyJson = false)
@@ -633,7 +694,7 @@ class Manager extends BasePackage
                 $e->getMessage()
             );
 
-            //We dont so anything here with respect to return. If the json file is not there, we consider the module to be unavailable
+            //We dont do anything here with respect to return. If the json file is not there, we consider the module to be unavailable
         }
 
         return true;
