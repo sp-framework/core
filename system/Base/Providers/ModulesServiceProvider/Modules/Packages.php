@@ -164,7 +164,7 @@ class Packages extends BasePackage
 		$packages = [];
 
 		foreach($this->packages as $package) {
-			if ($package['category'] === $category) {
+			if (strtolower($package['category']) === strtolower($category)) {
 				$packages[$package['id']] = $package;
 			}
 		}
@@ -177,7 +177,7 @@ class Packages extends BasePackage
 		$packages = [];
 
 		foreach($this->packages as $package) {
-			if ($package['app_type'] === $appType) {
+			if (strtolower($package['app_type']) === strtolower($appType)) {
 				$packages[$package['id']] = $package;
 			}
 		}
