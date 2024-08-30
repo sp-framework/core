@@ -131,7 +131,7 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-' + widgetsData[
 
                         var responseMessage = response.responseMessage;
 
-                        $.post('{{links.url("dashboards/getWidgetContent")}}', postDataGetWidget, function(response) {
+                        $.post('{{links.url("dashboards/getDashboardWidgets")}}', postDataGetWidget, function(response) {
                             if (response.tokenKey && response.token) {
                                 $("#security-token").attr("name", response.tokenKey);
                                 $("#security-token").val(response.token);
@@ -171,20 +171,23 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets']) 
 
 dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func'] =
     {
-        worldClock : function(offSet, region) {
+        worldClock : function(clock) {
             var dst = 0;
-            var time, startDST, endDST, currentTime, dayDST;
+            var time, clockMS, clockStr;
             time = new Date();
-            startDST = new Date();
-            endDST = new Date();
             var gmtMS = time.getTime() + (time.getTimezoneOffset() * 60000);
-            var gmtTime = new Date(gmtMS);
-            var day = gmtTime.getDate();
-            var month = gmtTime.getMonth();
-            var year = gmtTime.getYear();
-            var hr = gmtTime.getHours() + offSet;
-            var min = gmtTime.getMinutes();
-            var sec = gmtTime.getSeconds();
+            if (clock['gmt_offset'] < 0) {
+                clockMS = gmtMS - (Math.abs(clock['gmt_offset']) * 60000);
+            } else if (clock['gmt_offset'] > 0) {
+                clockMS = gmtMS + (Math.abs(clock['gmt_offset']) * 60000);
+            }
+            var clockTime = new Date(clockMS);
+            var day = clockTime.getDate();
+            var month = clockTime.getMonth();
+            var year = clockTime.getYear();
+            var hr = clockTime.getHours();
+            var min = clockTime.getMinutes();
+            var sec = clockTime.getSeconds();
             var monthArray = ["January","February","March","April","May","June","July","August","September","October","November","December"];
             var monthDays = ["31","28","31","30","31","30","31","31","30","31","30","31"];
 
@@ -242,209 +245,9 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func'] =
                 }
             }
 
-            if (region == "NAmerica") {
-                startDST.setMonth(3);
-                startDST.setHours(2);
-                startDST.setDate(1);
-                dayDST = startDST.getDay();
-                if (dayDST != 0) {
-                    startDST.setDate(8 - dayDST);
-                } else {
-                    startDST.setDate(1);
-                }
-                endDST.setMonth(9);
-                endDST.setHours(1);
-                endDST.setDate(31);
-                dayDST = endDST.getDay();
-                endDST.setDate(31-dayDST);
-                currentTime = new Date();
-                currentTime.setMonth(month);
-                currentTime.setYear(year);
-                currentTime.setDate(day);
-                currentTime.setHours(hr);
-                if (currentTime >= startDST && currentTime < endDST) {
-                    dst = 1;
-                }
-            }
+            clockStr = monthArray[month] + " " + day + ", " + year + " " + hr + ":" + min + ":" + sec;
 
-            if (region == "Europe") {
-                startDST = new Date();
-                endDST = new Date();
-                startDST.setMonth(2);
-                startDST.setHours(1);
-                startDST.setDate(31);
-                dayDST = startDST.getDay();
-                startDST.setDate(31-dayDST);
-                endDST.setMonth(9);
-                endDST.setHours(0);
-                endDST.setDate(31);
-                dayDST = endDST.getDay();
-                endDST.setDate(31-dayDST);
-                currentTime = new Date();
-                currentTime.setMonth(month);
-                currentTime.setYear(year);
-                currentTime.setDate(day);
-                currentTime.setHours(hr);
-                if (currentTime >= startDST && currentTime < endDST) {
-                    dst = 1;
-                }
-            }
-
-            if (region == "SAmerica") {
-                startDST = new Date();
-                endDST = new Date();
-                startDST.setMonth(9);
-                startDST.setHours(0);
-                startDST.setDate(1);
-                dayDST = startDST.getDay();
-                if (dayDST != 0) {
-                    startDST.setDate(22-dayDST);
-                } else {
-                    startDST.setDate(15);
-                }
-                endDST.setMonth(1);
-                endDST.setHours(11);
-                endDST.setDate(1);
-                dayDST = endDST.getDay();
-                if (dayDST != 0) {
-                    endDST.setDate(21-dayDST);
-                } else {
-                    endDST.setDate(14);
-                }
-                currentTime = new Date();
-                currentTime.setMonth(month);
-                currentTime.setYear(year);
-                currentTime.setDate(day);
-                currentTime.setHours(hr);
-                if(currentTime >= startDST || currentTime < endDST) {
-                    dst = 1;
-                }
-            }
-
-            if (region == "Cairo") {
-                startDST = new Date();
-                endDST = new Date();
-                startDST.setMonth(3);
-                startDST.setHours(0);
-                startDST.setDate(30);
-                dayDST = startDST.getDay();
-                if (dayDST < 5) {
-                    startDST.setDate(28-dayDST);
-                } else {
-                    startDST.setDate(35-dayDST);
-                }
-                endDST.setMonth(8);
-                endDST.setHours(11);
-                endDST.setDate(30);
-                dayDST = endDST.getDay();
-                if (dayDST < 4) {
-                    endDST.setDate(27-dayDST);
-                } else {
-                    endDST.setDate(34-dayDST);
-                }
-                currentTime = new Date();
-                currentTime.setMonth(month);
-                currentTime.setYear(year);
-                currentTime.setDate(day);
-                currentTime.setHours(hr);
-                if (currentTime >= startDST && currentTime < endDST) {
-                    dst = 1;
-                }
-            }
-
-            if (region == "Israel") {
-                startDST = new Date();
-                endDST = new Date();
-                startDST.setMonth(3);
-                startDST.setHours(2);
-                startDST.setDate(1);
-                endDST.setMonth(8);
-                endDST.setHours(2);
-                endDST.setDate(25);
-                dayDST = endDST.getDay();
-                if (dayDST != 0) {
-                    endDST.setDate(32-dayDST);
-                } else {
-                    endDST.setDate(1);
-                    endDST.setMonth(9);
-                }
-                currentTime = new Date();
-                currentTime.setMonth(month);
-                currentTime.setYear(year);
-                currentTime.setDate(day);
-                currentTime.setHours(hr);
-                if (currentTime >= startDST && currentTime < endDST) {
-                    dst = 1;
-                }
-            }
-
-            if (region == "Beirut") {
-                startDST = new Date();
-                endDST = new Date();
-                startDST.setMonth(2);
-                startDST.setHours(0);
-                startDST.setDate(31);
-                dayDST = startDST.getDay();
-                startDST.setDate(31-dayDST);
-                endDST.setMonth(9);
-                endDST.setHours(11);
-                endDST.setDate(31);
-                dayDST = endDST.getDay();
-                endDST.setDate(30-dayDST);
-                currentTime = new Date();
-                currentTime.setMonth(month);
-                currentTime.setYear(year);
-                currentTime.setDate(day);
-                currentTime.setHours(hr);
-                if(currentTime >= startDST && currentTime < endDST) {
-                    dst = 1;
-                }
-            }
-
-            if (region == "Baghdad") {
-                startDST = new Date();
-                endDST = new Date();
-                startDST.setMonth(3);
-                startDST.setHours(3);
-                startDST.setDate(1);
-                endDST.setMonth(9);
-                endDST.setHours(3);
-                endDST.setDate(1);
-                dayDST = endDST.getDay();
-                currentTime = new Date();
-                currentTime.setMonth(month);
-                currentTime.setYear(year);
-                currentTime.setDate(day);
-                currentTime.setHours(hr);
-                if(currentTime >= startDST && currentTime < endDST) {
-                    dst = 1;
-                }
-            }
-
-            if (region == "Australia") {
-                startDST = new Date();
-                endDST = new Date();
-                startDST.setMonth(9);
-                startDST.setHours(2);
-                startDST.setDate(31);
-                dayDST = startDST.getDay();
-                startDST.setDate(31-dayDST);
-                endDST.setMonth(2);
-                endDST.setHours(2);
-                endDST.setDate(31);
-                dayDST = endDST.getDay();
-                endDST.setDate(31-dayDST);
-                currentTime = new Date();
-                currentTime.setMonth(month);
-                currentTime.setYear(year);
-                currentTime.setDate(day);
-                currentTime.setHours(hr);
-                if (currentTime >= startDST || currentTime < endDST) {
-                    dst = 1;
-                }
-            }
-
-            if (dst == 1) {
+            if (clock['isDST'] == true) {
                 hr -= -1;
 
                 if (hr >= 24) {
@@ -466,10 +269,21 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func'] =
                         month -= -1
                     }
                 }
-                return monthArray[month] + " " + day + ", " + year + " " + hr + ":" + min + ":" + sec + " DST"
+
+                if (!clock['abbreviation_dst'].includes('-') &&
+                    !clock['abbreviation_dst'].includes('+')
+                ) {
+                    clockStr = clockStr + " " + clock['abbreviation_dst'];
+                }
             } else {
-                return monthArray[month] + " " + day + ", " + year + " " + hr + ":" + min + ":" + sec
+                if (!clock['abbreviation_dst'].includes('-') &&
+                    !clock['abbreviation_dst'].includes('+')
+                ) {
+                    clockStr = clockStr + " " + clock['abbreviation'];
+                }
             }
+
+            return clockStr;
         },
         worldClockZone : function(widgetsData) {
             if (widgetsData['data']['settings']['clocks'] && Object.keys(widgetsData['data']['settings']['clocks']).length > 0) {
@@ -478,8 +292,7 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func'] =
                     if (widgetsData['settings']['clocks'][clockId]) {
                         $('#worldclock-' + widgetsData['data']['id'] + '-' + clockId).html(
                             dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func'].worldClock(
-                                widgetsData['settings']['clocks'][clockId]['offset'],
-                                widgetsData['settings']['clocks'][clockId]['region']
+                                widgetsData['settings']['clocks'][clockId]
                             )
                         );
                     }

@@ -2,6 +2,7 @@
 
 namespace Apps\Core\Packages\Devtools\GeoExtractData;
 
+use Carbon\Carbon;
 use League\Csv\Reader;
 use League\Csv\Statement;
 use League\Flysystem\FilesystemException;
@@ -20,6 +21,8 @@ class DevtoolsGeoExtractData extends BasePackage
     public $method;
 
     protected $zip;
+
+    protected $gmtOffsets = [];
 
     public function onConstruct()
     {
@@ -204,11 +207,14 @@ class DevtoolsGeoExtractData extends BasePackage
                     if ($wikiTz[$zoneKey]['tzName'] === '') {
                         $wikiTz[$zoneKey]['tzName'] = $wikiTz[$zoneKey]['zoneName'];
                     }
-                    $wikiTz[$zoneKey]['gmtOffsetName'] = 'UTC' . trim($tr->children[4]->plaintext);
-                    $wikiTz[$zoneKey]['gmtOffset'] = $this->getGMTOffset(trim($tr->children[4]->plaintext));
+                    //Wikipedia article does not have a minus sign instead it has '−'
+                    $gmtOffset = str_replace('−', '-', trim($tr->children[4]->plaintext));
+                    $gmtOffsetDST = str_replace('−', '-', trim($tr->children[5]->plaintext));
+                    $wikiTz[$zoneKey]['gmtOffsetName'] = 'UTC' . $gmtOffset;
+                    $wikiTz[$zoneKey]['gmtOffset'] = $this->getGMTOffset($gmtOffset);
                     $wikiTz[$zoneKey]['abbreviation'] = trim($tr->children[6]->plaintext);
-                    $wikiTz[$zoneKey]['gmtOffsetNameDST'] = 'UTC' . trim($tr->children[5]->plaintext);
-                    $wikiTz[$zoneKey]['gmtOffsetDST'] = $this->getGMTOffset(trim($tr->children[5]->plaintext));
+                    $wikiTz[$zoneKey]['gmtOffsetNameDST'] = 'UTC' . $gmtOffsetDST;
+                    $wikiTz[$zoneKey]['gmtOffsetDST'] = $this->getGMTOffset($gmtOffsetDST);
                     if (count($tr->children) === 10) {
                         $wikiTz[$zoneKey]['abbreviationDST'] = trim($tr->children[7]->plaintext);
                     } else {
@@ -363,18 +369,17 @@ class DevtoolsGeoExtractData extends BasePackage
 
     protected function getGMTOffset($gmtOffset)
     {
-        $gmtOffset = str_replace('-', '', str_replace('+', '', $gmtOffset));
-
-        $gmtOffset = explode(':', $gmtOffset);
-
-        if (count($gmtOffset) === 2) {
-            $hours = (int) $gmtOffset[0] * 3600;//seconds
-            $mins = (int) $gmtOffset[1] * 60;
-
-            $time = $hours + $mins;
-
-            return $time;
+        if (str_contains($gmtOffset, '00:00')) {
+            return 0;
         }
+
+        if (isset($this->gmtOffsets[$gmtOffset])) {
+            return $this->gmtOffsets[$gmtOffset];
+        }
+
+        $this->gmtOffsets[$gmtOffset] = Carbon::now($gmtOffset)->utcOffset();
+
+        return $this->gmtOffsets[$gmtOffset];
     }
 
     protected function downloadData($url, $sink)
