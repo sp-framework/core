@@ -38,9 +38,11 @@ class ExtractgeodataComponent extends BaseComponent
         }
 
         try {
+            $success = false;
+
             if (isset($this->postData()['geo']) && $this->postData()['geo'] == 'true') {
-                $this->geoExtractDataPackage->downloadGeoData();
-                $this->geoExtractDataPackage->processGeoData();
+                $success = $this->geoExtractDataPackage->downloadGeoData();
+                $success = $this->geoExtractDataPackage->processGeoData();
             }
 
             if (isset($this->postData()['timezone']) && $this->postData()['timezone'] == 'true') {
@@ -49,16 +51,18 @@ class ExtractgeodataComponent extends BaseComponent
             }
 
             if (isset($this->postData()['ip']) && $this->postData()['ip'] == 'true') {
-                $this->geoExtractDataPackage->downloadGeoIpv4Data();
-                $this->geoExtractDataPackage->unzipGeoIpv4Data();
-                $this->geoExtractDataPackage->processGeoIpv4Data();
-                $this->geoExtractDataPackage->downloadGeoIpv6Data();
-                $this->geoExtractDataPackage->unzipGeoIpv6Data();
-                $this->geoExtractDataPackage->processGeoIpv6Data();
-                $this->geoExtractDataPackage->mergeGeoIpData();
+                $success = $this->geoExtractDataPackage->downloadGeoIpv4Data();
+                $success = $this->geoExtractDataPackage->unzipGeoIpv4Data();
+                $success = $this->geoExtractDataPackage->processGeoIpv4Data();
+                $success = $this->geoExtractDataPackage->downloadGeoIpv6Data();
+                $success = $this->geoExtractDataPackage->unzipGeoIpv6Data();
+                $success = $this->geoExtractDataPackage->processGeoIpv6Data();
+                $success = $this->geoExtractDataPackage->mergeGeoIpData();
             }
 
-            $this->geoExtractDataPackage->zipData();
+            if ($success) {
+                $this->geoExtractDataPackage->zipData();
+            }
 
             $this->addResponse(
                 $this->geoExtractDataPackage->packagesData->responseMessage,
@@ -150,14 +154,18 @@ class ExtractgeodataComponent extends BaseComponent
             return false;
         }
 
-        $methods = array_merge($methods,
-            [
+        if ((isset($this->postData()['geo']) && $this->postData()['geo'] == 'true') ||
+            (isset($this->postData()['geo']) && $this->postData()['geo'] == 'true')
+        ) {
+            $methods = array_merge($methods,
                 [
-                    'method'    => 'zipData',
-                    'text'      => 'Zip Geo Location Data...',
+                    [
+                        'method'    => 'zipData',
+                        'text'      => 'Zip Geo Location Data...',
+                    ]
                 ]
-            ]
-        );
+            );
+        }
 
         $this->basepackages->progress->registerMethods($methods);
 

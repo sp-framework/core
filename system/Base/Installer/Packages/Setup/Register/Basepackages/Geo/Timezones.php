@@ -21,9 +21,10 @@ class Timezones
                     'tz_name'               => isset($timezone['tzName']) ? $timezone['tzName'] : null,
                     'gmt_offset'            => isset($timezone['gmtOffset']) ? $timezone['gmtOffset'] : null,
                     'gmt_offset_name'       => isset($timezone['gmtOffsetName']) ? $timezone['gmtOffsetName'] : null,
+                    'abbreviation'          => isset($timezone['abbreviation']) ? $timezone['abbreviation'] : null,
                     'gmt_offset_dst'        => isset($timezone['gmtOffsetDST']) ? $timezone['gmtOffsetDST'] : null,
                     'gmt_offset_name_dst'   => isset($timezone['gmtOffsetNameDST']) ? $timezone['gmtOffsetNameDST'] : null,
-                    'abbreviation'          => isset($timezone['abbreviation']) ? $timezone['abbreviation'] : null
+                    'abbreviation_dst'      => isset($timezone['abbreviationDST']) ? $timezone['abbreviationDST'] : null
                 ];
 
             if ($db) {

@@ -47,11 +47,22 @@ abstract class BaseComponent extends Controller
 		$this->domain = $this->domains->getDomain();
 
 		$this->app = $this->apps->getAppInfo();
+
 		if (!$this->app) {
 			return;
 		}
 
-		if (!$this->api->isApi()) {
+		if ($this->api->isApi()) {
+			if (count($this->dispatcher->getParams()) > 0) {
+				$this->buildGetQueryParamsArr();
+			}
+
+			$this->setComponent();
+
+			if (!$this->component && $this->app) {
+				throw new ControllerNotFoundException('Component Not Found!');
+			}
+		} else {
 			$this->addResponse('Ok');//Default Response
 
 			$this->views = $this->modules->views->getViewInfo();
@@ -71,20 +82,10 @@ abstract class BaseComponent extends Controller
 					$this->viewSimple->setViewsDir($this->view->getViewsDir() . $this->getURI());
 				}
 			}
-		} else if ($this->api->isApi()) {
-			if (count($this->dispatcher->getParams()) > 0) {
-				$this->buildGetQueryParamsArr();
-			}
-
-			$this->setComponent();
-
-			if (!$this->component && $this->app) {
-				throw new ControllerNotFoundException('Component Not Found!');
-			}
 		}
 	}
 
-	protected function setComponent($checkWidgets = true)
+	protected function setComponent()
 	{
 		$this->reflection = new \ReflectionClass($this);
 
@@ -147,12 +148,12 @@ abstract class BaseComponent extends Controller
 			}
 		}
 
-		if ($checkWidgets) {
+		if (isset($this->getData()['widgets'])) {
 			$this->checkComponentWidgets();
 		}
 	}
 
-	protected function checkComponentWidgets()
+	public function checkComponentWidgets()
 	{
 		$namespace = $this->reflection->getNamespaceName();
 
@@ -369,8 +370,6 @@ abstract class BaseComponent extends Controller
 	protected function setDefaultViewData()
 	{
 		$this->view->breadcrumb = '';
-
-		$this->view->widget = $this->widget;
 
 		$this->view->appName = $this->app['name'];
 
@@ -927,37 +926,6 @@ abstract class BaseComponent extends Controller
 				$componentClass,
 				$this->app['id']
 			);
-	}
-
-	protected function useComponentWithView($componentClass, $action = 'view', $args = null)
-	{
-		//To Use from Component - $this->useComponentWithView(HomeComponent::class);
-		//This will generate 2 view variables 1) {{home}} & {{homeTemplate}}
-		//This can be used for dashboard component
-		//From dashboard you can make a call to a component widgetAction and grab the template content from it.
-		//The template data can be then passed to view for widget rendering.
-		//Need further investigation.
-		$this->app = $this->apps->getAppInfo();
-
-		$component = $this->checkComponent($componentClass);
-
-		if ($component) {
-			$componentName = strtolower($component['name']);
-			$componentAction = $action . 'Action';
-			$componentViewName = strtolower($component['name']) . 'Template';
-
-			// var_dump($componentName,$componentAction,$componentViewName);
-
-			$this->view->{$componentName} =
-				$this->useComponent($componentClass)->{$componentAction}($args);
-
-			$this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
-
-			$this->view->{$componentViewName} =
-				$this->view->render($componentName, $action)->getContent();
-
-			$this->view->setRenderLevel(View::LEVEL_MAIN_LAYOUT);
-		}
 	}
 
 	protected function addResponse($responseMessage, int $responseCode = 0, $responseData = null)

@@ -7,7 +7,7 @@ if (!function_exists('base_path')) {
 }
 
 if (!function_exists('trace')) {
-    function trace(array $varsToDump = [], $exit = true, $args = false, $object = false, $file = true, $line = true, $class = true, $function = true, $returnTraces = false) {
+    function trace(array $varsToDump = [], $exit = true, $args = false, $object = false, $file = true, $line = true, $class = true, $function = true, $returnTraces = false, $dumpTraces = true) {
         $backtrace = debug_backtrace();
 
         $traces = [];
@@ -49,14 +49,18 @@ if (!function_exists('trace')) {
                         dump($var);
                     }
                 }
-                dump($reversedTraces);
+                if ($dumpTraces) {
+                    dump($reversedTraces);
+                }
             } else {
                 if (count($varsToDump) > 0) {
                     foreach ($varsToDump as $var) {
                         var_dump($var);
                     }
                 }
-                var_dump($reversedTraces);
+                if ($dumpTraces) {
+                    var_dump($reversedTraces);
+                }
             }
         } else {
             if (count($varsToDump) > 0) {
@@ -64,7 +68,9 @@ if (!function_exists('trace')) {
                     var_dump($var);
                 }
             }
-            var_dump($reversedTraces);
+            if ($dumpTraces) {
+                var_dump($reversedTraces);
+            }
         }
 
         if ($exit) {

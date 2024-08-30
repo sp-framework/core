@@ -194,33 +194,34 @@ class DevtoolsGeoExtractData extends BasePackage
 
         if ($table[0] && $table[0]->children) {
             foreach ($table[0]->children as $tr) {
-                if (isset($tr->children[4]) && trim($tr->children[4]->plaintext) === 'Canonical') {
-                    $zoneName = trim($tr->children[2]->plaintext);
+                if (isset($tr->children[3]) && strtolower(trim($tr->children[3]->plaintext)) === 'canonical') {
+                    $zoneName = trim($tr->children[1]->plaintext);
+
                     $zoneKey = strtolower(str_replace('/', '', $zoneName));
 
-                    $wikiTz[$zoneKey]['zoneName'] = trim($tr->children[2]->plaintext);
-                    $wikiTz[$zoneKey]['gmtOffsetName'] = 'UTC' . trim($tr->children[5]->plaintext);
-                    $wikiTz[$zoneKey]['gmtOffset'] = $this->getGMTOffset(trim($tr->children[5]->plaintext));
-                    $wikiTz[$zoneKey]['gmtOffsetNameDST'] = 'UTC' . trim($tr->children[6]->plaintext);
-                    $wikiTz[$zoneKey]['gmtOffsetDST'] = $this->getGMTOffset(trim($tr->children[6]->plaintext));
+                    $wikiTz[$zoneKey]['zoneName'] = trim($tr->children[1]->plaintext);
+                    $wikiTz[$zoneKey]['tzName'] = trim($tr->children[2]->plaintext);
+                    if ($wikiTz[$zoneKey]['tzName'] === '') {
+                        $wikiTz[$zoneKey]['tzName'] = $wikiTz[$zoneKey]['zoneName'];
+                    }
+                    $wikiTz[$zoneKey]['gmtOffsetName'] = 'UTC' . trim($tr->children[4]->plaintext);
+                    $wikiTz[$zoneKey]['gmtOffset'] = $this->getGMTOffset(trim($tr->children[4]->plaintext));
+                    $wikiTz[$zoneKey]['abbreviation'] = trim($tr->children[6]->plaintext);
+                    $wikiTz[$zoneKey]['gmtOffsetNameDST'] = 'UTC' . trim($tr->children[5]->plaintext);
+                    $wikiTz[$zoneKey]['gmtOffsetDST'] = $this->getGMTOffset(trim($tr->children[5]->plaintext));
+                    if (count($tr->children) === 10) {
+                        $wikiTz[$zoneKey]['abbreviationDST'] = trim($tr->children[7]->plaintext);
+                    } else {
+                        $wikiTz[$zoneKey]['abbreviationDST'] = '-';
+                    }
                 }
             }
         }
 
-        $allCountries = $this->helper->decode($this->localContent->read($this->sourceDir . 'AllCountries.json'), true);
+        if (count($wikiTz) === 0) {
+            $this->addResponse('Not able to extract tz data.', 1);
 
-        foreach ($allCountries as $country) {
-            if (isset($country['timezones']) && count($country['timezones']) > 0) {
-                foreach ($country['timezones'] as $tzKey => $tz) {
-                    $tzName = strtolower(str_replace('/', '', $tz['zoneName']));
-
-                    if (isset($wikiTz[$tzName])) {
-                        $wikiTz[$tzName] = array_replace($tz, $wikiTz[$tzName]);
-                    } else {
-                        $wikiTz[$tzName] = $tz;
-                    }
-                }
-            }
+            return false;
         }
 
         try {
@@ -228,6 +229,8 @@ class DevtoolsGeoExtractData extends BasePackage
         } catch (FilesystemException | UnableToWriteFile | \throwable $e) {
             throw $e;
         }
+
+        $this->addResponse('Downloaded and extract Tz data');
 
         return true;
     }

@@ -12,28 +12,27 @@ class DashboardsComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['widgets'])) {
+            $this->getNewToken();
+
             if ($this->getData()['widgets'] == 'info') {
-                $this->getNewToken();
                 return $this->basepackages->widgets->getWidget($this->getData()['id'], 'info')['info'];
-            } else if ($this->getData()['widgets'] == 'content') {
+            } else if ($this->getData()['widgets'] == 'content') {//This is when we add the widget via list of widgets in dashboard.
                 $dashboardWidget = $this->basepackages->dashboards->getDashboardWidgetById($this->getData()['id'], $this->getData()['did']);
+
                 $dashboardWidget['getWidgetData'] = true;
 
-                $this->getNewToken();
                 return $this->basepackages->widgets->getWidget($this->getData()['wid'], 'content', $dashboardWidget)['content'];
             }
         } else {
             if (isset($this->getData()['id'])) {
                 $dashboardId = $this->getData()['id'];
             } else {
-                $app = $this->apps->getAppInfo();
-
-                if (is_string($app['settings'])) {
-                    $app['settings'] = $this->helper->decode($app['settings'], true);
+                if (is_string($this->app['settings'])) {
+                    $this->app['settings'] = $this->helper->decode($this->app['settings'], true);
                 }
 
-                if (isset($app['settings']['defaultDashboard'])) {
-                    $dashboardId = $app['settings']['defaultDashboard'];
+                if (isset($this->app['settings']['defaultDashboard'])) {
+                    $dashboardId = $this->app['settings']['defaultDashboard'];
                 }
             }
         }
@@ -110,11 +109,11 @@ class DashboardsComponent extends BaseComponent
         );
     }
 
-    public function getWidgetContentAction()
+    public function getDashboardWidgetsAction()
     {
         $this->requestIsPost();
 
-        $this->basepackages->dashboards->getWidgetContent($this->postData());
+        $this->basepackages->dashboards->getDashboardWidgets($this->postData());
 
         $this->addResponse(
             $this->basepackages->dashboards->packagesData->responseMessage,

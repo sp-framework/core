@@ -1,9 +1,9 @@
 [submodule "phpunit"]
 	path = phpunit
 	url = https://github.com/sp-framework/phpunit.git
-[submodule "apps/Core/Packages/Devtools/GeoExtractData/Data"]
-	path = apps/Core/Packages/Devtools/GeoExtractData/Data
-	url = https://github.com/sp-framework/geodata.git
 [submodule "docker"]
 	path = docker
 	url = https://github.com/sp-framework/docker-sp-core.git
+[submodule "apps/Core/Packages/Devtools/GeoExtractData/Data"]
+	path = apps/Core/Packages/Devtools/GeoExtractData/Data
+	url = https://github.com/sp-framework/geodata.git

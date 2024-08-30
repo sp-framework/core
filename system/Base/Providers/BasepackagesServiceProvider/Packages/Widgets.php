@@ -44,7 +44,7 @@ class Widgets extends BasePackage
     }
 
     public function getWidget(int $id, $task = null, $dashboardWidget = [])
-    {//Do investigation on BaseComponent method useComponentWithView for this.
+    {
         $widget = $this->getById($id);
 
         if (!$task) {
@@ -52,7 +52,9 @@ class Widgets extends BasePackage
         }
 
         if ($widget['settings']) {
-            $widget['settings'] = $this->helper->decode($widget['settings'], true);
+            if (is_string($widget['settings'])) {
+                $widget['settings'] = $this->helper->decode($widget['settings'], true);
+            }
         }
         $widgetMethod = $widget['method'];
 
@@ -61,6 +63,8 @@ class Widgets extends BasePackage
         try {
             if (class_exists($component['class'])) {
                 $componentObj = new $component['class'];
+
+                $componentObj->checkComponentWidgets();
 
                 $widgetClass = $componentObj->widgets->init($componentObj, $component);
             }
@@ -77,9 +81,11 @@ class Widgets extends BasePackage
                 } else if ($task === 'content') {
                     $widget['content'] = $widgetClass->$widgetMethod($widget, $dashboardWidget);
                 }
+
+                return $widget;
             }
 
-            return $widget;
+            return false;
         }
 
         return false;
@@ -96,23 +102,5 @@ class Widgets extends BasePackage
         }
 
         return $widgets;
-    }
-
-    public function getWidgetsContent(array $data)
-    {
-        $widgetsData = [];
-
-        foreach ($data as $key => $dashboardWidget) {
-            $dashboardWidget['settings'] = $this->helper->decode($dashboardWidget['settings'], true);
-            $widgetsData[$key] = $dashboardWidget;
-            $widget = $this->getWidget($dashboardWidget['widget_id'], 'content', $dashboardWidget);
-            $widgetsData[$key]['widget'] = $widget;
-        }
-
-        $widgetsData = msort($widgetsData, 'sequence');
-
-        $this->addResponse('Ok', 0, ['widgetsData' => $widgetsData]);
-
-        return $widgetsData;
     }
 }

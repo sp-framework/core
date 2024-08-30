@@ -25,7 +25,7 @@ class Dashboards extends BasePackage
 
         $this->getFirst('id', $id);
 
-        if ($this->model) {
+        if ($this->config->databasetype === 'db') {
             $dashboard = $this->model->toArray();
             $dashboard['settings'] = $this->helper->decode($dashboard['settings'], true);
 
@@ -41,6 +41,10 @@ class Dashboards extends BasePackage
             return $dashboard;
         } else {
             if ($this->ffData) {
+                if ($getContent) {
+                    $this->ffData['widgets'] = $this->basepackages->widgets->getWidgetsContent($this->ffData['widgets']);
+                }
+
                 return $this->ffData;
             }
         }
@@ -56,8 +60,11 @@ class Dashboards extends BasePackage
             foreach ($dashboard['widgets'] as $key => $widget) {
                 if ($id == $widget['id']) {
                     if ($widget['settings']) {
-                        $widget['settings'] = $this->helper->decode($widget['settings'], true);
+                        if (is_string($widget['settings'])) {
+                            $widget['settings'] = $this->helper->decode($widget['settings'], true);
+                        }
                     }
+
                     return $widget;
                 }
             }
@@ -102,19 +109,21 @@ class Dashboards extends BasePackage
         }
 
         $dashboardWidgets = $this->useModel(BasepackagesDashboardsWidgets::class);
-
-        $dashboardWidgets->assign($this->jsonData($data));
+        $dashboardStore = $this->ff->store($dashboardWidgets->getSource());
 
         try {
-            if ($dashboardWidgets->create()) {
+            if ($this->config->databasetype === 'db') {
+                $dashboardWidgets->assign($this->jsonData($data));
+                $dashboardWidgets->create();
+
                 $newWidget = $dashboardWidgets->toArray();
-
-                $newWidget['widget'] = $this->basepackages->widgets->getWidget($newWidget['widget_id'], 'content', $newWidget);
-
-                $this->addResponse('Widget added to dashboard.', 0, $newWidget);
             } else {
-                $this->addResponse('Could not add widget to dashboard.', 1);
+                $newWidget = $dashboardStore->insert($this->jsonData($data));
             }
+
+            $newWidget['widget'] = $this->basepackages->widgets->getWidget($newWidget['widget_id'], 'content', $newWidget);
+
+            $this->addResponse('Widget added to dashboard.', 0, $newWidget);
         } catch (\Exception $e) {
             $this->addResponse('Could not add widget to dashboard.', 1);
         }
@@ -124,6 +133,8 @@ class Dashboards extends BasePackage
     {
         $this->modelToUse = $this->useModel(BasepackagesDashboardsWidgets::class);
 
+        $this->setFfStoreToUse();
+
         try {
             foreach ($data['widgets'] as $key => $widget) {
                 $dbWidget = $this->getFirst('id', $widget['id']);
@@ -131,22 +142,27 @@ class Dashboards extends BasePackage
                 if ($dbWidget) {
                     unset($widget['id']);
 
-                    $dbWidget->settings = $this->helper->decode($dbWidget->settings, true);
-                    $dbWidget->settings = array_merge($dbWidget->settings, $widget);
-                    $dbWidget->settings = $this->helper->encode($dbWidget->settings);
+                    $dbWidgetArr = $dbWidget->toArray();
 
-                    $dbWidget->update();
+                    $dbWidgetArr['settings'] = array_merge($dbWidgetArr['settings'], $widget);
+
+                    if ($this->config->databasetype === 'db') {
+                        $dbWidget->assign($dbWidgetArr);
+
+                        $dbWidget->update();
+                    } else {
+                        $this->update($dbWidgetArr);
+                    }
                 }
             }
 
-            if (!isset($data['dashboard_id'])) {
-                $widget = $this->basepackages->widgets->getWidget($dbWidget->widget_id);
+            if (!isset($data['dashboard_id']) && count($data['widgets']) === 1) {
+                $widget = $this->basepackages->widgets->getWidget($dbWidget['widget_id']);
 
                 $this->addResponse('Widget ' . $widget['name'] . ' updated.', 0);
             } else {
                 $this->addResponse('Dashboard widgets updated.', 0);
             }
-
         } catch (\Exception $e) {
             $this->addResponse('Error updating dashboard widgets.', 1);
         }
@@ -156,22 +172,30 @@ class Dashboards extends BasePackage
     {
         $this->modelToUse = $this->useModel(BasepackagesDashboardsWidgets::class);
 
-        $widget = $this->getFirst('id', $data['id']);
+        $this->setFfStoreToUse();
 
-        if ($widget && $widget->count() > 0) {
-            try {
-                $widget->delete();
+        $dbWidget = $this->getFirst('id', $data['id']);
 
-                $this->addResponse('Widget removed from dashboard.', 0);
-            } catch (\Exception $e) {
-                $this->addResponse('Error removing widget from dashboard.', 1);
+        if ($dbWidget) {
+            if ($this->config->databasetype === 'db') {
+                try {
+                    $dbWidget->delete();
+
+                    $this->addResponse('Widget removed from dashboard.', 0);
+                } catch (\Exception $e) {
+                    $this->addResponse('Error removing widget from dashboard.', 1);
+                }
+            } else {
+                $dbWidgetArr = $dbWidget->toArray();
+
+                $this->remove($dbWidgetArr['id']);
             }
         } else {
             $this->addResponse('Error removing widget from dashboard.', 1);
         }
     }
 
-    public function getWidgetContent(array $data)
+    public function getDashboardWidgets(array $data)
     {
         $dashboard = $this->getDashboardById($data['dashboard_id'], true);
 
@@ -184,12 +208,26 @@ class Dashboards extends BasePackage
                 }
             }
 
-            $this->basepackages->widgets->getWidgetsContent($dashboard['widgets']);
+            $widgetsData = [];
+
+            foreach ($dashboard['widgets'] as $key => $dashboardWidget) {
+                if (is_string($dashboardWidget['settings'])) {
+                    $dashboardWidget['settings'] = $this->helper->decode($dashboardWidget['settings'], true);
+                }
+
+                $widgetsData[$key] = $dashboardWidget;
+
+                $widget = $this->basepackages->widgets->getWidget($dashboardWidget['widget_id'], 'content', $dashboardWidget);
+
+                $widgetsData[$key]['widget'] = $widget;
+            }
+
+            $widgetsData = msort($widgetsData, 'sequence');
 
             $this->addResponse(
-                $this->basepackages->widgets->packagesData->responseMessage,
-                $this->basepackages->widgets->packagesData->responseCode,
-                $this->basepackages->widgets->packagesData->responseData
+                'Dashboard widgets',
+                0,
+                ['widgetsData' => $widgetsData]
             );
         } else {
             $this->addResponse('No widgets', 2, []);

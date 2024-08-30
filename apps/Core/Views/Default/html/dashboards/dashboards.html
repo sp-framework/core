@@ -77,7 +77,7 @@
     )}}
 </div>
 <script>
-/* globals paginatedPNotify GridStack Swal */
+/* globals paginatedPNotify GridStack Swal BazContentFields */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -107,22 +107,24 @@ dataCollectionSection =
                 }
 
                 grid = dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid'] = GridStack.init({
-                    'draggable'     : {
-                        'handle'    : '[data-card-widget="move"]'
+                    'draggable'     :
+                    {
+                        'handle'    : '.btn-tool-move .fa-up-down-left-right'
                     },
                     'margin'        : '5px',
-                    'animate'       : false
+                    'animate'       : false,
+                    'sizeToContent' : true
                 });
+
             }
 
             initGrid();
 
             grid.on('added', function(e, items) {
-                //eslint-disable-next-line
-                console.log(items);
                 items.forEach(function(item) {
                     populateGridData(item);
                 });
+                initWidgetCardButtons();
             });
 
             function fixHeight(item) {
@@ -136,6 +138,7 @@ dataCollectionSection =
                 data.items.forEach(function(item) {
                     populateGridData(item);
                 });
+                initWidgetCardButtons();
             });
 
             grid.on('resizestart', function(e, el) {
@@ -151,7 +154,7 @@ dataCollectionSection =
                 postData[$('#security-token').attr('name')] = $('#security-token').val();
                 postData['dashboard_id'] = $('#{{componentId}}-{{sectionId}}-dashboards').select2().val();
 
-                $.post('{{links.url("dashboards/getWidgetContent")}}', postData, function(response) {
+                $.post('{{links.url("dashboards/getDashboardWidgets")}}', postData, function(response) {
                     if (response.tokenKey && response.token) {
                         $("#security-token").attr("name", response.tokenKey);
                         $("#security-token").val(response.token);
@@ -178,8 +181,6 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
                     }
                     $('#{{componentId}}-{{sectionId}}-dashboard-loader').attr('hidden', true);
-
-                    initRemoveButtons();
                 }, 'json');
             }
             populateGridStructure();
@@ -205,7 +206,7 @@ dataCollectionSection =
             }
 
 
-            function initRemoveButtons() {
+            function initWidgetCardButtons() {
                 $('.btn-tool-widgetRemove').off();
                 $('.btn-tool-widgetRemove').click(function() {
                     Swal.fire({
@@ -262,7 +263,10 @@ dataCollectionSection =
                                         $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
                                         $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
                                     }
+
+                                    return;
                                 }
+                                paginatedPNotify('error', {'text' : response.responseMessage});
                             }, 'json');
                         }
                     });
@@ -271,7 +275,14 @@ dataCollectionSection =
                 $('.btn-tool-settings').off();
                 $('.btn-tool-settings').click(function() {
                     $(this).parents('.card').first().find('.widgets-setting-modal').modal('show');
+
+                    BazContentFields.init({
+                        'componentId'   : "{{componentId}}",
+                        'sectionId'     : "{{componentId}}-{{sectionId}}",
+                        'fieldId'       : "{{componentId}}-{{sectionId}}-worldclock-" + $(this).parents('.grid-stack-item').attr('gs-id') + "-clocks"
+                    });
                 });
+
             }
 
             function addWidgetToGrid(widgetsData) {
@@ -305,7 +316,6 @@ dataCollectionSection =
 
                 grid.addWidget(newWidget);
                 dataCollectionComponent['{{componentId}}-{{sectionId}}'][widgetsData['widget']['method']] = { };
-                initRemoveButtons();
 
                 //Disable so that we dont add duplicates unless multiple is set to 1.
                 if (widgetsData['widget']['multiple'] && widgetsData['widget']['multiple'] == '0') {

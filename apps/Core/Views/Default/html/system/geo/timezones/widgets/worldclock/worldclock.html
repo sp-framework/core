@@ -1,6 +1,6 @@
 {% if widget['data']['settings']['clocks'] is defined %}
     <div class="table-responsive">
-        <table class="table table-sm text-nowrap table-borderless worldclocktable" data-worldclockid="{{widget['data']['id']}}">
+        <table class="table table-sm text-nowrap table-borderless worldclocktable mb-0" data-worldclockid="{{widget['data']['id']}}">
             <tbody>
                 <tr>
                     {% for clock in widget['data']['settings']['clocks'] %}
@@ -60,7 +60,7 @@
 )}}
 {% set widgetsData = json_encode(widget, 16) %}
 <script>
-/* globals BazContentFields paginatedPNotify BazHelpers */
+/* globals paginatedPNotify BazHelpers */
 var dataCollectionComponent, dataCollectionSection;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -99,7 +99,7 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-' + widgetsData[
                 var widgetId = $(el).attr('gs-id');
 
                 $(gridWidgets).each(function(i, widget) {
-                    if (widget['id'] === widgetId) {
+                    if (widget['id'] == widgetId) {
                         widgets.push(gridWidgets[i]);
                         return false;
                     }
@@ -161,12 +161,6 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-' + widgetsData[
             });
         }
     };
-
-BazContentFields.init({
-    'componentId'   : "{{componentId}}",
-    'sectionId'     : "{{componentId}}-{{sectionId}}",
-    'fieldId'       : "{{componentId}}-{{sectionId}}-worldclock-{{widget['data']['id']}}-clocks"
-});
 
 if (!dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets']) {
     dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets'] = { };
@@ -490,6 +484,8 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func'] =
                         );
                     }
                 }
+            } else {
+                return true;
             }
 
             var timers = BazHelpers.setTimeoutTimers.all();

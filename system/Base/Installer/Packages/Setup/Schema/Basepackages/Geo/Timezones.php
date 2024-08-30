@@ -52,6 +52,14 @@ class Timezones
                     ]
                 ),
                 new Column(
+                    'abbreviation',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 10,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
                     'gmt_offset_dst',
                     [
                         'type'          => Column::TYPE_INTEGER,
@@ -67,7 +75,7 @@ class Timezones
                     ]
                 ),
                 new Column(
-                    'abbreviation',
+                    'abbreviation_dst',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 10,
