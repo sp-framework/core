@@ -100,6 +100,7 @@ dataCollectionSection =
         afterInit: function() {
             var swalSound = window['dataCollection'].env.sounds.swalSound;
             var grid;
+            var isOwner = "{{isOwner}}";
 
             function initGrid(removeDom = true) {
                 if (dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid']) {
@@ -115,7 +116,6 @@ dataCollectionSection =
                     'animate'       : false,
                     'sizeToContent' : true
                 });
-
             }
 
             initGrid();
@@ -166,8 +166,10 @@ dataCollectionSection =
                                 addWidgetToGrid(response.responseData.widgetsData[widget]);
                             }
 
-                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
+                            if (isOwner) {
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
+                            }
                             grid.enableMove(false);
                             grid.enableResize(false);
                         } else {
@@ -204,7 +206,6 @@ dataCollectionSection =
                     fixHeight(item);
                 });
             }
-
 
             function initWidgetCardButtons() {
                 $('.btn-tool-widgetRemove').off();
@@ -292,7 +293,7 @@ dataCollectionSection =
                 newWidget['w'] = 3;//25% of the screen
                 newWidget['minW'] = 3;//25% of the screen
                 newWidget['method'] = widgetsData['widget']['method'];
-                newWidget['widget_id'] = widgetsData['widget']['id'];
+                newWidget['widget_id'] = widgetsData['widget_id'];
                 newWidget['dashboard_id'] = widgetsData['dashboard_id'];
 
                 if (widgetsData['settings']['w']) {
@@ -383,8 +384,10 @@ dataCollectionSection =
 
                             addWidgetToGrid(response.responseData);
                             $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', true);
-                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
-                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
+                            if (isOwner) {
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
+                            }
 
                             $('#{{componentId}}-{{sectionId}}-modal-button-add').attr('disabled', true);
                             grid.enableMove(false);
@@ -451,8 +454,10 @@ dataCollectionSection =
 
                 if (grid.save().length === 0) {
                     $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
-                    $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
+                    if (isOwner) {
+                        $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
+                    }
                 } else {
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();

@@ -3,6 +3,7 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use System\Base\BasePackage;
+use System\Base\Providers\AccessServiceProvider\Exceptions\PermissionDeniedException;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesDashboards;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Dashboards\BasepackagesDashboardsWidgets;
 
@@ -77,6 +78,12 @@ class Dashboards extends BasePackage
     {
         $dashboard = $this->getDashboardById($data['dashboard_id']);
 
+        if ($this->access->auth->account() &&
+            $this->access->auth->account()['id'] != $dashboard['created_by']
+        ) {
+            throw new PermissionDeniedException;
+        }
+
         $maxWidgetsPerDashboard = 10;
 
         if (isset($dashboard['settings']['maxWidgetsPerDashboard'])) {
@@ -131,11 +138,21 @@ class Dashboards extends BasePackage
 
     public function updateWidgetToDashboard(array $data)
     {
+        $dashboard = $this->getDashboardById($data['dashboard_id']);
+
+        if ($this->access->auth->account() &&
+            $this->access->auth->account()['id'] != $dashboard['created_by']
+        ) {
+            throw new PermissionDeniedException;
+        }
+
         $this->modelToUse = $this->useModel(BasepackagesDashboardsWidgets::class);
 
         $this->setFfStoreToUse();
 
         try {
+            $sequence = 0;
+
             foreach ($data['widgets'] as $key => $widget) {
                 $dbWidget = $this->getFirst('id', $widget['id']);
 
@@ -146,6 +163,8 @@ class Dashboards extends BasePackage
 
                     $dbWidgetArr['settings'] = array_merge($dbWidgetArr['settings'], $widget);
 
+                    $dbWidgetArr['sequence'] = $sequence;
+
                     if ($this->config->databasetype === 'db') {
                         $dbWidget->assign($dbWidgetArr);
 
@@ -153,6 +172,8 @@ class Dashboards extends BasePackage
                     } else {
                         $this->update($dbWidgetArr);
                     }
+
+                    $sequence++;
                 }
             }
 
@@ -170,6 +191,14 @@ class Dashboards extends BasePackage
 
     public function removeWidgetFromDashboard(array $data)
     {
+        $dashboard = $this->getDashboardById($data['dashboard_id']);
+
+        if ($this->access->auth->account() &&
+            $this->access->auth->account()['id'] != $dashboard['created_by']
+        ) {
+            throw new PermissionDeniedException;
+        }
+
         $this->modelToUse = $this->useModel(BasepackagesDashboardsWidgets::class);
 
         $this->setFfStoreToUse();

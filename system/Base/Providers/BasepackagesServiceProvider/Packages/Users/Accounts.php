@@ -655,12 +655,11 @@ class Accounts extends BasePackage
             }
         }
 
+        if (isset($data['id'])) {
+            unset($data['id']);
+        }
 
         if ($accountSecurity) {
-            if (isset($data['id'])) {
-                unset($data['id']);
-            }
-
             $accountSecurity = array_replace($accountSecurity, $data);
 
             if ($this->config->databasetype === 'db') {

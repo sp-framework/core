@@ -41,6 +41,13 @@ class ErrorsComponent extends BaseComponent
         $this->addResponse('Id Not Found', 1);
     }
 
+    public function permissionDeniedAction()
+    {
+        $this->view->pick('common/errors/permissiondenied');
+
+        $this->addResponse('Permission denied, contact administrator!', 1);
+    }
+
     public function serverErrorAction()
     {
         $this->view->pick('common/errors/servererror');

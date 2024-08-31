@@ -25,7 +25,9 @@ class DashboardsComponent extends BaseComponent
             }
         } else {
             if (isset($this->getData()['id'])) {
-                $dashboardId = $this->getData()['id'];
+                if ($this->getData()['id'] != 0) {
+                    $dashboardId = $this->getData()['id'];
+                }
             } else {
                 if (is_string($this->app['settings'])) {
                     $this->app['settings'] = $this->helper->decode($this->app['settings'], true);
@@ -35,17 +37,22 @@ class DashboardsComponent extends BaseComponent
                     $dashboardId = $this->app['settings']['defaultDashboard'];
                 }
             }
+
+            if (isset($dashboardId)) {
+                $dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true, false);
+
+                $this->view->setViewsDir($this->modules->views->getPhalconViewPath() . $this->getURI());
+
+                $this->view->dashboard = $dashboard;
+
+                $this->view->dashboards = $this->basepackages->dashboards->dashboards;
+
+                $this->view->widgetsTree = $this->basepackages->widgets->getWidgetsTree();
+
+                return;
+            }
         }
 
-        $dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true, false);
-
-        $this->view->setViewsDir($this->modules->views->getPhalconViewPath() . $this->getURI());
-
-        $this->view->dashboard = $dashboard;
-
-        $this->view->dashboards = $this->basepackages->dashboards->dashboards;
-
-        $this->view->widgetsTree = $this->basepackages->widgets->getWidgetsTree();
     }
 
     public function addAction()

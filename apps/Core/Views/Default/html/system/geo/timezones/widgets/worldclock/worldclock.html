@@ -313,20 +313,16 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func'] =
             }
 
             if (!found) {
-                if (dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']) {
-                    BazHelpers.setTimeoutTimers.add(function() {
-                        dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']
-                            .worldClockZone(dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets'][widgetsData['data']['id']]);
-                    }, 1000, '{{componentId}}', 'worldClock' + widgetsData['data']['id']);
-                }
+                BazHelpers.setTimeoutTimers.add(function() {
+                    dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']
+                        .worldClockZone(dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets'][widgetsData['data']['id']]);
+                }, 1000, '{{componentId}}', 'worldClock' + widgetsData['data']['id']);
             } else {
                 BazHelpers.setTimeoutTimers.stop(found);
-                if (dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']) {
-                    BazHelpers.setTimeoutTimers.add(function() {
-                        dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']
-                            .worldClockZone(dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets'][widgetsData['data']['id']]);
-                    }, 1000, '{{componentId}}', 'worldClock' + widgetsData['data']['id']);
-                }
+                BazHelpers.setTimeoutTimers.add(function() {
+                    dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']
+                        .worldClockZone(dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-widgets'][widgetsData['data']['id']]);
+                }, 1000, '{{componentId}}', 'worldClock' + widgetsData['data']['id']);
             }
         }
     };

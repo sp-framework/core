@@ -80,6 +80,8 @@ class Dispatcher
                     if ($class === 'InvalidDataException') {
                         $action = 'invalidData';
                         $params = [$exception->getMessage()];
+                    } else if ($class === 'PermissionDeniedException') {
+                        $action = 'permissionDenied';
                     } else {
                         $action = 'serverError';
                     }
