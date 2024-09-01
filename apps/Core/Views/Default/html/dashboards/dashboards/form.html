@@ -1,0 +1,130 @@
+{% set defaultChecked = false %}
+{% if dashboard['id'] is defined %}
+    {% set dashboardId = dashboard['id'] %}
+    {% set dashboardName = dashboard['name'] %}
+    {% if dashboard['is_default'] is defined and dashboard['is_default'] == true %}
+        {% set defaultChecked = true %}
+    {% endif %}
+{% else %}
+    {% set dashboardId = '' %}
+    {% set dashboardName = '' %}
+{% endif %}
+<form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'id',
+                    'fieldLabel'                     : 'Dashboard ID',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Dashboard ID',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldHidden'                    : true,
+                    'fieldDisabled'                  : true,
+                    'fieldValue'                     : dashboardId
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'name',
+                    'fieldLabel'                     : 'Dashboard Name',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Dashboard Name',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldDataInputMinLength'        : 1,
+                    'fieldDataInputMaxLength'        : 50,
+                    'fieldValue'                     : dashboardName
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'is_default',
+                    'fieldLabel'                     : 'Dashboard is default?',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Check to make the dashboard default dashboard.',
+                    'fieldType'                      : 'checkbox',
+                    'fieldCheckboxType'              : 'info',
+                    'fieldCheckboxChecked'           : defaultChecked,
+                    'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+    </div>
+</form>
+<script>
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-name'                                : { },
+        '{{componentId}}-{{sectionId}}-is_default'                          : { },
+        '{{componentId}}-{{sectionId}}-shared'                              : { },
+        '{{componentId}}-{{sectionId}}-form'                                : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            invalidHandler: function (form, validator) {
+                // //eslint-disable-next-line
+                // console.log(validator.errorList);
+            },
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter dashboard name'
+            }
+        }
+    });
+</script>

@@ -20,7 +20,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col">
+    <div class="col" id="grid-main">
         <div class="grid-stack"></div>
     </div>
 </div>
@@ -60,22 +60,6 @@
         ]
     )}}
 </div>
-<div>
-    {{adminltetags.useTag('modal',
-        [
-            'component'                 : component,
-            'componentName'             : componentName,
-            'componentId'               : componentId,
-            'sectionId'                 : sectionId,
-            'modalId'                   : 'share-modal',
-            'modalBodyInclude'          : 'dashboards/dashboards/share',
-            'modalSize'                 : 'lg',
-            'modalHeader'               : true,
-            'modalFooter'               : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-share"></i> SHARE DASHBOARD'
-        ]
-    )}}
-</div>
 <script>
 /* globals paginatedPNotify GridStack Swal BazContentFields */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -107,6 +91,8 @@ dataCollectionSection =
                     dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid'].destroy(removeDom);
                 }
 
+                $('#grid-main').html('<div class="grid-stack"></div>');
+                grid = null;
                 grid = dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid'] = GridStack.init({
                     'draggable'     :
                     {
@@ -116,16 +102,24 @@ dataCollectionSection =
                     'animate'       : false,
                     'sizeToContent' : true
                 });
-            }
 
+                grid.on('added', function(e, items) {
+                    items.forEach(function(item) {
+                        populateGridData(item);
+                    });
+                    initWidgetCardButtons();
+                });
+
+                grid.on('resizestart', function(e, el) {
+                    $(el).find('.card-header').attr('hidden', true);
+                });
+
+                grid.on('resizestop', function(e, el) {
+                    $(el).find('.card-header').attr('hidden', false);
+                });
+            }
             initGrid();
 
-            grid.on('added', function(e, items) {
-                items.forEach(function(item) {
-                    populateGridData(item);
-                });
-                initWidgetCardButtons();
-            });
 
             function fixHeight(item) {
                 var itemHeight = $(item.el).find('.card')[0].offsetHeight + 20;//20 for padding
@@ -139,14 +133,6 @@ dataCollectionSection =
                     populateGridData(item);
                 });
                 initWidgetCardButtons();
-            });
-
-            grid.on('resizestart', function(e, el) {
-                $(el).find('.card-header').attr('hidden', true);
-            });
-
-            grid.on('resizestop', function(e, el) {
-                $(el).find('.card-header').attr('hidden', false);
             });
 
             function populateGridStructure() {
@@ -179,7 +165,11 @@ dataCollectionSection =
                     } else if (response.responseCode === 1) {
                         paginatedPNotify('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
                     } else if (response.responseCode === 2) {
-                        paginatedPNotify('error', {'text' : response.responseMessage});
+                        if (response.responseMessage.includes('CSRF')) {
+                            paginatedPNotify('error', {'text' : response.responseMessage});
+                        } else {
+                            paginatedPNotify('info', {'text' : response.responseMessage});
+                        }
                         $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
                     }
                     $('#{{componentId}}-{{sectionId}}-dashboard-loader').attr('hidden', true);
@@ -283,7 +273,6 @@ dataCollectionSection =
                         'fieldId'       : "{{componentId}}-{{sectionId}}-worldclock-" + $(this).parents('.grid-stack-item').attr('gs-id') + "-clocks"
                     });
                 });
-
             }
 
             function addWidgetToGrid(widgetsData) {
@@ -484,6 +473,72 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-widget-info').empty();
                 $('#{{componentId}}-{{sectionId}}-widget-no-widgets').attr('hidden', false);
             });
+
+            function initDashboardButtons() {
+                var href = $('#{{componentId}}-{{sectionId}}-edit').attr('href');
+                $('#{{componentId}}-{{sectionId}}-edit').attr(
+                    'href',
+                    href +
+                    $('#{{componentId}}-{{sectionId}}-dashboards').select2().val()
+                );
+
+                $('#{{componentId}}-{{sectionId}}-dashboards').on('select2:select', function(e) {
+                    $('#{{componentId}}-{{sectionId}}-edit').attr(
+                        'href',
+                        href +
+                        e.params.data.id
+                    );
+                    $('#{{componentId}}-{{sectionId}}-dashboard-loader').attr('hidden', false);
+                    initGrid();
+                    populateGridStructure();
+                });
+
+                $('#{{componentId}}-{{sectionId}}-remove').click(function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title                       : '<span class="text-danger"> Remove dashboard?</span>',
+                        icon                        : 'question',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Remove',
+                        customClass                 : {
+                            'confirmButton'             : 'btn btn-danger text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        didOpen                     : function() {
+                            swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                            var postData = { };
+                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+                            postData['id'] = $('#{{componentId}}-{{sectionId}}-dashboards').select2().val();
+
+                            $.post('{{links.url("dashboards/remove")}}', postData, function(response) {
+                                if (response.tokenKey && response.token) {
+                                    $("#security-token").attr("name", response.tokenKey);
+                                    $("#security-token").val(response.token);
+                                }
+
+                                if (response.responseCode === 0) {
+                                    paginatedPNotify('success', {'text' : response.responseMessage});
+
+                                    return;
+                                }
+
+                                paginatedPNotify('error', {'text' : response.responseMessage});
+                            }, 'json');
+                        }
+                    });
+                });
+            }
+            initDashboardButtons();
         }
     });
 </script>

@@ -3,6 +3,7 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use System\Base\BasePackage;
+use System\Base\Exceptions\IdNotFoundException;
 use System\Base\Providers\AccessServiceProvider\Exceptions\PermissionDeniedException;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesDashboards;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Dashboards\BasepackagesDashboardsWidgets;
@@ -12,6 +13,8 @@ class Dashboards extends BasePackage
     protected $modelToUse = BasepackagesDashboards::class;
 
     public $dashboards;
+
+    protected $maxWidgetsPerDashboard = 10;
 
     public function init(bool $resetCache = false)
     {
@@ -53,6 +56,60 @@ class Dashboards extends BasePackage
         return false;
     }
 
+    public function addDashboard(array $data)
+    {
+        $data['app_id'] = $this->apps->getAppInfo()['id'];
+
+        $data['created_by'] = 0;
+        if ($this->access->auth->account()) {
+            $data['created_by'] = $this->access->auth->account()['id'];
+        }
+
+        $data['settings']['maxWidgetsPerDashboard'] = $this->maxWidgetsPerDashboard;
+
+        if ($this->add($data)) {
+            $this->addResponse('Dashboard Added');
+        } else {
+            $this->addResponse('Error Adding Dashboard', 1);
+        }
+    }
+
+    public function updateDashboard(array $data)
+    {
+        $dashboard = $this->getDashboardById($data['dashboard_id']);
+
+        if (!$dashboard) {
+            throw new IdNotFoundException;
+        }
+
+        if ($this->access->auth->account() &&
+            $this->access->auth->account()['id'] != $dashboard['created_by']
+        ) {
+            throw new PermissionDeniedException;
+        }
+
+        if ($this->update($data)) {
+            $this->addResponse('Dashboard Updated');
+        } else {
+            $this->addResponse('Error Updating Dashboard', 1);
+        }
+    }
+
+    public function removeDashboard(array $data)
+    {
+        $dashboard = $this->getById($data['id']);
+
+        if (!$dashboard) {
+            throw new IdNotFoundException;
+        }
+
+        if ($this->remove($data['id'])) {
+            $this->addResponse('Dashboard Removed');
+        } else {
+            $this->addResponse('Error Removing Dashboard', 1);
+        }
+    }
+
     public function getDashboardWidgetById(int $id, int $dashboardId, $getContent = false)
     {
         $dashboard = $this->getDashboardById($dashboardId, true, $getContent);
@@ -77,6 +134,10 @@ class Dashboards extends BasePackage
     public function addWidgetToDashboard(array $data)
     {
         $dashboard = $this->getDashboardById($data['dashboard_id']);
+
+        if (!$dashboard) {
+            throw new IdNotFoundException;
+        }
 
         if ($this->access->auth->account() &&
             $this->access->auth->account()['id'] != $dashboard['created_by']
@@ -140,6 +201,10 @@ class Dashboards extends BasePackage
     {
         $dashboard = $this->getDashboardById($data['dashboard_id']);
 
+        if (!$dashboard) {
+            throw new IdNotFoundException;
+        }
+
         if ($this->access->auth->account() &&
             $this->access->auth->account()['id'] != $dashboard['created_by']
         ) {
@@ -193,6 +258,10 @@ class Dashboards extends BasePackage
     {
         $dashboard = $this->getDashboardById($data['dashboard_id']);
 
+        if (!$dashboard) {
+            throw new IdNotFoundException;
+        }
+
         if ($this->access->auth->account() &&
             $this->access->auth->account()['id'] != $dashboard['created_by']
         ) {
@@ -227,6 +296,10 @@ class Dashboards extends BasePackage
     public function getDashboardWidgets(array $data)
     {
         $dashboard = $this->getDashboardById($data['dashboard_id'], true);
+
+        if (!$dashboard) {
+            throw new IdNotFoundException;
+        }
 
         if (isset($dashboard['widgets']) && count($dashboard['widgets']) > 0) {
             if (isset($data['widget_id'])) {

@@ -36,10 +36,31 @@ class Dashboards
                     ]
                 ),
                 new Column(
+                    'app_default',
+                    [
+                        'type'    => Column::TYPE_BOOLEAN,
+                        'notNull' => true
+                    ]
+                ),
+                new Column(
                     'created_by',
                     [
                         'type'    => Column::TYPE_INTEGER,
                         'notNull' => true
+                    ]
+                ),
+                new Column(
+                    'shared',
+                    [
+                        'type'    => Column::TYPE_JSON,
+                        'notNull' => false
+                    ]
+                ),
+                new Column(
+                    'is_default',
+                    [
+                        'type'    => Column::TYPE_BOOLEAN,
+                        'notNull' => false
                     ]
                 ),
                 new Column(

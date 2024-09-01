@@ -12,27 +12,16 @@
         'fieldGroupPreAddonIcon'            : 'dashboard',
         'fieldGroupPostAddonButtons'        :
             [
-                'sync'   : [
-                    'title'                   : false,
-                    'type'                    : 'primary',
-                    'tooltipTitle'            : 'Share',
-                    'icon'                    : 'share',
-                    'noMargin'                : true,
-                    'disabled'                : true,
-                    'buttonAdditionalClass'   : 'rounded-0',
-                    'position'                : 'right'
-                ],
                 'edit'   : [
                     'title'                   : false,
                     'type'                    : 'warning',
                     'icon'                    : 'edit',
                     'noMargin'                : true,
-                    'disabled'                : true,
-                    'url'                     : links.url('dashboards/q/id/0'),
-                    'buttonAdditionalClass'   : 'rounded-0 text-white contentAjaxLink disabled',
+                    'url'                     : links.url('dashboards/q/id/'),
+                    'buttonAdditionalClass'   : 'rounded-0 text-white contentAjaxLink',
                     'position'                : 'right'
                 ],
-                'delete'   : [
+                'remove'   : [
                     'title'                   : false,
                     'type'                    : 'danger',
                     'icon'                    : 'trash',
@@ -58,10 +47,7 @@
         'fieldDataSelectOptionsKey'           : 'id',
         'fieldDataSelectOptionsValue'         : 'name',
         'fieldDataSelectOptionsSelected'      : dashboard['id'],
-        'fieldDataSelectOptionsZero'          : true,
+        'fieldDataSelectOptionsZero'          : false,
         'fieldDataSelectOptionsZeroTitle'     : 'Select dashboard'
     ]
 )}}
-<script>
-
-</script>
