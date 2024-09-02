@@ -159,6 +159,14 @@ class Dashboards extends BasePackage
             throw new PermissionDeniedException;
         }
 
+        if (isset($this->apps->getAppInfo()['settings']['defaultDashboard'])) {
+            if ($this->apps->getAppInfo()['settings']['defaultDashboard'] == $dashboard['id']) {
+                $this->addResponse('Cannot remove app default dashboard', 1);
+
+                return false;
+            }
+        }
+
         //Remove widgets
         $widgets = $this->getDashboardWidgets(['dashboard_id' => $data['id']]);
 
