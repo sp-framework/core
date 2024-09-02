@@ -1,13 +1,21 @@
+{% set defaultDisabled = false %}
 {% set defaultChecked = false %}
+{% set appDefaultChecked = false %}
 {% if dashboard['id'] is defined %}
     {% set dashboardId = dashboard['id'] %}
     {% set dashboardName = dashboard['name'] %}
     {% if dashboard['is_default'] is defined and dashboard['is_default'] == true %}
         {% set defaultChecked = true %}
     {% endif %}
+    {% if dashboard['is_app_default'] is defined and dashboard['is_app_default'] == true %}
+        {% set appDefaultChecked = true %}
+        {% set defaultDisabled = true %}
+    {% endif %}
+    {% set dashboardShared = dashboard['shared'] %}
 {% else %}
     {% set dashboardId = '' %}
     {% set dashboardName = '' %}
+    {% set dashboardShared = [] %}
 {% endif %}
 <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <div class="row">
@@ -70,6 +78,7 @@
                     'fieldHelp'                      : true,
                     'fieldHelpTooltipContent'        : 'Check to make the dashboard default dashboard.',
                     'fieldType'                      : 'checkbox',
+                    'fieldDisabled'                  : defaultDisabled,
                     'fieldCheckboxType'              : 'info',
                     'fieldCheckboxChecked'           : defaultChecked,
                     'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
@@ -77,6 +86,56 @@
                     'fieldBazPostOnUpdate'           : true,
                     'fieldBazJstreeSearch'           : true,
                     'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'is_app_default',
+                    'fieldLabel'                     : 'Dashboard is App default?',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Check to make the dashboard default dashboard.',
+                    'fieldType'                      : 'checkbox',
+                    'fieldDisabled'                  : true,
+                    'fieldCheckboxType'              : 'success',
+                    'fieldCheckboxChecked'           : appDefaultChecked,
+                    'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'shared',
+                    'fieldLabel'                     : 'Shared',
+                    'fieldType'                      : 'select2',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Select Accounts to share dashboard with',
+                    'fieldBazScan'                   : true,
+                    'fieldRequired'                  : false,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldDataSelect2Options'        : sharedAccounts,
+                    'fieldDataSelect2Multiple'       : true,
+                    'fieldDataSelect2OptionsKey'     : 'id',
+                    'fieldDataSelect2OptionsValue'   : 'email',
+                    'fieldDataSelect2OptionsArray'   : true,
+                    'fieldDataSelect2OptionsSelected': dashboardShared
                 ]
             )}}
         </div>
@@ -112,7 +171,43 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                                  : { },
         '{{componentId}}-{{sectionId}}-name'                                : { },
         '{{componentId}}-{{sectionId}}-is_default'                          : { },
-        '{{componentId}}-{{sectionId}}-shared'                              : { },
+        '{{componentId}}-{{sectionId}}-is_app_default'                      : { },
+        '{{componentId}}-{{sectionId}}-shared'                              : {
+            placeholder: "SELECT ACCOUNT(S)",
+            "ajax"          : {
+                url         : "{{links.url('dashboards/searchAccount')}}",
+                dataType    : "json",
+                method      : "post",
+                data: function(params) {
+                    var query = { };
+                    query['search'] = params.term;
+                    query[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    return query;
+                },
+                processResults: function(response) {
+                    if (response.responseData.accounts) {
+                        var accountsData = [];
+                        for (var item of response.responseData.accounts) {
+                            accountsData.push({
+                                "id"    : item["id"],
+                                "text"  : item["email"]
+                            });
+                        }
+
+                        return {
+                            results: accountsData
+                        }
+                    } else {
+                        return {
+                            results : []
+                        }
+                    }
+                },
+                cache: true
+            },
+            minimumInputLength : 2
+        },
         '{{componentId}}-{{sectionId}}-form'                                : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             invalidHandler: function (form, validator) {

@@ -67,6 +67,12 @@ class Dashboards extends BasePackage
 
         $data['settings']['maxWidgetsPerDashboard'] = $this->maxWidgetsPerDashboard;
 
+        if (isset($data['is_default']) && $data['is_default'] == true) {
+            $this->checkDefaultDashboard($data);
+        }
+
+        $data = $this->getSharedIds($data);
+
         if ($this->add($data)) {
             $this->addResponse('Dashboard Added');
         } else {
@@ -76,7 +82,7 @@ class Dashboards extends BasePackage
 
     public function updateDashboard(array $data)
     {
-        $dashboard = $this->getDashboardById($data['dashboard_id']);
+        $dashboard = $this->getDashboardById($data['id']);
 
         if (!$dashboard) {
             throw new IdNotFoundException;
@@ -88,11 +94,55 @@ class Dashboards extends BasePackage
             throw new PermissionDeniedException;
         }
 
+        $data = array_merge($dashboard, $data);
+
+        if (isset($data['is_default']) && $data['is_default'] == true) {
+            $this->checkDefaultDashboard($data);
+        }
+
+        $data = $this->getSharedIds($data);
+
         if ($this->update($data)) {
             $this->addResponse('Dashboard Updated');
         } else {
             $this->addResponse('Error Updating Dashboard', 1);
         }
+    }
+
+    protected function checkDefaultDashboard($data)
+    {
+        $dashboards = $this->basepackages->dashboards->dashboards;
+
+        foreach ($dashboards as $dashboard) {
+            if ($data['id'] == $dashboard['id']) {
+                continue;
+            }
+
+            if (isset($dashboard['is_default']) && $dashboard['is_default'] == true) {
+                $dashboard['is_default'] = null;
+
+                $this->update($dashboard);
+
+                break;
+            }
+        }
+    }
+
+    protected function getSharedIds($data)
+    {
+        if (isset($data['shared']) && is_string($data['shared'])) {
+            try {
+                $data['shared'] = $this->helper->decode($data['shared'], true);
+
+                if (isset($data['shared']['data'])) {
+                    $data['shared'] = $data['shared']['data'];
+                }
+            } catch (\throwable $e) {
+                $data['shared'] = null;
+            }
+        }
+
+        return $data;
     }
 
     public function removeDashboard(array $data)
@@ -101,6 +151,21 @@ class Dashboards extends BasePackage
 
         if (!$dashboard) {
             throw new IdNotFoundException;
+        }
+
+        if ($this->access->auth->account() &&
+            $this->access->auth->account()['id'] != $dashboard['created_by']
+        ) {
+            throw new PermissionDeniedException;
+        }
+
+        //Remove widgets
+        $widgets = $this->getDashboardWidgets(['dashboard_id' => $data['id']]);
+
+        if ($widgets && count($widgets) > 0) {
+            foreach ($widgets as $widget) {
+                $this->removeWidgetFromDashboard(['dashboard_id' => $data['id'], 'id' => $widget['id']]);
+            }
         }
 
         if ($this->remove($data['id'])) {
@@ -113,6 +178,10 @@ class Dashboards extends BasePackage
     public function getDashboardWidgetById(int $id, int $dashboardId, $getContent = false)
     {
         $dashboard = $this->getDashboardById($dashboardId, true, $getContent);
+
+        if (!$dashboard) {
+            throw new IdNotFoundException;
+        }
 
         if (isset($dashboard['widgets']) && count($dashboard['widgets']) > 0) {
             foreach ($dashboard['widgets'] as $key => $widget) {

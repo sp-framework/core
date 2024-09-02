@@ -61,7 +61,7 @@
     )}}
 </div>
 <script>
-/* globals paginatedPNotify GridStack Swal BazContentFields */
+/* globals paginatedPNotify GridStack Swal BazContentFields Pace BazCore BazContentLoader */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -152,12 +152,16 @@ dataCollectionSection =
                                 addWidgetToGrid(response.responseData.widgetsData[widget]);
                             }
 
-                            if (isOwner) {
+                            if (isOwner && grid.save().length > 0) {
                                 $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
                                 $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
                             }
                             grid.enableMove(false);
                             grid.enableResize(false);
+                            $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', true);
                         } else {
                             $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
                             paginatedPNotify('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
@@ -171,6 +175,7 @@ dataCollectionSection =
                             paginatedPNotify('info', {'text' : response.responseMessage});
                         }
                         $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
+                        $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
                     }
                     $('#{{componentId}}-{{sectionId}}-dashboard-loader').attr('hidden', true);
                 }, 'json');
@@ -189,12 +194,14 @@ dataCollectionSection =
 
                 var url = '{{links.url("dashboards/q/widgets/content/id/' + item.id + '/did/' + item.dashboard_id + '/wid/' + item.widget_id + '")}}';
                 $(item.el).find('.card-body').load(url, null, function (response, status, xhr) {
-                    if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
-                        $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
-                        $('#security-token').val(xhr.getResponseHeader('token'));
-                    }
                     fixHeight(item);
+                    addToken(xhr);
                 });
+            }
+
+            function addToken(xhr) {
+                $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
+                $('#security-token').val(xhr.getResponseHeader('token'));
             }
 
             function initWidgetCardButtons() {
@@ -373,9 +380,12 @@ dataCollectionSection =
 
                             addWidgetToGrid(response.responseData);
                             $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', true);
-                            if (isOwner) {
+                            if (isOwner && grid.save().length > 0) {
                                 $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
                                 $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
                             }
 
                             $('#{{componentId}}-{{sectionId}}-modal-button-add').attr('disabled', true);
@@ -443,10 +453,8 @@ dataCollectionSection =
 
                 if (grid.save().length === 0) {
                     $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
-                    if (isOwner) {
-                        $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
-                    }
+                    $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
                 } else {
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -526,13 +534,27 @@ dataCollectionSection =
                                     $("#security-token").val(response.token);
                                 }
 
-                                if (response.responseCode === 0) {
+                                if (response.responseCode == 0) {
                                     paginatedPNotify('success', {'text' : response.responseMessage});
 
-                                    return;
+                                    BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-remove'), {
+                                        ajaxBefore                      : function () {
+                                                                            Pace.restart();
+                                                                            $("#baz-content").empty();
+                                                                            $("#loader").attr('hidden', false);
+                                                                        },
+                                        ajaxFinished                    : function () {
+                                                                            BazCore.updateBreadcrumb();
+                                                                            $("#loader").attr('hidden', true);
+                                                                        },
+                                        ajaxError                       : function () {
+                                                                            $("#loader").attr('hidden', true);
+                                                                            BazCore.updateBreadcrumb();
+                                                                        }
+                                    });
+                                } else {
+                                    paginatedPNotify('error', {'text' : response.responseMessage});
                                 }
-
-                                paginatedPNotify('error', {'text' : response.responseMessage});
                             }, 'json');
                         }
                     });

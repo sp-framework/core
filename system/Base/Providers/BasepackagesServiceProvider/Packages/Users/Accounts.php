@@ -781,11 +781,7 @@ class Accounts extends BasePackage
                 }
             }
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->accounts = $accounts;
-
-            return true;
+            return $accounts;
         }
 
         return false;
