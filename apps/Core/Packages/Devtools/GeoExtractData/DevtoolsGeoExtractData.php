@@ -74,7 +74,7 @@ class DevtoolsGeoExtractData extends BasePackage
         $this->method = 'downloadGeoData';
 
         return $this->downloadData(
-            'https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates%2Bcities.json',
+            'https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/json/countries%2Bstates%2Bcities.json',
             base_path('apps/Core/Packages/Devtools/GeoExtractData/Data/countries+states+cities.json')
         );
     }
