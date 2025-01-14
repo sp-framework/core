@@ -1218,11 +1218,15 @@ class Setup
 
 			$passStrength = $this->checkPwStrength($this->postData['password']);
 
-			if ($passStrength !== false && $passStrength <= 2) {
-				throw new \Exception('DB Password strength is weak!');
+			if ($this->postData['dev'] == false) {
+				$passStrength = $this->checkPwStrength($this->postData['password']);
+
+				if ($passStrength !== false && $passStrength <= 2) {
+					throw new \Exception('DB Password strength is weak!');
+				}
 			}
 
-			$this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH mysql_native_password BY ?;", [$this->postData['username'], $this->postData['password']]);
+			$this->executeSQL("CREATE USER ?@'%' IDENTIFIED WITH caching_sha2_password BY ?;", [$this->postData['username'], $this->postData['password']]);
 		}
 
 		$this->executeSQL("GRANT ALL PRIVILEGES ON " . $this->postData['dbname'] . ".* TO ?@'%' WITH GRANT OPTION;", [$this->postData['username']]);
