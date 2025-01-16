@@ -398,7 +398,7 @@ class Queues extends BasePackage
                             $taskName = 'first';
                         }
 
-                        $module['name'] = $module['display_name'] ?? $module['name'];
+                        // $module['name'] = $module['display_name'] ?? $module['name'];
                         $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
 
                         if ($moduleType === 'views' &&
@@ -406,7 +406,8 @@ class Queues extends BasePackage
                             $module['is_subview'] == 0
                         ) {
                             $module['id'] = $module['id'] . '-public';
-                            $module['name'] = ($module['display_name'] ?? $module['name']) . ' (Public)';
+                            $module['display_name'] = $module['display_name'] . ' (Public)';
+                            // $module['name'] = ($module['display_name'] ?? $module['name']) . ' (Public)';
                             $module['repo'] = $module['repo'] . '-public';
 
                             $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
@@ -484,7 +485,7 @@ class Queues extends BasePackage
                     if ($installedModule['installed'] != '1') {
                         $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
                     } else {
-                        $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']);
+                        // $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']);
 
                         if ($task !== 'first') {
                             $task = 'update';
@@ -497,7 +498,8 @@ class Queues extends BasePackage
                         $installedModule['is_subview'] == 0
                     ) {
                         $installedModule['id'] = $installedModule['id'] . '-public';
-                        $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']) . ' (Public)';
+                        $installedModule['display_name'] = $installedModule['display_name'] . ' (Public)';
+                        // $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']) . ' (Public)';
                         $installedModule['repo'] = $installedModule['repo'] . '-public';
 
                         if ($installedModule['installed'] != '1') {
@@ -529,7 +531,8 @@ class Queues extends BasePackage
                     $installedModule['is_subview'] == 0
                 ) {
                     $installedModule['id'] = $installedModule['id'] . '-public';
-                    $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']) . ' (Public)';
+                    $installedModule['display_name'] = $installedModule['display_name'] . ' (Public)';
+                    // $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']) . ' (Public)';
                     $installedModule['repo'] = $installedModule['repo'] . '-public';
 
                     $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
@@ -629,7 +632,9 @@ class Queues extends BasePackage
             $this->queueTasks[$taskName][$moduleType][$module['id']] = [];
             $this->queueTasks[$taskName][$moduleType][$module['id']]['id'] = $moduleId;
             $this->queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['name'];
+            $this->queueTasks[$taskName][$moduleType][$module['id']]['display_name'] = $module['display_name'] ?? $module['name'];
             $this->queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $moduleType;
+            $this->queueTasks[$taskName][$moduleType][$module['id']]['app_type'] = $module['app_type'];
             if (!$version) {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['version'] =
                     (($taskName === 'update' || $taskName === 'first') && $module['update_version'] && $module['update_version'] !== '') ? $module['version'] . ' -> ' . $module['update_version'] : $module['version'];
