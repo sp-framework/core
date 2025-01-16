@@ -1216,8 +1216,6 @@ class Setup
 				throw new \Exception('User ' . $this->postData['username'] . ' does not exist. Please enable create new user/database.');
 			}
 
-			$passStrength = $this->checkPwStrength($this->postData['password']);
-
 			if ($this->postData['dev'] == false) {
 				$passStrength = $this->checkPwStrength($this->postData['password']);
 
