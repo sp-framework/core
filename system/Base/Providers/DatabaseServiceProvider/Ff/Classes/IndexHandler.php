@@ -52,8 +52,9 @@ class IndexHandler
         foreach ($this->indexes as $index) {
             if (isset($content[$index])) {
                 IoHelper::createFolder($this->indexesPath . $index . '/', $this->folderPermissions);
+
                 if (is_string($content[$index])) {
-                    $indexChars = strtolower(substr($content[$index], 0, $this->minIndexChars));
+                    $indexChars = strtolower(mb_substr($content[$index], 0, $this->minIndexChars, 'UTF-8'));
                 } else {
                     $indexChars = $content[$index];
                 }
@@ -91,7 +92,9 @@ class IndexHandler
 
     public function reIndex($dataPath = null)
     {
-        IoHelper::deleteFolder($this->indexesPath);
+        if (IoHelper::checkFolder($this->indexesPath)) {
+            IoHelper::deleteFolder($this->indexesPath);
+        }
 
         if (!$dataPath) {
             $dataPath = $this->storeConfiguration['storePath'] . 'data/';
