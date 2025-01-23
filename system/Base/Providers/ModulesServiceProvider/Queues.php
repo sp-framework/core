@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
+use Phalcon\Filter\Validation\Validator\Email;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Model\ServiceProviderModulesQueues;
 use z4kn4fein\SemVer\Version;
@@ -15,8 +16,6 @@ class Queues extends BasePackage
     protected $queueTasks;
 
     protected $results;
-
-    // protected $coreExternalDependencies;
 
     public function init(bool $resetCache = false)
     {
@@ -52,7 +51,29 @@ class Queues extends BasePackage
                     'remove'    => []
                 ]
             ),
-            'total'     => 0
+            'total'     => 0,
+            'settings'  => $this->helper->encode(
+                [
+                    'backupSettings'    =>
+                        [
+                            'backup'                    => true,
+                            'apps_dir'                  => true,
+                            'systems_dir'               => true,
+                            'public_dir'                => true,
+                            'private_dir'               => true,
+                            'external_dir'              => true,
+                            'html_compiled'             => false,
+                            'var_dir'                   => false,
+                            'external_vendor_dir'       => false,
+                            'old_backups'               => false,
+                            'database'                  => true,
+                            'keys'                      => true,
+                            'password_protect'          => $this->basepackages->utils->generateNewPassword()['password'],
+                            'notes'                     => '',
+                        ],
+                    'emailReport'                       => $this->access->auth->account()['email']
+                ]
+            )
         ];
 
         if ($this->add($queue)) {
@@ -179,6 +200,109 @@ class Queues extends BasePackage
         $this->addResponse('Error updating queue', 1);
 
         return false;
+    }
+
+    public function saveQueueSettings($data)
+    {
+        $queue = $this->getById((int) $data['id']);
+
+        if (!$queue) {
+            $this->addResponse('Queue with ID not found', 1);
+
+            return false;
+        }
+
+        $noOptions = true;
+        array_walk($data['settings']['backupSettings'], function(&$setting, $index) use (&$noOptions) {
+            if ($index === 'notes' ||
+                $index === 'password_protect'
+            ) {
+                return;
+            }
+
+            if ($setting !== '') {
+                if ($setting == 'true') {
+                    $setting = true;
+                    $noOptions = false;
+                } else {
+                    $setting = false;
+                }
+            } else {
+                $setting = false;
+            }
+        });
+
+
+        if ($data['settings']['backupSettings']['keys'] === true &&
+            $data['settings']['backupSettings']['password_protect'] === ''
+        ) {
+            $this->addResponse('Password is required if keys are being backed up!', 1);
+
+            return false;
+        }
+
+        if ($noOptions) {//No option selected disables backup.
+            $data['settings']['backupSettings']['backup'] = false;
+            $data['settings']['backupSettings']['password_protect'] = '';
+            $data['settings']['backupSettings']['notes'] = '';
+        } else {
+            $data['settings']['backupSettings']['backup'] = true;
+        }
+
+        if ($data['settings']['emailReport'] !== '') {
+            $emails = explode(',', $data['settings']['emailReport']);
+
+            if (count($emails) > 1) {
+                array_walk($emails, function(&$email, $index) use (&$emails) {
+                    $email = trim($email);
+
+                    if ($email === '') {
+                        unset($emails[$index]);
+                    }
+                });
+            } else {
+                $emails[0] = trim($emails[0]);
+            }
+
+            foreach ($emails as $email) {
+                $validation = $this->validateData(['email' => $email]);
+
+                if ($validation !== true) {
+                    $this->addResponse($validation, 1);
+
+                    return false;
+                }
+            }
+        }
+
+        $queue['settings'] = array_replace($queue['settings'], $data['settings']);
+
+        if ($this->update($queue)) {
+            $this->addResponse('Queue settings updated');
+
+            return true;
+        }
+
+        $this->addResponse('Error updating queue settings', 1);
+    }
+
+    protected function validateData(array $data)
+    {
+        $this->validation->init();
+        $this->validation->add('email', Email::class, ["message" => "Enter valid email."]);
+
+        $validated = $this->validation->validate($data)->jsonSerialize();
+
+        if (count($validated) > 0) {
+            $messages = 'Error: ';
+
+            foreach ($validated as $key => $value) {
+                $messages .= $value['message'] . ' ';
+            }
+            return $messages . ' (' . $data['email'] . ')';
+        } else {
+            return true;
+        }
     }
 
     protected function getTasksCount(&$queue, $analyse = false)

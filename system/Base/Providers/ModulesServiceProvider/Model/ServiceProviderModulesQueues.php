@@ -27,4 +27,6 @@ class ServiceProviderModulesQueues extends BaseModel
     public $sync;
 
     public $total;
+
+    public $settings;
 }
