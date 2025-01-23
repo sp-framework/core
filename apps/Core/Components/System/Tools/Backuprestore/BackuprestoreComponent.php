@@ -38,13 +38,13 @@ class BackuprestoreComponent extends BaseComponent
                         [
                             'uuidLocation'    => '.backups/',
                             'storagesId'      => $storage['id'],
-                            'orphan'          => 0
+                            'orphan'          => false
                         ]
                 ];
         } else {
             $params =
                 [
-                    'conditions'    => [['uuid_location', '=', '.backups/'], ['storages_id', '=', $storage['id']], ['orphan', '=', 0]]
+                    'conditions'    => [['uuid_location', '=', '.backups/'], ['storages_id', '=', $storage['id']], ['orphan', '=', false]]
                 ];
         }
 

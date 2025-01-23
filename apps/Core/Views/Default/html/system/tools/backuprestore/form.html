@@ -427,14 +427,14 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
 }
 $('#body').off('dropzoneInitDone');
 $('#body').on('dropzoneInitDone', function() {
-    if (dataCollectionSection['admin-backuprestore-main-backup_upload_restore']) {
-        dataCollectionSection['admin-backuprestore-main-backup_upload_restore']['onSuccess'] = function(file, response) {
-            if (response.responseData && response.responseData.name && response.responseData.uuid) {
-                var newOption = new Option(response.responseData.name, response.responseData.uuid, false, false);
+    if (dataCollectionSection['core-backuprestore-main-backup_upload_restore']) {
+        dataCollectionSection['core-backuprestore-main-backup_upload_restore']['onSuccess'] = function(file, response) {
+            if (response.responseData && response.responseData.org_file_name && response.responseData.uuid) {
+                var newOption = new Option(response.responseData.org_file_name, response.responseData.uuid, false, false);
                 $('#{{componentId}}-{{sectionId}}-backups').append(newOption).val(response.responseData.uuid).trigger('change');
-                dataCollectionSectionForm['funcs']['addedNewBackupOption'](response.responseData.uuid, response.responseData.name);
-                paginatedPNotify('success', {text: 'File ' + response.responseData.name + ' uploaded and ready to be restored.'});
-                dataCollectionSection['admin-backuprestore-main-backup_upload_restore']['reset']();
+                dataCollectionSectionForm['funcs']['addedNewBackupOption'](response.responseData.uuid, response.responseData.org_file_name);
+                paginatedPNotify('success', {text: 'File ' + response.responseData.org_file_name + ' uploaded and ready to be restored.'});
+                dataCollectionSection['core-backuprestore-main-backup_upload_restore']['reset']();
             }
         };
     }
