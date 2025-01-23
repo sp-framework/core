@@ -730,8 +730,10 @@ class Installer extends BasePackage
             return true;
         }
 
+        unset($this->queue['settings']['backupSettings']['backup']);
+
         if ($this->queue['settings']['backupSettings']['notes'] === '') {
-            $this->queue['settings']['backupSettings']['notes'] = 'Backup taking while processing module installer queue with ID: ' . $this->queue['id'];
+            $this->queue['settings']['backupSettings']['notes'] = 'Backup taken while processing module installer queue with ID: ' . $this->queue['id'];
         }
 
         return $this->basepackages->backuprestore->init()->backup($this->queue['settings']['backupSettings']);

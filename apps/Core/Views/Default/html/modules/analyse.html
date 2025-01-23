@@ -232,11 +232,11 @@ dataCollectionSectionForm['funcs']['saveSettings'] = function() {
     postData['settings']['backupSettings']['systems_dir'] = $('#{{componentId}}-{{sectionId}}-systems_dir')[0].checked;
     postData['settings']['backupSettings']['public_dir'] = $('#{{componentId}}-{{sectionId}}-public_dir')[0].checked;
     postData['settings']['backupSettings']['private_dir'] = $('#{{componentId}}-{{sectionId}}-private_dir')[0].checked;
-    postData['settings']['backupSettings']['html_compiled'] = $('#{{componentId}}-{{sectionId}}-html_compiled')[0].checked;
+    postData['settings']['backupSettings']['html_compiled_dir'] = $('#{{componentId}}-{{sectionId}}-html_compiled_dir')[0].checked;
     postData['settings']['backupSettings']['var_dir'] = $('#{{componentId}}-{{sectionId}}-var_dir')[0].checked;
     postData['settings']['backupSettings']['external_dir'] = $('#{{componentId}}-{{sectionId}}-external_dir')[0].checked;
     postData['settings']['backupSettings']['external_vendor_dir'] = $('#{{componentId}}-{{sectionId}}-external_vendor_dir')[0].checked;
-    postData['settings']['backupSettings']['old_backups'] = $('#{{componentId}}-{{sectionId}}-old_backups')[0].checked;
+    postData['settings']['backupSettings']['old_backups_dir'] = $('#{{componentId}}-{{sectionId}}-old_backups_dir')[0].checked;
     postData['settings']['backupSettings']['database'] = $('#{{componentId}}-{{sectionId}}-database')[0].checked;
     postData['settings']['backupSettings']['keys'] = $('#{{componentId}}-{{sectionId}}-keys')[0].checked;
     postData['settings']['backupSettings']['password_protect'] = $('#{{componentId}}-{{sectionId}}-password_protect').val().trim();
@@ -490,7 +490,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-public_dir'                              : { },
         '{{componentId}}-{{sectionId}}-private_dir'                             : { },
         '{{componentId}}-{{sectionId}}-external_dir'                            : { },
-        '{{componentId}}-{{sectionId}}-html_compiled'                           : { },
+        '{{componentId}}-{{sectionId}}-html_compiled_dir'                       : { },
         '{{componentId}}-{{sectionId}}-var_dir'                                 : { },
         '{{componentId}}-{{sectionId}}-external_vendor_dir'                     : {
             afterInit : function() {
@@ -504,7 +504,7 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-old_backups'                             : { },
+        '{{componentId}}-{{sectionId}}-old_backups_dir'                         : { },
         '{{componentId}}-{{sectionId}}-database'                                : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-database').click(function() {
