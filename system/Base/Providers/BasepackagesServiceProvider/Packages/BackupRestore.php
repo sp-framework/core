@@ -150,6 +150,11 @@ class BackupRestore extends BasePackage
     {
         $this->zip->open(base_path($this->backupLocation . $this->backupInfo['backupName']), $this->zip::CREATE);
 
+        if (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true') {
+            if ($this->core->core['settings']['databasetype'] != 'db') {
+                $this->getContent($this->basepackages->utils->scanDir('.ff/'));
+            }
+        }
         if (isset($this->backupInfo['request']['apps_dir']) && $this->backupInfo['request']['apps_dir'] == 'true') {
             $this->getContent($this->basepackages->utils->scanDir('apps/'));
         }
@@ -175,6 +180,8 @@ class BackupRestore extends BasePackage
 
         if (isset($this->backupInfo['request']['old_backups']) && $this->backupInfo['request']['old_backups'] == 'true') {
             $this->getContent($this->basepackages->utils->scanDir('.backups/'));
+            $this->getContent($this->basepackages->utils->scanDir('.backupsdb/'));
+            $this->getContent($this->basepackages->utils->scanDir('.backupsff/'));
         }
 
         return true;
