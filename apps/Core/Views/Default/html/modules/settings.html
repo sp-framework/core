@@ -1,50 +1,76 @@
-{% set settingsBackupAppsDirChecked = false %}
-{% set settingsBackupSystemsDirChecked = false %}
-{% set settingsBackupPublicDirChecked = false %}
-{% set settingsBackupPrivateDirChecked = false %}
-{% set settingsBackupExternalDirChecked = false %}
-{% set settingsBackupHTMLCompiledDirChecked = false %}
-{% set settingsBackupVarDirChecked = false %}
-{% set settingsBackupExternalVendorDirChecked = false %}
-{% set settingsBackupOldBackupsDirChecked = false %}
-{% set settingsBackupDatabaseChecked = false %}
-{% set settingsBackupKeysChecked = false %}
+{% set settingsBackupSettingsAppsDirChecked = false %}
+{% set settingsBackupSettingsSystemsDirChecked = false %}
+{% set settingsBackupSettingsPublicDirChecked = false %}
+{% set settingsBackupSettingsPrivateDirChecked = false %}
+{% set settingsBackupSettingsExternalDirChecked = false %}
+{% set settingsBackupSettingsHTMLCompiledDirChecked = false %}
+{% set settingsBackupSettingsVarDirChecked = false %}
+{% set settingsBackupSettingsExternalVendorDirChecked = false %}
+{% set settingsBackupSettingsOldBackupsDirChecked = false %}
+{% set settingsBackupSettingsDatabaseChecked = false %}
+{% set settingsBackupSettingsKeysChecked = false %}
 {% if queue['settings']['backupSettings']['apps_dir'] == 'true' %}
-    {% set settingsBackupAppsDirChecked = true %}
+    {% set settingsBackupSettingsAppsDirChecked = true %}
 {% endif %}
 {% if queue['settings']['backupSettings']['systems_dir'] == 'true' %}
-    {% set settingsBackupSystemsDirChecked = true %}
+    {% set settingsBackupSettingsSystemsDirChecked = true %}
 {% endif %}
 {% if queue['settings']['backupSettings']['public_dir'] == 'true' %}
-    {% set settingsBackupPublicDirChecked = true %}
+    {% set settingsBackupSettingsPublicDirChecked = true %}
 {% endif %}
 {% if queue['settings']['backupSettings']['private_dir'] == 'true' %}
-    {% set settingsBackupPrivateDirChecked = true %}
+    {% set settingsBackupSettingsPrivateDirChecked = true %}
 {% endif %}
 {% if queue['settings']['backupSettings']['external_dir'] == 'true' %}
-    {% set settingsBackupExternalDirChecked = true %}
+    {% set settingsBackupSettingsExternalDirChecked = true %}
 {% endif %}
 {% if queue['settings']['backupSettings']['html_compiled_dir'] == 'true' %}
-    {% set settingsBackupHTMLCompiledDirChecked = true %}
+    {% set settingsBackupSettingsHTMLCompiledDirChecked = true %}
 {% endif %}
 {% if queue['settings']['backupSettings']['var_dir'] == 'true' %}
-    {% set settingsBackupVarDirChecked = true %}
+    {% set settingsBackupSettingsVarDirChecked = true %}
 {% endif %}
 {% if queue['settings']['backupSettings']['external_vendor_dir'] == 'true' %}
-    {% set settingsBackupExternalVendorDirChecked = true %}
+    {% set settingsBackupSettingsExternalVendorDirChecked = true %}
 {% endif %}
 {% if queue['settings']['backupSettings']['old_backups_dir'] == 'true' %}
-    {% set settingsBackupOldBackupsDirChecked = true %}
+    {% set settingsBackupSettingsOldBackupsDirChecked = true %}
 {% endif %}
 {% if queue['settings']['backupSettings']['database'] == 'true' %}
-    {% set settingsBackupDatabaseChecked = true %}
+    {% set settingsBackupSettingsDatabaseChecked = true %}
 {% endif %}
 {% if queue['settings']['backupSettings']['keys'] == 'true' %}
-    {% set settingsBackupKeysChecked = true %}
+    {% set settingsBackupSettingsKeysChecked = true %}
+{% endif %}
+{% set settingsRSyncDeleteDestinationFilesChecked = false %}
+{% if queue['settings']['rsync']['deleteDestinationFiles'] == 'true' %}
+    {% set settingsRSyncDeleteDestinationFilesChecked = true %}
 {% endif %}
 <div class="row">
     <div class="col">
         <div id="{{componentId}}-{{sectionId}}-queue-settings">
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'backup_settings',
+                            'fieldLabel'                            : 'BACKUP SETTINGS',
+                            'fieldLabelLegend'                      : true,
+                            'fieldHidden'                           : false,
+                            'fieldType'                             : 'html',
+                            'fieldBazScan'                          : false,
+                            'fieldBazPostOnCreate'                  : false,
+                            'fieldBazPostOnUpdate'                  : false,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldHtmlContent'                      : ''
+                        ]
+                    )}}
+                </div>
+            </div>
             <div class="row">
                 <div class="col">
                     {{adminltetags.useTag('fields',
@@ -60,8 +86,8 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'success',
-                            'fieldCheckboxLabel'             : 'BACKUP APPS DIRECTORY',
-                            'fieldCheckboxChecked'           : settingsBackupAppsDirChecked,
+                            'fieldCheckboxLabel'             : 'APPS DIRECTORY',
+                            'fieldCheckboxChecked'           : settingsBackupSettingsAppsDirChecked,
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
@@ -83,8 +109,8 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'success',
-                            'fieldCheckboxLabel'             : 'BACKUP SYSTEMS DIRECTORY',
-                            'fieldCheckboxChecked'           : settingsBackupSystemsDirChecked,
+                            'fieldCheckboxLabel'             : 'SYSTEMS DIRECTORY',
+                            'fieldCheckboxChecked'           : settingsBackupSettingsSystemsDirChecked,
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
@@ -108,8 +134,8 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'success',
-                            'fieldCheckboxLabel'             : 'BACKUP PUBLIC DIRECTORY',
-                            'fieldCheckboxChecked'           : settingsBackupPublicDirChecked,
+                            'fieldCheckboxLabel'             : 'PUBLIC DIRECTORY',
+                            'fieldCheckboxChecked'           : settingsBackupSettingsPublicDirChecked,
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
@@ -131,8 +157,8 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'success',
-                            'fieldCheckboxLabel'             : 'BACKUP PRIVATE DIRECTORY',
-                            'fieldCheckboxChecked'           : settingsBackupPrivateDirChecked,
+                            'fieldCheckboxLabel'             : 'PRIVATE DIRECTORY',
+                            'fieldCheckboxChecked'           : settingsBackupSettingsPrivateDirChecked,
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
@@ -156,8 +182,8 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'success',
-                            'fieldCheckboxLabel'             : 'BACKUP EXTERNAL DIRECTORY',
-                            'fieldCheckboxChecked'           : settingsBackupExternalDirChecked,
+                            'fieldCheckboxLabel'             : 'EXTERNAL DIRECTORY',
+                            'fieldCheckboxChecked'           : settingsBackupSettingsExternalDirChecked,
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
@@ -179,7 +205,7 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'warning',
-                            'fieldCheckboxChecked'           : settingsBackupHTMLCompiledDirChecked,
+                            'fieldCheckboxChecked'           : settingsBackupSettingsHTMLCompiledDirChecked,
                             'fieldCheckboxLabel'             : 'COMPILED HTML DIRECTORY',
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : false,
@@ -204,7 +230,7 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'warning',
-                            'fieldCheckboxChecked'           : settingsBackupVarDirChecked,
+                            'fieldCheckboxChecked'           : settingsBackupSettingsVarDirChecked,
                             'fieldCheckboxLabel'             : 'VAR DIRECTORY',
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : false,
@@ -227,8 +253,8 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'warning',
-                            'fieldCheckboxLabel'             : 'BACKUP EXTERNAL VENDOR DIRECTORY',
-                            'fieldCheckboxChecked'           : settingsBackupExternalVendorDirChecked,
+                            'fieldCheckboxLabel'             : 'EXTERNAL VENDOR DIRECTORY',
+                            'fieldCheckboxChecked'           : settingsBackupSettingsExternalVendorDirChecked,
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
@@ -252,8 +278,8 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'danger',
-                            'fieldCheckboxChecked'           : settingsBackupOldBackupsDirChecked,
-                            'fieldCheckboxLabel'             : 'OLD BACKUP FILES',
+                            'fieldCheckboxChecked'           : settingsBackupSettingsOldBackupsDirChecked,
+                            'fieldCheckboxLabel'             : 'OLD BACKUP FILES DIRECTORY',
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
@@ -275,7 +301,7 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'success',
-                            'fieldCheckboxChecked'           : settingsBackupDatabaseChecked,
+                            'fieldCheckboxChecked'           : settingsBackupSettingsDatabaseChecked,
                             'fieldCheckboxLabel'             : 'DATABASE',
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : false,
@@ -300,7 +326,7 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'danger',
-                            'fieldCheckboxChecked'           : settingsBackupKeysChecked,
+                            'fieldCheckboxChecked'           : settingsBackupSettingsKeysChecked,
                             'fieldDisabled'                  : true,
                             'fieldCheckboxLabel'             : 'SECURITY AND DB KEYS',
                             'fieldBazJstreeSearch'           : true,
@@ -345,7 +371,7 @@
                             'componentId'                    : componentId,
                             'sectionId'                      : sectionId,
                             'fieldId'                        : 'notes',
-                            'fieldLabel'                     : 'Backup Notes',
+                            'fieldLabel'                     : 'Notes',
                             'fieldType'                      : 'textarea',
                             'fieldDataMaxLength'             : 2048,
                             'fieldHelp'                      : true,
@@ -371,6 +397,28 @@
                             'componentName'                         : componentName,
                             'componentId'                           : componentId,
                             'sectionId'                             : sectionId,
+                            'fieldId'                               : 'report_settings',
+                            'fieldLabel'                            : 'REPORT SETTINGS',
+                            'fieldLabelLegend'                      : true,
+                            'fieldHidden'                           : false,
+                            'fieldType'                             : 'html',
+                            'fieldBazScan'                          : false,
+                            'fieldBazPostOnCreate'                  : false,
+                            'fieldBazPostOnUpdate'                  : false,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldHtmlContent'                      : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
                             'fieldId'                               : 'email_report',
                             'fieldLabel'                            : 'Email Report',
                             'fieldType'                             : 'input',
@@ -382,6 +430,54 @@
                             'fieldBazPostOnUpdate'                  : false,
                             'fieldAdditionalClass'                  : 'mb-0',
                             'fieldValue'                            : queue['settings']['emailReport']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'rsync_settings',
+                            'fieldLabel'                            : 'RSYNC SETTINGS',
+                            'fieldLabelLegend'                      : true,
+                            'fieldHidden'                           : false,
+                            'fieldType'                             : 'html',
+                            'fieldBazScan'                          : false,
+                            'fieldBazPostOnCreate'                  : false,
+                            'fieldBazPostOnUpdate'                  : false,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldHtmlContent'                      : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'delete_destination_files',
+                            'fieldLabel'                     : false,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'RSync delete destination files? Disable if you have any custom code installed, else RSync will delete the files that are not found in the source.',
+                            'fieldRequired'                  : false,
+                            'fieldType'                      : 'checkbox',
+                            'fieldCheckboxType'              : 'danger',
+                            'fieldCheckboxChecked'           : settingsRSyncDeleteDestinationFilesChecked,
+                            'fieldCheckboxLabel'             : 'RSYNC DELETE DESTINATION FILES?',
+                            'fieldBazJstreeSearch'           : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldBazScan'                   : true
                         ]
                     )}}
                 </div>

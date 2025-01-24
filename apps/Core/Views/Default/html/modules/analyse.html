@@ -242,6 +242,8 @@ dataCollectionSectionForm['funcs']['saveSettings'] = function() {
     postData['settings']['backupSettings']['password_protect'] = $('#{{componentId}}-{{sectionId}}-password_protect').val().trim();
     postData['settings']['backupSettings']['notes'] = $('#{{componentId}}-{{sectionId}}-notes').val().trim();
     postData['settings']['emailReport'] = $('#{{componentId}}-{{sectionId}}-email_report').val().trim();
+    postData['settings']['rsync'] = { };
+    postData['settings']['rsync']['deleteDestinationFiles'] = $('#{{componentId}}-{{sectionId}}-delete_destination_files')[0].checked;
 
     $.post('{{links.url("modules/saveQueueSettings")}}', postData, function(response) {
         if (response.tokenKey && response.token) {
@@ -534,6 +536,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-password_protect'                        : { },
         '{{componentId}}-{{sectionId}}-notes'                                   : { },
         '{{componentId}}-{{sectionId}}-email_report'                            : { },
+        '{{componentId}}-{{sectionId}}-delete_destination_files'                : { },
         '{{componentId}}-{{sectionId}}-form'                                    : $.extend(dataCollectionSectionForm, {
             rules: {
             },

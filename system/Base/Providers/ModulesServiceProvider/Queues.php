@@ -71,6 +71,10 @@ class Queues extends BasePackage
                             'password_protect'          => $this->basepackages->utils->generateNewPassword()['password'],
                             'notes'                     => '',
                         ],
+                    'rsync'                             =>
+                        [
+                            'deleteDestinationFiles'    => false
+                        ],
                     'emailReport'                       => $this->access->auth->account()['email']
                 ]
             )
@@ -232,7 +236,6 @@ class Queues extends BasePackage
             }
         });
 
-
         if ($data['settings']['backupSettings']['keys'] === true &&
             $data['settings']['backupSettings']['password_protect'] === ''
         ) {
@@ -274,6 +277,18 @@ class Queues extends BasePackage
                 }
             }
         }
+
+        array_walk($data['settings']['rsync'], function(&$setting, $index) {
+            if ($setting !== '') {
+                if ($setting == 'true') {
+                    $setting = true;
+                } else {
+                    $setting = false;
+                }
+            } else {
+                $setting = false;
+            }
+        });
 
         $queue['settings'] = array_replace($queue['settings'], $data['settings']);
 

@@ -575,8 +575,10 @@ class Installer extends BasePackage
 
         if ($precheck) {
             $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
-
             $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
+        } else {
+            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+            $resultQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['result_logs'];
         }
 
         if ($module['module_type'] === 'packages' &&
@@ -603,20 +605,26 @@ class Installer extends BasePackage
         }
 
         try {
-            $rsync = new Rsync([
-                Rsync::CONF_CWD        => base_path('var/tmp/installer/' . $this->zipFile['name'] . '/' . $this->zipFile['name']),
-                Rsync::CONF_OPTIONS    =>
-                    [
-                        Rsync::OPT_DRY_RUN           => $precheck,
-                        Rsync::OPT_VERBOSE           => true,
-                        Rsync::OPT_ARCHIVE           => true,
-                        Rsync::OPT_HUMAN_READABLE    => true,
-                        Rsync::OPT_CHECKSUM          => true,
-                        Rsync::OPT_DELETE_AFTER      => true,
-                        Rsync::OPT_INCLUDE           => $includeFiles,
-                        Rsync::OPT_EXCLUDE           => ['*'],
-                    ]
-            ]);
+            $rsyncSettings =
+                [
+                    Rsync::CONF_CWD        => base_path('var/tmp/installer/' . $this->zipFile['name'] . '/' . $this->zipFile['name']),
+                    Rsync::CONF_OPTIONS    =>
+                        [
+                            Rsync::OPT_DRY_RUN           => $precheck,
+                            Rsync::OPT_VERBOSE           => true,
+                            Rsync::OPT_ARCHIVE           => true,
+                            Rsync::OPT_HUMAN_READABLE    => true,
+                            Rsync::OPT_CHECKSUM          => true,
+                            Rsync::OPT_INCLUDE           => $includeFiles,
+                            Rsync::OPT_EXCLUDE           => ['*'],
+                        ]
+                ];
+
+            if ($this->queue['settings']['rsync']['deleteDestinationFiles']) {
+                $rsyncSettings[Rsync::CONF_OPTIONS][Rsync::OPT_DELETE_AFTER] = true;
+            }
+
+            $rsync = new Rsync($rsyncSettings);
 
             if ($module['module_type'] === 'packages' &&
                 str_contains($module['name'], 'Core')
@@ -651,13 +659,15 @@ class Installer extends BasePackage
                         }
                     }
 
-                    if (str_starts_with($output, 'deleting')) {
-                        if (!str_ends_with($output, '/') &&
-                            !str_ends_with($output, '.git') &&
-                            !str_ends_with($output, 'keys')
-                        ) {
-                            $output = str_replace('deleting ', '', $output);
-                            array_push($deleteFiles, $output);
+                    if ($this->queue['settings']['rsync']['deleteDestinationFiles']) {
+                        if (str_starts_with($output, 'deleting')) {
+                            if (!str_ends_with($output, '/') &&
+                                !str_ends_with($output, '.git') &&
+                                !str_ends_with($output, 'keys')
+                            ) {
+                                $output = str_replace('deleting ', '', $output);
+                                array_push($deleteFiles, $output);
+                            }
                         }
                     }
                 });
@@ -665,7 +675,18 @@ class Installer extends BasePackage
 
             if ($precheck) {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'pass';
-                $preCheckQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles, 'deleteFiles' => $deleteFiles]);
+                if ($this->queue['settings']['rsync']['deleteDestinationFiles']) {
+                    $preCheckQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles, 'deleteFiles' => $deleteFiles]);
+                } else {
+                    $preCheckQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles]);
+                }
+            } else {
+                $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
+                if ($this->queue['settings']['rsync']['deleteDestinationFiles']) {
+                    $resultQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles, 'deleteFiles' => $deleteFiles]);
+                } else {
+                    $resultQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles]);
+                }
             }
 
             // trace(varsToDump : [$modifiedFiles, $deleteFiles], object: true);
@@ -689,7 +710,10 @@ class Installer extends BasePackage
                 $preCheckQueueLogs
             );
         } else {
-            //
+            return $this->preCheckHasErrors(
+                $rsyncError,
+                $resultQueueLogs
+            );
         }
     }
 
@@ -729,8 +753,6 @@ class Installer extends BasePackage
         if ((bool) $this->queue['settings']['backupSettings']['backup'] === false) {
             return true;
         }
-
-        unset($this->queue['settings']['backupSettings']['backup']);
 
         if ($this->queue['settings']['backupSettings']['notes'] === '') {
             $this->queue['settings']['backupSettings']['notes'] = 'Backup taken while processing module installer queue with ID: ' . $this->queue['id'];
@@ -876,13 +898,13 @@ class Installer extends BasePackage
                                     'text'      => 'Creating filesystem and database backup...'
                                 ]
                             );
-                            // array_push($this->runProcessProgressMethods,
-                            //     [
-                            //         'method'    => 'runRsync-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                            //         'text'      => 'Running rsync --dry-run for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                            //         'args'      => [$taskName, $module, true],
-                            //     ]
-                            // );
+                            array_push($this->runProcessProgressMethods,
+                                [
+                                    'method'    => 'runRsync-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Running rsync for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                    'args'      => [$taskName, $module, false],
+                                ]
+                            );
                         }
                     }
                 }
