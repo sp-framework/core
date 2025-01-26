@@ -12,6 +12,7 @@ use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
 use System\Base\BasePackage;
+use System\Base\Installer\Packages\Setup\Schema;
 use xobotyi\rsync\Rsync;
 use z4kn4fein\SemVer\Version;
 
@@ -46,6 +47,8 @@ class Installer extends BasePackage
     protected $runProcessProgressMethods;
 
     protected $updatedBy;
+
+    protected $storesToIndex = [];
 
     public function init($process = 'precheck')
     {
@@ -582,7 +585,7 @@ class Installer extends BasePackage
         }
 
         if ($module['module_type'] === 'packages' &&
-            str_contains($module['name'], 'Core')
+            $module['name'] === 'Core'
         ) {
             $includeFiles =
                 [
@@ -627,7 +630,7 @@ class Installer extends BasePackage
             $rsync = new Rsync($rsyncSettings);
 
             if ($module['module_type'] === 'packages' &&
-                str_contains($module['name'], 'Core')
+                $module['name'] === 'Core'
             ) {
                 $rsync->sync(
                     '.',
@@ -715,6 +718,72 @@ class Installer extends BasePackage
                 $resultQueueLogs
             );
         }
+    }
+
+    protected function updateSchema($args)
+    {
+        $taskName = $args[0];
+        $module = $args[1];
+
+        if ($module['module_type'] === 'packages' &&
+            $module['name'] === 'Core'
+        ) {
+            $databases = (new Schema)->getSchema();
+        } else {
+            //
+        }
+
+        // trace(varsToDump : [$this->config], object: true);
+        if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'ff') {
+
+
+            foreach ($databases as $tableName => $tableClass) {
+                if (method_exists($tableClass['schema'], 'columns')) {
+                    $table = $this->describe($tableClass['model']->getSource());
+                    trace(varsToDump : [$table]);
+
+                    $this->db->createTable($tableName, $this->config['db']['dbname'], $tableClass['schema']->columns());
+                }
+                if (method_exists($tableClass['schema'], 'indexes')) {
+                    $this->addIndex($tableName, $tableClass['schema']->indexes());
+                }
+            }
+        }
+
+        if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'db') {
+            foreach ($databases as $tableName => $tableClass) {
+                if ($tableClass['model'] && $tableClass['model']->getSource()) {
+                    $tableName = $tableClass['model']->getSource();
+                }
+
+                $config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model']);
+                $schema = $this->ff->generateSchema($tableName, $tableClass['schema'], $tableClass['model']);
+
+                $this->ff->store($tableName, $config, $schema, $this->ff);
+
+                if (method_exists($tableClass['schema'], 'indexes')) {
+                    array_push($this->storesToIndex, $tableName);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    protected function performIndexing()
+    {
+        if (isset($this->config['databasetype']) &&
+            $this->config['databasetype'] !== 'db' &&
+            count($this->storesToIndex) > 0
+        ) {
+            foreach ($this->storesToIndex as $storeToIndex) {
+                $store = $this->ff->store($storeToIndex);
+
+                $store->reIndexStore();
+            }
+        }
+
+        return true;
     }
 
     public function cleanup(array $what)
@@ -892,17 +961,24 @@ class Installer extends BasePackage
                         if ($taskName === 'first' && $moduleType === 'external') {
                             continue;
                         } else {
+                            // array_push($this->runProcessProgressMethods,
+                            //     [
+                            //         'method'    => 'createBackup',
+                            //         'text'      => 'Creating filesystem and database backup...'
+                            //     ]
+                            // );
+                            // array_push($this->runProcessProgressMethods,
+                            //     [
+                            //         'method'    => 'runRsync-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                            //         'text'      => 'Running rsync for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                            //         'args'      => [$taskName, $module, false],
+                            //     ]
+                            // );
                             array_push($this->runProcessProgressMethods,
                                 [
-                                    'method'    => 'createBackup',
-                                    'text'      => 'Creating filesystem and database backup...'
-                                ]
-                            );
-                            array_push($this->runProcessProgressMethods,
-                                [
-                                    'method'    => 'runRsync-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                    'text'      => 'Running rsync for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                                    'args'      => [$taskName, $module, false],
+                                    'method'    => 'updateSchema-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Running schema update for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                    'args'      => [$taskName, $module],
                                 ]
                             );
                         }
