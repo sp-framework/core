@@ -2009,16 +2009,33 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	public function alterTable(string $method, string $table, array $columns, $schemaName = '')
+	public function alterTable(string $method, string $table, mixed $columns, array $currentColumn = null, string $schemaName = '')
 	{
 		$method = $method . 'Column';
 
 		try {
-			foreach ($columns as $column) {
+			if (is_array($columns)) {
+				foreach ($columns as $column) {
+					if ($method === 'addColumn') {
+						$this->db->{$method}(
+							$table,
+							$schemaName,
+							$column
+						);
+					} else if ($method === 'modifyColumn') {
+						$this->db->{$method}(
+							$table,
+							$schemaName,
+							$column,
+							$currentColumn
+						);
+					}
+				}
+			} else if (is_string($columns) && $method === 'dropColumn') {
 				$this->db->{$method}(
 					$table,
 					$schemaName,
-					$column
+					$columns
 				);
 			}
 

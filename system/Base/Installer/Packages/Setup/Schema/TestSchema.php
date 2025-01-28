@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class TestSchema
 {
@@ -22,6 +23,14 @@ class TestSchema
                     ),
                     new Column(
                         'key',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 100,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
+                        'key2',
                         [
                             'type'    => Column::TYPE_VARCHAR,
                             'size'    => 4096,
@@ -49,6 +58,15 @@ class TestSchema
                             'type'    => Column::TYPE_BOOLEAN,
                             'notNull' => false,
                         ]
+                    )
+                ],
+                'indexes' => [
+                    new Index(
+                        'column_UNIQUE',
+                        [
+                            'key'
+                        ],
+                        'UNIQUE'
                     )
                 ]
             ];
