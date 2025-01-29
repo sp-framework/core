@@ -29,6 +29,10 @@ class Store
     protected $indexesPath = '';
     protected $indexing = false;
     protected $minIndexChars = 3;
+    protected $multiWords = true;
+    protected $multiWordsSeparator = ' ';
+    protected $minMultiWordsChars = 5;
+
     protected $indexes = [];
     protected $model = null;
 
@@ -137,7 +141,7 @@ class Store
                                     $rmd['storeRelations'][$column] = $relationsStore->getSchemaMetaData();
                                     $rmd['storeRelations'][$column]['relationStore'] = $relation[2];
                                 } catch (\Exception $e) {
-                                    //
+                                    throw $e;
                                 }
                             }
                         }
@@ -1206,6 +1210,27 @@ class Store
             $this->minIndexChars = $configuration["minIndexChars"];
         }
 
+        if (array_key_exists("multiWords", $configuration)) {
+            if (!is_bool($configuration["multiWords"])) {
+                throw new InvalidConfigurationException("multiWords has to be a boolean");
+            }
+
+            $this->multiWords = $configuration["multiWords"];
+        }
+
+        if (array_key_exists("multiWordsSeparator", $configuration)) {
+            $this->multiWordsSeparator = $configuration["multiWordsSeparator"];
+        }
+
+        if (array_key_exists("minMultiWordsChars", $configuration)) {
+            if (!is_int($configuration["minMultiWordsChars"])) {
+                throw new InvalidConfigurationException("minMultiWordsChars has to be an integer");
+            }
+
+            $this->minMultiWordsChars = $configuration["minMultiWordsChars"];
+        }
+
+
         if (array_key_exists("indexes", $configuration)) {
             if (!is_array($configuration["indexes"])) {
                 throw new InvalidConfigurationException("indexes has to be an array");
@@ -1319,6 +1344,9 @@ class Store
             "folder_permissions"    => $this->folderPermissions,
             "indexing"              => $this->indexing,
             "min_index_chars"       => $this->minIndexChars,
+            "multi_words"           => $this->multiWords,
+            "multi_words_separator" => $this->multiWordsSeparator,
+            "min_multi_words_chars" => $this->minMultiWordsChars,
             "uniqueFields"          => $this->uniqueFields,
             "indexes"               => $this->indexes,
             "storePath"             => $this->storePath,
