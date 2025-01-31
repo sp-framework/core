@@ -183,7 +183,7 @@ class Core extends BasePackage
 		$fileInfo = $this->basepackages->storages->getFileInfo($data['id']);
 
 		if ($fileInfo) {
-			if ($this->zip->open(base_path($fileInfo['uuid_location'] . $fileInfo['org_file_name']))) {
+			if ($this->zip->open(base_path($fileInfo['uuid_location'] . $fileInfo['org_file_name'])) === true) {
 				$backupInfo = $this->zip->getFromName('backupInfo.json');
 
 				if (!$backupInfo) {
@@ -523,6 +523,7 @@ class Core extends BasePackage
 						try {
 							$storeToMaintain->reIndexStore();
 						} catch (\Exception $e) {
+							trace([$e]);
 							$this->addResponse($e->getMessage(), 1);
 
 							return false;
@@ -660,7 +661,7 @@ class Core extends BasePackage
 		$fileInfo = $this->basepackages->storages->getFileInfo($data['id']);
 
 		if ($fileInfo) {
-			if ($this->zip->open(base_path($fileInfo['uuid_location'] . $fileInfo['org_file_name']))) {
+			if ($this->zip->open(base_path($fileInfo['uuid_location'] . $fileInfo['org_file_name'])) === true) {
 				$backupInfo = $this->zip->getFromName('backupInfo.json');
 
 				if (!$backupInfo) {
@@ -885,7 +886,7 @@ class Core extends BasePackage
 			return false;
 		}
 
-		$this->zip::close();
+		$this->zip->close();
 
 		return true;
 	}
@@ -909,7 +910,7 @@ class Core extends BasePackage
 					$this->zip->deleteIndex($this->zip->numFiles - 1);
 				}
 
-				$this->zip::close();
+				$this->zip->close();
 
 				$this->addResponse('Could not set provided password for file ' . $name, 1, []);
 

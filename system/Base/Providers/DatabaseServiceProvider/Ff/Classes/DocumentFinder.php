@@ -59,6 +59,8 @@ class DocumentFinder
         unset($queryBuilderProperties);
 
         if ($this->storeConfiguration['indexing']) {
+            // This has to be rewritten to include multiple keywords using spaces
+            // Example: If we want to search for wes aus, it should search for all entries with Wes keyword and that also includes Aus keyword.
             if (count($conditions) > 0) {
                 foreach ($conditions as $condition) {
                     if (isset($condition[0]) &&

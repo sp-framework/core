@@ -145,9 +145,6 @@ class Profiles
                         ]
                     )
                 ],
-                'options' => [
-                    'TABLE_COLLATION'       => 'utf8mb4_general_ci'
-                ],
                 'indexes' => [
                     new Index(
                         'column_UNIQUE',

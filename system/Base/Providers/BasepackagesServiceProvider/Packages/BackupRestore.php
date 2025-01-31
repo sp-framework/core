@@ -42,11 +42,13 @@ class BackupRestore extends BasePackage
             $this->localContent->createDirectory('var/tmp/backups/');
         }
 
-        $this->basepackages->progress->deleteProgressFile();
-
         if ($process === 'backup') {
+            $this->basepackages->progress->deleteProgressFile();
+
             $this->registerBackupProgressMethods();
         } else if ($process === 'restore') {
+            $this->basepackages->progress->deleteProgressFile();
+
             $this->registerRestoreProgressMethods();
         }
 
@@ -73,7 +75,8 @@ class BackupRestore extends BasePackage
     public function backup(array $data)
     {
         set_time_limit(300);//5 mins
-        $tokenkey = array_search($this->security->getRequestToken(), $data);
+
+        $tokenkey = array_search($this->security->getRequestToken(), $data, true);
         if ($tokenkey) {
             unset($data[$tokenkey]);
         }
@@ -102,7 +105,6 @@ class BackupRestore extends BasePackage
         $this->backupInfo['dbs'] = [];
         $this->backupInfo['dirs'] = [];
         $this->backupInfo['files'] = [];
-        $this->backupInfo['notes'] = $data['notes'];
 
         if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true' ||
             isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true'
@@ -125,17 +127,25 @@ class BackupRestore extends BasePackage
             }
         }
 
+        $noFilesOptions = true;
+        foreach ($data as $key => $value) {
+            if (str_contains($key, '_dir') && $value == 'true') {
+                $noFilesOptions = false;
+            }
+        }
+        if ($noFilesOptions) {
+            $this->basepackages->progress->unregisterMethods(['generateStructure']);
+        }
+
+        if (!isset($this->backupInfo['request']['database']) ||
+            (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] != 'true')
+        ) {
+            $this->basepackages->progress->unregisterMethods(['performDbBackup']);
+        }
+
         $this->basepackages->progress->preCheckComplete();
 
         foreach ($this->backupProgressMethods as $method) {
-            if ($method['method'] === 'performDbBackup') {
-                if (!isset($this->backupInfo['request']['database']) ||
-                    (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] != 'true')
-                ) {
-                    continue;
-                }
-            }
-
             if ($this->withProgress($method['method'], $data) === false) {
                  return false;
             }
@@ -150,6 +160,11 @@ class BackupRestore extends BasePackage
     {
         $this->zip->open(base_path($this->backupLocation . $this->backupInfo['backupName']), $this->zip::CREATE);
 
+        if (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true') {
+            if ($this->core->core['settings']['databasetype'] != 'db') {
+                $this->getContent($this->basepackages->utils->scanDir('.ff/'));
+            }
+        }
         if (isset($this->backupInfo['request']['apps_dir']) && $this->backupInfo['request']['apps_dir'] == 'true') {
             $this->getContent($this->basepackages->utils->scanDir('apps/'));
         }
@@ -173,8 +188,10 @@ class BackupRestore extends BasePackage
             }
         }
 
-        if (isset($this->backupInfo['request']['old_backups']) && $this->backupInfo['request']['old_backups'] == 'true') {
+        if (isset($this->backupInfo['request']['old_backups_dir']) && $this->backupInfo['request']['old_backups_dir'] == 'true') {
             $this->getContent($this->basepackages->utils->scanDir('.backups/'));
+            $this->getContent($this->basepackages->utils->scanDir('.backupsdb/'));
+            $this->getContent($this->basepackages->utils->scanDir('.backupsff/'));
         }
 
         return true;
@@ -584,7 +601,7 @@ class BackupRestore extends BasePackage
         $fileInfo = $this->basepackages->storages->getFileInfo($id);
 
         if ($fileInfo) {
-            if ($this->zip->open(base_path($fileInfo['uuid_location'] . $fileInfo['org_file_name']))) {
+            if ($this->zip->open(base_path($fileInfo['uuid_location'] . $fileInfo['org_file_name'])) === true) {
                 $backupInfo = $this->zip->getFromName('backupInfo.json');
 
                 if (!$backupInfo) {
@@ -638,7 +655,7 @@ class BackupRestore extends BasePackage
 
         foreach ($localContent['dirs'] as $key => $dir) {
             $key = $dirsKeyCount + $key;
-            if (isset($this->backupInfo['request']['html_compiled']) && $this->backupInfo['request']['html_compiled'] == 'true') {
+            if (isset($this->backupInfo['request']['html_compiled_dir']) && $this->backupInfo['request']['html_compiled_dir'] == 'true') {
                 $this->backupInfo['dirs'] = array_merge($this->backupInfo['dirs'], ['fo' . $key => $dir]);
             } else {
                 if (strpos($dir, 'Html_compiled') === false) {
@@ -649,7 +666,7 @@ class BackupRestore extends BasePackage
 
         foreach ($localContent['files'] as $key => $file) {
             $key = $filesKeyCount + $key;
-            if (isset($this->backupInfo['request']['html_compiled']) && $this->backupInfo['request']['html_compiled'] == 'true') {
+            if (isset($this->backupInfo['request']['html_compiled_dir']) && $this->backupInfo['request']['html_compiled_dir'] == 'true') {
                 $this->backupInfo['files'] = array_merge($this->backupInfo['files'], ['fi' . $key => $file]);
             } else {
                 if (strpos($file, 'Html_compiled') === false) {

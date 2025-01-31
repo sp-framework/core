@@ -655,12 +655,11 @@ class Accounts extends BasePackage
             }
         }
 
+        if (isset($data['id'])) {
+            unset($data['id']);
+        }
 
         if ($accountSecurity) {
-            if (isset($data['id'])) {
-                unset($data['id']);
-            }
-
             $accountSecurity = array_replace($accountSecurity, $data);
 
             if ($this->config->databasetype === 'db') {
@@ -782,11 +781,7 @@ class Accounts extends BasePackage
                 }
             }
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->accounts = $accounts;
-
-            return true;
+            return $accounts;
         }
 
         return false;

@@ -210,7 +210,8 @@ class TwoFa extends BasePackage
         }
 
         if ($this->core->core['settings']['security']['twofaSettings']['twofaOtp'] === 'totp') {
-            $this->otp = TOTP::create($secret);
+            $clock = new \Carbon\FactoryImmutable;
+            $this->otp = TOTP::createFromSecret($secret, $clock);
         } else if ($this->core->core['settings']['security']['twofaSettings']['twofaOtp'] === 'hotp') {
             $this->otp = HOTP::create($secret);
         }

@@ -148,6 +148,7 @@ var BazContentLoader = function() {
     }
 
     function loadAjax(element, options, popped) {
+        BazHelpers.setTimeoutTimers.stopAll();//Stop all timers from previous component.
         var urlToLoad, elementId;
         var dataCollection = window.dataCollection;
         // Delete old Content Objects

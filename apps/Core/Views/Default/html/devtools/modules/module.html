@@ -1295,9 +1295,14 @@ dataCollectionSection =
             onSubmitResponse: function(response) {
                 if (response.responseData && response.responseData.newRepo && $('#repo-details').length > 0) {
                     $('#path').html(BazHelpers.capitalizeFirstLetter($('#{{componentId}}-{{sectionId}}-app_type').val()));
+                    var devLink = '/src/branch/dev';
+
+                    if (response.responseData.newRepo.html_url.includes('github')) {
+                        devLink = '/tree/dev';
+                    }
                     $('#repo_url').html(response.responseData.newRepo.clone_url);
                     $('#repo_url_dev').html(response.responseData.newRepo.html_url);
-                    $('#repo_url_dev_a').attr('href', response.responseData.newRepo.html_url + '/src/branch/dev');
+                    $('#repo_url_dev_a').attr('href', response.responseData.newRepo.html_url + devLink);
 
                     $('#repo-details').attr('hidden', false);
                     $('#module-details').attr('hidden', true);
@@ -3071,14 +3076,14 @@ dataCollectionSection =
                     var found = false;
                     if (label === 'core') {
                         dataCollectionSectionForm['vars']['moduleDependencies'][label] = { };
-                        dataCollectionSectionForm['vars']['moduleDependencies'][label]['name'] = moduleData['name'];
-                        dataCollectionSectionForm['vars']['moduleDependencies'][label]['version'] = moduleData['version'];
-                        dataCollectionSectionForm['vars']['moduleDependencies'][label]['repo'] = moduleData['repo'];
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label]['name'] = $('#{{componentId}}-{{sectionId}}-dependencies-modulename').val();
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label]['version'] = $('#{{componentId}}-{{sectionId}}-dependencies-moduleversion').val();
+                        dataCollectionSectionForm['vars']['moduleDependencies'][label]['repo'] = $('#{{componentId}}-{{sectionId}}-dependencies-modulerepo').val();
                     } else if (label === 'apptypes') {
                         dataCollectionSectionForm['vars']['moduleDependencies']['apptype'] = { };
-                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['name'] = moduleData['name'];
-                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['version'] = moduleData['version'];
-                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['repo'] = moduleData['repo'];
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['name'] = $('#{{componentId}}-{{sectionId}}-dependencies-modulename').val();
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['version'] = $('#{{componentId}}-{{sectionId}}-dependencies-moduleversion').val();
+                        dataCollectionSectionForm['vars']['moduleDependencies']['apptype']['repo'] = $('#{{componentId}}-{{sectionId}}-dependencies-modulerepo').val();
                     } else if (label === 'external') {
                         if (dataCollectionSectionForm['vars']['module_type'] === 'core') {
                             if (!dataCollectionSectionForm['vars']['moduleDependencies']['composer']) {

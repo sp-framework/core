@@ -57,7 +57,7 @@
     </div>
     <div class="col">
         <label class="text-sm">COMPILED HTML DIRECTORY: </label>
-        {% if backupInfoFile['request']['html_compiled'] == 'true' %}
+        {% if backupInfoFile['request']['html_compiled_dir'] == 'true' %}
             <span class="text-sm">Yes</span>
         {% else %}
             <span class="text-sm">No</span>
@@ -83,7 +83,7 @@
     </div>
     <div class="col">
         <label class="text-sm">OLD BACKUP FILES: </label>
-        {% if backupInfoFile['request']['old_backups'] == 'true' %}
+        {% if backupInfoFile['request']['old_backups_dir'] == 'true' %}
             <span class="text-sm">Yes</span>
         {% else %}
             <span class="text-sm">No</span>

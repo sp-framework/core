@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
+use Phalcon\Filter\Validation\Validator\Email;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Model\ServiceProviderModulesQueues;
 use z4kn4fein\SemVer\Version;
@@ -15,8 +16,6 @@ class Queues extends BasePackage
     protected $queueTasks;
 
     protected $results;
-
-    // protected $coreExternalDependencies;
 
     public function init(bool $resetCache = false)
     {
@@ -52,7 +51,33 @@ class Queues extends BasePackage
                     'remove'    => []
                 ]
             ),
-            'total'     => 0
+            'total'     => 0,
+            'settings'  => $this->helper->encode(
+                [
+                    'backupSettings'    =>
+                        [
+                            'backup'                    => true,
+                            'apps_dir'                  => true,
+                            'systems_dir'               => true,
+                            'public_dir'                => true,
+                            'private_dir'               => true,
+                            'external_dir'              => true,
+                            'html_compiled_dir'         => false,
+                            'var_dir'                   => false,
+                            'external_vendor_dir'       => false,
+                            'old_backups_dir'           => false,
+                            'database'                  => true,
+                            'keys'                      => true,
+                            'password_protect'          => $this->basepackages->utils->generateNewPassword()['password'],
+                            'notes'                     => '',
+                        ],
+                    'rsync'                             =>
+                        [
+                            'deleteDestinationFiles'    => false
+                        ],
+                    'emailReport'                       => $this->access->auth->account()['email']
+                ]
+            )
         ];
 
         if ($this->add($queue)) {
@@ -181,6 +206,120 @@ class Queues extends BasePackage
         return false;
     }
 
+    public function saveQueueSettings($data)
+    {
+        $queue = $this->getById((int) $data['id']);
+
+        if (!$queue) {
+            $this->addResponse('Queue with ID not found', 1);
+
+            return false;
+        }
+
+        $noOptions = true;
+        array_walk($data['settings']['backupSettings'], function(&$setting, $index) use (&$noOptions) {
+            if ($index === 'notes' ||
+                $index === 'password_protect'
+            ) {
+                return;
+            }
+
+            if ($setting !== '') {
+                if ($setting == 'true') {
+                    $setting = true;
+                    $noOptions = false;
+                } else {
+                    $setting = false;
+                }
+            } else {
+                $setting = false;
+            }
+        });
+
+        if ($data['settings']['backupSettings']['keys'] === true &&
+            $data['settings']['backupSettings']['password_protect'] === ''
+        ) {
+            $this->addResponse('Password is required if keys are being backed up!', 1);
+
+            return false;
+        }
+
+        if ($noOptions) {//No option selected disables backup.
+            $data['settings']['backupSettings']['backup'] = false;
+            $data['settings']['backupSettings']['password_protect'] = '';
+            $data['settings']['backupSettings']['notes'] = '';
+        } else {
+            $data['settings']['backupSettings']['backup'] = true;
+        }
+
+        if ($data['settings']['emailReport'] !== '') {
+            $emails = explode(',', $data['settings']['emailReport']);
+
+            if (count($emails) > 1) {
+                array_walk($emails, function(&$email, $index) use (&$emails) {
+                    $email = trim($email);
+
+                    if ($email === '') {
+                        unset($emails[$index]);
+                    }
+                });
+            } else {
+                $emails[0] = trim($emails[0]);
+            }
+
+            foreach ($emails as $email) {
+                $validation = $this->validateData(['email' => $email]);
+
+                if ($validation !== true) {
+                    $this->addResponse($validation, 1);
+
+                    return false;
+                }
+            }
+        }
+
+        array_walk($data['settings']['rsync'], function(&$setting, $index) {
+            if ($setting !== '') {
+                if ($setting == 'true') {
+                    $setting = true;
+                } else {
+                    $setting = false;
+                }
+            } else {
+                $setting = false;
+            }
+        });
+
+        $queue['settings'] = array_replace($queue['settings'], $data['settings']);
+
+        if ($this->update($queue)) {
+            $this->addResponse('Queue settings updated');
+
+            return true;
+        }
+
+        $this->addResponse('Error updating queue settings', 1);
+    }
+
+    protected function validateData(array $data)
+    {
+        $this->validation->init();
+        $this->validation->add('email', Email::class, ["message" => "Enter valid email."]);
+
+        $validated = $this->validation->validate($data)->jsonSerialize();
+
+        if (count($validated) > 0) {
+            $messages = 'Error: ';
+
+            foreach ($validated as $key => $value) {
+                $messages .= $value['message'] . ' ';
+            }
+            return $messages . ' (' . $data['email'] . ')';
+        } else {
+            return true;
+        }
+    }
+
     protected function getTasksCount(&$queue, $analyse = false)
     {
         $queue['total'] = 0;
@@ -229,6 +368,10 @@ class Queues extends BasePackage
 
         if (isset($queue['tasks']['analysed']) && !$reAnalyse) {
             return true;
+        }
+
+        if ($reAnalyse) {
+            $this->modules->installer->cleanup(['composer', 'downloads']);
         }
 
         $this->queueTasks = [];
@@ -394,7 +537,7 @@ class Queues extends BasePackage
                             $taskName = 'first';
                         }
 
-                        $module['name'] = $module['display_name'] ?? $module['name'];
+                        // $module['name'] = $module['display_name'] ?? $module['name'];
                         $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
 
                         if ($moduleType === 'views' &&
@@ -402,7 +545,8 @@ class Queues extends BasePackage
                             $module['is_subview'] == 0
                         ) {
                             $module['id'] = $module['id'] . '-public';
-                            $module['name'] = ($module['display_name'] ?? $module['name']) . ' (Public)';
+                            $module['display_name'] = $module['display_name'] . ' (Public)';
+                            // $module['name'] = ($module['display_name'] ?? $module['name']) . ' (Public)';
                             $module['repo'] = $module['repo'] . '-public';
 
                             $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
@@ -480,7 +624,7 @@ class Queues extends BasePackage
                     if ($installedModule['installed'] != '1') {
                         $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
                     } else {
-                        $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']);
+                        // $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']);
 
                         if ($task !== 'first') {
                             $task = 'update';
@@ -493,7 +637,8 @@ class Queues extends BasePackage
                         $installedModule['is_subview'] == 0
                     ) {
                         $installedModule['id'] = $installedModule['id'] . '-public';
-                        $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']) . ' (Public)';
+                        $installedModule['display_name'] = $installedModule['display_name'] . ' (Public)';
+                        // $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']) . ' (Public)';
                         $installedModule['repo'] = $installedModule['repo'] . '-public';
 
                         if ($installedModule['installed'] != '1') {
@@ -525,7 +670,8 @@ class Queues extends BasePackage
                     $installedModule['is_subview'] == 0
                 ) {
                     $installedModule['id'] = $installedModule['id'] . '-public';
-                    $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']) . ' (Public)';
+                    $installedModule['display_name'] = $installedModule['display_name'] . ' (Public)';
+                    // $installedModule['name'] = ($installedModule['display_name'] ?? $installedModule['name']) . ' (Public)';
                     $installedModule['repo'] = $installedModule['repo'] . '-public';
 
                     $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
@@ -577,8 +723,12 @@ class Queues extends BasePackage
                 }
 
                 if (isset($composerPackages['extra']['patches'][$composerPackage])) {
-                    $composerJsonFile['extra']['patches'][$composerPackage][$this->helper->firstKey($composerPackages['extra']['patches'][$composerPackage])] = base_path($this->helper->first($composerPackages['extra']['patches'][$composerPackage]));
-                    $hasPatch = true;
+                    foreach ($composerPackages['extra']['patches'][$composerPackage] as $patchKey => $patchValue) {
+                        if (!isset($composerJsonFile['extra']['patches'][$composerPackage][$patchKey])) {
+                            $composerJsonFile['extra']['patches'][$composerPackage][$patchKey] = $patchValue;
+                            $hasPatch = true;
+                        }
+                    }
                 }
 
                 if ($installExternal || $hasConfigChange || $hasPatch) {
@@ -621,7 +771,9 @@ class Queues extends BasePackage
             $this->queueTasks[$taskName][$moduleType][$module['id']] = [];
             $this->queueTasks[$taskName][$moduleType][$module['id']]['id'] = $moduleId;
             $this->queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['name'];
+            $this->queueTasks[$taskName][$moduleType][$module['id']]['display_name'] = $module['display_name'] ?? $module['name'];
             $this->queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $moduleType;
+            $this->queueTasks[$taskName][$moduleType][$module['id']]['app_type'] = $module['app_type'];
             if (!$version) {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['version'] =
                     (($taskName === 'update' || $taskName === 'first') && $module['update_version'] && $module['update_version'] !== '') ? $module['version'] . ' -> ' . $module['update_version'] : $module['version'];

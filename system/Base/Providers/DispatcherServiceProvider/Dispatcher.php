@@ -72,7 +72,9 @@ class Dispatcher
                 $dispatcher,
                 \Exception $exception
             ) use ($errorComponent, $namespace) {
-                $dispatcher->getDi()->getShared('logger')->logExceptions->critical(json_trace($exception));
+                if ($dispatcher->getDi()->getShared('logger')->logExceptions) {
+                    $dispatcher->getDi()->getShared('logger')->logExceptions->critical(json_trace($exception));
+                }
 
                 if (!str_contains($exception->getMessage(), 'handler class cannot be loaded')) {//Handle any other exceptions, like variable not found, etc
                     $class = (new \ReflectionClass($exception))->getShortName();
@@ -80,6 +82,8 @@ class Dispatcher
                     if ($class === 'InvalidDataException') {
                         $action = 'invalidData';
                         $params = [$exception->getMessage()];
+                    } else if ($class === 'PermissionDeniedException') {
+                        $action = 'permissionDenied';
                     } else {
                         $action = 'serverError';
                     }

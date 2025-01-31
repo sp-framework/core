@@ -4,10 +4,12 @@
 {% set saveHidden = true %}
 {% set addDisabled = true %}
 {% set addHidden = true %}
+{% set isOwner = false %}
 {% if access.auth.account() %}
     {% if dashboard['created_by'] == access.auth.account()['id'] %}
         {% set addDisabled = false %}
         {% set addHidden = false %}
+        {% set isOwner = true %}
     {% endif %}
 {% endif %}
 <div class="row">

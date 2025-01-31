@@ -14,6 +14,12 @@ class IndexHandler
 
     protected $minIndexChars = 3;
 
+    protected $multiWords = true;
+
+    protected $multiWordsSeparator = ' ';
+
+    protected $minMultiWordsChars = 5;
+
     protected $folderPermissions = 0777;
 
     public function __construct(array $storeConfiguration)
@@ -39,6 +45,15 @@ class IndexHandler
         if (isset($this->storeConfiguration['min_index_chars'])) {
             $this->minIndexChars = $this->storeConfiguration['min_index_chars'];
         }
+        if (isset($this->storeConfiguration['multi_words'])) {
+            $this->multiWords = $this->storeConfiguration['multi_words'];
+        }
+        if (isset($this->storeConfiguration['multi_words_separator'])) {
+            $this->multiWordsSeparator = $this->storeConfiguration['multi_words_separator'];
+        }
+        if (isset($this->storeConfiguration['min_multi_words_chars'])) {
+            $this->minMultiWordsChars = $this->storeConfiguration['min_multi_words_chars'];
+        }
     }
 
     public function setIndex(string $content)
@@ -52,31 +67,61 @@ class IndexHandler
         foreach ($this->indexes as $index) {
             if (isset($content[$index])) {
                 IoHelper::createFolder($this->indexesPath . $index . '/', $this->folderPermissions);
-                if (is_string($content[$index])) {
-                    $indexChars = strtolower(substr($content[$index], 0, $this->minIndexChars));
-                } else {
-                    $indexChars = $content[$index];
-                }
 
-                try {
-                    $indexFile = $this->getIndex($index, $indexChars);
+                if ($this->multiWords === true) {
+                    if (is_string($content[$index])) {
+                        $contentArr = explode($this->multiWordsSeparator, $content[$index]);
 
-                    $indexJson = json_decode($indexFile, true);
-                } catch (\Exception $e) {
-                    $indexJson = [];
-                }
+                        if (count($contentArr) > 1) {
+                            foreach ($contentArr as $content) {
+                                if (strlen($content) < $this->minMultiWordsChars) {
+                                    continue;
+                                }
 
-                if (isset($indexJson[$content[$index]])) {
-                    if (!in_array($indexPointer, $indexJson[$content[$index]])) {
-                        array_push($indexJson[$content[$index]], $indexPointer);
+                                $indexChars = strtolower(mb_substr($content, 0, $this->minIndexChars, 'UTF-8'));
+
+                                $this->writeIndex($indexPointer, $index, $indexChars, $content);
+                            }
+                        } else {
+                            $indexChars = strtolower(mb_substr($content[$index], 0, $this->minIndexChars, 'UTF-8'));
+
+                            $this->writeIndex($indexPointer, $index, $indexChars, $content[$index]);
+                        }
+                    } else {
+                        $this->writeIndex($indexPointer, $index, $content[$index], $content[$index]);
                     }
                 } else {
-                    $indexJson[$content[$index]] = [$indexPointer];
-                }
+                    if (is_string($content[$index])) {
+                        $indexChars = strtolower(mb_substr($content[$index], 0, $this->minIndexChars, 'UTF-8'));
 
-                IoHelper::writeContentToFile($this->indexesPath . $index . '/' . $indexChars . '.json', json_encode($indexJson));
+                        $this->writeIndex($indexPointer, $index, $indexChars, $content[$index]);
+                    } else {
+                        $this->writeIndex($indexPointer, $index, $content[$index], $content[$index]);
+                    }
+                }
             }
         }
+    }
+
+    protected function writeIndex($indexPointer, $index, $indexChars, $content)
+    {
+        try {
+            $indexFile = $this->getIndex($index, $indexChars);
+
+            $indexJson = json_decode($indexFile, true);
+        } catch (\Exception $e) {
+            $indexJson = [];
+        }
+
+        if (isset($indexJson[$content])) {
+            if (!in_array($indexPointer, $indexJson[$content])) {
+                array_push($indexJson[$content], $indexPointer);
+            }
+        } else {
+            $indexJson[$content] = [$indexPointer];
+        }
+
+        IoHelper::writeContentToFile($this->indexesPath . $index . '/' . $indexChars . '.json', json_encode($indexJson));
     }
 
     public function getIndex($index, $indexChars)
@@ -91,7 +136,9 @@ class IndexHandler
 
     public function reIndex($dataPath = null)
     {
-        IoHelper::deleteFolder($this->indexesPath);
+        if (IoHelper::checkFolder($this->indexesPath)) {
+            IoHelper::deleteFolder($this->indexesPath);
+        }
 
         if (!$dataPath) {
             $dataPath = $this->storeConfiguration['storePath'] . 'data/';

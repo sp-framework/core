@@ -84,6 +84,13 @@ class Queues
                             'type'    => Column::TYPE_SMALLINTEGER,
                             'notNull' => false,
                         ]
+                    ),
+                    new Column(
+                        'settings',
+                        [
+                            'type'    => Column::TYPE_JSON,
+                            'notNull' => false,
+                        ]
                     )
                 ]
             ];

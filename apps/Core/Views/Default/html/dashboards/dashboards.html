@@ -20,7 +20,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col">
+    <div class="col" id="grid-main">
         <div class="grid-stack"></div>
     </div>
 </div>
@@ -60,24 +60,8 @@
         ]
     )}}
 </div>
-<div>
-    {{adminltetags.useTag('modal',
-        [
-            'component'                 : component,
-            'componentName'             : componentName,
-            'componentId'               : componentId,
-            'sectionId'                 : sectionId,
-            'modalId'                   : 'share-modal',
-            'modalBodyInclude'          : 'dashboards/dashboards/share',
-            'modalSize'                 : 'lg',
-            'modalHeader'               : true,
-            'modalFooter'               : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-share"></i> SHARE DASHBOARD'
-        ]
-    )}}
-</div>
 <script>
-/* globals paginatedPNotify GridStack Swal */
+/* globals paginatedPNotify GridStack Swal BazContentFields Pace BazCore BazContentLoader */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -100,30 +84,42 @@ dataCollectionSection =
         afterInit: function() {
             var swalSound = window['dataCollection'].env.sounds.swalSound;
             var grid;
+            var isOwner = "{{isOwner}}";
 
             function initGrid(removeDom = true) {
                 if (dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid']) {
                     dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid'].destroy(removeDom);
                 }
 
+                $('#grid-main').html('<div class="grid-stack"></div>');
+                grid = null;
                 grid = dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid'] = GridStack.init({
-                    'draggable'     : {
-                        'handle'    : '[data-card-widget="move"]'
+                    'draggable'     :
+                    {
+                        'handle'    : '.btn-tool-move .fa-up-down-left-right'
                     },
                     'margin'        : '5px',
-                    'animate'       : false
+                    'animate'       : false,
+                    'sizeToContent' : true
+                });
+
+                grid.on('added', function(e, items) {
+                    items.forEach(function(item) {
+                        populateGridData(item);
+                    });
+                    initWidgetCardButtons();
+                });
+
+                grid.on('resizestart', function(e, el) {
+                    $(el).find('.card-header').attr('hidden', true);
+                });
+
+                grid.on('resizestop', function(e, el) {
+                    $(el).find('.card-header').attr('hidden', false);
                 });
             }
-
             initGrid();
 
-            grid.on('added', function(e, items) {
-                //eslint-disable-next-line
-                console.log(items);
-                items.forEach(function(item) {
-                    populateGridData(item);
-                });
-            });
 
             function fixHeight(item) {
                 var itemHeight = $(item.el).find('.card')[0].offsetHeight + 20;//20 for padding
@@ -136,14 +132,7 @@ dataCollectionSection =
                 data.items.forEach(function(item) {
                     populateGridData(item);
                 });
-            });
-
-            grid.on('resizestart', function(e, el) {
-                $(el).find('.card-header').attr('hidden', true);
-            });
-
-            grid.on('resizestop', function(e, el) {
-                $(el).find('.card-header').attr('hidden', false);
+                initWidgetCardButtons();
             });
 
             function populateGridStructure() {
@@ -151,7 +140,7 @@ dataCollectionSection =
                 postData[$('#security-token').attr('name')] = $('#security-token').val();
                 postData['dashboard_id'] = $('#{{componentId}}-{{sectionId}}-dashboards').select2().val();
 
-                $.post('{{links.url("dashboards/getWidgetContent")}}', postData, function(response) {
+                $.post('{{links.url("dashboards/getDashboardWidgets")}}', postData, function(response) {
                     if (response.tokenKey && response.token) {
                         $("#security-token").attr("name", response.tokenKey);
                         $("#security-token").val(response.token);
@@ -163,10 +152,16 @@ dataCollectionSection =
                                 addWidgetToGrid(response.responseData.widgetsData[widget]);
                             }
 
-                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
+                            if (isOwner && grid.save().length > 0) {
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
+                            }
                             grid.enableMove(false);
                             grid.enableResize(false);
+                            $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', true);
                         } else {
                             $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
                             paginatedPNotify('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
@@ -174,12 +169,15 @@ dataCollectionSection =
                     } else if (response.responseCode === 1) {
                         paginatedPNotify('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
                     } else if (response.responseCode === 2) {
-                        paginatedPNotify('error', {'text' : response.responseMessage});
+                        if (response.responseMessage.includes('CSRF')) {
+                            paginatedPNotify('error', {'text' : response.responseMessage});
+                        } else {
+                            paginatedPNotify('info', {'text' : response.responseMessage});
+                        }
                         $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', false);
+                        $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
                     }
                     $('#{{componentId}}-{{sectionId}}-dashboard-loader').attr('hidden', true);
-
-                    initRemoveButtons();
                 }, 'json');
             }
             populateGridStructure();
@@ -196,16 +194,17 @@ dataCollectionSection =
 
                 var url = '{{links.url("dashboards/q/widgets/content/id/' + item.id + '/did/' + item.dashboard_id + '/wid/' + item.widget_id + '")}}';
                 $(item.el).find('.card-body').load(url, null, function (response, status, xhr) {
-                    if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
-                        $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
-                        $('#security-token').val(xhr.getResponseHeader('token'));
-                    }
                     fixHeight(item);
+                    addToken(xhr);
                 });
             }
 
+            function addToken(xhr) {
+                $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
+                $('#security-token').val(xhr.getResponseHeader('token'));
+            }
 
-            function initRemoveButtons() {
+            function initWidgetCardButtons() {
                 $('.btn-tool-widgetRemove').off();
                 $('.btn-tool-widgetRemove').click(function() {
                     Swal.fire({
@@ -262,7 +261,10 @@ dataCollectionSection =
                                         $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
                                         $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
                                     }
+
+                                    return;
                                 }
+                                paginatedPNotify('error', {'text' : response.responseMessage});
                             }, 'json');
                         }
                     });
@@ -271,6 +273,12 @@ dataCollectionSection =
                 $('.btn-tool-settings').off();
                 $('.btn-tool-settings').click(function() {
                     $(this).parents('.card').first().find('.widgets-setting-modal').modal('show');
+
+                    BazContentFields.init({
+                        'componentId'   : "{{componentId}}",
+                        'sectionId'     : "{{componentId}}-{{sectionId}}",
+                        'fieldId'       : "{{componentId}}-{{sectionId}}-worldclock-" + $(this).parents('.grid-stack-item').attr('gs-id') + "-clocks"
+                    });
                 });
             }
 
@@ -281,7 +289,7 @@ dataCollectionSection =
                 newWidget['w'] = 3;//25% of the screen
                 newWidget['minW'] = 3;//25% of the screen
                 newWidget['method'] = widgetsData['widget']['method'];
-                newWidget['widget_id'] = widgetsData['widget']['id'];
+                newWidget['widget_id'] = widgetsData['widget_id'];
                 newWidget['dashboard_id'] = widgetsData['dashboard_id'];
 
                 if (widgetsData['settings']['w']) {
@@ -305,7 +313,6 @@ dataCollectionSection =
 
                 grid.addWidget(newWidget);
                 dataCollectionComponent['{{componentId}}-{{sectionId}}'][widgetsData['widget']['method']] = { };
-                initRemoveButtons();
 
                 //Disable so that we dont add duplicates unless multiple is set to 1.
                 if (widgetsData['widget']['multiple'] && widgetsData['widget']['multiple'] == '0') {
@@ -373,8 +380,13 @@ dataCollectionSection =
 
                             addWidgetToGrid(response.responseData);
                             $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', true);
-                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
-                            $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
+                            if (isOwner && grid.save().length > 0) {
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', false);
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', false);
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('disabled', true);
+                                $('#{{componentId}}-{{sectionId}}-edit-widgets').attr('hidden', true);
+                            }
 
                             $('#{{componentId}}-{{sectionId}}-modal-button-add').attr('disabled', true);
                             grid.enableMove(false);
@@ -469,6 +481,86 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-widget-info').empty();
                 $('#{{componentId}}-{{sectionId}}-widget-no-widgets').attr('hidden', false);
             });
+
+            function initDashboardButtons() {
+                var href = $('#{{componentId}}-{{sectionId}}-edit').attr('href');
+                $('#{{componentId}}-{{sectionId}}-edit').attr(
+                    'href',
+                    href +
+                    $('#{{componentId}}-{{sectionId}}-dashboards').select2().val()
+                );
+
+                $('#{{componentId}}-{{sectionId}}-dashboards').on('select2:select', function(e) {
+                    $('#{{componentId}}-{{sectionId}}-edit').attr(
+                        'href',
+                        href +
+                        e.params.data.id
+                    );
+                    $('#{{componentId}}-{{sectionId}}-dashboard-loader').attr('hidden', false);
+                    initGrid();
+                    populateGridStructure();
+                });
+
+                $('#{{componentId}}-{{sectionId}}-remove').click(function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title                       : '<span class="text-danger"> Remove dashboard?</span>',
+                        icon                        : 'question',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Remove',
+                        customClass                 : {
+                            'confirmButton'             : 'btn btn-danger text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        didOpen                     : function() {
+                            swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                            var postData = { };
+                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+                            postData['id'] = $('#{{componentId}}-{{sectionId}}-dashboards').select2().val();
+
+                            $.post('{{links.url("dashboards/remove")}}', postData, function(response) {
+                                if (response.tokenKey && response.token) {
+                                    $("#security-token").attr("name", response.tokenKey);
+                                    $("#security-token").val(response.token);
+                                }
+
+                                if (response.responseCode == 0) {
+                                    paginatedPNotify('success', {'text' : response.responseMessage});
+
+                                    BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-remove'), {
+                                        ajaxBefore                      : function () {
+                                                                            Pace.restart();
+                                                                            $("#baz-content").empty();
+                                                                            $("#loader").attr('hidden', false);
+                                                                        },
+                                        ajaxFinished                    : function () {
+                                                                            BazCore.updateBreadcrumb();
+                                                                            $("#loader").attr('hidden', true);
+                                                                        },
+                                        ajaxError                       : function () {
+                                                                            $("#loader").attr('hidden', true);
+                                                                            BazCore.updateBreadcrumb();
+                                                                        }
+                                    });
+                                } else {
+                                    paginatedPNotify('error', {'text' : response.responseMessage});
+                                }
+                            }, 'json');
+                        }
+                    });
+                });
+            }
+            initDashboardButtons();
         }
     });
 </script>

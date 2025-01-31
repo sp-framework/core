@@ -136,9 +136,6 @@ class Maintenance
                         'notNull'           => false
                     ]
                 )
-            ],
-            'options' => [
-                'TABLE_COLLATION' => 'utf8mb4_general_ci'
             ]
         ];
     }

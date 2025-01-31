@@ -241,6 +241,19 @@ class ModulesComponent extends BaseComponent
 		}
 	}
 
+	public function saveQueueSettingsAction()
+	{
+		$this->requestIsPost();
+
+		$this->modules->queues->saveQueueSettings($this->postData());
+
+		$this->addResponse(
+			$this->modules->queues->packagesData->responseMessage,
+			$this->modules->queues->packagesData->responseCode,
+			$this->modules->queues->packagesData->responseData ?? []
+		);
+	}
+
 	public function saveModuleSettingsAction()
 	{
 		$this->requestIsPost();

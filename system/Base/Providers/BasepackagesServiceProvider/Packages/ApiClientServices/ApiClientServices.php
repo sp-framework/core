@@ -95,13 +95,19 @@ class ApiClientServices extends BasePackage
     {
         $this->apiCategories = [];
 
-        $basepackagesApis = $this->modules->packages->getPackagesForCategory('basepackagesApis');
         $apis = $this->modules->packages->getPackagesForCategory('appsApis');
 
-        $apis = array_merge($basepackagesApis, $apis);
+        if ($this->apps->getAppInfo()['app_type'] === 'core') {
+            $basepackagesApis = $this->modules->packages->getPackagesForCategory('basepackagesApis');
+            $apis = array_merge($basepackagesApis, $apis);
+        }
 
         if ($apis && is_array($apis) && count($apis) > 0) {
             foreach ($apis as $api) {
+                if ($this->apps->getAppInfo()['app_type'] !== $api['app_type']) {
+                    continue;
+                }
+
                 $api['class'] = explode('\\', $api['class']);
 
                 $category = strtolower($api['class'][$this->helper->lastKey($api['class']) - 2]);

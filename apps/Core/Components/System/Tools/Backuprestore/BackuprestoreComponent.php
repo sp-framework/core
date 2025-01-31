@@ -19,7 +19,7 @@ class BackuprestoreComponent extends BaseComponent
         $this->getNewToken();
 
         if (isset($this->getData()['analyse']) && $this->getData()['analyse'] == 'info') {
-            $backupInfoFile = $this->basepackages->backuprestore->analyseBackinfoFile($this->getData()['id']);
+            $backupInfoFile = $this->basepackages->backuprestore->init('analyse')->analyseBackinfoFile($this->getData()['id']);
 
             if ($backupInfoFile) {
                 return $this->view->getPartial('backuprestore/analyse/analysis', ['backupInfoFile' => $backupInfoFile]);
@@ -38,13 +38,13 @@ class BackuprestoreComponent extends BaseComponent
                         [
                             'uuidLocation'    => '.backups/',
                             'storagesId'      => $storage['id'],
-                            'orphan'          => 0
+                            'orphan'          => false
                         ]
                 ];
         } else {
             $params =
                 [
-                    'conditions'    => [['uuid_location', '=', '.backups/'], ['storages_id', '=', $storage['id']], ['orphan', '=', 0]]
+                    'conditions'    => [['uuid_location', '=', '.backups/'], ['storages_id', '=', $storage['id']], ['orphan', '=', false]]
                 ];
         }
 

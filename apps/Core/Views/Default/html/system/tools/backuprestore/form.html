@@ -72,7 +72,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-public_dir'                              : { },
         '{{componentId}}-{{sectionId}}-private_dir'                             : { },
         '{{componentId}}-{{sectionId}}-external_dir'                            : { },
-        '{{componentId}}-{{sectionId}}-html_compiled'                           : { },
+        '{{componentId}}-{{sectionId}}-html_compiled_dir'                       : { },
         '{{componentId}}-{{sectionId}}-var_dir'                                 : { },
         '{{componentId}}-{{sectionId}}-external_vendor_dir'                     : {
             afterInit : function() {
@@ -86,7 +86,7 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-old_backups'                             : { },
+        '{{componentId}}-{{sectionId}}-old_backups_dir'                         : { },
         '{{componentId}}-{{sectionId}}-database'                                : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-database').click(function() {
@@ -141,11 +141,11 @@ dataCollectionSection =
                     postData['systems_dir'] = $('#{{componentId}}-{{sectionId}}-systems_dir')[0].checked;
                     postData['public_dir'] = $('#{{componentId}}-{{sectionId}}-public_dir')[0].checked;
                     postData['private_dir'] = $('#{{componentId}}-{{sectionId}}-private_dir')[0].checked;
-                    postData['html_compiled'] = $('#{{componentId}}-{{sectionId}}-html_compiled')[0].checked;
+                    postData['html_compiled_dir'] = $('#{{componentId}}-{{sectionId}}-html_compiled_dir')[0].checked;
                     postData['var_dir'] = $('#{{componentId}}-{{sectionId}}-var_dir')[0].checked;
                     postData['external_dir'] = $('#{{componentId}}-{{sectionId}}-external_dir')[0].checked;
                     postData['external_vendor_dir'] = $('#{{componentId}}-{{sectionId}}-external_vendor_dir')[0].checked;
-                    postData['old_backups'] = $('#{{componentId}}-{{sectionId}}-old_backups')[0].checked;
+                    postData['old_backups_dir'] = $('#{{componentId}}-{{sectionId}}-old_backups_dir')[0].checked;
                     postData['database'] = $('#{{componentId}}-{{sectionId}}-database')[0].checked;
                     postData['keys'] = $('#{{componentId}}-{{sectionId}}-keys')[0].checked;
                     postData['password_protect'] = $('#{{componentId}}-{{sectionId}}-password_protect').val();
@@ -427,14 +427,14 @@ dataCollectionSectionForm['funcs']['addedNewBackupOption'] = function(id, text) 
 }
 $('#body').off('dropzoneInitDone');
 $('#body').on('dropzoneInitDone', function() {
-    if (dataCollectionSection['admin-backuprestore-main-backup_upload_restore']) {
-        dataCollectionSection['admin-backuprestore-main-backup_upload_restore']['onSuccess'] = function(file, response) {
-            if (response.responseData && response.responseData.name && response.responseData.uuid) {
-                var newOption = new Option(response.responseData.name, response.responseData.uuid, false, false);
+    if (dataCollectionSection['core-backuprestore-main-backup_upload_restore']) {
+        dataCollectionSection['core-backuprestore-main-backup_upload_restore']['onSuccess'] = function(file, response) {
+            if (response.responseData && response.responseData.org_file_name && response.responseData.uuid) {
+                var newOption = new Option(response.responseData.org_file_name, response.responseData.uuid, false, false);
                 $('#{{componentId}}-{{sectionId}}-backups').append(newOption).val(response.responseData.uuid).trigger('change');
-                dataCollectionSectionForm['funcs']['addedNewBackupOption'](response.responseData.uuid, response.responseData.name);
-                paginatedPNotify('success', {text: 'File ' + response.responseData.name + ' uploaded and ready to be restored.'});
-                dataCollectionSection['admin-backuprestore-main-backup_upload_restore']['reset']();
+                dataCollectionSectionForm['funcs']['addedNewBackupOption'](response.responseData.uuid, response.responseData.org_file_name);
+                paginatedPNotify('success', {text: 'File ' + response.responseData.org_file_name + ' uploaded and ready to be restored.'});
+                dataCollectionSection['core-backuprestore-main-backup_upload_restore']['reset']();
             }
         };
     }

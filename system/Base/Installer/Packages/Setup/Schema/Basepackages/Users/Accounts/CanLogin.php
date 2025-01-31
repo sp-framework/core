@@ -41,9 +41,6 @@ class CanLogin
                             'notNull'       => true,
                         ]
                     )
-                ],
-                'options' => [
-                    'TABLE_COLLATION' => 'utf8mb4_general_ci'
                 ]
             ];
     }

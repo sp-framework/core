@@ -136,7 +136,7 @@ class Profiles extends BasePackage
 
     public function updateProfileViaAccount(array $data)
     {
-        $profile = $this->getProfile($data['profile_package_row_id']);
+        $profile = $this->getProfile((int) $data['id']);
 
         if (isset($data['first_name']) && isset($data['last_name'])) {
             if (($data['first_name'] !== $profile['first_name'] ||

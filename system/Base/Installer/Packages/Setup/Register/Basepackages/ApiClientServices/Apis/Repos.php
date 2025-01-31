@@ -31,8 +31,8 @@ class Repos
         $modulesRepo =
             [
                 'api_url'               => 'https://api.github.com',
-                'org_user'              => 'sp-framework',
-                'repo_url'              => 'https://github.com/sp-framework/sp-modules',
+                'org_user'              => 'sp-modules',
+                'repo_url'              => 'https://github.com/sp-modules/',
                 'branch'                => 'main',
                 'auth_type'             => 'autho',
                 'authorization'         => ''
