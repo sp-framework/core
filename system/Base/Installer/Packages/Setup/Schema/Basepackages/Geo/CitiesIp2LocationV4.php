@@ -44,9 +44,6 @@ class CitiesIp2LocationV4
                         'notNull'       => true,
                     ]
                 ),
-            ],
-            'options' => [
-                'TABLE_COLLATION' => 'utf8mb4_general_ci'
             ]
         ];
     }
@@ -56,15 +53,9 @@ class CitiesIp2LocationV4
         return
         [
             new Index(
-                'column_range_start_index',
+                'column_INDEX',
                 [
-                    'range_start'
-                ],
-                'INDEX'
-            ),
-            new Index(
-                'column_range_end_index',
-                [
+                    'range_start',
                     'range_end'
                 ],
                 'INDEX'

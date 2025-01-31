@@ -69,9 +69,6 @@ class States
                         'notNull'       => false,
                     ]
                 )
-            ],
-            'options' => [
-                'TABLE_COLLATION' => 'utf8mb4_general_ci'
             ]
         ];
     }
@@ -81,15 +78,9 @@ class States
         return
         [
             new Index(
-                'column_name_index',
+                'column_INDEX',
                 [
-                    'name'
-                ],
-                'INDEX'
-            ),
-            new Index(
-                'column_country_id_index',
-                [
+                    'name',
                     'country_id'
                 ],
                 'INDEX'

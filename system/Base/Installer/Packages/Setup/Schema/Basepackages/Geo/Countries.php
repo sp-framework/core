@@ -171,9 +171,6 @@ class Countries
                         'notNull'       => false,
                     ]
                 )
-            ],
-            'options' => [
-                'TABLE_COLLATION' => 'utf8mb4_unicode_ci'
             ]
         ];
     }

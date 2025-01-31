@@ -89,9 +89,6 @@ class Murls
                         ],
                         'UNIQUE'
                     )
-                ],
-                'options' => [
-                    'TABLE_COLLATION' => 'utf8mb4_general_ci'
                 ]
             ];
     }
@@ -101,7 +98,7 @@ class Murls
         return
         [
             new Index(
-                'murl_index',
+                'column_INDEX',
                 [
                     'murl'
                 ],

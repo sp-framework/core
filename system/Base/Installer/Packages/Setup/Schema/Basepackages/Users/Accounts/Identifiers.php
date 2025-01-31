@@ -70,9 +70,6 @@ class Identifiers
                         ],
                         'UNIQUE'
                     )
-                ],
-                'options' => [
-                    'TABLE_COLLATION' => 'utf8mb4_general_ci'
                 ]
             ];
     }
