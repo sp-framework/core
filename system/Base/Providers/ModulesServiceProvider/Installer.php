@@ -202,7 +202,7 @@ class Installer extends BasePackage
 
             $preCheckQueueLogs = &$this->queue['results']['first']['packages'][$module['id']]['precheck_logs'];
 
-            return $this->preCheckHasErrors(
+            return $this->queueHasErrors(
                 $this->modules->manager->packagesData->responseMessage ?? 'Could not retrieve repository information for module: ' . $module['name'],
                 $preCheckQueueLogs
             );
@@ -211,7 +211,7 @@ class Installer extends BasePackage
 
             $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
 
-            return $this->preCheckHasErrors(
+            return $this->queueHasErrors(
                 $this->modules->manager->packagesData->responseMessage ?? 'Could not retrieve repository information for module: ' . $module['name'],
                 $preCheckQueueLogs
             );
@@ -233,7 +233,7 @@ class Installer extends BasePackage
                 if (!isset($module['composerJsonFile']['extra']['patches'][$module['name']])) {
                     $this->cleanup(['composer']);
 
-                    return $this->preCheckHasErrors(
+                    return $this->queueHasErrors(
                         'External packages should have package defined, but are missing from the composer json file for : ' . $module['name'],
                         $preCheckQueueLogs
                     );
@@ -252,7 +252,7 @@ class Installer extends BasePackage
                 if (count($patches['files']) === 0) {
                     $this->cleanup(['composer']);
 
-                    return $this->preCheckHasErrors(
+                    return $this->queueHasErrors(
                         'External package requires a patch which is missing from the repository : ' . $module['root_module']['repo'],
                         $preCheckQueueLogs
                     );
@@ -264,7 +264,7 @@ class Installer extends BasePackage
                 if (count($patches['files']) !== count($module['composerJsonFile']['extra']['patches'][$module['name']])) {
                     $this->cleanup(['composer']);
 
-                    return $this->preCheckHasErrors(
+                    return $this->queueHasErrors(
                         'External package number of patches do not match what is defined in the composer json file for repository : ' . $module['root_module']['repo'],
                         $preCheckQueueLogs
                     );
@@ -284,7 +284,7 @@ class Installer extends BasePackage
                 if (in_array('false', $foundAll)) {
                     $this->cleanup(['composer']);
 
-                    return $this->preCheckHasErrors(
+                    return $this->queueHasErrors(
                         'External package all patches not found in the external/patches directory as per the  composer json file for repository : ' . $module['root_module']['repo'],
                         $preCheckQueueLogs
                     );
@@ -299,7 +299,7 @@ class Installer extends BasePackage
                 } catch (FilesystemException | UnableToCopyFile $e) {
                     $this->cleanup(['composer']);
 
-                    return $this->preCheckHasErrors('Error copying file : ' . $fileName, $preCheckQueueLogs);
+                    return $this->queueHasErrors('Error copying file : ' . $fileName, $preCheckQueueLogs);
                 }
             }
 
@@ -310,7 +310,7 @@ class Installer extends BasePackage
             } catch (FilesystemException | UnableToWriteFile $e) {
                 $this->cleanup(['composer']);
 
-                return $this->preCheckHasErrors(
+                return $this->queueHasErrors(
                     'Error writing file external package composer file : ' . $externalComposerFileName,
                     $preCheckQueueLogs
                 );
@@ -336,28 +336,34 @@ class Installer extends BasePackage
             } catch (\throwable | UnableToReadFile $e) {
                 $this->cleanup(['composer']);
 
-                return $this->preCheckHasErrors($e->getMessage(), $preCheckQueueLogs);
+                return $this->queueHasErrors($e->getMessage(), $preCheckQueueLogs);
             }
 
             if ($app !== 0) {
                 $this->cleanup(['composer']);
 
-                return $this->preCheckHasErrors('Precheck for composer package failed : ' . $module['name'], $preCheckQueueLogs);
+                return $this->queueHasErrors('Precheck for composer package failed : ' . $module['name'], $preCheckQueueLogs);
             }
         } else {
             $this->cleanup(['composer']);
 
-            return $this->preCheckHasErrors('Incorrect external package type: ' . $module['name'], $preCheckQueueLogs);
+            return $this->queueHasErrors('Incorrect external package type: ' . $module['name'], $preCheckQueueLogs);
         }
 
         return true;
     }
 
-    protected function preCheckHasErrors($errorMessage, &$preCheckQueueLogs)
+    protected function queueHasErrors($errorMessage, &$queueLogs, $precheck = true)
     {
-        $preCheckQueueLogs = $errorMessage;
+        $queueLogs = $errorMessage;
 
-        $this->addResponse('Precheck has errors! Check logs.', 1, ['queue' => $this->queue]);
+        if ($precheck) {
+            $queueType = 'Precheck';
+        } else {
+            $queueType = 'Process';
+        }
+
+        $this->addResponse($queueType . ' has errors! Check logs.', 1, ['queue' => $this->queue]);
 
         $this->basepackages->progress->resetProgress();
 
@@ -599,7 +605,10 @@ class Installer extends BasePackage
                     'external/patches/***',
                     'apps',
                     'apps/Core/***',
-                    'system/***'
+                    'system',
+                    'system/Base/***',
+                    'system/Cli/***',
+                    'system/Bootstrap.php'
                 ];
         } else {
             $includeFiles =
@@ -607,6 +616,16 @@ class Installer extends BasePackage
                     '*'
                 ];
         }
+
+        $this->modulesToInstallOrUpdate = $this->modules->manager->getModuleInfo(
+            [
+                'module_type'   => $module['module_type'],
+                'module_id'     => $module['id']
+            ]
+        );
+
+        $this->zipFile['name'] = $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                        $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'];
 
         try {
             $rsyncSettings =
@@ -620,7 +639,7 @@ class Installer extends BasePackage
                             Rsync::OPT_HUMAN_READABLE    => true,
                             Rsync::OPT_CHECKSUM          => true,
                             Rsync::OPT_INCLUDE           => $includeFiles,
-                            Rsync::OPT_EXCLUDE           => ['*'],
+                            Rsync::OPT_EXCLUDE           => ['*']
                         ]
                 ];
 
@@ -646,7 +665,6 @@ class Installer extends BasePackage
 
             if ($rsync->getExitCode() == 0) {
                 $outputArr = explode(PHP_EOL, $rsync->getStdout());
-                // trace([$outputArr], false, false, true);
                 $modifiedFiles = [];
                 $deleteFiles = [];
 
@@ -693,8 +711,6 @@ class Installer extends BasePackage
                 }
             }
 
-            // trace(varsToDump : [$modifiedFiles, $deleteFiles], object: true);
-
             return true;
         } catch (\throwable $e) {
             if (str_contains($e->getMessage(), 'No such file or directory')) {
@@ -709,14 +725,15 @@ class Installer extends BasePackage
         }
 
         if ($precheck) {
-            return $this->preCheckHasErrors(
+            return $this->queueHasErrors(
                 $rsyncError,
                 $preCheckQueueLogs
             );
         } else {
-            return $this->preCheckHasErrors(
+            return $this->queueHasErrors(
                 $rsyncError,
-                $resultQueueLogs
+                $resultQueueLogs,
+                false
             );
         }
     }
@@ -726,6 +743,9 @@ class Installer extends BasePackage
         $taskName = $args[0];
         $module = $args[1];
 
+        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
+        $resultQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['result_logs'];
+
         if ($module['module_type'] === 'packages' &&
             $module['name'] === 'Core'
         ) {
@@ -733,8 +753,80 @@ class Installer extends BasePackage
                 (new CorePackage)->install($this);
             } catch (\throwable $e) {
                 trace([$e]);
-                //Store $e somewhere
-                return false;
+                $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+                return $this->queueHasErrors(
+                    $e->getMessage(),
+                    $resultQueueLogs,
+                    false
+                );
+            }
+        } else {
+            //
+        }
+
+        return true;
+    }
+
+    protected function updateVersion($args)
+    {
+        $taskName = $args[0];
+        $module = $args[1];
+
+        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
+        $resultQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['result_logs'];
+
+        if ($module['module_type'] === 'packages' &&
+            $module['name'] === 'Core'
+        ) {
+            try {
+                $versionArr = explode(' -> ', $module['version']);
+
+                if (count($versionArr) !== 2) {
+                    return $this->queueHasErrors(
+                        'Incorrect number of versions for Core. Please contact developer.',
+                        $resultQueueLogs,
+                        false
+                    );
+                }
+
+                $package = $this->modules->packages->getPackageById($module['id']);
+
+                if (!$package) {
+                    return $this->queueHasErrors(
+                        'Package core not found with the ID provided. Please contact developer.',
+                        $resultQueueLogs,
+                        false
+                    );
+                }
+
+                if ($package['version'] !== $versionArr[0] &&
+                    $package['update_version'] !== $versionArr[1]
+                ) {
+                    return $this->queueHasErrors(
+                        'Module information received by installer is incorrect. Please contact developer.',
+                        $resultQueueLogs,
+                        false
+                    );
+                }
+
+                $package['version'] = $package['update_version'];
+                $package['updated_on'] = date('c');
+
+                if ($this->access->auth->account() && isset($this->access->auth->account()['id'])) {
+                    $package['updated_by'] = $this->access->auth->account()['id'];
+                }
+
+                $this->modules->packages->update($package);
+            } catch (\throwable $e) {
+                trace([$e]);
+                $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+                return $this->queueHasErrors(
+                    $e->getMessage(),
+                    $resultQueueLogs,
+                    false
+                );
             }
         } else {
             //
@@ -918,23 +1010,30 @@ class Installer extends BasePackage
                         if ($taskName === 'first' && $moduleType === 'external') {
                             continue;
                         } else {
-                            // array_push($this->runProcessProgressMethods,
-                            //     [
-                            //         'method'    => 'createBackup',
-                            //         'text'      => 'Creating filesystem and database backup...'
-                            //     ]
-                            // );
-                            // array_push($this->runProcessProgressMethods,
-                            //     [
-                            //         'method'    => 'runRsync-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                            //         'text'      => 'Running rsync for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                            //         'args'      => [$taskName, $module, false],
-                            //     ]
-                            // );
+                            array_push($this->runProcessProgressMethods,
+                                [
+                                    'method'    => 'createBackup',
+                                    'text'      => 'Creating filesystem and database backup...'
+                                ]
+                            );
+                            array_push($this->runProcessProgressMethods,
+                                [
+                                    'method'    => 'runRsync-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Running rsync for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                    'args'      => [$taskName, $module, false],
+                                ]
+                            );
                             array_push($this->runProcessProgressMethods,
                                 [
                                     'method'    => 'runModuleInstallScripts-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                    'text'      => 'Running schema update for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                    'text'      => 'Running module install scripts for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                    'args'      => [$taskName, $module],
+                                ]
+                            );
+                            array_push($this->runProcessProgressMethods,
+                                [
+                                    'method'    => 'updateVersion-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Updating version for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
                                     'args'      => [$taskName, $module],
                                 ]
                             );

@@ -33,7 +33,7 @@ class TestSchema
                         'key2',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 4096,
+                            'size'    => 100,
                             'notNull' => true,
                         ]
                     ),
@@ -70,5 +70,19 @@ class TestSchema
                     )
                 ]
             ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'key2'
+                ],
+                'INDEX'
+            )
+        ];
     }
 }

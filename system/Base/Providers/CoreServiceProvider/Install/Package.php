@@ -9,22 +9,39 @@ class Package extends BasePackage
 {
     protected $installer;
 
+    protected $databases;
+
     public function install($installer)
     {
         $this->installer = $installer;
 
-        $databases = (new Schema)->getSchema();
+        $this->databases = (new Schema)->getSchema();
 
+        $this->preInstall();
+
+        $this->installDb();
+
+        $this->postInstall();
+
+        return true;
+    }
+
+    protected function preInstall()
+    {
         //Do version specific update for any future version upgrades.
         // if ($this->core->core['version'] === 'x.x.x') {
-            //Do this
+            //Do something
         // }
-        // trace(varsToDump : [$this->core->core], object: true);
 
+        return true;
+    }
+
+    protected function installDb()
+    {
         if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'ff') {
             $dbTablesList = $this->describe();
 
-            foreach ($databases as $tableName => $tableClass) {
+            foreach ($this->databases as $tableName => $tableClass) {
                 if ($tableClass['model'] && $tableClass['model']->getSource()) {
                     $tableName = $tableClass['model']->getSource();
                 }
@@ -62,18 +79,71 @@ class Package extends BasePackage
                     }
                 }
 
-                // $dbTableIndexes = $this->describe($tableName, true);
-                // var_dump($dbTableIndexes);
-                // if (method_exists($tableClass['schema'], 'indexes')) {
-                //     $this->addIndex($tableName, $tableClass['schema']->indexes());
-                // }
+                $indexList = [];
+                if (isset($tableClass['schema']->columns()['indexes'])) {
+                    $indexList = array_merge($indexList, $tableClass['schema']->columns()['indexes']);
+                }
+
+                if (method_exists($tableClass['schema'], 'indexes')) {
+                    $indexList = array_merge($indexList, $tableClass['schema']->indexes());
+                }
+
+                if (count($indexList) > 0) {
+                    $dbTableIndexes = $this->describe($tableName, true);
+
+                    //New Indexes
+                    foreach ($indexList as $indexListKey => $index) {
+                        $indexList[$index->getName()] = $index;
+
+                        if (!isset($dbTableIndexes[$index->getName()])) {
+                            try {
+                                $this->addIndex($tableName, [$index]);
+                            } catch (\throwable $e) {
+                                throw $e;
+                            }
+                        } else {
+                            $dbIndexColumns = $dbTableIndexes[$index->getName()]->getColumns();
+                            $newIndexColumns = $index->getColumns();
+
+                            if (count(array_diff($newIndexColumns, $dbIndexColumns)) > 0 ||
+                                count(array_diff($dbIndexColumns, $newIndexColumns)) > 0
+                            ) {
+                                try {
+                                    $this->dropIndex($tableName, $index->getName());
+                                    $this->addIndex($tableName, [$index]);
+                                } catch (\throwable $e) {
+                                    throw $e;
+                                }
+                            }
+                        }
+
+                        unset($indexList[$indexListKey]);
+                    }
+
+                    $dbTableIndexes = $this->describe($tableName, true);
+
+                    //Drop any indexes that are removed
+                    foreach ($dbTableIndexes as $dbTableIndexKey => $dbTableIndex) {
+                        if (strtolower($dbTableIndexKey) === 'primary') {
+                            continue;
+                        }
+
+                        if (!isset($indexList[$dbTableIndexKey])) {
+                            try {
+                                $this->dropIndex($tableName, $dbTableIndexKey);
+                            } catch (\throwable $e) {
+                                throw $e;
+                            }
+                        }
+                    }
+                }
             }
         }
 
         if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'db') {
             $storesToIndex = [];
 
-            foreach ($databases as $tableName => $tableClass) {
+            foreach ($this->databases as $tableName => $tableClass) {
                 if ($tableClass['model'] && $tableClass['model']->getSource()) {
                     $tableName = $tableClass['model']->getSource();
                 }
@@ -94,6 +164,13 @@ class Package extends BasePackage
                 }
             }
         }
+
+        return true;
+    }
+
+    protected function postInstall()
+    {
+        //Do anything after installation.
 
         return true;
     }
