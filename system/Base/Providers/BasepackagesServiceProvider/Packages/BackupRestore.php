@@ -42,11 +42,13 @@ class BackupRestore extends BasePackage
             $this->localContent->createDirectory('var/tmp/backups/');
         }
 
-        $this->basepackages->progress->deleteProgressFile();
-
         if ($process === 'backup') {
+            $this->basepackages->progress->deleteProgressFile();
+
             $this->registerBackupProgressMethods();
         } else if ($process === 'restore') {
+            $this->basepackages->progress->deleteProgressFile();
+
             $this->registerRestoreProgressMethods();
         }
 
@@ -599,7 +601,7 @@ class BackupRestore extends BasePackage
         $fileInfo = $this->basepackages->storages->getFileInfo($id);
 
         if ($fileInfo) {
-            if ($this->zip->open(base_path($fileInfo['uuid_location'] . $fileInfo['org_file_name']))) {
+            if ($this->zip->open(base_path($fileInfo['uuid_location'] . $fileInfo['org_file_name'])) === true) {
                 $backupInfo = $this->zip->getFromName('backupInfo.json');
 
                 if (!$backupInfo) {

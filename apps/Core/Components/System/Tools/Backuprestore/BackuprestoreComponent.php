@@ -19,7 +19,7 @@ class BackuprestoreComponent extends BaseComponent
         $this->getNewToken();
 
         if (isset($this->getData()['analyse']) && $this->getData()['analyse'] == 'info') {
-            $backupInfoFile = $this->basepackages->backuprestore->analyseBackinfoFile($this->getData()['id']);
+            $backupInfoFile = $this->basepackages->backuprestore->init('analyse')->analyseBackinfoFile($this->getData()['id']);
 
             if ($backupInfoFile) {
                 return $this->view->getPartial('backuprestore/analyse/analysis', ['backupInfoFile' => $backupInfoFile]);
