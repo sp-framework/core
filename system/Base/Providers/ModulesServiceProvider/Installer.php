@@ -164,7 +164,12 @@ class Installer extends BasePackage
 
             $this->modules->queues->update($this->queue);
 
-            $this->addResponse('Process complete', 0, ['queue' => $this->queue]);
+            $emailReport = false;
+            if ($this->queue['settings']['emailReport'] !== '') {
+                $emailReport = $this->emailReport();
+            }
+
+            $this->addResponse('Process complete', 0, ['queue' => $this->queue, 'emailReport' => $emailReport]);
         }
     }
 
@@ -1300,5 +1305,32 @@ class Installer extends BasePackage
                 $resultQueueLogs
             );
         }
+    }
+
+    protected function emailReport()
+    {
+        //If Email is not configured, we cannot send report.
+        if (!$this->basepackages->email->setup()) {
+            return true;
+        }
+
+        $addresses = explode(',', $this->queue['settings']['emailReport']);
+
+        return $this->addEmailToQueue($addresses);
+    }
+
+    protected function addEmailToQueue(array $addresses)
+    {
+        $emailData['app_id'] = $this->apps->getAppInfo()['id'];
+        $emailData['domain_id'] = $this->domains->getDomain()['id'];
+        $emailData['status'] = 1;
+        $emailData['priority'] = 1;
+        $emailData['confidential'] = 0;
+        $emailData['to_addresses'] = $addresses;
+        $emailData['subject'] = 'Queue Report for Queue ID: ' . $this->queue['id'];
+        //Move this to template in future.
+        $emailData['body'] = printArrayList($this->queue);
+
+        return $this->basepackages->emailqueue->addToQueue($emailData);
     }
 }

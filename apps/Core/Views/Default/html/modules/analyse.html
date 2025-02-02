@@ -295,11 +295,6 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
         }
 
         if (response.responseCode == 0) {
-            paginatedPNotify('success', {
-                text        : response.responseMessage,
-                textTrusted : true
-            });
-
             if (postData['process'] === 'runprecheck') {
                 $('#{{componentId}}-{{sectionId}}-re-analyse').removeClass('disabled');
                 $('#{{componentId}}-{{sectionId}}-perform-precheck').text(' RE-PERFORM PRECHECK');
@@ -313,7 +308,21 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
                 $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
+
+                var notifyText = response.responseMessage;
+                var notifyType = 'success';
+                if (response.responseData && response.responseData.emailReport && response.responseData.emailReport == true) {
+                    notifyText += '. An email report was successfully sent to : ' + $('#{{componentId}}-{{sectionId}}-email_report').val().trim();
+                } else {
+                    notifyType = 'notice';
+                    notifyText += '. Failed to send email report!';
+                }
             }
+
+            paginatedPNotify(notifyType, {
+                text        : notifyText,
+                textTrusted : true
+            });
         } else {
             paginatedPNotify('error', {
                 text        : response.responseMessage,
