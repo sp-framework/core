@@ -578,7 +578,7 @@ class Manager extends BasePackage
             return true;
         }
 
-        $this->addResponse('Unable to sync with remote or remote has no module repositories!', 1);
+        $this->addResponse('Unable to sync with remote or remote has no repositories!', 1);
 
         return false;
     }

@@ -5,6 +5,7 @@ namespace System\Base\Providers\ModulesServiceProvider;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToCopyFile;
+use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToListContents;
@@ -42,7 +43,7 @@ class Installer extends BasePackage
 
     protected $preCheckResult = [];
 
-    protected $modulesToInstallOrUpdate;
+    public $modulesToInstallOrUpdate;
 
     protected $runPrecheckProgressMethods;
 
@@ -668,6 +669,20 @@ class Installer extends BasePackage
                     base_path('')
                 );
             } else {
+                if (!$precheck) {
+                    try {
+                        if (!$this->localContent->directoryExists(
+                            'apps/' . ucfirst($module['app_type']) . '/' . ucfirst($module['module_type']) . '/' . ucfirst($module['name']) . '/'
+                        )) {
+                            $this->localContent->createDirectory(
+                                'apps/' . ucfirst($module['app_type']) . '/' . ucfirst($module['module_type']) . '/' . ucfirst($module['name']) . '/'
+                            );
+                        }
+                    } catch (FilesystemException | UnableToCheckExistence | UnableToCreateDirectory | \throwable $e) {
+                        throw $e;
+                    }
+                }
+
                 $rsync->sync(
                     '.',
                     base_path('apps/' . ucfirst($module['app_type']) . '/' . ucfirst($module['module_type']) . '/' . ucfirst($module['name']) . '/')
@@ -679,50 +694,90 @@ class Installer extends BasePackage
                 $modifiedFiles = [];
                 $deleteFiles = [];
 
-                array_walk($outputArr, function($output) use (&$modifiedFiles, &$deleteFiles) {
-                    if (str_starts_with($output, 'apps') ||
-                        str_starts_with($output, 'system') ||
-                        str_starts_with($output, 'public') ||
-                        str_starts_with($output, 'external')
-                    ) {
-                        if (!str_ends_with($output, '/') &&
-                            !str_ends_with($output, '.git')
+                if ($module['module_type'] === 'packages' &&
+                    $module['name'] === 'Core'
+                ) {
+                    array_walk($outputArr, function($output) use (&$modifiedFiles, &$deleteFiles) {
+                        if (str_starts_with($output, 'apps') ||
+                            str_starts_with($output, 'system') ||
+                            str_starts_with($output, 'public') ||
+                            str_starts_with($output, 'external')
+                        ) {
+                            if (!str_ends_with($output, '/') &&
+                                !str_ends_with($output, '.git')
+                            ) {
+                                array_push($modifiedFiles, $output);
+                            }
+                        }
+
+                        if ($this->queue['settings']['files']['deleteDestinationFiles']) {
+                            if (str_starts_with($output, 'deleting')) {
+                                if (!str_ends_with($output, '/') &&
+                                    !str_ends_with($output, '.git') &&
+                                    !str_ends_with($output, 'keys')
+                                ) {
+                                    $output = str_replace('deleting ', '', $output);
+
+                                    array_push($deleteFiles, $output);
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    array_walk($outputArr, function($output) use (&$modifiedFiles, &$deleteFiles) {
+                        if (!str_starts_with($output, 'sending') &&
+                            !str_starts_with($output, 'created') &&
+                            !str_ends_with($output, '/') &&
+                            !str_starts_with($output, 'sent ') &&
+                            !str_starts_with($output, 'total ') &&
+                            $output !== ''
                         ) {
                             array_push($modifiedFiles, $output);
                         }
-                    }
 
-                    if ($this->queue['settings']['files']['deleteDestinationFiles']) {
-                        if (str_starts_with($output, 'deleting')) {
-                            if (!str_ends_with($output, '/') &&
-                                !str_ends_with($output, '.git') &&
-                                !str_ends_with($output, 'keys')
-                            ) {
+                        if ($this->queue['settings']['files']['deleteDestinationFiles']) {
+                            if (str_starts_with($output, 'deleting')) {
                                 $output = str_replace('deleting ', '', $output);
+
                                 array_push($deleteFiles, $output);
                             }
                         }
+                    });
+                }
+
+                $rsyncResults = [];
+                if (count($deleteFiles) > 0) {
+                    $rsyncResults['deleteFiles'] = $deleteFiles;
+                }
+
+                if ($precheck) {
+                    $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'pass';
+
+                    if (count($modifiedFiles) > 0) {
+                        $rsyncResults['modifyFiles'] = $modifiedFiles;
                     }
-                });
-            }
 
-            if ($precheck) {
-                $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'pass';
-                if ($this->queue['settings']['files']['deleteDestinationFiles']) {
-                    $preCheckQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles, 'deleteFiles' => $deleteFiles]);
+                    if (count($rsyncResults) === 0) {
+                        $preCheckQueueLogs = '-';
+                    } else {
+                        $preCheckQueueLogs = $this->helper->encode($rsyncResults);
+                    }
                 } else {
-                    $preCheckQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles]);
-                }
-            } else {
-                $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
-                if ($this->queue['settings']['files']['deleteDestinationFiles']) {
-                    $resultQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles, 'deleteFiles' => $deleteFiles]);
-                } else {
-                    $resultQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles]);
-                }
-            }
+                    $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
 
-            return true;
+                    if (count($modifiedFiles) > 0) {
+                        $rsyncResults['modifiedFiles'] = $modifiedFiles;
+                    }
+
+                    if (count($rsyncResults) === 0) {
+                        $resultQueueLogs = '-';
+                    } else {
+                        $resultQueueLogs = $this->helper->encode($rsyncResults);
+                    }
+                }
+
+                return true;
+            }
         } catch (\throwable $e) {
             if (str_contains($e->getMessage(), 'No such file or directory')) {
                 $rsyncError = 'Incorrect directory : ' . $rsync->getCWD();
@@ -754,16 +809,17 @@ class Installer extends BasePackage
         $taskName = $args[0];
         $module = $args[1];
 
+        if ($module['module_type'] !== 'packages') {
+            return true;
+        }
+
         $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
         $resultQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['result_logs'];
 
-        if ($module['module_type'] === 'packages' &&
-            $module['name'] === 'Core'
-        ) {
+        if ($module['name'] === 'Core') {
             try {
                 (new CorePackage)->install($this);
             } catch (\throwable $e) {
-                trace([$e]);
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
 
                 return $this->queueHasErrors(
@@ -773,7 +829,30 @@ class Installer extends BasePackage
                 );
             }
         } else {
-            //
+            try {
+                $this->modulesToInstallOrUpdate = $this->modules->manager->getModuleInfo(
+                    [
+                        'module_type'   => $module['module_type'],
+                        'module_id'     => $module['id']
+                    ]
+                );
+
+                $classArr = explode('\\', $this->modulesToInstallOrUpdate['class']);
+
+                $classArr = array_slice($classArr, 0, -1);
+
+                $class = implode('\\', $classArr) . '\\Install\\Package';
+
+                (new $class)->install($this);
+            } catch (\throwable $e) {
+                $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+                return $this->queueHasErrors(
+                    $e->getMessage(),
+                    $resultQueueLogs,
+                    false
+                );
+            }
         }
 
         return true;
@@ -787,68 +866,74 @@ class Installer extends BasePackage
         $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
         $resultQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['result_logs'];
 
-        if ($module['module_type'] === 'packages' &&
-            $module['name'] === 'Core'
-        ) {
-            try {
-                $versionArr = explode(' -> ', $module['version']);
+        if ($taskName === 'update') {
+            $versionArr = explode(' -> ', $module['version']);
 
-                if (count($versionArr) !== 2) {
-                    return $this->queueHasErrors(
-                        'Incorrect number of versions for Core. Please contact developer.',
-                        $resultQueueLogs,
-                        false
-                    );
-                }
-
-                $package = $this->modules->packages->getPackageById($module['id']);
-
-                if (!$package) {
-                    return $this->queueHasErrors(
-                        'Package core not found with the ID provided. Please contact developer.',
-                        $resultQueueLogs,
-                        false
-                    );
-                }
-
-                if ($package['version'] !== $versionArr[0] &&
-                    $package['update_version'] !== $versionArr[1]
-                ) {
-                    return $this->queueHasErrors(
-                        'Module information received by installer is incorrect. Please contact developer.',
-                        $resultQueueLogs,
-                        false
-                    );
-                }
-
-                $package['version'] = $package['update_version'];
-                $package['updated_on'] = date('c');
-                $package['update_available'] = 0;
-                $package['update_version'] = '';
-
-                if ($this->access->auth->account() && isset($this->access->auth->account()['id'])) {
-                    $package['updated_by'] = $this->access->auth->account()['id'];
-                }
-
-                $this->modules->packages->update($package);
-
-                $this->core->core['version'] = $package['version'];
-
-                $this->core->update($this->core->core);
-            } catch (\throwable $e) {
-                $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
-
+            if (count($versionArr) !== 2) {
                 return $this->queueHasErrors(
-                    $e->getMessage(),
+                    'Incorrect number of versions for module. Please contact developer.',
                     $resultQueueLogs,
                     false
                 );
             }
-        } else {
-            //
         }
 
-        return true;
+        try {
+            $moduleMethod = 'get' . ucfirst(substr($module['module_type'], 0, -1)) . 'ById';
+            $moduleArr = $this->modules->{$module['module_type']}->$moduleMethod($module['id']);
+
+            if (!$moduleArr) {
+                return $this->queueHasErrors(
+                    'Module not found with the ID provided. Please contact developer.',
+                    $resultQueueLogs,
+                    false
+                );
+            }
+
+            if ($taskName === 'update' &&
+                $moduleArr['version'] !== $versionArr[0] &&
+                $moduleArr['update_version'] !== $versionArr[1]
+            ) {
+                return $this->queueHasErrors(
+                    'Module information received by installer is incorrect. Please contact developer.',
+                    $resultQueueLogs,
+                    false
+                );
+            }
+
+            if ($taskName === 'update') {
+                $moduleArr['version'] = $moduleArr['update_version'];
+            }
+
+            $moduleArr['installed'] = 1;
+            $moduleArr['updated_on'] = date('c');
+            $moduleArr['update_available'] = 0;
+            $moduleArr['update_version'] = '';
+
+            if ($this->access->auth->account() && isset($this->access->auth->account()['id'])) {
+                $moduleArr['updated_by'] = $this->access->auth->account()['id'];
+            }
+
+            $this->modules->{$module['module_type']}->update($moduleArr);
+
+            if ($module['module_type'] === 'packages' &&
+                $module['name'] === 'Core'
+            ) {
+                $this->core->core['version'] = $moduleArr['version'];
+
+                $this->core->update($this->core->core);
+            }
+
+            return true;
+        } catch (\throwable $e) {
+            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+            return $this->queueHasErrors(
+                $e->getMessage(),
+                $resultQueueLogs,
+                false
+            );
+        }
     }
 
     public function cleanup(array $what)
@@ -882,32 +967,20 @@ class Installer extends BasePackage
         }
     }
 
-    protected function createBackup($args)
+    protected function createBackup()
     {
-        if ((bool) $this->queue['settings']['backupSettings']['backup'] === false) {
-            return true;
-        }
-
         if ($this->queue['settings']['backupSettings']['notes'] === '') {
             $this->queue['settings']['backupSettings']['notes'] = 'Backup taken while processing module installer queue with ID: ' . $this->queue['id'];
         }
 
-        $taskName = $args[0];
-        $module = $args[1];
-
-        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
-        $resultQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['result_logs'];
-
         $backupInit = $this->basepackages->backuprestore->init()->backup($this->queue['settings']['backupSettings'], true);
 
         if (!$backupInit) {
-            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+            $this->basepackages->progress->resetProgress();
 
-            return $this->queueHasErrors(
-                $this->basepackages->backuprestore->packagesData->responseMessage,
-                $resultQueueLogs,
-                false
-            );
+            $this->addResponse('Error initializing backup! Contact developer', 1);
+
+            return false;
         }
 
         $progress = $this->basepackages->progress->getProgress();
@@ -933,13 +1006,11 @@ class Installer extends BasePackage
                     }
 
                     if ($call === false) {
-                        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+                        $this->basepackages->progress->resetProgress();
 
-                        return $this->queueHasErrors(
-                            $this->basepackages->backuprestore->packagesData->responseMessage,
-                            $resultQueueLogs,
-                            false
-                        );
+                        $this->addResponse($this->basepackages->backuprestore->packagesData->responseMessage, 1);
+
+                        return false;
                     }
 
                     if ($call !== false) {
@@ -953,13 +1024,11 @@ class Installer extends BasePackage
             return true;
         }
 
-        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+        $this->basepackages->progress->resetProgress();
 
-        return $this->queueHasErrors(
-            'Progress Error!',
-            $resultQueueLogs,
-            false
-        );
+        $this->addResponse('Progress Error! Contact developer.', 1);
+
+        return false;
     }
 
     protected function registerRunPrecheckProgressMethods()
@@ -977,31 +1046,13 @@ class Installer extends BasePackage
                         continue;
                     }
 
+                    //External First
                     foreach ($modules as $module) {
                         if ($taskName === 'first' && $moduleType === 'external') {
                             if (isset($module['hasPatch']) && $module['hasPatch'] === true) {
-                                array_push($this->runPrecheckProgressMethods,
-                                    [
-                                        'method'    => 'precheckQueueData-' . $module['root_module']['id'] . '-' . strtolower(str_replace(' ', '', $module['root_module']['name'])),
-                                        'text'      => 'Perform precheck for module ' . $module['root_module']['name'] . ' (' . ucfirst($module['root_module']['module_type']) . ') ...',
-                                        'args'      => [$taskName, $module['root_module']],
-                                    ]
-                                );
-                                array_push($this->runPrecheckProgressMethods,
-                                    [
-                                        'method'    => 'downloadModulesFromRepo-' . $module['root_module']['id'] . '-' . strtolower(str_replace(' ', '', $module['root_module']['name'])),
-                                        'text'      => 'Download module ' . $module['root_module']['name'] . ' (' . ucfirst($module['root_module']['module_type']) . ') files from repository...',
-                                        'args'      => [$taskName, $module['root_module']],
-                                        'remoteWeb' => true
-                                    ]
-                                );
-                                array_push($this->runPrecheckProgressMethods,
-                                    [
-                                        'method'    => 'extractModulesDownloadedFromRepo-' . $module['root_module']['id'] . '-' . strtolower(str_replace(' ', '', $module['root_module']['name'])),
-                                        'text'      => 'Extracting downloaded module ' . $module['root_module']['name'] . ' (' . ucfirst($module['root_module']['module_type']) . ')...'
-                                    ]
-                                );
+                                $this->addProgressMethods($this->runPrecheckProgressMethods, $module, $taskName, 'first_external', true);
                             }
+
                             array_push($this->runPrecheckProgressMethods,
                                 [
                                     'method'    => 'processExternalPackages-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
@@ -1014,31 +1065,15 @@ class Installer extends BasePackage
                         }
                     }
 
+                    //For Views
                     foreach ($modules as $module) {
                         if ($taskName === 'first' && $moduleType === 'external') {
                             continue;
-                        } else {
-                            array_push($this->runPrecheckProgressMethods,
-                                [
-                                    'method'    => 'precheckQueueData-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                    'text'      => 'Perform precheck for module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
-                                    'args'      => [$taskName, $module],
-                                ]
-                            );
-                            array_push($this->runPrecheckProgressMethods,
-                                [
-                                    'method'    => 'downloadModulesFromRepo-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                    'text'      => 'Download module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') files from repository...',
-                                    'args'      => [$taskName, $module],
-                                    'remoteWeb' => true
-                                ]
-                            );
-                            array_push($this->runPrecheckProgressMethods,
-                                [
-                                    'method'    => 'extractModulesDownloadedFromRepo-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                    'text'      => 'Extracting downloaded module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...'
-                                ]
-                            );
+                        }
+
+                        if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
+                            $this->addProgressMethods($this->runPrecheckProgressMethods, $module, $taskName, 'for_main_view', true);
+
                             array_push($this->runPrecheckProgressMethods,
                                 [
                                     'method'    => 'runRsync-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
@@ -1048,6 +1083,26 @@ class Installer extends BasePackage
                             );
                         }
                     }
+
+                    foreach ($modules as $module) {
+                        if ($taskName === 'first' && $moduleType === 'external') {
+                            continue;
+                        }
+
+                        if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
+                            continue;
+                        }
+
+                        $this->addProgressMethods($this->runPrecheckProgressMethods, $module, $taskName, 'everything_else', true);
+
+                        array_push($this->runPrecheckProgressMethods,
+                            [
+                                'method'    => 'runRsync-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                'text'      => 'Running rsync --dry-run for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                'args'      => [$taskName, $module, true],
+                            ]
+                        );
+                    }
                 }
             }
         }
@@ -1055,9 +1110,79 @@ class Installer extends BasePackage
         $this->basepackages->progress->registerMethods($this->runPrecheckProgressMethods);
     }
 
+    protected function addProgressMethods(&$methods, $module, $taskName, $forTask, $precheck)
+    {
+        if ($precheck) {
+            if ($forTask === 'first_external') {
+                $module = $module['root_module'];
+            }
+
+            array_push($methods,
+                [
+                    'method'    => 'precheckQueueData-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                    'text'      => 'Perform precheck for module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
+                    'args'      => [$taskName, $module],
+                ]
+            );
+            array_push($methods,
+                [
+                    'method'    => 'downloadModulesFromRepo-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                    'text'      => 'Download module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') files from repository...',
+                    'args'      => [$taskName, $module],
+                    'remoteWeb' => true
+                ]
+            );
+            array_push($methods,
+                [
+                    'method'    => 'extractModulesDownloadedFromRepo-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                    'text'      => 'Extracting downloaded module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...'
+                ]
+            );
+        } else {
+            array_push($methods,
+                [
+                    'method'    => 'runRsync-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                    'text'      => 'Running rsync for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                    'args'      => [$taskName, $module, $precheck],
+                ]
+            );
+            array_push($methods,
+                [
+                    'method'    => 'runModuleInstallScripts-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                    'text'      => 'Running module install scripts for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                    'args'      => [$taskName, $module],
+                ]
+            );
+            array_push($methods,
+                [
+                    'method'    => 'deleteSourceFiles-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                    'text'      => 'Deleting Source files for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                    'args'      => [$taskName, $module],
+                ]
+            );
+            array_push($methods,
+                [
+                    'method'    => 'updateVersion-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                    'text'      => 'Updating version for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                    'args'      => [$taskName, $module],
+                ]
+            );
+        }
+    }
+
     protected function registerRunProcessProgressMethods()
     {
         $this->runProcessProgressMethods = [];
+
+        if ((bool) $this->queue['settings']['backupSettings']['backup'] === true) {
+            array_push($this->runProcessProgressMethods,
+                [
+                    'method'    => 'createBackup',
+                    'text'      => 'Creating filesystem and database backup...',
+                    'childs'    => $this->basepackages->backuprestore->getBackupProgressMethods()
+                ]
+            );
+        }
 
         foreach ($this->queue['tasks']['analysed'] as $taskName => $modulesTypes) {
             if (($taskName === 'first' || $taskName === 'install' || $taskName === 'update') &&
@@ -1069,7 +1194,7 @@ class Installer extends BasePackage
                     ) {
                         continue;
                     }
-
+                    //First we process external or first (core or other dependencies)
                     foreach ($modules as $module) {
                         if ($taskName === 'first' && $moduleType === 'external') {
                             array_push($this->runProcessProgressMethods,
@@ -1084,53 +1209,80 @@ class Installer extends BasePackage
                         }
                     }
 
+                    //For Views
                     foreach ($modules as $module) {
                         if ($taskName === 'first' && $moduleType === 'external') {
                             continue;
-                        } else {
-                            array_push($this->runProcessProgressMethods,
-                                [
-                                    'method'    => 'createBackup',
-                                    'text'      => 'Creating filesystem and database backup...',
-                                    'args'      => [$taskName, $module],
-                                    'childs'    => $this->basepackages->backuprestore->getBackupProgressMethods()
-                                ]
-                            );
-                            array_push($this->runProcessProgressMethods,
-                                [
-                                    'method'    => 'runRsync-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                    'text'      => 'Running rsync for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                                    'args'      => [$taskName, $module, false],
-                                ]
-                            );
-                            array_push($this->runProcessProgressMethods,
-                                [
-                                    'method'    => 'runModuleInstallScripts-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                    'text'      => 'Running module install scripts for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                                    'args'      => [$taskName, $module],
-                                ]
-                            );
-                            array_push($this->runProcessProgressMethods,
-                                [
-                                    'method'    => 'deleteSourceFiles-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                    'text'      => 'Updating version for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                                    'args'      => [$taskName, $module],
-                                ]
-                            );
-                            array_push($this->runProcessProgressMethods,
-                                [
-                                    'method'    => 'updateVersion-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                    'text'      => 'Updating version for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                                    'args'      => [$taskName, $module],
-                                ]
-                            );
                         }
+
+                        if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
+                            $this->addProgressMethods($this->runProcessProgressMethods, $module, $taskName, 'for_main_view', false);
+                        }
+                    }
+
+                    //Then we process all other modules.
+                    foreach ($modules as $module) {
+                        if ($taskName === 'first' && $moduleType === 'external') {
+                            continue;
+                        }
+
+                        if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
+                            continue;
+                        }
+
+                        $this->addProgressMethods($this->runProcessProgressMethods, $module, $taskName, 'everything_else', false);
+                    }
+                }
+            } else if ($taskName === 'uninstall' && count($modulesTypes) > 0) {
+                foreach ($modulesTypes as $moduleType => $modules) {
+                    if ((is_array($modules) && count($modules) === 0) ||
+                        !is_array($modules)
+                    ) {
+                        continue;
+                    }
+
+                    foreach ($modules as $module) {
+                        array_push($this->runProcessProgressMethods,
+                            [
+                                'method'    => 'uninstallModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                'text'      => 'Uninstalling module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                'args'      => [$taskName, $module],
+                            ]
+                        );
+                    }
+                }
+            } else if ($taskName === 'remove' && count($modulesTypes) > 0) {
+                foreach ($modulesTypes as $moduleType => $modules) {
+                    if ((is_array($modules) && count($modules) === 0) ||
+                        !is_array($modules)
+                    ) {
+                        continue;
+                    }
+
+                    foreach ($modules as $module) {
+                        array_push($this->runProcessProgressMethods,
+                            [
+                                'method'    => 'removeModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                'text'      => 'Removing module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                'args'      => [$taskName, $module],
+                            ]
+                        );
                     }
                 }
             }
         }
 
         $this->basepackages->progress->registerMethods($this->runProcessProgressMethods);
+    }
+
+    protected function uninstallModule($args)
+    {
+        //
+    }
+
+    protected function removeModule($args)
+    {
+        //
     }
 
     protected function initApi($data, $sink = null, $method = null)
