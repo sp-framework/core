@@ -31,10 +31,6 @@ class View
 					$helper->encode(['1'=>['enabled'=>true]]),
 				'api_id'				=> 1,
 				'installed'				=> 1,
-				'files'					=>
-					isset($viewFile['files']) ?
-					$helper->encode($viewFile['files']) :
-					$helper->encode([]),
 				'updated_by'			=> 0
 			];
 

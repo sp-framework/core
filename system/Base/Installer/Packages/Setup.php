@@ -521,13 +521,6 @@ class Setup
 						$this->registerStorages($jsonFile);
 					}
 
-					$jsonFile['files'] = [];
-
-					if ($jsonFile['name'] === 'Core') {
-						$jsonFile['files'] =
-							array_merge_recursive($this->basepackages->utils->init($this->container)->scanDir('system/', true), $this->basepackages->utils->init($this->container)->scanDir('apps/', true));
-					}
-
 					$this->registerCorePackage($jsonFile);
 				}
 			}

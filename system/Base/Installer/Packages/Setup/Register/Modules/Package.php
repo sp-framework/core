@@ -29,10 +29,6 @@ class Package
 					$helper->encode(['1'=>['enabled'=>true]]),
 				'api_id'				=> 1,
 				'installed'				=> 1,
-				'files'					=>
-					isset($packageFile['files']) ?
-					$helper->encode($packageFile['files']) :
-					$helper->encode([]),
 				'updated_by'			=> 0
 			];
 

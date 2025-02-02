@@ -36,10 +36,6 @@ class Middleware
 				'apps'					=> $apps,
 				'api_id'				=> 1,
 				'installed'				=> 1,
-				'files'					=>
-					isset($middlewareFile['files']) ?
-					$helper->encode($middlewareFile['files']) :
-					$helper->encode([]),
 				'updated_by'			=> 0
 			];
 
