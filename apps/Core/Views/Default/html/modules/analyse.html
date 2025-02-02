@@ -199,7 +199,7 @@ dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['queue'] = JSON.parse('{{queue}}');
 dataCollectionSectionForm['funcs'] = { };
 dataCollectionSectionForm['funcs']['init'] = function() {
-    BazProgress.buildProgressBar($('#installer-progress'), false, false, true);
+    BazProgress.buildProgressBar($('#installer-progress'), false, true, true);
 
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
         $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
@@ -242,8 +242,9 @@ dataCollectionSectionForm['funcs']['saveSettings'] = function() {
     postData['settings']['backupSettings']['password_protect'] = $('#{{componentId}}-{{sectionId}}-password_protect').val().trim();
     postData['settings']['backupSettings']['notes'] = $('#{{componentId}}-{{sectionId}}-notes').val().trim();
     postData['settings']['emailReport'] = $('#{{componentId}}-{{sectionId}}-email_report').val().trim();
-    postData['settings']['rsync'] = { };
-    postData['settings']['rsync']['deleteDestinationFiles'] = $('#{{componentId}}-{{sectionId}}-delete_destination_files')[0].checked;
+    postData['settings']['files'] = { };
+    postData['settings']['files']['deleteSourceFiles'] = $('#{{componentId}}-{{sectionId}}-delete_source_files')[0].checked;
+    postData['settings']['files']['deleteDestinationFiles'] = $('#{{componentId}}-{{sectionId}}-delete_destination_files')[0].checked;
 
     $.post('{{links.url("modules/saveQueueSettings")}}', postData, function(response) {
         if (response.tokenKey && response.token) {
@@ -311,6 +312,7 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
                 $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
             }
         } else {
             paginatedPNotify('error', {
@@ -457,8 +459,12 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
             if (object === 'analyse_logs' || object === 'precheck_logs' || object === 'result_logs') {
                 if (logObject[object] !== '-') {
                     if ($(this).data()['moduletype'] !== 'external') {
-                        logObject[object] = JSON.parse(logObject[object]);
-                        logObject[object] = BazHelpers.createHtmlList({'obj': logObject[object]});
+                        try {
+                            logObject[object] = JSON.parse(logObject[object]);
+                            logObject[object] = BazHelpers.createHtmlList({'obj': logObject[object]});
+                        } catch (e) {
+                            //Do nothing
+                        }
                     }
 
                     logObject[object] = '<pre>' + logObject[object] + '</pre>';
@@ -536,6 +542,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-password_protect'                        : { },
         '{{componentId}}-{{sectionId}}-notes'                                   : { },
         '{{componentId}}-{{sectionId}}-email_report'                            : { },
+        '{{componentId}}-{{sectionId}}-delete_source_files'                     : { },
         '{{componentId}}-{{sectionId}}-delete_destination_files'                : { },
         '{{componentId}}-{{sectionId}}-form'                                    : $.extend(dataCollectionSectionForm, {
             rules: {

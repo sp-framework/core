@@ -71,8 +71,9 @@ class Queues extends BasePackage
                             'password_protect'          => $this->basepackages->utils->generateNewPassword()['password'],
                             'notes'                     => '',
                         ],
-                    'rsync'                             =>
+                    'files'                             =>
                         [
+                            'deleteSourceFiles'         => false,
                             'deleteDestinationFiles'    => false
                         ],
                     'emailReport'                       => $this->access->auth->account()['email']
@@ -278,7 +279,7 @@ class Queues extends BasePackage
             }
         }
 
-        array_walk($data['settings']['rsync'], function(&$setting, $index) {
+        array_walk($data['settings']['files'], function(&$setting, $index) {
             if ($setting !== '') {
                 if ($setting == 'true') {
                     $setting = true;

@@ -42,9 +42,13 @@
 {% if queue['settings']['backupSettings']['keys'] == 'true' %}
     {% set settingsBackupSettingsKeysChecked = true %}
 {% endif %}
-{% set settingsRSyncDeleteDestinationFilesChecked = false %}
-{% if queue['settings']['rsync']['deleteDestinationFiles'] == 'true' %}
-    {% set settingsRSyncDeleteDestinationFilesChecked = true %}
+{% set settingsFilesDeleteSourceFilesChecked = false %}
+{% if queue['settings']['files']['deleteSourceFiles'] == 'true' %}
+    {% set settingsFilesDeleteSourceFilesChecked = true %}
+{% endif %}
+{% set settingsFilesDeleteDestinationFilesChecked = false %}
+{% if queue['settings']['files']['deleteDestinationFiles'] == 'true' %}
+    {% set settingsFilesDeleteDestinationFilesChecked = true %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -443,8 +447,8 @@
                             'componentName'                         : componentName,
                             'componentId'                           : componentId,
                             'sectionId'                             : sectionId,
-                            'fieldId'                               : 'rsync_settings',
-                            'fieldLabel'                            : 'RSYNC SETTINGS',
+                            'fieldId'                               : 'files_settings',
+                            'fieldLabel'                            : 'FILES SETTINGS',
                             'fieldLabelLegend'                      : true,
                             'fieldHidden'                           : false,
                             'fieldType'                             : 'html',
@@ -465,6 +469,29 @@
                             'componentName'                  : componentName,
                             'componentId'                    : componentId,
                             'sectionId'                      : sectionId,
+                            'fieldId'                        : 'delete_source_files',
+                            'fieldLabel'                     : false,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Delete downloaded source files? Files are only deleted on successful installation/upgrade.',
+                            'fieldRequired'                  : false,
+                            'fieldType'                      : 'checkbox',
+                            'fieldCheckboxType'              : 'success',
+                            'fieldCheckboxChecked'           : settingsFilesDeleteSourceFilesChecked,
+                            'fieldCheckboxLabel'             : 'DELETE SOURCE FILES?',
+                            'fieldBazJstreeSearch'           : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldBazScan'                   : true
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
                             'fieldId'                        : 'delete_destination_files',
                             'fieldLabel'                     : false,
                             'fieldHelp'                      : true,
@@ -472,7 +499,7 @@
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'danger',
-                            'fieldCheckboxChecked'           : settingsRSyncDeleteDestinationFilesChecked,
+                            'fieldCheckboxChecked'           : settingsFilesDeleteDestinationFilesChecked,
                             'fieldCheckboxLabel'             : 'RSYNC DELETE DESTINATION FILES?',
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : false,

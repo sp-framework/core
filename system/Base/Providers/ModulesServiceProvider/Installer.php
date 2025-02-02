@@ -7,6 +7,7 @@ use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
+use League\Flysystem\UnableToListContents;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
@@ -51,6 +52,8 @@ class Installer extends BasePackage
 
     protected $storesToIndex = [];
 
+    protected $progressFileName = 'modulesinstaller';
+
     public function init($process = 'precheck')
     {
         $this->queue = $this->modules->queues->getActiveQueue();
@@ -73,7 +76,7 @@ class Installer extends BasePackage
             throw $e;
         }
 
-        $this->basepackages->progress->init(null, 'modulesinstaller');
+        $this->basepackages->progress->init(null, $this->progressFileName);
 
         if ($this->basepackages->progress->checkProgressFile()) {
             $this->basepackages->progress->deleteProgressFile();
@@ -128,7 +131,7 @@ class Installer extends BasePackage
             return false;
         }
 
-        set_time_limit(300);//5 mins
+        set_time_limit(600);//10 mins
 
         if ($this->process === 'runprecheck') {
             $this->basepackages->progress->preCheckComplete();
@@ -139,7 +142,6 @@ class Installer extends BasePackage
 
                     return false;
                 }
-                // usleep(500);
             }
 
             $this->queue['status'] = 1;
@@ -156,9 +158,13 @@ class Installer extends BasePackage
 
                     return false;
                 }
-                // usleep(500);
             }
-            //
+
+            $this->queue['status'] = 2;
+
+            $this->modules->queues->update($this->queue);
+
+            $this->addResponse('Process complete', 0, ['queue' => $this->queue]);
         }
     }
 
@@ -643,7 +649,7 @@ class Installer extends BasePackage
                         ]
                 ];
 
-            if ($this->queue['settings']['rsync']['deleteDestinationFiles']) {
+            if ($this->queue['settings']['files']['deleteDestinationFiles']) {
                 $rsyncSettings[Rsync::CONF_OPTIONS][Rsync::OPT_DELETE_AFTER] = true;
             }
 
@@ -681,7 +687,7 @@ class Installer extends BasePackage
                         }
                     }
 
-                    if ($this->queue['settings']['rsync']['deleteDestinationFiles']) {
+                    if ($this->queue['settings']['files']['deleteDestinationFiles']) {
                         if (str_starts_with($output, 'deleting')) {
                             if (!str_ends_with($output, '/') &&
                                 !str_ends_with($output, '.git') &&
@@ -697,14 +703,14 @@ class Installer extends BasePackage
 
             if ($precheck) {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'pass';
-                if ($this->queue['settings']['rsync']['deleteDestinationFiles']) {
+                if ($this->queue['settings']['files']['deleteDestinationFiles']) {
                     $preCheckQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles, 'deleteFiles' => $deleteFiles]);
                 } else {
                     $preCheckQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles]);
                 }
             } else {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
-                if ($this->queue['settings']['rsync']['deleteDestinationFiles']) {
+                if ($this->queue['settings']['files']['deleteDestinationFiles']) {
                     $resultQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles, 'deleteFiles' => $deleteFiles]);
                 } else {
                     $resultQueueLogs = $this->helper->encode(['modifiedFiles' => $modifiedFiles]);
@@ -812,14 +818,18 @@ class Installer extends BasePackage
 
                 $package['version'] = $package['update_version'];
                 $package['updated_on'] = date('c');
+                $package['update_available'] = 0;
 
                 if ($this->access->auth->account() && isset($this->access->auth->account()['id'])) {
                     $package['updated_by'] = $this->access->auth->account()['id'];
                 }
 
                 $this->modules->packages->update($package);
+
+                $this->core->core['version'] = $package['version'];
+
+                $this->core->update($this->core->core);
             } catch (\throwable $e) {
-                trace([$e]);
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
 
                 return $this->queueHasErrors(
@@ -866,7 +876,7 @@ class Installer extends BasePackage
         }
     }
 
-    protected function createBackup()
+    protected function createBackup($args)
     {
         if ((bool) $this->queue['settings']['backupSettings']['backup'] === false) {
             return true;
@@ -876,12 +886,74 @@ class Installer extends BasePackage
             $this->queue['settings']['backupSettings']['notes'] = 'Backup taken while processing module installer queue with ID: ' . $this->queue['id'];
         }
 
-        return $this->basepackages->backuprestore->init()->backup($this->queue['settings']['backupSettings']);
-    }
+        $taskName = $args[0];
+        $module = $args[1];
 
-    protected function rollBack()
-    {
-        //
+        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
+        $resultQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['result_logs'];
+
+        $backupInit = $this->basepackages->backuprestore->init()->backup($this->queue['settings']['backupSettings'], true);
+
+        if (!$backupInit) {
+            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+            return $this->queueHasErrors(
+                $this->basepackages->backuprestore->packagesData->responseMessage,
+                $resultQueueLogs,
+                false
+            );
+        }
+
+        $progress = $this->basepackages->progress->getProgress();
+
+        if (is_string($progress)) {
+            $progress = $this->helper->decode($progress, true);
+        }
+
+        if ($progress['runners']['running']['method'] === 'createBackup') {
+            if (isset($progress['runners']['running']['childs']) &&
+                is_array($progress['runners']['running']['childs']) &&
+                count($progress['runners']['running']['childs']) > 0
+            ) {
+                foreach ($progress['runners']['running']['childs'] as $child) {
+                    $method = $child['method'];
+
+                    $this->basepackages->progress->updateProgress('createBackup', null, false, $method);
+
+                    if ($method === 'finishBackup') {
+                        $call = $this->basepackages->backuprestore->$method($this->queue['settings']['backupSettings']);
+                    } else {
+                        $call = $this->basepackages->backuprestore->$method();
+                    }
+
+                    if ($call === false) {
+                        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+                        return $this->queueHasErrors(
+                            $this->basepackages->backuprestore->packagesData->responseMessage,
+                            $resultQueueLogs,
+                            false
+                        );
+                    }
+
+                    if ($call !== false) {
+                        $call = true;
+                    }
+
+                    $this->basepackages->progress->updateProgress('createBackup', $call, false, $method);
+                }
+            }
+
+            return true;
+        }
+
+        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+        return $this->queueHasErrors(
+            'Progress Error!',
+            $resultQueueLogs,
+            false
+        );
     }
 
     protected function registerRunPrecheckProgressMethods()
@@ -1013,7 +1085,9 @@ class Installer extends BasePackage
                             array_push($this->runProcessProgressMethods,
                                 [
                                     'method'    => 'createBackup',
-                                    'text'      => 'Creating filesystem and database backup...'
+                                    'text'      => 'Creating filesystem and database backup...',
+                                    'args'      => [$taskName, $module],
+                                    'childs'    => $this->basepackages->backuprestore->getBackupProgressMethods()
                                 ]
                             );
                             array_push($this->runProcessProgressMethods,
@@ -1033,6 +1107,13 @@ class Installer extends BasePackage
                             array_push($this->runProcessProgressMethods,
                                 [
                                     'method'    => 'updateVersion-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Updating version for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                    'args'      => [$taskName, $module],
+                                ]
+                            );
+                            array_push($this->runProcessProgressMethods,
+                                [
+                                    'method'    => 'deleteSourceFiles-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
                                     'text'      => 'Updating version for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
                                     'args'      => [$taskName, $module],
                                 ]
@@ -1171,454 +1252,53 @@ class Installer extends BasePackage
         }
     }
 
-    // protected function checkDependencies()
-    // {
-    //     if (count($this->modulesToProcess) === 0) {
-    //         return true;
-    //     }
-
-    //     // var_dump($this->modulesToProcess);die();
-    //     foreach ($this->modulesToProcess as $moduleName => $module) {
-    //         $this->preCheckResult[$moduleName] = [];
-    //         $this->preCheckResult[$moduleName]['module'] = $module['module'];
-    //         $this->preCheckResult[$moduleName]['result'] = 'success';
-    //         $this->preCheckResult[$moduleName]['logs'] = '';
-
-    //         $names = explode('-', $moduleName);
-
-    //         try {
-    //             $jsonFile = $this->helper->decode($this->localContent->read($module['location'] . 'Install/' . substr($names[1], 0, -1) . '.json'), true);
-    //         } catch (\throwable $e) {
-    //             $this->preCheckResult[$moduleName]['result'] = 'error';
-    //             $this->preCheckResult[$moduleName]['logs'] .= 'Reading module ' . $moduleName . ' install JSON file resulted in error. ';
-
-    //             continue;//move onto the next one.
-    //         }
-
-    //         // Make sure we have an entry for all module dependencies. Even if there are no dependencies, we need to make sure we have empty array for them.
-    //         if (!isset($jsonFile['dependencies']) ||
-    //             (isset($jsonFile['dependencies']) &&
-    //              (!isset($jsonFile['dependencies']['core']) ||
-    //               !isset($jsonFile['dependencies']['components']) ||
-    //               !isset($jsonFile['dependencies']['packages']) ||
-    //               !isset($jsonFile['dependencies']['middlewares']) ||
-    //               !isset($jsonFile['dependencies']['views'])))
-    //         ) {
-    //             $this->preCheckResult[$moduleName]['result'] = 'error';
-    //             $this->preCheckResult[$moduleName]['logs'] .= 'Reading module ' . $moduleName . ' dependencies resulted in error. ';
-
-    //             continue;//move onto the next one.
-    //         }
-
-    //         //Check Core dependency
-    //         if (Version::greaterThan($jsonFile['dependencies']['core']['version'], $this->core->getVersion())) {
-    //             //Lets check for latest release on Core as required version is greater than installed version.
-    //             $core = $this->modules->packages->getPackageByName('core');
-    //             $core = $this->modules->manager->updateModuleRepoDetails($core);
-
-    //             if ($core) {
-    //                 $this->preCheckResult[$moduleName]['result'] = 'warning';
-    //                 $this->preCheckResult[$moduleName]['logs'] .= 'Module ' . $moduleName . ' needs core version : ' . $core['update_version'] . '. Installed version of core is : ' . $core['version'] . '. Adding Core to list of updates. ';
-
-    //                 $this->preCheckResult['core'] = [];
-    //                 $this->preCheckResult['core']['module'] = $core;
-    //                 $this->preCheckResult['core']['result'] = 'warning';
-    //                 $name = $module['module']['name'];
-    //                 if (isset($module['module']['display_name'])) {
-    //                     $name = $module['module']['display_name'];
-    //                 }
-    //                 $this->preCheckResult['core']['logs'] = 'Added to queue as required by module : ' . $name . '. ';
-    //             }
-    //         }
-
-    //         //
-    //     }
-
-    //     var_dump($this->preCheckResult);die();
-    //     // $this->getLatestRepositoryModulesData();
-
-    //     ${$this->postData()['type']} =
-    //         $this->{$this->postData()['type']}->getById($this->postData()['id'])->getAllArr();
-
-    //     $dependencies =
-    //         json_decode(${$this->postData()['type']}['dependencies'], true);
-
-    //     $checkForDependencies = $this->checkRegisteredDependencies($dependencies);
-
-    //     if (is_array($checkForDependencies)) {
-    //         $this->packagesData->responseCode = 1;
-
-    //         $this->packagesData->responseMessage =
-    //             'Dependency ' . $checkForDependencies['name'] . ' not found!<br>' .
-    //             'Check repository ' . $checkForDependencies['repo'] . ' for further details.';
-
-    //         return $this->packagesData;
-    //     }
-
-    //     return true;
-    // }
-
-    // protected function checkRegisteredDependencies($dependencies)
-    // {
-    //     $found = true;
-
-    //     $this->dependenciesToDownload = [];
-
-    //     foreach ($dependencies as $dependencyKey => $dependencyValue) {
-    //         if ($dependencyKey === 'app') {
-    //             $dependencyKey = $dependencyKey . 's';
-    //         }
-
-    //         if (!isset($dependencyValue['name'])) { //if dependency is an array
-    //             foreach ($dependencyValue as $multiDependencyKey => $multiDependencyValue) {
-
-    //                 $thisDependency =
-    //                     $this->{$dependencyKey}->getAll(
-    //                         [
-    //                             'name' => $multiDependencyValue['name'],
-    //                             'repo' => $multiDependencyValue['repo'],
-    //                             'version' => $multiDependencyValue['version']
-    //                         ]
-    //                     );
-
-    //                 if (!$thisDependency) {
-
-    //                     $thisDependency =
-    //                         $this->{$dependencyKey}->getAll(
-    //                             [
-    //                                 'name' => $multiDependencyValue['name'],
-    //                                 'repo' => $multiDependencyValue['repo'],
-    //                                 'update_version' => $multiDependencyValue['version'],
-    //                             ]
-    //                         );
-
-    //                     if ($thisDependency) {
-
-    //                         if ($thisDependency[0]->get('update_available') === 1) {
-
-    //                             $multiDependencyValue['type'] = $dependencyKey;
-    //                             $multiDependencyValue['id'] = $thisDependency[0]->get('id');
-    //                             array_push($this->dependenciesToDownload, $multiDependencyValue);
-    //                         }
-
-    //                         $found = true;
-
-    //                     } else {
-    //                         $found = $multiDependencyValue;
-
-    //                         return $found;
-    //                     }
-    //                 } else {
-    //                     if ($thisDependency[0]->get('installed') === 0) {
-
-    //                         $multiDependencyValue['type'] = $dependencyKey;
-    //                         $multiDependencyValue['id'] = $thisDependency[0]->get('id');
-    //                         array_push($this->dependenciesToDownload, $multiDependencyValue);
-    //                     }
-
-    //                     $found = true;
-    //                 }
-    //             }
-    //         } else {
-
-    //             $thisDependency =
-    //                 $this->{$dependencyKey}->getAll(
-    //                     [
-    //                         'name' => $dependencyValue['name'],
-    //                         'repo' => $dependencyValue['repo'],
-    //                         'version' => $dependencyValue['version'],
-    //                     ]
-    //                 );
-
-    //             if (!$thisDependency) {
-
-    //                 $thisDependency =
-    //                     $this->{$dependencyKey}->getAll(
-    //                         [
-    //                             'name' => $dependencyValue['name'],
-    //                             'repo' => $dependencyValue['repo'],
-    //                             'update_version' => $dependencyValue['version'],
-    //                         ]
-    //                     );
-
-    //                     if ($thisDependency) {
-
-    //                         if ($thisDependency[0]->get('update_available') === 1) {
-
-    //                             $dependencyValue['type'] = $dependencyKey;
-    //                             $dependencyValue['id'] = $thisDependency[0]->get('id');
-    //                             array_push($this->dependenciesToDownload, $dependencyValue);
-
-    //                         }
-
-    //                         $found = true;
-
-    //                     } else {
-    //                         $found = $dependencyValue;
-
-    //                         return $found;
-    //                     }
-
-    //             } else {
-    //                 if ($thisDependency[0]->get('installed') === 0) {
-
-    //                     $dependencyValue['type'] = $dependencyKey;
-    //                     $dependencyValue['id'] = $thisDependency[0]->get('id');
-    //                     array_push($this->dependenciesToDownload, $dependencyValue);
-
-    //                 }
-
-    //                 $found = true;
-    //             }
-    //         }
-    //     }
-
-    //     return $found;
-    // }
-
-
-
-    // protected function getLatestRepositoryModulesData()
-    // {
-    //     $repositories = getAllArr($this->repositories->getAll());
-
-    //     if (count($repositories) > 0) {
-    //         $modules = $this->packages->use(Modules::class);
-
-    //         foreach ($repositories as $repositoryKey => $repositoryValue) {
-    //             $sync = $modules->syncRemoteWithLocal($repositoryValue['id']);
-
-    //             if ($sync->packagesData['responseCode'] === 1) {
-    //                 $this->packagesData->responseCode = 1;
-
-    //                 $this->packagesData->responseMessage = 'Error Syncing with repository ' . $repositoryValue['name'];
-
-    //                 return $this->packagesData;
-    //             }
-    //         }
-    //     }
-    // }
-
-    // protected function createBackup()
-    // {
-    //     trace([$this->queue]);
-    //     $this->basepackages->backuprestore->init()->backup();
-
-        //
-        // $this->backupLocation = '.backups/';
-
-        // $now = new \DateTime('now');
-
-        // $this->zip->open(base_path($this->backupLocation . '/' . $now->format('Y_m_d_H_i_s') . '.zip'), $this->zip::CREATE);
-
-        // $framework = [];
-        // $framework['dir'] = [];
-        // $framework['file'] = [];
-
-        // $rootContents = $this->localContent->listContents('/');
-
-        // foreach ($rootContents as $rootKey => $rootValue) {
-        //     if ($rootValue['type'] === 'dir') {
-        //         if ($rootValue['path'] !== '.backups' &&
-        //             $rootValue['path'] !== '.git' &&
-        //             $rootValue['path'] !== 'vendor'
-        //         ) {
-        //             array_push($framework['dir'], $rootValue['path']);
-        //         }
-        //     } else if ($rootValue['type'] === 'file') {
-        //         if ($rootValue['path'] !== '.gitignore' &&
-        //             $rootValue['path'] !== '.htaccess.example'
-        //         ) {
-        //             array_push($framework['file'], $rootValue['path']);
-        //         }
-        //     }
-        // }
-
-        // foreach ($framework['dir'] as $dirKey => $dirValue) {
-        //     $rootDirContents[$dirValue] = $this->localContent->listContents($dirValue, true);
-        // }
-
-        // foreach ($rootDirContents as $rootDirContentsKey => $rootDirContentsValue) {
-        //     if (count($rootDirContentsValue) > 0) {
-        //         foreach ($rootDirContentsValue as $subDirectoryKey => $subDirectory) {
-        //             if ($subDirectory['type'] === 'dir') {
-        //                 $this->zip->addEmptyDir($subDirectory['dirname']);
-        //             } else if ($subDirectory['type'] === 'file') {
-        //                 $this->zip->addFile($subDirectory['path']);
-        //             }
-        //         }
-        //     } else {
-        //         $this->zip->addEmptyDir($rootDirContentsKey);
-        //     }
-        // };
-
-        // foreach ($framework['file'] as $fileKey => $fileValue) {
-        //     $this->zip->addFile($fileValue);
-        // }
-
-        // $this->zip->close();
-
-        // $this->packagesData->backupFile = $now->format('Y_m_d_H_i_s') . '.zip';
-
-        // $this->packagesData->responseCode = 0;
-    // }
-
-    // protected function processInstall()
-    // {
-    //     foreach ($this->modulesToInstall as $moduleToInstallKey => $moduleToInstall) {
-
-    //         $repoNameArr = explode('/', $moduleToInstall['repo']);
-    //         $repoName = end($repoNameArr);
-
-    //         $this->downloadPackagesAndDependencies($moduleToInstall);
-
-    //         $contents = $this->extractDownloadedPackagesAndDependencies(
-    //             $moduleToInstall['name'],
-    //             $repoName,
-    //             $moduleToInstall['type']
-    //         );
-
-    //         if ($contents) {
-    //             $files = $this->copyFilesToDestination(
-    //                 $contents,
-    //                 $moduleToInstall['name'],
-    //                 $repoName,
-    //                 $moduleToInstall['type']
-    //             );
-    //         }
-
-
-    //         $this->{$moduleToInstall['type']}->update(
-    //             [
-    //                 'id'        => $moduleToInstall['id'],
-    //                 'installed' => 1,
-    //                 'files'     => json_encode($files),
-    //             ]
-    //         );
-    //     }
-    // }
-
-    // protected function processUpdate()
-    // {
-    //     $files = [];
-
-    //     foreach ($this->modulesToInstall as $moduleToInstallKey => $moduleToInstall) {
-    //         //
-    //         //Delete only files first
-    //         //Check if directory is empty, then delete directory
-    //         //check if directory is html_compiled, if so, then scan directory, delete all files first and then all directories.
-    //         //Copy all files.
-    //         //
-    //         var_dump(json_decode($this->{$moduleToInstall['type']}->getById($moduleToInstall['id'])->getAllArr()['files'], true));
-    //         // $repoNameArr = explode('/', $moduleToInstall['repo']);
-    //         // $repoName = end($repoNameArr);
-
-    //         // $this->downloadPackagesAndDependencies($moduleToInstall);
-
-    //         // $contents = $this->extractDownloadedPackagesAndDependencies(
-    //         //  $moduleToInstall['name'],
-    //         //  $repoName,
-    //         //  $moduleToInstall['type']
-    //         // );
-
-    //         // if ($contents) {
-    //         //  $files = $this->copyFilesToDestination(
-    //         //      $contents,
-    //         //      $moduleToInstall['name'],
-    //         //      $repoName,
-    //         //      $moduleToInstall['type']
-    //         //  );
-    //         // }
-
-
-    //         // $this->{$moduleToInstall['type']}->update(
-    //         //  [
-    //         //      'id'        => $moduleToInstall['id'],
-    //         //      'installed' => 1,
-    //         //      'files'     => json_encode($files),
-    //         //  ]
-    //         // );
-    //     }
-    // }
-
-    // protected function copyFilesToDestination($contents, $name, $repoName, $type)
-    // {
-    //     $installedFiles = [];
-    //     $installedFiles['dir'] = [];
-    //     $installedFiles['files'] = [];
-
-    //     foreach ($contents as $contentKey => $content) {
-    //         $destDir =
-    //             str_replace(
-    //                 $this->downloadLocation . '/' . strtolower($repoName) . '-master/',
-    //                 '',
-    //                 $content['dirname']
-    //             );
-
-    //         if ($content['type'] === 'dir') {
-
-    //             $this->localContent->createDirectory($destDir . '/' . $content['basename']);
-
-    //             array_push($installedFiles['dir'], $destDir . '/' . $content['basename']);
-
-    //         } else if ($content['type'] === 'file') {
-
-    //             if ($content['basename'] !== '.gitkeep') {
-
-    //                 $this->localContent->copy($content['path'], $destDir . '/' . $content['basename']);
-
-    //                 array_push($installedFiles['files'], $destDir . '/' . $content['basename']);
-    //             }
-
-    //         }
-    //     }
-
-    //     return $installedFiles;
-    //     // if ($type === 'components' || $type === 'packages' || $type === 'middlewares') {
-    //     //  if ($type === 'components') {
-    //     //      $this->localContent->write(
-    //     //          $type . '/'. $this->appName . '/Install/' . $this->componentName . '/files.info', json_encode($installedFiles)
-    //     //      );
-    //     //  } else if ($type === 'packages') {
-    //     //      $this->localContent->write(
-    //     //          $type . '/'. $this->appName . '/Install/' . $this->packageName . '/files.info', json_encode($installedFiles)
-    //     //      );
-    //     //  } else if ($type === 'middlewares') {
-    //     //      $this->localContent->write(
-    //     //          $type . '/'. $this->appName . '/Install/' . $this->middlewareName . '/files.info', json_encode($installedFiles)
-    //     //      );
-    //     //  }
-    //     // } else {
-    //     //  $this->localContent->write($type . '/'. $this->appName . '/files.info', json_encode($installedFiles));
-    //     // }
-    // }
-
-    // protected function deleteDownloads()
-    // {
-    //     $downloadsToDelete = $this->localContent->listContents('.downloads', true);
-
-    //     $downloadedFiles = [];
-    //     $downloadedFiles['dir'] = [];
-    //     $downloadedFiles['files'] = [];
-
-    //     foreach ($downloadsToDelete as $key => $value) {
-    //         if ($value['type'] === 'dir') {
-    //             array_push($downloadedFiles['dir'], $value['path']);
-    //         } else if ($value['type'] === 'file') {
-    //             array_push($downloadedFiles['files'], $value['path']);
-    //         }
-    //     }
-
-    //     if (count($downloadedFiles['files']) > 0) {
-    //         foreach ($downloadedFiles['files'] as $fileKey => $file) {
-    //             $this->localContent->delete($file);
-    //         }
-    //     }
-
-    //     if (count($downloadedFiles['dir']) > 0) {
-    //         foreach ($downloadedFiles['dir'] as $dirKey => $dir) {
-    //             $this->localContent->deleteDir($dir);
-    //         }
-    //     }
-    // }
+    protected function deleteSourceFiles($args)
+    {
+        if ((bool) $this->queue['settings']['files']['deleteSourceFiles'] === false) {
+            return true;
+        }
+
+        $taskName = $args[0];
+        $module = $args[1];
+
+        try {
+            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+            $resultQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['result_logs'];
+
+            $modulesToInstallOrUpdate = $this->modules->manager->getModuleInfo(
+                [
+                    'module_type'   => $module['module_type'],
+                    'module_id'     => $module['id']
+                ]
+            );
+
+            $files =
+                $this->basepackages->utils->scanDir(
+                    'var/tmp/installer/' . $modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' . $modulesToInstallOrUpdate['repo_details']['latestRelease']['name']
+                );
+
+            if (count($files['files']) > 0) {
+                foreach ($files['files'] as $file) {
+                    $this->localContent->delete($file);
+                }
+            }
+
+            if (count($files['dirs']) > 0) {
+                foreach ($files['dirs'] as $dir) {
+                    $this->localContent->deleteDirectory($dir);
+                }
+            }
+
+            $this->localContent->deleteDirectory(
+                'var/tmp/installer/' . $modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' . $modulesToInstallOrUpdate['repo_details']['latestRelease']['name']
+            );
+
+            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
+        } catch (UnableToListContents | UnableToDeleteDirectory | UnableToDeleteFile | \throwable $e) {
+            return $this->queueHasErrors(
+                $e->getMessage(),
+                $resultQueueLogs
+            );
+        }
+    }
 }
