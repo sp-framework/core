@@ -800,6 +800,12 @@ Class Setup
 					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json'),
 					true
 				);
+
+			$this->view->coreJson =
+				$this->helper->decode(
+					$this->localContent->read('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json'),
+					true
+				);
 		}
 
 		echo $this->container->getShared('view')->render(
