@@ -824,6 +824,7 @@ class Installer extends BasePackage
                 $package['version'] = $package['update_version'];
                 $package['updated_on'] = date('c');
                 $package['update_available'] = 0;
+                $package['update_version'] = '';
 
                 if ($this->access->auth->account() && isset($this->access->auth->account()['id'])) {
                     $package['updated_by'] = $this->access->auth->account()['id'];
