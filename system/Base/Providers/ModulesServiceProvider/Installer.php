@@ -1106,14 +1106,14 @@ class Installer extends BasePackage
                             );
                             array_push($this->runProcessProgressMethods,
                                 [
-                                    'method'    => 'updateVersion-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'method'    => 'deleteSourceFiles-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
                                     'text'      => 'Updating version for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
                                     'args'      => [$taskName, $module],
                                 ]
                             );
                             array_push($this->runProcessProgressMethods,
                                 [
-                                    'method'    => 'deleteSourceFiles-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'method'    => 'updateVersion-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
                                     'text'      => 'Updating version for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
                                     'args'      => [$taskName, $module],
                                 ]
