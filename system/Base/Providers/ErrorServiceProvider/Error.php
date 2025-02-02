@@ -250,8 +250,8 @@ class Error
 
 		$userId = 0;
 
-		if ($this->auth->account()) {
-			$userId = $this->auth->account()['id'];
+		if ($this->access->auth->account()) {
+			$userId = $this->access->auth->account()['id'];
 		}
 
 		return '<style type="text/css">
