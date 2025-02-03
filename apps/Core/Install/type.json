@@ -1,7 +1,8 @@
 {
-    "name": "Core",
-    "app_type": "core",
-    "description": "Core apps type for core modules.",
-    "repo": "https://.../",
-    "version": "0.0.0"
+	"app_type" : "core",
+	"dashboards" : "true",
+	"name" : "Core",
+	"description" : "Core apps type for core modules.",
+	"version" : "0.0.0",
+	"repo" : "https://.../"
 }

@@ -1188,6 +1188,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                                      : { },
         '{{componentId}}-{{sectionId}}-app_type'                                : { },
         '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-dashboards'                              : { },
         '{{componentId}}-{{sectionId}}-description'                             : { },
         '{{componentId}}-{{sectionId}}-api_id'                                  : {
             'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
@@ -1291,6 +1292,15 @@ dataCollectionSection =
             messages: {
                 '{{componentId}}-{{sectionId}}-app_type'                        : 'Please enter app type',
                 '{{componentId}}-{{sectionId}}-name'                            : 'Please enter app type name',
+            },
+            onSubmit: function() {
+                if (dataCollectionSection['dataToSubmit']['dashboards'] == '1') {
+                    dataCollectionSection['dataToSubmit']['dashboards'] = true;
+                } else {
+                    dataCollectionSection['dataToSubmit']['dashboards'] = false;
+                }
+
+                return true;
             },
             onSubmitResponse: function(response) {
                 if (response.responseData && response.responseData.newRepo && $('#repo-details').length > 0) {

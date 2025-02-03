@@ -141,12 +141,16 @@ class DevtoolsModules extends BasePackage
                 if ($data['createrepo'] == true) {
                     if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {//Create public repository as well
                         if (!$this->checkRepo($data)) {
-                            $newRepo['base'] = $this->createRepo($data);
+                            if (strtolower($data['app_type']) !== 'core') {
+                                $newRepo['base'] = $this->createRepo($data);
+                            }
                         }
 
                         $data['repo'] = $data['repo'] . '-public';
                         if (!$this->checkRepo($data)) {
-                            $newRepo['public'] = $this->createRepo($data);
+                            if (strtolower($data['app_type']) !== 'core') {
+                                $newRepo['public'] = $this->createRepo($data);
+                            }
                         }
 
                         $this->addResponse('Module added & created new repo.',
@@ -161,7 +165,9 @@ class DevtoolsModules extends BasePackage
                         return;
                     } else {
                         if (!$this->checkRepo($data)) {
-                            $newRepo = $this->createRepo($data);
+                            if (strtolower($data['app_type']) !== 'core') {
+                                $newRepo = $this->createRepo($data);
+                            }
 
                             $this->addResponse('Module added & created new repo.',
                                                0,
@@ -233,7 +239,9 @@ class DevtoolsModules extends BasePackage
             if ($this->modules->{$data['module_type']}->update($data)) {
                 if ($data['createrepo'] == true) {
                     if (!$this->checkRepo($data)) {
-                        $newRepo = $this->createRepo($data);
+                        if (strtolower($data['app_type']) !== 'core') {
+                            $newRepo = $this->createRepo($data);
+                        }
 
                         $this->addResponse('Bundle updated & created new repo.',
                                            0,
@@ -294,12 +302,16 @@ class DevtoolsModules extends BasePackage
                     if ($data['createrepo'] == true && strtolower($data['name']) !== 'core') {
                         if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {//Create public repository as well
                             if (!$this->checkRepo($data)) {
-                                $newRepo['base'] = $this->createRepo($data);
+                                if (strtolower($data['app_type']) !== 'core') {
+                                    $newRepo['base'] = $this->createRepo($data);
+                                }
                             }
 
                             $data['repo'] = $data['repo'] . '-public';
                             if (!$this->checkRepo($data)) {
-                                $newRepo['public'] = $this->createRepo($data);
+                                if (strtolower($data['app_type']) !== 'core') {
+                                    $newRepo['public'] = $this->createRepo($data);
+                                }
                             }
 
                             $this->addResponse('Module updated & created new repo.',
@@ -314,7 +326,9 @@ class DevtoolsModules extends BasePackage
                             return;
                         } else {
                             if (!$this->checkRepo($data)) {
-                                $newRepo = $this->createRepo($data);
+                                if (strtolower($data['app_type']) !== 'core') {
+                                    $newRepo = $this->createRepo($data);
+                                }
 
                                 $this->addResponse('Module updated & created new repo.',
                                                    0,
@@ -407,6 +421,7 @@ class DevtoolsModules extends BasePackage
                         [
                             'name'          => $data['app_type']['newTags'][0],
                             'app_type'      => strtolower($data['app_type']['newTags'][0]),
+                            'dashboards'    => $data['dashboards'],
                             'description'   => 'Added via devtools module add.',
                             'version'       => $data['version'],
                             'api_id'        => $data['api_id'],
@@ -435,9 +450,10 @@ class DevtoolsModules extends BasePackage
                 $appType = $this->apps->types->getAppTypeById($data['id']);
             }
 
-            if (isset($appType) && strtolower($appType['app_type']) !== 'core') {
+            if (isset($appType)) {
                 $appType['name'] = $data['name'];
                 $appType['app_type'] = strtolower($data['app_type']);
+                $appType['dashboards'] = $data['dashboards'];
                 $appType['description'] = $data['description'];
                 $appType['version'] = $data['version'];
                 $appType['api_id'] = $data['api_id'];
@@ -458,9 +474,13 @@ class DevtoolsModules extends BasePackage
                 $this->addUpdateAppTypeFiles($data);
             }
 
-            if ($data['createrepo'] == true) {
+            if (strtolower($appType['app_type']) !== 'core' &&
+                $data['createrepo'] == true
+            ) {
                 if (!$this->checkRepo($data)) {
-                    $newRepo = $this->createRepo($data);
+                    if (strtolower($data['app_type']) !== 'core') {
+                        $newRepo = $this->createRepo($data);
+                    }
 
                     $this->addResponse('Added new app type', 0, ['newRepo' => $newRepo]);
                 }
@@ -498,6 +518,7 @@ class DevtoolsModules extends BasePackage
         $jsonFile = 'apps/' . ucfirst($appType['app_type']) . '/Install/type.json';
 
         $jsonContent["app_type"] = $appType["app_type"];
+        $jsonContent["dashboards"] = $appType["dashboards"];
         $jsonContent["name"] = $appType["name"];
         $jsonContent["description"] = $appType["description"];
         $jsonContent["version"] = $appType["version"];
