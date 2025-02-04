@@ -427,7 +427,7 @@ class DevtoolsModules extends BasePackage
                             'api_id'        => $data['api_id'],
                             'repo'          => $data['repo'],
                             'updated_by'    => '0',
-                            'installed'     => '1'
+                            'installed'     => $data['installed']
                         ];
 
                     $this->apps->types->add($appType);
@@ -458,6 +458,7 @@ class DevtoolsModules extends BasePackage
                 $appType['version'] = $data['version'];
                 $appType['api_id'] = $data['api_id'];
                 $appType['repo'] = $data['repo'];
+                $appType['installed'] = $data['installed'];
 
                 $this->apps->types->update($appType);
 
@@ -467,7 +468,6 @@ class DevtoolsModules extends BasePackage
             } else {
                 $data['app_type'] = strtolower($data['app_type']);
                 $data['updated_by'] = '0';
-                $data['installed'] = '1';
 
                 $this->apps->types->add($data);
 

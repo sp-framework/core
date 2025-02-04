@@ -1,6 +1,6 @@
 {
 	"app_type" : "core",
-	"dashboards" : "true",
+	"dashboards" : true,
 	"name" : "Core",
 	"description" : "Core apps type for core modules.",
 	"version" : "0.0.0",

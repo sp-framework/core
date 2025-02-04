@@ -99,7 +99,6 @@ class ModulesComponent extends BaseComponent
 				$modulesArr = $this->processModulesArr(msort($this->modules->{$modulesType}->{$modulesType}, 'name'));
 				${$modulesType . 'CategoryArr'} = $modulesArr['categoryArr'];
 			}
-
 			if ($modulesArr['modules'] && count($modulesArr['modules']) > 0) {
 				$modules[$modulesType]['value'] = ucfirst($modulesType);
 				$modules[$modulesType]['childs'] = $modulesArr['modules'];
@@ -236,8 +235,12 @@ class ModulesComponent extends BaseComponent
 
 									$routePath = implode('/', $pathArr) . '/Install/';
 								} else if ($module['module_details']['module_type'] === 'views') {
-									if (isset($module['module_details']['base_view_module_id']) && $module['module_details']['base_view_module_id'] != 0) {
-										$baseView = $this->modules->views->getViewById($module['module_details']['base_view_module_id']);
+									if ($module['module_details']['is_subview'] == true) {
+										if ($module['module_details']['base_view_module_id'] != 0) {
+											$baseView = $this->modules->views->getViewById($module['module_details']['base_view_module_id']);
+										} else {
+											$baseView['name'] = 'Default';
+										}
 
 										$pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['module_details']['name']), -1, PREG_SPLIT_NO_EMPTY);
 
