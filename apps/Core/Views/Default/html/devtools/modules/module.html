@@ -1284,6 +1284,7 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-createrepo'                              : { },
+        '{{componentId}}-{{sectionId}}-installed'                               : { },
         '{{componentId}}-{{sectionId}}-form'                                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                            : 'required',
@@ -1292,15 +1293,6 @@ dataCollectionSection =
             messages: {
                 '{{componentId}}-{{sectionId}}-app_type'                        : 'Please enter app type',
                 '{{componentId}}-{{sectionId}}-name'                            : 'Please enter app type name',
-            },
-            onSubmit: function() {
-                if (dataCollectionSection['dataToSubmit']['dashboards'] == '1') {
-                    dataCollectionSection['dataToSubmit']['dashboards'] = true;
-                } else {
-                    dataCollectionSection['dataToSubmit']['dashboards'] = false;
-                }
-
-                return true;
             },
             onSubmitResponse: function(response) {
                 if (response.responseData && response.responseData.newRepo && $('#repo-details').length > 0) {
@@ -1646,6 +1638,8 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-createrepo'                              : { },
+        '{{componentId}}-{{sectionId}}-installed'                               : { },
+        '{{componentId}}-{{sectionId}}-reinstall'                               : { },
         '{{componentId}}-{{sectionId}}-class'                                   : {
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-generate-module-class').click(function(e) {

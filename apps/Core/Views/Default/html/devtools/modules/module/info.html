@@ -1,4 +1,8 @@
 {% set createRepoDisabled = true %}
+{% set moduleInstallChecked = false %}
+{% if module['module_details']['installed'] is defined and module['module_details']['installed'] == true %}
+    {% set moduleInstallChecked = true %}
+{% endif %}
 {% if module['id'] is defined %}
     {% set moduleId = module['id'] %}
     {% set moduleName = module['name'] %}
@@ -409,6 +413,54 @@
             ]
         )}}
     </div>
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'installed',
+                'fieldLabel'                     : 'Installed?',
+                'fieldHelp'                      : true,
+                'fieldDisabled'                  : false,
+                'fieldHelpTooltipContent'        : 'Install/Uninstall module from system.',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : moduleInstallChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    {% if module['id'] is defined and type === 'packages' %}
+        <div class="col-md-2">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'reinstall',
+                    'fieldLabel'                     : 'Reinstall Module?',
+                    'fieldHelp'                      : true,
+                    'fieldDisabled'                  : false,
+                    'fieldHelpTooltipContent'        : 'This will reinstall the module.',
+                    'fieldType'                      : 'checkbox',
+                    'fieldCheckboxType'              : 'danger',
+                    'fieldCheckboxChecked'           : false,
+                    'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+    {% endif %}
 </div>
 {% if type !== 'views' %}
 <div class="row">
