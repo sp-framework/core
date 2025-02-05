@@ -13,6 +13,7 @@ use Phalcon\Filter\Validation\Validator\PresenceOf;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use System\Base\BasePackage;
+use System\Base\Providers\CoreServiceProvider\Install\Install as CoreInstall;
 use z4kn4fein\SemVer\Version;
 
 class DevtoolsModules extends BasePackage
@@ -354,6 +355,12 @@ class DevtoolsModules extends BasePackage
                         $this->core->update($core);
                     }
 
+                    if ((isset($data['reinstall_table']) && $data['reinstall_table'] == true) ||
+                        (isset($data['truncate_table']) && $data['truncate_table'] == true)
+                    ) {
+                        $this->reinstallTruncateTable($data);
+                    }
+
                     $this->addResponse('Module updated');
 
                     return;
@@ -389,6 +396,54 @@ class DevtoolsModules extends BasePackage
             $this->addResponse('Removed module from DB. Remove files manually...');
         } else {
             $this->addResponse('Error removing module.', 1);
+        }
+    }
+
+    protected function reinstallTruncateTable($data)
+    {
+        $moduleToReinstall = $this->modules->manager->getModuleInfo(
+            [
+                'module_type'   => $data['module_type'],
+                'module_id'     => $data['id']
+            ]
+        );
+
+        $class = $moduleToReinstall['class'];
+
+        if ($moduleToReinstall['app_type'] !== 'core') {
+            $classArr = explode('\\', $moduleToReinstall['class']);
+            $classArr = array_slice($classArr, 0, -1);
+            $class = implode('\\', $classArr) . '\\Install\\Install';
+        }
+
+        $path = lcfirst(str_replace('\\', '/', $class) . '.php');
+
+        try {
+            if ($this->localContent->fileExists($path)) {
+                $module = new $class();
+
+                if ($data['app_type'] === 'core') {
+                    if ($data['type'] === 'packages') {
+                        $moduleModel = $module->useModel();
+                        $coreInstall = new CoreInstall;
+
+                        if (isset($data['truncate_table']) && $data['truncate_table'] == true) {
+                            $coreInstall->init([$moduleModel->getSource()])->truncate();
+                        } else if (isset($data['reinstall_table']) && $data['reinstall_table'] == true) {
+                            $coreInstall->init([$moduleModel->getSource()])->install();
+                        }
+                    }
+                } else {
+                    $module = new $class();
+                    if (isset($data['truncate_table']) && $data['truncate_table'] == true && method_exists($module, 'truncate')) {
+                        $module->init()->truncate();
+                    } else if (isset($data['reinstall_table']) && $data['reinstall_table'] == true) {
+                        $module->init()->install();
+                    }
+                }
+            }
+        } catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
+            throw $e;
         }
     }
 

@@ -7,16 +7,31 @@ use System\Base\Installer\Packages\Setup\Schema;
 
 class Install extends BasePackage
 {
-    protected $installer;
-
     protected $databases;
 
-    public function install($installer)
+    public function init($schemaNames = [])
     {
-        $this->installer = $installer;
+        $databases = (new Schema)->getSchema();
 
-        $this->databases = (new Schema)->getSchema();
+        $this->databases = $databases;
 
+        //Only update 1 database
+        if (count($schemaNames) > 0) {
+            $schemaNamesDatabase = [];
+            foreach ($schemaNames as $schemaName) {
+                if (isset($databases[$schemaName])) {
+                    $schemaNamesDatabase[$schemaName] = $databases[$schemaName];
+                }
+            }
+
+            $this->databases = $schemaNamesDatabase;
+        }
+
+        return $this;
+    }
+
+    public function install()
+    {
         $this->preInstall();
 
         $this->installDb();
@@ -26,7 +41,7 @@ class Install extends BasePackage
         return true;
     }
 
-    protected function preInstall()
+    public function preInstall()
     {
         //Do version specific update for any future version upgrades.
         // if ($this->core->core['version'] === 'x.x.x') {
@@ -36,11 +51,9 @@ class Install extends BasePackage
         return true;
     }
 
-    protected function installDb()
+    public function installDb()
     {
         if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'ff') {
-            $dbTablesList = $this->describe();
-
             foreach ($this->databases as $tableName => $tableClass) {
                 if ($tableClass['model'] && $tableClass['model']->getSource()) {
                     $tableName = $tableClass['model']->getSource();
@@ -168,10 +181,36 @@ class Install extends BasePackage
         return true;
     }
 
-    protected function postInstall()
+    public function postInstall()
     {
         //Do anything after installation.
 
         return true;
+    }
+
+    public function truncate()
+    {
+        if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'ff') {
+            foreach ($this->databases as $tableName => $tableClass) {
+                if ($tableClass['model'] && $tableClass['model']->getSource()) {
+                    $tableName = $tableClass['model']->getSource();
+
+                    $this->dropTable($tableName);
+                }
+            }
+
+        }
+
+        if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'db') {
+            foreach ($this->databases as $tableName => $tableClass) {
+                if ($tableClass['model'] && $tableClass['model']->getSource()) {
+                    $tableName = $tableClass['model']->getSource();
+
+                    $this->ff->store($tableName)->deleteStore();
+                }
+            }
+        }
+
+        $this->installDb();
     }
 }

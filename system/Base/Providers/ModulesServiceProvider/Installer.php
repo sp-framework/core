@@ -814,7 +814,7 @@ class Installer extends BasePackage
 
         if ($module['name'] === 'Core') {
             try {
-                (new CoreInstall)->install($this);
+                (new CoreInstall)->init()->install();
             } catch (\throwable $e) {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
 
@@ -839,8 +839,15 @@ class Installer extends BasePackage
 
                 $class = implode('\\', $classArr) . '\\Install\\Install';
 
-                //See if the Install File exists first
-                (new $class)->install($this);
+                $path = lcfirst(str_replace('\\', '/', $class) . '.php');
+
+                try {
+                    if ($this->localContent->fileExists($path)) {
+                        (new $class)->init()->install();
+                    }
+                } catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
+                    return true;
+                }
             } catch (\throwable $e) {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
 
