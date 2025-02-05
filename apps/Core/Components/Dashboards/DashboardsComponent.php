@@ -234,6 +234,19 @@ class DashboardsComponent extends BaseComponent
         );
     }
 
+    public function getDashboardsByAppTypeAction()
+    {
+        $this->requestIsPost();
+
+        $this->basepackages->dashboards->getDashboardsByAppType($this->postData()['app_type']);
+
+        $this->addResponse(
+            $this->basepackages->dashboards->packagesData->responseMessage,
+            $this->basepackages->dashboards->packagesData->responseCode,
+            $this->basepackages->dashboards->packagesData->responseData
+        );
+    }
+
     public function searchAccountAction()
     {
         $this->requestIsPost();

@@ -44,10 +44,8 @@
     {% set appAutoUnblockIpMinutes = app['auto_unblock_ip_minutes'] %}
     {% set appIncorrectLoginAttemptBlockIp = app['incorrect_login_attempt_block_ip'] %}
     {% set wizard = false %}
-    {% if appType == 'core' or appType == 'dash' %}
-        {% set defaultDashboardHidden = '' %}
-    {% endif %}
     {% if app['settings']['defaultDashboard'] is defined %}
+        {% set defaultDashboardHidden = '' %}
         {% set defaultDashboard = app['settings']['defaultDashboard'] %}
     {% endif %}
 {% else %}
@@ -165,6 +163,7 @@
                         'fieldDataSelect2OptionsKey'           : 'app_type',
                         'fieldDataSelect2OptionsValue'         : 'name',
                         'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2AddDataAttrFromData'  : ['dashboards'],
                         'fieldDataSelect2OptionsSelected'      : appType
                     ]
                 )}}
@@ -226,6 +225,7 @@
 </form>
 {% endif %}
 <script>
+/* globals paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -255,21 +255,62 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                                  : { },
         '{{componentId}}-{{sectionId}}-name'                                : { },
         '{{componentId}}-{{sectionId}}-app_type'                            : {
-            'placeholder'   : 'SELECT APP TYPE'
-        },
-        '{{componentId}}-{{sectionId}}-default_dashboard'                   : {
-            'placeholder'   : 'SELECT DEFAULT DASHBOARD',
+            'placeholder'   : 'SELECT APP TYPE',
             afterInit       : function() {
                 $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function (e) {
                     var data = e.params.data;
 
-                    if (data.id === 'dash' || data.id === 'core') {
-                        $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', false);
-                        $('#default_dashboard').attr('hidden', false);
-                        $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
-                        $('#{{componentId}}-{{sectionId}}-default_dashboard').on('select2:select', function() {
-                            window.dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['formValidator'].valid();
-                        });
+                    if ($(data.element).data()['dashboards'] && $(data.element).data()['dashboards'] == true) {
+                        var postData = { };
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['app_type'] = $(data.element).data()['value'];
+
+                        $.post('{{links.url("dashboards/getDashboardsByAppType")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $("#security-token").attr("name", response.tokenKey);
+                                $("#security-token").val(response.token);
+                            }
+
+                            if (response.responseCode == 0) {
+                                if (response.responseData && response.responseData.dashboards) {
+                                    if (response.responseData.dashboards.length === 0) {
+                                        $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', true);
+                                        $('#default_dashboard').attr('hidden', true);
+                                        $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
+
+                                        paginatedPNotify('error', {
+                                            title   : 'No dashboards for app type ' + $(data.element).data()['value'] +  ' found! Contact developer.'
+                                        });
+
+                                        return;
+                                    }
+
+                                    for (var dashboard in response.responseData.dashboards) {
+                                        var newOption = new Option(
+                                            response.responseData.dashboards[dashboard]['name'],
+                                            response.responseData.dashboards[dashboard]['id'],
+                                            false,
+                                            false
+                                        );
+
+                                        $('#{{componentId}}-{{sectionId}}-default_dashboard').append(newOption).trigger('change');
+                                    }
+
+                                    $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', false);
+                                    $('#default_dashboard').attr('hidden', false);
+                                    $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
+                                    $('#{{componentId}}-{{sectionId}}-default_dashboard').on('select2:select', function() {
+                                        window.dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['formValidator'].valid();
+                                    });
+                                }
+
+                                return
+                            }
+
+                            paginatedPNotify('error', {
+                                title   : response.responseMessage
+                            });
+                        }, 'json');
                     } else {
                         $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', true);
                         $('#default_dashboard').attr('hidden', true);
@@ -277,6 +318,9 @@ dataCollectionSection =
                     }
                 });
             }
+        },
+        '{{componentId}}-{{sectionId}}-default_dashboard'                   : {
+            'placeholder'   : 'SELECT DEFAULT DASHBOARD'
         },
         '{{componentId}}-{{sectionId}}-route'                               : { },
         '{{componentId}}-{{sectionId}}-description'                         : { },

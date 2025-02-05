@@ -38,6 +38,13 @@ class Types
                     ]
                 ),
                 new Column(
+                    'dashboards',
+                    [
+                        'type'    => Column::TYPE_BOOLEAN,
+                        'notNull' => true
+                    ]
+                ),
+                new Column(
                     'description',
                     [
                         'type'    => Column::TYPE_VARCHAR,

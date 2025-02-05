@@ -43,6 +43,14 @@ class Dashboards
                     ]
                 ),
                 new Column(
+                    'app_type',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
                     'created_by',
                     [
                         'type'    => Column::TYPE_INTEGER,

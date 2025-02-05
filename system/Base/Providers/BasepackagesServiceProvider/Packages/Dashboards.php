@@ -69,6 +69,21 @@ class Dashboards extends BasePackage
         return $dashboards;
     }
 
+    public function getDashboardsByAppType($appType)
+    {
+        $dashboards = [];
+
+        foreach($this->dashboards as $dashboard) {
+            if ($dashboard['app_type'] == $appType) {
+                array_push($dashboards, $dashboard);
+            }
+        }
+
+        $this->addResponse('Ok', 0, ['dashboards' => $dashboards]);
+
+        return $dashboards;
+    }
+
     public function addDashboard(array $data)
     {
         $data['app_id'] = $this->apps->getAppInfo()['id'];

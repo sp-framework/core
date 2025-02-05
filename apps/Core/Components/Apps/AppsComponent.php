@@ -14,7 +14,7 @@ class AppsComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $typesArr = $this->apps->types->types;
+        $typesArr = $this->apps->types->getInstalledAppTypes();
 
         $this->view->types = $typesArr;
 
@@ -259,6 +259,8 @@ class AppsComponent extends BaseComponent
                     return;
                 }
                 $this->view->acceptableUsernames = $this->apps->getAcceptableUsernamesForAppId();
+
+                $this->view->dashboards = $this->basepackages->dashboards->init()->getDashboardsByAppType($app['app_type']);
             } else {
                 $this->view->app = null;
                 $domains = $this->domains->domains;
@@ -286,9 +288,10 @@ class AppsComponent extends BaseComponent
                 $this->view->publicStorages = $publicStorages;
 
                 $this->view->privateStorages = $privateStorages;
+
+                $this->view->dashboards = [];
             }
 
-            $this->view->dashboards = $this->basepackages->dashboards->init()->dashboards;
             $this->view->roles = $this->basepackages->roles->init()->roles;
             $this->view->pick('apps/view');
 
