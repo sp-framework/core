@@ -5,7 +5,7 @@ namespace System\Base\Providers\CoreServiceProvider\Install;
 use System\Base\BasePackage;
 use System\Base\Installer\Packages\Setup\Schema;
 
-class Package extends BasePackage
+class Install extends BasePackage
 {
     protected $installer;
 

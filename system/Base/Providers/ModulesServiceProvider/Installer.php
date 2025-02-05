@@ -15,7 +15,7 @@ use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
 use System\Base\BasePackage;
 use System\Base\Installer\Packages\Setup\Schema;
-use System\Base\Providers\CoreServiceProvider\Install\Package as CorePackage;
+use System\Base\Providers\CoreServiceProvider\Install\Install as CoreInstall;
 use xobotyi\rsync\Rsync;
 use z4kn4fein\SemVer\Version;
 
@@ -809,16 +809,12 @@ class Installer extends BasePackage
         $taskName = $args[0];
         $module = $args[1];
 
-        if ($module['module_type'] !== 'packages') {
-            return true;
-        }
-
         $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
         $resultQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['result_logs'];
 
         if ($module['name'] === 'Core') {
             try {
-                (new CorePackage)->install($this);
+                (new CoreInstall)->install($this);
             } catch (\throwable $e) {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
 
@@ -841,8 +837,9 @@ class Installer extends BasePackage
 
                 $classArr = array_slice($classArr, 0, -1);
 
-                $class = implode('\\', $classArr) . '\\Install\\Package';
+                $class = implode('\\', $classArr) . '\\Install\\Install';
 
+                //See if the Install File exists first
                 (new $class)->install($this);
             } catch (\throwable $e) {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';

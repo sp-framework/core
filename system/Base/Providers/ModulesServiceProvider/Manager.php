@@ -463,6 +463,8 @@ class Manager extends BasePackage
                 return true;
             }
         } catch (ClientException | \throwable $e) {
+            //To troubleshoot sync errors
+            // trace([$e]);
             $this->addResponse($e->getMessage(), 1);
 
             return false;
