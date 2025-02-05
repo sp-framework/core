@@ -288,9 +288,9 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-clone-module').off();
                 $('#{{componentId}}-{{sectionId}}-clone-module').click(function() {
                     if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true, false, true);
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true, false, true, false, isSubView);
                     } else {
-                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, false, true);
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, false, true, false, isSubView);
                     }
                 });
 
