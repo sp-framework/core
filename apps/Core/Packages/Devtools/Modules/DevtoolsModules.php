@@ -1135,6 +1135,29 @@ $file .= '
             return false;
         }
 
+        try {
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ComponentInstallInstall.txt');
+        } catch (FilesystemException | UnableToReadFile $exception) {
+            $this->addResponse('Unable to read module base component file.');
+
+            return false;
+        }
+
+        $moduleFilesLocation = $moduleFilesLocation . 'Install';
+        $fileName = $moduleFilesLocation . '/Install.php';
+        $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+        // $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+        $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
+
+        try {
+            $this->localContent->write($fileName, $file);
+            array_push($this->newFiles, $fileName);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write module component file');
+
+            return false;
+        }
+
         return true;
     }
 
@@ -1166,6 +1189,31 @@ $file .= '
 
             return false;
         }
+
+        try {
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/MiddlewareInstallInstall.txt');
+        } catch (FilesystemException | UnableToReadFile $exception) {
+            $this->addResponse('Unable to read module base component file.');
+
+            return false;
+        }
+
+        $moduleFilesLocation = $moduleFilesLocation . 'Install';
+        $fileName = $moduleFilesLocation . '/Install.php';
+        $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+        // $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+        $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
+
+        try {
+            $this->localContent->write($fileName, $file);
+            array_push($this->newFiles, $fileName);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write module component file');
+
+            return false;
+        }
+
+        return true;
     }
 
     protected function generateNewPackagesFiles($moduleFilesLocation, $data)
@@ -1246,7 +1294,7 @@ $file .= '
             $moduleFilesLocation = $moduleFilesLocation . 'Install/Schema';
             $fileName = $moduleFilesLocation . '/' . $data['name'] . '.php';
             $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-            $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+            // $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
             $moduleSchemaClass = $moduleFilesLocationClass . '\\' . $data['name'];
         }
 
@@ -1265,7 +1313,7 @@ $file .= '
         //Package Installer File only for apps.
         if (!str_starts_with($data['category'], 'basepackages') && $data['category'] !== 'providers') {
             try {
-                $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/PackageInstallPackage.txt');
+                $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/PackageInstallInstall.txt');
             } catch (FilesystemException | UnableToReadFile $exception) {
                 $this->addResponse('Unable to read module base package file.');
 
@@ -1274,9 +1322,9 @@ $file .= '
 
             if ($data['category'] !== str_starts_with($data['category'], 'basepackages') && $data['category'] !== 'providers') {
                 $moduleFilesLocation = str_replace('/Schema', '', $moduleFilesLocation);
-                $fileName = $moduleFilesLocation . '/' . 'Package.php';
+                $fileName = $moduleFilesLocation . '/' . 'Install.php';
                 $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-                $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+                // $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
                 $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
                 $file = str_replace('"PACKAGESCHEMACLASS"', $moduleSchemaClass . ';', $file);
                 $file = str_replace('"PACKAGESCHEMANAME"', $data['name'], $file);
@@ -1333,7 +1381,7 @@ $file .= '
             $moduleFilesLocation = $moduleFilesLocation . 'Model';
             $fileName = $moduleFilesLocation . '/' . 'Apps' . ucfirst($data['app_type']) . ucfirst($data['name']) . '.php';
             $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-            $moduleFilesLocationClass = str_replace('\\' . ucfirst($data['name']), '', $moduleFilesLocationClass);
+            // $moduleFilesLocationClass = str_replace('\\' . ucfirst($data['name']), '', $moduleFilesLocationClass);
             $className = 'Apps' . ucfirst($data['app_type']) . ucfirst($data['name']);
         }
 
