@@ -192,7 +192,7 @@ class ModulesComponent extends BaseComponent
 									 $module['module_details']['category'] === 'providers')
 								) {
 									if ($module['module_details']['category'] === 'basepackagesApis') {
-										$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/ApiClientServices/Apis/';
+										$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/Api/Apis/';
 									} else if (str_starts_with($module['module_details']['category'], 'basepackages')) {
 										$moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/';
 									} else if ($module['module_details']['category'] === 'providers') {

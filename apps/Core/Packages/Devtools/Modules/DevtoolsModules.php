@@ -832,7 +832,7 @@ class DevtoolsModules extends BasePackage
                  $data['category'] === 'providers')
             ) {
                 if ($data['category'] === 'basepackagesApis') {
-                    $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/ApiClientServices/Apis/';
+                    $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/Api/Apis/';
                 } else if (str_starts_with($data['category'], 'basepackages')) {
                     $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/';
                 } else if ($data['category'] === 'providers') {
@@ -851,12 +851,12 @@ class DevtoolsModules extends BasePackage
             (str_starts_with($data['category'], 'basepackages') ||
             $data['category'] === 'providers')
         ) {
-            if ($data['category'] === 'basepackagesApis') {
+            // if ($data['category'] === 'basepackagesApis') {
                 $pathArr = preg_split('/(?=[A-Z])/', ucfirst($data['name']), -1, PREG_SPLIT_NO_EMPTY);
                 $path = implode('/', $pathArr);
-            } else {
-                $path = ucfirst($data['name']);
-            }
+            // } else {
+            //     $path = ucfirst($data['name']);
+            // }
 
             return
                 $moduleLocation .
@@ -929,7 +929,7 @@ class DevtoolsModules extends BasePackage
                  $data['category'] === 'providers')
             ) {
                 if ($data['category'] === 'basepackagesApis') {
-                    $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/ApiClientServices/Apis/';
+                    $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Api/Apis/';
                 } else if (str_starts_with($data['category'], 'basepackages')) {
                     $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/';
                 } else if ($data['category'] === 'providers') {
@@ -1254,7 +1254,7 @@ $file .= '
         if (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'providers') {
             if (str_starts_with($data['category'], 'basepackages')) {
                 if ($data['category'] === 'basepackagesApis') {
-                    $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/ApiClientServices/Apis/';
+                    $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/Api/Apis/';
                     $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
                     unset($pathArr[$this->helper->lastKey($pathArr)]);
 
