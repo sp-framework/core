@@ -354,11 +354,7 @@ class Schema
             'service_provider_api_scopes'               => [
                     'schema'    => new Scopes,
                     'model'     => new ServiceProviderApiScopes,
-                ],
-            'test_schema'                               => [
-                    'schema'    => new \System\Base\Installer\Packages\Setup\Schema\TestSchema,
-                    'model'     => new \System\Base\Installer\Packages\Setup\Schema\TestModel,
-                ],
+                ]
         ];
     }
 }

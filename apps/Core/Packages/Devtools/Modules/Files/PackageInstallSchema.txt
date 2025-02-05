@@ -58,7 +58,7 @@ class "PACKAGESCHEMANAME"
         return
         [
             new Index(
-                'column_first_name_index',
+                'column_INDEX',
                 [
                     'first_name'
                 ],

@@ -119,10 +119,10 @@ class ServicesComponent extends BaseComponent
     protected function replaceColumns($dataArr)
     {
         foreach ($dataArr as $dataKey => &$data) {
-            if (isset($data['in_use']) && $data['in_use'] == '0') {
-                $data['in_use'] = '<span class="badge badge-secondary text-uppercase">No</span>';
-            } else if (isset($data['in_use']) && $data['in_use'] == '1') {
+            if (isset($data['in_use']) && $data['in_use'] == '1') {
                 $data['in_use'] = '<span class="badge badge-success text-uppercase">Yes</span>';
+            } else {
+                $data['in_use'] = '<span class="badge badge-secondary text-uppercase">No</span>';
             }
 
             $data['category'] = ucfirst($data['category']);

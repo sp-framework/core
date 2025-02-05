@@ -238,17 +238,30 @@ class Installer extends BasePackage
         $precheck = $args[2];
 
         if ($module['module_type'] === 'external') {
-            $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck'] = 'fail';
-            $preCheckQueueLogs = &$this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'];
+            if ($precheck) {
+                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck'] = 'fail';
+                $preCheckQueueLogs = &$this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'];
+            } else {
+                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['result'] = 'fail';
+                $resultQueueLogs = &$this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['result_logs'];
+            }
 
             if (isset($module['hasPatch']) && $module['hasPatch'] === true) {
                 if (!isset($module['composerJsonFile']['extra']['patches'][$module['name']])) {
                     $this->cleanup(['composer']);
 
-                    return $this->queueHasErrors(
-                        'External packages should have package defined, but are missing from the composer json file for : ' . $module['name'],
-                        $preCheckQueueLogs
-                    );
+                    if ($precheck) {
+                        return $this->queueHasErrors(
+                            'External packages should have package defined, but are missing from the composer json file for : ' . $module['name'],
+                            $preCheckQueueLogs
+                        );
+                    } else {
+                        return $this->queueHasErrors(
+                            'External packages should have package defined, but are missing from the composer json file for : ' . $module['name'],
+                            $resultQueueLogs,
+                            false
+                        );
+                    }
                 }
 
                 $patches = $this->basepackages->utils->scanDir($this->downloadLocation .
@@ -264,10 +277,18 @@ class Installer extends BasePackage
                 if (count($patches['files']) === 0) {
                     $this->cleanup(['composer']);
 
-                    return $this->queueHasErrors(
-                        'External package requires a patch which is missing from the repository : ' . $module['root_module']['repo'],
-                        $preCheckQueueLogs
-                    );
+                    if ($precheck) {
+                        return $this->queueHasErrors(
+                            'External package requires a patch which is missing from the repository : ' . $module['root_module']['repo'],
+                            $preCheckQueueLogs
+                        );
+                    } else {
+                        return $this->queueHasErrors(
+                            'External package requires a patch which is missing from the repository : ' . $module['root_module']['repo'],
+                            $resultQueueLogs,
+                            false
+                        );
+                    }
                 }
 
                 $modulePatchName = str_replace(['/','-'], ['_','_'], $module['name']);
@@ -276,10 +297,18 @@ class Installer extends BasePackage
                 if (count($patches['files']) !== count($module['composerJsonFile']['extra']['patches'][$module['name']])) {
                     $this->cleanup(['composer']);
 
-                    return $this->queueHasErrors(
-                        'External package number of patches do not match what is defined in the composer json file for repository : ' . $module['root_module']['repo'],
-                        $preCheckQueueLogs
-                    );
+                    if ($precheck) {
+                        return $this->queueHasErrors(
+                            'External package number of patches do not match what is defined in the composer json file for repository : ' . $module['root_module']['repo'],
+                            $preCheckQueueLogs
+                        );
+                    } else {
+                        return $this->queueHasErrors(
+                            'External package number of patches do not match what is defined in the composer json file for repository : ' . $module['root_module']['repo'],
+                            $resultQueueLogs,
+                            false
+                        );
+                    }
                 }
 
                 $foundAll = [];
@@ -296,10 +325,18 @@ class Installer extends BasePackage
                 if (in_array('false', $foundAll)) {
                     $this->cleanup(['composer']);
 
-                    return $this->queueHasErrors(
-                        'External package all patches not found in the external/patches directory as per the  composer json file for repository : ' . $module['root_module']['repo'],
-                        $preCheckQueueLogs
-                    );
+                    if ($precheck) {
+                        return $this->queueHasErrors(
+                            'External package all patches not found in the external/patches directory as per the  composer json file for repository : ' . $module['root_module']['repo'],
+                            $preCheckQueueLogs
+                        );
+                    } else {
+                        return $this->queueHasErrors(
+                            'External package all patches not found in the external/patches directory as per the  composer json file for repository : ' . $module['root_module']['repo'],
+                            $resultQueueLogs,
+                            false
+                        );
+                    }
                 }
 
                 try {
@@ -322,10 +359,18 @@ class Installer extends BasePackage
             } catch (FilesystemException | UnableToWriteFile $e) {
                 $this->cleanup(['composer']);
 
-                return $this->queueHasErrors(
-                    'Error writing file external package composer file : ' . $externalComposerFileName,
-                    $preCheckQueueLogs
-                );
+                if ($precheck) {
+                    return $this->queueHasErrors(
+                        'Error writing file external package composer file : ' . $externalComposerFileName,
+                        $preCheckQueueLogs
+                    );
+                } else {
+                    return $this->queueHasErrors(
+                        'Error writing file external package composer file : ' . $externalComposerFileName,
+                        $resultQueueLogs,
+                        false
+                    );
+                }
             }
 
             try {
@@ -333,7 +378,11 @@ class Installer extends BasePackage
                 putenv('COMPOSER=' . $externalComposerFileName);
 
                 $stream = fopen(base_path('external/' . $externalComposerFileName . '.install'), 'w');
-                $input = new \Symfony\Component\Console\Input\StringInput('install --dry-run -d ' . base_path('external/'));
+                if ($precheck) {
+                    $input = new \Symfony\Component\Console\Input\StringInput('install --dry-run -d ' . base_path('external/'));
+                } else {
+                    $input = new \Symfony\Component\Console\Input\StringInput('install -d ' . base_path('external/'));
+                }
                 $output = new \Symfony\Component\Console\Output\StreamOutput($stream);
 
                 $application = new \Composer\Console\Application();
@@ -341,25 +390,38 @@ class Installer extends BasePackage
 
                 $app = $application->run($input, $output);
 
-                $precheckLog = $this->localContent->read('external/' . $externalComposerFileName . '.install');
+                $installLogs = $this->localContent->read('external/' . $externalComposerFileName . '.install');
 
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck'] = 'pass';
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $precheckLog;
+                if ($precheck) {
+                    $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck'] = 'pass';
+                    $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $installLogs;
+                } else {
+                    $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['result'] = 'pass';
+                    $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['result_logs'] = $installLogs;
+                }
             } catch (\throwable | UnableToReadFile $e) {
                 $this->cleanup(['composer']);
 
-                return $this->queueHasErrors($e->getMessage(), $preCheckQueueLogs);
+                return $this->queueHasErrors($e->getMessage(), $preCheckQueueLogs, $precheck);
             }
 
             if ($app !== 0) {
                 $this->cleanup(['composer']);
 
-                return $this->queueHasErrors('Precheck for composer package failed : ' . $module['name'], $preCheckQueueLogs);
+                if ($precheck) {
+                    return $this->queueHasErrors('Precheck for composer package failed : ' . $module['name'] . '<br>' . $installLogs, $preCheckQueueLogs);
+                } else {
+                    return $this->queueHasErrors('Precheck for composer package failed : ' . $module['name'] . '<br>' . $installLogs, $resultQueueLogs, false);
+                }
             }
         } else {
             $this->cleanup(['composer']);
 
-            return $this->queueHasErrors('Incorrect external package type: ' . $module['name'], $preCheckQueueLogs);
+            if ($precheck) {
+                return $this->queueHasErrors('Incorrect external package type: ' . $module['name'], $preCheckQueueLogs);
+            } else {
+                return $this->queueHasErrors('Incorrect external package type: ' . $module['name'], $resultQueueLogs, false);
+            }
         }
 
         return true;
@@ -1205,7 +1267,7 @@ class Installer extends BasePackage
                                 [
                                     'method'    => 'processExternalPackages-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
                                     'text'      => 'Perform precheck for external package ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
-                                    'args'      => [$taskName, $module],
+                                    'args'      => [$taskName, $module, false],
                                 ]
                             );
                         } else {

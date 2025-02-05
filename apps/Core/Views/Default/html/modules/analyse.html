@@ -449,9 +449,9 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
             logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results']['first']['external'][$(this).data()['id']]);
         } else if ($(this).data()['moduletype'] === 'packages' &&
                    $(this).data()['task'] === 'update' &&
-                   dataCollectionSectionForm['vars']['queue']['results']['first']['packages'][$(this).data()['id']]
+                   dataCollectionSectionForm['vars']['queue']['results']['update']['packages'][$(this).data()['id']]
         ) {
-            logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results']['first']['packages'][$(this).data()['id']]);
+            logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results']['update']['packages'][$(this).data()['id']]);
         } else {
             logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results'][$(this).data()['task']][$(this).data()['moduletype']][$(this).data()['id']]);
         }

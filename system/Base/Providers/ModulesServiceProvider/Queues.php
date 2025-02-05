@@ -777,7 +777,9 @@ class Queues extends BasePackage
             if ($moduleType === 'views' && array_key_exists('is_subview', $module)) {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['is_subview'] = $module['is_subview'];
             }
-            $this->queueTasks[$taskName][$moduleType][$module['id']]['app_type'] = $module['app_type'];
+            if ($moduleType !== 'external') {
+                $this->queueTasks[$taskName][$moduleType][$module['id']]['app_type'] = $module['app_type'];
+            }
             if (!$version) {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['version'] =
                     (($taskName === 'update' || $taskName === 'first') && $module['update_version'] && $module['update_version'] !== '') ? $module['version'] . ' -> ' . $module['update_version'] : $module['version'];
