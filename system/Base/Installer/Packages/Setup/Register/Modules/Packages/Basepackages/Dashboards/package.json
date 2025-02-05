@@ -1,0 +1,26 @@
+{
+	"name" : "Dashboards",
+	"display_name" : "Dashboards",
+	"description" : "Basepackage Dashboards",
+	"module_type" : "packages",
+	"app_type" : "core",
+	"category" : "basepackages",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Dashboards",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : [],
+		"packages" : [],
+		"middlewares" : [],
+		"views" : [],
+		"external" : []
+	},
+	"settings" : []
+}
