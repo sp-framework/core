@@ -21,7 +21,7 @@ class BasepackagesDashboards extends BaseModel
 
     public $shared;
 
-    public $is_default;
+    public $user_default;
 
     public $settings;
 

@@ -57,9 +57,9 @@ class Dashboards
                     ]
                 ),
                 new Column(
-                    'is_default',
+                    'user_default',
                     [
-                        'type'    => Column::TYPE_BOOLEAN,
+                        'type'    => Column::TYPE_JSON,
                         'notNull' => false
                     ]
                 ),

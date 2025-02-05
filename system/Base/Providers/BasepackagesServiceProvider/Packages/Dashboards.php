@@ -56,9 +56,25 @@ class Dashboards extends BasePackage
         return false;
     }
 
+    public function getDashboardsByAppId($appId)
+    {
+        $dashboards = [];
+
+        foreach($this->dashboards as $dashboard) {
+            if ($dashboard['app_id'] == $appId) {
+                array_push($dashboards, $dashboard);
+            }
+        }
+
+        return $dashboards;
+    }
+
     public function addDashboard(array $data)
     {
         $data['app_id'] = $this->apps->getAppInfo()['id'];
+
+        $data['app_default'] = 0;
+        $data['app_type'] = $this->apps->app['app_type'];
 
         $data['created_by'] = 0;
         if ($this->access->auth->account()) {
@@ -67,8 +83,10 @@ class Dashboards extends BasePackage
 
         $data['settings']['maxWidgetsPerDashboard'] = $this->maxWidgetsPerDashboard;
 
-        if (isset($data['is_default']) && $data['is_default'] == true) {
-            $this->checkDefaultDashboard($data);
+        if (isset($data['user_default']) && $data['user_default'] == true) {
+            if ($this->access->auth->account()) {
+                $data['user_default'] = [$this->access->auth->account()['id']];
+            }
         }
 
         $data = $this->getSharedIds($data);
@@ -94,11 +112,32 @@ class Dashboards extends BasePackage
             throw new PermissionDeniedException;
         }
 
-        $data = array_merge($dashboard, $data);
-
-        if (isset($data['is_default']) && $data['is_default'] == true) {
-            $this->checkDefaultDashboard($data);
+        if (is_string($dashboard['user_default'])) {
+            $dashboard['user_default'] = $this->helper->decode($dashboard['user_default'], true);
         }
+        if (isset($data['user_default'])) {
+            if ($data['user_default'] == true) {
+                if ($this->access->auth->account()) {
+                    if ($dashboard['user_default'] && !in_array($this->access->auth->account()['id'], $dashboard['user_default'])) {
+                        array_push($dashboard['user_default'], $this->access->auth->account()['id']);
+                    } else {
+                        $dashboard['user_default'] = [$this->access->auth->account()['id']];
+                    }
+                }
+            } else if ($data['user_default'] == false) {
+                if ($this->access->auth->account()) {
+                    if ($dashboard['user_default'] && in_array($this->access->auth->account()['id'], $dashboard['user_default'])) {
+                        $key = array_search($this->access->auth->account()['id'], $dashboard['user_default']);
+
+                        if ($key !== false) {
+                            unset($dashboard['user_default'][$key]);
+                        }
+                    }
+                }
+            }
+        }
+        unset($data['user_default']);
+        $data = array_merge($dashboard, $data);
 
         $data = $this->getSharedIds($data);
 
@@ -106,25 +145,6 @@ class Dashboards extends BasePackage
             $this->addResponse('Dashboard Updated');
         } else {
             $this->addResponse('Error Updating Dashboard', 1);
-        }
-    }
-
-    protected function checkDefaultDashboard($data)
-    {
-        $dashboards = $this->basepackages->dashboards->dashboards;
-
-        foreach ($dashboards as $dashboard) {
-            if ($data['id'] == $dashboard['id']) {
-                continue;
-            }
-
-            if (isset($dashboard['is_default']) && $dashboard['is_default'] == true) {
-                $dashboard['is_default'] = null;
-
-                $this->update($dashboard);
-
-                break;
-            }
         }
     }
 

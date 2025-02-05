@@ -4,10 +4,10 @@
 {% if dashboard['id'] is defined %}
     {% set dashboardId = dashboard['id'] %}
     {% set dashboardName = dashboard['name'] %}
-    {% if dashboard['is_default'] is defined and dashboard['is_default'] == true %}
+    {% if dashboard['user_default'] is defined and dashboard['user_default'] == true %}
         {% set defaultChecked = true %}
     {% endif %}
-    {% if dashboard['is_app_default'] is defined and dashboard['is_app_default'] == true %}
+    {% if dashboard['app_default'] is defined and dashboard['app_default'] == true %}
         {% set appDefaultChecked = true %}
         {% set defaultDisabled = true %}
     {% endif %}
@@ -73,12 +73,12 @@
                     'componentName'                  : componentName,
                     'componentId'                    : componentId,
                     'sectionId'                      : sectionId,
-                    'fieldId'                        : 'is_default',
-                    'fieldLabel'                     : 'Dashboard is default?',
+                    'fieldId'                        : 'user_default',
+                    'fieldLabel'                     : 'Dashboard is user default?',
                     'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'Check to make the dashboard default dashboard.',
+                    'fieldHelpTooltipContent'        : "Check to make the dashboard user's default dashboard.",
                     'fieldType'                      : 'checkbox',
-                    'fieldDisabled'                  : defaultDisabled,
+                    'fieldDisabled'                  : false,
                     'fieldCheckboxType'              : 'info',
                     'fieldCheckboxChecked'           : defaultChecked,
                     'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
@@ -96,7 +96,7 @@
                     'componentName'                  : componentName,
                     'componentId'                    : componentId,
                     'sectionId'                      : sectionId,
-                    'fieldId'                        : 'is_app_default',
+                    'fieldId'                        : 'app_default',
                     'fieldLabel'                     : 'Dashboard is App default?',
                     'fieldHelp'                      : true,
                     'fieldHelpTooltipContent'        : 'Check to make the dashboard default dashboard.',
@@ -170,8 +170,8 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                                  : { },
         '{{componentId}}-{{sectionId}}-name'                                : { },
-        '{{componentId}}-{{sectionId}}-is_default'                          : { },
-        '{{componentId}}-{{sectionId}}-is_app_default'                      : { },
+        '{{componentId}}-{{sectionId}}-user_default'                        : { },
+        '{{componentId}}-{{sectionId}}-app_default'                         : { },
         '{{componentId}}-{{sectionId}}-shared'                              : {
             placeholder: "SELECT ACCOUNT(S)",
             "ajax"          : {
