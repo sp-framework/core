@@ -56,19 +56,6 @@ class Dashboards extends BasePackage
         return false;
     }
 
-    public function getDashboardsByAppId($appId)
-    {
-        $dashboards = [];
-
-        foreach($this->dashboards as $dashboard) {
-            if ($dashboard['app_id'] == $appId) {
-                array_push($dashboards, $dashboard);
-            }
-        }
-
-        return $dashboards;
-    }
-
     public function getDashboardsByAppType($appType)
     {
         $dashboards = [];
@@ -86,8 +73,6 @@ class Dashboards extends BasePackage
 
     public function addDashboard(array $data)
     {
-        $data['app_id'] = $this->apps->getAppInfo()['id'];
-
         $data['app_default'] = 0;
         $data['app_type'] = $this->apps->app['app_type'];
 

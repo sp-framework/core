@@ -29,20 +29,6 @@ class Dashboards
                     ]
                 ),
                 new Column(
-                    'app_id',
-                    [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true
-                    ]
-                ),
-                new Column(
-                    'app_default',
-                    [
-                        'type'    => Column::TYPE_BOOLEAN,
-                        'notNull' => true
-                    ]
-                ),
-                new Column(
                     'app_type',
                     [
                         'type'    => Column::TYPE_VARCHAR,

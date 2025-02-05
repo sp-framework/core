@@ -81,11 +81,13 @@ class DashboardsComponent extends BaseComponent
 
                 return;
             } else {//List of all dashboards
+                $dashboardId = 0;
+
                 if (isset($this->app['settings']['defaultDashboard'])) {
                     $dashboardId = $this->app['settings']['defaultDashboard'];
                 }
 
-                $dashboards = $this->basepackages->dashboards->getDashboardsByAppId($this->app['id']);
+                $dashboards = $this->basepackages->dashboards->getDashboardsByAppType($this->app['app_type']);
 
                 if ($this->access->auth->account()) {
                     foreach ($dashboards as $dashboardKey => &$dashboard) {
@@ -130,9 +132,9 @@ class DashboardsComponent extends BaseComponent
                     }
                 }
 
-                $this->view->dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true, false);
-
                 $this->view->dashboards = $dashboards;
+
+                $this->view->dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true, false);
 
                 $this->view->widgetsTree = $this->basepackages->widgets->getWidgetsTree();
             }

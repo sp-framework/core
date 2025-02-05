@@ -9,9 +9,7 @@ class Dashboard
         $dashboard =
             [
                 'name'                  => 'Core Default',
-                'app_id'                => 1,
                 'app_type'              => 'core',
-                'app_default'           => 1,
                 'created_by'            => 1,
                 'settings'              => $helper->encode($componentFile['settings'])
             ];
