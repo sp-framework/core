@@ -397,7 +397,7 @@ class Setup
 
 	protected function registerRepos()
 	{
-		(new RegisterRepos())->register($this->db, $this->ff);
+		(new RegisterRepos())->register($this->db, $this->ff, $this->postData);
 
 		return true;
 	}

@@ -4,7 +4,7 @@ namespace System\Base\Installer\Packages\Setup\Register\Basepackages\ApiClientSe
 
 class Repos
 {
-    public function register($db, $ff)
+    public function register($db, $ff, $postData)
     {
         $coreRepo =
             [
@@ -16,16 +16,21 @@ class Repos
                 'authorization'         => ''
             ];
 
+        $usedBy = ["modules"];
+        if ($postData['dev'] == 'true') {
+            array_push($usedBy, "devtoolsmodules");
+        }
+
         $coreApi =
             [
-                'name'              => 'SP Framework Core',
-                'description'       => 'SP Framework Core Repository',
-                'category'          => 'repos',
-                'provider'          => 'Github',
-                'in_use'            => 0,
-                'used_by'           => json_encode([]),
-                'setup'             => 4,
-                'location'          => 'basepackages'
+                'name'                  => 'SP Framework Core',
+                'description'           => 'SP Framework Core Repository',
+                'category'              => 'repos',
+                'provider'              => 'Github',
+                'in_use'                => 1,
+                'used_by'               => json_encode($usedBy),
+                'setup'                 => 4,
+                'location'              => 'basepackages'
             ];
 
         $modulesRepo =
@@ -44,8 +49,8 @@ class Repos
                 'description'           => 'SP Framework Modules Repository',
                 'category'              => 'repos',
                 'provider'              => 'Github',
-                'in_use'                => 0,
-                'used_by'               => json_encode([]),
+                'in_use'                => 1,
+                'used_by'               => json_encode($usedBy),
                 'setup'                 => 4,
                 'location'              => 'basepackages'
             ];
