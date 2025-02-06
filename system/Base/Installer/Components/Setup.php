@@ -417,6 +417,8 @@ Class Setup
 
 				$this->setupPackage->registerModule('views');
 
+				$this->setupPackage->registerModule('externals');
+
 				$this->setupPackage->registerCoreRole();
 
 				$this->setupPackage->registerRegisteredUserAndGuestRoles();
@@ -588,6 +590,10 @@ Class Setup
 				[
 					'method'	=> 'registerModule',
 					'text'		=> 'Registering views modules...'
+				],
+				[
+					'method'	=> 'registerModule',
+					'text'		=> 'Registering external modules...'
 				],
 				[
 					'method'	=> 'registerCoreRole',

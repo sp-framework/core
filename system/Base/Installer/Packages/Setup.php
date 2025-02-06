@@ -26,6 +26,7 @@ use System\Base\Installer\Packages\Setup\Register\Modules\Component as RegisterC
 use System\Base\Installer\Packages\Setup\Register\Modules\Middleware as RegisterMiddleware;
 use System\Base\Installer\Packages\Setup\Register\Modules\Package as RegisterPackage;
 use System\Base\Installer\Packages\Setup\Register\Modules\View as RegisterView;
+use System\Base\Installer\Packages\Setup\Register\Modules\External as RegisterExternal;
 use System\Base\Installer\Packages\Setup\Register\Providers\App as RegisterCoreApp;
 use System\Base\Installer\Packages\Setup\Register\Providers\App\Type as RegisterCoreAppType;
 use System\Base\Installer\Packages\Setup\Register\Providers\Core as RegisterCore;
@@ -566,6 +567,14 @@ class Setup
 			}
 
 			$this->registerCoreView($jsonFile);
+		} else if ($type === 'externals') {
+			try {
+				$composerJsonFile = $this->helper->decode(file_get_contents(base_path('external/composer.json')), true);
+			} catch (\throwable $e) {
+				throw new \Exception($e->getMessage() . '. Problem reading composer.json');
+			}
+
+			$this->registerCoreExternal($composerJsonFile);
 		}
 
 		return true;
@@ -609,6 +618,11 @@ class Setup
 	protected function registerCoreView(array $viewFile)
 	{
 		return (new RegisterView())->register($this->db, $this->ff, $viewFile, $this->helper);
+	}
+
+	protected function registerCoreExternal(array $composerJsonFile)
+	{
+		return (new RegisterExternal())->register($this->db, $this->ff, $composerJsonFile, $this->helper);
 	}
 
 	public function validateData()
