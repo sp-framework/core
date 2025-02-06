@@ -843,7 +843,9 @@ class Manager extends BasePackage
                 if ($moduleNeedsUpgrade) {
                     if ($this->getRemoteModuleJson($remoteModulesType, $localModule, true)) {
                         if (isset($this->remoteModulesJson[$remoteModulesType][$remoteModule['name']])) {
+                            $localModuleVersion = $localModule['version'];
                             $localModule = array_merge($localModule, $this->remoteModulesJson[$remoteModulesType][$remoteModule['name']]);
+                            $localModule['version'] = $localModuleVersion;
                         }
                     }
 
