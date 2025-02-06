@@ -28,6 +28,8 @@ class ModulesExternals extends BaseModel
 
     public $installed;
 
+    public $required_by;
+
     public $update_available;
 
     public $update_version;

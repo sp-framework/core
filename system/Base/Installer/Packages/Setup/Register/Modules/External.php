@@ -9,6 +9,8 @@ class External
         if (isset($composerJsonFile['require']) && is_array($composerJsonFile['require']) && count($composerJsonFile) > 0) {
             $installedComposerPackages = $this->executeComposer();
 
+            $coreId = $this->getCoreId($db, $ff);
+
             try {
                 $installedComposerPackages = $helper->decode($installedComposerPackages, true);
             } catch (\throwable $e) {
@@ -34,7 +36,7 @@ class External
                             'display_name'          => $externalPackageName,
                             'description'           =>
                                 (isset($installedComposerPackages[$externalPackageName])) ? $installedComposerPackages[$externalPackageName]['description'] : '',
-                            'module_type'           => 'external',
+                            'module_type'           => 'externals',
                             'app_type'              => 'core',
                             'version'               =>
                                 (isset($installedComposerPackages[$externalPackageName])) ? $installedComposerPackages[$externalPackageName]['version'] : '',
@@ -45,6 +47,7 @@ class External
                             'abandoned'             =>
                                 (isset($installedComposerPackages[$externalPackageName])) ? (($installedComposerPackages[$externalPackageName]['abandoned'] == true) ? 1 : 0) : 0,
                             'installed'             => 1,
+                            'required_by'           => $helper->encode(['packages' => [$coreId]]),
                             'updated_by'            => 0
                         ];
 
@@ -98,5 +101,35 @@ class External
         }
 
         return $file;
+    }
+
+    protected function getCoreId($db, $ff)
+    {
+        if ($ff) {
+            $modulesStore = $ff->store('modules_packages');
+
+            $core = $modulesStore->findOneBy(['name', '=', 'Core']);
+
+            if ($core) {
+                return $core['id'];
+            }
+        }
+
+        if ($db) {
+            $core =
+                $db->fetchAll(
+                    "SELECT * FROM modules_packages WHERE name LIKE :name",
+                    Enum::FETCH_ASSOC,
+                    [
+                        "name" => "Core",
+                    ]
+                );
+
+            if ($core) {
+                return $core['id'];
+            }
+        }
+
+        return 0;
     }
 }

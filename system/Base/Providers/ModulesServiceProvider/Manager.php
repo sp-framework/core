@@ -115,13 +115,46 @@ class Manager extends BasePackage
                 }
             }
 
-            if ($module['repo_details']) {
+            if (isset($module['repo_details'])) {
                 if (is_string($module['repo_details'])) {
                     try {
                         $module['repo_details'] = $this->helper->decode($module['repo_details'], true);
                     } catch (\Exception $e) {
                         $module['repo_details'] = null;
                     }
+                }
+            }
+
+            if (isset($module['required_by'])) {
+                if (is_string($module['required_by'])) {
+                    try {
+                        $module['required_by'] = $this->helper->decode($module['required_by'], true);
+
+                    } catch (\Exception $e) {
+                        $module['required_by'] = [];
+                    }
+                }
+
+                if (count($module['required_by']) > 0) {
+                    $requiredModules = [];
+                    foreach ($module['required_by'] as $requiredModuleType => $requiredModuleArr) {
+                        if (!isset($requiredModules[$requiredModuleType])) {
+                            $requiredModules[$requiredModuleType] = [];
+                        }
+
+                        if (count($requiredModuleArr) > 0) {
+                            foreach ($requiredModuleArr as $requiredModuleKey => $requiredModuleId) {
+                                $requiredModuleMethod = 'get' . ucfirst(substr($requiredModuleType, 0, -1)) . 'ById';
+                                $requiredModule = $this->modules->{$requiredModuleType}->$requiredModuleMethod($requiredModuleId);
+
+                                if ($requiredModule) {
+                                    array_push($requiredModules[$requiredModuleType], $requiredModule['display_name'] ?? $requiredModule['name']);
+                                }
+                            }
+                        }
+                    }
+
+                    $module['required_by'] = $requiredModules;
                 }
             }
 
@@ -315,10 +348,15 @@ class Manager extends BasePackage
             $localModules['views'] = $this->modules->views->init(true)->views;
             $localModules['bundles'] = $this->modules->bundles->init(true)->bundles;
         }
+        $localModules['externals'] = $this->modules->externals->init(true)->externals;
 
         foreach ($localModules as $moduleType => $modulesArr) {
             if (count($modulesArr) > 0) {
                 foreach ($modulesArr as $moduleArr) {
+                    if ($moduleArr['module_type'] === 'externals') {
+                        $moduleArr['api_id'] = 1;
+                    }
+
                     if (!isset($sortedModules[$moduleArr['api_id']])) {
                         continue;
                     }
@@ -341,6 +379,12 @@ class Manager extends BasePackage
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']] = [];
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['name'] = $moduleArr['category'];
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['data']['type'] = 'category';
+                    } else if (isset($moduleArr['developer']) &&
+                               !isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['developer']])
+                    ) {
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['developer']] = [];
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['developer']]['name'] = $moduleArr['developer'];
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['developer']]['data']['type'] = 'developer';
                     }
 
                     $module['id'] = $moduleArr['id'];
@@ -351,7 +395,11 @@ class Manager extends BasePackage
                     $module['data']['apiid'] = $moduleArr['api_id'];
                     $module['data']['apptype'] = $moduleArr['app_type'];
                     $module['data']['moduletype'] = $moduleArr['module_type'];
-                    $module['data']['modulecategory'] = $moduleArr['category'] ?? '-';
+                    if ($moduleArr['module_type'] === 'externals') {
+                        $module['data']['modulecategory'] = $moduleArr['developer'] ?? '-';
+                    } else {
+                        $module['data']['modulecategory'] = $moduleArr['category'] ?? '-';
+                    }
                     $module['data']['moduleid'] = $moduleArr['module_type'] . '-' . $moduleArr['id'];
                     $module['data']['installed'] = $moduleArr['installed'] ?? 0;
                     $module['data']['update_available'] = $moduleArr['update_available'];
@@ -377,6 +425,8 @@ class Manager extends BasePackage
 
                     if (isset($moduleArr['category'])) {
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$module['data']['moduleid']] = $module;
+                    } else if ($moduleArr['module_type'] === 'externals') {
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['developer']]['childs'][$module['data']['moduleid']] = $module;
                     } else {
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$module['data']['moduleid']] = $module;
                     }

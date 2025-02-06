@@ -748,7 +748,7 @@ dataCollectionSectionForm['funcs']['toggleJstreeTool'] = function(toolId, textCo
         }
     }
 }
-dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], showButtons = ['cancel'], showSettings = true, showBundleModules = false) {
+dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], showButtons = ['cancel'], showSettings = true, showBundleModules = false, showChangeLogs = false) {
     $('#{{componentId}}-{{sectionId}}-tabs-tabLinks a').removeClass('active');
     $('#{{componentId}}-{{sectionId}}-tabs-tabContent .tab-pane').removeClass('active show');
     $('#{{componentId}}-{{sectionId}}-tabs-info').addClass('active show');
@@ -764,6 +764,11 @@ dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], s
     } else {
         $('a[href*="#{{componentId}}-{{sectionId}}-tabs-bundlemodules"]').parent().removeClass('d-none');
     }
+    if (!showChangeLogs) {
+        $('a[href*="#{{componentId}}-{{sectionId}}-tabs-changelogs"]').parent().addClass('d-none');
+    } else {
+        $('a[href*="#{{componentId}}-{{sectionId}}-tabs-changelogs"]').parent().removeClass('d-none');
+    }
 
     if (show.length > 0) {
         var moduleinfos = ['loader', 'info', 'noinfo', 'error', 'buttons'];
@@ -776,7 +781,7 @@ dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], s
         });
     }
 
-    if (showButtons.length > 0) {
+    if (showButtons && showButtons.length > 0) {
         var modulebuttons = ['install', 'update', 'uninstall', 'remove', 'cancel', 'repo-sync'];
         $(modulebuttons).each(function(e, modulebutton) {
             if (showButtons.includes(modulebutton)) {
@@ -808,6 +813,8 @@ dataCollectionSectionForm['funcs']['getSelectedModuleInfo'] = function(selected)
         moduleType = 'views';
     } else if (selected.startsWith('bundles')) {
         moduleType = 'bundles';
+    } else if (selected.startsWith('external')) {
+        moduleType = 'externals';
     }
 
     if (moduleType && moduleId) {
@@ -835,8 +842,10 @@ dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, modul
             $('#security-token').val(response.token);
         }
 
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').attr('disabled', false);
-        $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
+        if (moduleType !== 'externals') {
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-moduleinfo-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
+        }
 
         if (response.responseCode == 0) {
             if (response.responseData.module) {
@@ -886,7 +895,21 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     moduleData['version'] = '<span class="badge badge-info text-xs">' + moduleData['version'] + '</span>';
 
     $('#app_type').html(moduleData.app_type);
-    $('#category').html(moduleData.category);
+    if (moduleData.category) {
+        $('#category').html(moduleData.category);
+        $('#category-field').attr('hidden', false);
+        $('#developer-field').attr('hidden', true);
+        $('#developer-field').attr('hidden', true);
+        $('#required_by-field').attr('hidden', true);
+        $('#required_by').attr('hidden', true);
+    } else if (moduleData.developer) {
+        $('#developer').html(moduleData.developer);
+        $('#category-field').attr('hidden', true);
+        $('#developer-field').attr('hidden', false);
+        $('#required_by-field').attr('hidden', false);
+        $('#required_by').html(BazHelpers.createHtmlList({'obj': moduleData.required_by}));
+        $('#required_by').attr('hidden', false);
+    }
     $('#update_available').html(moduleData.update_available);
     $('#update_version').html(moduleData.update_version);
     $('#updated_on').html(moduleData.updated_on);
@@ -896,14 +919,16 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     $('#module_type').html(moduleData.module_type);
     if (moduleData.display_name) {
         $('#display_name').html(moduleData.display_name);
-        $('#display_name').html(moduleData.display_name);
     } else {
         $('#display_name').html(moduleData.name);
     }
     $('#module_id').html(moduleData.id);
     $('#description').html(moduleData.description);
 
-    if (moduleData.repo_details.latestRelease && moduleData.repo_details.latestRelease.body) {
+    if (moduleData.module_type !== 'externals' &&
+        moduleData.repo_details.latestRelease &&
+        moduleData.repo_details.latestRelease.body
+    ) {
         var changelogText;
         if (moduleData.repo_details.latestRelease.prerelease === false) {
             changelogText =
@@ -919,7 +944,7 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     }
 
     $('#{{componentId}}-{{sectionId}}-auto_update')[0].checked = false;
-    if (moduleInfo.auto_update !== 'null') {
+    if (moduleInfo.auto_update && moduleInfo.auto_update !== 'null') {
         if (moduleInfo.auto_update == '0') {
             $('#{{componentId}}-{{sectionId}}-auto_update')[0].checked = false;
         } else if (moduleInfo.auto_update == '1') {
@@ -927,7 +952,7 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
         }
     }
 
-    if (moduleInfo.level_of_update !== 'null') {
+    if (moduleInfo.level_of_update && moduleInfo.level_of_update !== 'null') {
         $('#{{componentId}}-{{sectionId}}-level_of_update').val(moduleInfo.level_of_update).trigger('change');
     }
 
@@ -936,17 +961,33 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
             if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type] &&
                 (BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type], moduleInfo.id) > -1)
             ) {
-                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
+                if (moduleData['module_type'] !== 'externals') {
+                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
+                } else {
+                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
+                }
             } else {
-                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'remove', 'repo-sync']);
+                if (moduleData['module_type'] !== 'externals') {
+                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'remove', 'repo-sync']);
+                } else {
+                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'remove'], false);
+                }
             }
         } else {
             if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
                 (BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type], moduleInfo.id) > -1)
             ) {
-                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
+                if (moduleData['module_type'] !== 'externals') {
+                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
+                } else {
+                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
+                }
             } else {
-                dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['uninstall', 'remove', 'repo-sync']);
+                if (moduleData['module_type'] !== 'externals') {
+                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['uninstall', 'remove', 'repo-sync']);
+                } else {
+                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['uninstall', 'remove'], false);
+                }
             }
         }
     } else {
@@ -958,9 +999,17 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
         }
 
         if (index > -1) {
-            dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel', 'repo-sync']);
+            if (moduleData['module_type'] !== 'externals') {
+                dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel', 'repo-sync']);
+            } else {
+                dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel'], false);
+            }
         } else {
-            dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
+            if (moduleData['module_type'] !== 'externals') {
+                dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
+            } else {
+                dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove'], false);
+            }
         }
     }
 
@@ -1027,7 +1076,7 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
         dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], []);
 
         if (moduleData['app_type'] === 'core') {
-            if (moduleInfo['name'] !== 'Core') {
+            if (moduleInfo['name'] !== 'Core' && moduleData['module_type'] !== 'externals') {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], [], false);
             } else {
                 if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type]) {
@@ -1035,12 +1084,24 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
                 }
 
                 if (index !== 'undefined' && index > -1) {
-                    dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
-                } else {
-                    if (moduleInfo.update_available == '1') {
-                        dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'repo-sync']);
+                    if (moduleData['module_type'] !== 'externals') {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
                     } else {
-                        dataCollectionSectionForm['funcs']['moduleinfo']([], ['repo-sync']);
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel'], false);
+                    }
+                } else {
+                    if (moduleData['module_type'] !== 'externals') {
+                        if (moduleInfo.update_available == '1') {
+                            dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'repo-sync']);
+                        } else {
+                            dataCollectionSectionForm['funcs']['moduleinfo']([], ['repo-sync']);
+                        }
+                    } else {
+                        if (moduleInfo.update_available == '1') {
+                            dataCollectionSectionForm['funcs']['moduleinfo']([], ['update']);
+                        } else {
+                            dataCollectionSectionForm['funcs']['moduleinfo']([], false, false);
+                        }
                     }
                 }
             }

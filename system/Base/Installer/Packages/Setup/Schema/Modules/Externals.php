@@ -99,6 +99,13 @@ class Externals
                         ]
                     ),
                     new Column(
+                        'required_by',
+                        [
+                            'type'    => Column::TYPE_JSON,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
                         'update_available',
                         [
                             'type'    => Column::TYPE_TINYINTEGER,
