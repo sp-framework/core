@@ -691,7 +691,6 @@ dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
             if (selected[0].data.type !== 'repo') {
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_node(selected);
 
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-add');
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update');
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
                 dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
@@ -708,7 +707,6 @@ dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
             dataCollectionSectionForm['funcs']['moduleinfo']();
         } else {
             if (selected[0].data.type !== 'repo') {
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-add');
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update');
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
             }

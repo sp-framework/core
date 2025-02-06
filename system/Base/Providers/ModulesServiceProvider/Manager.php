@@ -218,6 +218,11 @@ class Manager extends BasePackage
                     $module['repo_details']['latestRelease'] = $latestRelease;
                     $module['update_available'] = '1';
                     $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                    $latestReleaseJson = $this->getRemoteModuleJson($module['module_type'], $module, true);
+
+                    if ($latestReleaseJson) {
+                        $module['repo_details']['latestRelease']['moduleJson'] = $this->remoteModulesJson[$module['module_type']][$module['name']];
+                    }
                 }
 
                 if ($module['module_type'] === 'apptypes') {
@@ -336,19 +341,19 @@ class Manager extends BasePackage
         }
 
         if (isset($data['api_id'])) {
-            $localModules['components'] = $this->modules->components->init(true)->getComponentsByApiId($data['api_id']);
-            $localModules['middlewares'] = $this->modules->middlewares->init(true)->getMiddlewaresByApiId($data['api_id']);
-            $localModules['packages'] = $this->modules->packages->init(true)->getPackagesByApiId($data['api_id']);
-            $localModules['views'] = $this->modules->views->init(true)->getViewsByApiId($data['api_id']);
-            $localModules['bundles'] = $this->modules->bundles->init(true)->getBundlesByApiId($data['api_id']);
+            $localModules['components'] = msort($this->modules->components->init(true)->getComponentsByApiId($data['api_id']), 'name');
+            $localModules['middlewares'] = msort($this->modules->middlewares->init(true)->getMiddlewaresByApiId($data['api_id']), 'name');
+            $localModules['packages'] = msort($this->modules->packages->init(true)->getPackagesByApiId($data['api_id']), 'name');
+            $localModules['views'] = msort($this->modules->views->init(true)->getViewsByApiId($data['api_id']), 'name');
+            $localModules['bundles'] = msort($this->modules->bundles->init(true)->getBundlesByApiId($data['api_id']), 'name');
         } else {
-            $localModules['components'] = $this->modules->components->init(true)->components;
-            $localModules['middlewares'] = $this->modules->middlewares->init(true)->middlewares;
-            $localModules['packages'] = $this->modules->packages->init(true)->packages;
-            $localModules['views'] = $this->modules->views->init(true)->views;
-            $localModules['bundles'] = $this->modules->bundles->init(true)->bundles;
+            $localModules['components'] = msort($this->modules->components->init(true)->components, 'name');
+            $localModules['middlewares'] = msort($this->modules->middlewares->init(true)->middlewares, 'name');
+            $localModules['packages'] = msort($this->modules->packages->init(true)->packages, 'name');
+            $localModules['views'] = msort($this->modules->views->init(true)->views, 'name');
+            $localModules['bundles'] = msort($this->modules->bundles->init(true)->bundles, 'name');
         }
-        $localModules['externals'] = $this->modules->externals->init(true)->externals;
+        $localModules['externals'] = msort($this->modules->externals->init(true)->externals, 'developer');
 
         foreach ($localModules as $moduleType => $modulesArr) {
             if (count($modulesArr) > 0) {
@@ -714,10 +719,18 @@ class Manager extends BasePackage
             $method = 'reposGetContent';
         }
 
+        if (isset($module['html_url'])) {
+            $moduleRepoArr = explode('/', $module['html_url']);
+        } else if (isset($module['repo'])) {
+            $moduleRepoArr = explode('/', $module['repo']);
+        } else {
+            return true;
+        }
+
         $args =
             [
                 $this->apiClientConfig['org_user'],
-                $module['name'],
+                $this->helper->last($moduleRepoArr),
                 $jsonFileName,
                 $this->apiClientConfig['branch']
             ];
@@ -891,15 +904,16 @@ class Manager extends BasePackage
                 $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($remoteModule, $localModule);
 
                 if ($moduleNeedsUpgrade) {
+                    $localModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
+
                     if ($this->getRemoteModuleJson($remoteModulesType, $localModule, true)) {
                         if (isset($this->remoteModulesJson[$remoteModulesType][$remoteModule['name']])) {
                             $localModuleVersion = $localModule['version'];
                             $localModule = array_merge($localModule, $this->remoteModulesJson[$remoteModulesType][$remoteModule['name']]);
                             $localModule['version'] = $localModuleVersion;
+                            $localModule['repo_details']['latestRelease']['moduleJson'] = $this->remoteModulesJson[$remoteModulesType][$remoteModule['name']];
                         }
                     }
-
-                    $localModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
 
                     if (isset($localModule['installed']) && $localModule['installed'] == '0') {
                         $localModule['version'] = $moduleNeedsUpgrade['name'];

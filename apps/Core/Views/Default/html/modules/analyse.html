@@ -126,7 +126,7 @@
                             '           <td>' ~  module['repo'] ~ '</td>' ~
                             '           <td>' ~  '<span class="badge badge-' ~ color ~ ' mt-1 text-xs text-uppercase">' ~ taskName ~ '</span></td>' ~
                             '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' ~ module['id'] ~ '">' ~
-                            '               <a href="#" type="button" data-error="' ~ error ~ '" data-task="' ~ taskName ~ '" data-moduletype="' ~ modulesType ~ '" data-id="' ~ module['id'] ~ '" class="ml-1 mr-1 text-white btn btn-info btn-xs viewLogs">' ~
+                            '               <a href="#" type="button" data-error="' ~ error ~ '" data-task="' ~ task ~ '" data-taskName="' ~ taskName ~ '" data-moduletype="' ~ modulesType ~ '" data-id="' ~ module['id'] ~ '" class="ml-1 mr-1 text-white btn btn-info btn-xs viewLogs">' ~
                             '                   <i class="fas fa-fw fa-xs fa-eye"></i>' ~
                             '               </a>' ~
                             '           </td>' ~
@@ -448,7 +448,7 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
         ) {
             logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results']['first']['external'][$(this).data()['id']]);
         } else if ($(this).data()['moduletype'] === 'packages' &&
-                   $(this).data()['task'] === 'update' &&
+                   $(this).data()['taskName'] === 'update' &&
                    dataCollectionSectionForm['vars']['queue']['results']['update']['packages'][$(this).data()['id']]
         ) {
             logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results']['update']['packages'][$(this).data()['id']]);
