@@ -414,6 +414,11 @@ class DevtoolsModules extends BasePackage
             $classArr = explode('\\', $moduleToReinstall['class']);
             $classArr = array_slice($classArr, 0, -1);
             $class = implode('\\', $classArr) . '\\Install\\Install';
+        } else if ($moduleToReinstall['name'] === 'Core' ||
+                   $moduleToReinstall['app_type'] === 'core'
+        ) {//Core packages. This can be a problem for packages that are not registered in the system, example(modules_packages, modules_external...)
+           //so, the user has to update whole core.
+            $class = 'System\\Base\\Providers\\CoreServiceProvider\\Install\\Install';
         }
 
         $path = lcfirst(str_replace('\\', '/', $class) . '.php');
@@ -423,9 +428,14 @@ class DevtoolsModules extends BasePackage
                 $module = new $class();
 
                 if ($data['app_type'] === 'core') {
-                    if ($data['type'] === 'packages') {
+                    $coreInstall = new CoreInstall;
+
+                    if ($data['type'] === 'core') {
+                        if (isset($data['reinstall_table']) && $data['reinstall_table'] == true) {
+                            $coreInstall->init()->install();
+                        }
+                    } else if ($data['type'] === 'packages') {
                         $moduleModel = $module->useModel();
-                        $coreInstall = new CoreInstall;
 
                         if (isset($data['truncate_table']) && $data['truncate_table'] == true) {
                             $coreInstall->init([$moduleModel->getSource()])->truncate();
