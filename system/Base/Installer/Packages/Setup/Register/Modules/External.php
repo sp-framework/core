@@ -35,17 +35,17 @@ class External
                             'name'                  => $externalPackageNameArr[1],
                             'display_name'          => $externalPackageName,
                             'description'           =>
-                                (isset($installedComposerPackages[$externalPackageName])) ? $installedComposerPackages[$externalPackageName]['description'] : '',
+                                (isset($installedComposerPackages[$externalPackageName]['description'])) ? $installedComposerPackages[$externalPackageName]['description'] : '',
                             'module_type'           => 'externals',
                             'app_type'              => 'core',
                             'version'               =>
-                                (isset($installedComposerPackages[$externalPackageName])) ? $installedComposerPackages[$externalPackageName]['version'] : '',
+                                (isset($installedComposerPackages[$externalPackageName]['version'])) ? $installedComposerPackages[$externalPackageName]['version'] : '',
                             'patches'               =>
                                 (isset($composerJsonFile['extra']['patches'][$externalPackageName])) ?
                                     $helper->encode($composerJsonFile['extra']['patches'][$externalPackageName]) :
                                     $helper->encode([]),
                             'abandoned'             =>
-                                (isset($installedComposerPackages[$externalPackageName])) ? (($installedComposerPackages[$externalPackageName]['abandoned'] == true) ? 1 : 0) : 0,
+                                (isset($installedComposerPackages[$externalPackageName]['abandoned'])) ? (($installedComposerPackages[$externalPackageName]['abandoned'] == true) ? 1 : 0) : 0,
                             'installed'             => 1,
                             'required_by'           => $helper->encode(['packages' => [$coreId]]),
                             'updated_by'            => 0

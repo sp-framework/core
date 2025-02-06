@@ -473,6 +473,12 @@ class Queues extends BasePackage
                             }
                         }
                     } else {
+                        if ($taskName === 'update' &&
+                            isset($module['repo_details']['latestRelease']['moduleJson']['dependencies'])
+                        ) {
+                            $module['dependencies'] = $module['repo_details']['latestRelease']['moduleJson']['dependencies'];
+                        }
+
                         if (isset($module['dependencies']) && is_string($module['dependencies'])) {
                             $module['dependencies'] = $this->helper->decode($module['dependencies'], true);
                         }
@@ -711,7 +717,10 @@ class Queues extends BasePackage
             $hasPatch = false;
 
             if ($composerJsonFile && isset($composerJsonFile['require'])) {
-                if (!isset($composerJsonFile['require'][$composerPackage])) {
+                if (!isset($composerJsonFile['require'][$composerPackage]) ||
+                    (isset($composerJsonFile['require'][$composerPackage]) &&
+                     $composerJsonFile['require'][$composerPackage] !== $version)
+                ) {
                     $composerJsonFile['require'][$composerPackage] = $version;
                     $installExternal = true;
                 }

@@ -28,4 +28,15 @@ class Externals extends BasePackage
 
         return false;
     }
+
+    public function getExternalByName($name)
+    {
+        foreach($this->externals as $external) {
+            if ($external['name'] == $name) {
+                return $external;
+            }
+        }
+
+        return false;
+    }
 }
