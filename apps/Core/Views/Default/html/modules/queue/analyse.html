@@ -27,6 +27,13 @@
             'buttonType'                    : 'button',
             'buttons'                       :
                     [
+                        'queue-info' : [
+                            'title'                   : 'Queue Info',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'position'                : 'left',
+                            'icon'                    : 'info'
+                        ],
                         'queue-settings' : [
                             'title'                   : 'Queue Settings',
                             'size'                    : 'xs',
@@ -39,6 +46,7 @@
         )}}
     </div>
 </div>
+<hr>
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -86,6 +94,7 @@
         )}}
     </div>
 </div>
+<hr>
 {% set moduleHtml = '' %}
 {% set hasAnalysisError = 'false' %}
 {% if queue['tasks']['analysed']|length > 0 %}
@@ -440,6 +449,13 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
         });
     });
 
+    $('#{{componentId}}-{{sectionId}}-queue-info').off();
+    $('#{{componentId}}-{{sectionId}}-queue-info').click(function(e) {
+        e.preventDefault();
+
+        $('#{{componentId}}-{{sectionId}}-queue-info-modal').modal('show');
+    });
+
     $('.viewLogs').off();
     $('.viewLogs').click(function(e) {
         e.preventDefault();
@@ -569,8 +585,28 @@ dataCollectionSection =
         })
     });
 
+function stringToBoolean(string) {
+        switch (string.toLowerCase().trim()) {
+            case "true":
+            case "yes":
+            case "1":
+              return true;
+
+            case "false":
+            case "no":
+            case "0":
+            case null:
+            case undefined:
+            case 'undefined':
+              return false;
+
+            default:
+              return JSON.parse(string);
+        }
+}
+
 $(document).ready(function() {
-    dataCollectionSectionForm['vars']['hasAnalysisError'] = BazHelpers.stringToBoolean("{{hasAnalysisError}}");
+    dataCollectionSectionForm['vars']['hasAnalysisError'] = stringToBoolean("{{hasAnalysisError}}");
 
     dataCollectionSectionForm['funcs']['initQueueButtons']();
 
@@ -588,14 +624,32 @@ $(window).on('load', function() {
             'componentName'             : componentName,
             'componentId'               : componentId,
             'sectionId'                 : sectionId,
-            'modalId'                   : 'queue-settings-modal',
-            'modalBodyInclude'          : 'modules/settings',
+            'modalId'                   : 'queue-info-modal',
+            'modalBodyInclude'          : 'modules/queue/info',
             'modalSize'                 : 'xl',
             'modalHeader'               : true,
             'modalFooter'               : true,
             'modalHeaderCloseButton'    : true,
             'modalEscClose'             : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-cogs"></i> QUEUE SETTINGS',
+            'modalTitle'                : '<i class="fa fas fa-fw fa-info"></i> INFO'
+        ]
+    )}}
+</div>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'queue-settings-modal',
+            'modalBodyInclude'          : 'modules/queue/settings',
+            'modalSize'                 : 'xl',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalHeaderCloseButton'    : true,
+            'modalEscClose'             : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-cogs"></i> SETTINGS',
             'modalFooterButtons'        :
                 [
                 'component'                     : component,
@@ -626,7 +680,7 @@ $(window).on('load', function() {
             'componentId'               : componentId,
             'sectionId'                 : sectionId,
             'modalId'                   : 'queue-logs-modal',
-            'modalBodyInclude'          : 'modules/logs',
+            'modalBodyInclude'          : 'modules/queue/logs',
             'modalSize'                 : 'xl',
             'modalHeader'               : true,
             'modalFooter'               : true,
