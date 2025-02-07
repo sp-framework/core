@@ -161,7 +161,7 @@
     <hr>
     <div class="row">
         <div class="col">
-            <div id="installer-progress" class="mb-3"></div>
+            <div id="installer-progress" class="mb-3" hidden></div>
         </div>
     </div>
 {% endif %}
@@ -276,6 +276,7 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
     }
 
     $('tr').removeClass('bg-danger');
+    BazProgress.switchProgressBarColor();
 
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -345,7 +346,9 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
                         for (var moduleType in dataCollectionSectionForm['vars']['queue']['results'][task]) {
                             if (Object.keys(dataCollectionSectionForm['vars']['queue']['results'][task][moduleType]).length > 0) {
                                 for (var taskModule in dataCollectionSectionForm['vars']['queue']['results'][task][moduleType]) {
-                                    if (dataCollectionSectionForm['vars']['queue']['results'][task][moduleType][taskModule]['precheck'] === 'fail') {
+                                    if (dataCollectionSectionForm['vars']['queue']['results'][task][moduleType][taskModule]['precheck'] === 'fail' ||
+                                        dataCollectionSectionForm['vars']['queue']['results'][task][moduleType][taskModule]['result'] === 'fail'
+                                    ) {
                                         var moduleLogs = document.querySelectorAll("[data-id='" + taskModule + "']");
 
                                         if (moduleLogs.length === 1) {
