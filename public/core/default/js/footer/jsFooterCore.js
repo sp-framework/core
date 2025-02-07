@@ -12005,6 +12005,7 @@ var BazProgress = function() {
                                 $('.child-progress-span').attr('hidden', true);
                                 $('.' + $(element)[0].id + '-child-bar').css('width', '0%');
                                 $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 0);
+                                switchProgressBarColor('.' + $(element)[0].id + '-child-bar', 'info');
 
                                 if (responseData['runners']['running'] &&
                                     responseData['runners']['running']['remoteWeb'] &&
@@ -12023,6 +12024,7 @@ var BazProgress = function() {
                                     } else {
                                         $('.' + $(element)[0].id + '-remote-bar').css('width', '0%');
                                         $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
+                                        switchProgressBarColor('.' + $(element)[0].id + '-remote-bar', 'info');
                                     }
                                 } else {
                                     $('.progress-remote, .remote-progress-span').attr('hidden', true);
@@ -12059,17 +12061,13 @@ var BazProgress = function() {
                             $('.' + $(element)[0].id + '-child-bar').css('width', '100%');
                             $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 100);
                             $('.' + $(element)[0].id + '-child-progress-span').html('Done (100%)');
-                            $('.' + $(element)[0].id + '-child-bar').removeClass(function (index, className) {
-                                return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
-                            }).addClass('bg-success');
+                            switchProgressBarColor('.' + $(element)[0].id + '-child-bar', 'success');
                         } else {
                             $('.' + $(element)[0].id + '-bar').removeClass('progress-bar-animated');
                             $('.' + $(element)[0].id + '-bar').css('width', '100%');
                             $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', 100);
                             $('.' + $(element)[0].id + '-progress-span').html('Done (100%)');
-                            $('.' + $(element)[0].id + '-bar').removeClass(function (index, className) {
-                                return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
-                            }).addClass('bg-success');
+                            switchProgressBarColor('.' + $(element)[0].id + '-bar', 'success');
                             $('#' + $(element)[0].id + ' .progress-child').attr('hidden', true);
                             $('.child-progress-span').attr('hidden', true);
 
@@ -12091,8 +12089,10 @@ var BazProgress = function() {
                             isDownload = false;
                             $('.' + $(element)[0].id + '-child-bar').css('width', '0%');
                             $('.' + $(element)[0].id + '-child-bar').attr('aria-valuenow', 0);
+                            switchProgressBarColor('.' + $(element)[0].id + '-child-bar', 'info');
                             $('.' + $(element)[0].id + '-remote-bar').css('width', '0%');
                             $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
+                            switchProgressBarColor('.' + $(element)[0].id + '-remote-bar', 'info');
                             $('.progress-remote, .remote-progress-span').attr('hidden', true);
                         }
                     } else {
@@ -12114,6 +12114,16 @@ var BazProgress = function() {
                 return;
             }
         }
+    }
+
+    function switchProgressBarColor(bar = null, color = 'info') {
+        if (!bar) {
+            bar = '.' + $(element)[0].id + '-bar';
+        }
+
+        $(bar).removeClass(function (index, className) {
+            return (className.match (/(^|\s)bg-\S+/g) || []).join(' ');
+        }).addClass('bg-' + color);
     }
 
     function getText(responseData) {
@@ -12161,6 +12171,7 @@ var BazProgress = function() {
         $('#' + $(element)[0].id).attr('hidden', true);
         $('.' + $(element)[0].id + '-bar').css('width', '0%');
         $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', 0);
+        switchProgressBarColor('.' + $(element)[0].id + '-bar', 'info');
         downloadTotal = 0;
         downloadedBytes = 0;
         uploadTotal = 0;
@@ -12206,6 +12217,9 @@ var BazProgress = function() {
         }
         BazProgress.buildProgressBar = function(el, mSH = false, child = false, remoteWeb = false) {
             buildProgressBar(el, mSH, child, remoteWeb);
+        }
+        BazProgress.switchProgressBarColor = function(el, color) {
+            switchProgressBarColor(el, color);
         }
         BazProgress.setCallable = function(callable) {
             setCallable(callable);
