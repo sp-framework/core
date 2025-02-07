@@ -51,6 +51,11 @@ class Progress extends BasePackage
         return false;
     }
 
+    public function getProgressFile()
+    {
+        return $this->readProgressFile();
+    }
+
     public function registerMethods(array $methods)
     {
         foreach ($methods as $key => $method) {

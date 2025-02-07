@@ -704,6 +704,8 @@ class Manager extends BasePackage
                 }
 
                 $jsonFileName = substr($moduleType, 0, -1) . '.json';
+            } else if ($moduleType === 'packages' && $module['name'] === 'Core') {
+                $jsonFileName = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json';
             } else {
                 $jsonFileName = 'Install/' . substr($moduleType, 0, -1) . '.json';
             }

@@ -15,7 +15,37 @@
 {% if queue['tasks_count']['remove'] is defined %}
     {% set queueTasksCounterRemove = queue['tasks_count']['remove'] %}
 {% endif %}
+{% set queueStatus = 'Analysis Complete' %}
+{% if queue['status'] == '1' %}
+    {% set queueStatus = 'Precheck Complete' %}
+{% elseif queue['status'] == '2' %}
+    {% set queueStatus = 'Process Complete' %}
+{% endif %}
+{% set queuePrecheckedAt = '-' %}
+{% set queuePrecheckedBy = '-' %}
+{% set queueProcessedAt = '-' %}
+{% set queueProcessedBy = '-' %}
+{% if queue['prechecked_at'] is defined %}
+    {% set queuePrecheckedAt = queue['prechecked_at'] %}
+{% endif %}
+{% if queue['prechecked_by'] is defined %}
+    {% set queuePrecheckedBy = queue['prechecked_by'] %}
+{% endif %}
+{% if queue['processed_at'] is defined %}
+    {% set queueProcessedAt = queue['processed_at'] %}
+{% endif %}
+{% if queue['processed_by'] is defined %}
+    {% set queueProcessedBy = queue['processed_by'] %}
+{% endif %}
 <div class="row">
+    <div class="col">
+        <label>ID: </label>
+        <span class="text-uppercase" id="queue-id">{{queue['id']}}</span>
+    </div>
+    <div class="col">
+        <label>STATUS: </label>
+        <span class="text-uppercase" id="status">{{queueStatus}}</span>
+    </div>
     <div class="col">
         {{adminltetags.useTag('buttons',
             [
@@ -27,13 +57,6 @@
             'buttonType'                    : 'button',
             'buttons'                       :
                     [
-                        'queue-info' : [
-                            'title'                   : 'Queue Info',
-                            'size'                    : 'xs',
-                            'type'                    : 'primary',
-                            'position'                : 'left',
-                            'icon'                    : 'info'
-                        ],
                         'queue-settings' : [
                             'title'                   : 'Queue Settings',
                             'size'                    : 'xs',
@@ -47,6 +70,25 @@
     </div>
 </div>
 <hr>
+<div class="row">
+    <div class="col">
+        <label>PRECHECKED AT: </label>
+        <span class="text-uppercase" id="prechecked_at">{{queuePrecheckedAt}}</span>
+    </div>
+    <div class="col">
+        <label>PRECHECKED BY: </label>
+        <span id="prechecked_by">{{queuePrecheckedBy}}</span>
+    </div>
+    <div class="col">
+        <label>PROCESSED AT: </label>
+        <span class="text-uppercase" id="processed_at">{{queueProcessedAt}}</span>
+    </div>
+    <div class="col">
+        <label>PROCESSED BY: </label>
+        <span id="processed_by">{{queueProcessedBy}}</span>
+    </div>
+</div>
+<hr class="mt-0">
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -94,7 +136,7 @@
         )}}
     </div>
 </div>
-<hr>
+<hr class="mt-0">
 {% set moduleHtml = '' %}
 {% set hasAnalysisError = 'false' %}
 {% if queue['tasks']['analysed']|length > 0 %}
@@ -315,6 +357,17 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
                 $('#{{componentId}}-{{sectionId}}-perform-precheck').children('i').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', false);
                 $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', false);
+                if (response.responseData.queue) {
+                    if (response.responseData.queue.prechecked_at) {
+                        $('#prechecked_at').html(response.responseData.queue.prechecked_at);
+                    }
+                    if (response.responseData.queue.prechecked_by) {
+                        $('#prechecked_by').html(response.responseData.queue.prechecked_by);
+                    }
+                    if (response.responseData.queue.status == 1) {
+                        $('#status').html('Precheck Complete');
+                    }
+                }
             } else if (postData['process'] === 'runprocess') {
                 $('#{{componentId}}-{{sectionId}}-re-analyse').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', true);
@@ -322,6 +375,17 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
                 $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-close').attr('hidden', false);
+                if (response.responseData.queue) {
+                    if (response.responseData.queue.processed_at) {
+                        $('#processed_at').html(response.responseData.queue.processed_at);
+                    }
+                    if (response.responseData.queue.processed_by) {
+                        $('#processed_by').html(response.responseData.queue.processed_by);
+                    }
+                    if (response.responseData.queue.status == 2) {
+                        $('#status').html('Process Complete');
+                    }
+                }
 
                 if (response.responseData && response.responseData.emailReport && response.responseData.emailReport == true) {
                     notifyText += '. An email report was successfully sent to : ' + $('#{{componentId}}-{{sectionId}}-email_report').val().trim();
@@ -447,13 +511,6 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
 
             dataCollectionSectionForm['funcs']['saveSettings']();
         });
-    });
-
-    $('#{{componentId}}-{{sectionId}}-queue-info').off();
-    $('#{{componentId}}-{{sectionId}}-queue-info').click(function(e) {
-        e.preventDefault();
-
-        $('#{{componentId}}-{{sectionId}}-queue-info-modal').modal('show');
     });
 
     $('.viewLogs').off();
@@ -617,24 +674,6 @@ $(window).on('load', function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
-<div>
-    {{adminltetags.useTag('modal',
-        [
-            'component'                 : component,
-            'componentName'             : componentName,
-            'componentId'               : componentId,
-            'sectionId'                 : sectionId,
-            'modalId'                   : 'queue-info-modal',
-            'modalBodyInclude'          : 'modules/queue/info',
-            'modalSize'                 : 'xl',
-            'modalHeader'               : true,
-            'modalFooter'               : true,
-            'modalHeaderCloseButton'    : true,
-            'modalEscClose'             : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-info"></i> INFO'
-        ]
-    )}}
-</div>
 <div>
     {{adminltetags.useTag('modal',
         [

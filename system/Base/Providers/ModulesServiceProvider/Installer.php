@@ -139,6 +139,10 @@ class Installer extends BasePackage
 
             foreach ($this->runPrecheckProgressMethods as $method) {
                 if ($this->withProgress($method['method'], $method['args'] ?? []) === false) {
+                    if ($this->basepackages->progress->checkProgressFile()) {
+                        $this->addProgressToResult(true);
+                    }
+
                     $this->modules->queues->update($this->queue);
 
                     return false;
@@ -146,8 +150,20 @@ class Installer extends BasePackage
             }
 
             $this->queue['status'] = 1;
+            $this->queue['prechecked_at'] = date('c');
+            $this->queue['prechecked_by'] = '-';
+
+            if ($this->access->auth->account() && isset($this->access->auth->account()['id'])) {
+                $this->queue['prechecked_by'] = $this->access->auth->account()['id'];
+            }
+
+            if ($this->basepackages->progress->checkProgressFile()) {
+                $this->addProgressToResult();
+            }
 
             $this->modules->queues->update($this->queue);
+
+            $this->queue['prechecked_by'] = $this->access->auth->account()['email'];
 
             $this->addResponse('Precheck complete', 0, ['queue' => $this->queue]);
         } else if ($this->process === 'runprocess') {
@@ -155,6 +171,10 @@ class Installer extends BasePackage
 
             foreach ($this->runProcessProgressMethods as $method) {
                 if ($this->withProgress($method['method'], $method['args'] ?? []) === false) {
+                    if ($this->basepackages->progress->checkProgressFile()) {
+                        $this->addProgressToResult(true);
+                    }
+
                     $this->modules->queues->update($this->queue);
 
                     return false;
@@ -162,6 +182,16 @@ class Installer extends BasePackage
             }
 
             $this->queue['status'] = 2;
+            $this->queue['processed_at'] = date('c');
+            $this->queue['processed_by'] = '-';
+
+            if ($this->access->auth->account() && isset($this->access->auth->account()['id'])) {
+                $this->queue['processed_by'] = $this->access->auth->account()['id'];
+            }
+
+            if ($this->basepackages->progress->checkProgressFile()) {
+                $this->addProgressToResult();
+            }
 
             $this->modules->queues->update($this->queue);
 
@@ -170,7 +200,52 @@ class Installer extends BasePackage
                 $emailReport = $this->emailReport();
             }
 
+            $this->queue['processed_by'] = $this->access->auth->account()['email'];
+
             $this->addResponse('Process complete', 0, ['queue' => $this->queue, 'emailReport' => $emailReport]);
+        }
+    }
+
+    protected function addProgressToResult($failed = false)
+    {
+        $progressFile = $this->basepackages->progress->getProgressFile();
+
+        if (!$progressFile ||
+            ($progressFile && !isset($progressFile['allProcesses']))
+        ) {
+            return;
+        }
+
+        if ($this->process === 'runprecheck') {
+            foreach ($progressFile['allProcesses'] as $key => $progress) {
+                if ($failed && !isset($progress['callResult'])) {
+                    return;
+                }
+                if (!isset($this->queue['results'][$progress['args'][0]][$progress['args'][1]['module_type']][$progress['args'][1]['id']])) {
+                    continue;
+                }
+
+                $progressResultResult = &$this->queue['results'][$progress['args'][0]][$progress['args'][1]['module_type']][$progress['args'][1]['id']];
+
+                $progressResultResult['precheck_progress_logs'][$key]['progressTask'] = $progress['text'];
+                $progressResultResult['precheck_progress_logs'][$key]['progressResult'] = $progress['callResult'] == true ? 'Pass' : 'Fail';
+                $progressResultResult['precheck_progress_logs'][$key]['progressExecTime'] = $progress['callExecTime'];
+            }
+        } else if ($this->process === 'runprocess') {
+            foreach ($progressFile['allProcesses'] as $key => $progress) {
+                if ($failed && !isset($progress['callResult'])) {
+                    return;
+                }
+                if (!isset($this->queue['results'][$progress['args'][0]][$progress['args'][1]['module_type']][$progress['args'][1]['id']])) {
+                    continue;
+                }
+
+                $progressResultResult = &$this->queue['results'][$progress['args'][0]][$progress['args'][1]['module_type']][$progress['args'][1]['id']];
+
+                $progressResultResult['process_progress_logs'][$key]['progressTask'] = $progress['text'];
+                $progressResultResult['process_progress_logs'][$key]['progressResult'] = $progress['callResult'] == true ? 'Pass' : 'Fail';
+                $progressResultResult['process_progress_logs'][$key]['progressExecTime'] = $progress['callExecTime'];
+            }
         }
     }
 
@@ -1348,7 +1423,8 @@ class Installer extends BasePackage
             array_push($methods,
                 [
                     'method'    => 'extractModulesDownloadedFromRepo-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                    'text'      => 'Extracting downloaded module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...'
+                    'text'      => 'Extracting downloaded module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                    'args'      => [$taskName, $module]
                 ]
             );
         } else {
@@ -1359,13 +1435,15 @@ class Installer extends BasePackage
                     'args'      => [$taskName, $module, $precheck],
                 ]
             );
-            array_push($methods,
-                [
-                    'method'    => 'runModuleInstallScripts-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                    'text'      => 'Running module install scripts for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                    'args'      => [$taskName, $module],
-                ]
-            );
+            if ($module['module_type'] !== 'views') {
+                array_push($methods,
+                    [
+                        'method'    => 'runModuleInstallScripts-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                        'text'      => 'Running module install scripts for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                        'args'      => [$taskName, $module],
+                    ]
+                );
+            }
             array_push($methods,
                 [
                     'method'    => 'deleteSourceFiles-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
@@ -1373,6 +1451,9 @@ class Installer extends BasePackage
                     'args'      => [$taskName, $module],
                 ]
             );
+            if (is_string($module['id']) && str_contains($module['id'], '-public')) {
+                return;
+            }
             array_push($methods,
                 [
                     'method'    => 'updateVersion-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),

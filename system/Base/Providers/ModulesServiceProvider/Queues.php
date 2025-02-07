@@ -36,6 +36,19 @@ class Queues extends BasePackage
 
         $queue = $queue->toArray();
 
+        if (isset($queue['prechecked_by']) && $queue['prechecked_by'] !== 0) {
+            $account = $this->basepackages->accounts->getAccountById($queue['prechecked_by']);
+            if ($account) {
+                $queue['prechecked_by'] = $account['email'];
+            }
+        }
+        if (isset($queue['processed_by']) && $queue['processed_by'] !== 0) {
+            $account = $this->basepackages->accounts->getAccountById($queue['processed_by']);
+            if ($account) {
+                $queue['processed_by'] = $account['email'];
+            }
+        }
+
         return $queue;
     }
 
