@@ -539,7 +539,7 @@ class DevtoolsModules extends BasePackage
                 $this->addUpdateAppTypeFiles($data);
             }
 
-            if (strtolower($appType['app_type']) !== 'core' &&
+            if (strtolower($data['app_type']) !== 'core' &&
                 $data['createrepo'] == true
             ) {
                 if (!$this->checkRepo($data)) {
@@ -3101,7 +3101,7 @@ $file .= '
             }
         }
 
-        $this->addResponse('Generated Repo Url', 0, ['repo' => $url]);
+        $this->addResponse('Generated Repo Url', 0, ['repo' => strtolower($url)]);
 
         return true;
     }

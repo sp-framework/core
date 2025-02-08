@@ -1568,12 +1568,17 @@ class Store
                             continue;
                         }
 
-                        if ($type === 'boolean' || $type === 'integer') {
+                        if ($type === 'integer') {
                             if (is_string($data[$propertyKey])) {
                                 $data[$propertyKey] = (int) $data[$propertyKey];
                             }
+                        }
 
-                            if (is_int($data[$propertyKey]) && $type === 'boolean') {
+                        if ($type === 'boolean') {
+                            if (is_string($data[$propertyKey])) {
+                                $data[$propertyKey] = $data[$propertyKey] === 'false' ? false : true;
+                            }
+                            if (is_int($data[$propertyKey])) {
                                 $data[$propertyKey] = $data[$propertyKey] === 0 ? false : true;
                             }
                         }

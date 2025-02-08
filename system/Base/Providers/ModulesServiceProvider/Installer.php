@@ -137,6 +137,9 @@ class Installer extends BasePackage
         if ($this->process === 'runprecheck') {
             $this->basepackages->progress->preCheckComplete();
 
+            $this->queue['results'] = arrayReplace($this->queue['results'], 'precheck_progress_logs', []);
+            $this->modules->queues->update($this->queue);
+
             foreach ($this->runPrecheckProgressMethods as $method) {
                 if ($this->withProgress($method['method'], $method['args'] ?? []) === false) {
                     if ($this->basepackages->progress->checkProgressFile()) {
@@ -168,6 +171,9 @@ class Installer extends BasePackage
             $this->addResponse('Precheck complete', 0, ['queue' => $this->queue]);
         } else if ($this->process === 'runprocess') {
             $this->basepackages->progress->preCheckComplete();
+
+            $this->queue['results'] = arrayReplace($this->queue['results'], 'progress_progress_logs', []);
+            $this->modules->queues->update($this->queue);
 
             foreach ($this->runProcessProgressMethods as $method) {
                 if ($this->withProgress($method['method'], $method['args'] ?? []) === false) {
@@ -218,9 +224,17 @@ class Installer extends BasePackage
 
         if ($this->process === 'runprecheck') {
             foreach ($progressFile['allProcesses'] as $key => $progress) {
-                if ($failed && !isset($progress['callResult'])) {
+                if ($failed &&
+                    (!isset($progress['callResult']) ||
+                     isset($progress['callResult']) && $progress['callResult'] === false)
+                ) {
                     return;
                 }
+
+                if (!isset($progress['args'])) {
+                    continue;
+                }
+
                 if (!isset($this->queue['results'][$progress['args'][0]][$progress['args'][1]['module_type']][$progress['args'][1]['id']])) {
                     continue;
                 }
@@ -233,9 +247,17 @@ class Installer extends BasePackage
             }
         } else if ($this->process === 'runprocess') {
             foreach ($progressFile['allProcesses'] as $key => $progress) {
-                if ($failed && !isset($progress['callResult'])) {
+                if ($failed &&
+                    (!isset($progress['callResult']) ||
+                     isset($progress['callResult']) && $progress['callResult'] === false)
+                ) {
                     return;
                 }
+
+                if (!isset($progress['args'])) {
+                    continue;
+                }
+
                 if (!isset($this->queue['results'][$progress['args'][0]][$progress['args'][1]['module_type']][$progress['args'][1]['id']])) {
                     continue;
                 }
@@ -291,7 +313,8 @@ class Installer extends BasePackage
 
             return $this->queueHasErrors(
                 $this->modules->manager->packagesData->responseMessage ?? 'Could not retrieve repository information for module: ' . $module['name'],
-                $preCheckQueueLogs
+                $preCheckQueueLogs,
+                true
             );
         } else {
             $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
@@ -300,7 +323,8 @@ class Installer extends BasePackage
 
             return $this->queueHasErrors(
                 $this->modules->manager->packagesData->responseMessage ?? 'Could not retrieve repository information for module: ' . $module['name'],
-                $preCheckQueueLogs
+                $preCheckQueueLogs,
+                true
             );
         }
 
@@ -901,12 +925,56 @@ class Installer extends BasePackage
         );
 
         $this->zipFile['name'] = $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
-                        $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'];
+                                 ($this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] !== '' ? $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] : $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['tag_name']);
 
         try {
+            if ($module['module_type'] === 'packages' &&
+                $module['name'] === 'Core'
+            ) {
+                $destDir = '';
+            } else {
+                $name = $this->helper->last(explode('-', strtolower($this->helper->last(explode('/', $module['repo'])))));
+
+                $destDir = 'apps/' . ucfirst($module['app_type']) . '/' . ucfirst($module['module_type']) . '/' . ucfirst($name) . '/';
+
+                if ($module['module_type'] === 'apptype') {
+                    $destDir = 'apps/' . ucfirst($module['name']) . '/';
+                }
+
+                if ($module['module_type'] === 'views') {
+                    //for view check if the main view is installed before adding to queue.
+                    if (isset($module['is_public']) &&
+                        $module['is_public'] == true
+                    ) {
+                        $destDir = 'public/' . strtolower($module['app_type']) . '/' . strtolower($module['name']) . '/';
+
+                        $this->zipFile['name'] = $this->modulesToInstallOrUpdate['repo_details']['details']['name'] .
+                                                 '-public-' .
+                                                 $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'];
+
+                    } else if (isset($module['is_subview']) &&
+                        $module['is_subview'] == true
+                    ) {
+                        $destDir = 'apps/' . ucfirst($module['app_type']) . '/' . ucfirst($module['module_type']) . '/' . ucfirst($module['base_view_name']) . '/html/' . strtolower($module['name']) . '/';
+                    }
+                }
+
+                if (!$precheck) {
+                    try {
+                        if (!$this->localContent->directoryExists($destDir)) {
+                            $this->localContent->createDirectory($destDir);
+                        }
+                    } catch (FilesystemException | UnableToCheckExistence | UnableToCreateDirectory | \throwable $e) {
+                        throw $e;
+                    }
+                }
+            }
+
+            $srcDir = 'var/tmp/installer/' . $this->zipFile['name'] . '/' . $this->zipFile['name'];
+
             $rsyncSettings =
                 [
-                    Rsync::CONF_CWD        => base_path('var/tmp/installer/' . $this->zipFile['name'] . '/' . $this->zipFile['name']),
+                    Rsync::CONF_CWD        => base_path($srcDir),
                     Rsync::CONF_OPTIONS    =>
                         [
                             Rsync::OPT_DRY_RUN           => $precheck,
@@ -925,33 +993,7 @@ class Installer extends BasePackage
 
             $rsync = new Rsync($rsyncSettings);
 
-            if ($module['module_type'] === 'packages' &&
-                $module['name'] === 'Core'
-            ) {
-                $rsync->sync(
-                    '.',
-                    base_path('')
-                );
-            } else {
-                if (!$precheck) {
-                    try {
-                        if (!$this->localContent->directoryExists(
-                            'apps/' . ucfirst($module['app_type']) . '/' . ucfirst($module['module_type']) . '/' . ucfirst($module['name']) . '/'
-                        )) {
-                            $this->localContent->createDirectory(
-                                'apps/' . ucfirst($module['app_type']) . '/' . ucfirst($module['module_type']) . '/' . ucfirst($module['name']) . '/'
-                            );
-                        }
-                    } catch (FilesystemException | UnableToCheckExistence | UnableToCreateDirectory | \throwable $e) {
-                        throw $e;
-                    }
-                }
-
-                $rsync->sync(
-                    '.',
-                    base_path('apps/' . ucfirst($module['app_type']) . '/' . ucfirst($module['module_type']) . '/' . ucfirst($module['name']) . '/')
-                );
-            }
+            $rsync->sync('.', base_path($destDir));
 
             if ($rsync->getExitCode() == 0) {
                 $outputArr = explode(PHP_EOL, $rsync->getStdout());
@@ -1147,8 +1189,12 @@ class Installer extends BasePackage
         }
 
         try {
-            $moduleMethod = 'get' . ucfirst(substr($module['module_type'], 0, -1)) . 'ById';
-            $moduleArr = $this->modules->{$module['module_type']}->$moduleMethod($module['id']);
+            if (str_contains($module['module_type'], 'apptype')) {
+                $moduleArr = $this->apps->types->getAppTypeById($module['id']);
+            } else {
+                $moduleMethod = 'get' . ucfirst(substr($module['module_type'], 0, -1)) . 'ById';
+                $moduleArr = $this->modules->{$module['module_type']}->$moduleMethod($module['id']);
+            }
 
             if (!$moduleArr) {
                 return $this->queueHasErrors(
@@ -1181,8 +1227,11 @@ class Installer extends BasePackage
             if ($this->access->auth->account() && isset($this->access->auth->account()['id'])) {
                 $moduleArr['updated_by'] = $this->access->auth->account()['id'];
             }
-
-            $this->modules->{$module['module_type']}->update($moduleArr);
+            if (str_contains($module['module_type'], 'apptype')) {
+                $this->apps->types->update($moduleArr);
+            } else {
+                $this->modules->{$module['module_type']}->update($moduleArr);
+            }
 
             if ($module['module_type'] === 'packages' &&
                 $module['name'] === 'Core'
@@ -1435,7 +1484,9 @@ class Installer extends BasePackage
                     'args'      => [$taskName, $module, $precheck],
                 ]
             );
-            if ($module['module_type'] !== 'views') {
+            if ($module['module_type'] !== 'views' &&
+                $module['module_type'] !== 'apptype'
+            ) {
                 array_push($methods,
                     [
                         'method'    => 'runModuleInstallScripts-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
@@ -1444,20 +1495,19 @@ class Installer extends BasePackage
                     ]
                 );
             }
+            if (!isset($module['is_public'])) {
+                array_push($methods,
+                    [
+                        'method'    => 'updateVersion-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                        'text'      => 'Updating version for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                        'args'      => [$taskName, $module],
+                    ]
+                );
+            }
             array_push($methods,
                 [
                     'method'    => 'deleteSourceFiles-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
                     'text'      => 'Deleting Source files for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                    'args'      => [$taskName, $module],
-                ]
-            );
-            if (is_string($module['id']) && str_contains($module['id'], '-public')) {
-                return;
-            }
-            array_push($methods,
-                [
-                    'method'    => 'updateVersion-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                    'text'      => 'Updating version for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
                     'args'      => [$taskName, $module],
                 ]
             );
@@ -1737,26 +1787,34 @@ class Installer extends BasePackage
                 ]
             );
 
-            $files =
-                $this->basepackages->utils->scanDir(
-                    'var/tmp/installer/' . $modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' . $modulesToInstallOrUpdate['repo_details']['latestRelease']['name']
-                );
+            $scanDirs = [
+                'var/tmp/installer/' . $modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                ($modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] !== '' ? $modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] : $modulesToInstallOrUpdate['repo_details']['latestRelease']['tag_name'])
+            ];
 
-            if (count($files['files']) > 0) {
-                foreach ($files['files'] as $file) {
-                    $this->localContent->delete($file);
-                }
+            if (isset($module['is_public']) && $module['is_public'] == true) {
+                array_push($scanDirs,
+                    'var/tmp/installer/' . $modulesToInstallOrUpdate['repo_details']['details']['name'] . '-public-' .
+                    ($modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] !== '' ? $modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] : $modulesToInstallOrUpdate['repo_details']['latestRelease']['tag_name']));
             }
 
-            if (count($files['dirs']) > 0) {
-                foreach ($files['dirs'] as $dir) {
-                    $this->localContent->deleteDirectory($dir);
-                }
-            }
+            foreach ($scanDirs as $scanDir) {
+                $files = $this->basepackages->utils->scanDir($scanDir);
 
-            $this->localContent->deleteDirectory(
-                'var/tmp/installer/' . $modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' . $modulesToInstallOrUpdate['repo_details']['latestRelease']['name']
-            );
+                if (count($files['files']) > 0) {
+                    foreach ($files['files'] as $file) {
+                        $this->localContent->delete($file);
+                    }
+                }
+
+                if (count($files['dirs']) > 0) {
+                    foreach ($files['dirs'] as $dir) {
+                        $this->localContent->deleteDirectory($dir);
+                    }
+                }
+
+                $this->localContent->deleteDirectory($scanDir);
+            }
 
             $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
         } catch (UnableToListContents | UnableToDeleteDirectory | UnableToDeleteFile | \throwable $e) {
@@ -1765,6 +1823,8 @@ class Installer extends BasePackage
                 $resultQueueLogs
             );
         }
+
+        return true;
     }
 
     protected function emailReport()

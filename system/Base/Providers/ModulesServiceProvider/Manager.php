@@ -68,12 +68,15 @@ class Manager extends BasePackage
 
     public function getModuleInfo($data)
     {
-        $moduleId = $data['module_id'];
-
-        if ($data['module_type'] === 'apptype') {
-            $module = $this->apps->types->getAppTypeById($data['module_id']);
-            $module['module_type'] = 'apptypes';
+        if (str_contains($data['module_type'], 'apptype')) {
+            if (is_int($data['module_id'])) {
+                $module = $this->apps->types->getAppTypeById($data['module_id']);
+            } else if (is_string($data['module_id'])) {
+                $module = $this->apps->types->getAppTypeByType($data['module_id']);
+            }
         } else {
+            $moduleId = $data['module_id'];
+
             if ($data['module_type'] === 'views' &&
                 str_contains($data['module_id'], '-public')
             ) {
@@ -210,6 +213,15 @@ class Manager extends BasePackage
 
                 $module['repo_details']['details'] = $responseArr;
 
+                $repoArr = explode('/', $module['repo']);
+                $names = explode('-', $this->helper->last($repoArr));
+
+                if (count($names) === 1) {
+                    if (!isset($module['module_type'])) {
+                        $module['module_type'] = 'apptypes';
+                    }
+                }
+
                 $this->remoteModules[$module['module_type']] = [$responseArr];
 
                 $latestRelease = $this->moduleNeedsUpgrade($responseArr, $module);
@@ -225,7 +237,7 @@ class Manager extends BasePackage
                     }
                 }
 
-                if ($module['module_type'] === 'apptypes') {
+                if (str_contains($module['module_type'], 'apptype')) {
                     $this->apps->types->update($module);
                 } else {
                     $this->modules->{$module['module_type']}->update($module);
@@ -369,7 +381,7 @@ class Manager extends BasePackage
                     if (!isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']])) {
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']] = [];
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['name'] = $moduleArr['app_type'];
-                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['data']['type'] = 'app';
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['data']['type'] = 'apptype';
                     }
 
                     if (!isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']])) {
@@ -693,7 +705,7 @@ class Manager extends BasePackage
 
     protected function getRemoteModuleJson($moduleType, $module, $onlyJson = false)
     {
-        if ($moduleType === 'apptypes') {
+        if (str_contains($moduleType, 'apptype')) {
             $jsonFileName = 'Install/type.json';
         } else {
             if ($moduleType === 'views' || $moduleType === 'bundles') {//remove "s" from the name
@@ -785,7 +797,7 @@ class Manager extends BasePackage
                         $this->counter['updates']['count'] = 0;
                     }
 
-                    if ($remoteModulesType === 'apptypes') {
+                    if (str_contains($remoteModulesType, 'apptype')) {
                         $this->apps->types->update($updateRemotePackage);
                     } else {
                         $this->modules->{$remoteModulesType}->update($updateRemotePackage);
@@ -837,7 +849,7 @@ class Manager extends BasePackage
 
                     $registerRemotePackage['api_id'] = $this->apiClientConfig['id'];
 
-                    if ($remoteModulesType === 'apptypes') {
+                    if (str_contains($remoteModulesType, 'apptype')) {
                         $this->apps->types->add($registerRemotePackage);
                     } else {
                         if ($registerRemotePackage['module_type'] === 'components') {
@@ -892,7 +904,7 @@ class Manager extends BasePackage
                 $repoUrl = $remoteModule['html_url'];
             }
 
-            if ($remoteModulesType === 'apptypes') {
+            if (str_contains($remoteModulesType, 'apptype')) {
                 $localModule = $this->apps->types->getAppTypeByRepo($repoUrl);
             } else {
                 $moduleMethod = 'get' . ucfirst(substr($remoteModulesType, 0, -1)) . 'ByRepo';

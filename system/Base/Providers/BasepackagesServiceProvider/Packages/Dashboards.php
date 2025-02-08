@@ -87,6 +87,8 @@ class Dashboards extends BasePackage
             if ($this->access->auth->account()) {
                 $data['user_default'] = [$this->access->auth->account()['id']];
             }
+        } else {
+            $data['user_default'] = [];
         }
 
         $data = $this->getSharedIds($data);
@@ -160,6 +162,8 @@ class Dashboards extends BasePackage
             } catch (\throwable $e) {
                 $data['shared'] = null;
             }
+        } else {
+            $data['shared'] = null;
         }
 
         return $data;

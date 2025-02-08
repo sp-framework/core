@@ -567,3 +567,19 @@ if (!function_exists('printArrayList')) {
         return $html;
     }
 }
+
+if (!function_exists('arrayReplace')) {
+    function arrayReplace($array, $findKey, $replace) {
+        if (is_array($array)) {
+            foreach ($array as $key=>$val) {
+                if ($key === $findKey) {
+                    $array[$key] = $replace;
+                } else if (is_array($array[$key])) {
+                    $array[$key] = arrayReplace($array[$key], $findKey, $replace);
+                }
+            }
+        }
+
+        return $array;
+    }
+}

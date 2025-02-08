@@ -476,7 +476,6 @@ dataCollectionSectionForm['funcs']['initJstreeButtons'] = function() {
 
         if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-repo-sync') {
             dataCollectionSectionForm['funcs']['toggleJstreeTool']($(this)[0].id);
-
             dataCollectionSectionForm['funcs']['initSync'](
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true)[0].data.apiid
             );
@@ -689,12 +688,18 @@ dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
 
         if (selected[0].id.startsWith('j')) {
             if (selected[0].data.type !== 'repo') {
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_node(selected);
+                if (selected[0].data.type === 'apptype') {
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
+                    dataCollectionSectionForm['funcs']['moduleinfo'](['loader']);
+                    dataCollectionSectionForm['funcs']['getSelectedModuleInfo'](selected[0].data.id, true);
+                } else {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_node(selected);
 
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update');
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
-                dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
-                return false;
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update');
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
+                    dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
+                    return false;
+                }
             } else if (selected[0].data.type === 'repo') {
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-add', 'success', false);
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update', 'warning', false);
@@ -702,9 +707,8 @@ dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
                     'href', '{{links.url("system/api/client/services/q/id/' + selected[0].data.apiid + '")}}'
                 );
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync', 'primary', false);
+                dataCollectionSectionForm['funcs']['moduleinfo']();
             }
-
-            dataCollectionSectionForm['funcs']['moduleinfo']();
         } else {
             if (selected[0].data.type !== 'repo') {
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-update');
@@ -791,28 +795,33 @@ dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], s
     }
 }
 
-dataCollectionSectionForm['funcs']['getSelectedModuleInfo'] = function(selected) {
+dataCollectionSectionForm['funcs']['getSelectedModuleInfo'] = function(selected, apptype = false) {
     if (!selected) {
         return false;
     }
 
     var splitModule, moduleType, moduleId;
 
-    splitModule = selected.split('-');
-    moduleId = splitModule[1];
+    if (apptype) {
+        moduleType = 'apptype';
+        moduleId = selected;
+    } else {
+        splitModule = selected.split('-');
+        moduleId = splitModule[1];
 
-    if (selected.startsWith('components')) {
-        moduleType = 'components';
-    } else if (selected.startsWith('packages')) {
-        moduleType = 'packages';
-    } else if (selected.startsWith('middlewares')) {
-        moduleType = 'middlewares';
-    } else if (selected.startsWith('views')) {
-        moduleType = 'views';
-    } else if (selected.startsWith('bundles')) {
-        moduleType = 'bundles';
-    } else if (selected.startsWith('external')) {
-        moduleType = 'externals';
+        if (selected.startsWith('components')) {
+            moduleType = 'components';
+        } else if (selected.startsWith('packages')) {
+            moduleType = 'packages';
+        } else if (selected.startsWith('middlewares')) {
+            moduleType = 'middlewares';
+        } else if (selected.startsWith('views')) {
+            moduleType = 'views';
+        } else if (selected.startsWith('bundles')) {
+            moduleType = 'bundles';
+        } else if (selected.startsWith('external')) {
+            moduleType = 'externals';
+        }
     }
 
     if (moduleType && moduleId) {
@@ -824,7 +833,7 @@ dataCollectionSectionForm['funcs']['getSelectedModuleInfo'] = function(selected)
     return false;
 }
 
-dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, moduleId, sync = false) {
+dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, moduleId = null, sync = false) {
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
     postData['module_type'] = moduleType;
@@ -849,7 +858,9 @@ dataCollectionSectionForm['funcs']['getModuleInfo'] = function(moduleType, modul
             if (response.responseData.module) {
 
                 dataCollectionSectionForm['vars']['module'] = response.responseData.module;
-
+                if (moduleType === 'apptype') {
+                    dataCollectionSectionForm['vars']['module']['module_type'] = 'apptype';
+                }
                 dataCollectionSectionForm['funcs']['processModuleInfo'](response.responseData.module);
             }
         } else if (response.responseCode == 1) {
@@ -914,7 +925,11 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     $('#installed').html(moduleData.installed);
     $('#version').html(moduleData.version);
     $('#updated_by').html(moduleData.updated_by);
-    $('#module_type').html(moduleData.module_type);
+    if (moduleData.module_type) {
+        $('#module_type').html(moduleData.module_type);
+    } else {
+        $('#module_type').html('-');
+    }
     if (moduleData.display_name) {
         $('#display_name').html(moduleData.display_name);
     } else {
@@ -1175,9 +1190,13 @@ dataCollectionSectionForm['funcs']['initModuleButtons'] = function() {
 
         dataCollectionSectionForm['funcs']['moduleinfo'](['loader', 'buttons'], ['repo-sync']);
 
+        var moduleId = dataCollectionSectionForm['vars']['module']['id'];
+        if (dataCollectionSectionForm['vars']['module']['module_type'] === 'apptype') {
+            moduleId = dataCollectionSectionForm['vars']['module']['app_type'];
+        }
         dataCollectionSectionForm['funcs']['getModuleInfo'](
             dataCollectionSectionForm['vars']['module']['module_type'],
-            dataCollectionSectionForm['vars']['module']['id'],
+            moduleId,
             true
         );
     });
@@ -1216,29 +1235,47 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
 
             if (task === 'install') {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install', 'primary', false);
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
-                dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, true);
+                if (moduleType === 'apptype') {
+                    dataCollectionSectionForm['funcs']['initQueueButtons']();
+                } else {
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-install', 'primary', false);
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
+                    dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, true);
+                }
             } else if (task === 'update') {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update', 'info', false);
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
-                dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id);
+                if (moduleType === 'apptype') {
+                    dataCollectionSectionForm['funcs']['initQueueButtons']();
+                } else {
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-update', 'info', false);
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
+                    dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id);
+                }
             } else if (task === 'uninstall') {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall', 'warning', false);
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
-                dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, false, true);
+                if (moduleType === 'apptype') {
+                    dataCollectionSectionForm['funcs']['initQueueButtons']();
+                } else {
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-uninstall', 'warning', false);
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
+                    dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, false, true);
+                }
             } else if (task === 'remove') {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel']);
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove', 'danger', false);
-                dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
-                dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, false, false, true);
+                if (moduleType === 'apptype') {
+                    dataCollectionSectionForm['funcs']['initQueueButtons']();
+                } else {
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-remove', 'danger', false);
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-queue', 'purple', false);
+                    dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](moduleType + '-' + id, false, false, true);
+                }
             } else if (task === 'cancel') {
                 dataCollectionSectionForm['funcs']['processModuleInfo'](dataCollectionSectionForm['vars']['module']);
 
                 for (var queueTask in dataCollectionSectionForm['vars']['queue']['tasks']) {
-                    if (dataCollectionSectionForm['vars']['queue']['tasks'][queueTask].length === 0) {
+                    if (!dataCollectionSectionForm['vars']['queue']['tasks'][queueTask] ||
+                        (dataCollectionSectionForm['vars']['queue']['tasks'][queueTask] && dataCollectionSectionForm['vars']['queue']['tasks'][queueTask].length === 0)
+                    ) {
                         dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-filter-' + queueTask);
                     }
                 }
@@ -1246,6 +1283,10 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
                 dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](
                     dataCollectionSectionForm['vars']['module']['module_type'] + '-' + dataCollectionSectionForm['vars']['module']['id']
                 );
+
+                if (dataCollectionSectionForm['vars']['queue']['total'] === 0) {
+                    dataCollectionSectionForm['funcs']['initQueueButtons'](false);
+                }
             } else if (task === 'clearQueue') {
                 dataCollectionSectionForm['funcs']['clearQueue']();
             }
