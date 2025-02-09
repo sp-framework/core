@@ -615,11 +615,15 @@ class Ff
                         if (is_array($storeDataValue)) {
                             $storeDataValue = $this->helper->encode($storeDataValue);
                         }
+                        if (is_int($storeDataValue)) {
+                            $storeDataValue = (string) $storeDataValue;
+                        }
+                        if (is_bool($storeDataValue)) {
+                            $storeDataValue = $storeDataValue ? 1 : 0;
+                        }
                     }
 
-                    $model->assign($storeData);
-
-                    $model->create();
+                    $this->db->insertAsDict($model->getSource(), $storeData);
                 }
 
                 return true;
