@@ -38,7 +38,11 @@ class Menus extends BasePackage
         $buildMenu = [];
 
         foreach (msort($menus, 'sequence') as $key => $menu) {
-            $menu = $this->helper->decode($menu['menu'], true);
+            if (is_string($menu['menu'])) {
+                $menu['menu'] = $this->helper->decode($menu['menu'], true);
+            }
+
+            $menu = $menu['menu'];
 
             if ($menu) {
                 $buildMenu = array_replace_recursive($buildMenu, $menu);
@@ -81,7 +85,22 @@ class Menus extends BasePackage
         return $this->buildMenus($menus);
     }
 
-    public function updateMenus($data)
+    public function getMenusByRouteForAppType($route, $appType)
+    {
+        $menus = [];
+
+        foreach($this->menus as $menu) {
+            if ($menu['route'] === strtolower($route)) {
+                if ($menu['app_type'] === $appType) {
+                    return $menu;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function updateMenus(array $data)
     {
         $menus = $data['menus'];
 
@@ -109,9 +128,9 @@ class Menus extends BasePackage
         $this->init(true);
     }
 
-    public function addMenu($data)
+    public function addMenu(array $componentJsonFile)
     {
-        $menu = $data['menu'];
+        $menu = $componentJsonFile['menu'];
 
         if (isset($menu['seq'])) {
             $sequence = $menu['seq'];
@@ -125,8 +144,8 @@ class Menus extends BasePackage
         $insertMenu = $this->add([
                 'menu'                  => $this->helper->encode($menu),
                 'apps'                  => $this->helper->encode([]),
-                'app_type'              => $data['app_type'],
-                'route'                 => $data['route'],
+                'app_type'              => $componentJsonFile['app_type'],
+                'route'                 => $componentJsonFile['route'],
                 'sequence'              => $sequence
             ]
         );
@@ -138,14 +157,17 @@ class Menus extends BasePackage
         }
     }
 
-    public function updateMenu($id, array $data)
+    public function updateMenu($id, array $componentJsonFile)
     {
         $menu = $this->getById($id);
 
+        if (is_string($menu['menu'])) {
+            $menu['menu'] = $this->helper->decode($menu['menu'], true);
+        }
         if ($menu) {
-            $menu = array_merge($menu, $data['menu']);
+            $menu = array_merge($menu['menu'], $componentJsonFile['menu']);
         } else {
-            $menu = $data['menu'];
+            $menu = $componentJsonFile['menu'];
         }
 
         if (isset($menu['seq'])) {
@@ -161,8 +183,8 @@ class Menus extends BasePackage
                 'id'                    => $id,
                 'menu'                  => $this->helper->encode($menu),
                 'apps'                  => $this->helper->encode([]),
-                'app_type'              => $data['app_type'],
-                'route'                 => $data['route'],
+                'app_type'              => $componentJsonFile['app_type'],
+                'route'                 => $componentJsonFile['route'],
                 'sequence'              => $sequence
             ]
         );
