@@ -1576,8 +1576,17 @@ class Store
 
                         if ($type === 'boolean') {
                             if (is_string($data[$propertyKey])) {
-                                $data[$propertyKey] = $data[$propertyKey] === 'false' ? false : true;
+                                if ($data[$propertyKey] === 'false' ||
+                                    $data[$propertyKey] === '0'
+                                ) {
+                                    $data[$propertyKey] = false;
+                                } else if ($data[$propertyKey] === 'false' ||
+                                           $data[$propertyKey] === '1'
+                                ) {
+                                    $data[$propertyKey] = true;
+                                }
                             }
+
                             if (is_int($data[$propertyKey])) {
                                 $data[$propertyKey] = $data[$propertyKey] === 0 ? false : true;
                             }
