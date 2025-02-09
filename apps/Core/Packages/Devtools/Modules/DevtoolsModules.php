@@ -1507,11 +1507,11 @@ $file .= '
             $data['menu'] = $this->helper->decode($data['menu'], true);
 
             if (isset($menu)) {
-                $this->basepackages->menus->updateMenu($data['menu_id'], $data['app_type'], $data['menu']);
+                $this->basepackages->menus->updateMenu($data['menu_id'], $data);
 
                 return;
             } else {
-                $menu = $this->basepackages->menus->addMenu($data['app_type'], $data['menu']);
+                $menu = $this->basepackages->menus->addMenu($data);
 
                 if ($menu) {
                     $module = $this->modules->{$data['module_type']}->packagesData->last;

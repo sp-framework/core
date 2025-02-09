@@ -1,0 +1,29 @@
+{% if menu['id'] is defined %}
+    {% set menuId = menu['id'] %}
+    {% set title = ' Menu (' ~ menu['route'] ~ ')' %}
+{% else %}
+    {% set menuId = '' %}
+    {% set title = 'New Menu' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'bars',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'menus/form',
+        'formButtons'                   :
+        [
+            'closeActionUrl'                : 'system/menus'
+        ]
+    ]
+)}}

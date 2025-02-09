@@ -9,7 +9,7 @@ class Menus extends BasePackage
 {
     protected $modelToUse = BasepackagesMenus::class;
 
-    protected $packageNameS = 'Menu';
+    protected $packageName = 'menus';
 
     public $menus;
 
@@ -83,7 +83,11 @@ class Menus extends BasePackage
 
     public function updateMenus($data)
     {
-        $menus = $this->helper->decode($data['menus'], true);
+        $menus = $data['menus'];
+
+        if (is_string($menus)) {
+            $menus = $this->helper->decode($menus, true);
+        }
 
         if (count($menus) > 0) {
             foreach ($menus as $menuId => $value) {
@@ -105,8 +109,10 @@ class Menus extends BasePackage
         $this->init(true);
     }
 
-    public function addMenu($appType, array $menu)
+    public function addMenu($data)
     {
+        $menu = $data['menu'];
+
         if (isset($menu['seq'])) {
             $sequence = $menu['seq'];
             unset($menu['seq']);
@@ -119,7 +125,8 @@ class Menus extends BasePackage
         $insertMenu = $this->add([
                 'menu'                  => $this->helper->encode($menu),
                 'apps'                  => $this->helper->encode([]),
-                'app_type'              => $appType,
+                'app_type'              => $data['app_type'],
+                'route'                 => $data['route'],
                 'sequence'              => $sequence
             ]
         );
@@ -131,8 +138,16 @@ class Menus extends BasePackage
         }
     }
 
-    public function updateMenu($id, $appType, array $menu)
+    public function updateMenu($id, array $data)
     {
+        $menu = $this->getById($id);
+
+        if ($menu) {
+            $menu = array_merge($menu, $data['menu']);
+        } else {
+            $menu = $data['menu'];
+        }
+
         if (isset($menu['seq'])) {
             $sequence = $menu['seq'];
             unset($menu['seq']);
@@ -146,7 +161,8 @@ class Menus extends BasePackage
                 'id'                    => $id,
                 'menu'                  => $this->helper->encode($menu),
                 'apps'                  => $this->helper->encode([]),
-                'app_type'              => $appType,
+                'app_type'              => $data['app_type'],
+                'route'                 => $data['route'],
                 'sequence'              => $sequence
             ]
         );

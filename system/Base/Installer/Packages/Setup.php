@@ -465,7 +465,7 @@ class Setup
 					}
 
 					if ($jsonFile['menu'] && $jsonFile['menu'] !== 'false') {
-						$menuId = $this->registerCoreMenu($jsonFile['app_type'], $jsonFile['menu']);
+						$menuId = $this->registerCoreMenu($jsonFile);
 					} else {
 						$menuId = null;
 					}
@@ -600,9 +600,9 @@ class Setup
 		return (new RegisterCoreApp())->update($this->db, $this->ff);
 	}
 
-	protected function registerCoreMenu($appType, array $menu)
+	protected function registerCoreMenu($componentJsonFile)
 	{
-		return (new RegisterMenu())->register($this->db, $this->ff, $appType, $menu, $this->helper);
+		return (new RegisterMenu())->register($this->db, $this->ff, $componentJsonFile, $this->helper);
 	}
 
 	protected function registerCorePackage(array $packageFile)
