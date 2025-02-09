@@ -381,7 +381,7 @@ class AppsComponent extends BaseComponent
             $this->apps->packagesData->responseCode
         );
 
-        $this->addToNotification('update', 'Updated app', null, $this->apps->packagesData->last);
+        $this->addToNotification('update', 'Updated app', null, $this->apps->packagesData->last ?? []);
     }
 
     /**
