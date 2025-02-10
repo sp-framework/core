@@ -39,8 +39,6 @@ class ButtonGroup
         $this->buttonParams = $buttonParams;
 
         $this->buildButtonParamsArr();
-
-        $this->buildButton();
     }
 
     public function getContent()
@@ -54,6 +52,13 @@ class ButtonGroup
             $buttons = $this->params['buttons'];
         } else {
             $this->content .= 'Error: buttons (array) missing';
+
+            return;
+        }
+
+        if (!isset($this->params['buttonId'])) {
+            $this->content .= 'Error: buttonId missing';
+
             return;
         }
 
@@ -84,6 +89,8 @@ class ButtonGroup
             isset($this->params['groupButtonPosition']) ?
             'float-' . $this->params['groupButtonPosition'] :
             '';
+
+        $this->buildButton();
     }
 
     protected function buildButton()
@@ -161,10 +168,12 @@ class ButtonGroup
                     $hasButtonDisabled = '';
                     $hasButtonCursor = 'style=cursor:pointer;';
                 }
-                if (isset($this->params['componentId']) && isset($this->params['sectionId'])) {
-                    $hasButtonId = $this->params['componentId'] . '-' . $this->params['sectionId'] . '-' . $buttonKey;
-                } else {
-                    $hasButtonId = $buttonKey;
+
+                $hasButtonValue = $buttonKey;
+                $hasButtonId = $buttonKey;
+                if (isset($button['value'])) {
+                    $hasButtonValue = $button['value'];
+                    $hasButtonId = $button['value'];
                 }
 
                 $hasButtonAdditionalClass = '';
@@ -172,9 +181,18 @@ class ButtonGroup
                     $hasButtonAdditionalClass = $button['buttonAdditionalClass'];
                 }
 
+                if (isset($this->params['buttonId'])) {
+                    $hasButtonName = $this->params['buttonId'];
+                } else if (isset($this->params['componentId']) && isset($this->params['sectionId'])) {
+                    $hasButtonName =
+                        $this->params['componentId'] . '-' . $this->params['sectionId'] . '-' . $buttonKey;
+                } else {
+                    $hasButtonName = $buttonKey;
+                }
+
                 $this->content .=
                     '<label class="btn ' . $this->buttonParams['groupButtonFlat'] . ' ' . $this->buttonParams['groupRadioButtonType'] . ' ' . $hasButtonCheckedClasses . ' ' . $hasButtonDisabled . ' ' . $hasButtonAdditionalClass . ' '  . $hasButtonCheckedBgClass . '" ' . $hasButtonCursor . '>
-                        <input type="radio" name="options" id="' . $hasButtonId . '" autocomplete="off" data-value="' . $button['value'] . '" ' . $hasButtonChecked . '>';
+                        <input type="radio" name="' . $hasButtonName . '" id="' . $hasButtonId . '" autocomplete="off" data-value="' . $hasButtonValue . '" ' . $hasButtonChecked . '>';
 
                         if (isset($button['iconPosition'])) {
                             if ($button['iconPosition'] === 'after') {
@@ -358,6 +376,7 @@ class ButtonGroup
 //         'componentId'                       : 'core',
 //         'sectionId'                         : 'main',
 //         'buttonType'                        : 'ButtonGroup',
+//         'buttonId'                          : 'guru',
 //         'groupButtonType'                   : 'horizontal',
 //         'groupButtonSize'                   : 'btn-xs',
 //         'groupButtonFlat'                   : false,
@@ -418,6 +437,7 @@ class ButtonGroup
 //         'componentId'                       : 'core',
 //         'sectionId'                         : 'main',
 //         'buttonType'                        : 'ButtonGroup',
+//         'buttonId'                          : 'guru',
 //         'groupButtonType'                   : 'radio',
 //         'groupButtonSize'                   : 'sm',
 //         'groupButtonFlat'                   : false,
@@ -447,4 +467,5 @@ class ButtonGroup
 //             }
 //     ]
 // )}}
+// To get checked data from js $("input[type='radio'][name='guru']:checked").data('value');
 }
