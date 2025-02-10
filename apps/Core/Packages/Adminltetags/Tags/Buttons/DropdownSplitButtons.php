@@ -39,8 +39,6 @@ class DropdownSplitButtons
         $this->buttonParams = $buttonParams;
 
         $this->buildButtonParamsArr();
-
-        $this->buildButton();
     }
 
     public function getContent()
@@ -50,10 +48,9 @@ class DropdownSplitButtons
 
     protected function buildButtonParamsArr()
     {
-        if (isset($this->params['buttons'])) {
-            $buttons = $this->params['buttons'];
-        } else {
-            $this->content .= 'Error: buttons (array) missing';
+        if (!isset($this->params['dropdowns'])) {
+            $this->content .= 'Error: dropdowns (array) missing';
+
             return;
         }
 
@@ -78,17 +75,17 @@ class DropdownSplitButtons
 
         //Whole Dropdown
         $this->buttonParams['dropdownHover'] =
-            isset($this->params['dropdownHover']) ?
+            (isset($this->params['dropdownHover']) && $this->params['dropdownHover'] === true) ?
             'dropdown-hover' :
             '';
 
         $this->buttonParams['dropdownDirection'] =
             isset($this->params['dropdownDirection']) ?
-            'dropup' :
-            '';
+            $this->params['dropdownDirection'] :
+            '';//either '' or 'dropup'
 
         $this->buttonParams['dropdownAlign'] =
-            isset($this->params['dropdownAlign']) && $this->params['dropdownAlign'] === 'right' ?
+            (isset($this->params['dropdownAlign']) && $this->params['dropdownAlign'] === 'right') ?
             'dropdown-menu-right' :
             '';
 
@@ -98,6 +95,8 @@ class DropdownSplitButtons
         } else {
             $this->buildButtonParamsArrSplit();
         }
+
+        $this->buildButton();
     }
 
     protected function buildButtonParamsArrNoSplit()
@@ -255,7 +254,7 @@ class DropdownSplitButtons
     protected function buildButton()
     {
         $this->content .=
-            '<div class="btn-group ' . $this->buttonParams['dropdownDirection'] . ' ' . $this->buttonParams['buttonPosition'] . '">';
+            '<div class="btn-group ' . $this->buttonParams['dropdownDirection'] . ' ' . $this->buttonParams['dropdownHover'] . ' ' . $this->buttonParams['buttonPosition'] . '">';
 
         if (!$this->buttonParams['dropdownSplitButtonsSplit']) {
             $this->content .=
@@ -325,53 +324,10 @@ class DropdownSplitButtons
                 '><span class="sr-only">Toggle Dropdown</span></button>';
         }
 
-        $this->content .=
-            '<div class="dropdown-menu ' . $this->buttonParams['dropdownAlign'] . ' ">';
-            foreach ($this->params['buttons'] as $index => $links) {
-                if ($index === 'divider') {
+        $params = $this->params;
+        $params['buttonType'] = 'Dropdown';
+        $this->content .= $this->adminLTETags->useTag('buttons', $params);
 
-                    $this->content .= '<div class="dropdown-divider"></div>';
-                } else {
-                    if (isset($links['icon']) && isset($links['title'])) {
-                        if (isset($links['iconPosition']) && $links['iconPosition'] === 'after') {
-                            $icon['linkIcon'] =
-                                '<i class="fas fa-fw fa-' . $links['icon'] . '"></i>';
-                            $icon['linkIconPosition'] = 'after';
-                        } else {
-                            $icon['linkIcon'] =
-                                '<i class="fas fa-fw fa-' . $links['icon'] . '"></i>';
-                            $icon['linkIconPosition'] = '';
-                        }
-                    } else {
-                        $icon['linkIcon'] = '';
-                        $icon['linkIconPosition'] = '';
-                    }
-
-                    $linkId = $this->params['componentId'] . '-' . $this->params['sectionId'] . '-' . $index;
-                    $linkDisabled = isset($links['disabled']) && $links['disabled'] === true ? 'disabled' : '';
-                    $linkAdditionalClass = isset($links['additionalClass']) ? $links['additionalClass'] : '';
-                    $linkUrl = isset($links['url']) ? $links['url'] : '#';
-                    $link = isset($links['title']) ? $links['title'] : 'missing_button_title';
-
-                    $this->content .=
-                        '<a id="' . $linkId .'" class="dropdown-item ' . $linkDisabled . ' ' . $linkAdditionalClass . ' " href="'. $linkUrl . '">';
-
-                    if ($icon['linkIcon'] !== '') {
-                        if ($icon['linkIconPosition'] === 'after') {
-                            $this->content .=
-                                strtoupper($link) . ' ' . $icon['linkIcon'];
-                        } else {
-                            $this->content .=
-                                $icon['linkIcon'] . ' ' . strtoupper($link);
-                        }
-                    } else {
-                        $this->content .=
-                            strtoupper($link);
-                    }
-
-                    $this->content .= '</a>';
-                }
-            }
-        $this->content .= '</div></div>';
+        $this->content .= '</div>';
     }
 }
