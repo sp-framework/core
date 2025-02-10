@@ -189,7 +189,7 @@ class AppsComponent extends BaseComponent
                 }
 
                 //Views
-                $viewsArr = $this->modules->views->getViewsForAppType($app['app_type']);
+                $viewsArr = $this->modules->views->getViewsForAppType($app['app_type'], false);
                 if (count($viewsArr) === 1) {
                     array_push($mandatoryViews, $this->helper->first($viewsArr)['name']);
 
@@ -346,7 +346,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $viewsArr = $this->modules->views->getViewsForAppType($this->postData()['app_type']);
+        $viewsArr = $this->modules->views->getViewsForAppType($this->postData()['app_type'], false);
 
         if (count($viewsArr) === 0) {
             $this->addResponse('No Views Available for app type ' . $this->postData()['app_type'] . ' cannot proceed!', 1);
@@ -520,7 +520,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $viewsArr = $this->modules->views->getViewsForAppType($this->postData()['app_type']);
+        $viewsArr = $this->modules->views->getViewsForAppType($this->postData()['app_type'], false);
 
         if ($viewsArr && count($viewsArr) > 0) {
             $views = [];

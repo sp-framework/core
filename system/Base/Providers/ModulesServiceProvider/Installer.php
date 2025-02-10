@@ -933,15 +933,27 @@ class Installer extends BasePackage
             ) {
                 $destDir = '';
             } else {
-                $name = $this->helper->last(explode('-', strtolower($this->helper->last(explode('/', $module['repo'])))));
-
-                $destDir = 'apps/' . ucfirst($module['app_type']) . '/' . ucfirst($module['module_type']) . '/' . ucfirst($name) . '/';
-
                 if ($module['module_type'] === 'apptype') {
                     $destDir = 'apps/' . ucfirst($module['name']) . '/';
-                }
+                } else if ($module['module_type'] === 'components') {
+                    $destDir = 'apps/' . ucfirst($module['app_type']) . '/Components/';
 
-                if ($module['module_type'] === 'views') {
+                    $routeArr = explode('/', $module['route']);
+
+                    foreach ($routeArr as &$path) {
+                        $path = ucfirst($path);
+                    }
+
+                    $destDir .= implode('/', $routeArr) . '/';
+                } else if ($module['module_type'] === 'middlewares') {
+                    $destDir = 'apps/' . ucfirst($module['app_type']) . '/Middlewares/' . ucfirst($module['name']) . '/';
+                } else if ($module['module_type'] === 'packages') {
+                    $destDir = 'apps/' . ucfirst($module['app_type']) . '/Packages/';
+
+                    $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+                    $destDir .= implode('/', $pathArr) . '/';
+                } else if ($module['module_type'] === 'views') {
                     //for view check if the main view is installed before adding to queue.
                     if (isset($module['is_public']) &&
                         $module['is_public'] == true
@@ -951,11 +963,24 @@ class Installer extends BasePackage
                         $this->zipFile['name'] = $this->modulesToInstallOrUpdate['repo_details']['details']['name'] .
                                                  '-public-' .
                                                  $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'];
-
                     } else if (isset($module['is_subview']) &&
                         $module['is_subview'] == true
                     ) {
-                        $destDir = 'apps/' . ucfirst($module['app_type']) . '/' . ucfirst($module['module_type']) . '/' . ucfirst($module['base_view_name']) . '/html/' . strtolower($module['name']) . '/';
+                        $destDir = 'apps/' . ucfirst($module['app_type']) . '/' . ucfirst($module['module_type']) . '/' . ucfirst($module['base_view_name']) . '/html/';
+
+                        $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+                        if (count($pathArr) > 1) {
+                            foreach ($pathArr as &$path) {
+                                $path = strtolower($path);
+                            }
+                        } else {
+                            $pathArr[0] = strtolower($pathArr[0]);
+                        }
+
+                        $destDir .= implode('/', $pathArr) . '/';
+                    } else {
+                        $destDir = 'apps/' . ucfirst($module['app_type']) . '/Views/' . ucfirst($module['name']) . '/';
                     }
                 }
 

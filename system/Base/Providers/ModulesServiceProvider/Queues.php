@@ -801,6 +801,9 @@ class Queues extends BasePackage
             $this->queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['name'];
             $this->queueTasks[$taskName][$moduleType][$module['id']]['display_name'] = $module['display_name'] ?? $module['name'];
             $this->queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $moduleType;
+            if ($moduleType === 'components') {
+                $this->queueTasks[$taskName][$moduleType][$module['id']]['route'] = $module['route'];
+            }
             if ($moduleType === 'views' && array_key_exists('is_subview', $module)) {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['is_subview'] = $module['is_subview'];
                 if ($module['is_subview']) {
