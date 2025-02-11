@@ -148,6 +148,10 @@ var BazContentLoader = function() {
     }
 
     function loadAjax(element, options, popped) {
+        if (element.length === 0) {
+            return false;
+        }
+
         BazHelpers.setTimeoutTimers.stopAll();//Stop all timers from previous component.
         var urlToLoad, elementId;
         var dataCollection = window.dataCollection;
