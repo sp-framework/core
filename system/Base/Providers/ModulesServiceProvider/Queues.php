@@ -230,40 +230,18 @@ class Queues extends BasePackage
             return false;
         }
 
-        $noOptions = true;
-        array_walk($data['settings']['backupSettings'], function(&$setting, $index) use (&$noOptions) {
-            if ($index === 'notes' ||
-                $index === 'password_protect'
+        if ($data['settings']['backupSettings']['backup'] == 'true') {
+            if ($data['settings']['backupSettings']['keys'] === true &&
+                $data['settings']['backupSettings']['password_protect'] === ''
             ) {
-                return;
+                $this->addResponse('Password is required if keys are being backed up!', 1);
+
+                return false;
             }
 
-            if ($setting !== '') {
-                if ($setting == 'true') {
-                    $setting = true;
-                    $noOptions = false;
-                } else {
-                    $setting = false;
-                }
-            } else {
-                $setting = false;
-            }
-        });
-
-        if ($data['settings']['backupSettings']['keys'] === true &&
-            $data['settings']['backupSettings']['password_protect'] === ''
-        ) {
-            $this->addResponse('Password is required if keys are being backed up!', 1);
-
-            return false;
-        }
-
-        if ($noOptions) {//No option selected disables backup.
-            $data['settings']['backupSettings']['backup'] = false;
-            $data['settings']['backupSettings']['password_protect'] = '';
-            $data['settings']['backupSettings']['notes'] = '';
-        } else {
             $data['settings']['backupSettings']['backup'] = true;
+        } else {
+            $data['settings']['backupSettings']['backup'] = false;
         }
 
         if ($data['settings']['emailReport'] !== '') {

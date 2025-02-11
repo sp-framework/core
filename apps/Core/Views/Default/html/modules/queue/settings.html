@@ -9,45 +9,56 @@
 {% set settingsBackupSettingsOldBackupsDirChecked = false %}
 {% set settingsBackupSettingsDatabaseChecked = false %}
 {% set settingsBackupSettingsKeysChecked = false %}
-{% if queue['settings']['backupSettings']['apps_dir'] == 'true' %}
-    {% set settingsBackupSettingsAppsDirChecked = true %}
-{% endif %}
-{% if queue['settings']['backupSettings']['systems_dir'] == 'true' %}
-    {% set settingsBackupSettingsSystemsDirChecked = true %}
-{% endif %}
-{% if queue['settings']['backupSettings']['public_dir'] == 'true' %}
-    {% set settingsBackupSettingsPublicDirChecked = true %}
-{% endif %}
-{% if queue['settings']['backupSettings']['private_dir'] == 'true' %}
-    {% set settingsBackupSettingsPrivateDirChecked = true %}
-{% endif %}
-{% if queue['settings']['backupSettings']['external_dir'] == 'true' %}
-    {% set settingsBackupSettingsExternalDirChecked = true %}
-{% endif %}
-{% if queue['settings']['backupSettings']['html_compiled_dir'] == 'true' %}
-    {% set settingsBackupSettingsHTMLCompiledDirChecked = true %}
-{% endif %}
-{% if queue['settings']['backupSettings']['var_dir'] == 'true' %}
-    {% set settingsBackupSettingsVarDirChecked = true %}
-{% endif %}
-{% if queue['settings']['backupSettings']['external_vendor_dir'] == 'true' %}
-    {% set settingsBackupSettingsExternalVendorDirChecked = true %}
-{% endif %}
-{% if queue['settings']['backupSettings']['old_backups_dir'] == 'true' %}
-    {% set settingsBackupSettingsOldBackupsDirChecked = true %}
-{% endif %}
-{% if queue['settings']['backupSettings']['database'] == 'true' %}
-    {% set settingsBackupSettingsDatabaseChecked = true %}
-{% endif %}
-{% if queue['settings']['backupSettings']['keys'] == 'true' %}
-    {% set settingsBackupSettingsKeysChecked = true %}
+{% set settingsBackupSettingsKeysDisabled = false %}
+{% set settingsBackupSettingsBackup = 'backup-off' %}
+{% set settingsBackupSettingsPasswordProtectDisabled = true %}
+{% set settingsBackupSettingsNotesDisabled = true %}
+{% if queue['settings']['backupSettings']['backup'] == true %}
+    {% set settingsBackupSettingsPasswordProtectDisabled = false %}
+    {% set settingsBackupSettingsNotesDisabled = false %}
+    {% set settingsBackupSettingsBackup = 'backup-on' %}
+    {% if queue['settings']['backupSettings']['apps_dir'] == true %}
+        {% set settingsBackupSettingsAppsDirChecked = true %}
+        {% set settingsBackupSettingsKeysDisabled = true %}
+    {% endif %}
+    {% if queue['settings']['backupSettings']['systems_dir'] == true %}
+        {% set settingsBackupSettingsSystemsDirChecked = true %}
+        {% set settingsBackupSettingsKeysChecked = true %}
+    {% endif %}
+    {% if queue['settings']['backupSettings']['public_dir'] == true %}
+        {% set settingsBackupSettingsPublicDirChecked = true %}
+    {% endif %}
+    {% if queue['settings']['backupSettings']['private_dir'] == true %}
+        {% set settingsBackupSettingsPrivateDirChecked = true %}
+    {% endif %}
+    {% if queue['settings']['backupSettings']['external_dir'] == true %}
+        {% set settingsBackupSettingsExternalDirChecked = true %}
+    {% endif %}
+    {% if queue['settings']['backupSettings']['html_compiled_dir'] == true %}
+        {% set settingsBackupSettingsHTMLCompiledDirChecked = true %}
+    {% endif %}
+    {% if queue['settings']['backupSettings']['var_dir'] == true %}
+        {% set settingsBackupSettingsVarDirChecked = true %}
+    {% endif %}
+    {% if queue['settings']['backupSettings']['external_vendor_dir'] == true %}
+        {% set settingsBackupSettingsExternalVendorDirChecked = true %}
+    {% endif %}
+    {% if queue['settings']['backupSettings']['old_backups_dir'] == true %}
+        {% set settingsBackupSettingsOldBackupsDirChecked = true %}
+    {% endif %}
+    {% if queue['settings']['backupSettings']['database'] == true %}
+        {% set settingsBackupSettingsDatabaseChecked = true %}
+    {% endif %}
+    {% if queue['settings']['backupSettings']['keys'] == true %}
+        {% set settingsBackupSettingsKeysChecked = true %}
+    {% endif %}
 {% endif %}
 {% set settingsFilesDeleteSourceFilesChecked = false %}
-{% if queue['settings']['files']['deleteSourceFiles'] == 'true' %}
+{% if queue['settings']['files']['deleteSourceFiles'] == true %}
     {% set settingsFilesDeleteSourceFilesChecked = true %}
 {% endif %}
 {% set settingsFilesDeleteDestinationFilesChecked = false %}
-{% if queue['settings']['files']['deleteDestinationFiles'] == 'true' %}
+{% if queue['settings']['files']['deleteDestinationFiles'] == true %}
     {% set settingsFilesDeleteDestinationFilesChecked = true %}
 {% endif %}
 <div class="row">
@@ -71,6 +82,38 @@
                             'fieldBazPostOnUpdate'                  : false,
                             'fieldBazJstreeSearch'                  : true,
                             'fieldHtmlContent'                      : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'component'                         : component,
+                            'componentName'                     : componentName,
+                            'componentId'                       : componentId,
+                            'sectionId'                         : sectionId,
+                            'buttonType'                        : 'ButtonGroup',
+                            'buttonId'                          : 'backup',
+                            'groupButtonType'                   : 'radio',
+                            'groupButtonSize'                   : 'sm',
+                            'groupButtonPosition'               : 'right',
+                            'groupRadioButtonChecked'           : settingsBackupSettingsBackup,
+                            'groupRadioButtonStyle'             : 'outline',
+                            'buttons'                           :
+                                {
+                                    'backup-off' : {
+                                        'title'                   : 'Backup Off',
+                                        'type'                    : 'primary',
+                                        'value'                   : 'backup-off'
+                                    },
+                                    'backup-on' : {
+                                        'title'                   : 'Backup On',
+                                        'type'                    : 'success',
+                                        'value'                   : 'backup-on'
+                                    }
+                                }
                         ]
                     )}}
                 </div>
@@ -331,7 +374,7 @@
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'danger',
                             'fieldCheckboxChecked'           : settingsBackupSettingsKeysChecked,
-                            'fieldDisabled'                  : true,
+                            'fieldDisabled'                  : settingsBackupSettingsKeysDisabled,
                             'fieldCheckboxLabel'             : 'SECURITY AND DB KEYS',
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : false,
@@ -355,6 +398,7 @@
                             'fieldInputPasswordGenerate'            : true,
                             'fieldInputPasswordStrengthMeter'       : true,
                             'fieldHelp'                             : true,
+                            'fieldDisabled'                         : settingsBackupSettingsPasswordProtectDisabled,
                             'fieldHelpTooltipContent'               : 'We will password protect the zip file if password is provided. Password protection is a must in case of Security and DB keys (if not provided, a new password will be auto generated). During restore, you need to enter this password, else restore will fail. Please keep this password safe.',
                             'fieldRequired'                         : false,
                             'fieldBazScan'                          : true,
@@ -379,6 +423,7 @@
                             'fieldType'                      : 'textarea',
                             'fieldDataMaxLength'             : 2048,
                             'fieldHelp'                      : true,
+                            'fieldDisabled'                  : settingsBackupSettingsNotesDisabled,
                             'fieldHelpTooltipContent'        : 'Backup Notes',
                             'fieldRequired'                  : false,
                             'fieldBazScan'                   : true,

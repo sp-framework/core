@@ -392,16 +392,24 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
 
     $('#{{componentId}}-{{sectionId}}-modules').on('search.jstree', function(e, res) {
         if (dataCollectionSectionForm['vars']['syncInfo'] === '') {
+            var updateTexts = { };
+
             $(res.nodes).each(function(i, node) {
                 var updateNode = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(node);
                 var apiNode = updateNode.parents[updateNode.parents.length - 2];
-                var apiNodeObj = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(apiNode);
                 var update = 'update';
                 if (res.nodes.length > 1) {
                     update = 'updates';
                 }
-                dataCollectionSectionForm['vars']['syncInfo'] += apiNodeObj.text + ' has ' + res.nodes.length + ' new ' + update + ' available.<br>';
+                var apiNodeObj = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_node(apiNode);
+                updateTexts[apiNodeObj.text] = ' has ' + res.nodes.length + ' new ' + update + ' available.';
             });
+
+            if (Object.keys(updateTexts).length > 0) {
+                for (var updateText in updateTexts) {
+                    dataCollectionSectionForm['vars']['syncInfo'] += updateText + updateTexts[updateText] + '<br>';
+                }
+            }
         }
 
         if (dataCollectionSectionForm['vars']['initJstree'] === true) {
@@ -416,7 +424,6 @@ dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
                     textTrusted : true
                 });
             }
-
         }
 
         dataCollectionSectionForm['vars']['syncInfo'] = '';
@@ -1331,20 +1338,7 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function(init = true) {
                                                     BazCore.updateBreadcrumb();
                                                 }
             });
-            // dataCollectionSectionForm['funcs']['analyseQueue']();
         });
-
-        // $('#{{componentId}}-{{sectionId}}-perform-precheck').click(function(e) {
-        //     e.preventDefault();
-
-        //     dataCollectionSectionForm['funcs']['processQueue']();
-        // });
-
-        // $('#{{componentId}}-{{sectionId}}-process-queue').click(function(e) {
-        //     e.preventDefault();
-
-        //     dataCollectionSectionForm['funcs']['processQueue']('process');
-        // });
     } else {
         $('#{{componentId}}-{{sectionId}}-analyse-queue').addClass('disabled');
         $('#{{componentId}}-{{sectionId}}-clear-queue').attr('disabled', true);
@@ -1369,34 +1363,6 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function() {
     dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
     $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
 }
-// dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck') {
-//     var postData = { };
-//     postData[$('#security-token').attr('name')] = $('#security-token').val();
-//     postData['queue'] = dataCollectionSectionForm['vars']['queue']['tasks'];
-//     postData['process'] = 'runprecheck';
-//     if (task === 'process') {
-//         postData['process'] = 'runprocess';
-//     }
-
-//     $.post('{{links.url("modules/processQueue")}}', postData, function(response) {
-//         if (response.tokenKey && response.token) {
-//             $('#security-token').attr('name', response.tokenKey);
-//             $('#security-token').val(response.token);
-//         }
-
-//         if (response.responseCode == 0) {
-//             paginatedPNotify('success', {
-//                 text        : response.responseMessage,
-//                 textTrusted : true
-//             });
-//         } else {
-//             paginatedPNotify('error', {
-//                 text        : response.responseMessage,
-//                 textTrusted : true
-//             });
-//         }
-//     }, 'json');
-// }
 
 dataCollectionSectionForm['funcs']['initSync'] = function(val) {
     dataCollectionSectionForm['vars']['sync'] = true;

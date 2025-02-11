@@ -2267,8 +2267,7 @@ $file .= '
 
                 if (isset($data['module_type']) &&
                     $data['module_type'] === 'views' &&
-                    isset($data['base_view_module_id']) &&
-                    $data['base_view_module_id'] == 0
+                    $module['is_subview'] === false
                 ) {
                     array_push($reposArr, $module['repo'] . '-public');
                 }
@@ -2355,8 +2354,7 @@ $file .= '
 
         if (isset($data['module_type']) &&
             $data['module_type'] === 'views' &&
-            isset($module['base_view_module_id']) &&
-            $module['base_view_module_id'] == 0
+            $module['is_subview'] === false
         ) {
             array_push($reposArr, $module['repo'] . '-public');
         }
@@ -2817,8 +2815,7 @@ $file .= '
 
         if (isset($data['module_type']) &&
             $data['module_type'] === 'views' &&
-            isset($data['base_view_module_id']) &&
-            $data['base_view_module_id'] == 0
+            $data['is_subview'] === false
         ) {
             array_push($reposArr, $data['repo'] . '-public');
         }

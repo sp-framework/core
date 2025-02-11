@@ -279,6 +279,13 @@ dataCollectionSectionForm['funcs']['saveSettings'] = function() {
     postData['id'] = dataCollectionSectionForm['vars']['queue']['id'];
     postData['settings'] = { };
     postData['settings']['backupSettings'] = { };
+    var backup = $("input[type='radio'][name='backup']:checked").data('value');
+
+    if (backup === 'backup-off') {
+        postData['settings']['backupSettings']['backup'] = false;
+    } else {
+        postData['settings']['backupSettings']['backup'] = true;
+    }
     postData['settings']['backupSettings']['apps_dir'] = $('#{{componentId}}-{{sectionId}}-apps_dir')[0].checked;
     postData['settings']['backupSettings']['systems_dir'] = $('#{{componentId}}-{{sectionId}}-systems_dir')[0].checked;
     postData['settings']['backupSettings']['public_dir'] = $('#{{componentId}}-{{sectionId}}-public_dir')[0].checked;
@@ -305,6 +312,7 @@ dataCollectionSectionForm['funcs']['saveSettings'] = function() {
 
         if (response.responseCode == 0) {
             paginatedPNotify('success', {text : response.responseMessage});
+            $('#{{componentId}}-{{sectionId}}-queue-settings-modal').modal('hide');
         } else {
             paginatedPNotify('error', {text : response.responseMessage});
         }
@@ -569,7 +577,34 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-apps_dir'                                : { },
+        '{{componentId}}-{{sectionId}}-apps_dir'                                : {
+            afterInit : function() {
+                var backup, disabled;
+
+                $("input[type='radio'][name='backup']:checked").parents('.btn-group').click(function() {
+                    backup = $("input[type='radio'][name='backup']:checked").data('value');
+
+                    if (backup === 'backup-off') {
+                        disabled = true;
+                    } else {
+                        disabled = false;
+                    }
+                    $('#{{componentId}}-{{sectionId}}-apps_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-systems_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-public_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-private_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-external_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-html_compiled_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-var_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-external_vendor_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-old_backups_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-database').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-keys').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-password_protect').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-notes').attr('disabled', disabled);
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-systems_dir'                             : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-systems_dir').click(function() {
@@ -643,23 +678,23 @@ dataCollectionSection =
     });
 
 function stringToBoolean(string) {
-        switch (string.toLowerCase().trim()) {
-            case "true":
-            case "yes":
-            case "1":
-              return true;
+    switch (string.toLowerCase().trim()) {
+        case "true":
+        case "yes":
+        case "1":
+          return true;
 
-            case "false":
-            case "no":
-            case "0":
-            case null:
-            case undefined:
-            case 'undefined':
-              return false;
+        case "false":
+        case "no":
+        case "0":
+        case null:
+        case undefined:
+        case 'undefined':
+          return false;
 
-            default:
-              return JSON.parse(string);
-        }
+        default:
+          return JSON.parse(string);
+    }
 }
 
 $(document).ready(function() {
@@ -667,10 +702,6 @@ $(document).ready(function() {
 
     dataCollectionSectionForm['funcs']['initQueueButtons']();
 
-    dataCollectionSectionForm['funcs']['init']();
-});
-
-$(window).on('load', function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
