@@ -417,6 +417,8 @@ Class Setup
 
 				$this->setupPackage->registerModule('views');
 
+				$this->setupPackage->registerModule('externals');
+
 				$this->setupPackage->registerCoreRole();
 
 				$this->setupPackage->registerRegisteredUserAndGuestRoles();
@@ -588,6 +590,10 @@ Class Setup
 				[
 					'method'	=> 'registerModule',
 					'text'		=> 'Registering views modules...'
+				],
+				[
+					'method'	=> 'registerModule',
+					'text'		=> 'Registering external modules...'
 				],
 				[
 					'method'	=> 'registerCoreRole',
@@ -798,6 +804,12 @@ Class Setup
 			$this->view->countries =
 				$this->helper->decode(
 					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/AllCountries.json'),
+					true
+				);
+
+			$this->view->coreJson =
+				$this->helper->decode(
+					$this->localContent->read('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json'),
 					true
 				);
 		}

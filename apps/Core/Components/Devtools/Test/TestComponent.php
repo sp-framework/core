@@ -7,20 +7,33 @@ use System\Base\BaseComponent;
 
 class TestComponent extends BaseComponent
 {
-    protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/';
-
     /**
      * @acl(name=view)
      */
     public function viewAction()
     {
-        // var_dump($this->opCache->setCache('guru', ['guru'=>123], 'guru'));
-        // var_dump($this->opCache->getCache('guru', 'guru'));
-        // var_dump($this->opCache->removeCache());
+        // $install = new \Apps\Fintech\Components\Dashboards\Install\Install;
 
-        // $dicData = new DevtoolsDicExtractData;
+        // $install->init()->install();
+        // $adminComponents = $this->basepackages->utils->scanDir('apps/Core/Components/', true);
 
-        // $dicData->processDicData();
+        // foreach ($adminComponents['files'] as $adminComponentKey => $adminComponent) {
+        //     if (strpos($adminComponent, 'component.json')) {
+        //         try {
+        //             $jsonFile =
+        //                 $this->helper->decode(
+        //                     $this->localContent->read($adminComponent),
+        //                     true
+        //                 );
+        //         } catch (\throwable $e) {
+        //             throw new \Exception($e->getMessage() . '. Problem reading component.json at location ' . $adminComponent);
+        //         }
+
+        //         if ($jsonFile['menu'] && $jsonFile['menu'] !== 'false') {
+        //             $this->basepackages->menus->addMenu($jsonFile);
+        //         }
+        //     }
+        // }
     }
 
     /**
@@ -28,9 +41,6 @@ class TestComponent extends BaseComponent
      */
     public function apiViewAction()
     {
-        // usleep(50000);
-        // sleep(10);
-        // var_dump($_SESSION);
         $this->addResponse('Test', 0, ['connection' => $this->connection->getId(), 'session' => $this->session->getId()]);
     }
 

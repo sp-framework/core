@@ -141,7 +141,7 @@ class Filters extends BasePackage
                                 count($filter['shared_ids']['aids']) > 0
                             ) {
                                 foreach ($filter['shared_ids']['aids'] as $sharingAidKey => $sharingAid) {
-                                    $sharingAccount = $this->accounts->getById($sharingAid);
+                                    $sharingAccount = $this->basepackages->accounts->getById($sharingAid);
 
                                     if ($sharingAccount) {
                                         $filter['shared_ids']['aids'][$sharingAidKey] =
@@ -215,7 +215,7 @@ class Filters extends BasePackage
                                     //         $filter['employee_full_name'] = $employee['full_name'];
                                     //     }
                                     // } else {
-                                        $sharedBy = $this->accounts->getById($filter['account_id']);
+                                        $sharedBy = $this->basepackages->accounts->getById($filter['account_id']);
 
                                         if ($sharedBy) {
                                             $filter['account_email'] = $sharedBy['email'];
@@ -243,7 +243,7 @@ class Filters extends BasePackage
                                     //         $filter['employee_full_name'] = $employee['full_name'];
                                     //     }
                                     // } else {
-                                        $sharedBy = $this->accounts->getById($filter['account_id']);
+                                        $sharedBy = $this->basepackages->accounts->getById($filter['account_id']);
 
                                         if ($sharedBy) {
                                             $filter['account_email'] = $sharedBy['email'];

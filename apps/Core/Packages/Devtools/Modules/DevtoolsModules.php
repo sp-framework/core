@@ -13,6 +13,7 @@ use Phalcon\Filter\Validation\Validator\PresenceOf;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use System\Base\BasePackage;
+use System\Base\Providers\CoreServiceProvider\Install\Install as CoreInstall;
 use z4kn4fein\SemVer\Version;
 
 class DevtoolsModules extends BasePackage
@@ -141,12 +142,16 @@ class DevtoolsModules extends BasePackage
                 if ($data['createrepo'] == true) {
                     if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {//Create public repository as well
                         if (!$this->checkRepo($data)) {
-                            $newRepo['base'] = $this->createRepo($data);
+                            if (strtolower($data['app_type']) !== 'core') {
+                                $newRepo['base'] = $this->createRepo($data);
+                            }
                         }
 
                         $data['repo'] = $data['repo'] . '-public';
                         if (!$this->checkRepo($data)) {
-                            $newRepo['public'] = $this->createRepo($data);
+                            if (strtolower($data['app_type']) !== 'core') {
+                                $newRepo['public'] = $this->createRepo($data);
+                            }
                         }
 
                         $this->addResponse('Module added & created new repo.',
@@ -161,7 +166,9 @@ class DevtoolsModules extends BasePackage
                         return;
                     } else {
                         if (!$this->checkRepo($data)) {
-                            $newRepo = $this->createRepo($data);
+                            if (strtolower($data['app_type']) !== 'core') {
+                                $newRepo = $this->createRepo($data);
+                            }
 
                             $this->addResponse('Module added & created new repo.',
                                                0,
@@ -233,7 +240,9 @@ class DevtoolsModules extends BasePackage
             if ($this->modules->{$data['module_type']}->update($data)) {
                 if ($data['createrepo'] == true) {
                     if (!$this->checkRepo($data)) {
-                        $newRepo = $this->createRepo($data);
+                        if (strtolower($data['app_type']) !== 'core') {
+                            $newRepo = $this->createRepo($data);
+                        }
 
                         $this->addResponse('Bundle updated & created new repo.',
                                            0,
@@ -294,12 +303,16 @@ class DevtoolsModules extends BasePackage
                     if ($data['createrepo'] == true && strtolower($data['name']) !== 'core') {
                         if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {//Create public repository as well
                             if (!$this->checkRepo($data)) {
-                                $newRepo['base'] = $this->createRepo($data);
+                                if (strtolower($data['app_type']) !== 'core') {
+                                    $newRepo['base'] = $this->createRepo($data);
+                                }
                             }
 
                             $data['repo'] = $data['repo'] . '-public';
                             if (!$this->checkRepo($data)) {
-                                $newRepo['public'] = $this->createRepo($data);
+                                if (strtolower($data['app_type']) !== 'core') {
+                                    $newRepo['public'] = $this->createRepo($data);
+                                }
                             }
 
                             $this->addResponse('Module updated & created new repo.',
@@ -314,7 +327,9 @@ class DevtoolsModules extends BasePackage
                             return;
                         } else {
                             if (!$this->checkRepo($data)) {
-                                $newRepo = $this->createRepo($data);
+                                if (strtolower($data['app_type']) !== 'core') {
+                                    $newRepo = $this->createRepo($data);
+                                }
 
                                 $this->addResponse('Module updated & created new repo.',
                                                    0,
@@ -338,6 +353,12 @@ class DevtoolsModules extends BasePackage
                         $core['version'] = $data['version'];
 
                         $this->core->update($core);
+                    }
+
+                    if ((isset($data['reinstall_table']) && $data['reinstall_table'] == true) ||
+                        (isset($data['truncate_table']) && $data['truncate_table'] == true)
+                    ) {
+                        $this->reinstallTruncateTable($data);
                     }
 
                     $this->addResponse('Module updated');
@@ -378,6 +399,64 @@ class DevtoolsModules extends BasePackage
         }
     }
 
+    protected function reinstallTruncateTable($data)
+    {
+        $moduleToReinstall = $this->modules->manager->getModuleInfo(
+            [
+                'module_type'   => $data['module_type'],
+                'module_id'     => $data['id']
+            ]
+        );
+
+        $class = $moduleToReinstall['class'];
+
+        if ($moduleToReinstall['app_type'] !== 'core') {
+            $classArr = explode('\\', $moduleToReinstall['class']);
+            $classArr = array_slice($classArr, 0, -1);
+            $class = implode('\\', $classArr) . '\\Install\\Install';
+        } else if ($moduleToReinstall['name'] === 'Core' ||
+                   $moduleToReinstall['app_type'] === 'core'
+        ) {//Core packages. This can be a problem for packages that are not registered in the system, example(modules_packages, modules_external...)
+           //so, the user has to update whole core.
+            $class = 'System\\Base\\Providers\\CoreServiceProvider\\Install\\Install';
+        }
+
+        $path = lcfirst(str_replace('\\', '/', $class) . '.php');
+
+        try {
+            if ($this->localContent->fileExists($path)) {
+                $module = new $class();
+
+                if ($data['app_type'] === 'core') {
+                    $coreInstall = new CoreInstall;
+
+                    if ($data['type'] === 'core') {
+                        if (isset($data['reinstall_table']) && $data['reinstall_table'] == true) {
+                            $coreInstall->init()->install();
+                        }
+                    } else if ($data['type'] === 'packages') {
+                        $moduleModel = $module->useModel();
+
+                        if (isset($data['truncate_table']) && $data['truncate_table'] == true) {
+                            $coreInstall->init([$moduleModel->getSource()])->truncate();
+                        } else if (isset($data['reinstall_table']) && $data['reinstall_table'] == true) {
+                            $coreInstall->init([$moduleModel->getSource()])->install();
+                        }
+                    }
+                } else {
+                    $module = new $class();
+                    if (isset($data['truncate_table']) && $data['truncate_table'] == true && method_exists($module, 'truncate')) {
+                        $module->init()->truncate();
+                    } else if (isset($data['reinstall_table']) && $data['reinstall_table'] == true) {
+                        $module->init()->install();
+                    }
+                }
+            }
+        } catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
+            throw $e;
+        }
+    }
+
     protected function checkAppType($data)
     {
         if (isset($data['app_type']) &&
@@ -407,12 +486,13 @@ class DevtoolsModules extends BasePackage
                         [
                             'name'          => $data['app_type']['newTags'][0],
                             'app_type'      => strtolower($data['app_type']['newTags'][0]),
+                            'dashboards'    => $data['dashboards'],
                             'description'   => 'Added via devtools module add.',
                             'version'       => $data['version'],
                             'api_id'        => $data['api_id'],
                             'repo'          => $data['repo'],
                             'updated_by'    => '0',
-                            'installed'     => '1'
+                            'installed'     => $data['installed']
                         ];
 
                     $this->apps->types->add($appType);
@@ -435,13 +515,15 @@ class DevtoolsModules extends BasePackage
                 $appType = $this->apps->types->getAppTypeById($data['id']);
             }
 
-            if (isset($appType) && strtolower($appType['app_type']) !== 'core') {
+            if (isset($appType)) {
                 $appType['name'] = $data['name'];
                 $appType['app_type'] = strtolower($data['app_type']);
+                $appType['dashboards'] = $data['dashboards'];
                 $appType['description'] = $data['description'];
                 $appType['version'] = $data['version'];
                 $appType['api_id'] = $data['api_id'];
                 $appType['repo'] = $data['repo'];
+                $appType['installed'] = $data['installed'];
 
                 $this->apps->types->update($appType);
 
@@ -451,16 +533,19 @@ class DevtoolsModules extends BasePackage
             } else {
                 $data['app_type'] = strtolower($data['app_type']);
                 $data['updated_by'] = '0';
-                $data['installed'] = '1';
 
                 $this->apps->types->add($data);
 
                 $this->addUpdateAppTypeFiles($data);
             }
 
-            if ($data['createrepo'] == true) {
+            if (strtolower($data['app_type']) !== 'core' &&
+                $data['createrepo'] == true
+            ) {
                 if (!$this->checkRepo($data)) {
-                    $newRepo = $this->createRepo($data);
+                    if (strtolower($data['app_type']) !== 'core') {
+                        $newRepo = $this->createRepo($data);
+                    }
 
                     $this->addResponse('Added new app type', 0, ['newRepo' => $newRepo]);
                 }
@@ -498,6 +583,7 @@ class DevtoolsModules extends BasePackage
         $jsonFile = 'apps/' . ucfirst($appType['app_type']) . '/Install/type.json';
 
         $jsonContent["app_type"] = $appType["app_type"];
+        $jsonContent["dashboards"] = $appType["dashboards"];
         $jsonContent["name"] = $appType["name"];
         $jsonContent["description"] = $appType["description"];
         $jsonContent["version"] = $appType["version"];
@@ -811,7 +897,7 @@ class DevtoolsModules extends BasePackage
                  $data['category'] === 'providers')
             ) {
                 if ($data['category'] === 'basepackagesApis') {
-                    $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/ApiClientServices/Apis/';
+                    $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/Api/Apis/';
                 } else if (str_starts_with($data['category'], 'basepackages')) {
                     $moduleLocation = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Basepackages/';
                 } else if ($data['category'] === 'providers') {
@@ -830,12 +916,12 @@ class DevtoolsModules extends BasePackage
             (str_starts_with($data['category'], 'basepackages') ||
             $data['category'] === 'providers')
         ) {
-            if ($data['category'] === 'basepackagesApis') {
+            // if ($data['category'] === 'basepackagesApis') {
                 $pathArr = preg_split('/(?=[A-Z])/', ucfirst($data['name']), -1, PREG_SPLIT_NO_EMPTY);
                 $path = implode('/', $pathArr);
-            } else {
-                $path = ucfirst($data['name']);
-            }
+            // } else {
+            //     $path = ucfirst($data['name']);
+            // }
 
             return
                 $moduleLocation .
@@ -908,7 +994,7 @@ class DevtoolsModules extends BasePackage
                  $data['category'] === 'providers')
             ) {
                 if ($data['category'] === 'basepackagesApis') {
-                    $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/ApiClientServices/Apis/';
+                    $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Api/Apis/';
                 } else if (str_starts_with($data['category'], 'basepackages')) {
                     $moduleLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/';
                 } else if ($data['category'] === 'providers') {
@@ -1059,6 +1145,29 @@ $file .= '
             return false;
         }
 
+        try {
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ComponentInstallInstall.txt');
+        } catch (FilesystemException | UnableToReadFile $exception) {
+            $this->addResponse('Unable to read module base component file.');
+
+            return false;
+        }
+
+        $moduleFilesLocation = $moduleFilesLocation . 'Install';
+        $fileName = $moduleFilesLocation . '/Install.php';
+        $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+        // $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+        $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
+
+        try {
+            $this->localContent->write($fileName, $file);
+            array_push($this->newFiles, $fileName);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write module component file');
+
+            return false;
+        }
+
         return true;
     }
 
@@ -1090,6 +1199,31 @@ $file .= '
 
             return false;
         }
+
+        try {
+            $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/MiddlewareInstallInstall.txt');
+        } catch (FilesystemException | UnableToReadFile $exception) {
+            $this->addResponse('Unable to read module base component file.');
+
+            return false;
+        }
+
+        $moduleFilesLocation = $moduleFilesLocation . 'Install';
+        $fileName = $moduleFilesLocation . '/Install.php';
+        $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
+        // $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+        $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
+
+        try {
+            $this->localContent->write($fileName, $file);
+            array_push($this->newFiles, $fileName);
+        } catch (FilesystemException | UnableToWriteFile $exception) {
+            $this->addResponse('Unable to write module component file');
+
+            return false;
+        }
+
+        return true;
     }
 
     protected function generateNewPackagesFiles($moduleFilesLocation, $data)
@@ -1170,7 +1304,7 @@ $file .= '
             $moduleFilesLocation = $moduleFilesLocation . 'Install/Schema';
             $fileName = $moduleFilesLocation . '/' . $data['name'] . '.php';
             $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-            $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+            // $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
             $moduleSchemaClass = $moduleFilesLocationClass . '\\' . $data['name'];
         }
 
@@ -1189,7 +1323,7 @@ $file .= '
         //Package Installer File only for apps.
         if (!str_starts_with($data['category'], 'basepackages') && $data['category'] !== 'providers') {
             try {
-                $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/PackageInstallPackage.txt');
+                $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/PackageInstallInstall.txt');
             } catch (FilesystemException | UnableToReadFile $exception) {
                 $this->addResponse('Unable to read module base package file.');
 
@@ -1198,9 +1332,9 @@ $file .= '
 
             if ($data['category'] !== str_starts_with($data['category'], 'basepackages') && $data['category'] !== 'providers') {
                 $moduleFilesLocation = str_replace('/Schema', '', $moduleFilesLocation);
-                $fileName = $moduleFilesLocation . '/' . 'Package.php';
+                $fileName = $moduleFilesLocation . '/' . 'Install.php';
                 $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-                $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
+                // $moduleFilesLocationClass = str_replace('\\' . $data['name'], '', $moduleFilesLocationClass);
                 $file = str_replace('"NAMESPACE"', 'namespace ' . $moduleFilesLocationClass . ';', $file);
                 $file = str_replace('"PACKAGESCHEMACLASS"', $moduleSchemaClass . ';', $file);
                 $file = str_replace('"PACKAGESCHEMANAME"', $data['name'], $file);
@@ -1233,7 +1367,7 @@ $file .= '
         if (str_starts_with($data['category'], 'basepackages') || $data['category'] === 'providers') {
             if (str_starts_with($data['category'], 'basepackages')) {
                 if ($data['category'] === 'basepackagesApis') {
-                    $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/ApiClientServices/Apis/';
+                    $moduleFilesLocation = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Model/Api/Apis/';
                     $pathArr = preg_split('/(?=[A-Z])/', $data['name'], -1, PREG_SPLIT_NO_EMPTY);
                     unset($pathArr[$this->helper->lastKey($pathArr)]);
 
@@ -1257,7 +1391,7 @@ $file .= '
             $moduleFilesLocation = $moduleFilesLocation . 'Model';
             $fileName = $moduleFilesLocation . '/' . 'Apps' . ucfirst($data['app_type']) . ucfirst($data['name']) . '.php';
             $moduleFilesLocationClass = str_replace('/', '\\', ucfirst($moduleFilesLocation));
-            $moduleFilesLocationClass = str_replace('\\' . ucfirst($data['name']), '', $moduleFilesLocationClass);
+            // $moduleFilesLocationClass = str_replace('\\' . ucfirst($data['name']), '', $moduleFilesLocationClass);
             $className = 'Apps' . ucfirst($data['app_type']) . ucfirst($data['name']);
         }
 
@@ -1373,11 +1507,11 @@ $file .= '
             $data['menu'] = $this->helper->decode($data['menu'], true);
 
             if (isset($menu)) {
-                $this->basepackages->menus->updateMenu($data['menu_id'], $data['app_type'], $data['menu']);
+                $this->basepackages->menus->updateMenu($data['menu_id'], $data);
 
                 return;
             } else {
-                $menu = $this->basepackages->menus->addMenu($data['app_type'], $data['menu']);
+                $menu = $this->basepackages->menus->addMenu($data);
 
                 if ($menu) {
                     $module = $this->modules->{$data['module_type']}->packagesData->last;
@@ -2133,8 +2267,7 @@ $file .= '
 
                 if (isset($data['module_type']) &&
                     $data['module_type'] === 'views' &&
-                    isset($data['base_view_module_id']) &&
-                    $data['base_view_module_id'] == 0
+                    $module['is_subview'] === false
                 ) {
                     array_push($reposArr, $module['repo'] . '-public');
                 }
@@ -2221,8 +2354,7 @@ $file .= '
 
         if (isset($data['module_type']) &&
             $data['module_type'] === 'views' &&
-            isset($module['base_view_module_id']) &&
-            $module['base_view_module_id'] == 0
+            $module['is_subview'] === false
         ) {
             array_push($reposArr, $module['repo'] . '-public');
         }
@@ -2683,8 +2815,7 @@ $file .= '
 
         if (isset($data['module_type']) &&
             $data['module_type'] === 'views' &&
-            isset($data['base_view_module_id']) &&
-            $data['base_view_module_id'] == 0
+            $data['is_subview'] === false
         ) {
             array_push($reposArr, $data['repo'] . '-public');
         }
@@ -2967,7 +3098,7 @@ $file .= '
             }
         }
 
-        $this->addResponse('Generated Repo Url', 0, ['repo' => $url]);
+        $this->addResponse('Generated Repo Url', 0, ['repo' => strtolower($url)]);
 
         return true;
     }

@@ -28,7 +28,7 @@ class BackupRestore extends BasePackage
 
     protected $restoreProgressMethods;
 
-    public function init($process = 'backup')
+    public function init($process = null)
     {
         $this->zip = new \ZipArchive;
 
@@ -72,7 +72,7 @@ class BackupRestore extends BasePackage
         }
     }
 
-    public function backup(array $data)
+    public function backup(array $data, $viaModuleInstaller = false)
     {
         set_time_limit(300);//5 mins
 
@@ -90,9 +90,11 @@ class BackupRestore extends BasePackage
         if ($noOptions) {
             $this->addResponse('Nothing to backup!', 1, []);
 
-            $this->basepackages->progress->preCheckComplete(false);
+            if (!$viaModuleInstaller) {
+                $this->basepackages->progress->preCheckComplete(false);
 
-            $this->basepackages->progress->resetProgress();
+                $this->basepackages->progress->resetProgress();
+            }
 
             return false;
         }
@@ -119,9 +121,11 @@ class BackupRestore extends BasePackage
             ) {
                 $this->addResponse('Protect password missing!', 1, []);
 
-                $this->basepackages->progress->preCheckComplete(false);
+                if (!$viaModuleInstaller) {
+                    $this->basepackages->progress->preCheckComplete(false);
 
-                $this->basepackages->progress->resetProgress();
+                    $this->basepackages->progress->resetProgress();
+                }
 
                 return false;
             }
@@ -134,99 +138,125 @@ class BackupRestore extends BasePackage
             }
         }
         if ($noFilesOptions) {
-            $this->basepackages->progress->unregisterMethods(['generateStructure']);
+            if ($viaModuleInstaller) {
+                $this->basepackages->progress->unregisterMethods(['createBackup'], 'method', ['generateStructure']);
+            } else {
+                $this->basepackages->progress->unregisterMethods(['generateStructure']);
+            }
         }
 
         if (!isset($this->backupInfo['request']['database']) ||
             (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] != 'true')
         ) {
-            $this->basepackages->progress->unregisterMethods(['performDbBackup']);
-        }
-
-        $this->basepackages->progress->preCheckComplete();
-
-        foreach ($this->backupProgressMethods as $method) {
-            if ($this->withProgress($method['method'], $data) === false) {
-                 return false;
-            }
-
-            usleep(500);
-        }
-
-        return true;
-    }
-
-    protected function generateStructure(array $data)
-    {
-        $this->zip->open(base_path($this->backupLocation . $this->backupInfo['backupName']), $this->zip::CREATE);
-
-        if (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true') {
-            if ($this->core->core['settings']['databasetype'] != 'db') {
-                $this->getContent($this->basepackages->utils->scanDir('.ff/'));
-            }
-        }
-        if (isset($this->backupInfo['request']['apps_dir']) && $this->backupInfo['request']['apps_dir'] == 'true') {
-            $this->getContent($this->basepackages->utils->scanDir('apps/'));
-        }
-        if (isset($this->backupInfo['request']['systems_dir']) && $this->backupInfo['request']['systems_dir'] == 'true') {
-            $this->getContent($this->basepackages->utils->scanDir('system/'));
-        }
-        if (isset($this->backupInfo['request']['public_dir']) && $this->backupInfo['request']['public_dir'] == 'true') {
-            $this->getContent($this->basepackages->utils->scanDir('public/'));
-        }
-        if (isset($this->backupInfo['request']['private_dir']) && $this->backupInfo['request']['private_dir'] == 'true') {
-            $this->getContent($this->basepackages->utils->scanDir('private/'));
-        }
-        if (isset($this->backupInfo['request']['var_dir']) && $this->backupInfo['request']['var_dir'] == 'true') {
-            $this->getContent($this->basepackages->utils->scanDir('var/'));
-        }
-        if (isset($this->backupInfo['request']['external_dir']) && $this->backupInfo['request']['external_dir'] == 'true') {
-            if (isset($this->backupInfo['request']['external_vendor_dir']) && $this->backupInfo['request']['external_vendor_dir'] == 'true') {
-                $this->getContent($this->basepackages->utils->scanDir('external/'));
+            if ($viaModuleInstaller) {
+                $this->basepackages->progress->unregisterMethods(['createBackup'], 'method', ['performDbBackup']);
             } else {
-                $this->getContent($this->basepackages->utils->scanDir('external/', false));
+                $this->basepackages->progress->unregisterMethods(['performDbBackup']);
             }
         }
 
-        if (isset($this->backupInfo['request']['old_backups_dir']) && $this->backupInfo['request']['old_backups_dir'] == 'true') {
-            $this->getContent($this->basepackages->utils->scanDir('.backups/'));
-            $this->getContent($this->basepackages->utils->scanDir('.backupsdb/'));
-            $this->getContent($this->basepackages->utils->scanDir('.backupsff/'));
+        if (!$viaModuleInstaller) {
+            $this->basepackages->progress->preCheckComplete();
+
+            foreach ($this->backupProgressMethods as $method) {
+                if ($this->withProgress($method['method'], $data) === false) {
+                     return false;
+                }
+
+                usleep(500);
+            }
         }
 
         return true;
     }
 
-    protected function zipBackupFiles(array $data)
+    public function generateStructure()
     {
-        foreach ($this->backupInfo['files'] as $file) {
-            if (!$this->addToZip(base_path($file), $file)) {
-                return false;
-            }
-        }
-
-        if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
-            $this->backupInfo['request']['password_protect'] =
-                $this->secTools->hashPassword($this->backupInfo['request']['password_protect'], 4);
-        }
-
         try {
-            $this->localContent->write('var/tmp/backupInfo.json' , $this->helper->encode($this->backupInfo));
-        } catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
-            throw $exception;
-        }
+            $this->zip->open(base_path($this->backupLocation . $this->backupInfo['backupName']), $this->zip::CREATE);
 
-        //Dont Encrypt info file as we need to know if encryption is applied or not during restore. We can encrypt the content in case we want to hide something (like we are encrypting the password_protect password)
-        if (!$this->addToZip(base_path('var/tmp/backupInfo.json'), 'backupInfo.json', false)) {
+            if (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true') {
+                if ($this->core->core['settings']['databasetype'] != 'db') {
+                    $this->getContent($this->basepackages->utils->scanDir('.ff/'));
+                }
+            }
+            if (isset($this->backupInfo['request']['apps_dir']) && $this->backupInfo['request']['apps_dir'] == 'true') {
+                $this->getContent($this->basepackages->utils->scanDir('apps/'));
+            }
+            if (isset($this->backupInfo['request']['systems_dir']) && $this->backupInfo['request']['systems_dir'] == 'true') {
+                $this->getContent($this->basepackages->utils->scanDir('system/'));
+            }
+            if (isset($this->backupInfo['request']['public_dir']) && $this->backupInfo['request']['public_dir'] == 'true') {
+                $this->getContent($this->basepackages->utils->scanDir('public/'));
+            }
+            if (isset($this->backupInfo['request']['private_dir']) && $this->backupInfo['request']['private_dir'] == 'true') {
+                $this->getContent($this->basepackages->utils->scanDir('private/'));
+            }
+            if (isset($this->backupInfo['request']['var_dir']) && $this->backupInfo['request']['var_dir'] == 'true') {
+                $this->getContent($this->basepackages->utils->scanDir('var/'));
+            }
+            if (isset($this->backupInfo['request']['external_dir']) && $this->backupInfo['request']['external_dir'] == 'true') {
+                if (isset($this->backupInfo['request']['external_vendor_dir']) && $this->backupInfo['request']['external_vendor_dir'] == 'true') {
+                    $this->getContent($this->basepackages->utils->scanDir('external/'));
+                } else {
+                    $this->getContent($this->basepackages->utils->scanDir('external/', false));
+                }
+            }
+
+            if (isset($this->backupInfo['request']['old_backups_dir']) && $this->backupInfo['request']['old_backups_dir'] == 'true') {
+                $this->getContent($this->basepackages->utils->scanDir('.backups/'));
+                $this->getContent($this->basepackages->utils->scanDir('.backupsdb/'));
+                $this->getContent($this->basepackages->utils->scanDir('.backupsff/'));
+            }
+
+            return true;
+        } catch (\Exception | \throwable $e) {
+            $this->addResponse('Backup Error: ' . $e->getMessage(), 1);
+
+            $this->basepackages->progress->resetProgress();
+
             return false;
         }
-
-        $this->zip->close();
-
-        return true;
     }
 
-    protected function performDbBackup(array $data)
+    public function zipBackupFiles()
+    {
+        try {
+            foreach ($this->backupInfo['files'] as $file) {
+                if (!$this->addToZip(base_path($file), $file)) {
+                    return false;
+                }
+            }
+
+            if (isset($this->backupInfo['request']['password_protect']) && $this->backupInfo['request']['password_protect'] !== '') {
+                $this->backupInfo['request']['password_protect'] =
+                    $this->secTools->hashPassword($this->backupInfo['request']['password_protect'], 4);
+            }
+
+            try {
+                $this->localContent->write('var/tmp/backupInfo.json' , $this->helper->encode($this->backupInfo));
+            } catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
+                throw $exception;
+            }
+
+            //Dont Encrypt info file as we need to know if encryption is applied or not during restore. We can encrypt the content in case we want to hide something (like we are encrypting the password_protect password)
+            if (!$this->addToZip(base_path('var/tmp/backupInfo.json'), 'backupInfo.json', false)) {
+                return false;
+            }
+
+            $this->zip->close();
+
+            return true;
+        } catch (\Exception | \throwable $e) {
+            $this->addResponse('Backup Error: ' . $e->getMessage(), 1);
+
+            $this->basepackages->progress->resetProgress();
+
+            return false;
+        }
+    }
+
+    public function performDbBackup()
     {
         foreach ($this->core->core['settings']['dbs'] as $dbKey => $db) {
             try {
@@ -266,35 +296,41 @@ class BackupRestore extends BasePackage
         return true;
     }
 
-    protected function finishBackup(array $data)
+    public function finishBackup(array $data)
     {
-        if ($this->basepackages->storages->storeFile(
-                'private',
-                '.backups',
-                null,
-                $this->backupInfo['backupName'],
-                filesize(base_path('.backups/' . $this->backupInfo['backupName'])),
-                'application/zip',
-                true
-            )
-        ) {
-            $this->basepackages->storages->changeOrphanStatus(
-                null,
-                null,
-                false,
-                null,
-                $this->backupInfo['backupName']
-            );
+        try {
+            if ($this->basepackages->storages->storeFile(
+                    'private',
+                    '.backups',
+                    null,
+                    $this->backupInfo['backupName'],
+                    filesize(base_path('.backups/' . $this->backupInfo['backupName'])),
+                    'application/zip',
+                    true
+                )
+            ) {
+                $this->basepackages->storages->changeOrphanStatus(
+                    null,
+                    null,
+                    false,
+                    null,
+                    $this->backupInfo['backupName']
+                );
 
-            $this->addResponse('Generated backup ' . $this->backupInfo['backupName'] . '.',
-                               0,
-                               ['filename'  => $this->backupInfo['backupName'],
-                                'uuid'      => $this->basepackages->storages->packagesData->responseData['uuid'],
-                                'request'   => $data
-                               ]
-            );
+                $this->addResponse('Generated backup ' . $this->backupInfo['backupName'] . '.',
+                                   0,
+                                   ['filename'  => $this->backupInfo['backupName'],
+                                    'uuid'      => $this->basepackages->storages->packagesData->responseData['uuid'],
+                                    'request'   => $data
+                                   ]
+                );
 
-            return true;
+                return true;
+            }
+        } catch (\Exception | \throwable $e) {
+            $this->addResponse('Backup Error: ' . $e->getMessage(), 1);
+
+            $this->basepackages->progress->resetProgress();
         }
 
         return false;
@@ -718,7 +754,7 @@ class BackupRestore extends BasePackage
         }
     }
 
-    protected function registerBackupProgressMethods()
+    public function getBackupProgressMethods()
     {
         $this->backupProgressMethods =
             [
@@ -740,10 +776,17 @@ class BackupRestore extends BasePackage
                 ]
             ];
 
+        return $this->backupProgressMethods;
+    }
+
+    protected function registerBackupProgressMethods()
+    {
+        $this->getBackupProgressMethods();
+
         $this->basepackages->progress->registerMethods($this->backupProgressMethods);
     }
 
-    protected function registerRestoreProgressMethods()
+    public function getRestoreProgressMethods()
     {
         $this->restoreProgressMethods =
             [
@@ -760,6 +803,13 @@ class BackupRestore extends BasePackage
                     'text'      => 'Restore databases...'
                 ]
             ];
+
+        return $this->restoreProgressMethods;
+    }
+
+    protected function registerRestoreProgressMethods()
+    {
+        $this->getRestoreProgressMethods();
 
         $this->basepackages->progress->registerMethods($this->restoreProgressMethods);
     }

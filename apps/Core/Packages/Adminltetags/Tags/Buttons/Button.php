@@ -62,7 +62,6 @@ class Button
         // }
 
         foreach ($buttons as $buttonKey => $button) {
-
             if (isset($button['title'])) {
                 if ($button['title'] === false) {
                     $this->buttonParams['title'] = '';

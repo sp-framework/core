@@ -29,17 +29,11 @@ class Dashboards
                     ]
                 ),
                 new Column(
-                    'app_id',
+                    'app_type',
                     [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true
-                    ]
-                ),
-                new Column(
-                    'app_default',
-                    [
-                        'type'    => Column::TYPE_BOOLEAN,
-                        'notNull' => true
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => true,
                     ]
                 ),
                 new Column(
@@ -57,9 +51,9 @@ class Dashboards
                     ]
                 ),
                 new Column(
-                    'is_default',
+                    'user_default',
                     [
-                        'type'    => Column::TYPE_BOOLEAN,
+                        'type'    => Column::TYPE_JSON,
                         'notNull' => false
                     ]
                 ),

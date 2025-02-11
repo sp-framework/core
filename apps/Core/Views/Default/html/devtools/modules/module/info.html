@@ -1,4 +1,8 @@
 {% set createRepoDisabled = true %}
+{% set moduleInstallChecked = false %}
+{% if module['module_details']['installed'] is defined and module['module_details']['installed'] == true %}
+    {% set moduleInstallChecked = true %}
+{% endif %}
 {% if module['id'] is defined %}
     {% set moduleId = module['id'] %}
     {% set moduleName = module['name'] %}
@@ -61,6 +65,7 @@
     {% if type !== 'core' %}
         {% set moduleApps = '' %}
     {% endif %}
+    {% set moduleInstallChecked = true %}
 {% endif %}
 {% set appTypeDisabled = false %}
 {% set moduleCategoryDisabled = false %}
@@ -409,6 +414,81 @@
             ]
         )}}
     </div>
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'installed',
+                'fieldLabel'                     : 'Installed?',
+                'fieldHelp'                      : true,
+                'fieldDisabled'                  : false,
+                'fieldHelpTooltipContent'        : 'Install/Uninstall module from system.',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : moduleInstallChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    {% if module['id'] is defined %}
+        {% if type === 'packages' %}
+            <div class="col-md-2">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'truncate_table',
+                        'fieldLabel'                     : 'Truncate Table?',
+                        'fieldHelp'                      : true,
+                        'fieldDisabled'                  : false,
+                        'fieldHelpTooltipContent'        : 'This will truncate the table(s).',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'danger',
+                        'fieldCheckboxChecked'           : false,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        {% endif %}
+        {% if type === 'packages' or type === 'core' %}
+            <div class="col-md-2">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'reinstall_table',
+                        'fieldLabel'                     : 'Reinstall Table?',
+                        'fieldHelp'                      : true,
+                        'fieldDisabled'                  : false,
+                        'fieldHelpTooltipContent'        : 'This will reinstall the table structure.',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'danger',
+                        'fieldCheckboxChecked'           : false,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        {% endif %}
+    {% endif %}
 </div>
 {% if type !== 'views' %}
 <div class="row">

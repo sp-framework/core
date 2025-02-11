@@ -51,7 +51,7 @@
                 'dropdownButtonAdditionalClass'     : 'text-uppercase',
                 'dropdownAlign'                     : 'right',
                 'buttonPosition'                    : 'right',
-                'buttons'                           :
+                'dropdowns'                         :
                     {
                         'apptypes' : {
                             'title'                   : 'App Type',
@@ -118,7 +118,7 @@
                 'fieldBazScan'                         : true,
                 'fieldBazPostOnCreate'                 : true,
                 'fieldBazPostOnUpdate'                 : true,
-                'fieldDataSelect2AddDataAttrFromData'  : ['installed'],
+                'fieldDataSelect2AddDataAttrFromData'  : ['installed', 'is_subview'],
                 'fieldDataSelect2Options'              : modules,
                 'fieldDataSelect2OptionsKey'           : 'id',
                 'fieldDataSelect2OptionsValue'         : 'display_name:app_type|name:app_type',
@@ -236,10 +236,14 @@ dataCollectionSection =
             'placeholder'   : 'SELECT MODULE TO EDIT',
             'afterInit'     : function() {
                 var id, label;
+                var isSubView = false;
                 $('#{{componentId}}-{{sectionId}}-modules').on('select2:select', function(e) {
                     id = e.params.data.id;
                     label = $(e.params.data.element).parents('optgroup').attr('label').toLowerCase();
 
+                    if ($(e.params.data.element).data().is_subview && $(e.params.data.element).data().is_subview == true) {
+                        isSubView = true;
+                    }
                     $('#{{componentId}}-{{sectionId}}-edit-module, #{{componentId}}-{{sectionId}}-remove-module').attr('disabled', false);
 
                     if (label !== 'bundles' && label !== 'apptypes') {
@@ -262,15 +266,6 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-generate-new-release').attr('disabled', true);
                         }
                     }
-
-                    if ('installed' in $(e.params.data.element).data() &&
-                        $(e.params.data.element).data()['installed'] == 0
-                    ) {
-                        $('#{{componentId}}-{{sectionId}}-clone-module, ' +
-                          '#{{componentId}}-{{sectionId}}-edit-module, ' +
-                          '#{{componentId}}-{{sectionId}}-generate-new-release, ' +
-                          '#{{componentId}}-{{sectionId}}-commit-bundle-json').attr('disabled', true);
-                    }
                 });
 
                 $('#{{componentId}}-{{sectionId}}-include_core_modules').click(function() {
@@ -284,18 +279,18 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-edit-module').off();
                 $('#{{componentId}}-{{sectionId}}-edit-module').click(function() {
                     if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true);
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true, false, false, false, isSubView);
                     } else {
-                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false);
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, false, false, false, isSubView);
                     }
                 });
 
                 $('#{{componentId}}-{{sectionId}}-clone-module').off();
                 $('#{{componentId}}-{{sectionId}}-clone-module').click(function() {
                     if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true, false, true);
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, true, false, true, false, isSubView);
                     } else {
-                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, false, true);
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, false, true, false, isSubView);
                     }
                 });
 
@@ -349,7 +344,7 @@ dataCollectionSection =
     });
 
 dataCollectionSectionForm['funcs']['loadAjax'] =
-    function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false, bundlesjson = false) {
+    function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false, bundlesjson = false, isSubView = false) {
         if (id && label) {
             if (label === 'bundles' && !newrelease) {
                 dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/bundles/true/id/' + id + '")}}';
@@ -370,6 +365,9 @@ dataCollectionSectionForm['funcs']['loadAjax'] =
                 }
                 if (clone) {
                     dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/clone/true';
+                }
+                if (isSubView) {
+                    dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/subview/true';
                 }
             }
         } else if (includecoremodules) {

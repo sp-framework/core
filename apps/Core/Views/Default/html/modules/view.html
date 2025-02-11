@@ -3,6 +3,8 @@
     {% set precheckHidden = false %}
     {% set analyseHidden = false %}
     {% set processHidden = true %}
+    {% set cancelHidden = false %}
+    {% set closeHidden = true %}
     {% if queue['status'] == 1 %}
         {% set precheckHidden = false %}
         {% set precheckTitle = 'Re-Perform Precheck' %}
@@ -11,6 +13,8 @@
         {% set precheckHidden = true %}
         {% set analyseHidden = true %}
         {% set processHidden = true %}
+        {% set cancelHidden = true %}
+        {% set closeHidden = false %}
     {% endif %}
     {% set footerContent =
         adminltetags.useTag('buttons',
@@ -47,6 +51,16 @@
                             'title'                   : 'Cancel',
                             'type'                    : 'secondary',
                             'position'                : 'right',
+                            'hidden'                  : cancelHidden,
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'url'                     : links.url('modules')
+                        ],
+                        'close' : [
+                            'title'                   : 'Close',
+                            'type'                    : 'secondary',
+                            'position'                : 'right',
+                            'hidden'                  : closeHidden,
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
                             'url'                     : links.url('modules')
                         ]
                     ]
@@ -64,10 +78,10 @@
             'cardFooter'                  : true,
             'cardType'                    : 'primary',
             'cardIcon'                    : 'th',
-            'cardTitle'                   : 'Analyse Modules',
+            'cardTitle'                   : 'Analyse Queue Modules',
             'cardAdditionalClass'         : 'rounded-0',
             'cardCollapsed'               : false,
-            'cardBodyInclude'             : 'modules/analyse',
+            'cardBodyInclude'             : 'modules/queue/analyse',
             'cardShowTools'               : ['maximize'],
             'cardFooterContent'           : footerContent
         ]

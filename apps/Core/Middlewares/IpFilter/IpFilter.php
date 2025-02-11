@@ -2,7 +2,6 @@
 
 namespace Apps\Core\Middlewares\IpFilter;
 
-use Phalcon\Mvc\View;
 use System\Base\BaseMiddleware;
 
 class IpFilter extends BaseMiddleware

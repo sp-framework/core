@@ -20,6 +20,19 @@ class Types extends BasePackage
         return $this;
     }
 
+    public function getInstalledAppTypes()
+    {
+        $types = [];
+
+        foreach($this->types as $type) {
+            if ($type['installed'] == true) {
+                array_push($types, $type);
+            }
+        }
+
+        return $types;
+    }
+
     public function getAppTypeById($id)
     {
         foreach($this->types as $type) {

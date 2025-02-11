@@ -45,6 +45,14 @@ class Menus
                         ]
                     ),
                     new Column(
+                        'route',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 50,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
                         'sequence',
                         [
                             'type'    => Column::TYPE_INTEGER,

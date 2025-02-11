@@ -10,6 +10,7 @@ class Type
             [
                 'name'              => $typeFile['name'],
                 'app_type'          => $typeFile['app_type'],
+                'dashboards'        => $typeFile['dashboards'] == 'true' ? 1 : 0,
                 'description'       => $typeFile['description'],
                 'api_id'            => 1,
                 'repo'              => $typeFile['repo'],

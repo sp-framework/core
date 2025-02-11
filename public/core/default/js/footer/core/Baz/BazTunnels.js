@@ -26,9 +26,6 @@ var BazTunnels = function() {
     dataCollection.env.wsTunnels.messenger = { };
     dataCollection.env.wsTunnels.pusher = { };
 
-    // var reconnectMessengerTunnel = null;
-    // var reconnectPusherTunnel = null;
-
     // Error
     // function error(errorMsg) {
     //     throw new Error(errorMsg);
@@ -173,7 +170,7 @@ var BazTunnels = function() {
 
                     BazHelpers.setTimeoutTimers.add(function() {
                         initPusherTunnel(options);
-                    }, 60000, null, 'initPusherTunnel');
+                    }, 30000, null, 'initPusherTunnel');
                 },
                 {
                     'skipSubprotocolCheck': true

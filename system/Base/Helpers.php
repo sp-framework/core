@@ -473,6 +473,30 @@ if (!function_exists('array_get_values_recursive')) {
     }
 }
 
+if (!function_exists('extractLineFromFile')) {
+    function extractLineFromFile($file, $word)
+    {
+        $lineWithWord = NULL;
+
+        $handle = fopen($file, "r");
+
+        if ($handle) {
+            while (($line = fgets($handle)) !== false) {
+                if (strpos($line, $word) === 0) {
+                    $parts = explode(' ', $line);
+
+                    $lineWithWord = rtrim(trim($parts[1]), ';');
+
+                    break;
+                }
+            }
+
+            fclose($handle);
+        }
+
+        return $lineWithWord;
+    }
+}
 
 if (!function_exists('arraySqueeze')) {
     //$task = keep - Keep the data of defined keys, remove rest
@@ -515,6 +539,46 @@ if (!function_exists('arrayFilterKeywords')) {
                 }
             }
         });
+
+        return $array;
+    }
+}
+
+if (!function_exists('printArrayList')) {
+    function printArrayList($array) {
+        $html = "<ul>";
+
+        foreach($array as $k => $v) {
+            if (!is_array($v) && !is_null($v) && is_string($v) && str_starts_with($v, '{') && str_ends_with($v, '}')) {
+                $v = @json_decode($v, true);
+            }
+
+            if (is_array($v)) {
+                $html .= "<li>" . $k . " : </li>";
+                $html .= "    " . printArrayList($v);
+                continue;
+            }
+
+            $html .= "<li>" . $k . " : " . $v . "</li>";
+        }
+
+        $html .= "</ul>";
+
+        return $html;
+    }
+}
+
+if (!function_exists('arrayReplace')) {
+    function arrayReplace($array, $findKey, $replace) {
+        if (is_array($array)) {
+            foreach ($array as $key=>$val) {
+                if ($key === $findKey) {
+                    $array[$key] = $replace;
+                } else if (is_array($array[$key])) {
+                    $array[$key] = arrayReplace($array[$key], $findKey, $replace);
+                }
+            }
+        }
 
         return $array;
     }

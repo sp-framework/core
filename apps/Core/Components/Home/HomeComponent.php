@@ -2,7 +2,6 @@
 
 namespace Apps\Core\Components\Home;
 
-use Phalcon\Helper\Arr;
 use System\Base\BaseComponent;
 
 class HomeComponent extends BaseComponent

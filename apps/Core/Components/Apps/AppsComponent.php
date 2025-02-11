@@ -14,7 +14,7 @@ class AppsComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $typesArr = $this->apps->types->types;
+        $typesArr = $this->apps->types->getInstalledAppTypes();
 
         $this->view->types = $typesArr;
 
@@ -189,7 +189,7 @@ class AppsComponent extends BaseComponent
                 }
 
                 //Views
-                $viewsArr = $this->modules->views->getViewsForAppType($app['app_type']);
+                $viewsArr = $this->modules->views->getViewsForAppType($app['app_type'], false);
                 if (count($viewsArr) === 1) {
                     array_push($mandatoryViews, $this->helper->first($viewsArr)['name']);
 
@@ -259,6 +259,8 @@ class AppsComponent extends BaseComponent
                     return;
                 }
                 $this->view->acceptableUsernames = $this->apps->getAcceptableUsernamesForAppId();
+
+                $this->view->dashboards = $this->basepackages->dashboards->init()->getDashboardsByAppType($app['app_type']);
             } else {
                 $this->view->app = null;
                 $domains = $this->domains->domains;
@@ -286,9 +288,10 @@ class AppsComponent extends BaseComponent
                 $this->view->publicStorages = $publicStorages;
 
                 $this->view->privateStorages = $privateStorages;
+
+                $this->view->dashboards = [];
             }
 
-            $this->view->dashboards = $this->basepackages->dashboards->init()->dashboards;
             $this->view->roles = $this->basepackages->roles->init()->roles;
             $this->view->pick('apps/view');
 
@@ -343,7 +346,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $viewsArr = $this->modules->views->getViewsForAppType($this->postData()['app_type']);
+        $viewsArr = $this->modules->views->getViewsForAppType($this->postData()['app_type'], false);
 
         if (count($viewsArr) === 0) {
             $this->addResponse('No Views Available for app type ' . $this->postData()['app_type'] . ' cannot proceed!', 1);
@@ -378,7 +381,7 @@ class AppsComponent extends BaseComponent
             $this->apps->packagesData->responseCode
         );
 
-        $this->addToNotification('update', 'Updated app ' . $this->postData()['name'], null, $this->apps->packagesData->last);
+        $this->addToNotification('update', 'Updated app', null, $this->apps->packagesData->last ?? []);
     }
 
     /**
@@ -517,7 +520,7 @@ class AppsComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        $viewsArr = $this->modules->views->getViewsForAppType($this->postData()['app_type']);
+        $viewsArr = $this->modules->views->getViewsForAppType($this->postData()['app_type'], false);
 
         if ($viewsArr && count($viewsArr) > 0) {
             $views = [];

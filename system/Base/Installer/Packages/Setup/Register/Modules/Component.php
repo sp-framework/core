@@ -40,10 +40,6 @@ class Component
 				'installed'				=> 1,
 				'apps'					=>
 					$helper->encode($componentApp),
-				'files'					=>
-					isset($componentFile['files']) ?
-					$helper->encode($componentFile['files']) :
-					$helper->encode([]),
 				'settings'				=>
 					isset($componentFile['settings']) ?
 					$helper->encode($componentFile['settings']) :

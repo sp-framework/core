@@ -752,6 +752,7 @@ class Croppie
                                 formData.append("setOrphan", "' . $this->params['setOrphan'] . '");
                                 formData.append("fileName", avatarName);
                                 formData.append("storagetype", "' . $this->params['storageType'] . '");
+                                formData.append($("#security-token").attr("name"), $("#security-token").val());
 
                                 performUpload(formData);
                             }
@@ -892,7 +893,7 @@ class Croppie
                                     } else {
                                         $("#profile-portrait").children("i").attr("hidden", true);
                                         $("#profile-portrait").children("img").attr("src", window.dataCollection.env.rootPath + window.dataCollection.env.appRoute +
-                                            "/system/storages/q/uuid/" + uploadUUIDs[0] + "/w/30");
+                                            "/system/storages/q/uuid/" + uploadUUIDs[uploadUUIDs.length - 1] + "/w/30");
                                         $("#profile-portrait").children("img").attr("hidden", false);
                                         window.dataCollection.env.profile.portrait =
                                             window.dataCollection.env.rootPath + window.dataCollection.env.appRoute + "/system/storages/q/uuid/" + uploadUUIDs[0] + "/w/80";

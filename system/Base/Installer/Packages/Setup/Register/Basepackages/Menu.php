@@ -4,8 +4,10 @@ namespace System\Base\Installer\Packages\Setup\Register\Basepackages;
 
 class Menu
 {
-    public function register($db, $ff, $appType, array $menu, $helper)
+    public function register($db, $ff, $componentJsonFile, $helper)
     {
+        $menu = $componentJsonFile['menu'];
+
         if (isset($menu['seq'])) {
             $sequence = $menu['seq'];
             unset($menu['seq']);
@@ -19,7 +21,8 @@ class Menu
             [
                 'menu'                  => $helper->encode($menu),
                 'apps'                  => $helper->encode(['1' => ['enabled'  => true]]),
-                'app_type'              => $appType,
+                'app_type'              => $componentJsonFile['app_type'],
+                'route'                 => $componentJsonFile['route'],
                 'sequence'              => $sequence
             ];
 

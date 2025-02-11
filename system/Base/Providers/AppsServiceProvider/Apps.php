@@ -298,7 +298,7 @@ class Apps extends BasePackage
 			$this->modules->components->updateComponents($app);
 		}
 
-		if (isset($app['menus'])) {
+		if (isset($app['menus']) && $app['menus'] !== '') {
 			$this->basepackages->menus->updateMenus($app);
 		}
 

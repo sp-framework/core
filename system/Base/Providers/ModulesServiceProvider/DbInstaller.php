@@ -1,47 +1,15 @@
 <?php
 
-namespace System\Base\Providers\CoreServiceProvider\Install;
+namespace System\Base\Providers\ModulesServiceProvider;
 
 use System\Base\BasePackage;
-use System\Base\Installer\Packages\Setup\Schema;
 
-class Package extends BasePackage
+class DbInstaller extends BasePackage
 {
-    protected $installer;
-
-    protected $databases;
-
-    public function install($installer)
-    {
-        $this->installer = $installer;
-
-        $this->databases = (new Schema)->getSchema();
-
-        $this->preInstall();
-
-        $this->installDb();
-
-        $this->postInstall();
-
-        return true;
-    }
-
-    protected function preInstall()
-    {
-        //Do version specific update for any future version upgrades.
-        // if ($this->core->core['version'] === 'x.x.x') {
-            //Do something
-        // }
-
-        return true;
-    }
-
-    protected function installDb()
+    public function installDb($databases)
     {
         if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'ff') {
-            $dbTablesList = $this->describe();
-
-            foreach ($this->databases as $tableName => $tableClass) {
+            foreach ($databases as $tableName => $tableClass) {
                 if ($tableClass['model'] && $tableClass['model']->getSource()) {
                     $tableName = $tableClass['model']->getSource();
                 }
@@ -143,7 +111,7 @@ class Package extends BasePackage
         if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'db') {
             $storesToIndex = [];
 
-            foreach ($this->databases as $tableName => $tableClass) {
+            foreach ($databases as $tableName => $tableClass) {
                 if ($tableClass['model'] && $tableClass['model']->getSource()) {
                     $tableName = $tableClass['model']->getSource();
                 }
@@ -168,9 +136,30 @@ class Package extends BasePackage
         return true;
     }
 
-    protected function postInstall()
+    public function truncate($databases)
     {
-        //Do anything after installation.
+        if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'ff') {
+            foreach ($databases as $tableName => $tableClass) {
+                if ($tableClass['model'] && $tableClass['model']->getSource()) {
+                    $tableName = $tableClass['model']->getSource();
+
+                    $this->dropTable($tableName);
+                }
+            }
+
+        }
+
+        if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'db') {
+            foreach ($databases as $tableName => $tableClass) {
+                if ($tableClass['model'] && $tableClass['model']->getSource()) {
+                    $tableName = $tableClass['model']->getSource();
+
+                    $this->ff->store($tableName)->deleteStore();
+                }
+            }
+        }
+
+        $this->installDb($databases);
 
         return true;
     }

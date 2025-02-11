@@ -406,12 +406,16 @@ class Views extends BasePackage
         return $views;
     }
 
-    public function getViewsForAppType($appType)
+    public function getViewsForAppType($appType, $includeSubViews = true)
     {
         $views = [];
 
         foreach($this->views as $view) {
             if ($view['app_type'] === $appType) {
+                if ($view['is_subview'] && !$includeSubViews) {
+                    continue;
+                }
+
                 $views[$view['id']] = $view;
             }
         }

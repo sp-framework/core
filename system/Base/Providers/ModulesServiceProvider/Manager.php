@@ -68,12 +68,15 @@ class Manager extends BasePackage
 
     public function getModuleInfo($data)
     {
-        $moduleId = $data['module_id'];
-
-        if ($data['module_type'] === 'apptype') {
-            $module = $this->apps->types->getAppTypeById($data['module_id']);
-            $module['module_type'] = 'apptypes';
+        if (str_contains($data['module_type'], 'apptype')) {
+            if (is_int($data['module_id'])) {
+                $module = $this->apps->types->getAppTypeById($data['module_id']);
+            } else if (is_string($data['module_id'])) {
+                $module = $this->apps->types->getAppTypeByType($data['module_id']);
+            }
         } else {
+            $moduleId = $data['module_id'];
+
             if ($data['module_type'] === 'views' &&
                 str_contains($data['module_id'], '-public')
             ) {
@@ -115,13 +118,46 @@ class Manager extends BasePackage
                 }
             }
 
-            if ($module['repo_details']) {
+            if (isset($module['repo_details'])) {
                 if (is_string($module['repo_details'])) {
                     try {
                         $module['repo_details'] = $this->helper->decode($module['repo_details'], true);
                     } catch (\Exception $e) {
                         $module['repo_details'] = null;
                     }
+                }
+            }
+
+            if (isset($module['required_by'])) {
+                if (is_string($module['required_by'])) {
+                    try {
+                        $module['required_by'] = $this->helper->decode($module['required_by'], true);
+
+                    } catch (\Exception $e) {
+                        $module['required_by'] = [];
+                    }
+                }
+
+                if (count($module['required_by']) > 0) {
+                    $requiredModules = [];
+                    foreach ($module['required_by'] as $requiredModuleType => $requiredModuleArr) {
+                        if (!isset($requiredModules[$requiredModuleType])) {
+                            $requiredModules[$requiredModuleType] = [];
+                        }
+
+                        if (count($requiredModuleArr) > 0) {
+                            foreach ($requiredModuleArr as $requiredModuleKey => $requiredModuleId) {
+                                $requiredModuleMethod = 'get' . ucfirst(substr($requiredModuleType, 0, -1)) . 'ById';
+                                $requiredModule = $this->modules->{$requiredModuleType}->$requiredModuleMethod($requiredModuleId);
+
+                                if ($requiredModule) {
+                                    array_push($requiredModules[$requiredModuleType], $requiredModule['display_name'] ?? $requiredModule['name']);
+                                }
+                            }
+                        }
+                    }
+
+                    $module['required_by'] = $requiredModules;
                 }
             }
 
@@ -177,6 +213,15 @@ class Manager extends BasePackage
 
                 $module['repo_details']['details'] = $responseArr;
 
+                $repoArr = explode('/', $module['repo']);
+                $names = explode('-', $this->helper->last($repoArr));
+
+                if (count($names) === 1) {
+                    if (!isset($module['module_type'])) {
+                        $module['module_type'] = 'apptypes';
+                    }
+                }
+
                 $this->remoteModules[$module['module_type']] = [$responseArr];
 
                 $latestRelease = $this->moduleNeedsUpgrade($responseArr, $module);
@@ -185,9 +230,14 @@ class Manager extends BasePackage
                     $module['repo_details']['latestRelease'] = $latestRelease;
                     $module['update_available'] = '1';
                     $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                    $latestReleaseJson = $this->getRemoteModuleJson($module['module_type'], $module, true);
+
+                    if ($latestReleaseJson) {
+                        $module['repo_details']['latestRelease']['moduleJson'] = $this->remoteModulesJson[$module['module_type']][$module['name']];
+                    }
                 }
 
-                if ($module['module_type'] === 'apptypes') {
+                if (str_contains($module['module_type'], 'apptype')) {
                     $this->apps->types->update($module);
                 } else {
                     $this->modules->{$module['module_type']}->update($module);
@@ -303,22 +353,27 @@ class Manager extends BasePackage
         }
 
         if (isset($data['api_id'])) {
-            $localModules['components'] = $this->modules->components->init(true)->getComponentsByApiId($data['api_id']);
-            $localModules['middlewares'] = $this->modules->middlewares->init(true)->getMiddlewaresByApiId($data['api_id']);
-            $localModules['packages'] = $this->modules->packages->init(true)->getPackagesByApiId($data['api_id']);
-            $localModules['views'] = $this->modules->views->init(true)->getViewsByApiId($data['api_id']);
-            $localModules['bundles'] = $this->modules->bundles->init(true)->getBundlesByApiId($data['api_id']);
+            $localModules['components'] = msort($this->modules->components->init(true)->getComponentsByApiId($data['api_id']), 'name');
+            $localModules['middlewares'] = msort($this->modules->middlewares->init(true)->getMiddlewaresByApiId($data['api_id']), 'name');
+            $localModules['packages'] = msort($this->modules->packages->init(true)->getPackagesByApiId($data['api_id']), 'name');
+            $localModules['views'] = msort($this->modules->views->init(true)->getViewsByApiId($data['api_id']), 'name');
+            $localModules['bundles'] = msort($this->modules->bundles->init(true)->getBundlesByApiId($data['api_id']), 'name');
         } else {
-            $localModules['components'] = $this->modules->components->init(true)->components;
-            $localModules['middlewares'] = $this->modules->middlewares->init(true)->middlewares;
-            $localModules['packages'] = $this->modules->packages->init(true)->packages;
-            $localModules['views'] = $this->modules->views->init(true)->views;
-            $localModules['bundles'] = $this->modules->bundles->init(true)->bundles;
+            $localModules['components'] = msort($this->modules->components->init(true)->components, 'name');
+            $localModules['middlewares'] = msort($this->modules->middlewares->init(true)->middlewares, 'name');
+            $localModules['packages'] = msort($this->modules->packages->init(true)->packages, 'name');
+            $localModules['views'] = msort($this->modules->views->init(true)->views, 'name');
+            $localModules['bundles'] = msort($this->modules->bundles->init(true)->bundles, 'name');
         }
+        $localModules['externals'] = msort($this->modules->externals->init(true)->externals, 'developer');
 
         foreach ($localModules as $moduleType => $modulesArr) {
             if (count($modulesArr) > 0) {
                 foreach ($modulesArr as $moduleArr) {
+                    if ($moduleArr['module_type'] === 'externals') {
+                        $moduleArr['api_id'] = 1;
+                    }
+
                     if (!isset($sortedModules[$moduleArr['api_id']])) {
                         continue;
                     }
@@ -326,7 +381,7 @@ class Manager extends BasePackage
                     if (!isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']])) {
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']] = [];
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['name'] = $moduleArr['app_type'];
-                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['data']['type'] = 'app';
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['data']['type'] = 'apptype';
                     }
 
                     if (!isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']])) {
@@ -341,6 +396,12 @@ class Manager extends BasePackage
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']] = [];
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['name'] = $moduleArr['category'];
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['data']['type'] = 'category';
+                    } else if (isset($moduleArr['developer']) &&
+                               !isset($sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['developer']])
+                    ) {
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['developer']] = [];
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['developer']]['name'] = $moduleArr['developer'];
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['developer']]['data']['type'] = 'developer';
                     }
 
                     $module['id'] = $moduleArr['id'];
@@ -351,7 +412,11 @@ class Manager extends BasePackage
                     $module['data']['apiid'] = $moduleArr['api_id'];
                     $module['data']['apptype'] = $moduleArr['app_type'];
                     $module['data']['moduletype'] = $moduleArr['module_type'];
-                    $module['data']['modulecategory'] = $moduleArr['category'] ?? '-';
+                    if ($moduleArr['module_type'] === 'externals') {
+                        $module['data']['modulecategory'] = $moduleArr['developer'] ?? '-';
+                    } else {
+                        $module['data']['modulecategory'] = $moduleArr['category'] ?? '-';
+                    }
                     $module['data']['moduleid'] = $moduleArr['module_type'] . '-' . $moduleArr['id'];
                     $module['data']['installed'] = $moduleArr['installed'] ?? 0;
                     $module['data']['update_available'] = $moduleArr['update_available'];
@@ -377,6 +442,8 @@ class Manager extends BasePackage
 
                     if (isset($moduleArr['category'])) {
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['category']]['childs'][$module['data']['moduleid']] = $module;
+                    } else if ($moduleArr['module_type'] === 'externals') {
+                        $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$moduleArr['developer']]['childs'][$module['data']['moduleid']] = $module;
                     } else {
                         $sortedModules[$moduleArr['api_id']]['childs'][$moduleArr['app_type']]['childs'][$moduleArr['module_type']]['childs'][$module['data']['moduleid']] = $module;
                     }
@@ -463,6 +530,8 @@ class Manager extends BasePackage
                 return true;
             }
         } catch (ClientException | \throwable $e) {
+            //To troubleshoot sync errors
+            // trace([$e]);
             $this->addResponse($e->getMessage(), 1);
 
             return false;
@@ -578,7 +647,7 @@ class Manager extends BasePackage
             return true;
         }
 
-        $this->addResponse('Unable to Sync with remote server', 1);
+        $this->addResponse('Unable to sync with remote or remote has no repositories!', 1);
 
         return false;
     }
@@ -636,7 +705,7 @@ class Manager extends BasePackage
 
     protected function getRemoteModuleJson($moduleType, $module, $onlyJson = false)
     {
-        if ($moduleType === 'apptypes') {
+        if (str_contains($moduleType, 'apptype')) {
             $jsonFileName = 'Install/type.json';
         } else {
             if ($moduleType === 'views' || $moduleType === 'bundles') {//remove "s" from the name
@@ -647,6 +716,8 @@ class Manager extends BasePackage
                 }
 
                 $jsonFileName = substr($moduleType, 0, -1) . '.json';
+            } else if ($moduleType === 'packages' && $module['name'] === 'Core') {
+                $jsonFileName = 'system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json';
             } else {
                 $jsonFileName = 'Install/' . substr($moduleType, 0, -1) . '.json';
             }
@@ -662,10 +733,18 @@ class Manager extends BasePackage
             $method = 'reposGetContent';
         }
 
+        if (isset($module['html_url'])) {
+            $moduleRepoArr = explode('/', $module['html_url']);
+        } else if (isset($module['repo'])) {
+            $moduleRepoArr = explode('/', $module['repo']);
+        } else {
+            return true;
+        }
+
         $args =
             [
                 $this->apiClientConfig['org_user'],
-                $module['name'],
+                $this->helper->last($moduleRepoArr),
                 $jsonFileName,
                 $this->apiClientConfig['branch']
             ];
@@ -718,7 +797,7 @@ class Manager extends BasePackage
                         $this->counter['updates']['count'] = 0;
                     }
 
-                    if ($remoteModulesType === 'apptypes') {
+                    if (str_contains($remoteModulesType, 'apptype')) {
                         $this->apps->types->update($updateRemotePackage);
                     } else {
                         $this->modules->{$remoteModulesType}->update($updateRemotePackage);
@@ -770,7 +849,7 @@ class Manager extends BasePackage
 
                     $registerRemotePackage['api_id'] = $this->apiClientConfig['id'];
 
-                    if ($remoteModulesType === 'apptypes') {
+                    if (str_contains($remoteModulesType, 'apptype')) {
                         $this->apps->types->add($registerRemotePackage);
                     } else {
                         if ($registerRemotePackage['module_type'] === 'components') {
@@ -825,7 +904,7 @@ class Manager extends BasePackage
                 $repoUrl = $remoteModule['html_url'];
             }
 
-            if ($remoteModulesType === 'apptypes') {
+            if (str_contains($remoteModulesType, 'apptype')) {
                 $localModule = $this->apps->types->getAppTypeByRepo($repoUrl);
             } else {
                 $moduleMethod = 'get' . ucfirst(substr($remoteModulesType, 0, -1)) . 'ByRepo';
@@ -839,13 +918,16 @@ class Manager extends BasePackage
                 $moduleNeedsUpgrade = $this->moduleNeedsUpgrade($remoteModule, $localModule);
 
                 if ($moduleNeedsUpgrade) {
+                    $localModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
+
                     if ($this->getRemoteModuleJson($remoteModulesType, $localModule, true)) {
                         if (isset($this->remoteModulesJson[$remoteModulesType][$remoteModule['name']])) {
+                            $localModuleVersion = $localModule['version'];
                             $localModule = array_merge($localModule, $this->remoteModulesJson[$remoteModulesType][$remoteModule['name']]);
+                            $localModule['version'] = $localModuleVersion;
+                            $localModule['repo_details']['latestRelease']['moduleJson'] = $this->remoteModulesJson[$remoteModulesType][$remoteModule['name']];
                         }
                     }
-
-                    $localModule['repo_details']['latestRelease'] = $moduleNeedsUpgrade;
 
                     if (isset($localModule['installed']) && $localModule['installed'] == '0') {
                         $localModule['version'] = $moduleNeedsUpgrade['name'];

@@ -1,13 +1,13 @@
 {
-    "name"          : "ModulesManager",
-    "display_name"  : "Modules Manager",
-    "description"   : "Package for managing modules",
+    "name"          : "Menus",
+    "display_name"  : "Menus",
+    "description"   : "Menus package",
     "module_type"   : "packages",
     "app_type"      : "core",
-    "category"      : "providers",
+    "category"      : "basepackages",
     "version"       : "0.0.0",
     "repo"          : "https://.../",
-    "class"         : "System\\Base\\Providers\\ModulesServiceProvider\\Manager",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Menus",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -20,8 +20,5 @@
         "views"         : [],
         "external"      : []
     },
-    "settings"      : {
-        "componentRoute":"modules",
-        "api_clients" : []
-    }
+    "settings"      : {"componentRoute":"system/menus"}
 }

@@ -172,11 +172,7 @@ class AuthComponent extends BaseComponent
     {
         $this->requestIsPost();
 
-        try {
-            $this->access->auth->twoFa->sendTwoFaEmail($this->postData());
-        } catch (\Exception $e) {
-            var_dump($e);die();
-        }
+        $this->access->auth->twoFa->sendTwoFaEmail($this->postData());
 
         $this->addResponse(
             $this->access->auth->twoFa->packagesData->responseMessage,

@@ -23,6 +23,6 @@
 		"external" : []
 	},
 	"settings" : {
-		"api_clients" : []
+		"api_clients" : [1,2]
 	}
 }

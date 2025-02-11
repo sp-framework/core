@@ -43,6 +43,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Tasks;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Workers;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Bundles;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Components;
+use System\Base\Installer\Packages\Setup\Schema\Modules\Externals;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Queues;
@@ -113,6 +114,7 @@ use System\Base\Providers\DomainsServiceProvider\Model\ServiceProviderDomains;
 use System\Base\Providers\ModulesServiceProvider\Model\ServiceProviderModulesQueues;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesBundles;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesComponents;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesExternals;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesMiddlewares;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesPackages;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesViews;
@@ -170,6 +172,10 @@ class Schema
             'modules_views_settings'                    => [
                     'schema'    => new Settings,
                     'model'     => new ModulesViewsSettings,
+                ],
+            'modules_externals'                         => [
+                    'schema'    => new Externals,
+                    'model'     => new ModulesExternals,
                 ],
             'basepackages_email_services'               => [
                     'schema'    => new EmailServices,
@@ -354,11 +360,7 @@ class Schema
             'service_provider_api_scopes'               => [
                     'schema'    => new Scopes,
                     'model'     => new ServiceProviderApiScopes,
-                ],
-            'test_schema'                               => [
-                    'schema'    => new \System\Base\Installer\Packages\Setup\Schema\TestSchema,
-                    'model'     => new \System\Base\Installer\Packages\Setup\Schema\TestModel,
-                ],
+                ]
         ];
     }
 }

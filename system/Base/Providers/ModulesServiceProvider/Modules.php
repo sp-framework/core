@@ -4,14 +4,15 @@ namespace System\Base\Providers\ModulesServiceProvider;
 
 use System\Base\Providers\ModulesServiceProvider\Installer;
 use System\Base\Providers\ModulesServiceProvider\Manager;
-use System\Base\Providers\ModulesServiceProvider\Queues;
 use System\Base\Providers\ModulesServiceProvider\Modules\Bundles;
 use System\Base\Providers\ModulesServiceProvider\Modules\Components;
+use System\Base\Providers\ModulesServiceProvider\Modules\Externals;
 use System\Base\Providers\ModulesServiceProvider\Modules\Middlewares;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages;
 use System\Base\Providers\ModulesServiceProvider\Modules\Repositories;
 use System\Base\Providers\ModulesServiceProvider\Modules\Views;
 use System\Base\Providers\ModulesServiceProvider\Modules\Views\ViewsSettings;
+use System\Base\Providers\ModulesServiceProvider\Queues;
 
 class Modules
 {
@@ -28,6 +29,8 @@ class Modules
 	protected $repositories;
 
 	protected $bundles;
+
+	protected $externals;
 
 	protected $manager;
 
@@ -97,6 +100,13 @@ class Modules
 		$this->bundles = (new Bundles())->init();
 
 		return $this->bundles;
+	}
+
+	protected function initExternals()
+	{
+		$this->externals = (new Externals())->init();
+
+		return $this->externals;
 	}
 
 	protected function initManager()

@@ -13,15 +13,13 @@ class BasepackagesDashboards extends BaseModel
 
     public $name;
 
-    public $app_id;
-
-    public $app_default;
+    public $app_type;
 
     public $created_by;
 
     public $shared;
 
-    public $is_default;
+    public $user_default;
 
     public $settings;
 

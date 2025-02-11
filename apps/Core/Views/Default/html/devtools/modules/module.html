@@ -1188,6 +1188,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                                      : { },
         '{{componentId}}-{{sectionId}}-app_type'                                : { },
         '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-dashboards'                              : { },
         '{{componentId}}-{{sectionId}}-description'                             : { },
         '{{componentId}}-{{sectionId}}-api_id'                                  : {
             'placeholder'   : 'SELECT LOCAL OR REMOTE REPOSITORY',
@@ -1283,6 +1284,7 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-createrepo'                              : { },
+        '{{componentId}}-{{sectionId}}-installed'                               : { },
         '{{componentId}}-{{sectionId}}-form'                                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                            : 'required',
@@ -1636,6 +1638,9 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-createrepo'                              : { },
+        '{{componentId}}-{{sectionId}}-installed'                               : { },
+        '{{componentId}}-{{sectionId}}-truncate_table'                          : { },
+        '{{componentId}}-{{sectionId}}-reinstall_table'                         : { },
         '{{componentId}}-{{sectionId}}-class'                                   : {
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-generate-module-class').click(function(e) {

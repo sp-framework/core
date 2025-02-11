@@ -51,6 +51,11 @@ class Progress extends BasePackage
         return false;
     }
 
+    public function getProgressFile()
+    {
+        return $this->readProgressFile();
+    }
+
     public function registerMethods(array $methods)
     {
         foreach ($methods as $key => $method) {
@@ -81,19 +86,28 @@ class Progress extends BasePackage
         return false;
     }
 
-    public function unregisterMethods(array $methods, $using = 'method')//Either Method or Text as identifier in case of duplicate methods.
+    public function unregisterMethods(array $methods, $using = 'method', array $childs = [])//Either Method or Text as identifier in case of duplicate methods.
     {
         $progressFile = $this->readProgressFile();
+
+        if ($using !== 'method' && $using !== 'text') {
+            $using = 'method';
+        }
 
         if (isset($progressFile['processes']) && count($progressFile['processes']) > 0) {
             foreach ($methods as $method) {
                 foreach ($progressFile['processes'] as $progressFileKey => $progressFileMethod) {
-                    if ($using === 'method') {
-                        if ($progressFileMethod['method'] === $method) {
-                            unset($progressFile['processes'][$progressFileKey]);
-                        }
-                    } else if ($using === 'text') {
-                        if ($progressFileMethod['text'] === $method) {
+                    if ($progressFileMethod[$using] === $method) {
+                        if (count($childs) > 0 &&
+                            isset($progressFile['processes'][$progressFileKey]['childs']) &&
+                            count($progressFile['processes'][$progressFileKey]['childs']) > 0
+                        ) {
+                            foreach ($progressFile['processes'][$progressFileKey]['childs'] as $childKey => $child) {
+                                if (in_array($child[$using], $childs)) {
+                                    unset($progressFile['processes'][$progressFileKey]['childs'][$childKey]);
+                                }
+                            }
+                        } else {
                             unset($progressFile['processes'][$progressFileKey]);
                         }
                     }

@@ -148,6 +148,10 @@ var BazContentLoader = function() {
     }
 
     function loadAjax(element, options, popped) {
+        if (element.length === 0) {
+            return false;
+        }
+
         BazHelpers.setTimeoutTimers.stopAll();//Stop all timers from previous component.
         var urlToLoad, elementId;
         var dataCollection = window.dataCollection;
@@ -554,6 +558,15 @@ var BazCore = function() {
         if (dataCollection.env.currentRoute.indexOf('auth') === -1) {
             BazTunnels.init();
         }
+        $('#body').on('bazContentLoaderAjaxComplete', function() {
+            //eslint-disable-next-line
+            console.log(dataCollection.env.wsTunnels.pusher._websocket_connected);
+            if (dataCollection.env.wsTunnels.pusher._websocket_connected !== 'undefined' &&
+                dataCollection.env.wsTunnels.pusher._websocket_connected === false
+            ) {
+                BazTunnels.init();
+            }
+        });
         initPings();
     }
 

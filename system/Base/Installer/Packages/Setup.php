@@ -26,6 +26,7 @@ use System\Base\Installer\Packages\Setup\Register\Modules\Component as RegisterC
 use System\Base\Installer\Packages\Setup\Register\Modules\Middleware as RegisterMiddleware;
 use System\Base\Installer\Packages\Setup\Register\Modules\Package as RegisterPackage;
 use System\Base\Installer\Packages\Setup\Register\Modules\View as RegisterView;
+use System\Base\Installer\Packages\Setup\Register\Modules\External as RegisterExternal;
 use System\Base\Installer\Packages\Setup\Register\Providers\App as RegisterCoreApp;
 use System\Base\Installer\Packages\Setup\Register\Providers\App\Type as RegisterCoreAppType;
 use System\Base\Installer\Packages\Setup\Register\Providers\Core as RegisterCore;
@@ -397,7 +398,7 @@ class Setup
 
 	protected function registerRepos()
 	{
-		(new RegisterRepos())->register($this->db, $this->ff);
+		(new RegisterRepos())->register($this->db, $this->ff, $this->postData);
 
 		return true;
 	}
@@ -464,7 +465,7 @@ class Setup
 					}
 
 					if ($jsonFile['menu'] && $jsonFile['menu'] !== 'false') {
-						$menuId = $this->registerCoreMenu($jsonFile['app_type'], $jsonFile['menu']);
+						$menuId = $this->registerCoreMenu($jsonFile);
 					} else {
 						$menuId = null;
 					}
@@ -521,13 +522,6 @@ class Setup
 						$this->registerStorages($jsonFile);
 					}
 
-					$jsonFile['files'] = [];
-
-					if ($jsonFile['name'] === 'Core') {
-						$jsonFile['files'] =
-							array_merge_recursive($this->basepackages->utils->init($this->container)->scanDir('system/', true), $this->basepackages->utils->init($this->container)->scanDir('apps/', true));
-					}
-
 					$this->registerCorePackage($jsonFile);
 				}
 			}
@@ -573,6 +567,14 @@ class Setup
 			}
 
 			$this->registerCoreView($jsonFile);
+		} else if ($type === 'externals') {
+			try {
+				$composerJsonFile = $this->helper->decode(file_get_contents(base_path('external/composer.json')), true);
+			} catch (\throwable $e) {
+				throw new \Exception($e->getMessage() . '. Problem reading composer.json');
+			}
+
+			$this->registerCoreExternal($composerJsonFile);
 		}
 
 		return true;
@@ -598,9 +600,9 @@ class Setup
 		return (new RegisterCoreApp())->update($this->db, $this->ff);
 	}
 
-	protected function registerCoreMenu($appType, array $menu)
+	protected function registerCoreMenu($componentJsonFile)
 	{
-		return (new RegisterMenu())->register($this->db, $this->ff, $appType, $menu, $this->helper);
+		return (new RegisterMenu())->register($this->db, $this->ff, $componentJsonFile, $this->helper);
 	}
 
 	protected function registerCorePackage(array $packageFile)
@@ -616,6 +618,11 @@ class Setup
 	protected function registerCoreView(array $viewFile)
 	{
 		return (new RegisterView())->register($this->db, $this->ff, $viewFile, $this->helper);
+	}
+
+	protected function registerCoreExternal(array $composerJsonFile)
+	{
+		return (new RegisterExternal())->register($this->db, $this->ff, $composerJsonFile, $this->helper);
 	}
 
 	public function validateData()

@@ -144,13 +144,6 @@ class Views
 						]
 					),
 					new Column(
-						'files',
-						[
-							'type'    => Column::TYPE_MEDIUMTEXT,
-							'notNull' => false,
-						]
-					),
-					new Column(
 						'api_id',
 						[
 							'type'    => Column::TYPE_INTEGER,

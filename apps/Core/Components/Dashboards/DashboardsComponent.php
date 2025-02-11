@@ -35,14 +35,11 @@ class DashboardsComponent extends BaseComponent
                     $dashboardId = $this->getData()['id'];
 
                     $dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true, false);
-                    $dashboard['is_app_default'] = false;
 
                     if (isset($this->app['settings']['defaultDashboard'])) {
                         if ($this->app['settings']['defaultDashboard'] == $dashboard['id']) {
-                            $dashboard['is_app_default'] = true;
+                            $dashboard['app_default'] = true;
                         }
-
-                        $this->view->isAppDefault = true;
                     }
 
                     if (isset($dashboard['shared']) && is_string($dashboard['shared'])) {
@@ -66,19 +63,31 @@ class DashboardsComponent extends BaseComponent
                         $dashboard['shared'] = [];
                     }
 
+                    //Default
+                    if ($dashboard['user_default']) {
+                        if (is_string($dashboard['user_default'])) {
+                            $dashboard['user_default'] = $this->helper->decode($dashboard['user_default'], true);
+                        }
+
+                        if (in_array($this->access->auth->account()['id'], $dashboard['user_default'])) {
+                            $dashboard['user_default'] = true;
+                        }
+                    }
+
                     $this->view->dashboard = $dashboard;
                 }
 
                 $this->view->pick('dashboards/dashboards/dashboard');
 
                 return;
-            } else {
+            } else {//List of all dashboards
+                $dashboardId = 0;
+
                 if (isset($this->app['settings']['defaultDashboard'])) {
                     $dashboardId = $this->app['settings']['defaultDashboard'];
                 }
 
-                $dashboards = $this->basepackages->dashboards->dashboards;
-                $dashboards = msort($dashboards, 'is_default');
+                $dashboards = $this->basepackages->dashboards->getDashboardsByAppType($this->app['app_type']);
 
                 if ($this->access->auth->account()) {
                     foreach ($dashboards as $dashboardKey => &$dashboard) {
@@ -110,17 +119,22 @@ class DashboardsComponent extends BaseComponent
                         }
 
                         //Default
-                        if ($dashboard['is_default'] && !$isShared) {
-                            $dashboardId = $dashboard['id'];
+                        if ($dashboard['user_default']) {
+                            if (is_string($dashboard['user_default'])) {
+                                $dashboard['user_default'] = $this->helper->decode($dashboard['user_default'], true);
+                            }
 
-                            $dashboard['name'] = $dashboard['name'] . ' (User Default)';
+                            if (in_array($this->access->auth->account()['id'], $dashboard['user_default'])) {
+                                $dashboard['name'] = $dashboard['name'] . ' (User Default)';
+                                $dashboardId = $dashboard['id'];
+                            }
                         }
                     }
                 }
 
-                $this->view->dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true, false);
-
                 $this->view->dashboards = $dashboards;
+
+                $this->view->dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true, false);
 
                 $this->view->widgetsTree = $this->basepackages->widgets->getWidgetsTree();
             }
@@ -214,6 +228,19 @@ class DashboardsComponent extends BaseComponent
         $this->requestIsPost();
 
         $this->basepackages->dashboards->getDashboardWidgets($this->postData());
+
+        $this->addResponse(
+            $this->basepackages->dashboards->packagesData->responseMessage,
+            $this->basepackages->dashboards->packagesData->responseCode,
+            $this->basepackages->dashboards->packagesData->responseData
+        );
+    }
+
+    public function getDashboardsByAppTypeAction()
+    {
+        $this->requestIsPost();
+
+        $this->basepackages->dashboards->getDashboardsByAppType($this->postData()['app_type']);
 
         $this->addResponse(
             $this->basepackages->dashboards->packagesData->responseMessage,

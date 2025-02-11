@@ -15,7 +15,37 @@
 {% if queue['tasks_count']['remove'] is defined %}
     {% set queueTasksCounterRemove = queue['tasks_count']['remove'] %}
 {% endif %}
+{% set queueStatus = 'Analysis Complete' %}
+{% if queue['status'] == '1' %}
+    {% set queueStatus = 'Precheck Complete' %}
+{% elseif queue['status'] == '2' %}
+    {% set queueStatus = 'Process Complete' %}
+{% endif %}
+{% set queuePrecheckedAt = '-' %}
+{% set queuePrecheckedBy = '-' %}
+{% set queueProcessedAt = '-' %}
+{% set queueProcessedBy = '-' %}
+{% if queue['prechecked_at'] is defined %}
+    {% set queuePrecheckedAt = queue['prechecked_at'] %}
+{% endif %}
+{% if queue['prechecked_by'] is defined %}
+    {% set queuePrecheckedBy = queue['prechecked_by'] %}
+{% endif %}
+{% if queue['processed_at'] is defined %}
+    {% set queueProcessedAt = queue['processed_at'] %}
+{% endif %}
+{% if queue['processed_by'] is defined %}
+    {% set queueProcessedBy = queue['processed_by'] %}
+{% endif %}
 <div class="row">
+    <div class="col">
+        <label>ID: </label>
+        <span class="text-uppercase" id="queue-id">{{queue['id']}}</span>
+    </div>
+    <div class="col">
+        <label>STATUS: </label>
+        <span class="text-uppercase" id="status">{{queueStatus}}</span>
+    </div>
     <div class="col">
         {{adminltetags.useTag('buttons',
             [
@@ -39,6 +69,26 @@
         )}}
     </div>
 </div>
+<hr>
+<div class="row">
+    <div class="col">
+        <label>PRECHECKED AT: </label>
+        <span class="text-uppercase" id="prechecked_at">{{queuePrecheckedAt}}</span>
+    </div>
+    <div class="col">
+        <label>PRECHECKED BY: </label>
+        <span id="prechecked_by">{{queuePrecheckedBy}}</span>
+    </div>
+    <div class="col">
+        <label>PROCESSED AT: </label>
+        <span class="text-uppercase" id="processed_at">{{queueProcessedAt}}</span>
+    </div>
+    <div class="col">
+        <label>PROCESSED BY: </label>
+        <span id="processed_by">{{queueProcessedBy}}</span>
+    </div>
+</div>
+<hr class="mt-0">
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -86,6 +136,7 @@
         )}}
     </div>
 </div>
+<hr class="mt-0">
 {% set moduleHtml = '' %}
 {% set hasAnalysisError = 'false' %}
 {% if queue['tasks']['analysed']|length > 0 %}
@@ -126,7 +177,7 @@
                             '           <td>' ~  module['repo'] ~ '</td>' ~
                             '           <td>' ~  '<span class="badge badge-' ~ color ~ ' mt-1 text-xs text-uppercase">' ~ taskName ~ '</span></td>' ~
                             '           <td id="{{componentId}}-{{sectionId}}-analyse-queue-modules-logs-' ~ module['id'] ~ '">' ~
-                            '               <a href="#" type="button" data-error="' ~ error ~ '" data-task="' ~ taskName ~ '" data-moduletype="' ~ modulesType ~ '" data-id="' ~ module['id'] ~ '" class="ml-1 mr-1 text-white btn btn-info btn-xs viewLogs">' ~
+                            '               <a href="#" type="button" data-error="' ~ error ~ '" data-task="' ~ task ~ '" data-taskName="' ~ taskName ~ '" data-moduletype="' ~ modulesType ~ '" data-id="' ~ module['id'] ~ '" class="ml-1 mr-1 text-white btn btn-info btn-xs viewLogs">' ~
                             '                   <i class="fas fa-fw fa-xs fa-eye"></i>' ~
                             '               </a>' ~
                             '           </td>' ~
@@ -161,7 +212,7 @@
     <hr>
     <div class="row">
         <div class="col">
-            <div id="installer-progress" class="mb-3"></div>
+            <div id="installer-progress" class="mb-3" hidden></div>
         </div>
     </div>
 {% endif %}
@@ -199,7 +250,7 @@ dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['queue'] = JSON.parse('{{queue}}');
 dataCollectionSectionForm['funcs'] = { };
 dataCollectionSectionForm['funcs']['init'] = function() {
-    BazProgress.buildProgressBar($('#installer-progress'), false, false, true);
+    BazProgress.buildProgressBar($('#installer-progress'), false, true, true);
 
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
         $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
@@ -228,6 +279,13 @@ dataCollectionSectionForm['funcs']['saveSettings'] = function() {
     postData['id'] = dataCollectionSectionForm['vars']['queue']['id'];
     postData['settings'] = { };
     postData['settings']['backupSettings'] = { };
+    var backup = $("input[type='radio'][name='backup']:checked").data('value');
+
+    if (backup === 'backup-off') {
+        postData['settings']['backupSettings']['backup'] = false;
+    } else {
+        postData['settings']['backupSettings']['backup'] = true;
+    }
     postData['settings']['backupSettings']['apps_dir'] = $('#{{componentId}}-{{sectionId}}-apps_dir')[0].checked;
     postData['settings']['backupSettings']['systems_dir'] = $('#{{componentId}}-{{sectionId}}-systems_dir')[0].checked;
     postData['settings']['backupSettings']['public_dir'] = $('#{{componentId}}-{{sectionId}}-public_dir')[0].checked;
@@ -242,8 +300,9 @@ dataCollectionSectionForm['funcs']['saveSettings'] = function() {
     postData['settings']['backupSettings']['password_protect'] = $('#{{componentId}}-{{sectionId}}-password_protect').val().trim();
     postData['settings']['backupSettings']['notes'] = $('#{{componentId}}-{{sectionId}}-notes').val().trim();
     postData['settings']['emailReport'] = $('#{{componentId}}-{{sectionId}}-email_report').val().trim();
-    postData['settings']['rsync'] = { };
-    postData['settings']['rsync']['deleteDestinationFiles'] = $('#{{componentId}}-{{sectionId}}-delete_destination_files')[0].checked;
+    postData['settings']['files'] = { };
+    postData['settings']['files']['deleteSourceFiles'] = $('#{{componentId}}-{{sectionId}}-delete_source_files')[0].checked;
+    postData['settings']['files']['deleteDestinationFiles'] = $('#{{componentId}}-{{sectionId}}-delete_destination_files')[0].checked;
 
     $.post('{{links.url("modules/saveQueueSettings")}}', postData, function(response) {
         if (response.tokenKey && response.token) {
@@ -253,6 +312,7 @@ dataCollectionSectionForm['funcs']['saveSettings'] = function() {
 
         if (response.responseCode == 0) {
             paginatedPNotify('success', {text : response.responseMessage});
+            $('#{{componentId}}-{{sectionId}}-queue-settings-modal').modal('hide');
         } else {
             paginatedPNotify('error', {text : response.responseMessage});
         }
@@ -275,6 +335,7 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
     }
 
     $('tr').removeClass('bg-danger');
+    BazProgress.switchProgressBarColor();
 
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -294,10 +355,8 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
         }
 
         if (response.responseCode == 0) {
-            paginatedPNotify('success', {
-                text        : response.responseMessage,
-                textTrusted : true
-            });
+            var notifyText = response.responseMessage;
+            var notifyType = 'success';
 
             if (postData['process'] === 'runprecheck') {
                 $('#{{componentId}}-{{sectionId}}-re-analyse').removeClass('disabled');
@@ -306,12 +365,48 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
                 $('#{{componentId}}-{{sectionId}}-perform-precheck').children('i').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', false);
                 $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', false);
+                if (response.responseData.queue) {
+                    if (response.responseData.queue.prechecked_at) {
+                        $('#prechecked_at').html(response.responseData.queue.prechecked_at);
+                    }
+                    if (response.responseData.queue.prechecked_by) {
+                        $('#prechecked_by').html(response.responseData.queue.prechecked_by);
+                    }
+                    if (response.responseData.queue.status == 1) {
+                        $('#status').html('Precheck Complete');
+                    }
+                }
             } else if (postData['process'] === 'runprocess') {
                 $('#{{componentId}}-{{sectionId}}-re-analyse').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-perform-precheck').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-process-queue').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-cancel').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-close').attr('hidden', false);
+                if (response.responseData.queue) {
+                    if (response.responseData.queue.processed_at) {
+                        $('#processed_at').html(response.responseData.queue.processed_at);
+                    }
+                    if (response.responseData.queue.processed_by) {
+                        $('#processed_by').html(response.responseData.queue.processed_by);
+                    }
+                    if (response.responseData.queue.status == 2) {
+                        $('#status').html('Process Complete');
+                    }
+                }
+
+                if (response.responseData && response.responseData.emailReport && response.responseData.emailReport == true) {
+                    notifyText += '. An email report was successfully sent to : ' + $('#{{componentId}}-{{sectionId}}-email_report').val().trim();
+                } else {
+                    notifyType = 'notice';
+                    notifyText += '. Failed to send email report!';
+                }
             }
+
+            paginatedPNotify(notifyType, {
+                text        : notifyText,
+                textTrusted : true
+            });
         } else {
             paginatedPNotify('error', {
                 text        : response.responseMessage,
@@ -332,7 +427,9 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
                         for (var moduleType in dataCollectionSectionForm['vars']['queue']['results'][task]) {
                             if (Object.keys(dataCollectionSectionForm['vars']['queue']['results'][task][moduleType]).length > 0) {
                                 for (var taskModule in dataCollectionSectionForm['vars']['queue']['results'][task][moduleType]) {
-                                    if (dataCollectionSectionForm['vars']['queue']['results'][task][moduleType][taskModule]['precheck'] === 'fail') {
+                                    if (dataCollectionSectionForm['vars']['queue']['results'][task][moduleType][taskModule]['precheck'] === 'fail' ||
+                                        dataCollectionSectionForm['vars']['queue']['results'][task][moduleType][taskModule]['result'] === 'fail'
+                                    ) {
                                         var moduleLogs = document.querySelectorAll("[data-id='" + taskModule + "']");
 
                                         if (moduleLogs.length === 1) {
@@ -435,10 +532,10 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
         ) {
             logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results']['first']['external'][$(this).data()['id']]);
         } else if ($(this).data()['moduletype'] === 'packages' &&
-                   $(this).data()['task'] === 'update' &&
-                   dataCollectionSectionForm['vars']['queue']['results']['first']['packages'][$(this).data()['id']]
+                   $(this).data()['taskName'] === 'update' &&
+                   dataCollectionSectionForm['vars']['queue']['results']['update']['packages'][$(this).data()['id']]
         ) {
-            logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results']['first']['packages'][$(this).data()['id']]);
+            logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results']['update']['packages'][$(this).data()['id']]);
         } else {
             logObject = Object.assign({}, dataCollectionSectionForm['vars']['queue']['results'][$(this).data()['task']][$(this).data()['moduletype']][$(this).data()['id']]);
         }
@@ -457,8 +554,12 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
             if (object === 'analyse_logs' || object === 'precheck_logs' || object === 'result_logs') {
                 if (logObject[object] !== '-') {
                     if ($(this).data()['moduletype'] !== 'external') {
-                        logObject[object] = JSON.parse(logObject[object]);
-                        logObject[object] = BazHelpers.createHtmlList({'obj': logObject[object]});
+                        try {
+                            logObject[object] = JSON.parse(logObject[object]);
+                            logObject[object] = BazHelpers.createHtmlList({'obj': logObject[object]});
+                        } catch (e) {
+                            //Do nothing
+                        }
                     }
 
                     logObject[object] = '<pre>' + logObject[object] + '</pre>';
@@ -476,7 +577,34 @@ dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-apps_dir'                                : { },
+        '{{componentId}}-{{sectionId}}-apps_dir'                                : {
+            afterInit : function() {
+                var backup, disabled;
+
+                $("input[type='radio'][name='backup']:checked").parents('.btn-group').click(function() {
+                    backup = $("input[type='radio'][name='backup']:checked").data('value');
+
+                    if (backup === 'backup-off') {
+                        disabled = true;
+                    } else {
+                        disabled = false;
+                    }
+                    $('#{{componentId}}-{{sectionId}}-apps_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-systems_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-public_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-private_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-external_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-html_compiled_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-var_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-external_vendor_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-old_backups_dir').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-database').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-keys').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-password_protect').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-notes').attr('disabled', disabled);
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-systems_dir'                             : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-systems_dir').click(function() {
@@ -536,6 +664,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-password_protect'                        : { },
         '{{componentId}}-{{sectionId}}-notes'                                   : { },
         '{{componentId}}-{{sectionId}}-email_report'                            : { },
+        '{{componentId}}-{{sectionId}}-delete_source_files'                     : { },
         '{{componentId}}-{{sectionId}}-delete_destination_files'                : { },
         '{{componentId}}-{{sectionId}}-form'                                    : $.extend(dataCollectionSectionForm, {
             rules: {
@@ -548,15 +677,31 @@ dataCollectionSection =
         })
     });
 
+function stringToBoolean(string) {
+    switch (string.toLowerCase().trim()) {
+        case "true":
+        case "yes":
+        case "1":
+          return true;
+
+        case "false":
+        case "no":
+        case "0":
+        case null:
+        case undefined:
+        case 'undefined':
+          return false;
+
+        default:
+          return JSON.parse(string);
+    }
+}
+
 $(document).ready(function() {
-    dataCollectionSectionForm['vars']['hasAnalysisError'] = BazHelpers.stringToBoolean("{{hasAnalysisError}}");
+    dataCollectionSectionForm['vars']['hasAnalysisError'] = stringToBoolean("{{hasAnalysisError}}");
 
     dataCollectionSectionForm['funcs']['initQueueButtons']();
 
-    dataCollectionSectionForm['funcs']['init']();
-});
-
-$(window).on('load', function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
@@ -568,13 +713,13 @@ $(window).on('load', function() {
             'componentId'               : componentId,
             'sectionId'                 : sectionId,
             'modalId'                   : 'queue-settings-modal',
-            'modalBodyInclude'          : 'modules/settings',
+            'modalBodyInclude'          : 'modules/queue/settings',
             'modalSize'                 : 'xl',
             'modalHeader'               : true,
             'modalFooter'               : true,
             'modalHeaderCloseButton'    : true,
             'modalEscClose'             : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-cogs"></i> QUEUE SETTINGS',
+            'modalTitle'                : '<i class="fa fas fa-fw fa-cogs"></i> SETTINGS',
             'modalFooterButtons'        :
                 [
                 'component'                     : component,
@@ -605,7 +750,7 @@ $(window).on('load', function() {
             'componentId'               : componentId,
             'sectionId'                 : sectionId,
             'modalId'                   : 'queue-logs-modal',
-            'modalBodyInclude'          : 'modules/logs',
+            'modalBodyInclude'          : 'modules/queue/logs',
             'modalSize'                 : 'xl',
             'modalHeader'               : true,
             'modalFooter'               : true,

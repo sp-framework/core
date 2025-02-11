@@ -155,6 +155,9 @@ class ApiClientServices extends BasePackage
             $api['location'] = ucfirst($api['location']);
             $api['category'] = ucfirst($api['category']);
             $api['provider'] = ucfirst($api['provider']);
+            if ($api['provider'] === 'Github' || $api['provider'] === 'Gitea') {
+                $api['location'] = 'Basepackages';
+            }
 
             if ($api['location'] === 'Basepackages') {
                 $modelClass = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Model\\ApiClientServices\\Apis\\' . $api['category'] . '\\';
@@ -179,6 +182,9 @@ class ApiClientServices extends BasePackage
         $data['location'] = strtolower($data['location']);
         $data['category'] = strtolower($data['category']);
         $data['provider'] = strtolower($data['provider']);
+        if ($data['provider'] === 'github' || $data['provider'] === 'gitea') {
+            $data['location'] = 'basepackages';
+        }
 
         $data = $this->encryptPassToken($data);
 
@@ -209,6 +215,9 @@ class ApiClientServices extends BasePackage
         $data['location'] = strtolower($data['location']);
         $data['category'] = strtolower($data['category']);
         $data['provider'] = strtolower($data['provider']);
+        if ($data['provider'] === 'github' || $data['provider'] === 'gitea') {
+            $data['location'] = 'basepackages';
+        }
 
         $data = $this->encryptPassToken($data);
 
