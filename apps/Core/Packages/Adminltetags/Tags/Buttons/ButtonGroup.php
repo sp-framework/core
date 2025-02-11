@@ -140,7 +140,7 @@ class ButtonGroup
                 }
 
                 if (isset($this->params['groupRadioButtonChecked'])) {
-                    if ($this->params['groupRadioButtonChecked'] === $button['dataValue']) {
+                    if ($this->params['groupRadioButtonChecked'] === $button['value']) {
                         $hasButtonChecked = 'checked';
                         $hasButtonCheckedClasses = 'active focus';
                         if ($this->params['groupRadioButtonStyle'] === 'outline') {
