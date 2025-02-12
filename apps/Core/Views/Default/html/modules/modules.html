@@ -1011,8 +1011,15 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
                     }
                 }
             } else {
-                if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
-                    (BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type], moduleInfo.id) > -1)
+                if ((dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
+                     Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type]).length > 0 &&
+                     BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type], moduleInfo.id) > -1) ||
+                    (dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type] &&
+                     Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type]).length > 0 &&
+                     BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type], moduleInfo.id) > -1) ||
+                    (dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type] &&
+                     Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type]).length > 0 &&
+                     BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type], moduleInfo.id) > -1)
                 ) {
                     if (moduleData['module_type'] !== 'externals') {
                         dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);

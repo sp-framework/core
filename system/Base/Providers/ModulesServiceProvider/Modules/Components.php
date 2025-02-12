@@ -355,9 +355,7 @@ class Components extends BasePackage
 				}
 
 				if (isset($component['dependencies']['packages']) && count($component['dependencies']['packages']) > 0) {
-
 					foreach ($component['dependencies']['packages'] as $key => $dependencyPackage) {
-
 						$package = $this->modules->packages->getPackageByNameForRepo($dependencyPackage['name'], $dependencyPackage['repo']);
 
 						if ($package) {
@@ -368,6 +366,22 @@ class Components extends BasePackage
 							$package['apps'] = $this->helper->encode($package['apps']);
 
 							$this->modules->packages->update($package);
+						}
+					}
+				}
+
+				if (isset($component['dependencies']['views']) && count($component['dependencies']['views']) > 0) {
+					foreach ($component['dependencies']['views'] as $key => $dependencyView) {
+						$view = $this->modules->views->getViewByRepo($dependencyView['repo']);
+
+						if ($view) {
+							$view['apps'] = $this->helper->decode($view['apps'], true);
+
+							$view['apps'][$data['id']]['enabled'] = true;
+
+							$view['apps'] = $this->helper->encode($view['apps']);
+
+							$this->modules->views->update($view);
 						}
 					}
 				}

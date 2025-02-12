@@ -276,27 +276,68 @@ class Installer extends BasePackage
         $taskName = $args[0];
         $module = $args[1];
 
+        if ($taskName === 'uninstall' || $taskName === 'remove') {
+            $sync = false;
+        } else {
+            $sync = true;
+        }
+
         $this->modulesToInstallOrUpdate = $this->modules->manager->getModuleInfo(
             [
                 'module_type'   => $module['module_type'],
                 'module_id'     => $module['id'],
-                'sync'          => true
+                'sync'          => $sync
             ]
         );
 
         if ($this->modulesToInstallOrUpdate) {
             $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'pass';
 
-            if (is_string($this->modulesToInstallOrUpdate['repo_details'])) {
-                try {
-                    $this->modulesToInstallOrUpdate['repo_details'] = $this->helper->decode($this->modulesToInstallOrUpdate['repo_details'], true);
+            if ($sync) {
+                if (is_string($this->modulesToInstallOrUpdate['repo_details'])) {
+                    try {
+                        $this->modulesToInstallOrUpdate['repo_details'] = $this->helper->decode($this->modulesToInstallOrUpdate['repo_details'], true);
 
+                        return true;
+                    } catch (\Exception $e) {
+                        //Do Nothings
+                    }
+                } else {
                     return true;
-                } catch (\Exception $e) {
-                    //Do Nothings
                 }
             } else {
-                return true;
+                $appBinding = false;
+
+                if ($this->modulesToInstallOrUpdate['apps'] &&
+                    is_string($this->modulesToInstallOrUpdate['apps'])
+                ) {
+                    try {
+                        $this->modulesToInstallOrUpdate['apps'] = $this->helper->decode($this->modulesToInstallOrUpdate['apps'], true);
+
+                        if (count($this->modulesToInstallOrUpdate['apps']) > 0) {
+                            foreach ($this->modulesToInstallOrUpdate['apps'] as $appId => $appSettings) {
+                                if (array_key_exists('enabled', $appSettings) && $appSettings['enabled'] == true) {
+                                    $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
+
+                                    $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
+
+                                    return $this->queueHasErrors(
+                                        'Module is assigned to app with ID: ' . $appId . '. Cannot ' . $taskName . '!',
+                                        $preCheckQueueLogs,
+                                        true
+                                    );
+                                }
+                            }
+                        }
+
+                        return true;
+                    } catch (\Exception $e) {
+                        //Do Nothings
+                    }
+                } else {
+                    return true;
+                }
+
             }
         }
 
@@ -1259,6 +1300,8 @@ class Installer extends BasePackage
             if (str_contains($module['module_type'], 'apptype')) {
                 $this->apps->types->update($moduleArr);
             } else {
+                $moduleArr['dependencies'] = $moduleArr['repo_details']['latestRelease']['moduleJson']['dependencies'];
+
                 $this->modules->{$module['module_type']}->update($moduleArr);
             }
 
@@ -1469,6 +1512,54 @@ class Installer extends BasePackage
                             ]
                         );
                     }
+                }
+            }
+        }
+
+        foreach ($this->queue['tasks']['analysed'] as $taskName => $modulesTypes) {
+            if ($taskName === 'uninstall' &&
+                count($modulesTypes) > 0
+            ) {
+                foreach ($modulesTypes as $moduleType => $modules) {
+                    if ((is_array($modules) && count($modules) === 0) ||
+                        !is_array($modules)
+                    ) {
+                        continue;
+                    }
+
+                    foreach ($modules as $module) {
+                        array_push($this->runPrecheckProgressMethods,
+                            [
+                                'method'    => 'precheckQueueData-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                'text'      => 'Perform precheck for module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
+                                'args'      => [$taskName, $module],
+                            ]
+                        );
+                    }
+                }
+            }
+        }
+
+        foreach ($this->queue['tasks']['analysed'] as $taskName => $modulesTypes) {
+            if ($taskName === 'remove' &&
+                count($modulesTypes) > 0
+            ) {
+                foreach ($modulesTypes as $moduleType => $modules) {
+                    if ((is_array($modules) && count($modules) === 0) ||
+                        !is_array($modules)
+                    ) {
+                        continue;
+                    }
+
+                    // foreach ($modules as $module) {
+                    //     array_push($this->runPrecheckProgressMethods,
+                    //         [
+                    //             'method'    => 'precheckQueueData-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                    //             'text'      => 'Perform precheck for module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
+                    //             'args'      => [$taskName, $module],
+                    //         ]
+                    //     );
+                    // }
                 }
             }
         }
