@@ -228,12 +228,19 @@ class Manager extends BasePackage
 
                 if ($latestRelease) {
                     $module['repo_details']['latestRelease'] = $latestRelease;
-                    $module['update_available'] = '1';
-                    $module['update_version'] = $module['repo_details']['latestRelease']['name'];
                     $latestReleaseJson = $this->getRemoteModuleJson($module['module_type'], $module, true);
 
                     if ($latestReleaseJson) {
                         $module['repo_details']['latestRelease']['moduleJson'] = $this->remoteModulesJson[$module['module_type']][$module['name']];
+                        if ($module['module_type'] === 'bundles') {
+                            $module['update_available'] = null;
+                            $module['update_version'] = null;
+                            $module['installed'] = null;
+                            $module['version'] = $module['repo_details']['latestRelease']['name'];
+                        } else {
+                            $module['update_available'] = '1';
+                            $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                        }
                     }
                 }
 

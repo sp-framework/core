@@ -420,50 +420,7 @@ class Queues extends BasePackage
                             $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
                         } else {
                             if (isset($module['bundle_modules'])) {
-                                if (is_string($module['bundle_modules'])) {
-                                    $module['bundle_modules'] = $this->helper->decode($module['bundle_modules'], true);
-                                }
-
-                                if (count($module['bundle_modules']) > 0) {
-                                    foreach ($module['bundle_modules'] as $bundleType => $bundles) {
-                                        if (count($bundles) === 0) {
-                                            continue;
-                                        }
-
-                                        if ($bundleType === 'apptype') {
-                                            $bundleModule = $this->apps->types->getAppTypeByRepo($bundles['repo']);
-
-                                            if ($bundleModule) {
-                                                $this->compareAndAddToQueue($bundles, $bundleModule, $taskName, $bundleType);
-                                            } else {
-                                                $this->addToQueueTasksAndResults($taskName, $bundleType, $bundles, null, 'fail', $this->getApiClientServices($bundles, true));
-                                            }
-                                        } else if ($bundleType === 'core') {
-                                            $bundleModule = $this->modules->packages->getPackageByRepo($bundles['repo']);
-
-                                            $this->compareAndAddToQueue($bundles, $bundleModule, 'first', 'packages');
-                                        } else {
-                                            if ($bundleType === 'external') {
-                                                $this->checkComposerAndAddToQueue($bundles, $module);
-
-                                                continue;
-                                            }
-
-                                            foreach ($bundles as $bundleKey => $bundle) {
-                                                $bundleModuleMethod = 'get' . ucfirst(substr($bundleType, 0, -1)) . 'ByRepo';
-                                                $bundleModuleType = $bundleType;
-
-                                                $bundleModule = $this->modules->{$bundleModuleType}->$bundleModuleMethod($bundle['repo']);
-
-                                                if ($bundleModule) {
-                                                    $this->compareAndAddToQueue($bundle, $bundleModule, $taskName, $bundleType);
-                                                } else {
-                                                    $this->addToQueueTasksAndResults($taskName, $bundleType, $bundle, null, 'fail', $this->getApiClientServices($bundle, true));
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                $this->processBundleModules($taskName, $module);
                             }
                         }
                     } else {
@@ -585,6 +542,62 @@ class Queues extends BasePackage
         return false;
     }
 
+    protected function processBundleModules($taskName, $module)
+    {
+        if (is_string($module['bundle_modules'])) {
+            $module['bundle_modules'] = $this->helper->decode($module['bundle_modules'], true);
+        }
+
+        if (count($module['bundle_modules']) > 0) {
+            foreach ($module['bundle_modules'] as $bundleType => $bundles) {
+                if (count($bundles) === 0) {
+                    continue;
+                }
+
+                if ($bundleType === 'apptype') {
+                    $bundleModule = $this->apps->types->getAppTypeByRepo($bundles['repo']);
+
+                    if ($bundleModule) {
+                        $this->compareAndAddToQueue($bundles, $bundleModule, $taskName, $bundleType);
+                    } else {
+                        $this->addToQueueTasksAndResults($taskName, $bundleType, $bundles, null, 'fail', $this->getApiClientServices($bundles, true));
+                    }
+                } else if ($bundleType === 'core') {
+                    $bundleModule = $this->modules->packages->getPackageByRepo($bundles['repo']);
+
+                    $this->compareAndAddToQueue($bundles, $bundleModule, 'first', 'packages');
+                } else if ($bundleType === 'bundles') {
+                    foreach ($bundles as $bundle) {
+                        $bundleModule = $this->modules->bundles->getBundleByRepo($bundle['repo']);
+
+                        if (isset($bundleModule['bundle_modules'])) {
+                            $this->processBundleModules($taskName, $bundleModule);
+                        }
+                    }
+                } else {
+                    if ($bundleType === 'external') {
+                        $this->checkComposerAndAddToQueue($bundles, $module);
+
+                        continue;
+                    }
+
+                    foreach ($bundles as $bundleKey => $bundle) {
+                        $bundleModuleMethod = 'get' . ucfirst(substr($bundleType, 0, -1)) . 'ByRepo';
+                        $bundleModuleType = $bundleType;
+
+                        $bundleModule = $this->modules->{$bundleModuleType}->$bundleModuleMethod($bundle['repo']);
+
+                        if ($bundleModule) {
+                            $this->compareAndAddToQueue($bundle, $bundleModule, $taskName, $bundleType);
+                        } else {
+                            $this->addToQueueTasksAndResults($taskName, $bundleType, $bundle, null, 'fail', $this->getApiClientServices($bundle, true));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     protected function getApiClientServices($module, $getLogMessage = false)
     {
         $appTypeRepo = explode('/', str_replace('https://', '', $module['repo']));
@@ -665,7 +678,9 @@ class Queues extends BasePackage
                 $this->addToQueueTasksAndResults($task, $moduleType, $installedModule, null, 'fail', $analyseLogs);
             }
         } else {
-            if ($installedModule['installed'] != '1') {
+            if (isset($installedModule['installed']) &&
+                $installedModule['installed'] != '1'
+            ) {
                 $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
 
                 if ($moduleType === 'views' &&

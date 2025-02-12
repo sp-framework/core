@@ -680,22 +680,29 @@ class DevtoolsModules extends BasePackage
                 'components'                => [],
                 'packages'                  => [],
                 'middlewares'               => [],
-                'views'                     => [],
-                'external'                  => [
-                    'composer'              => [
-                        'require'           => []
-                    ],
-                    'config'                => [
-                        'allow-plugins'     => []
-                    ],
-                    'extra'                 => [
-                        'patches'           => []
-                    ]
-                ]
+                'views'                     => []
             ];
 
-        if ($type && $type === 'views') {
-            unset($defaultDependencies['external']);
+        if ($type && $type !== 'views') {
+            if ($type === 'bundles') {
+                $defaultDependencies['bundles'] = [];
+            }
+
+            $defaultDependencies['external'] =
+                [
+                    'composer'              =>
+                    [
+                        'require'           => []
+                    ],
+                    'config'                =>
+                    [
+                        'allow-plugins'     => []
+                    ],
+                    'extra'                 =>
+                    [
+                        'patches'           => []
+                    ]
+                ];
         }
 
         return $this->helper->encode($defaultDependencies);

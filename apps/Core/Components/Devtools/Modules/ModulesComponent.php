@@ -28,6 +28,8 @@ class ModulesComponent extends BaseComponent
 	 */
 	public function viewAction()
 	{
+		$this->view->bundles = false;
+		$this->view->bundlesjson = false;
 		if (isset($this->getData()['bundles'])) {
 			$this->view->bundles = true;
 
@@ -112,7 +114,9 @@ class ModulesComponent extends BaseComponent
 		$modulesJson = [];
 
 		foreach ($modules as $moduleKey => $moduleJson) {
-			if ($moduleKey === 'bundles') {
+			if ($moduleKey === 'bundles' &&
+				!$this->view->bundles
+			) {
 				continue;
 			}
 
@@ -149,6 +153,11 @@ class ModulesComponent extends BaseComponent
 
 			if ($type !== 'apptypes') {
 				if ($type !== 'core' && $type !== 'bundles') {
+					if (isset($modules['bundles'])) {
+						unset($modules['bundles']);
+					}
+					$this->view->modules = $modules;
+
 					$this->view->categoryArr = ${$type . 'CategoryArr'};
 
 					if ($type === 'components') {
@@ -388,7 +397,7 @@ class ModulesComponent extends BaseComponent
 			$this->view->apis = $apis;
 			unset($appTypes['core']);//Remove core
 			$this->view->appTypes = $appTypes;
-			$this->view->bundleModules = $this->modulesPackage->getDefaultDependencies();
+			$this->view->bundleModules = $this->modulesPackage->getDefaultDependencies('bundles');
 
 			if ($this->getData()['id'] != 0) {
 				$bundle = $this->modules->bundles->getById($this->getData()['id']);
@@ -402,10 +411,18 @@ class ModulesComponent extends BaseComponent
 				}
 				$this->view->bundle = $bundle;
 				$this->view->bundleModules = $bundle['bundle_modules'];
-			}
 
-			if (isset($modules['bundles'])) {
-				unset($modules['bundles']);
+				if (isset($modules['bundles']['childs'])) {
+					foreach ($modules['bundles']['childs'] as $childBundleKey => $childBundle) {
+						if ($bundle['id'] === $childBundle['id']) {
+							unset($modules['bundles']['childs'][$childBundleKey]);
+						}
+					}
+
+					if (count($modules['bundles']['childs']) === 0) {
+						unset($modules['bundles']);
+					}
+				}
 			}
 
 			$this->view->modules = $modules;
