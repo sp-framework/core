@@ -1201,7 +1201,9 @@ class Installer extends BasePackage
         $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
         $resultQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['result_logs'];
 
-        if ($taskName === 'update') {
+        if ($taskName === 'update' ||
+            $module['name'] === 'Core'
+        ) {
             $versionArr = explode(' -> ', $module['version']);
 
             if (count($versionArr) !== 2) {
@@ -1240,7 +1242,9 @@ class Installer extends BasePackage
                 );
             }
 
-            if ($taskName === 'update') {
+            if ($taskName === 'update' ||
+                $module['name'] === 'Core'
+            ) {
                 $moduleArr['version'] = $moduleArr['update_version'];
             }
 
