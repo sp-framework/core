@@ -72,17 +72,28 @@ class Menus extends BasePackage
         return $menus;
     }
 
-    public function getMenusForAppType($appType)
+    public function getMenusForAppType($appType, $buildMenu = true)
     {
         $menus = [];
 
         foreach($this->menus as $menu) {
             if ($menu['app_type'] === $appType) {
+                if (is_string($menu['menu'])) {
+                    $menu['menu'] = $this->helper->decode($menu['menu'], true);
+                }
+                if (is_string($menu['apps'])) {
+                    $menu['apps'] = $this->helper->decode($menu['apps'], true);
+                }
+
                 $menus[$menu['id']] = $menu;
             }
         }
 
-        return $this->buildMenus($menus);
+        if ($buildMenu) {
+            return $this->buildMenus($menus);
+        }
+
+        return $menus;
     }
 
     public function getMenusByRouteForAppType($route, $appType)

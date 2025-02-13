@@ -124,8 +124,8 @@
                 </td>
                 {% if moduleType === 'component' %}
                     <td>
-                        {% if module['menu_id'] %}
-                            {% if modulesMenus[module['menu_id']]['apps'][app['id']]['enabled'] is defined and modulesMenus[module['menu_id']]['apps'][app['id']]['enabled'] === true %}
+                        {% if module['menu_id'] and module['menu'] != 'false' %}
+                            {% if modulesMenus[module['menu_id']]['apps'][app['id']]['enabled'] is defined and modulesMenus[module['menu_id']]['apps'][app['id']]['enabled'] == true %}
                                 {% set menuChecked = true %}
                             {% else %}
                                 {% set menuChecked = false %}
