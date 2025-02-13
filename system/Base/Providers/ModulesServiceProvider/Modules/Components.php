@@ -139,6 +139,17 @@ class Components extends BasePackage
 		return false;
 	}
 
+	public function getComponentByClass($class)
+	{
+		foreach($this->components as $component) {
+			if ($component['class'] === $class) {
+				return $component;
+			}
+		}
+
+		return false;
+	}
+
 	public function getComponentByClassForAppId($class, $appId = null)
 	{
 		if (!$appId) {

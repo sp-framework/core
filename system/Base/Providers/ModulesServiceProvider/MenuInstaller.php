@@ -28,11 +28,23 @@ class MenuInstaller extends BasePackage
                 if ($menu) {
                     $this->basepackages->menus->updateMenu($menu['id'], $installComponentJsonFile);
                 } else {
-                    $this->basepackages->menus->addMenu($installComponentJsonFile);
+                    $menu = $this->basepackages->menus->addMenu($installComponentJsonFile);
+                }
+
+                //Assign MenuId
+                $componentClassArr = array_slice(explode('\\', get_class($componentClass)), 1, -2);
+                $componentClass = 'Apps\\' . implode('\\', $componentClassArr) . '\\' . $this->helper->last($componentClassArr) . 'Component';
+
+                $component = $this->modules->components->getComponentByClass($componentClass);
+
+                if ($component) {
+                    $component['menu'] = $installComponentJsonFile['menu'];
+                    $component['menu_id'] = $menu['id'];
+
+                    $this->modules->components->update($component);
                 }
             }
         } catch (FilesystemException | UnableToCheckExistence | UnableToReadFile | \throwable $e) {
-            trace([$e]);
             throw $e;
         }
 
