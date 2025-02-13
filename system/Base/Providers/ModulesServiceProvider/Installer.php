@@ -1297,6 +1297,7 @@ class Installer extends BasePackage
             if ($this->access->auth->account() && isset($this->access->auth->account()['id'])) {
                 $moduleArr['updated_by'] = $this->access->auth->account()['id'];
             }
+
             if (str_contains($module['module_type'], 'apptype')) {
                 $this->apps->types->update($moduleArr);
             } else {

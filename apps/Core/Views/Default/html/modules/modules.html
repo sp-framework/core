@@ -1005,9 +1005,9 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
                     }
                 } else {
                     if (moduleData['module_type'] !== 'externals') {
-                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'remove', 'repo-sync']);
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'uninstall', 'remove', 'repo-sync']);
                     } else {
-                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'remove'], false);
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'uninstall', 'remove'], false);
                     }
                 }
             } else {
