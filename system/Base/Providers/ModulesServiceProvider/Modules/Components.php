@@ -247,12 +247,17 @@ class Components extends BasePackage
 		return $components;
 	}
 
-	public function getComponentsForAppType($appType)
+	public function getComponentsForAppType($appType, $checkInstalled = false)
 	{
 		$components = [];
 
 		foreach($this->components as $component) {
 			if ($component['app_type'] === $appType) {
+				if ($checkInstalled &&
+					$component['installed'] != '1'
+				) {
+					continue;
+				}
 				$components[$component['id']] = $component;
 			}
 		}

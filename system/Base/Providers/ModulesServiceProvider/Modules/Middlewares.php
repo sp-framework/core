@@ -180,12 +180,18 @@ class Middlewares extends BasePackage
 		return $middlewares;
 	}
 
-	public function getMiddlewaresForAppType($appType, $appId = null)
+	public function getMiddlewaresForAppType($appType, $appId = null, $checkInstalled = false)
 	{
 		$middlewares = [];
 
 		foreach($this->middlewares as $middleware) {
 			if ($middleware['app_type'] == $appType) {
+				if ($checkInstalled &&
+					$middleware['installed'] != '1'
+				) {
+					continue;
+				}
+
 				$middlewares[$middleware['id']] = $middleware;
 
 				if ($appId) {

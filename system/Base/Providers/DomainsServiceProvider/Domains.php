@@ -281,7 +281,7 @@ class Domains extends BasePackage
 		foreach ($appsArr as $key => $value) {
 			$apps[$value['id']] = $value;
 			$apps[$value['id']]['views'] =
-				$this->modules->views->getViewsForAppId($value['id']);
+				$this->modules->views->getViewsForAppId($value['id'], false);
 		}
 
 		$this->packagesData->apps = $apps;
