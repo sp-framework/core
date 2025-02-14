@@ -191,6 +191,20 @@ abstract class BaseComponent extends Controller
 	{
 		$this->checkSettingsRoute();
 
+		if ($this->app) {
+			$appType = $this->apps->types->getAppTypeByType($this->app['app_type']);
+
+			if (!$appType ||
+				($appType && !$appType['installed'])
+			) {
+				if (!$this->dispatcher->wasForwarded()) {
+					$this->setErrorDispatcher('routeNotFound', ['error' => true]);
+
+					return false;
+				}
+			}
+		}
+
 		if (!$this->component && $this->app) {
 			$this->setErrorDispatcher('controllerNotFound', ['error' => true]);
 
