@@ -94,6 +94,13 @@
                         ]
                     %}
                 {% endif %}
+                {% if module['menu_id'] is defined %}
+                    {% if modulesMenus[module['menu_id']]['apps'][app['id']] is defined and modulesMenus[module['menu_id']]['apps'][app['id']] == true %}
+                        {% set checked = true %}
+                    {% else %}
+                        {% set checked = false %}
+                    {% endif %}
+                {% endif %}
                 {% if module['name'] in mandatoryModules %}
                     {% set disabled = true %}
                     {% set checked = true %}
@@ -163,7 +170,11 @@
                     <td>
                         {% if module['apps'][app['id']]['needAuth'] is defined and module['apps'][app['id']]['needAuth'] !== 'disabled' %}
                             {% if module['apps'][app['id']]['needAuth'] is defined and module['apps'][app['id']]['needAuth'] === true %}
-                                {% set needAuthChecked = true %}
+                                {% if module['apps'][app['id']]['enabled'] is defined and module['apps'][app['id']]['enabled'] === true %}
+                                    {% set needAuthChecked = true %}
+                                {% else %}
+                                    {% set needAuthChecked = false %}
+                                {% endif %}
                             {% else %}
                                 {% set needAuthChecked = false %}
                             {% endif %}
@@ -173,7 +184,9 @@
                                 {% set needAuthDisabled = true %}
                             {% endif %}
                             {% if module['apps'][app['id']]['needAuth'] is defined and module['apps'][app['id']]['needAuth'] === 'mandatory' %}
-                                {% set needAuthChecked = true %}
+                                {% if module['apps'][app['id']]['enabled'] is defined and module['apps'][app['id']]['enabled'] === true %}
+                                    {% set needAuthChecked = true %}
+                                {% endif %}
                                 {% set needAuthDisabled = true %}
                             {% endif %}
 
