@@ -1053,9 +1053,7 @@ abstract class BaseComponent extends Controller
 		if ($this->app) {
 			$component = $this->modules->components->getComponentById($this->app['errors_component']);
 
-			if (isset($this->app['errors_component']) &&
-				$this->app['errors_component'] != 0
-			) {
+			if ($component && $component['installed'] != 0) {
 				$errorClassArr = explode('\\', $component['class']);
 				unset($errorClassArr[$this->helper->lastKey($errorClassArr)]);
 				$errorComponent = ucfirst($component['route']);
