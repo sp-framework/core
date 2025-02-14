@@ -116,6 +116,11 @@ class AppsComponent extends BaseComponent
 
                 //Components
                 $componentsArr = $this->modules->components->getComponentsForAppType($app['app_type'], true);
+
+                if (count($componentsArr) === 0) {
+                    $this->view->menuBaseStructure = $this->view->modulesMenus = [];
+                }
+
                 foreach ($componentsArr as $key => &$componentValue) {
                     if ($componentValue['apps']) {
                         if (is_string($componentValue['apps'])) {
