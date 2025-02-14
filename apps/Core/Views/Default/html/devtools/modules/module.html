@@ -1972,7 +1972,7 @@ dataCollectionSection =
                         if (dataCollectionSectionForm['vars']['moduleWidgets'].length > 0) {
                             $(dataCollectionSectionForm['vars']['moduleWidgets']).each(function(index, widget) {
                                 if (widget['method'] === $('#{{componentId}}-{{sectionId}}-widget-method').val()) {
-                                    dataCollectionSectionForm['vars']['moduleWidgets'].splice(index);
+                                    dataCollectionSectionForm['vars']['moduleWidgets'].splice(index, 1);
                                 }
                             });
 
@@ -3179,13 +3179,14 @@ dataCollectionSection =
                                 });
 
                                 if (found) {
-                                    if (modules === 'views') {
+                                    if (modules === 'views' && dataCollectionSectionForm['vars']['module_type'] === 'views') {
                                         $('#{{componentId}}-{{sectionId}}-base_view_module_id').val('0');
 
                                         $('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked = true;
                                         $('#{{componentId}}-{{sectionId}}-base_view_module').attr('disabled', false);
                                     }
-                                    dataCollectionSectionForm['vars']['moduleDependencies'][modules].splice(foundIndex);
+
+                                    dataCollectionSectionForm['vars']['moduleDependencies'][modules].splice(foundIndex, 1);
                                 }
                             }
                         }
