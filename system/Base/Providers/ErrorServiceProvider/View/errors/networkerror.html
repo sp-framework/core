@@ -1,0 +1,28 @@
+{% set sectionId = '0' %}
+<div id="{{componentId}}-{{sectionId}}" hidden>
+    <div class="row">
+        <div class="col">
+            <div class="jumbotron text-center bg-danger">
+                <h1>
+                    <span class="text-white"><i class="fas fa-fw fa-network-wired"></i> Network Error!</span>
+                </h1>
+                <p class="lead">Either your internet is down or your connection to our server is broken..</p>
+                <a href="" class="contentAjaxLink btn btn-primary btn-lg">
+                    <span class="text-uppercase">Try Again</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h2>What happened?</h2>
+            <p class="lead">A network error status implies IP communication between your computer and our server is broken, thus we cannot fulfil this request.</p>
+        </div>
+        <div class="col">
+            <h2>What can I do?</h2>
+            <p class="lead">Refresh page. If the problem persists and you need immediate assistance, please
+                <a href="mailto:dev@bazaari.com.au?Subject=Network%20Error" class="font-weight-bold">contact</a> the administrator.
+            </p>
+        </div>
+    </div>
+</div>

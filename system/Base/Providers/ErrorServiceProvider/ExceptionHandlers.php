@@ -17,7 +17,7 @@ class ExceptionHandlers extends BaseComponent
 			return $this->sendJson();
 		}
 
-		return $this->setViewsDir('permissionDenied');
+		return $this->setViewsDir('permissiondenied');
 	}
 
 	public function handleAppNotAllowedException($exception)
@@ -29,7 +29,7 @@ class ExceptionHandlers extends BaseComponent
 			return $this->sendJson();
 		}
 
-		return $this->setViewsDir('notFound');
+		return $this->setViewsDir('notfound');
 	}
 
 	public function handleControllerNotFoundException($exception)
@@ -41,7 +41,7 @@ class ExceptionHandlers extends BaseComponent
 			return $this->sendJson();
 		}
 
-		return $this->setViewsDir('notFound');
+		return $this->setViewsDir('notfound');
 	}
 
 	public function handleIdNotFoundException($exception)
@@ -53,7 +53,7 @@ class ExceptionHandlers extends BaseComponent
 			return $this->sendJson();
 		}
 
-		return $this->setViewsDir('notFound');
+		return $this->setViewsDir('notfound');
 	}
 
 	public function handleValidationException($exception)

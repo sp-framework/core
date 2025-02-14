@@ -1,0 +1,28 @@
+{% set sectionId = '504' %}
+<div id="{{componentId}}-{{sectionId}}" hidden>
+    <div class="row">
+        <div class="col">
+            <div class="jumbotron text-center bg-danger">
+                <h1>
+                    <span class="text-white"><i class="fas fa-fw fa-clock"></i> Gateway Timeout! (Error:504)</span>
+                </h1>
+                <p class="lead">The web server is returning an unexpected networking error.</p>
+                <a href="" class="contentAjaxLink btn btn-primary btn-lg">
+                    <span class="text-uppercase">Try Again</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h2>What happened?</h2>
+            <p class="lead">A 504 error status implies there is a slow IP communication problem between back-end servers attempting to fulfill this request.</p>
+        </div>
+        <div class="col">
+            <h2>What can I do?</h2>
+            <p class="lead">Refresh page. If the problem persists and you need immediate assistance, please
+                <a href="mailto:dev@bazaari.com.au?Subject=Gateway%20Timeout%20Error" class="font-weight-bold">contact</a> the administrator.
+            </p>
+        </div>
+    </div>
+</div>

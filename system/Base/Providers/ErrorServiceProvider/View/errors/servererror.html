@@ -1,0 +1,27 @@
+{% set sectionId = '500' %}
+<div id="{{componentId}}-{{sectionId}}">
+    <div class="row">
+        <div class="col">
+            <div class="jumbotron text-center bg-danger">
+                <h1>
+                    <span class="text-white"><i class="fas fa-fw fa-fire"></i> Server Error! (Error:500)</span>
+                </h1>
+                <p class="lead">The web server is returning an internal error for.</p>
+                <a href="#" class="btn btn-primary btn-lg text-center contentAjaxLink">
+                    <span class="text-uppercase">Try Again</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h2>What happened?</h2>
+            <p class="lead">A 500 error status implies there is a problem with the web server's software causing it to malfunction.</p>
+        </div>
+        <div class="col">
+            <h2>What can I do?</h2>
+            <p class="lead">Nothing you can do at the moment. If you need immediate assistance, please
+                <a href="mailto:dev@bazaari.com.au?Subject=Internal%20Server%20Error">contact</a> us.</p>
+        </div>
+    </div>
+</div>

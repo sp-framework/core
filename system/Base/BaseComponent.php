@@ -85,9 +85,13 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	protected function setComponent()
+	protected function setComponent($componentClass = null)
 	{
-		$this->reflection = new \ReflectionClass($this);
+		if (!$componentClass) {
+			$componentClass = get_class($this);
+		}
+
+		$this->reflection = new \ReflectionClass($componentClass);
 
 		$this->componentName =
 			str_replace('Component', '', $this->reflection->getShortName());
@@ -188,11 +192,29 @@ abstract class BaseComponent extends Controller
 		$this->checkSettingsRoute();
 
 		if (!$this->component && $this->app) {
-			$this->setErrorDispatcher('controllerNotFound');
+			$this->setErrorDispatcher('controllerNotFound', ['error' => true]);
 
 			return false;
 		} else if (!$this->component) {
 			throw new ControllerNotFoundException('Component Not Found!');
+		}
+
+		if (!$this->dispatcher->wasForwarded()) {
+			$this->checkComponentDependencies();
+		} else {
+			if (!isset($this->dispatcher->getParams()['error'])) {
+				if ($this->component['class'] !== $this->dispatcher->getHandlerClass()) {
+					$reflection = new \ReflectionClass($this->dispatcher->getHandlerClass());
+
+					$component = $this->modules->components->getComponentByClassForAppId(
+							$reflection->getName(), $this->app['id']
+						);
+
+					if ($component) {
+						$this->checkComponentDependencies($component);
+					}
+				}
+			}
 		}
 
 		if (!$this->isJson()) {
@@ -242,6 +264,58 @@ abstract class BaseComponent extends Controller
 				}
 			} else if ($permissions === 'sysAdmin') {
 				$this->setViewPermissions();
+			}
+		}
+	}
+
+	protected function checkComponentDependencies($component = null)
+	{
+		if (!$component) {
+			$component = $this->component;
+		}
+
+		if (isset($component['dependencies']['packages']) && count($component['dependencies']['packages']) > 0) {
+			foreach ($component['dependencies']['packages'] as $package) {
+				$packageModule = $this->modules->packages->getPackageByNameForRepo($package['name'], $package['repo']);
+
+				if (is_string($packageModule['apps'])) {
+					$packageModule['apps'] = $this->helper->decode($packageModule['apps'], true);
+				}
+
+				if (!$packageModule ||
+					($packageModule &&
+					 ($packageModule['installed'] == false || $packageModule['apps'][$this->app['id']]['enabled'] == false)
+					)
+				) {
+					$this->setErrorDispatcher('controllerDependencyError', ['error' => true]);
+
+					return false;
+				}
+			}
+		}
+
+		//Check if subview Dependencies for the component is installed and enabled
+		if (isset($component['dependencies']['views']) && count($component['dependencies']['views']) > 0) {
+			foreach ($component['dependencies']['views'] as $view) {
+				$viewModule = $this->modules->views->getViewByAppTypeAndRepoAndName($component['app_type'], $view['repo'], $view['name']);
+
+				if (is_string($viewModule['apps'])) {
+					$viewModule['apps'] = $this->helper->decode($viewModule['apps'], true);
+				}
+
+				if (!$viewModule['is_subview']) {
+					continue;
+				}
+
+				if (!$viewModule ||
+					($viewModule &&
+					 ($viewModule['installed'] == false || $viewModule['apps'][$this->app['id']]['enabled'] == false)
+					)
+				) {
+					$this->setErrorDispatcher('controllerDependencyError', ['error' => true]);
+
+					return false;
+				}
 			}
 		}
 	}
@@ -960,7 +1034,7 @@ abstract class BaseComponent extends Controller
 		throw new IdNotFoundException('ID Not Found!');
 	}
 
-	protected function setErrorDispatcher($action)
+	protected function setErrorDispatcher($action, $params = [])
 	{
 		if ($this->app) {
 			$component = $this->modules->components->getComponentById($this->app['errors_component']);
@@ -982,7 +1056,8 @@ abstract class BaseComponent extends Controller
 				[
 					'controller' => $errorComponent,
 					'action'     => $action,
-					'namespace'  => $namespace
+					'namespace'  => $namespace,
+					'params'	 => $params
 				]
 			);
 		}
