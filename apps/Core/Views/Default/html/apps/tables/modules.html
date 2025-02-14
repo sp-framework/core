@@ -94,13 +94,6 @@
                         ]
                     %}
                 {% endif %}
-                {% if module['menu_id'] is defined %}
-                    {% if modulesMenus[module['menu_id']]['apps'][app['id']] is defined and modulesMenus[module['menu_id']]['apps'][app['id']] == true %}
-                        {% set checked = true %}
-                    {% else %}
-                        {% set checked = false %}
-                    {% endif %}
-                {% endif %}
                 {% if module['name'] in mandatoryModules %}
                     {% set disabled = true %}
                     {% set checked = true %}
