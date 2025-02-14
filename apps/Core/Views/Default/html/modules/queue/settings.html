@@ -61,6 +61,10 @@
 {% if queue['settings']['files']['deleteDestinationFiles'] == true %}
     {% set settingsFilesDeleteDestinationFilesChecked = true %}
 {% endif %}
+{% set settingsInstallerForceUninstallChecked = false %}
+{% if queue['settings']['installer']['forceUninstall'] == true %}
+    {% set settingsInstallerForceUninstallChecked = true %}
+{% endif %}
 <div class="row">
     <div class="col">
         <div id="{{componentId}}-{{sectionId}}-queue-settings">
@@ -486,72 +490,125 @@
             <hr>
             <div class="row">
                 <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                             : component,
-                            'componentName'                         : componentName,
-                            'componentId'                           : componentId,
-                            'sectionId'                             : sectionId,
-                            'fieldId'                               : 'files_settings',
-                            'fieldLabel'                            : 'FILES SETTINGS',
-                            'fieldLabelLegend'                      : true,
-                            'fieldHidden'                           : false,
-                            'fieldType'                             : 'html',
-                            'fieldBazScan'                          : false,
-                            'fieldBazPostOnCreate'                  : false,
-                            'fieldBazPostOnUpdate'                  : false,
-                            'fieldBazJstreeSearch'                  : true,
-                            'fieldHtmlContent'                      : ''
-                        ]
-                    )}}
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                             : component,
+                                    'componentName'                         : componentName,
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : sectionId,
+                                    'fieldId'                               : 'files_settings',
+                                    'fieldLabel'                            : 'FILES SETTINGS',
+                                    'fieldLabelLegend'                      : true,
+                                    'fieldHidden'                           : false,
+                                    'fieldType'                             : 'html',
+                                    'fieldBazScan'                          : false,
+                                    'fieldBazPostOnCreate'                  : false,
+                                    'fieldBazPostOnUpdate'                  : false,
+                                    'fieldBazJstreeSearch'                  : true,
+                                    'fieldHtmlContent'                      : ''
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'delete_source_files',
+                                    'fieldLabel'                     : false,
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'Delete downloaded source files? Files are only deleted on successful installation/upgrade.',
+                                    'fieldRequired'                  : false,
+                                    'fieldType'                      : 'checkbox',
+                                    'fieldCheckboxType'              : 'success',
+                                    'fieldCheckboxChecked'           : settingsFilesDeleteSourceFilesChecked,
+                                    'fieldCheckboxLabel'             : 'DELETE SOURCE FILES?',
+                                    'fieldBazJstreeSearch'           : true,
+                                    'fieldBazPostOnCreate'           : false,
+                                    'fieldBazPostOnUpdate'           : false,
+                                    'fieldBazScan'                   : true
+                                ]
+                            )}}
+                        </div>
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'delete_destination_files',
+                                    'fieldLabel'                     : false,
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'RSync delete destination files? Disable if you have any custom code installed, else RSync will delete the files that are not found in the source.',
+                                    'fieldRequired'                  : false,
+                                    'fieldType'                      : 'checkbox',
+                                    'fieldCheckboxType'              : 'danger',
+                                    'fieldCheckboxChecked'           : settingsFilesDeleteDestinationFilesChecked,
+                                    'fieldCheckboxLabel'             : 'RSYNC DELETE DESTINATION FILES?',
+                                    'fieldBazJstreeSearch'           : true,
+                                    'fieldBazPostOnCreate'           : false,
+                                    'fieldBazPostOnUpdate'           : false,
+                                    'fieldBazScan'                   : true
+                                ]
+                            )}}
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'delete_source_files',
-                            'fieldLabel'                     : false,
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'Delete downloaded source files? Files are only deleted on successful installation/upgrade.',
-                            'fieldRequired'                  : false,
-                            'fieldType'                      : 'checkbox',
-                            'fieldCheckboxType'              : 'success',
-                            'fieldCheckboxChecked'           : settingsFilesDeleteSourceFilesChecked,
-                            'fieldCheckboxLabel'             : 'DELETE SOURCE FILES?',
-                            'fieldBazJstreeSearch'           : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldBazScan'                   : true
-                        ]
-                    )}}
-                </div>
-                <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'delete_destination_files',
-                            'fieldLabel'                     : false,
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'RSync delete destination files? Disable if you have any custom code installed, else RSync will delete the files that are not found in the source.',
-                            'fieldRequired'                  : false,
-                            'fieldType'                      : 'checkbox',
-                            'fieldCheckboxType'              : 'danger',
-                            'fieldCheckboxChecked'           : settingsFilesDeleteDestinationFilesChecked,
-                            'fieldCheckboxLabel'             : 'RSYNC DELETE DESTINATION FILES?',
-                            'fieldBazJstreeSearch'           : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldBazScan'                   : true
-                        ]
-                    )}}
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                             : component,
+                                    'componentName'                         : componentName,
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : sectionId,
+                                    'fieldId'                               : 'installer',
+                                    'fieldLabel'                            : 'INSTALLER SETTINGS',
+                                    'fieldLabelLegend'                      : true,
+                                    'fieldHidden'                           : false,
+                                    'fieldType'                             : 'html',
+                                    'fieldBazScan'                          : false,
+                                    'fieldBazPostOnCreate'                  : false,
+                                    'fieldBazPostOnUpdate'                  : false,
+                                    'fieldBazJstreeSearch'                  : true,
+                                    'fieldHtmlContent'                      : ''
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'force_uninstall',
+                                    'fieldLabel'                     : false,
+                                    'fieldHelp'                      : true,
+                                    'fieldHelpTooltipContent'        : 'Force the installer to uninstall even when the module is assigned to an app.',
+                                    'fieldRequired'                  : false,
+                                    'fieldType'                      : 'checkbox',
+                                    'fieldCheckboxType'              : 'warning',
+                                    'fieldCheckboxChecked'           : settingsInstallerForceUninstallChecked,
+                                    'fieldCheckboxLabel'             : 'FORCE UNINSTALL?',
+                                    'fieldBazJstreeSearch'           : true,
+                                    'fieldBazPostOnCreate'           : false,
+                                    'fieldBazPostOnUpdate'           : false,
+                                    'fieldBazScan'                   : true
+                                ]
+                            )}}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

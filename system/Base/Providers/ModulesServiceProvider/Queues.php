@@ -89,6 +89,10 @@ class Queues extends BasePackage
                             'deleteSourceFiles'         => false,
                             'deleteDestinationFiles'    => false
                         ],
+                    'installer'                         =>
+                        [
+                            'forceUninstall'            => false
+                        ],
                     'emailReport'                       => $this->access->auth->account()['email']
                 ]
             )
@@ -271,6 +275,18 @@ class Queues extends BasePackage
         }
 
         array_walk($data['settings']['files'], function(&$setting, $index) {
+            if ($setting !== '') {
+                if ($setting == 'true') {
+                    $setting = true;
+                } else {
+                    $setting = false;
+                }
+            } else {
+                $setting = false;
+            }
+        });
+
+        array_walk($data['settings']['installer'], function(&$setting, $index) {
             if ($setting !== '') {
                 if ($setting == 'true') {
                     $setting = true;

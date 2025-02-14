@@ -303,6 +303,8 @@ dataCollectionSectionForm['funcs']['saveSettings'] = function() {
     postData['settings']['files'] = { };
     postData['settings']['files']['deleteSourceFiles'] = $('#{{componentId}}-{{sectionId}}-delete_source_files')[0].checked;
     postData['settings']['files']['deleteDestinationFiles'] = $('#{{componentId}}-{{sectionId}}-delete_destination_files')[0].checked;
+    postData['settings']['installer'] = { };
+    postData['settings']['installer']['forceUninstall'] = $('#{{componentId}}-{{sectionId}}-force_uninstall')[0].checked;
 
     $.post('{{links.url("modules/saveQueueSettings")}}', postData, function(response) {
         if (response.tokenKey && response.token) {
@@ -666,6 +668,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-email_report'                            : { },
         '{{componentId}}-{{sectionId}}-delete_source_files'                     : { },
         '{{componentId}}-{{sectionId}}-delete_destination_files'                : { },
+        '{{componentId}}-{{sectionId}}-force_uninstall'                         : { },
         '{{componentId}}-{{sectionId}}-form'                                    : $.extend(dataCollectionSectionForm, {
             rules: {
             },

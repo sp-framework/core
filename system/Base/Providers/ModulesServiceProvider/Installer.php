@@ -138,6 +138,8 @@ class Installer extends BasePackage
             $this->basepackages->progress->preCheckComplete();
 
             $this->queue['results'] = arrayReplace($this->queue['results'], 'precheck_progress_logs', []);
+            $this->queue['results'] = arrayReplace($this->queue['results'], 'precheck_logs', '-');
+            $this->queue['results'] = arrayReplace($this->queue['results'], 'result_logs', '-');
             $this->modules->queues->update($this->queue);
 
             foreach ($this->runPrecheckProgressMethods as $method) {
@@ -306,6 +308,10 @@ class Installer extends BasePackage
                     return true;
                 }
             } else {
+                if ($this->queue['settings']['installer']['forceUninstall']) {
+                    return true;
+                }
+
                 $appBinding = false;
 
                 if ($this->modulesToInstallOrUpdate['apps'] &&
@@ -322,7 +328,7 @@ class Installer extends BasePackage
                                     $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
 
                                     return $this->queueHasErrors(
-                                        'Module is assigned to app with ID: ' . $appId . '. Cannot ' . $taskName . '!',
+                                        'Module is assigned to app with ID: ' . $appId . '. Either remove it via app or use force uninstall in the queue settings.',
                                         $preCheckQueueLogs,
                                         true
                                     );
@@ -337,7 +343,6 @@ class Installer extends BasePackage
                 } else {
                     return true;
                 }
-
             }
         }
 
