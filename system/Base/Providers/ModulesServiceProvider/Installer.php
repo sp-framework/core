@@ -310,40 +310,83 @@ class Installer extends BasePackage
                 }
             } else {
                 if ($this->queue['settings']['installer']['forceUninstall']) {
+                    $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'] = 'Precheck ignored due to force uninstall.';
+
                     return true;
                 }
 
-                $appBinding = false;
+                //AppType
+                if (strtolower($this->modulesToInstallOrUpdate['app_type']) === strtolower($this->modulesToInstallOrUpdate['name'])) {
+                    $components = $this->modules->components->getComponentsForAppType(strtolower($this->modulesToInstallOrUpdate['app_type']), true);
 
-                if ($this->modulesToInstallOrUpdate['apps'] &&
-                    is_string($this->modulesToInstallOrUpdate['apps'])
-                ) {
-                    try {
-                        $this->modulesToInstallOrUpdate['apps'] = $this->helper->decode($this->modulesToInstallOrUpdate['apps'], true);
+                    if ($components && count($components) > 0) {
+                        foreach ($components as $component) {
+                            $this->modulesToInstallOrUpdate = $component;
 
-                        if (count($this->modulesToInstallOrUpdate['apps']) > 0) {
-                            foreach ($this->modulesToInstallOrUpdate['apps'] as $appId => $appSettings) {
-                                if (array_key_exists('enabled', $appSettings) && $appSettings['enabled'] == true) {
-                                    $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
+                            if (isset($this->modulesToInstallOrUpdate['apps'])) {
+                                $checkBinding = $this->preCheckModuleAppsBinding($taskName, $module);
 
-                                    $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
-
-                                    return $this->queueHasErrors(
-                                        'Module is assigned to app with ID: ' . $appId . '. Either remove it via app or use force uninstall in the queue settings.',
-                                        $preCheckQueueLogs,
-                                        true
-                                    );
+                                if ($checkBinding !== true) {
+                                    return $checkBinding;
                                 }
                             }
                         }
+                    }
 
-                        return true;
-                    } catch (\Exception $e) {
-                        //Do Nothings
+                    $packages = $this->modules->packages->getPackagesForAppType(strtolower($this->modulesToInstallOrUpdate['app_type']), true);
+
+                    if ($packages && count($packages) > 0) {
+                        foreach ($packages as $package) {
+                            $this->modulesToInstallOrUpdate = $package;
+
+                            if (isset($this->modulesToInstallOrUpdate['apps'])) {
+                                $checkBinding = $this->preCheckModuleAppsBinding($taskName, $module);
+
+                                if ($checkBinding !== true) {
+                                    return $checkBinding;
+                                }
+                            }
+                        }
+                    }
+
+                    $middlewares = $this->modules->middlewares->getMiddlewaresForAppType(strtolower($this->modulesToInstallOrUpdate['app_type']), null, true);
+
+                    if ($middlewares && count($middlewares) > 0) {
+                        foreach ($middlewares as $middleware) {
+                            $this->modulesToInstallOrUpdate = $middleware;
+
+                            if (isset($this->modulesToInstallOrUpdate['apps'])) {
+                                $checkBinding = $this->preCheckModuleAppsBinding($taskName, $module);
+
+                                if ($checkBinding !== true) {
+                                    return $checkBinding;
+                                }
+                            }
+                        }
+                    }
+
+                    $views = $this->modules->views->getViewsForAppType(strtolower($this->modulesToInstallOrUpdate['app_type']), true, true);
+
+                    if ($views && count($views) > 0) {
+                        foreach ($views as $view) {
+                            $this->modulesToInstallOrUpdate = $view;
+
+                            if (isset($this->modulesToInstallOrUpdate['apps'])) {
+                                $checkBinding = $this->preCheckModuleAppsBinding($taskName, $module);
+
+                                if ($checkBinding !== true) {
+                                    return $checkBinding;
+                                }
+                            }
+                        }
                     }
                 } else {
-                    return true;
+                    if (isset($this->modulesToInstallOrUpdate['apps'])) {
+                        return $this->preCheckModuleAppsBinding($taskName, $module);
+                    }
                 }
+
+                return true;
             }
         }
 
@@ -376,6 +419,43 @@ class Installer extends BasePackage
         }
 
         return false;
+    }
+
+    protected function preCheckModuleAppsBinding($taskName, $module)
+    {
+        try {
+            if (is_string($this->modulesToInstallOrUpdate['apps'])) {
+                $this->modulesToInstallOrUpdate['apps'] = $this->helper->decode($this->modulesToInstallOrUpdate['apps'], true);
+            }
+
+            if (count($this->modulesToInstallOrUpdate['apps']) > 0) {
+                foreach ($this->modulesToInstallOrUpdate['apps'] as $appId => $appSettings) {
+                    if (array_key_exists('enabled', $appSettings) && $appSettings['enabled'] == true) {
+                        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
+
+                        $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
+
+                        return $this->queueHasErrors(
+                            'Module ' . $this->modulesToInstallOrUpdate['name'] . ' (' . $this->modulesToInstallOrUpdate['module_type'] . ') is assigned to app with ID: ' . $appId . '. Either remove it via app or use force uninstall in the queue settings.',
+                            $preCheckQueueLogs,
+                            true
+                        );
+                    }
+                }
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
+
+            $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
+
+            return $this->queueHasErrors(
+                $e->getMessage(),
+                $preCheckQueueLogs,
+                true
+            );
+        }
     }
 
     protected function processExternalPackages($args)
@@ -1754,21 +1834,108 @@ class Installer extends BasePackage
                     }
 
                     foreach ($modules as $module) {
-                        array_push($this->runProcessProgressMethods,
-                            [
-                                'method'    => 'uninstallModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                'text'      => 'Uninstalling module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                                'args'      => [$taskName, $module],
-                            ]
-                        );
-                        if ($module['module_type'] !== 'views' &&
-                            $module['module_type'] !== 'apptype'
-                        ) {
-                            array_push($methods,
+                        if ($module['module_type'] !== 'apptype') {
+                            array_push($this->runProcessProgressMethods,
                                 [
-                                    'method'    => 'runModuleInstallScripts-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                    'text'      => 'Running module install scripts for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                                    'args'      => [$taskName, $module, true],
+                                    'method'    => 'uninstallModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Uninstalling module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                    'args'      => [$taskName, $module],
+                                ]
+                            );
+
+                            if ($module['module_type'] !== 'views') {
+                                array_push($this->runProcessProgressMethods,
+                                    [
+                                        'method'    => 'runModuleInstallScripts-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                        'text'      => 'Running module install scripts for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                        'args'      => [$taskName, $module, true],
+                                    ]
+                                );
+                            }
+                        } else {
+                            $components = $this->modules->components->getComponentsForAppType(strtolower($module['app_type']), true);
+
+                            if ($components && count($components) > 0) {
+                                foreach ($components as $component) {
+                                    array_push($this->runProcessProgressMethods,
+                                        [
+                                            'method'    => 'uninstallModule-' . $component['id'] . '-' . strtolower(str_replace(' ', '', $component['name'])),
+                                            'text'      => 'Uninstalling module ' . $component['name'] . ' (' . ucfirst($component['module_type']) . ')...',
+                                            'args'      => [$taskName, $component],
+                                        ]
+                                    );
+                                    array_push($this->runProcessProgressMethods,
+                                        [
+                                            'method'    => 'runModuleInstallScripts-' . $component['id'] . '-' . strtolower(str_replace(' ', '', $component['name'])),
+                                            'text'      => 'Running module install scripts for ' . $component['name'] . ' (' . ucfirst($component['module_type']) . ')...',
+                                            'args'      => [$taskName, $component, true],
+                                        ]
+                                    );
+                                }
+                            }
+
+                            $packages = $this->modules->packages->getPackagesForAppType(strtolower($module['app_type']), true);
+
+                            if ($packages && count($packages) > 0) {
+                                foreach ($packages as $package) {
+                                    array_push($this->runProcessProgressMethods,
+                                        [
+                                            'method'    => 'uninstallModule-' . $package['id'] . '-' . strtolower(str_replace(' ', '', $package['name'])),
+                                            'text'      => 'Uninstalling module ' . $package['name'] . ' (' . ucfirst($package['module_type']) . ')...',
+                                            'args'      => [$taskName, $package],
+                                        ]
+                                    );
+                                    array_push($this->runProcessProgressMethods,
+                                        [
+                                            'method'    => 'runModuleInstallScripts-' . $package['id'] . '-' . strtolower(str_replace(' ', '', $package['name'])),
+                                            'text'      => 'Running module install scripts for ' . $package['name'] . ' (' . ucfirst($package['module_type']) . ')...',
+                                            'args'      => [$taskName, $package, true],
+                                        ]
+                                    );
+                                }
+                            }
+
+                            $middlewares = $this->modules->middlewares->getMiddlewaresForAppType(strtolower($module['app_type']), null, true);
+
+                            if ($middlewares && count($middlewares) > 0) {
+                                foreach ($middlewares as $middleware) {
+                                    array_push($this->runProcessProgressMethods,
+                                        [
+                                            'method'    => 'uninstallModule-' . $middleware['id'] . '-' . strtolower(str_replace(' ', '', $middleware['name'])),
+                                            'text'      => 'Uninstalling module ' . $middleware['name'] . ' (' . ucfirst($middleware['module_type']) . ')...',
+                                            'args'      => [$taskName, $middleware],
+                                        ]
+                                    );
+                                    array_push($this->runProcessProgressMethods,
+                                        [
+                                            'method'    => 'runModuleInstallScripts-' . $middleware['id'] . '-' . strtolower(str_replace(' ', '', $middleware['name'])),
+                                            'text'      => 'Running module install scripts for ' . $middleware['name'] . ' (' . ucfirst($middleware['module_type']) . ')...',
+                                            'args'      => [$taskName, $middleware, true],
+                                        ]
+                                    );
+                                }
+                            }
+
+                            $views = $this->modules->views->getViewsForAppType(strtolower($module['app_type']), true, true);
+
+                            if ($views && count($views) > 0) {
+                                foreach ($views as $view) {
+                                    array_push($this->runProcessProgressMethods,
+                                        [
+                                            'method'    => 'uninstallModule-' . $view['id'] . '-' . strtolower(str_replace(' ', '', $view['name'])),
+                                            'text'      => 'Uninstalling module ' . $view['name'] . ' (' . ucfirst($view['module_type']) . ')...',
+                                            'args'      => [$taskName, $view],
+                                        ]
+                                    );
+                                }
+                            }
+
+                            //AppType
+                            array_push($this->runProcessProgressMethods,
+                                [
+                                    'method'    => 'uninstallModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Uninstalling module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                    'args'      => [$taskName, $module],
                                 ]
                             );
                         }

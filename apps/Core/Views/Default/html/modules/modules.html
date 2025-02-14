@@ -283,7 +283,7 @@
 {% set queue = str_replace('\\', '\\\\', queue) %}
 {% set modules = json_encode(modules, 16) %}
 <script>
-/*global BazProgress Swal BazContentFields BazHelpers BazContentLoader Pace BazCore paginatedPNotify */
+/*global BazProgress Swal dataCollection BazContentFields BazHelpers BazContentLoader Pace BazCore paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -1190,21 +1190,103 @@ dataCollectionSectionForm['funcs']['initModuleButtons'] = function() {
     $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').click(function(e) {
         e.preventDefault();
 
-        dataCollectionSectionForm['funcs']['updateQueue'](
-            dataCollectionSectionForm['vars']['module']['id'],
-            dataCollectionSectionForm['vars']['module']['module_type'],
-            'uninstall'
-        );
+        if (dataCollectionSectionForm['vars']['module']['module_type'] === 'apptype') {
+            Swal.fire({
+                title                       : '<span class="text-danger"> Uninstalling Apptype will uninstall all modules with this Apptype. Proceed?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Yes',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : true,
+                allowEscapeKey              : true,
+                didOpen                     : function() {
+                    dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    dataCollectionSectionForm['funcs']['updateQueue'](
+                        dataCollectionSectionForm['vars']['module']['id'],
+                        dataCollectionSectionForm['vars']['module']['module_type'],
+                        'uninstall'
+                    );
+                }
+            });
+        } else {
+            dataCollectionSectionForm['funcs']['updateQueue'](
+                dataCollectionSectionForm['vars']['module']['id'],
+                dataCollectionSectionForm['vars']['module']['module_type'],
+                'uninstall'
+            );
+        }
     });
 
     $('#{{componentId}}-{{sectionId}}-moduleinfo-remove').click(function(e) {
         e.preventDefault();
 
-        dataCollectionSectionForm['funcs']['updateQueue'](
-            dataCollectionSectionForm['vars']['module']['id'],
-            dataCollectionSectionForm['vars']['module']['module_type'],
-            'remove'
-        );
+        if (dataCollectionSectionForm['vars']['module']['module_type'] === 'apptype') {
+            Swal.fire({
+                title                       : '<span class="text-danger"> Removing Apptype will uninstall all modules with this Apptype and remove them from the system. Proceed?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Yes',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : true,
+                allowEscapeKey              : true,
+                didOpen                     : function() {
+                    dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    dataCollectionSectionForm['funcs']['updateQueue'](
+                        dataCollectionSectionForm['vars']['module']['id'],
+                        dataCollectionSectionForm['vars']['module']['module_type'],
+                        'remove'
+                    );
+                }
+            });
+        } else {
+            Swal.fire({
+                title                       : '<span class="text-danger"> Removing will uninstall the module and remove it from the system. Proceed?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Yes',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : true,
+                allowEscapeKey              : true,
+                didOpen                     : function() {
+                    dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    dataCollectionSectionForm['funcs']['updateQueue'](
+                        dataCollectionSectionForm['vars']['module']['id'],
+                        dataCollectionSectionForm['vars']['module']['module_type'],
+                        'remove'
+                    );
+                }
+            });
+        }
     });
 
     $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').click(function(e) {
