@@ -385,6 +385,7 @@ var BazProgress = function() {
         uploadedBytes = 0;
         isUpload = false;
         isDownload = false;
+        $('body').trigger({'type':'bazProgressComplete', 'reset' : true});
     }
 
     function onMessage(data) {
