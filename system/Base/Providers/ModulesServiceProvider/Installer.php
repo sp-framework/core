@@ -303,7 +303,15 @@ class Installer extends BasePackage
 
                         return true;
                     } catch (\Exception $e) {
-                        //Do Nothings
+                        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
+
+                        $preCheckQueueLogs = &$this->queue['results']['first']['packages'][$module['id']]['precheck_logs'];
+
+                        return $this->queueHasErrors(
+                            $e->getMessage(),
+                            $preCheckQueueLogs,
+                            false
+                        );
                     }
                 } else {
                     return true;
@@ -652,7 +660,7 @@ class Installer extends BasePackage
                 try {
                     $installedComposerPackages = $this->helper->decode($installedComposerPackages, true);
                 } catch (\throwable $e) {
-                    //Do nothing.
+                    return $this->queueHasErrors($e->getMessage(), $resultQueueLogs, false);
                 }
                 $externalPackageNameArr = explode('/', $module['name']);
 
@@ -2050,7 +2058,13 @@ class Installer extends BasePackage
                             }
                         }
                     } catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
-                        return true;
+                         $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+                        return $this->queueHasErrors(
+                            $e->getMessage(),
+                            $resultQueueLogs,
+                            false
+                        );
                     }
 
                     $classArr = explode('\\', $this->modulesToInstallOrUpdate['class']);

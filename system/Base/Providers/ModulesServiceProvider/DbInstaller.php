@@ -136,7 +136,16 @@ class DbInstaller extends BasePackage
         return true;
     }
 
-    public function truncate($databases)
+    public function truncate(array $databases)
+    {
+        $this->uninstallDb($databases);
+
+        $this->installDb($databases);
+
+        return true;
+    }
+
+    public function uninstallDb(array $databases)
     {
         if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'ff') {
             foreach ($databases as $tableName => $tableClass) {
@@ -158,8 +167,6 @@ class DbInstaller extends BasePackage
                 }
             }
         }
-
-        $this->installDb($databases);
 
         return true;
     }

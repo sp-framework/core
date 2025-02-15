@@ -50,4 +50,9 @@ class MenuInstaller extends BasePackage
 
         return true;
     }
+
+    public function uninstallMenu($menuId)
+    {
+        return $this->basepackages->menus->remove($menuId);
+    }
 }
