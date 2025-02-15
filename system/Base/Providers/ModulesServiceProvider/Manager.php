@@ -238,10 +238,19 @@ class Manager extends BasePackage
                             $module['installed'] = null;
                             $module['version'] = $module['repo_details']['latestRelease']['name'];
                         } else {
-                            $module['update_available'] = '1';
-                            $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                            if ($module['installed'] == '1') {
+                                $module['update_available'] = '1';
+                                $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                            } else {
+                                $module['version'] = $module['repo_details']['latestRelease']['name'];
+                                $module['update_available'] = '0';
+                                $module['update_version'] = null;
+                            }
                         }
                     }
+                } else {
+                    $module['update_available'] = '0';
+                    $module['update_version'] = null;
                 }
 
                 if (str_contains($module['module_type'], 'apptype')) {
@@ -273,8 +282,17 @@ class Manager extends BasePackage
 
                     if ($latestRelease) {
                         $module['repo_details']['latestRelease'] = $latestRelease;
-                        $module['update_available'] = '1';
-                        $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                        if ($module['installed'] == '1') {
+                            $module['update_available'] = '1';
+                            $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                        } else {
+                            $module['update_available'] = '0';
+                            $module['version'] = $module['repo_details']['latestRelease']['name'];
+                            $module['update_version'] = '-';
+                        }
+                    } else {
+                        $module['update_available'] = '0';
+                        $module['update_version'] = '-';
                     }
                 } else {
                     $module['repo_details'] = false;
@@ -938,6 +956,8 @@ class Manager extends BasePackage
 
                     if (isset($localModule['installed']) && $localModule['installed'] == '0') {
                         $localModule['version'] = $moduleNeedsUpgrade['name'];
+                        $localModule['update_available'] = '0';
+                        $localModule['update_version'] = null;
                     } else if (isset($localModule['installed']) && $localModule['installed'] == '1') {
                         $localModule['update_available'] = '1';
                         $localModule['update_version'] = $moduleNeedsUpgrade['name'];

@@ -1628,7 +1628,7 @@ class Installer extends BasePackage
         }
 
         foreach ($this->queue['tasks']['analysed'] as $taskName => $modulesTypes) {
-            if ($taskName === 'uninstall' &&
+            if (($taskName === 'uninstall' || $taskName === 'remove') &&
                 count($modulesTypes) > 0
             ) {
                 foreach ($modulesTypes as $moduleType => $modules) {
@@ -1647,30 +1647,6 @@ class Installer extends BasePackage
                             ]
                         );
                     }
-                }
-            }
-        }
-
-        foreach ($this->queue['tasks']['analysed'] as $taskName => $modulesTypes) {
-            if ($taskName === 'remove' &&
-                count($modulesTypes) > 0
-            ) {
-                foreach ($modulesTypes as $moduleType => $modules) {
-                    if ((is_array($modules) && count($modules) === 0) ||
-                        !is_array($modules)
-                    ) {
-                        continue;
-                    }
-
-                    // foreach ($modules as $module) {
-                    //     array_push($this->runPrecheckProgressMethods,
-                    //         [
-                    //             'method'    => 'precheckQueueData-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                    //             'text'      => 'Perform precheck for module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
-                    //             'args'      => [$taskName, $module],
-                    //         ]
-                    //     );
-                    // }
                 }
             }
         }
@@ -1825,7 +1801,9 @@ class Installer extends BasePackage
         }
 
         foreach ($this->queue['tasks']['analysed'] as $taskName => $modulesTypes) {
-            if ($taskName === 'uninstall' && count($modulesTypes) > 0) {
+            if (($taskName === 'uninstall' || $taskName === 'remove') &&
+                count($modulesTypes) > 0
+            ) {
                 foreach ($modulesTypes as $moduleType => $modules) {
                     if ((is_array($modules) && count($modules) === 0) ||
                         !is_array($modules)
@@ -1857,20 +1835,22 @@ class Installer extends BasePackage
 
                             if ($components && count($components) > 0) {
                                 foreach ($components as $component) {
-                                    array_push($this->runProcessProgressMethods,
-                                        [
-                                            'method'    => 'uninstallModule-' . $component['id'] . '-' . strtolower(str_replace(' ', '', $component['name'])),
-                                            'text'      => 'Uninstalling module ' . $component['name'] . ' (' . ucfirst($component['module_type']) . ')...',
-                                            'args'      => [$taskName, $component],
-                                        ]
-                                    );
-                                    array_push($this->runProcessProgressMethods,
-                                        [
-                                            'method'    => 'runModuleInstallScripts-' . $component['id'] . '-' . strtolower(str_replace(' ', '', $component['name'])),
-                                            'text'      => 'Running module install scripts for ' . $component['name'] . ' (' . ucfirst($component['module_type']) . ')...',
-                                            'args'      => [$taskName, $component, true],
-                                        ]
-                                    );
+                                    if ($component['installed'] == '1') {
+                                        array_push($this->runProcessProgressMethods,
+                                            [
+                                                'method'    => 'runModuleInstallScripts-' . $component['id'] . '-' . strtolower(str_replace(' ', '', $component['name'])),
+                                                'text'      => 'Running module uninstall scripts for ' . $component['name'] . ' (' . ucfirst($component['module_type']) . ')...',
+                                                'args'      => [$taskName, $component, true],
+                                            ]
+                                        );
+                                        array_push($this->runProcessProgressMethods,
+                                            [
+                                                'method'    => 'uninstallModule-' . $component['id'] . '-' . strtolower(str_replace(' ', '', $component['name'])),
+                                                'text'      => 'Uninstalling module ' . $component['name'] . ' (' . ucfirst($component['module_type']) . ')...',
+                                                'args'      => [$taskName, $component],
+                                            ]
+                                        );
+                                    }
                                 }
                             }
 
@@ -1878,20 +1858,22 @@ class Installer extends BasePackage
 
                             if ($packages && count($packages) > 0) {
                                 foreach ($packages as $package) {
-                                    array_push($this->runProcessProgressMethods,
-                                        [
-                                            'method'    => 'uninstallModule-' . $package['id'] . '-' . strtolower(str_replace(' ', '', $package['name'])),
-                                            'text'      => 'Uninstalling module ' . $package['name'] . ' (' . ucfirst($package['module_type']) . ')...',
-                                            'args'      => [$taskName, $package],
-                                        ]
-                                    );
-                                    array_push($this->runProcessProgressMethods,
-                                        [
-                                            'method'    => 'runModuleInstallScripts-' . $package['id'] . '-' . strtolower(str_replace(' ', '', $package['name'])),
-                                            'text'      => 'Running module install scripts for ' . $package['name'] . ' (' . ucfirst($package['module_type']) . ')...',
-                                            'args'      => [$taskName, $package, true],
-                                        ]
-                                    );
+                                    if ($package['installed'] == '1') {
+                                        array_push($this->runProcessProgressMethods,
+                                            [
+                                                'method'    => 'runModuleInstallScripts-' . $package['id'] . '-' . strtolower(str_replace(' ', '', $package['name'])),
+                                                'text'      => 'Running module uninstall scripts for ' . $package['name'] . ' (' . ucfirst($package['module_type']) . ')...',
+                                                'args'      => [$taskName, $package, true],
+                                            ]
+                                        );
+                                        array_push($this->runProcessProgressMethods,
+                                            [
+                                                'method'    => 'uninstallModule-' . $package['id'] . '-' . strtolower(str_replace(' ', '', $package['name'])),
+                                                'text'      => 'Uninstalling module ' . $package['name'] . ' (' . ucfirst($package['module_type']) . ')...',
+                                                'args'      => [$taskName, $package],
+                                            ]
+                                        );
+                                    }
                                 }
                             }
 
@@ -1899,20 +1881,22 @@ class Installer extends BasePackage
 
                             if ($middlewares && count($middlewares) > 0) {
                                 foreach ($middlewares as $middleware) {
-                                    array_push($this->runProcessProgressMethods,
-                                        [
-                                            'method'    => 'uninstallModule-' . $middleware['id'] . '-' . strtolower(str_replace(' ', '', $middleware['name'])),
-                                            'text'      => 'Uninstalling module ' . $middleware['name'] . ' (' . ucfirst($middleware['module_type']) . ')...',
-                                            'args'      => [$taskName, $middleware],
-                                        ]
-                                    );
-                                    array_push($this->runProcessProgressMethods,
-                                        [
-                                            'method'    => 'runModuleInstallScripts-' . $middleware['id'] . '-' . strtolower(str_replace(' ', '', $middleware['name'])),
-                                            'text'      => 'Running module install scripts for ' . $middleware['name'] . ' (' . ucfirst($middleware['module_type']) . ')...',
-                                            'args'      => [$taskName, $middleware, true],
-                                        ]
-                                    );
+                                    if ($middleware['installed'] == '1') {
+                                        array_push($this->runProcessProgressMethods,
+                                            [
+                                                'method'    => 'runModuleInstallScripts-' . $middleware['id'] . '-' . strtolower(str_replace(' ', '', $middleware['name'])),
+                                                'text'      => 'Running module uninstall scripts for ' . $middleware['name'] . ' (' . ucfirst($middleware['module_type']) . ')...',
+                                                'args'      => [$taskName, $middleware, true],
+                                            ]
+                                        );
+                                        array_push($this->runProcessProgressMethods,
+                                            [
+                                                'method'    => 'uninstallModule-' . $middleware['id'] . '-' . strtolower(str_replace(' ', '', $middleware['name'])),
+                                                'text'      => 'Uninstalling module ' . $middleware['name'] . ' (' . ucfirst($middleware['module_type']) . ')...',
+                                                'args'      => [$taskName, $middleware],
+                                            ]
+                                        );
+                                    }
                                 }
                             }
 
@@ -1920,13 +1904,15 @@ class Installer extends BasePackage
 
                             if ($views && count($views) > 0) {
                                 foreach ($views as $view) {
-                                    array_push($this->runProcessProgressMethods,
-                                        [
-                                            'method'    => 'uninstallModule-' . $view['id'] . '-' . strtolower(str_replace(' ', '', $view['name'])),
-                                            'text'      => 'Uninstalling module ' . $view['name'] . ' (' . ucfirst($view['module_type']) . ')...',
-                                            'args'      => [$taskName, $view],
-                                        ]
-                                    );
+                                    if($view['installed'] == '1') {
+                                        array_push($this->runProcessProgressMethods,
+                                            [
+                                                'method'    => 'uninstallModule-' . $view['id'] . '-' . strtolower(str_replace(' ', '', $view['name'])),
+                                                'text'      => 'Uninstalling module ' . $view['name'] . ' (' . ucfirst($view['module_type']) . ')...',
+                                                'args'      => [$taskName, $view],
+                                            ]
+                                        );
+                                    }
                                 }
                             }
 
@@ -1977,8 +1963,7 @@ class Installer extends BasePackage
         $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
         $resultQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['result_logs'];
 
-        if ($taskName === 'uninstall' && $module['name'] === 'Core'
-        ) {
+        if ($taskName === 'uninstall' && $module['name'] === 'Core') {
             return $this->queueHasErrors(
                 'Core cannot be uninstalled!',
                 $resultQueueLogs,
@@ -2024,7 +2009,66 @@ class Installer extends BasePackage
 
     protected function removeModule($args)
     {
-        //
+        $taskName = $args[0];
+        $module = $args[1];
+
+        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'pass';
+        $resultQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['result_logs'];
+
+        if ($module['name'] === 'Core') {
+            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+            return $this->queueHasErrors(
+                'Core cannot be removed!',
+                $resultQueueLogs,
+                false
+            );
+        } else {
+            try {
+                $this->modulesToInstallOrUpdate = $this->modules->manager->getModuleInfo(
+                    [
+                        'module_type'   => $module['module_type'],
+                        'module_id'     => $module['id']
+                    ]
+                );
+
+                if ($module['module_type'] !== 'views') {
+                    $classArr = explode('\\', $this->modulesToInstallOrUpdate['class']);
+
+                    $classArr = array_slice($classArr, 0, -1);
+
+                    $class = implode('\\', $classArr) . '\\Install\\Install';
+
+                    $path = lcfirst(str_replace('\\', '/', $class) . '.php');
+
+                    try {
+                        if ($this->localContent->fileExists($path)) {
+                            $class = new $class;
+
+                            if (method_exists($class, 'remove')) {
+                                $class->init()->remove();
+                            }
+                        }
+                    } catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
+                        return true;
+                    }
+
+                    $classArr = explode('\\', $this->modulesToInstallOrUpdate['class']);
+
+                    trace([$classArr]);
+                }
+            } catch (\throwable $e) {
+                $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+                return $this->queueHasErrors(
+                    $e->getMessage(),
+                    $resultQueueLogs,
+                    false
+                );
+            }
+        }
+
+        return true;
     }
 
     protected function initApi($data, $sink = null, $method = null)

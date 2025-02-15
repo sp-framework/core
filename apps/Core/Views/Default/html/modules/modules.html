@@ -909,6 +909,8 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
 
     if (moduleData['update_available'] !== '-' && moduleData['update_available'] == 1) {
         moduleData['update_available'] = '<span class="badge badge-info text-xs">Yes</span>';
+    } else {
+        moduleData['update_available'] = '<span class="badge badge-secondary text-xs">No</span>';
     }
     if (moduleData['update_version'] !== '-') {
         moduleData['update_version'] = '<span class="badge badge-info text-xs">' + moduleData['update_version'] + '</span>';
@@ -991,7 +993,20 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     }
 
     if (moduleData['module_type'] === 'bundles') {
-        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['install', 'uninstall', 'remove', 'repo-sync']);
+        if ((dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
+             Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type]).length > 0 &&
+             BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type], moduleInfo.id) > -1) ||
+            (dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type] &&
+             Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type]).length > 0 &&
+             BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type], moduleInfo.id) > -1) ||
+            (dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type] &&
+             Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type]).length > 0 &&
+             BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type], moduleInfo.id) > -1)
+        ) {
+            dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
+        } else {
+            dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['install', 'uninstall', 'remove', 'repo-sync']);
+        }
     } else {
         if (moduleInfo.installed == '1') {
             if (moduleInfo.update_available == '1') {

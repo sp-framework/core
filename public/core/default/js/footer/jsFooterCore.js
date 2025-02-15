@@ -12091,6 +12091,7 @@ var BazProgress = function() {
                             $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
                             switchProgressBarColor('.' + $(element)[0].id + '-remote-bar', 'info');
                             $('.progress-remote, .remote-progress-span').attr('hidden', true);
+                            $('body').trigger('bazProgressComplete');
                         }
                     } else {
                         resetProgressCounter();

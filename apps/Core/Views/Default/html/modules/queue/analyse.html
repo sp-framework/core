@@ -356,6 +356,16 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
             dataCollectionSectionForm['vars']['queue'] = response.responseData.queue;
         }
 
+        if (BazProgress.isOnline) {
+            $('#body').on('bazProgressComplete', function() {
+                processResponse(postData, response);
+            });
+        } else {
+            processResponse(postData, response);
+        }
+    }, 'json');
+
+    function processResponse(postData, response) {
         if (response.responseCode == 0) {
             var notifyText = response.responseMessage;
             var notifyType = 'success';
@@ -458,7 +468,7 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
                 $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', true);
             }
         }
-    }, 'json');
+    }
 }
 
 dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
