@@ -43,7 +43,9 @@ class Installer extends BasePackage
 
     protected $preCheckResult = [];
 
-    public $modulesToInstallOrUpdate;
+    protected $modulesToInstallOrUpdate;
+
+    protected $moduleToRemove;
 
     protected $runPrecheckProgressMethods;
 
@@ -2033,7 +2035,7 @@ class Installer extends BasePackage
             );
         } else {
             try {
-                $this->modulesToInstallOrUpdate = $this->modules->manager->getModuleInfo(
+                $this->moduleToRemove = $this->modules->manager->getModuleInfo(
                     [
                         'module_type'   => $module['module_type'],
                         'module_id'     => $module['id']
@@ -2041,7 +2043,7 @@ class Installer extends BasePackage
                 );
 
                 if ($module['module_type'] !== 'views') {
-                    $classArr = explode('\\', $this->modulesToInstallOrUpdate['class']);
+                    $classArr = explode('\\', $this->moduleToRemove['class']);
 
                     $classArr = array_slice($classArr, 0, -1);
 
@@ -2053,12 +2055,12 @@ class Installer extends BasePackage
                         if ($this->localContent->fileExists($path)) {
                             $class = new $class;
 
-                            if (method_exists($class, 'remove')) {
-                                $class->init()->remove();
+                            if (method_exists($class, 'uninstall')) {
+                                $class->init()->uninstall(true);
                             }
                         }
                     } catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
-                         $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+                        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
 
                         return $this->queueHasErrors(
                             $e->getMessage(),
@@ -2067,10 +2069,49 @@ class Installer extends BasePackage
                         );
                     }
 
-                    $classArr = explode('\\', $this->modulesToInstallOrUpdate['class']);
+                    $path = 'apps/' . implode('/', array_slice(explode('\\', $this->moduleToRemove['class']), 1, -1));
 
-                    trace([$classArr]);
+                    $files = $this->basepackages->utils->scanDir($path);
+
+                    if (count($files['files']) > 0) {
+                        try {
+                            foreach ($files['files'] as $file) {
+                                $this->localContent->delete($file);
+                            }
+                        } catch (FilesystemException | UnableToDeleteFile | \throwable $e) {
+                            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+                            return $this->queueHasErrors(
+                                $e->getMessage(),
+                                $resultQueueLogs,
+                                false
+                            );
+                        }
+                    }
+
+                    if (count($files['dirs']) > 0) {
+                        try {
+                            foreach ($files['dirs'] as $dir) {
+                                $this->localContent->deleteDirectory($dir);
+                                $this->localContent->deleteDirectory($path);
+                            }
+                        } catch (FilesystemException | UnableToDeleteFile | \throwable $e) {
+                            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+                            return $this->queueHasErrors(
+                                $e->getMessage(),
+                                $resultQueueLogs,
+                                false
+                            );
+                        }
+                    }
+                } else {
+                    //For Views
+                    //Remove Public Module and files
                 }
+
+                //Remove the module
+                $this->modules->$module['module_type']->remove($module['_id']);
             } catch (\throwable $e) {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
 

@@ -51,8 +51,16 @@ class MenuInstaller extends BasePackage
         return true;
     }
 
-    public function uninstallMenu($menuId)
+    public function uninstallMenu($componentClass)
     {
-        return $this->basepackages->menus->remove($menuId);
+        //Get MenuId
+        $componentClassArr = array_slice(explode('\\', get_class($componentClass)), 1, -2);
+        $componentClass = 'Apps\\' . implode('\\', $componentClassArr) . '\\' . $this->helper->last($componentClassArr) . 'Component';
+
+        $component = $this->modules->components->getComponentByClass($componentClass);
+
+        if ($component) {
+            return $this->basepackages->menus->remove($component['menu_id']);
+        }
     }
 }
