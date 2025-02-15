@@ -42,8 +42,8 @@ class Manager extends BasePackage
 
     public function saveModuleSettings($data)
     {
-        $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ById';
-        $module = $this->modules->{$data['module_type']}->$moduleMethod($data['module_id']);
+        // $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ById';
+        $module = $this->modules->{$data['module_type']}->getById($data['module_id']);
 
         if ($module) {
             if ($module['app_type'] === 'core' && strtolower($module['name']) !== 'core') {
@@ -83,8 +83,8 @@ class Manager extends BasePackage
                 $moduleId = explode('-', $data['module_id'])[0];
             }
 
-            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ById';
-            $module = $this->modules->{$data['module_type']}->$moduleMethod($moduleId);
+            // $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ById';
+            $module = $this->modules->{$data['module_type']}->getById($moduleId);
         }
 
         if (isset($module) && is_array($module)) {

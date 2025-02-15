@@ -1374,10 +1374,10 @@ class Installer extends BasePackage
 
         try {
             if (str_contains($module['module_type'], 'apptype')) {
-                $moduleArr = $this->apps->types->getAppTypeById($module['id']);
+                $moduleArr = $this->apps->types->getById($module['id']);
             } else {
-                $moduleMethod = 'get' . ucfirst(substr($module['module_type'], 0, -1)) . 'ById';
-                $moduleArr = $this->modules->{$module['module_type']}->$moduleMethod($module['id']);
+                // $moduleMethod = 'get' . ucfirst(substr($module['module_type'], 0, -1)) . 'ById';
+                $moduleArr = $this->modules->{$module['module_type']}->getById($module['id']);
             }
 
             if (!$moduleArr) {
@@ -1981,10 +1981,10 @@ class Installer extends BasePackage
 
         try {
             if (str_contains($module['module_type'], 'apptype')) {
-                $moduleArr = $this->apps->types->getAppTypeById($module['id']);
+                $moduleArr = $this->apps->types->getById($module['id']);
             } else {
-                $moduleMethod = 'get' . ucfirst(substr($module['module_type'], 0, -1)) . 'ById';
-                $moduleArr = $this->modules->{$module['module_type']}->$moduleMethod($module['id']);
+                // $moduleMethod = 'get' . ucfirst(substr($module['module_type'], 0, -1)) . 'ById';
+                $moduleArr = $this->modules->{$module['module_type']}->getById($module['id']);
             }
 
             if (!$moduleArr) {
