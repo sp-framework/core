@@ -335,6 +335,7 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
         $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
         $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', false);
     }
+    $('#{{componentId}}-{{sectionId}}-queue-settings').attr('disabled', false);
 
     $('tr').removeClass('bg-danger');
     BazProgress.switchProgressBarColor();
@@ -359,6 +360,7 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
         if (BazProgress.isOnline) {
             $('#body').on('bazProgressComplete', function() {
                 processResponse(postData, response);
+                $('#body').off('bazProgressComplete');
             });
         } else {
             processResponse(postData, response);
@@ -366,6 +368,7 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
     }, 'json');
 
     function processResponse(postData, response) {
+        $('#{{componentId}}-{{sectionId}}-queue-settings').attr('disabled', false);
         if (response.responseCode == 0) {
             var notifyText = response.responseMessage;
             var notifyType = 'success';
