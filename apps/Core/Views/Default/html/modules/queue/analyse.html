@@ -357,18 +357,12 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
             dataCollectionSectionForm['vars']['queue'] = response.responseData.queue;
         }
 
-        if (BazProgress.isOnline) {
-            $('#body').on('bazProgressComplete', function() {
-                processResponse(postData, response);
-                $('#body').off('bazProgressComplete');
-            });
-        } else {
-            processResponse(postData, response);
-        }
+        processResponse(postData, response);
     }, 'json');
 
     function processResponse(postData, response) {
         $('#{{componentId}}-{{sectionId}}-queue-settings').attr('disabled', false);
+
         if (response.responseCode == 0) {
             var notifyText = response.responseMessage;
             var notifyType = 'success';

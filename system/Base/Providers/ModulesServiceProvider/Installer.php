@@ -61,12 +61,6 @@ class Installer extends BasePackage
     {
         $this->queue = $this->modules->queues->getActiveQueue();
 
-        if (!$this->queue) {
-            $this->addResponse('Not able to obtain queue', 1);
-
-            return false;
-        }
-
         $this->process = $process;
 
         $this->zip = new \ZipArchive;
