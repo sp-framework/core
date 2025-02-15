@@ -401,6 +401,56 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
+	public function wspingAction()
+	{
+		$this->requestIsPost();
+
+		//Get Cookies information
+		$cookiesArr = [];
+		$cookies = [];
+
+		$cookiesArr = $this->request->getHeader('Cookie');
+		$cookiesArr = explode(';', $cookiesArr);
+
+		foreach ($cookiesArr as $cookie) {
+			$cookie = explode('=', $cookie);
+			$cookies[trim($cookie[0])] = trim($cookie[1]);
+		}
+
+		if (!isset($cookies['id'])) {
+			$this->addResponse('Account ID not set!', 1);
+
+			return false;
+		}
+
+		$account = $this->basepackages->accounts->getAccountById($cookies['id']);
+
+		if ($account && $account['tunnels']) {
+			$tunnels = $account['tunnels'];
+		} else {
+			$this->addResponse('Account Tunnels not set!', 1);
+
+			return false;
+		}
+
+		if ($tunnels['notifications_tunnel']) {
+			$this->wss->send(
+				[
+					'type'              => 'systemNotifications',
+					'to'                => $tunnels['notifications_tunnel'],
+					'response'          => [
+						'responseCode'      => 0,
+						'responseData'      => ['pong' => true]
+					]
+				]
+			);
+
+			$this->addResponse('Pong');
+
+			return true;
+		}
+	}
+
 	protected function checkPermissions()
 	{
 		if ($this->access->auth->account()) {

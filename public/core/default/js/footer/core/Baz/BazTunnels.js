@@ -15,7 +15,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 // eslint-disable-next-line no-unused-vars
 var BazTunnels = function() {
     var BazTunnels = void 0;
-    var dataCollection, timerId;
+    var dataCollection, timerId, wsPingPongTimerId;
     dataCollection = window.dataCollection;
     dataCollection.env.wsTunnels = { };
     if (dataCollection.env.httpScheme === 'http') {
@@ -151,6 +151,14 @@ var BazTunnels = function() {
                             BazProgress.init();
                         }
                     }
+
+                    wsPingPongTimerId = BazHelpers.getTimerId('wsPingPong');
+                    if (wsPingPongTimerId) {
+                        BazHelpers.setTimeoutTimers.stop(wsPingPongTimerId, null, 'wsPingPong');
+                    }
+                    BazHelpers.setTimeoutTimers.add(function() {
+                        sendPing();
+                    }, 240000, null, 'wsPingPong');
                 },
                 function() {
                     if (tunnelsToInit.includes('systemNotifications')) {
@@ -176,6 +184,34 @@ var BazTunnels = function() {
                     'skipSubprotocolCheck': true
                 }
             );
+    }
+
+    function sendPing() {
+        var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/home/wsping/';
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+        $.post(url, postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+
+            wsPingPongTimerId = BazHelpers.getTimerId('wsPingPong');
+            if (response.responseCode == 1) {
+                if (wsPingPongTimerId) {
+                    BazHelpers.setTimeoutTimers.stop(wsPingPongTimerId, null, 'wsPingPong');
+                }
+            } else {
+                if (wsPingPongTimerId) {
+                    BazHelpers.setTimeoutTimers.stop(wsPingPongTimerId, null, 'wsPingPong');
+                }
+                BazHelpers.setTimeoutTimers.add(function() {
+                    sendPing();
+                }, 240000, null, 'wsPingPong');
+            }
+        }, 'json');
     }
 
     function bazTunnelsConstructor() {
