@@ -159,6 +159,11 @@
                 <h6><i class="fa fa-fw fa-info-circle text-danger"></i> Error loading module information. Please contact administrator.</h6>
             </div>
         </div>
+        <div class="row m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-repo" hidden>
+            <div class="col">
+                {% include('modules/repo') %}
+            </div>
+        </div>
         <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-noinfo">
             <div class="col">
                 <h6><i class="fa fa-fw fa-info-circle text-info"></i> Select module from the tree to see it's details.</h6>
@@ -349,6 +354,29 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-queue_id'                    : { },
+        '{{componentId}}-{{sectionId}}-import_repo'                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-import').click(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true)[0] === 'undefined') {
+                        paginatedPNotify('notice', {
+                            text        : 'Please select repository from the tree!',
+                            textTrusted : true
+                        });
+
+                        return;
+                    }
+
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
+                    dataCollectionSectionForm['funcs']['initSync'](
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true)[0],
+                        $('#{{componentId}}-{{sectionId}}-import_repo').val().trim()
+                    );
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-form'                        : {
             rules: { },
             messages: { }
@@ -369,23 +397,21 @@ dataCollectionSectionForm['vars']['syncInfo'] = '';
 
 dataCollectionSectionForm['funcs'] = { };
 
-dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
+dataCollectionSectionForm['funcs']['jstreeReady'] = function(selectedRepo = null) {
     $('#{{componentId}}-{{sectionId}}-modules').off('ready.jstree');
     $('#{{componentId}}-{{sectionId}}-modules').on('ready.jstree', function(e) {
         dataCollectionSectionForm['vars']['rootTree'] = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {flat:true});
 
-        // var selected;
+        if (selectedRepo) {
+            $(dataCollectionSectionForm['vars']['rootTree']).each(function(i, v) {
+                v.text = v.text.toLowerCase();
+                if (v.data.apiid == selectedRepo.data.apiid && v.data.type === 'repo') {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().select_node(v.id);
 
-        // $(dataCollectionSectionForm['vars']['rootTree']).each(function(i, v) {
-        //     v.text = v.text.toLowerCase();
-        //     if (v.data.apiid == '1' && v.data.type === 'repo' && v.text.includes('core')) {
-        //         selected = v.id;
-
-        //         $('#{{componentId}}-{{sectionId}}-modules').jstree().select_node(v.id);
-
-        //         return false;
-        //     }
-        // });
+                    return false;
+                }
+            });
+        }
 
         dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](null, false, false, false, true);
     });
@@ -484,7 +510,7 @@ dataCollectionSectionForm['funcs']['initJstreeButtons'] = function() {
         if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-repo-sync') {
             dataCollectionSectionForm['funcs']['toggleJstreeTool']($(this)[0].id);
             dataCollectionSectionForm['funcs']['initSync'](
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true)[0].data.apiid
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true)[0]
             );
 
             return;
@@ -716,7 +742,7 @@ dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
                     'href', '{{links.url("system/api/client/services/q/id/' + selected[0].data.apiid + '")}}'
                 );
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync', 'primary', false);
-                dataCollectionSectionForm['funcs']['moduleinfo']();
+                dataCollectionSectionForm['funcs']['moduleinfo'](['repo']);
             }
         } else {
             if (selected[0].data.type !== 'repo') {
@@ -782,7 +808,7 @@ dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], s
     }
 
     if (show.length > 0) {
-        var moduleinfos = ['loader', 'info', 'noinfo', 'error', 'buttons'];
+        var moduleinfos = ['repo', 'loader', 'info', 'noinfo', 'error', 'buttons'];
         $(moduleinfos).each(function(e, moduleinfo) {
             if (show.includes(moduleinfo)) {
                 $('#{{componentId}}-{{sectionId}}-moduleinfo-' + moduleinfo).attr('hidden', false);
@@ -1489,7 +1515,7 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function() {
     $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
 }
 
-dataCollectionSectionForm['funcs']['initSync'] = function(val) {
+dataCollectionSectionForm['funcs']['initSync'] = function(selectedRepo, importRepo = null) {
     dataCollectionSectionForm['vars']['sync'] = true;
     $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
     $('#{{componentId}}-{{sectionId}}-analyse-queue').addClass('disabled');
@@ -1510,16 +1536,25 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
         $('#{{componentId}}-{{sectionId}}-modules-empty').remove();
     }
 
+    var syncText = 'Syncing modules...';
+
+    if (importRepo) {
+        syncText = 'Importing module...';
+    }
+
     $('#{{componentId}}-{{sectionId}}-modules').append(
         '<div id="{{componentId}}-{{sectionId}}-modules-empty" class="text-center">' +
-            '<i class="fa fa-cog fa-spin"></i> Syncing modules...' +
+            '<i class="fa fa-cog fa-spin"></i> ' + syncText +
         '</div>'
     );
 
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
-    postData['api_id'] = val;
+    postData['api_id'] = selectedRepo.data.apiid;
     postData['get_repository_modules'] = true;
+    if (importRepo) {
+        postData['import_repo'] = importRepo;
+    }
 
     $.post('{{links.url("modules/sync")}}', postData, function(response) {
         dataCollectionSectionForm['vars']['sync'] = false;
@@ -1532,7 +1567,7 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
             $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
 
             if (response.responseData) {
-                dataCollectionSectionForm['funcs']['processSync'](response);
+                dataCollectionSectionForm['funcs']['processSync'](response, selectedRepo);
             }
         } else {
             paginatedPNotify('error', {
@@ -1546,12 +1581,18 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
 
             $('#{{componentId}}-{{sectionId}}-modules').children('ul').show();
         }
+
         dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync', 'primary', false);
         $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
+
+        if (importRepo) {
+            $('#{{componentId}}-{{sectionId}}-import').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-import').children('i').attr('hidden', true);
+        }
     }, 'json');
 }
 
-dataCollectionSectionForm['funcs']['processSync'] = function(response) {
+dataCollectionSectionForm['funcs']['processSync'] = function(response, selectedRepo) {
     var paginateText;
     var newCounter = 0;
     var newCounterText = '';
@@ -1642,6 +1683,7 @@ dataCollectionSectionForm['funcs']['processSync'] = function(response) {
         //     text += noReleaseCounter + noRelease + '<br>';
         // }
     } else {
+        paginateText = 'Sync Complete.<br>';
         paginateText += 'No ' + newModule + ' or ' + update + ' available.';
 
         paginatedPNotify('info', {
@@ -1675,8 +1717,7 @@ dataCollectionSectionForm['funcs']['processSync'] = function(response) {
     });
 
     dataCollectionSectionForm['funcs']['jstreeSelectNode']();
-    dataCollectionSectionForm['funcs']['jstreeReady']();
-
+    dataCollectionSectionForm['funcs']['jstreeReady'](selectedRepo);
     // dataCollectionSectionForm['vars']['syncInfo'] = text;
 
     // if (updatesCounter > 0) {

@@ -128,6 +128,7 @@ class Manager extends BasePackage
                 }
             }
 
+            //For external Composer packages
             if (isset($module['required_by'])) {
                 if (is_string($module['required_by'])) {
                     try {
@@ -147,8 +148,8 @@ class Manager extends BasePackage
 
                         if (count($requiredModuleArr) > 0) {
                             foreach ($requiredModuleArr as $requiredModuleKey => $requiredModuleId) {
-                                $requiredModuleMethod = 'get' . ucfirst(substr($requiredModuleType, 0, -1)) . 'ById';
-                                $requiredModule = $this->modules->{$requiredModuleType}->$requiredModuleMethod($requiredModuleId);
+                                // $requiredModuleMethod = 'get' . ucfirst(substr($requiredModuleType, 0, -1)) . 'ById';
+                                $requiredModule = $this->modules->{$requiredModuleType}->getById($requiredModuleId);
 
                                 if ($requiredModule) {
                                     array_push($requiredModules[$requiredModuleType], $requiredModule['display_name'] ?? $requiredModule['name']);
@@ -539,20 +540,37 @@ class Manager extends BasePackage
         }
 
         try {
-            if ($this->getRemoteModules() === true && $this->updateRemoteModulesToDB() === true) {
-                if (isset($data['get_repository_modules']) &&
-                    $data['get_repository_modules'] == 'true'
-                ) {
-                    $this->getRepositoryModules();
-                } else {
-                    $this->getRepositoryModules(['api_id' => $this->apiClientConfig['id']]);
+            if (isset($data['import_repo'])) {
+                $this->apiClientConfig['repo_url'] = $this->apiClientConfig['repo_url'] . '/' . $data['import_repo'];
+                $this->apiClientConfig['sync']['modules']['last_sync'] = '';
+
+                if ($this->getRemoteModules() === true && $this->updateRemoteModulesToDB(false, true) === true) {
+                    if (isset($data['get_repository_modules']) &&
+                        $data['get_repository_modules'] == 'true'
+                    ) {
+                        $this->getRepositoryModules();
+                    } else {
+                        $this->getRepositoryModules(['api_id' => $this->apiClientConfig['id']]);
+                    }
+
+                    return true;
                 }
+            } else {
+                if ($this->getRemoteModules() === true && $this->updateRemoteModulesToDB() === true) {
+                    if (isset($data['get_repository_modules']) &&
+                        $data['get_repository_modules'] == 'true'
+                    ) {
+                        $this->getRepositoryModules();
+                    } else {
+                        $this->getRepositoryModules(['api_id' => $this->apiClientConfig['id']]);
+                    }
 
-                $this->apiClientConfig['sync']['modules']['last_sync'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
+                    $this->apiClientConfig['sync']['modules']['last_sync'] = (\Carbon\Carbon::now())->toDateTimeLocalString();
 
-                $this->basepackages->apiClientServices->updateApi($this->apiClientConfig);
+                    $this->basepackages->apiClientServices->updateApi($this->apiClientConfig);
 
-                return true;
+                    return true;
+                }
             }
         } catch (ClientException | \throwable $e) {
             //To troubleshoot sync errors
@@ -653,7 +671,13 @@ class Manager extends BasePackage
                     $this->counter['noRelease']['api']['id'] = $this->apiClientConfig['id'];
                     $this->counter['noRelease']['api']['name'] = $this->apiClientConfig['name'];
 
-                    continue;//Dont add as there are no releases.
+                    if (count($modulesArr) === 1) {
+                        $this->addResponse('Module has no release', 1);
+
+                        return false;
+                    } else {
+                        continue;//Dont add as there are no releases.
+                    }
                 }
 
                 if (count($names) === 1) {//Only Core and Apptype has no module type set
@@ -804,7 +828,7 @@ class Manager extends BasePackage
         return true;
     }
 
-    protected function updateRemoteModulesToDB()
+    protected function updateRemoteModulesToDB($onlyUpdate = true, $onlyAdd = true)
     {
         if ($this->remoteModules && count($this->remoteModules) === 0) {
             return true;
@@ -813,107 +837,117 @@ class Manager extends BasePackage
         foreach ($this->remoteModules as $remoteModulesType => $remoteModules) {
             $remotePackages = $this->findRemoteInLocal($remoteModules, $remoteModulesType);
 
-            if (count($remotePackages['updates']) > 0) {
-                foreach ($remotePackages['updates'] as $updateRemotePackageKey => $updateRemotePackage) {
-                    if (!isset($this->counter['updates'])) {
-                        $this->counter['updates'] = [];
-                        $this->counter['updates']['api']['id'] = $this->apiClientConfig['id'];
-                        $this->counter['updates']['api']['name'] = $this->apiClientConfig['name'];
-                        $this->counter['updates']['count'] = 0;
-                    }
-
-                    if (str_contains($remoteModulesType, 'apptype')) {
-                        $this->apps->types->update($updateRemotePackage);
-                    } else {
-                        $this->modules->{$remoteModulesType}->update($updateRemotePackage);
-                    }
-
-                    if (isset($updateRemotePackage['installed']) &&
-                        $updateRemotePackage['installed'] == '1' &&
-                        $updateRemotePackage['update_available'] == '1'
-                    ) {
-                        $this->counter['updates']['count'] = $this->counter['updates']['count'] + 1;
-                    }
+            if ($onlyUpdate && count($remotePackages['updates']) > 0) {
+                if (!isset($this->counter['updates'])) {
+                    $this->counter['updates'] = [];
+                    $this->counter['updates']['api']['id'] = $this->apiClientConfig['id'];
+                    $this->counter['updates']['api']['name'] = $this->apiClientConfig['name'];
+                    $this->counter['updates']['count'] = 0;
                 }
+
+                $this->updateRemotePackages($remotePackages, $remoteModulesType);
             }
 
-            if (count($remotePackages['new']) > 0) {
-                foreach ($remotePackages['new'] as $registerRemotePackageKey => $registerRemotePackage) {
-                    if ($registerRemotePackage['repo_details']['latestRelease'] === false) {
-                        continue;
-                    }
-
-                    if (!isset($this->counter['new'])) {
-                        $this->counter['new'] = [];
-                        $this->counter['new']['api']['id'] = $this->apiClientConfig['id'];
-                        $this->counter['new']['api']['name'] = $this->apiClientConfig['name'];
-                        $this->counter['new']['count'] = 0;
-                    }
-
-                    $repo_details = $registerRemotePackage['repo_details'];
-                    $version = $registerRemotePackage['repo_details']['latestRelease']['tag_name'];
-
-                    $registerRemotePackage = $this->remoteModulesJson[$remoteModulesType][$registerRemotePackage['name']];
-                    $registerRemotePackage['repo_details'] = $repo_details;
-                    $registerRemotePackage['version'] = $version;
-
-                    $registerRemotePackage['settings'] =
-                        isset($registerRemotePackage['settings']) ?
-                        $this->helper->encode($registerRemotePackage['settings']) :
-                        $this->helper->encode([]);
-
-                    $registerRemotePackage['apps'] = $this->helper->encode([]);
-
-                    $registerRemotePackage['installed'] = 0;
-
-                    if ($this->access->auth->account()) {
-                        $registerRemotePackage['updated_by'] = $this->access->auth->account()['id'];
-                    } else {
-                        $registerRemotePackage['updated_by'] = 0;
-                    }
-
-                    $registerRemotePackage['api_id'] = $this->apiClientConfig['id'];
-
-                    if (str_contains($remoteModulesType, 'apptype')) {
-                        $this->apps->types->add($registerRemotePackage);
-                    } else {
-                        if ($registerRemotePackage['module_type'] === 'components') {
-                            if (!isset($registerRemotePackage['menu']) ||
-                                (isset($registerRemotePackage['menu']) && is_bool($registerRemotePackage['menu']))
-                            ) {
-                                $registerRemotePackage['menu'] = 'false';
-                            }
-                        } else if ($registerRemotePackage['module_type'] === 'views') {
-                            if (count($registerRemotePackage['dependencies']['views']) === 0 &&
-                                (!isset($registerRemotePackage['base_view_module_id']) ||
-                                 (isset($registerRemotePackage['base_view_module_id']) && $registerRemotePackage['base_view_module_id'] === null)
-                                )
-                            ) {
-                                $registerRemotePackage['base_view_module_id'] = 0;
-                            } else if (count($registerRemotePackage['dependencies']['views']) === 1) {
-                                $baseView = $this->modules->views->getViewByRepo($registerRemotePackage['dependencies']['views'][0]['repo']);
-
-                                if ($baseView) {//Add Baseview ID here or during installation.
-                                    $registerRemotePackage['base_view_module_id'] = $baseView['id'];
-                                } else {
-                                    $registerRemotePackage['base_view_module_id'] = 0;
-                                }
-                            } else {
-                                $registerRemotePackage['base_view_module_id'] = 0;
-                            }
-                        }
-
-                        $this->modules->{$remoteModulesType}->add($registerRemotePackage);
-                    }
-
-                    $this->counter['new']['count'] = $this->counter['new']['count'] + 1;
+            if ($onlyAdd && count($remotePackages['new']) > 0) {
+                if (!isset($this->counter['new'])) {
+                    $this->counter['new'] = [];
+                    $this->counter['new']['api']['id'] = $this->apiClientConfig['id'];
+                    $this->counter['new']['api']['name'] = $this->apiClientConfig['name'];
+                    $this->counter['new']['count'] = 0;
                 }
+
+                $this->addRemotePackages($remotePackages, $remoteModulesType);
             }
         }
 
         $this->packagesData->counter = $this->counter;
 
         return true;
+    }
+
+    protected function updateRemotePackages($remotePackages, $remoteModulesType)
+    {
+        foreach ($remotePackages['updates'] as $updateRemotePackageKey => $updateRemotePackage) {
+            if (str_contains($remoteModulesType, 'apptype')) {
+                $this->apps->types->update($updateRemotePackage);
+            } else {
+                $this->modules->{$remoteModulesType}->update($updateRemotePackage);
+            }
+
+            if (isset($updateRemotePackage['installed']) &&
+                $updateRemotePackage['installed'] == '1' &&
+                $updateRemotePackage['update_available'] == '1'
+            ) {
+                $this->counter['updates']['count'] = $this->counter['updates']['count'] + 1;
+            }
+        }
+    }
+
+    protected function addRemotePackages($remotePackages, $remoteModulesType)
+    {
+        foreach ($remotePackages['new'] as $registerRemotePackageKey => $registerRemotePackage) {
+            if ($registerRemotePackage['repo_details']['latestRelease'] === false) {
+                continue;
+            }
+
+            $repo_details = $registerRemotePackage['repo_details'];
+            $version = $registerRemotePackage['repo_details']['latestRelease']['tag_name'];
+
+            $registerRemotePackage = $this->remoteModulesJson[$remoteModulesType][$registerRemotePackage['name']];
+            $registerRemotePackage['repo_details'] = $repo_details;
+            $registerRemotePackage['version'] = $version;
+
+            $registerRemotePackage['settings'] =
+                isset($registerRemotePackage['settings']) ?
+                $this->helper->encode($registerRemotePackage['settings']) :
+                $this->helper->encode([]);
+
+            $registerRemotePackage['apps'] = $this->helper->encode([]);
+
+            $registerRemotePackage['installed'] = 0;
+
+            if ($this->access->auth->account()) {
+                $registerRemotePackage['updated_by'] = $this->access->auth->account()['id'];
+            } else {
+                $registerRemotePackage['updated_by'] = 0;
+            }
+
+            $registerRemotePackage['api_id'] = $this->apiClientConfig['id'];
+
+            if (str_contains($remoteModulesType, 'apptype')) {
+                $this->apps->types->add($registerRemotePackage);
+            } else {
+                if ($registerRemotePackage['module_type'] === 'components') {
+                    if (!isset($registerRemotePackage['menu']) ||
+                        (isset($registerRemotePackage['menu']) && is_bool($registerRemotePackage['menu']))
+                    ) {
+                        $registerRemotePackage['menu'] = 'false';
+                    }
+                } else if ($registerRemotePackage['module_type'] === 'views') {
+                    if (count($registerRemotePackage['dependencies']['views']) === 0 &&
+                        (!isset($registerRemotePackage['base_view_module_id']) ||
+                         (isset($registerRemotePackage['base_view_module_id']) && $registerRemotePackage['base_view_module_id'] === null)
+                        )
+                    ) {
+                        $registerRemotePackage['base_view_module_id'] = 0;
+                    } else if (count($registerRemotePackage['dependencies']['views']) === 1) {
+                        $baseView = $this->modules->views->getViewByRepo($registerRemotePackage['dependencies']['views'][0]['repo']);
+
+                        if ($baseView) {//Add Baseview ID here or during installation.
+                            $registerRemotePackage['base_view_module_id'] = $baseView['id'];
+                        } else {
+                            $registerRemotePackage['base_view_module_id'] = 0;
+                        }
+                    } else {
+                        $registerRemotePackage['base_view_module_id'] = 0;
+                    }
+                }
+
+                $this->modules->{$remoteModulesType}->add($registerRemotePackage);
+            }
+
+            $this->counter['new']['count'] = $this->counter['new']['count'] + 1;
+        }
     }
 
     protected function findRemoteInLocal($remoteModules, $remoteModulesType)
