@@ -45,8 +45,6 @@ class Installer extends BasePackage
 
     protected $modulesToInstallOrUpdate;
 
-    protected $moduleToRemove;
-
     protected $runPrecheckProgressMethods;
 
     protected $runProcessProgressMethods;
@@ -1440,7 +1438,7 @@ class Installer extends BasePackage
         }
     }
 
-    public function cleanup(array $what)
+    public function cleanup(array $what, $modulePath = null)
     {
         if (in_array('composer', $what)) {
             $files = $this->basepackages->utils->scanDir('external', false);
@@ -1476,6 +1474,61 @@ class Installer extends BasePackage
             } catch (FilesystemException | UnableToCheckExistence | UnableToDeleteDirectory | \throwable $e) {
                 throw $e;
             }
+        }
+
+        if (in_array('modulePath', $what) && $modulePath) {
+            $files = $this->basepackages->utils->scanDir($modulePath);
+
+            if (count($files['files']) > 0) {
+                try {
+                    foreach ($files['files'] as $file) {
+                        $this->localContent->delete($file);
+                    }
+                } catch (FilesystemException | UnableToDeleteFile | \throwable $e) {
+                    $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+                    return $this->queueHasErrors(
+                        $e->getMessage(),
+                        $resultQueueLogs,
+                        false
+                    );
+                }
+            }
+
+            if (count($files['dirs']) > 0) {
+                try {
+                    foreach ($files['dirs'] as $dir) {
+                        $this->localContent->deleteDirectory($dir);
+                    }
+
+                    //cleanup path by checking if any of the path directory is empty. If empty, we delete the directory.
+                    $pathArr = explode('/', $modulePath);
+
+                    foreach ($pathArr as $path) {
+                        $path = null;//We dont need path as we will be popping it in the end.
+
+                        $checkPath = join('/', $pathArr);
+
+                        $folders = $this->localContent->listContents($checkPath)->toArray();
+
+                        if (count($folders) === 0) {
+                            $this->localContent->deleteDirectory($checkPath);
+                        }
+
+                        array_pop($pathArr);
+                    }
+                } catch (FilesystemException | UnableToDeleteFile | UnableToDeleteDirectory | \throwable $e) {
+                    $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+
+                    return $this->queueHasErrors(
+                        $e->getMessage(),
+                        $resultQueueLogs,
+                        false
+                    );
+                }
+            }
+
+            return true;
         }
     }
 
@@ -1943,6 +1996,56 @@ class Installer extends BasePackage
                         continue;
                     }
 
+                    if ($module['module_type'] === 'views') {
+                        continue;
+                    }
+
+                    foreach ($modules as $module) {
+                        array_push($this->runProcessProgressMethods,
+                            [
+                                'method'    => 'removeModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                'text'      => 'Removing module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                'args'      => [$taskName, $module],
+                            ]
+                        );
+                    }
+                }
+
+                //Subview
+                foreach ($modulesTypes as $moduleType => $modules) {
+                    if ((is_array($modules) && count($modules) === 0) ||
+                        !is_array($modules)
+                    ) {
+                        continue;
+                    }
+
+                    if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
+                        continue;
+                    }
+
+                    foreach ($modules as $module) {
+                        array_push($this->runProcessProgressMethods,
+                            [
+                                'method'    => 'removeModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                'text'      => 'Removing module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                'args'      => [$taskName, $module],
+                            ]
+                        );
+                    }
+                }
+
+                //Main View
+                foreach ($modulesTypes as $moduleType => $modules) {
+                    if ((is_array($modules) && count($modules) === 0) ||
+                        !is_array($modules)
+                    ) {
+                        continue;
+                    }
+
+                    if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
+                        continue;
+                    }
+
                     foreach ($modules as $module) {
                         array_push($this->runProcessProgressMethods,
                             [
@@ -2029,7 +2132,7 @@ class Installer extends BasePackage
             );
         } else {
             try {
-                $this->moduleToRemove = $this->modules->manager->getModuleInfo(
+                $moduleToRemove = $this->modules->manager->getModuleInfo(
                     [
                         'module_type'   => $module['module_type'],
                         'module_id'     => $module['id']
@@ -2037,7 +2140,7 @@ class Installer extends BasePackage
                 );
 
                 if ($module['module_type'] !== 'views') {
-                    $classArr = explode('\\', $this->moduleToRemove['class']);
+                    $classArr = explode('\\', $moduleToRemove['class']);
 
                     $classArr = array_slice($classArr, 0, -1);
 
@@ -2062,50 +2165,16 @@ class Installer extends BasePackage
                             false
                         );
                     }
+                }
 
-                    $path = 'apps/' . implode('/', array_slice(explode('\\', $this->moduleToRemove['class']), 1, -1));
+                $cleanup = $this->cleanup('modulePath', $this->getModuleFilesLocation($moduleToRemove));
 
-                    $files = $this->basepackages->utils->scanDir($path);
-
-                    if (count($files['files']) > 0) {
-                        try {
-                            foreach ($files['files'] as $file) {
-                                $this->localContent->delete($file);
-                            }
-                        } catch (FilesystemException | UnableToDeleteFile | \throwable $e) {
-                            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
-
-                            return $this->queueHasErrors(
-                                $e->getMessage(),
-                                $resultQueueLogs,
-                                false
-                            );
-                        }
-                    }
-
-                    if (count($files['dirs']) > 0) {
-                        try {
-                            foreach ($files['dirs'] as $dir) {
-                                $this->localContent->deleteDirectory($dir);
-                                $this->localContent->deleteDirectory($path);
-                            }
-                        } catch (FilesystemException | UnableToDeleteFile | \throwable $e) {
-                            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
-
-                            return $this->queueHasErrors(
-                                $e->getMessage(),
-                                $resultQueueLogs,
-                                false
-                            );
-                        }
-                    }
-                } else {
-                    //For Views
-                    //Remove Public Module and files
+                if ($cleanup !== true) {
+                    return $cleanup;
                 }
 
                 //Remove the module
-                $this->modules->$module['module_type']->remove($module['_id']);
+                $this->modules->$module['module_type']->remove($module['id']);
             } catch (\throwable $e) {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
 
@@ -2118,6 +2187,61 @@ class Installer extends BasePackage
         }
 
         return true;
+    }
+
+    protected function getModuleFilesLocation($module, $viewPublic = false)
+    {
+        if ($module['module_type'] === 'components') {
+            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Components/';
+
+            $routeArr = explode('/', $module['route']);
+
+            foreach ($routeArr as &$path) {
+                $path = ucfirst($path);
+            }
+
+            $routePath = implode('/', $routeArr) . '/';
+        } else if ($module['module_type'] === 'packages') {
+            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Packages/';
+
+            $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+            $routePath = implode('/', $pathArr) . '/';
+        } else if ($module['module_type'] === 'middlewares') {
+            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Middlewares/';
+
+            $routePath = $module['name'] . '/';
+        } else if ($module['module_type'] === 'views') {
+            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Views/';
+
+            if ($viewPublic) {
+                $moduleLocation = 'public/' . $module['app_type'] . '/' . strtolower($module['name']) . '/';
+
+                return $moduleLocation;
+            }
+
+            if ($module['is_subview'] == 0) {
+                $routePath = $module['name'] . '/';
+            } else {
+                $baseView = $this->modules->views->getViewById($module['base_view_module_id']);
+
+                $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+                if (count($pathArr) > 1) {
+                    foreach ($pathArr as &$path) {
+                        $path = strtolower($path);
+                    }
+                } else {
+                    $pathArr[0] = strtolower($pathArr[0]);
+                }
+
+                $module['route'] = implode('/', $pathArr);
+
+                $routePath = $baseView['name'] . '/html/' . $module['route'] . '/';
+            }
+        }
+
+        return $moduleLocation . $routePath;
     }
 
     protected function initApi($data, $sink = null, $method = null)

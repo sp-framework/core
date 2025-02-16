@@ -508,6 +508,7 @@ dataCollectionSectionForm['funcs']['initJstreeButtons'] = function() {
         }
 
         if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-repo-sync') {
+            dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
             dataCollectionSectionForm['funcs']['toggleJstreeTool']($(this)[0].id);
             dataCollectionSectionForm['funcs']['initSync'](
                 $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true)[0]
@@ -809,6 +810,7 @@ dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], s
 
     if (show.length > 0) {
         var moduleinfos = ['repo', 'loader', 'info', 'noinfo', 'error', 'buttons'];
+
         $(moduleinfos).each(function(e, moduleinfo) {
             if (show.includes(moduleinfo)) {
                 $('#{{componentId}}-{{sectionId}}-moduleinfo-' + moduleinfo).attr('hidden', false);
