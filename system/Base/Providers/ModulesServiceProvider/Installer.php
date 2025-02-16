@@ -317,75 +317,8 @@ class Installer extends BasePackage
                     return true;
                 }
 
-                //AppType
-                if (strtolower($this->modulesToInstallOrUpdate['app_type']) === strtolower($this->modulesToInstallOrUpdate['name'])) {
-                    $components = $this->modules->components->getComponentsForAppType(strtolower($this->modulesToInstallOrUpdate['app_type']), true);
-
-                    if ($components && count($components) > 0) {
-                        foreach ($components as $component) {
-                            $this->modulesToInstallOrUpdate = $component;
-
-                            if (isset($this->modulesToInstallOrUpdate['apps'])) {
-                                $checkBinding = $this->preCheckModuleAppsBinding($taskName, $module);
-
-                                if ($checkBinding !== true) {
-                                    return $checkBinding;
-                                }
-                            }
-                        }
-                    }
-
-                    $packages = $this->modules->packages->getPackagesForAppType(strtolower($this->modulesToInstallOrUpdate['app_type']), true);
-
-                    if ($packages && count($packages) > 0) {
-                        foreach ($packages as $package) {
-                            $this->modulesToInstallOrUpdate = $package;
-
-                            if (isset($this->modulesToInstallOrUpdate['apps'])) {
-                                $checkBinding = $this->preCheckModuleAppsBinding($taskName, $module);
-
-                                if ($checkBinding !== true) {
-                                    return $checkBinding;
-                                }
-                            }
-                        }
-                    }
-
-                    $middlewares = $this->modules->middlewares->getMiddlewaresForAppType(strtolower($this->modulesToInstallOrUpdate['app_type']), null, true);
-
-                    if ($middlewares && count($middlewares) > 0) {
-                        foreach ($middlewares as $middleware) {
-                            $this->modulesToInstallOrUpdate = $middleware;
-
-                            if (isset($this->modulesToInstallOrUpdate['apps'])) {
-                                $checkBinding = $this->preCheckModuleAppsBinding($taskName, $module);
-
-                                if ($checkBinding !== true) {
-                                    return $checkBinding;
-                                }
-                            }
-                        }
-                    }
-
-                    $views = $this->modules->views->getViewsForAppType(strtolower($this->modulesToInstallOrUpdate['app_type']), true, true);
-
-                    if ($views && count($views) > 0) {
-                        foreach ($views as $view) {
-                            $this->modulesToInstallOrUpdate = $view;
-
-                            if (isset($this->modulesToInstallOrUpdate['apps'])) {
-                                $checkBinding = $this->preCheckModuleAppsBinding($taskName, $module);
-
-                                if ($checkBinding !== true) {
-                                    return $checkBinding;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    if (isset($this->modulesToInstallOrUpdate['apps'])) {
-                        return $this->preCheckModuleAppsBinding($taskName, $module);
-                    }
+                if (isset($this->modulesToInstallOrUpdate['apps'])) {
+                    return $this->preCheckModuleAppsBinding($taskName, $module);
                 }
 
                 return true;
@@ -393,11 +326,15 @@ class Installer extends BasePackage
         }
 
         if ($module['module_type'] === 'bundles') {
-            $this->addResponse($this->modules->manager->packagesData->responseMessage ?? 'Could not retrieve repository information for module: ' . $module['name'], 1);
+            $this->queue['results']['first']['packages'][$module['id']]['precheck'] = 'fail';
 
-            $this->basepackages->progress->resetProgress();
+            $preCheckQueueLogs = &$this->queue['results']['first']['packages'][$module['id']]['precheck_logs'];
 
-            return false;
+            return $this->queueHasErrors(
+                $this->modules->manager->packagesData->responseMessage ?? 'Could not retrieve repository information for module: ' . $module['name'],
+                $preCheckQueueLogs,
+                true
+            );
         } else if ($taskName === 'first' && strtolower($module['name']) === 'core') {
             $this->queue['results']['first']['packages'][$module['id']]['precheck'] = 'fail';
 
@@ -799,29 +736,35 @@ class Installer extends BasePackage
         return false;
     }
 
-    protected function downloadModulesFromRepo($data)
+    protected function downloadModulesFromRepo($args)
     {
-        if ($this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] === '' &&
-            $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['tag_name'] !== ''
-        ) {
-            $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] =
-                $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['tag_name'];
-        }
+        $taskName = $args[0];
+        $module = $args[1];
 
-        $this->zipFile['location'] = base_path($this->downloadLocation .
-                        $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
-                        $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/'
-        );
-        $this->zipFile['file'] = base_path($this->downloadLocation .
-                        $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
-                        $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/' .
-                        $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
-                        $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip'
-        );
-        $this->zipFile['name'] = $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
-                        $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'];
+        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'pass';
 
-        try {//Check if file was downloaded after release was published and also check if the zip file is readable
+        try {
+            if ($this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] === '' &&
+                $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['tag_name'] !== ''
+            ) {
+                $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] =
+                    $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['tag_name'];
+            }
+
+            $this->zipFile['location'] = base_path($this->downloadLocation .
+                            $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                            $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/'
+            );
+            $this->zipFile['file'] = base_path($this->downloadLocation .
+                            $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                            $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/' .
+                            $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                            $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip'
+            );
+            $this->zipFile['name'] = $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
+                            $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'];
+
+            //Check if file was downloaded after release was published and also check if the zip file is readable
             $fileModificationTime = $this->localContent->lastModified($this->downloadLocation .
                         $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
                         $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '/' .
@@ -833,8 +776,16 @@ class Installer extends BasePackage
             ) {
                 return true;
             }
-        } catch (FilesystemException | UnableToRetrieveMetadata | \Exception $e) {
-            // Do Nothing.
+        } catch (FilesystemException | UnableToRetrieveMetadata | \throwable $e) {
+            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
+
+            $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
+
+            return $this->queueHasErrors(
+                $e->getMessage() . '. Try removing and readding the module from repo.',
+                $preCheckQueueLogs,
+                true
+            );
         }
 
         // remove old data so there is no conflict
@@ -877,12 +828,18 @@ class Installer extends BasePackage
                         $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
                         $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip'
                     ),
-                    $data['progressMethod']
+                    $args['progressMethod']
                 )
             ) {
-                $this->basepackages->progress->resetProgress();
+                $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
 
-                return false;
+                $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
+
+                return $this->queueHasErrors(
+                    'Not able to initialize API',
+                    $preCheckQueueLogs,
+                    true
+                );
             }
 
             if ($this->apiClientConfig['id'] !== $this->modulesToInstallOrUpdate['api_id']) {
@@ -897,12 +854,18 @@ class Installer extends BasePackage
                             $this->modulesToInstallOrUpdate['repo_details']['details']['name'] . '-' .
                             $this->modulesToInstallOrUpdate['repo_details']['latestRelease']['name'] . '.zip'
                         ),
-                        $data['progressMethod']
+                        $args['progressMethod']
                     )
                 ) {
-                    $this->basepackages->progress->resetProgress();
+                    $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
 
-                    return false;
+                    $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
+
+                    return $this->queueHasErrors(
+                        'Not able to initialize API',
+                        $preCheckQueueLogs,
+                        true
+                    );
                 }
             }
 
@@ -925,14 +888,18 @@ class Installer extends BasePackage
                 $this->apiClient->useMethod($collection, $method, $args)->getResponse();
                 //As we have provided sink information, this should be downloaded and stored at the sink location.
             } catch (\throwable $e) {
-                $this->basepackages->progress->resetProgress();
+                $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
 
-                $this->addResponse($e->getMessage(), 1);
+                $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
 
-                return false;
+                return $this->queueHasErrors(
+                    $e->getMessage() . '. Try removing and readding the module from repo.',
+                    $preCheckQueueLogs,
+                    true
+                );
             }
         } else {
-            $this->method = $data['progressMethod'];
+            $this->method = $args['progressMethod'];
 
             if (isset($this->modulesToInstallOrUpdate['repo_details']['latestRelease']['zipball_url'])) {
                 return $this->downloadData(
@@ -1368,10 +1335,10 @@ class Installer extends BasePackage
 
         try {
             if (str_contains($module['module_type'], 'apptype')) {
-                $moduleArr = $this->apps->types->getById($module['id']);
+                $moduleArr = $this->apps->types->getById((int) $module['id']);
             } else {
                 // $moduleMethod = 'get' . ucfirst(substr($module['module_type'], 0, -1)) . 'ById';
-                $moduleArr = $this->modules->{$module['module_type']}->getById($module['id']);
+                $moduleArr = $this->modules->{$module['module_type']}->getById((int) $module['id']);
             }
 
             if (!$moduleArr) {
@@ -1513,6 +1480,13 @@ class Installer extends BasePackage
 
                         if (count($folders) === 0) {
                             $this->localContent->deleteDirectory($checkPath);
+                        } else if (count($folders) === 1) {
+                            $filePath = $folders[0]->path();
+
+                            if (str_contains($filePath, '.gitkeep')) {
+                                $this->localContent->delete($filePath);
+                                $this->localContent->deleteDirectory($checkPath);
+                            }
                         }
 
                         array_pop($pathArr);
@@ -2019,18 +1993,24 @@ class Installer extends BasePackage
                         continue;
                     }
 
-                    if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
+                    if ($module['module_type'] !== 'views') {
                         continue;
                     }
 
-                    foreach ($modules as $module) {
-                        array_push($this->runProcessProgressMethods,
-                            [
-                                'method'    => 'removeModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                'text'      => 'Removing module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                                'args'      => [$taskName, $module],
-                            ]
-                        );
+                    if ($module['module_type'] === 'views') {
+                        if ($module['is_subview'] == true) {
+                            foreach ($modules as $module) {
+                                array_push($this->runProcessProgressMethods,
+                                    [
+                                        'method'    => 'removeModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                        'text'      => 'Removing module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                        'args'      => [$taskName, $module],
+                                    ]
+                                );
+                            }
+                        } else {
+                            continue;
+                        }
                     }
                 }
 
@@ -2042,18 +2022,24 @@ class Installer extends BasePackage
                         continue;
                     }
 
-                    if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
+                    if ($module['module_type'] !== 'views') {
                         continue;
                     }
 
-                    foreach ($modules as $module) {
-                        array_push($this->runProcessProgressMethods,
-                            [
-                                'method'    => 'removeModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                'text'      => 'Removing module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                                'args'      => [$taskName, $module],
-                            ]
-                        );
+                    if ($module['module_type'] === 'views') {
+                        if ($module['is_subview'] != true) {
+                            foreach ($modules as $module) {
+                                array_push($this->runProcessProgressMethods,
+                                    [
+                                        'method'    => 'removeModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                        'text'      => 'Removing module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                        'args'      => [$taskName, $module],
+                                    ]
+                                );
+                            }
+                        } else {
+                            continue;
+                        }
                     }
                 }
             }
@@ -2080,10 +2066,10 @@ class Installer extends BasePackage
 
         try {
             if (str_contains($module['module_type'], 'apptype')) {
-                $moduleArr = $this->apps->types->getById($module['id']);
+                $moduleArr = $this->apps->types->getById((int) $module['id']);
             } else {
                 // $moduleMethod = 'get' . ucfirst(substr($module['module_type'], 0, -1)) . 'ById';
-                $moduleArr = $this->modules->{$module['module_type']}->getById($module['id']);
+                $moduleArr = $this->modules->{$module['module_type']}->getById((int) $module['id']);
             }
 
             if (!$moduleArr) {
@@ -2139,43 +2125,74 @@ class Installer extends BasePackage
                     ]
                 );
 
-                if ($module['module_type'] !== 'views') {
-                    $classArr = explode('\\', $moduleToRemove['class']);
+                if (!$moduleToRemove) {
+                    return true;
+                }
 
-                    $classArr = array_slice($classArr, 0, -1);
+                if ($module['module_type'] !== 'bundles') {
+                    if ($module['module_type'] !== 'views' &&
+                        $module['module_type'] !== 'apptype'
+                    ) {
+                        $classArr = explode('\\', $moduleToRemove['class']);
 
-                    $class = implode('\\', $classArr) . '\\Install\\Install';
+                        $classArr = array_slice($classArr, 0, -1);
 
-                    $path = lcfirst(str_replace('\\', '/', $class) . '.php');
+                        $class = implode('\\', $classArr) . '\\Install\\Install';
 
-                    try {
-                        if ($this->localContent->fileExists($path)) {
-                            $class = new $class;
+                        $path = lcfirst(str_replace('\\', '/', $class) . '.php');
 
-                            if (method_exists($class, 'uninstall')) {
-                                $class->init()->uninstall(true);
+                        try {
+                            if ($this->localContent->fileExists($path)) {
+                                $class = new $class;
+
+                                if (method_exists($class, 'uninstall')) {
+                                    $class->init()->uninstall(true);
+                                }
                             }
-                        }
-                    } catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
-                        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
+                        } catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
+                            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
 
-                        return $this->queueHasErrors(
-                            $e->getMessage(),
-                            $resultQueueLogs,
-                            false
-                        );
+                            return $this->queueHasErrors(
+                                $e->getMessage(),
+                                $resultQueueLogs,
+                                false
+                            );
+                        }
+                    }
+
+                    $cleanup = $this->cleanup(['modulePath'], $this->getModuleFilesLocation($moduleToRemove));
+
+                    if ($cleanup !== true) {
+                        return $cleanup;
+                    }
+
+                    if ($module['module_type'] === 'views' &&
+                        $moduleToRemove['is_subview'] == false
+                    ) {
+                        $cleanup = $this->cleanup(['modulePath'], $this->getModuleFilesLocation($moduleToRemove, true));
+
+                        if ($cleanup !== true) {
+                            return $cleanup;
+                        }
                     }
                 }
 
-                $cleanup = $this->cleanup('modulePath', $this->getModuleFilesLocation($moduleToRemove));
-
-                if ($cleanup !== true) {
-                    return $cleanup;
-                }
-
                 //Remove the module
-                $this->modules->$module['module_type']->remove($module['id']);
+                if ($module['module_type'] === 'apptype') {
+                    $bundles = $this->modules->bundles->getBundlesForAppType(strtolower($module['app_type']));
+
+                    if ($bundles && count($bundles) > 0) {
+                        foreach ($bundles as $bundle) {
+                            $this->modules->bundles->remove($bundle['id']);
+                        }
+                    }
+
+                    $this->apps->types->remove($module['id']);
+                } else {
+                    $this->modules->{$module['module_type']}->remove($module['id']);
+                }
             } catch (\throwable $e) {
+                trace([$e]);
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
 
                 return $this->queueHasErrors(
@@ -2191,7 +2208,11 @@ class Installer extends BasePackage
 
     protected function getModuleFilesLocation($module, $viewPublic = false)
     {
-        if ($module['module_type'] === 'components') {
+        if (!isset($module['module_type']) &&
+            ($module['app_type'] === strtolower($module['name']))
+        ) {
+            return 'apps/' . ucfirst($module['app_type']) . '/';
+        } else if ($module['module_type'] === 'components') {
             $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Components/';
 
             $routeArr = explode('/', $module['route']);
@@ -2223,7 +2244,29 @@ class Installer extends BasePackage
             if ($module['is_subview'] == 0) {
                 $routePath = $module['name'] . '/';
             } else {
-                $baseView = $this->modules->views->getViewById($module['base_view_module_id']);
+                if (is_string($module['dependencies'])) {
+                    $module['dependencies'] = $this->helper->decode($module['dependencies'], true);
+                }
+
+                if (!isset($module['dependencies']['views']) ||
+                    (isset($module['dependencies']['views']) && count($module['dependencies']['views']) === 0)
+                ) {
+                    throw new \Exception('Base view dependencies for sub view missing in module dependencies.');
+                }
+
+                foreach ($module['dependencies']['views'] as $view) {
+                    $view = $this->modules->views->getViewByRepo($view['repo']);
+
+                    if ($view && $view['is_subview'] == false) {
+                        $baseView = $view;
+
+                        break;
+                    }
+                }
+
+                if (!isset($baseView)) {
+                    throw new \Exception('Base view dependencies for sub view not found on the system.');
+                }
 
                 $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
 

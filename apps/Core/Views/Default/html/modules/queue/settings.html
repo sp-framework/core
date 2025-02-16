@@ -1,13 +1,23 @@
 {% set settingsBackupSettingsAppsDirChecked = false %}
+{% set settingsBackupSettingsAppsDirDisabled = false %}
 {% set settingsBackupSettingsSystemsDirChecked = false %}
+{% set settingsBackupSettingsSystemsDirDisabled = false %}
 {% set settingsBackupSettingsPublicDirChecked = false %}
+{% set settingsBackupSettingsPublicDirDisabled = false %}
 {% set settingsBackupSettingsPrivateDirChecked = false %}
+{% set settingsBackupSettingsPrivateDirDisabled = false %}
 {% set settingsBackupSettingsExternalDirChecked = false %}
+{% set settingsBackupSettingsExternalDirDisabled = false %}
 {% set settingsBackupSettingsHTMLCompiledDirChecked = false %}
+{% set settingsBackupSettingsHTMLCompiledDirDisabled = false %}
 {% set settingsBackupSettingsVarDirChecked = false %}
+{% set settingsBackupSettingsVarDirDisabled = false %}
 {% set settingsBackupSettingsExternalVendorDirChecked = false %}
+{% set settingsBackupSettingsExternalVendorDirDisabled = false %}
 {% set settingsBackupSettingsOldBackupsDirChecked = false %}
+{% set settingsBackupSettingsOldBackupsDirDisabled = false %}
 {% set settingsBackupSettingsDatabaseChecked = false %}
+{% set settingsBackupSettingsDatabaseDisabled = false %}
 {% set settingsBackupSettingsKeysChecked = false %}
 {% set settingsBackupSettingsKeysDisabled = false %}
 {% set settingsBackupSettingsBackup = 'backup-off' %}
@@ -52,6 +62,20 @@
     {% if queue['settings']['backupSettings']['keys'] == true %}
         {% set settingsBackupSettingsKeysChecked = true %}
     {% endif %}
+{% else %}
+    {% set settingsBackupSettingsAppsDirDisabled = true %}
+    {% set settingsBackupSettingsSystemsDirDisabled = true %}
+    {% set settingsBackupSettingsPublicDirDisabled = true %}
+    {% set settingsBackupSettingsPrivateDirDisabled = true %}
+    {% set settingsBackupSettingsExternalDirDisabled = true %}
+    {% set settingsBackupSettingsHTMLCompiledDirDisabled = true %}
+    {% set settingsBackupSettingsVarDirDisabled = true %}
+    {% set settingsBackupSettingsExternalVendorDirDisabled = true %}
+    {% set settingsBackupSettingsOldBackupsDirDisabled = true %}
+    {% set settingsBackupSettingsDatabaseDisabled = true %}
+    {% set settingsBackupSettingsKeysDisabled = true %}
+    {% set settingsBackupSettingsPasswordProtectDisabled = true %}
+    {% set settingsBackupSettingsNotesDisabled = true %}
 {% endif %}
 {% set settingsFilesDeleteSourceFilesChecked = false %}
 {% if queue['settings']['files']['deleteSourceFiles'] == true %}
@@ -136,6 +160,7 @@
                             'fieldHelpTooltipContent'        : 'Backup apps directory?',
                             'fieldRequired'                  : false,
                             'fieldType'                      : 'checkbox',
+                            'fieldDisabled'                  : settingsBackupSettingsAppsDirDisabled,
                             'fieldCheckboxType'              : 'success',
                             'fieldCheckboxLabel'             : 'APPS DIRECTORY',
                             'fieldCheckboxChecked'           : settingsBackupSettingsAppsDirChecked,
@@ -158,6 +183,7 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Backup systems directory?',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : settingsBackupSettingsSystemsDirDisabled,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'success',
                             'fieldCheckboxLabel'             : 'SYSTEMS DIRECTORY',
@@ -183,6 +209,7 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Backup public directory?',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : settingsBackupSettingsPublicDirDisabled,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'success',
                             'fieldCheckboxLabel'             : 'PUBLIC DIRECTORY',
@@ -206,6 +233,7 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Backup private directory?',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : settingsBackupSettingsPrivateDirDisabled,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'success',
                             'fieldCheckboxLabel'             : 'PRIVATE DIRECTORY',
@@ -231,6 +259,7 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Backup external (third party) directory? It includes only composer files. If you want to backup whole vendor folder, select Backup External Vendor Directory option as well.',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : settingsBackupSettingsExternalDirDisabled,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'success',
                             'fieldCheckboxLabel'             : 'EXTERNAL DIRECTORY',
@@ -254,6 +283,7 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Compiled Templates Directory? Note: This can be regenerated.',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : settingsBackupSettingsHTMLCompiledDirDisabled,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'warning',
                             'fieldCheckboxChecked'           : settingsBackupSettingsHTMLCompiledDirChecked,
@@ -279,6 +309,7 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Backup var (variable) directory? This directory contains logs, cache, session information. Information that will be regenerated by the system again.',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : settingsBackupSettingsVarDirDisabled,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'warning',
                             'fieldCheckboxChecked'           : settingsBackupSettingsVarDirChecked,
@@ -302,6 +333,7 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Backup external (third party) vendor directory? Note: External code can be restored using composer.',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : settingsBackupSettingsExternalVendorDirDisabled,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'warning',
                             'fieldCheckboxLabel'             : 'EXTERNAL VENDOR DIRECTORY',
@@ -327,6 +359,7 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Old backup files? This will increase the total size of the backup depending on how many backups you have taken before.',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : settingsBackupSettingsOldBackupsDirDisabled,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'danger',
                             'fieldCheckboxChecked'           : settingsBackupSettingsOldBackupsDirChecked,
@@ -350,6 +383,7 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Backup database?',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : settingsBackupSettingsDatabaseDisabled,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'success',
                             'fieldCheckboxChecked'           : settingsBackupSettingsDatabaseChecked,
