@@ -777,15 +777,7 @@ class Installer extends BasePackage
                 return true;
             }
         } catch (FilesystemException | UnableToRetrieveMetadata | \throwable $e) {
-            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
-
-            $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
-
-            return $this->queueHasErrors(
-                $e->getMessage() . '. Try removing and readding the module from repo.',
-                $preCheckQueueLogs,
-                true
-            );
+            //Important, do nothing. If the zip file is not there, it will throw an error because filesystem could not check the metadata.
         }
 
         // remove old data so there is no conflict
@@ -1843,116 +1835,22 @@ class Installer extends BasePackage
                     }
 
                     foreach ($modules as $module) {
-                        if ($module['module_type'] !== 'apptype') {
+                        array_push($this->runProcessProgressMethods,
+                            [
+                                'method'    => 'uninstallModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                'text'      => 'Uninstalling module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                'args'      => [$taskName, $module],
+                            ]
+                        );
+
+                        if ($module['module_type'] !== 'views' &&
+                            $module['module_type'] !== 'apptype'
+                        ) {
                             array_push($this->runProcessProgressMethods,
                                 [
-                                    'method'    => 'uninstallModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                    'text'      => 'Uninstalling module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                                    'args'      => [$taskName, $module],
-                                ]
-                            );
-
-                            if ($module['module_type'] !== 'views') {
-                                array_push($this->runProcessProgressMethods,
-                                    [
-                                        'method'    => 'runModuleInstallScripts-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                        'text'      => 'Running module install scripts for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                                        'args'      => [$taskName, $module, true],
-                                    ]
-                                );
-                            }
-                        } else {
-                            $components = $this->modules->components->getComponentsForAppType(strtolower($module['app_type']), true);
-
-                            if ($components && count($components) > 0) {
-                                foreach ($components as $component) {
-                                    if ($component['installed'] == '1') {
-                                        array_push($this->runProcessProgressMethods,
-                                            [
-                                                'method'    => 'runModuleInstallScripts-' . $component['id'] . '-' . strtolower(str_replace(' ', '', $component['name'])),
-                                                'text'      => 'Running module uninstall scripts for ' . $component['name'] . ' (' . ucfirst($component['module_type']) . ')...',
-                                                'args'      => [$taskName, $component, true],
-                                            ]
-                                        );
-                                        array_push($this->runProcessProgressMethods,
-                                            [
-                                                'method'    => 'uninstallModule-' . $component['id'] . '-' . strtolower(str_replace(' ', '', $component['name'])),
-                                                'text'      => 'Uninstalling module ' . $component['name'] . ' (' . ucfirst($component['module_type']) . ')...',
-                                                'args'      => [$taskName, $component],
-                                            ]
-                                        );
-                                    }
-                                }
-                            }
-
-                            $packages = $this->modules->packages->getPackagesForAppType(strtolower($module['app_type']), true);
-
-                            if ($packages && count($packages) > 0) {
-                                foreach ($packages as $package) {
-                                    if ($package['installed'] == '1') {
-                                        array_push($this->runProcessProgressMethods,
-                                            [
-                                                'method'    => 'runModuleInstallScripts-' . $package['id'] . '-' . strtolower(str_replace(' ', '', $package['name'])),
-                                                'text'      => 'Running module uninstall scripts for ' . $package['name'] . ' (' . ucfirst($package['module_type']) . ')...',
-                                                'args'      => [$taskName, $package, true],
-                                            ]
-                                        );
-                                        array_push($this->runProcessProgressMethods,
-                                            [
-                                                'method'    => 'uninstallModule-' . $package['id'] . '-' . strtolower(str_replace(' ', '', $package['name'])),
-                                                'text'      => 'Uninstalling module ' . $package['name'] . ' (' . ucfirst($package['module_type']) . ')...',
-                                                'args'      => [$taskName, $package],
-                                            ]
-                                        );
-                                    }
-                                }
-                            }
-
-                            $middlewares = $this->modules->middlewares->getMiddlewaresForAppType(strtolower($module['app_type']), null, true);
-
-                            if ($middlewares && count($middlewares) > 0) {
-                                foreach ($middlewares as $middleware) {
-                                    if ($middleware['installed'] == '1') {
-                                        array_push($this->runProcessProgressMethods,
-                                            [
-                                                'method'    => 'runModuleInstallScripts-' . $middleware['id'] . '-' . strtolower(str_replace(' ', '', $middleware['name'])),
-                                                'text'      => 'Running module uninstall scripts for ' . $middleware['name'] . ' (' . ucfirst($middleware['module_type']) . ')...',
-                                                'args'      => [$taskName, $middleware, true],
-                                            ]
-                                        );
-                                        array_push($this->runProcessProgressMethods,
-                                            [
-                                                'method'    => 'uninstallModule-' . $middleware['id'] . '-' . strtolower(str_replace(' ', '', $middleware['name'])),
-                                                'text'      => 'Uninstalling module ' . $middleware['name'] . ' (' . ucfirst($middleware['module_type']) . ')...',
-                                                'args'      => [$taskName, $middleware],
-                                            ]
-                                        );
-                                    }
-                                }
-                            }
-
-                            $views = $this->modules->views->getViewsForAppType(strtolower($module['app_type']), true, true);
-
-                            if ($views && count($views) > 0) {
-                                foreach ($views as $view) {
-                                    if($view['installed'] == '1') {
-                                        array_push($this->runProcessProgressMethods,
-                                            [
-                                                'method'    => 'uninstallModule-' . $view['id'] . '-' . strtolower(str_replace(' ', '', $view['name'])),
-                                                'text'      => 'Uninstalling module ' . $view['name'] . ' (' . ucfirst($view['module_type']) . ')...',
-                                                'args'      => [$taskName, $view],
-                                            ]
-                                        );
-                                    }
-                                }
-                            }
-
-                            //AppType
-                            array_push($this->runProcessProgressMethods,
-                                [
-                                    'method'    => 'uninstallModule-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
-                                    'text'      => 'Uninstalling module ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
-                                    'args'      => [$taskName, $module],
+                                    'method'    => 'runModuleInstallScripts-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Running module install scripts for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
+                                    'args'      => [$taskName, $module, true],
                                 ]
                             );
                         }
@@ -2192,7 +2090,6 @@ class Installer extends BasePackage
                     $this->modules->{$module['module_type']}->remove($module['id']);
                 }
             } catch (\throwable $e) {
-                trace([$e]);
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
 
                 return $this->queueHasErrors(
