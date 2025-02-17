@@ -203,7 +203,7 @@ dataCollectionSection =
                         ) {
                             $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId).attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId).attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)[0].checked = true;
+                            // $('#{{componentId}}-{{sectionId}}-component-menu-' + componentId)[0].checked = true;
                             window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = true;
                         } else {
                             //matched during onload extractComponentCheckboxData

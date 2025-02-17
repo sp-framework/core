@@ -139,6 +139,17 @@ class Components extends BasePackage
 		return false;
 	}
 
+	public function getComponentByClass($class)
+	{
+		foreach($this->components as $component) {
+			if ($component['class'] === $class) {
+				return $component;
+			}
+		}
+
+		return false;
+	}
+
 	public function getComponentByClassForAppId($class, $appId = null)
 	{
 		if (!$appId) {
@@ -236,12 +247,17 @@ class Components extends BasePackage
 		return $components;
 	}
 
-	public function getComponentsForAppType($appType)
+	public function getComponentsForAppType($appType, $checkInstalled = false)
 	{
 		$components = [];
 
 		foreach($this->components as $component) {
 			if ($component['app_type'] === $appType) {
+				if ($checkInstalled &&
+					$component['installed'] != '1'
+				) {
+					continue;
+				}
 				$components[$component['id']] = $component;
 			}
 		}
@@ -333,50 +349,71 @@ class Components extends BasePackage
 				$component['settings'] = $this->helper->decode($component['settings'], true);
 			}
 
-			if ($status === true) {
-				$component['apps'][$data['id']]['enabled'] = true;
+			// if ($status === true) {
+			$component['apps'][$data['id']]['enabled'] = (bool) $status;
 
-				if (isset($needAuths[$componentId])) {
-					if (isset($component['settings']['needAuth'])) {
-						if ($component['settings']['needAuth'] === 'mandatory') {
-							$component['apps'][$data['id']]['needAuth'] = 'mandatory';
-						} else if ($component['settings']['needAuth'] === 'disabled') {
-							$component['apps'][$data['id']]['needAuth'] = 'disabled';
-						}
-					} else {
-						$component['apps'][$data['id']]['needAuth'] = $needAuths[$componentId];
+			if (isset($needAuths[$componentId])) {
+				if (isset($component['settings']['needAuth'])) {
+					if ($component['settings']['needAuth'] === 'mandatory') {
+						$component['apps'][$data['id']]['needAuth'] = 'mandatory';
+					} else if ($component['settings']['needAuth'] === 'disabled') {
+						$component['apps'][$data['id']]['needAuth'] = 'disabled';
 					}
 				} else {
-					$component['apps'][$data['id']]['needAuth'] = 'disabled';
+					$component['apps'][$data['id']]['needAuth'] = $needAuths[$componentId];
 				}
+			} else {
+				$component['apps'][$data['id']]['needAuth'] = 'disabled';
+			}
 
-				if (is_string($component['dependencies'])) {
-					$component['dependencies'] = $this->helper->decode($component['dependencies'], true);
-				}
+			if (is_string($component['dependencies'])) {
+				$component['dependencies'] = $this->helper->decode($component['dependencies'], true);
+			}
 
-				if (isset($component['dependencies']['packages']) && count($component['dependencies']['packages']) > 0) {
+			//Only enable packages and not disable them as there is a possibility that other component might be using the same package.
+			if ($status &&
+				isset($component['dependencies']['packages']) && count($component['dependencies']['packages']) > 0
+			) {
+				foreach ($component['dependencies']['packages'] as $key => $dependencyPackage) {
+					$package = $this->modules->packages->getPackageByNameForRepo($dependencyPackage['name'], $dependencyPackage['repo']);
 
-					foreach ($component['dependencies']['packages'] as $key => $dependencyPackage) {
+					if ($package) {
+						$package['apps'] = $this->helper->decode($package['apps'], true);
 
-						$package = $this->modules->packages->getPackageByNameForRepo($dependencyPackage['name'], $dependencyPackage['repo']);
+						$package['apps'][$data['id']]['enabled'] = true;
 
-						if ($package) {
-							$package['apps'] = $this->helper->decode($package['apps'], true);
+						$package['apps'] = $this->helper->encode($package['apps']);
 
-							$package['apps'][$data['id']]['enabled'] = true;
-
-							$package['apps'] = $this->helper->encode($package['apps']);
-
-							$this->modules->packages->update($package);
-						}
+						$this->modules->packages->update($package);
 					}
 				}
-
-				$component['dependencies'] = $this->helper->encode($component['dependencies'], JSON_UNESCAPED_SLASHES);
-
-			} else if ($status === false) {
-				$component['apps'][$data['id']]['enabled'] = false;
 			}
+
+			if (isset($component['dependencies']['views']) && count($component['dependencies']['views']) > 0) {
+				foreach ($component['dependencies']['views'] as $key => $dependencyView) {
+					$view = $this->modules->views->getViewByRepo($dependencyView['repo']);
+
+					if ($view) {
+						//Only change the subviews to false as main view is being used by other components.
+						if (!$status && array_key_exists('is_subview', $view) && $view['is_subview'] == false) {
+							continue;
+						}
+						$view['apps'] = $this->helper->decode($view['apps'], true);
+
+						$view['apps'][$data['id']]['enabled'] = (bool) $status;
+
+						$view['apps'] = $this->helper->encode($view['apps']);
+
+						$this->modules->views->update($view);
+					}
+				}
+			}
+
+			$component['dependencies'] = $this->helper->encode($component['dependencies'], JSON_UNESCAPED_SLASHES);
+
+			// } else if ($status === false) {
+			// 	$component['apps'][$data['id']]['enabled'] = false;
+			// }
 
 			$component['apps'] = $this->helper->encode($component['apps']);
 

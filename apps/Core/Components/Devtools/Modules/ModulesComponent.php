@@ -28,6 +28,8 @@ class ModulesComponent extends BaseComponent
 	 */
 	public function viewAction()
 	{
+		$this->view->bundles = false;
+		$this->view->bundlesjson = false;
 		if (isset($this->getData()['bundles'])) {
 			$this->view->bundles = true;
 
@@ -99,11 +101,68 @@ class ModulesComponent extends BaseComponent
 				$modulesArr = $this->processModulesArr(msort($this->modules->{$modulesType}->{$modulesType}, 'name'));
 				${$modulesType . 'CategoryArr'} = $modulesArr['categoryArr'];
 			}
+
 			if ($modulesArr['modules'] && count($modulesArr['modules']) > 0) {
-				$modules[$modulesType]['value'] = ucfirst($modulesType);
-				$modules[$modulesType]['childs'] = $modulesArr['modules'];
+				if ($modulesType === 'views') {
+					if (isset($this->view->subview)) {
+						foreach ($modulesArr['modules'] as $moduleArrKey => $moduleArr) {
+							if (array_key_exists('is_subview', $moduleArr) &&
+								$moduleArr['is_subview'] == true
+							) {
+								continue;
+							}
+							$modules[$modulesType]['value'] = ucfirst($modulesType);
+							$modules[$modulesType]['childs'][$moduleArrKey] = $moduleArr;
+						}
+					} else if (!isset($this->view->subview)) {
+						$modules[$modulesType]['value'] = ucfirst($modulesType);
+						$modules[$modulesType]['childs'] = $modulesArr['modules'];
+					}
+				} else {
+					$modules[$modulesType]['value'] = ucfirst($modulesType);
+					$modules[$modulesType]['childs'] = $modulesArr['modules'];
+				}
 			} else {
 				$modules[$modulesType]['childs'] = [];
+			}
+		}
+
+		if (isset($this->getData()['type'])) {
+			// For all - core, apptype
+			// For components - packages, middlewares, views (only subview), externals
+			// For packages - middlewares, externals
+			// For middlewares - packages, externals
+			// For views (baseview) - packages (for any tag packages like adminltetags)
+			// For views (sub) - views (only baseview)
+			// For bundles - components, packages, middlewares, views, bundles, externals
+			if ($this->getData()['type'] === 'components') {
+				unset($modules['components']);
+				unset($modules['bundles']);
+				if (count($modules['views']['childs']) > 0) {
+					foreach ($modules['views']['childs'] as $childKey => $child) {
+						if ($child['is_subview'] != true) {
+							unset($modules['views']['childs'][$childKey]);
+						}
+					}
+				}
+			} else if ($this->getData()['type'] === 'packages') {
+				unset($modules['packages']);
+				unset($modules['views']);
+				unset($modules['bundles']);
+				$this->view->packageSettingsModules = $modules;
+				unset($modules['components']);
+			} else if ($this->getData()['type'] === 'middlewares') {
+				unset($modules['components']);
+				unset($modules['middlewares']);
+				unset($modules['views']);
+				unset($modules['bundles']);
+			} else if ($this->getData()['type'] === 'views') {
+				unset($modules['components']);
+				unset($modules['middlewares']);
+				unset($modules['bundles']);
+				if (!isset($this->view->subview)) {
+					unset($modules['views']);
+				}
 			}
 		}
 
@@ -112,7 +171,9 @@ class ModulesComponent extends BaseComponent
 		$modulesJson = [];
 
 		foreach ($modules as $moduleKey => $moduleJson) {
-			if ($moduleKey === 'bundles') {
+			if ($moduleKey === 'bundles' &&
+				!$this->view->bundles
+			) {
 				continue;
 			}
 
@@ -149,6 +210,11 @@ class ModulesComponent extends BaseComponent
 
 			if ($type !== 'apptypes') {
 				if ($type !== 'core' && $type !== 'bundles') {
+					if (isset($modules['bundles'])) {
+						unset($modules['bundles']);
+					}
+					$this->view->modules = $modules;
+
 					$this->view->categoryArr = ${$type . 'CategoryArr'};
 
 					if ($type === 'components') {
@@ -165,7 +231,11 @@ class ModulesComponent extends BaseComponent
 			$this->view->apis = $apis;
 			$this->view->moduleTypes = $this->modulesPackage->getModuleTypes();
 			$this->view->moduleSettings = $this->modulesPackage->getDefaultSettings();
-			$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies($type);
+			if (isset($this->view->subview)) {
+				$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies($type, true);
+			} else {
+				$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies($type);
+			}
 			$this->view->moduleMenu = $this->helper->encode([]);
 			$this->view->moduleWidgets = $this->helper->encode([]);
 
@@ -388,7 +458,7 @@ class ModulesComponent extends BaseComponent
 			$this->view->apis = $apis;
 			unset($appTypes['core']);//Remove core
 			$this->view->appTypes = $appTypes;
-			$this->view->bundleModules = $this->modulesPackage->getDefaultDependencies();
+			$this->view->bundleModules = $this->modulesPackage->getDefaultDependencies('bundles');
 
 			if ($this->getData()['id'] != 0) {
 				$bundle = $this->modules->bundles->getById($this->getData()['id']);
@@ -402,10 +472,18 @@ class ModulesComponent extends BaseComponent
 				}
 				$this->view->bundle = $bundle;
 				$this->view->bundleModules = $bundle['bundle_modules'];
-			}
 
-			if (isset($modules['bundles'])) {
-				unset($modules['bundles']);
+				if (isset($modules['bundles']['childs'])) {
+					foreach ($modules['bundles']['childs'] as $childBundleKey => $childBundle) {
+						if ($bundle['id'] === $childBundle['id']) {
+							unset($modules['bundles']['childs'][$childBundleKey]);
+						}
+					}
+
+					if (count($modules['bundles']['childs']) === 0) {
+						unset($modules['bundles']);
+					}
+				}
 			}
 
 			$this->view->modules = $modules;
@@ -685,6 +763,22 @@ class ModulesComponent extends BaseComponent
 		$this->requestIsPost();
 
 		$this->modulesPackage->generateModuleRepoUrl($this->postData());
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
+
+		if ($this->modulesPackage->packagesData->responseData) {
+			$this->view->responseData = $this->modulesPackage->packagesData->responseData;
+		}
+	}
+
+	public function getDefaultDependenciesAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->getDefaultDependencies($this->postData()['type'], $this->postData()['is_subview']);
 
 		$this->addResponse(
 			$this->modulesPackage->packagesData->responseMessage,

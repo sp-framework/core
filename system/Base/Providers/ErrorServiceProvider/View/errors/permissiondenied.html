@@ -1,0 +1,27 @@
+{% set sectionId = '403' %}
+<div id="{{componentId}}-{{sectionId}}">
+    <div class="row">
+        <div class="col">
+            <div class="jumbotron text-center bg-danger">
+                <h1>
+                    <span class="text-white"><i class="fas fa-fw fa-ban"></i> Permission Denied! (Error:403)</span>
+                </h1>
+                <p class="lead">Not allowed to access this resource.</p>
+                <a href="#" class="btn btn-primary btn-lg text-center contentAjaxLink">
+                    <span class="text-uppercase">Try Again</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h2>What happened?</h2>
+            <p class="lead">A 403 error status implies that you do not have access to this resource.</p>
+        </div>
+        <div class="col">
+            <h2>What can I do?</h2>
+            <p class="lead">Nothing you can do at the moment. If you need immediate assistance, please
+                <a href="mailto:?Subject=Permission%20Denied%20Error">contact</a> us.</p>
+        </div>
+    </div>
+</div>

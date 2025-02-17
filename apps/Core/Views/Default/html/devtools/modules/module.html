@@ -784,7 +784,7 @@ dataCollectionSection =
                     {% set bundleId = '0' %}
                 {% endif %}
                 <script>
-/* globals paginatedPNotify BazHelpers */
+/* globals paginatedPNotify BazHelpers Swal dataCollection */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -951,6 +951,58 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-bundle_modules'                          : {
             'afterInit'     : function() {
                 var id, label, moduleData;
+
+                $('#{{componentId}}-{{sectionId}}-modules-reset').off();
+                $('#{{componentId}}-{{sectionId}}-modules-reset').click(function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title                       : '<span class="text-danger"> Reset dependencies?</span>',
+                        icon                        : 'question',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Yes',
+                        customClass                 : {
+                            'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        didOpen                     : function() {
+                            dataCollection.env.sounds.swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                            var postData = { };
+                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+                            postData['type'] = 'bundles';
+                            postData['is_subview'] = false;
+
+                            $.post('{{links.url("devtools/modules/getDefaultDependencies")}}', postData, function(response) {
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+
+                                if (response.responseCode == 0) {
+                                    if (response.responseData && response.responseData.defaultDependencies) {
+                                        dataCollectionSectionForm['vars']['bundleModules'] = response.responseData.defaultDependencies;
+                                        $('#{{componentId}}-{{sectionId}}-bundle_modules').val(JSON.stringify(response.responseData.defaultDependencies));
+                                        prettyfyJson();
+                                    }
+
+                                    paginatedPNotify('success', {'text': response.responseMessage});
+                                } else {
+                                    paginatedPNotify('error', {'text': 'Error while retrieving default modules'});
+                                }
+                            }, 'json');
+                        }
+                    });
+                });
+
                 $('#{{componentId}}-{{sectionId}}-modules-external, ' +
                   '#{{componentId}}-{{sectionId}}-modules-external-version'
                 ).on('keyup', function() {
@@ -1087,7 +1139,7 @@ dataCollectionSection =
                                 });
 
                                 if (found) {
-                                    dataCollectionSectionForm['vars']['bundleModules'][modules].splice(foundIndex);
+                                    dataCollectionSectionForm['vars']['bundleModules'][modules].splice(foundIndex, 1);
                                 }
                             }
                         }
@@ -1395,7 +1447,7 @@ dataCollectionSection =
                 {% set subView = true %}
             {% endif %}
             <script>
-/* globals paginatedPNotify BazHelpers */
+/* globals paginatedPNotify BazHelpers Swal dataCollection */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -1972,7 +2024,7 @@ dataCollectionSection =
                         if (dataCollectionSectionForm['vars']['moduleWidgets'].length > 0) {
                             $(dataCollectionSectionForm['vars']['moduleWidgets']).each(function(index, widget) {
                                 if (widget['method'] === $('#{{componentId}}-{{sectionId}}-widget-method').val()) {
-                                    dataCollectionSectionForm['vars']['moduleWidgets'].splice(index);
+                                    dataCollectionSectionForm['vars']['moduleWidgets'].splice(index, 1);
                                 }
                             });
 
@@ -2982,6 +3034,61 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-dependencies'                            : {
             'afterInit'     : function() {
                 var id, label, moduleData;
+
+                $('#{{componentId}}-{{sectionId}}-dependencies-reset').off();
+                $('#{{componentId}}-{{sectionId}}-dependencies-reset').click(function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title                       : '<span class="text-danger"> Reset dependencies?</span>',
+                        icon                        : 'question',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Yes',
+                        customClass                 : {
+                            'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        didOpen                     : function() {
+                            dataCollection.env.sounds.swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                            var postData = { };
+                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+                            postData['type'] = '{{type}}';
+                            postData['is_subview'] = false;
+                            if (postData['type'] === 'views' && dataCollectionSectionForm['vars']['subview'] == true) {
+                                postData['is_subview'] = true;
+                            }
+
+                            $.post('{{links.url("devtools/modules/getDefaultDependencies")}}', postData, function(response) {
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+
+                                if (response.responseCode == 0) {
+                                    if (response.responseData && response.responseData.defaultDependencies) {
+                                        dataCollectionSectionForm['vars']['moduleDependencies'] = response.responseData.defaultDependencies;
+                                        $('#{{componentId}}-{{sectionId}}-dependencies').val(JSON.stringify(response.responseData.defaultDependencies));
+                                        prettyfyJson();
+                                    }
+
+                                    paginatedPNotify('success', {'text': response.responseMessage});
+                                } else {
+                                    paginatedPNotify('error', {'text': 'Error while retrieving default dependencies'});
+                                }
+                            }, 'json');
+                        }
+                    });
+                });
+
                 $('#{{componentId}}-{{sectionId}}-dependencies-external, ' +
                   '#{{componentId}}-{{sectionId}}-dependencies-external-version'
                 ).on('keyup', function() {
@@ -3179,13 +3286,14 @@ dataCollectionSection =
                                 });
 
                                 if (found) {
-                                    if (modules === 'views') {
+                                    if (modules === 'views' && dataCollectionSectionForm['vars']['module_type'] === 'views') {
                                         $('#{{componentId}}-{{sectionId}}-base_view_module_id').val('0');
 
                                         $('#{{componentId}}-{{sectionId}}-base_view_module')[0].checked = true;
                                         $('#{{componentId}}-{{sectionId}}-base_view_module').attr('disabled', false);
                                     }
-                                    dataCollectionSectionForm['vars']['moduleDependencies'][modules].splice(foundIndex);
+
+                                    dataCollectionSectionForm['vars']['moduleDependencies'][modules].splice(foundIndex, 1);
                                 }
                             }
                         }

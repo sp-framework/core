@@ -131,8 +131,8 @@
                 'fieldJstreeEdit'                           : false,
                 'fieldJstreeExpand'                         : true,
                 'fieldJstreeCollapse'                       : true,
-                'fieldJstreeFirstOpen'                      : true,
-                'fieldJstreeAllOpen'                        : true,
+                'fieldJstreeFirstOpen'                      : false,
+                'fieldJstreeAllOpen'                        : false,
                 'fieldJstreeAllChecked'                     : false,
                 'fieldJstreeRootIcon'                       : 'th',
                 'fieldJstreeToggleAllChildren'              : true,
@@ -157,6 +157,11 @@
         <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-error" hidden>
             <div class="col">
                 <h6><i class="fa fa-fw fa-info-circle text-danger"></i> Error loading module information. Please contact administrator.</h6>
+            </div>
+        </div>
+        <div class="row m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-repo" hidden>
+            <div class="col">
+                {% include('modules/repo') %}
             </div>
         </div>
         <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-moduleinfo-noinfo">
@@ -283,7 +288,7 @@
 {% set queue = str_replace('\\', '\\\\', queue) %}
 {% set modules = json_encode(modules, 16) %}
 <script>
-/*global BazProgress Swal BazContentFields BazHelpers BazContentLoader Pace BazCore paginatedPNotify */
+/*global BazProgress Swal dataCollection BazContentFields BazHelpers BazContentLoader Pace BazCore paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -349,6 +354,29 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-queue_id'                    : { },
+        '{{componentId}}-{{sectionId}}-import_repo'                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-import').click(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true)[0] === 'undefined') {
+                        paginatedPNotify('notice', {
+                            text        : 'Please select repository from the tree!',
+                            textTrusted : true
+                        });
+
+                        return;
+                    }
+
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+
+                    dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync');
+                    dataCollectionSectionForm['funcs']['initSync'](
+                        $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true)[0],
+                        $('#{{componentId}}-{{sectionId}}-import_repo').val().trim()
+                    );
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-form'                        : {
             rules: { },
             messages: { }
@@ -369,23 +397,21 @@ dataCollectionSectionForm['vars']['syncInfo'] = '';
 
 dataCollectionSectionForm['funcs'] = { };
 
-dataCollectionSectionForm['funcs']['jstreeReady'] = function() {
+dataCollectionSectionForm['funcs']['jstreeReady'] = function(selectedRepo = null) {
     $('#{{componentId}}-{{sectionId}}-modules').off('ready.jstree');
     $('#{{componentId}}-{{sectionId}}-modules').on('ready.jstree', function(e) {
         dataCollectionSectionForm['vars']['rootTree'] = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_json('#', {flat:true});
 
-        var selected;
+        if (selectedRepo) {
+            $(dataCollectionSectionForm['vars']['rootTree']).each(function(i, v) {
+                v.text = v.text.toLowerCase();
+                if (v.data.apiid == selectedRepo.data.apiid && v.data.type === 'repo') {
+                    $('#{{componentId}}-{{sectionId}}-modules').jstree().select_node(v.id);
 
-        $(dataCollectionSectionForm['vars']['rootTree']).each(function(i, v) {
-            v.text = v.text.toLowerCase();
-            if (v.data.apiid == '1' && v.data.type === 'repo' && v.text.includes('core')) {
-                selected = v.id;
-
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().select_node(v.id);
-
-                return false;
-            }
-        });
+                    return false;
+                }
+            });
+        }
 
         dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'](null, false, false, false, true);
     });
@@ -482,9 +508,10 @@ dataCollectionSectionForm['funcs']['initJstreeButtons'] = function() {
         }
 
         if ($(this)[0].id === '{{componentId}}-{{sectionId}}-modules-repo-sync') {
+            dataCollectionSectionForm['funcs']['moduleinfo'](['noinfo']);
             dataCollectionSectionForm['funcs']['toggleJstreeTool']($(this)[0].id);
             dataCollectionSectionForm['funcs']['initSync'](
-                $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true)[0].data.apiid
+                $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true)[0]
             );
 
             return;
@@ -668,13 +695,13 @@ dataCollectionSectionForm['funcs']['applyColorsToTreeIconsAndUpdateText'] =
                 dataCollectionSectionForm['vars']['initJstree'] = false;
             }
 
-            dataCollectionSectionForm['vars']['filter'] = true;
-            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
-            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
+            // dataCollectionSectionForm['vars']['filter'] = true;
+            // $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('update');
+            // $('#{{componentId}}-{{sectionId}}-modules').jstree().search('update');
         } else if (dataCollectionSectionForm['vars']['new_available'] == 1) {
-            dataCollectionSectionForm['vars']['filter'] = true;
-            $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('new');
-            $('#{{componentId}}-{{sectionId}}-modules').jstree().search('new');
+            // dataCollectionSectionForm['vars']['filter'] = true;
+            // $('#{{componentId}}-{{sectionId}}-modules-tree-search-input').val('new');
+            // $('#{{componentId}}-{{sectionId}}-modules').jstree().search('new');
         }
 
         if (dataCollectionSectionForm['vars']['queue']['total'] > 0) {
@@ -692,6 +719,8 @@ dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
     $('#{{componentId}}-{{sectionId}}-modules').off('select_node.jstree');
     $('#{{componentId}}-{{sectionId}}-modules').on('select_node.jstree', function() {
         var selected = $('#{{componentId}}-{{sectionId}}-modules').jstree().get_selected(true);
+
+        $('#{{componentId}}-{{sectionId}}-modules').jstree('open_all', selected[0].id);
 
         if (selected[0].id.startsWith('j')) {
             if (selected[0].data.type !== 'repo') {
@@ -714,7 +743,7 @@ dataCollectionSectionForm['funcs']['jstreeSelectNode'] = function() {
                     'href', '{{links.url("system/api/client/services/q/id/' + selected[0].data.apiid + '")}}'
                 );
                 dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync', 'primary', false);
-                dataCollectionSectionForm['funcs']['moduleinfo']();
+                dataCollectionSectionForm['funcs']['moduleinfo'](['repo']);
             }
         } else {
             if (selected[0].data.type !== 'repo') {
@@ -780,7 +809,8 @@ dataCollectionSectionForm['funcs']['moduleinfo'] = function(show = ['noinfo'], s
     }
 
     if (show.length > 0) {
-        var moduleinfos = ['loader', 'info', 'noinfo', 'error', 'buttons'];
+        var moduleinfos = ['repo', 'loader', 'info', 'noinfo', 'error', 'buttons'];
+
         $(moduleinfos).each(function(e, moduleinfo) {
             if (show.includes(moduleinfo)) {
                 $('#{{componentId}}-{{sectionId}}-moduleinfo-' + moduleinfo).attr('hidden', false);
@@ -901,8 +931,14 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
         moduleData['installed'] = '<span class="badge badge-secondary text-xs">No</span>';
     }
 
+    if (moduleData['module_type'] === 'bundles') {
+        moduleData['installed'] = '-';
+    }
+
     if (moduleData['update_available'] !== '-' && moduleData['update_available'] == 1) {
         moduleData['update_available'] = '<span class="badge badge-info text-xs">Yes</span>';
+    } else {
+        moduleData['update_available'] = '<span class="badge badge-secondary text-xs">No</span>';
     }
     if (moduleData['update_version'] !== '-') {
         moduleData['update_version'] = '<span class="badge badge-info text-xs">' + moduleData['update_version'] + '</span>';
@@ -928,6 +964,14 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
     }
     $('#update_available').html(moduleData.update_available);
     $('#update_version').html(moduleData.update_version);
+    $($('#update_available').parents('.col')[0]).attr('hidden', false);
+    $($('#update_version').parents('.col')[0]).attr('hidden', false);
+    $($('#installed').parents('.col')[0]).attr('hidden', false);
+    if (moduleData['module_type'] === 'bundles') {
+        $($('#update_available').parents('.col')[0]).attr('hidden', true);
+        $($('#update_version').parents('.col')[0]).attr('hidden', true);
+        $($('#installed').parents('.col')[0]).attr('hidden', true);
+    }
     $('#updated_on').html(moduleData.updated_on);
     $('#installed').html(moduleData.installed);
     $('#version').html(moduleData.version);
@@ -976,59 +1020,83 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
         $('#{{componentId}}-{{sectionId}}-level_of_update').val(moduleInfo.level_of_update).trigger('change');
     }
 
-    if (moduleInfo.installed == '1') {
-        if (moduleInfo.update_available == '1') {
-            if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type] &&
-                (BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type], moduleInfo.id) > -1)
-            ) {
-                if (moduleData['module_type'] !== 'externals') {
-                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
-                } else {
-                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
-                }
-            } else {
-                if (moduleData['module_type'] !== 'externals') {
-                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'remove', 'repo-sync']);
-                } else {
-                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'remove'], false);
-                }
-            }
+    if (moduleData['module_type'] === 'bundles') {
+        if ((dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
+             Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type]).length > 0 &&
+             BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type], moduleInfo.id) > -1) ||
+            (dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type] &&
+             Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type]).length > 0 &&
+             BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type], moduleInfo.id) > -1) ||
+            (dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type] &&
+             Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type]).length > 0 &&
+             BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type], moduleInfo.id) > -1)
+        ) {
+            dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
         } else {
-            if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
-                (BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type], moduleInfo.id) > -1)
-            ) {
-                if (moduleData['module_type'] !== 'externals') {
-                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
-                } else {
-                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
-                }
-            } else {
-                if (moduleData['module_type'] !== 'externals') {
-                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['uninstall', 'remove', 'repo-sync']);
-                } else {
-                    dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['uninstall', 'remove'], false);
-                }
-            }
+            dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['install', 'uninstall', 'remove', 'repo-sync']);
         }
     } else {
-        if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleData.module_type]) {
-            index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleData.module_type], moduleData.id);
-        }
-        if (!index && dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleData.module_type]) {
-            index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleData.module_type], moduleData.id);
-        }
-
-        if (index > -1) {
-            if (moduleData['module_type'] !== 'externals') {
-                dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel', 'repo-sync']);
+        if (moduleInfo.installed == '1') {
+            if (moduleInfo.update_available == '1') {
+                if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type] &&
+                    (BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type], moduleInfo.id) > -1)
+                ) {
+                    if (moduleData['module_type'] !== 'externals') {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
+                    } else {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
+                    }
+                } else {
+                    if (moduleData['module_type'] !== 'externals') {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'uninstall', 'remove', 'repo-sync']);
+                    } else {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'uninstall', 'remove'], false);
+                    }
+                }
             } else {
-                dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel'], false);
+                if ((dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
+                     Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type]).length > 0 &&
+                     BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type], moduleInfo.id) > -1) ||
+                    (dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type] &&
+                     Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type]).length > 0 &&
+                     BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type], moduleInfo.id) > -1) ||
+                    (dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type] &&
+                     Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type]).length > 0 &&
+                     BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type], moduleInfo.id) > -1)
+                ) {
+                    if (moduleData['module_type'] !== 'externals') {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
+                    } else {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
+                    }
+                } else {
+                    if (moduleData['module_type'] !== 'externals') {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['uninstall', 'remove', 'repo-sync']);
+                    } else {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['uninstall', 'remove'], false);
+                    }
+                }
             }
         } else {
-            if (moduleData['module_type'] !== 'externals') {
-                dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
+            if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleData.module_type]) {
+                index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleData.module_type], moduleData.id);
+            }
+            if (!index && dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleData.module_type]) {
+                index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleData.module_type], moduleData.id);
+            }
+
+            if (index > -1) {
+                if (moduleData['module_type'] !== 'externals') {
+                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel', 'repo-sync']);
+                } else {
+                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel'], false);
+                }
             } else {
-                dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove'], false);
+                if (moduleData['module_type'] !== 'externals') {
+                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
+                } else {
+                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove'], false);
+                }
             }
         }
     }
@@ -1039,6 +1107,9 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
         if (moduleData.bundle_modules && Object.keys(moduleData.bundle_modules).length > 0) {
             for (var bundleModuleType in moduleData.bundle_modules) {
                 if (bundleModuleType === 'core' || bundleModuleType === 'apptype') {
+                    if (moduleData.bundle_modules[bundleModuleType].length === 0) {
+                        continue;
+                    }
                     bundleModuleHtml +=
                     '       <tr>' +
                     '           <td>' +  moduleData.bundle_modules[bundleModuleType]['name'] + '</td>' +
@@ -1162,21 +1233,103 @@ dataCollectionSectionForm['funcs']['initModuleButtons'] = function() {
     $('#{{componentId}}-{{sectionId}}-moduleinfo-uninstall').click(function(e) {
         e.preventDefault();
 
-        dataCollectionSectionForm['funcs']['updateQueue'](
-            dataCollectionSectionForm['vars']['module']['id'],
-            dataCollectionSectionForm['vars']['module']['module_type'],
-            'uninstall'
-        );
+        if (dataCollectionSectionForm['vars']['module']['module_type'] === 'apptype') {
+            Swal.fire({
+                title                       : '<span class="text-danger"> Uninstalling Apptype will uninstall all modules with this Apptype. Proceed?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Yes',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : true,
+                allowEscapeKey              : true,
+                didOpen                     : function() {
+                    dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    dataCollectionSectionForm['funcs']['updateQueue'](
+                        dataCollectionSectionForm['vars']['module']['id'],
+                        dataCollectionSectionForm['vars']['module']['module_type'],
+                        'uninstall'
+                    );
+                }
+            });
+        } else {
+            dataCollectionSectionForm['funcs']['updateQueue'](
+                dataCollectionSectionForm['vars']['module']['id'],
+                dataCollectionSectionForm['vars']['module']['module_type'],
+                'uninstall'
+            );
+        }
     });
 
     $('#{{componentId}}-{{sectionId}}-moduleinfo-remove').click(function(e) {
         e.preventDefault();
 
-        dataCollectionSectionForm['funcs']['updateQueue'](
-            dataCollectionSectionForm['vars']['module']['id'],
-            dataCollectionSectionForm['vars']['module']['module_type'],
-            'remove'
-        );
+        if (dataCollectionSectionForm['vars']['module']['module_type'] === 'apptype') {
+            Swal.fire({
+                title                       : '<span class="text-danger"> Removing Apptype will uninstall all modules with this Apptype and remove them from the system. Proceed?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Yes',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : true,
+                allowEscapeKey              : true,
+                didOpen                     : function() {
+                    dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    dataCollectionSectionForm['funcs']['updateQueue'](
+                        dataCollectionSectionForm['vars']['module']['id'],
+                        dataCollectionSectionForm['vars']['module']['module_type'],
+                        'remove'
+                    );
+                }
+            });
+        } else {
+            Swal.fire({
+                title                       : '<span class="text-danger"> Removing will uninstall the module and remove it from the system. Proceed?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Yes',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : true,
+                allowEscapeKey              : true,
+                didOpen                     : function() {
+                    dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    dataCollectionSectionForm['funcs']['updateQueue'](
+                        dataCollectionSectionForm['vars']['module']['id'],
+                        dataCollectionSectionForm['vars']['module']['module_type'],
+                        'remove'
+                    );
+                }
+            });
+        }
     });
 
     $('#{{componentId}}-{{sectionId}}-moduleinfo-cancel').click(function(e) {
@@ -1364,7 +1517,7 @@ dataCollectionSectionForm['funcs']['clearQueue'] = function() {
     $('#{{componentId}}-{{sectionId}}-modules').jstree().deselect_all();
 }
 
-dataCollectionSectionForm['funcs']['initSync'] = function(val) {
+dataCollectionSectionForm['funcs']['initSync'] = function(selectedRepo, importRepo = null) {
     dataCollectionSectionForm['vars']['sync'] = true;
     $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-sync-alt").addClass("fa-cog fa-spin");
     $('#{{componentId}}-{{sectionId}}-analyse-queue').addClass('disabled');
@@ -1385,16 +1538,25 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
         $('#{{componentId}}-{{sectionId}}-modules-empty').remove();
     }
 
+    var syncText = 'Syncing modules...';
+
+    if (importRepo) {
+        syncText = 'Importing module...';
+    }
+
     $('#{{componentId}}-{{sectionId}}-modules').append(
         '<div id="{{componentId}}-{{sectionId}}-modules-empty" class="text-center">' +
-            '<i class="fa fa-cog fa-spin"></i> Syncing modules...' +
+            '<i class="fa fa-cog fa-spin"></i> ' + syncText +
         '</div>'
     );
 
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
-    postData['api_id'] = val;
+    postData['api_id'] = selectedRepo.data.apiid;
     postData['get_repository_modules'] = true;
+    if (importRepo) {
+        postData['import_repo'] = importRepo;
+    }
 
     $.post('{{links.url("modules/sync")}}', postData, function(response) {
         dataCollectionSectionForm['vars']['sync'] = false;
@@ -1407,7 +1569,7 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
             $('#{{componentId}}-{{sectionId}}-modules').jstree().destroy();
 
             if (response.responseData) {
-                dataCollectionSectionForm['funcs']['processSync'](response);
+                dataCollectionSectionForm['funcs']['processSync'](response, selectedRepo);
             }
         } else {
             paginatedPNotify('error', {
@@ -1421,16 +1583,25 @@ dataCollectionSectionForm['funcs']['initSync'] = function(val) {
 
             $('#{{componentId}}-{{sectionId}}-modules').children('ul').show();
         }
+
         dataCollectionSectionForm['funcs']['toggleJstreeTool']('{{componentId}}-{{sectionId}}-modules-repo-sync', 'primary', false);
         $('#{{componentId}}-{{sectionId}}-modules-repo-sync').children("i").removeClass("fa-cog fa-spin").addClass("fa-sync-alt");
+
+        if (importRepo) {
+            $('#{{componentId}}-{{sectionId}}-import').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-import').children('i').attr('hidden', true);
+        }
     }, 'json');
 }
 
-dataCollectionSectionForm['funcs']['processSync'] = function(response) {
-    var text = 'Sync Complete.<br>';
+dataCollectionSectionForm['funcs']['processSync'] = function(response, selectedRepo) {
+    var paginateText;
     var newCounter = 0;
+    var newCounterText = '';
     var updatesCounter = 0;
+    var updateCounterText = '';
     var noReleaseCounter = 0;
+    var noReleaseCounterText = '';
     var newModule = 'new module';
     var update = 'update';
     var noRelease = ' module with no release. It was ignored.';
@@ -1439,7 +1610,7 @@ dataCollectionSectionForm['funcs']['processSync'] = function(response) {
         newCounter = response.responseData.counter.new.count;
 
         if (response.responseData.counter.new.api && response.responseData.counter.new.api.name) {
-                text += response.responseData.counter.new.api.name + ' has '
+                newCounterText += response.responseData.counter.new.api.name + ' has '
         }
     }
 
@@ -1447,7 +1618,7 @@ dataCollectionSectionForm['funcs']['processSync'] = function(response) {
         updatesCounter = response.responseData.counter.updates.count;
 
         if (response.responseData.counter.updates.api && response.responseData.counter.updates.api.name) {
-            text += response.responseData.counter.updates.api.name + ' has '
+            updateCounterText += response.responseData.counter.updates.api.name + ' has '
         }
     }
 
@@ -1455,7 +1626,7 @@ dataCollectionSectionForm['funcs']['processSync'] = function(response) {
         noReleaseCounter = response.responseData.counter.noRelease.count;
 
         if (response.responseData.counter.noRelease.api && response.responseData.counter.noRelease.api.name) {
-            text += response.responseData.counter.noRelease.api.name + ' has '
+            noReleaseCounterText += response.responseData.counter.noRelease.api.name + ' has '
         }
     }
 
@@ -1469,22 +1640,58 @@ dataCollectionSectionForm['funcs']['processSync'] = function(response) {
         if (noReleaseCounter > 1) {
             noRelease = ' modules with no release. They were ignored.';
         }
-        if (newCounter !== 0 && updatesCounter === 0) {
-            dataCollectionSectionForm['vars']['new_available'] = newCounter;
-            text += newCounter + ' ' + newModule + ' available.<br> No ' + update + ' available.';
-        } else if (newCounter === 0 && updatesCounter !== 0) {
-            text += updatesCounter + ' new ' + update + ' available.<br> No ' + newModule + ' available.';
-        } else if (newCounter !== 0 && updatesCounter !== 0) {
-            text += updatesCounter + ' new ' + update + ' available.<br>' + newCounter + ' ' + newModule + ' available.';
-        }
 
-        if ((newCounter !== 0 || updatesCounter !== 0) && noReleaseCounter !== 0) {
-            text += '<br>'  + noReleaseCounter + noRelease + '<br>';
-        } else if (noReleaseCounter !== 0) {
-            text += noReleaseCounter + noRelease + '<br>';
+        if (newCounter > 0) {
+            dataCollectionSectionForm['vars']['new_available'] = newCounter;
+            paginateText = 'Sync Complete.<br>';
+            paginateText += newCounterText + newCounter + ' ' + newModule + ' available.';
+
+            paginatedPNotify('info', {
+                text        : paginateText,
+                textTrusted : true
+            });
         }
+        if (updatesCounter > 0) {
+            dataCollectionSectionForm['vars']['update_available'] = 1;
+            dataCollectionSectionForm['vars']['initJstree'] = false;
+            paginateText = 'Sync Complete.<br>';
+            paginateText += updatesCounter + ' ' + update + ' available.';
+
+            paginatedPNotify('info', {
+                text        : paginateText,
+                textTrusted : true
+            });
+        }
+        if (noReleaseCounter > 0) {
+            paginateText = 'Sync Complete.<br>';
+            paginateText += noReleaseCounter + noRelease;
+
+            paginatedPNotify('notice', {
+                text        : paginateText,
+                textTrusted : true
+            });
+        }
+        // if (newCounter !== 0 && updatesCounter === 0) {
+        //     text += newCounter + ' ' + newModule + ' available.<br> No ' + update + ' available.';
+        // } else if (newCounter === 0 && updatesCounter !== 0) {
+        //     text += updatesCounter + ' new ' + update + ' available.<br> No ' + newModule + ' available.';
+        // } else if (newCounter !== 0 && updatesCounter !== 0) {
+        //     text += updatesCounter + ' new ' + update + ' available.<br>' + newCounter + ' ' + newModule + ' available.';
+        // }
+
+        // if ((newCounter !== 0 || updatesCounter !== 0) && noReleaseCounter !== 0) {
+        //     text += '<br>'  + noReleaseCounter + noRelease + '<br>';
+        // } else if (noReleaseCounter !== 0) {
+        //     text += noReleaseCounter + noRelease + '<br>';
+        // }
     } else {
-        text = 'Sync Complete.<br>No ' + newModule + ' or ' + update + ' available.';
+        paginateText = 'Sync Complete.<br>';
+        paginateText += 'No ' + newModule + ' or ' + update + ' available.';
+
+        paginatedPNotify('info', {
+            text        : paginateText,
+            textTrusted : true
+        });
     }
 
     if (response.responseData.modules) {
@@ -1499,6 +1706,10 @@ dataCollectionSectionForm['funcs']['processSync'] = function(response) {
             '</div>';
 
         $('#{{componentId}}-{{sectionId}}-modules-tree-div').empty().html(modulesHtml);
+
+        if (dataCollectionSection['{{componentId}}-{{sectionId}}-modules']['jstree']) {
+            delete dataCollectionSection['{{componentId}}-{{sectionId}}-modules']['jstree'];
+        }
     }
 
     BazContentFields.init({
@@ -1508,24 +1719,23 @@ dataCollectionSectionForm['funcs']['processSync'] = function(response) {
     });
 
     dataCollectionSectionForm['funcs']['jstreeSelectNode']();
-    dataCollectionSectionForm['funcs']['jstreeReady']();
+    dataCollectionSectionForm['funcs']['jstreeReady'](selectedRepo);
+    // dataCollectionSectionForm['vars']['syncInfo'] = text;
 
-    dataCollectionSectionForm['vars']['syncInfo'] = text;
-
-    if (updatesCounter > 0) {
-        dataCollectionSectionForm['vars']['update_available'] = 1;
-        dataCollectionSectionForm['vars']['filter'] = true;
-        dataCollectionSectionForm['vars']['initJstree'] = false;
-    } else {
-        var notificationClass = 'info';
-        if (noReleaseCounter > 0) {
-            notificationClass = 'notice';
-        }
-        paginatedPNotify(notificationClass, {
-            text        : dataCollectionSectionForm['vars']['syncInfo'],
-            textTrusted : true
-        });
-    }
+    // if (updatesCounter > 0) {
+    //     dataCollectionSectionForm['vars']['update_available'] = 1;
+    //     dataCollectionSectionForm['vars']['filter'] = true;
+    //     dataCollectionSectionForm['vars']['initJstree'] = false;
+    // } else {
+    //     var notificationClass = 'info';
+    //     if (noReleaseCounter > 0) {
+    //         notificationClass = 'notice';
+    //     }
+    //     paginatedPNotify(notificationClass, {
+    //         text        : dataCollectionSectionForm['vars']['syncInfo'],
+    //         textTrusted : true
+    //     });
+    // }
 
     if (dataCollectionSectionForm['vars']['queue']['total'] > 0) {
         $('#{{componentId}}-{{sectionId}}-analyse-queue').removeClass('disabled');

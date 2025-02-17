@@ -300,6 +300,7 @@ var BazProgress = function() {
                             $('.' + $(element)[0].id + '-remote-bar').attr('aria-valuenow', 0);
                             switchProgressBarColor('.' + $(element)[0].id + '-remote-bar', 'info');
                             $('.progress-remote, .remote-progress-span').attr('hidden', true);
+                            $('body').trigger('bazProgressComplete');
                         }
                     } else {
                         resetProgressCounter();
@@ -384,6 +385,7 @@ var BazProgress = function() {
         uploadedBytes = 0;
         isUpload = false;
         isDownload = false;
+        $('body').trigger({'type':'bazProgressComplete', 'reset' : true});
     }
 
     function onMessage(data) {

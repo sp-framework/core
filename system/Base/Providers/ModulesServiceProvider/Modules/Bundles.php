@@ -52,4 +52,17 @@ class Bundles extends BasePackage
 
         return $bundles;
     }
+
+    public function getBundlesForAppType($appType)
+    {
+        $bundles = [];
+
+        foreach($this->bundles as $bundle) {
+            if ($bundle['app_type'] === $appType) {
+                $bundles[$bundle['id']] = $bundle;
+            }
+        }
+
+        return $bundles;
+    }
 }

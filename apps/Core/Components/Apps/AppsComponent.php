@@ -112,10 +112,15 @@ class AppsComponent extends BaseComponent
                     }
                 }
 
-                $this->view->modulesMenus = $this->basepackages->menus->getMenusForApp($app['id']);
+                $this->view->modulesMenus = $this->basepackages->menus->getMenusForAppType($app['app_type'], false);
 
                 //Components
-                $componentsArr = $this->modules->components->getComponentsForAppType($app['app_type']);
+                $componentsArr = $this->modules->components->getComponentsForAppType($app['app_type'], true);
+
+                if (count($componentsArr) === 0) {
+                    $this->view->menuBaseStructure = $this->view->modulesMenus = [];
+                }
+
                 foreach ($componentsArr as $key => &$componentValue) {
                     if ($componentValue['apps']) {
                         if (is_string($componentValue['apps'])) {
@@ -163,7 +168,7 @@ class AppsComponent extends BaseComponent
                 }
 
                 //Middlewares
-                $middlewaresArr = $this->modules->middlewares->getMiddlewaresForAppType($app['app_type'], $app['id']);
+                $middlewaresArr = $this->modules->middlewares->getMiddlewaresForAppType($app['app_type'], $app['id'], true);
                 foreach ($middlewaresArr as $key => &$middlewareValue) {
                     if ($middlewareValue['apps']) {
                         if (is_string($middlewareValue['apps'])) {
@@ -189,7 +194,7 @@ class AppsComponent extends BaseComponent
                 }
 
                 //Views
-                $viewsArr = $this->modules->views->getViewsForAppType($app['app_type'], false);
+                $viewsArr = $this->modules->views->getViewsForAppType($app['app_type'], false, true);
                 if (count($viewsArr) === 1) {
                     array_push($mandatoryViews, $this->helper->first($viewsArr)['name']);
 

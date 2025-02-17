@@ -72,7 +72,6 @@ class Packages extends BasePackage
 		return false;
 	}
 
-
 	public function getPackagesByApiId($apiId)
 	{
 		$packages = [];
@@ -172,12 +171,17 @@ class Packages extends BasePackage
 		return $packages;
 	}
 
-	public function getPackagesForAppType($appType)
+	public function getPackagesForAppType($appType, $checkInstalled = false)
 	{
 		$packages = [];
 
 		foreach($this->packages as $package) {
 			if (strtolower($package['app_type']) === strtolower($appType)) {
+				if ($checkInstalled &&
+					$package['installed'] != '1'
+				) {
+					continue;
+				}
 				$packages[$package['id']] = $package;
 			}
 		}

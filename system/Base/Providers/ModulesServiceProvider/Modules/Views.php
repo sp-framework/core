@@ -303,7 +303,7 @@ class Views extends BasePackage
         return false;
     }
 
-    public function getViewsForAppId($appId)
+    public function getViewsForAppId($appId, $includeSubViews = true)
     {
         $views = [];
 
@@ -313,6 +313,9 @@ class Views extends BasePackage
             if (isset($view['apps'][$appId]['enabled']) &&
                 $view['apps'][$appId]['enabled'] == 'true'
             ) {
+                if ($view['is_subview'] && !$includeSubViews) {
+                    continue;
+                }
                 array_push($views, $view);
             }
         }
@@ -406,12 +409,17 @@ class Views extends BasePackage
         return $views;
     }
 
-    public function getViewsForAppType($appType, $includeSubViews = true)
+    public function getViewsForAppType($appType, $includeSubViews = true, $checkInstalled = false)
     {
         $views = [];
 
         foreach($this->views as $view) {
             if ($view['app_type'] === $appType) {
+                if ($checkInstalled &&
+                    $view['installed'] != '1'
+                ) {
+                    continue;
+                }
                 if ($view['is_subview'] && !$includeSubViews) {
                     continue;
                 }

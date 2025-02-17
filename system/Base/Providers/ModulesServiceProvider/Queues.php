@@ -89,6 +89,10 @@ class Queues extends BasePackage
                             'deleteSourceFiles'         => false,
                             'deleteDestinationFiles'    => false
                         ],
+                    'installer'                         =>
+                        [
+                            'forceUninstall'            => false
+                        ],
                     'emailReport'                       => $this->access->auth->account()['email']
                 ]
             )
@@ -169,14 +173,6 @@ class Queues extends BasePackage
                 $this->addResponse('Removed from queue', 0, ['queue' => $queue]);
             }
         } else {
-            if (!isset($queue['tasks'][$data['task']][$data['moduleType']])) {
-                $queue['tasks'][$data['task']][$data['moduleType']] = [$data['id']];
-            }
-
-            if (!in_array($data['id'], $queue['tasks'][$data['task']][$data['moduleType']])) {
-                array_push($queue['tasks'][$data['task']][$data['moduleType']], $data['id']);
-            }
-
             if ($data['task'] === 'update') {
                 $tasksToCheck = ['install', 'uninstall', 'remove'];
             } else if ($data['task'] === 'install') {
@@ -185,6 +181,218 @@ class Queues extends BasePackage
                 $tasksToCheck = ['install', 'update', 'remove'];
             } else if ($data['task'] === 'remove') {
                 $tasksToCheck = ['install', 'update', 'uninstall'];
+            }
+
+            if ($data['moduleType'] === 'apptype' &&
+                ($data['task'] === 'remove' || $data['task'] === 'uninstall')
+            ) {
+                $appType = $this->apps->types->getById($data['id']);
+
+                if ($appType && isset($appType['app_type'])) {
+                    $components = $this->modules->components->getComponentsForAppType(strtolower($appType['app_type']));
+
+                    if ($components && count($components) > 0) {
+                        foreach ($components as $component) {
+                            if (!isset($queue['tasks'][$data['task']]['components'])) {
+                                $queue['tasks'][$data['task']]['components'] = [];
+                            }
+
+                            if (!in_array($component['id'], $queue['tasks'][$data['task']]['components'])) {
+                                array_push($queue['tasks'][$data['task']]['components'], (int) $component['id']);
+                            }
+
+                            foreach ($tasksToCheck as $taskToCheck) {
+                                if (isset($queue['tasks'][$taskToCheck]['components'])) {
+                                    $key = array_search($component['id'], $queue['tasks'][$taskToCheck]['components']);
+
+                                    if ($key !== false) {
+                                        unset($queue['tasks'][$taskToCheck]['components'][$key]);
+
+                                        if (count($queue['tasks'][$taskToCheck]['components']) === 0) {
+                                            unset($queue['tasks'][$taskToCheck]['components']);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $packages = $this->modules->packages->getPackagesForAppType(strtolower($appType['app_type']));
+
+                    if ($packages && count($packages) > 0) {
+                        foreach ($packages as $package) {
+                            if (!isset($queue['tasks'][$data['task']]['packages'])) {
+                                $queue['tasks'][$data['task']]['packages'] = [];
+                            }
+
+                            if (!in_array($package['id'], $queue['tasks'][$data['task']]['packages'])) {
+                                array_push($queue['tasks'][$data['task']]['packages'], (int) $package['id']);
+                            }
+
+                            foreach ($tasksToCheck as $taskToCheck) {
+                                if (isset($queue['tasks'][$taskToCheck]['packages'])) {
+                                    $key = array_search($package['id'], $queue['tasks'][$taskToCheck]['packages']);
+
+                                    if ($key !== false) {
+                                        unset($queue['tasks'][$taskToCheck]['packages'][$key]);
+
+                                        if (count($queue['tasks'][$taskToCheck]['packages']) === 0) {
+                                            unset($queue['tasks'][$taskToCheck]['packages']);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $middlewares = $this->modules->middlewares->getMiddlewaresForAppType(strtolower($appType['app_type']));
+
+                    if ($middlewares && count($middlewares) > 0) {
+                        foreach ($middlewares as $middleware) {
+                            if (!isset($queue['tasks'][$data['task']]['middlewares'])) {
+                                $queue['tasks'][$data['task']]['middlewares'] = [];
+                            }
+
+                            if (!in_array($middleware['id'], $queue['tasks'][$data['task']]['middlewares'])) {
+                                array_push($queue['tasks'][$data['task']]['middlewares'], (int) $middleware['id']);
+                            }
+
+                            foreach ($tasksToCheck as $taskToCheck) {
+                                if (isset($queue['tasks'][$taskToCheck]['middlewares'])) {
+                                    $key = array_search($middleware['id'], $queue['tasks'][$taskToCheck]['middlewares']);
+
+                                    if ($key !== false) {
+                                        unset($queue['tasks'][$taskToCheck]['middlewares'][$key]);
+
+                                        if (count($queue['tasks'][$taskToCheck]['middlewares']) === 0) {
+                                            unset($queue['tasks'][$taskToCheck]['middlewares']);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $views = $this->modules->views->getViewsForAppType(strtolower($appType['app_type']), true);
+
+                    if ($views && count($views) > 0) {
+                        foreach ($views as $view) {
+                            if ($view['is_subview'] == true) {
+                                if (!isset($queue['tasks'][$data['task']]['views'])) {
+                                    $queue['tasks'][$data['task']]['views'] = [];
+                                }
+
+                                if (!in_array($view['id'], $queue['tasks'][$data['task']]['views'])) {
+                                    array_push($queue['tasks'][$data['task']]['views'], (int) $view['id']);
+                                }
+
+                                foreach ($tasksToCheck as $taskToCheck) {
+                                    if (isset($queue['tasks'][$taskToCheck]['views'])) {
+                                        $key = array_search($view['id'], $queue['tasks'][$taskToCheck]['views']);
+
+                                        if ($key !== false) {
+                                            unset($queue['tasks'][$taskToCheck]['views'][$key]);
+
+                                            if (count($queue['tasks'][$taskToCheck]['views']) === 0) {
+                                                unset($queue['tasks'][$taskToCheck]['views']);
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                continue;
+                            }
+                        }
+
+                        foreach ($views as $view) {
+                            if ($view['is_subview'] != true) {
+                                if (!isset($queue['tasks'][$data['task']]['views'])) {
+                                    $queue['tasks'][$data['task']]['views'] = [];
+                                }
+
+                                if (!in_array($view['id'], $queue['tasks'][$data['task']]['views'])) {
+                                    array_push($queue['tasks'][$data['task']]['views'], (int) $view['id']);
+                                }
+
+                                foreach ($tasksToCheck as $taskToCheck) {
+                                    if (isset($queue['tasks'][$taskToCheck]['views'])) {
+                                        $key = array_search($view['id'], $queue['tasks'][$taskToCheck]['views']);
+
+                                        if ($key !== false) {
+                                            unset($queue['tasks'][$taskToCheck]['views'][$key]);
+
+                                            if (count($queue['tasks'][$taskToCheck]['views']) === 0) {
+                                                unset($queue['tasks'][$taskToCheck]['views']);
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                continue;
+                            }
+                        }
+                    }
+                }
+            } else if ($data['moduleType'] === 'views' &&
+                       ($data['task'] === 'remove' || $data['task'] === 'uninstall')
+            ) {
+                $moduleView = $this->modules->views->getById($data['id']);
+
+                if ($moduleView && $moduleView['is_subview'] == false) {
+                    $views = $this->modules->views->getViewsForAppType(strtolower($moduleView['app_type']), true);
+
+                    if ($views && count($views) > 0) {
+                        foreach ($views as $view) {
+                            if ($view['is_subview'] == true) {
+                                if (!isset($queue['tasks'][$data['task']]['views'])) {
+                                    $queue['tasks'][$data['task']]['views'] = [];
+                                }
+
+                                if (!in_array($view['id'], $queue['tasks'][$data['task']]['views'])) {
+                                    array_push($queue['tasks'][$data['task']]['views'], (int) $view['id']);
+                                }
+
+                                foreach ($tasksToCheck as $taskToCheck) {
+                                    if (isset($queue['tasks'][$taskToCheck]['views'])) {
+                                        $key = array_search($view['id'], $queue['tasks'][$taskToCheck]['views']);
+
+                                        if ($key !== false) {
+                                            unset($queue['tasks'][$taskToCheck]['views'][$key]);
+
+                                            if (count($queue['tasks'][$taskToCheck]['views']) === 0) {
+                                                unset($queue['tasks'][$taskToCheck]['views']);
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                continue;
+                            }
+                        }
+
+                        foreach ($tasksToCheck as $taskToCheck) {
+                            if (isset($queue['tasks'][$taskToCheck]['views'])) {
+                                $key = array_search($data['id'], $queue['tasks'][$taskToCheck]['views']);
+
+                                if ($key !== false) {
+                                    unset($queue['tasks'][$taskToCheck]['views'][$key]);
+
+                                    if (count($queue['tasks'][$taskToCheck]['views']) === 0) {
+                                        unset($queue['tasks'][$taskToCheck]['views']);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!isset($queue['tasks'][$data['task']][$data['moduleType']])) {
+                $queue['tasks'][$data['task']][$data['moduleType']] = [];
+            }
+
+            if (!in_array($data['id'], $queue['tasks'][$data['task']][$data['moduleType']])) {
+                array_push($queue['tasks'][$data['task']][$data['moduleType']], (int) $data['id']);
             }
 
             foreach ($tasksToCheck as $taskToCheck) {
@@ -271,6 +479,18 @@ class Queues extends BasePackage
         }
 
         array_walk($data['settings']['files'], function(&$setting, $index) {
+            if ($setting !== '') {
+                if ($setting == 'true') {
+                    $setting = true;
+                } else {
+                    $setting = false;
+                }
+            } else {
+                $setting = false;
+            }
+        });
+
+        array_walk($data['settings']['installer'], function(&$setting, $index) {
             if ($setting !== '') {
                 if ($setting == 'true') {
                     $setting = true;
@@ -420,50 +640,7 @@ class Queues extends BasePackage
                             $this->addToQueueTasksAndResults($taskName, $moduleType, $module);
                         } else {
                             if (isset($module['bundle_modules'])) {
-                                if (is_string($module['bundle_modules'])) {
-                                    $module['bundle_modules'] = $this->helper->decode($module['bundle_modules'], true);
-                                }
-
-                                if (count($module['bundle_modules']) > 0) {
-                                    foreach ($module['bundle_modules'] as $bundleType => $bundles) {
-                                        if (count($bundles) === 0) {
-                                            continue;
-                                        }
-
-                                        if ($bundleType === 'apptype') {
-                                            $bundleModule = $this->apps->types->getAppTypeByRepo($bundles['repo']);
-
-                                            if ($bundleModule) {
-                                                $this->compareAndAddToQueue($bundles, $bundleModule, $taskName, $bundleType);
-                                            } else {
-                                                $this->addToQueueTasksAndResults($taskName, $bundleType, $bundles, null, 'fail', $this->getApiClientServices($bundles, true));
-                                            }
-                                        } else if ($bundleType === 'core') {
-                                            $bundleModule = $this->modules->packages->getPackageByRepo($bundles['repo']);
-
-                                            $this->compareAndAddToQueue($bundles, $bundleModule, 'first', 'packages');
-                                        } else {
-                                            if ($bundleType === 'external') {
-                                                $this->checkComposerAndAddToQueue($bundles, $module);
-
-                                                continue;
-                                            }
-
-                                            foreach ($bundles as $bundleKey => $bundle) {
-                                                $bundleModuleMethod = 'get' . ucfirst(substr($bundleType, 0, -1)) . 'ByRepo';
-                                                $bundleModuleType = $bundleType;
-
-                                                $bundleModule = $this->modules->{$bundleModuleType}->$bundleModuleMethod($bundle['repo']);
-
-                                                if ($bundleModule) {
-                                                    $this->compareAndAddToQueue($bundle, $bundleModule, $taskName, $bundleType);
-                                                } else {
-                                                    $this->addToQueueTasksAndResults($taskName, $bundleType, $bundle, null, 'fail', $this->getApiClientServices($bundle, true));
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                $this->processBundleModules($taskName, $module);
                             }
                         }
                     } else {
@@ -487,7 +664,7 @@ class Queues extends BasePackage
                                     continue;//we dont process dependencies for anything other than install/update
                                 }
 
-                                if ($dependencyType === 'composer' || $dependencyType === 'external') {
+                                if ($dependencyType === 'composer' || $dependencyType === 'externals') {
                                     $this->checkComposerAndAddToQueue($dependencies, $module);
 
                                     continue;
@@ -511,7 +688,6 @@ class Queues extends BasePackage
                                             if (!isset($this->queueTasks[$taskName][$dependencyType])) {
                                                 $this->queueTasks[$taskName][$dependencyType] = [];
                                             }
-
                                             $dependencyModuleMethod = 'get' . ucfirst(substr($dependencyType, 0, -1)) . 'ByRepo';
                                             $dependencyModule = $this->modules->$dependencyType->$dependencyModuleMethod($dependency['repo']);
 
@@ -583,6 +759,62 @@ class Queues extends BasePackage
         $this->addResponse('Error analysing queue', 1);
 
         return false;
+    }
+
+    protected function processBundleModules($taskName, $module)
+    {
+        if (is_string($module['bundle_modules'])) {
+            $module['bundle_modules'] = $this->helper->decode($module['bundle_modules'], true);
+        }
+
+        if (count($module['bundle_modules']) > 0) {
+            foreach ($module['bundle_modules'] as $bundleType => $bundles) {
+                if (count($bundles) === 0) {
+                    continue;
+                }
+
+                if ($bundleType === 'apptype') {
+                    $bundleModule = $this->apps->types->getAppTypeByRepo($bundles['repo']);
+
+                    if ($bundleModule) {
+                        $this->compareAndAddToQueue($bundles, $bundleModule, $taskName, $bundleType);
+                    } else {
+                        $this->addToQueueTasksAndResults($taskName, $bundleType, $bundles, null, 'fail', $this->getApiClientServices($bundles, true));
+                    }
+                } else if ($bundleType === 'core') {
+                    $bundleModule = $this->modules->packages->getPackageByRepo($bundles['repo']);
+
+                    $this->compareAndAddToQueue($bundles, $bundleModule, 'first', 'packages');
+                } else if ($bundleType === 'bundles') {
+                    foreach ($bundles as $bundle) {
+                        $bundleModule = $this->modules->bundles->getBundleByRepo($bundle['repo']);
+
+                        if (isset($bundleModule['bundle_modules'])) {
+                            $this->processBundleModules($taskName, $bundleModule);
+                        }
+                    }
+                } else {
+                    if ($bundleType === 'external') {
+                        $this->checkComposerAndAddToQueue($bundles, $module);
+
+                        continue;
+                    }
+
+                    foreach ($bundles as $bundleKey => $bundle) {
+                        $bundleModuleMethod = 'get' . ucfirst(substr($bundleType, 0, -1)) . 'ByRepo';
+                        $bundleModuleType = $bundleType;
+
+                        $bundleModule = $this->modules->{$bundleModuleType}->$bundleModuleMethod($bundle['repo']);
+
+                        if ($bundleModule) {
+                            $this->compareAndAddToQueue($bundle, $bundleModule, $taskName, $bundleType);
+                        } else {
+                            $this->addToQueueTasksAndResults($taskName, $bundleType, $bundle, null, 'fail', $this->getApiClientServices($bundle, true));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     protected function getApiClientServices($module, $getLogMessage = false)
@@ -665,7 +897,9 @@ class Queues extends BasePackage
                 $this->addToQueueTasksAndResults($task, $moduleType, $installedModule, null, 'fail', $analyseLogs);
             }
         } else {
-            if ($installedModule['installed'] != '1') {
+            if (isset($installedModule['installed']) &&
+                $installedModule['installed'] != '1'
+            ) {
                 $this->addToQueueTasksAndResults('install', $moduleType, $installedModule);
 
                 if ($moduleType === 'views' &&
@@ -779,7 +1013,7 @@ class Queues extends BasePackage
             $this->queueTasks[$taskName][$moduleType][$module['id']]['name'] = $module['name'];
             $this->queueTasks[$taskName][$moduleType][$module['id']]['display_name'] = $module['display_name'] ?? $module['name'];
             $this->queueTasks[$taskName][$moduleType][$module['id']]['module_type'] = $moduleType;
-            if ($moduleType === 'components') {
+            if ($moduleType === 'components' && array_key_exists('route', $module)) {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['route'] = $module['route'];
             }
             if ($moduleType === 'views' && array_key_exists('is_subview', $module)) {

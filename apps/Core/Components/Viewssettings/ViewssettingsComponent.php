@@ -47,7 +47,10 @@ class ViewssettingsComponent extends BaseComponent
                         if (is_string($view['settings'])) {
                             $view['settings'] = $this->helper->decode($view['settings'], true);
                         }
-                        if (is_array($view['settings']['branding'])) {
+
+                        if (isset($view['settings']['branding']) &&
+                            is_array($view['settings']['branding'])
+                        ) {
                             foreach ($view['settings']['branding'] as $brandKey => $brand) {
 
                                 if (is_array($brand) && !isset($brand['brand'])) {

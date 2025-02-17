@@ -12,15 +12,16 @@ class HomeComponent extends BaseComponent
     public function viewAction()
     {
         try {
-            $defaultComponentId = $this->app['default_component'];
-
             if ($this->app['default_component'] == 0) {
-                $dashboardComponent = $this->modules->components->getComponentByRouteForAppId('dashboards');
-
-                $defaultComponentId = $dashboardComponent['id'];
+                return;
             }
 
-            $defaultComponent = $this->modules->components->getById($defaultComponentId);
+            $defaultComponent = $this->modules->components->getById($this->app['default_component']);
+
+            if ($defaultComponent['class'] === get_class($this)) {
+                return;
+            }
+
             $controller = $this->helper->last(explode('/', $defaultComponent['route']));
             $routeArr = explode('/', $defaultComponent['route']);
             unset($routeArr[$this->helper->lastKey($routeArr)]);

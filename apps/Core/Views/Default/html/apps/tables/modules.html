@@ -124,8 +124,8 @@
                 </td>
                 {% if moduleType === 'component' %}
                     <td>
-                        {% if module['menu_id'] %}
-                            {% if modulesMenus[module['menu_id']]['apps'][app['id']]['enabled'] is defined and modulesMenus[module['menu_id']]['apps'][app['id']]['enabled'] === true %}
+                        {% if module['menu_id'] and module['menu'] != 'false' %}
+                            {% if modulesMenus[module['menu_id']]['apps'][app['id']]['enabled'] is defined and modulesMenus[module['menu_id']]['apps'][app['id']]['enabled'] == true %}
                                 {% set menuChecked = true %}
                             {% else %}
                                 {% set menuChecked = false %}
@@ -163,7 +163,11 @@
                     <td>
                         {% if module['apps'][app['id']]['needAuth'] is defined and module['apps'][app['id']]['needAuth'] !== 'disabled' %}
                             {% if module['apps'][app['id']]['needAuth'] is defined and module['apps'][app['id']]['needAuth'] === true %}
-                                {% set needAuthChecked = true %}
+                                {% if module['apps'][app['id']]['enabled'] is defined and module['apps'][app['id']]['enabled'] === true %}
+                                    {% set needAuthChecked = true %}
+                                {% else %}
+                                    {% set needAuthChecked = false %}
+                                {% endif %}
                             {% else %}
                                 {% set needAuthChecked = false %}
                             {% endif %}
@@ -173,7 +177,9 @@
                                 {% set needAuthDisabled = true %}
                             {% endif %}
                             {% if module['apps'][app['id']]['needAuth'] is defined and module['apps'][app['id']]['needAuth'] === 'mandatory' %}
-                                {% set needAuthChecked = true %}
+                                {% if module['apps'][app['id']]['enabled'] is defined and module['apps'][app['id']]['enabled'] === true %}
+                                    {% set needAuthChecked = true %}
+                                {% endif %}
                                 {% set needAuthDisabled = true %}
                             {% endif %}
 

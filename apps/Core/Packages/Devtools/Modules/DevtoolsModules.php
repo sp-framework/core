@@ -671,32 +671,64 @@ class DevtoolsModules extends BasePackage
         return $this->helper->encode($defaultSettings);
     }
 
-    public function getDefaultDependencies($type = null)
+    public function getDefaultDependencies($type, $isSubView = false)
     {
+        // For all - core, apptype
+        // For components - packages, middlewares, views (only subview), externals
+        // For packages - middlewares, externals
+        // For middlewares - packages, externals
+        // For views (baseview) - packages (for any tag packages like adminltetags)
+        // For views (sub) - views (only baseview)
+        // For bundles - components, packages, middlewares, views, bundles, externals
+
         $defaultDependencies =
             [
                 'core'                      => [],
-                'apptype'                   => [],
-                'components'                => [],
-                'packages'                  => [],
-                'middlewares'               => [],
-                'views'                     => [],
-                'external'                  => [
-                    'composer'              => [
-                        'require'           => []
-                    ],
-                    'config'                => [
-                        'allow-plugins'     => []
-                    ],
-                    'extra'                 => [
-                        'patches'           => []
-                    ]
+                'apptype'                   => []
+            ];
+
+        $externalDependencies =
+            [
+                'composer'              =>
+                [
+                    'require'           => []
+                ],
+                'config'                =>
+                [
+                    'allow-plugins'     => []
+                ],
+                'extra'                 =>
+                [
+                    'patches'           => []
                 ]
             ];
 
-        if ($type && $type === 'views') {
-            unset($defaultDependencies['external']);
+        if ($type === 'components') {
+            $defaultDependencies['packages'] = [];
+            $defaultDependencies['middlewares'] = [];
+            $defaultDependencies['views'] = [];
+            $defaultDependencies['externals'] = $externalDependencies;
+        } else if ($type === 'packages') {
+            $defaultDependencies['middlewares'] = [];
+            $defaultDependencies['externals'] = $externalDependencies;
+        } else if ($type === 'middlewares') {
+            $defaultDependencies['packages'] = [];
+            $defaultDependencies['externals'] = $externalDependencies;
+        } else if ($type === 'views') {
+            $defaultDependencies['packages'] = [];
+            if ($isSubView == 'true') {
+                $defaultDependencies['views'] = [];
+            }
+        } else if ($type === 'bundles') {
+            $defaultDependencies['components'] = [];
+            $defaultDependencies['packages'] = [];
+            $defaultDependencies['middlewares'] = [];
+            $defaultDependencies['views'] = [];
+            $defaultDependencies['bundles'] = [];
+            $defaultDependencies['externals'] = $externalDependencies;
         }
+
+        $this->addResponse('Generated default dependencies', 0, ['defaultDependencies' => $defaultDependencies]);
 
         return $this->helper->encode($defaultDependencies);
     }
@@ -945,7 +977,11 @@ class DevtoolsModules extends BasePackage
 
                 $routePath = implode('/', $pathArr) . '/Install/';
             } else if ($data['module_type'] === 'views') {
-                if ($data['base_view_module_id'] == 0) {
+                if ($data['is_subview'] == true &&
+                    $data['base_view_module_id'] == 0
+                ) {
+                    throw new \Exception('View dependency for this subview not set.');
+                } else if ($data['base_view_module_id'] == 0) {
                     $routePath = $data['name'] . '/';
                 } else {
                     $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
@@ -3044,6 +3080,12 @@ $file .= '
 
             if ($data['module_type'] === 'views' && isset($data['is_subview']) && $data['is_subview'] == 'true') {
                 $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
+
+                if (!$baseView) {
+                    $this->addResponse('View dependency for this subview not set.', 1);
+
+                    return false;
+                }
             }
 
             if ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types') {

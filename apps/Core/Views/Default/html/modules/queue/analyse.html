@@ -303,6 +303,8 @@ dataCollectionSectionForm['funcs']['saveSettings'] = function() {
     postData['settings']['files'] = { };
     postData['settings']['files']['deleteSourceFiles'] = $('#{{componentId}}-{{sectionId}}-delete_source_files')[0].checked;
     postData['settings']['files']['deleteDestinationFiles'] = $('#{{componentId}}-{{sectionId}}-delete_destination_files')[0].checked;
+    postData['settings']['installer'] = { };
+    postData['settings']['installer']['forceUninstall'] = $('#{{componentId}}-{{sectionId}}-force_uninstall')[0].checked;
 
     $.post('{{links.url("modules/saveQueueSettings")}}', postData, function(response) {
         if (response.tokenKey && response.token) {
@@ -333,6 +335,7 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
         $('#{{componentId}}-{{sectionId}}-process-queue').attr('disabled', true);
         $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', false);
     }
+    $('#{{componentId}}-{{sectionId}}-queue-settings').attr('disabled', false);
 
     $('tr').removeClass('bg-danger');
     BazProgress.switchProgressBarColor();
@@ -353,6 +356,12 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
         if (response.responseData && response.responseData.queue) {
             dataCollectionSectionForm['vars']['queue'] = response.responseData.queue;
         }
+
+        processResponse(postData, response);
+    }, 'json');
+
+    function processResponse(postData, response) {
+        $('#{{componentId}}-{{sectionId}}-queue-settings').attr('disabled', false);
 
         if (response.responseCode == 0) {
             var notifyText = response.responseMessage;
@@ -456,7 +465,7 @@ dataCollectionSectionForm['funcs']['processQueue'] = function(task = 'precheck')
                 $('#{{componentId}}-{{sectionId}}-process-queue').children('i').attr('hidden', true);
             }
         }
-    }, 'json');
+    }
 }
 
 dataCollectionSectionForm['funcs']['initQueueButtons'] = function() {
@@ -666,6 +675,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-email_report'                            : { },
         '{{componentId}}-{{sectionId}}-delete_source_files'                     : { },
         '{{componentId}}-{{sectionId}}-delete_destination_files'                : { },
+        '{{componentId}}-{{sectionId}}-force_uninstall'                         : { },
         '{{componentId}}-{{sectionId}}-form'                                    : $.extend(dataCollectionSectionForm, {
             rules: {
             },
