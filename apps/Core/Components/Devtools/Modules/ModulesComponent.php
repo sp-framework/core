@@ -101,11 +101,62 @@ class ModulesComponent extends BaseComponent
 				$modulesArr = $this->processModulesArr(msort($this->modules->{$modulesType}->{$modulesType}, 'name'));
 				${$modulesType . 'CategoryArr'} = $modulesArr['categoryArr'];
 			}
+
 			if ($modulesArr['modules'] && count($modulesArr['modules']) > 0) {
-				$modules[$modulesType]['value'] = ucfirst($modulesType);
-				$modules[$modulesType]['childs'] = $modulesArr['modules'];
+				if ($modulesType === 'views') {
+					if (isset($this->view->subview)) {
+						foreach ($modulesArr['modules'] as $moduleArrKey => $moduleArr) {
+							if (array_key_exists('is_subview', $moduleArr) &&
+								$moduleArr['is_subview'] == true
+							) {
+								continue;
+							}
+							$modules[$modulesType]['value'] = ucfirst($modulesType);
+							$modules[$modulesType]['childs'][$moduleArrKey] = $moduleArr;
+						}
+					} else if (!isset($this->view->subview)) {
+						$modules[$modulesType]['value'] = ucfirst($modulesType);
+						$modules[$modulesType]['childs'] = $modulesArr['modules'];
+					}
+				} else {
+					$modules[$modulesType]['value'] = ucfirst($modulesType);
+					$modules[$modulesType]['childs'] = $modulesArr['modules'];
+				}
 			} else {
 				$modules[$modulesType]['childs'] = [];
+			}
+		}
+
+		if (isset($this->getData()['type'])) {
+			// For all - core, apptype
+			// For components - packages, middlewares, views (only subview), externals
+			// For packages - middlewares, externals
+			// For middlewares - packages, externals
+			// For views (baseview) - (for all)
+			// For views (sub) - views (only baseview)
+			// For bundles - components, packages, middlewares, views, bundles, externals
+			if ($this->getData()['type'] === 'components') {
+				unset($modules['components']);
+				unset($modules['bundles']);
+			} else if ($this->getData()['type'] === 'packages') {
+				unset($modules['packages']);
+				unset($modules['views']);
+				unset($modules['bundles']);
+				$this->view->packageSettingsModules = $modules;
+				unset($modules['components']);
+			} else if ($this->getData()['type'] === 'middlewares') {
+				unset($modules['components']);
+				unset($modules['middlewares']);
+				unset($modules['views']);
+				unset($modules['bundles']);
+			} else if ($this->getData()['type'] === 'views') {
+				unset($modules['components']);
+				unset($modules['middlewares']);
+				unset($modules['packages']);
+				unset($modules['bundles']);
+				if (!isset($this->view->subview)) {
+					unset($modules['views']);
+				}
 			}
 		}
 
@@ -174,7 +225,11 @@ class ModulesComponent extends BaseComponent
 			$this->view->apis = $apis;
 			$this->view->moduleTypes = $this->modulesPackage->getModuleTypes();
 			$this->view->moduleSettings = $this->modulesPackage->getDefaultSettings();
-			$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies($type);
+			if (isset($this->view->subview)) {
+				$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies($type, true);
+			} else {
+				$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies($type);
+			}
 			$this->view->moduleMenu = $this->helper->encode([]);
 			$this->view->moduleWidgets = $this->helper->encode([]);
 

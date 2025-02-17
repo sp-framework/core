@@ -151,8 +151,8 @@
     {% endif %}
 {% elseif type === 'packages' %}
     {% set modulesComponents = [] %}
-    {% if modules['components']['childs']|length > 0 %}
-        {% for componentKey, component in modules['components']['childs'] %}
+    {% if packageSettingsModules['components']['childs']|length > 0 %}
+        {% for componentKey, component in packageSettingsModules['components']['childs'] %}
             {% set modulesComponents['childs'][componentKey]['id'] = component['id'] %}
             {% set modulesComponents['childs'][componentKey]['name'] = component['name'] %}
             {% set modulesComponents['childs'][componentKey]['data']['type'] = 'components' %}

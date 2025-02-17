@@ -671,38 +671,60 @@ class DevtoolsModules extends BasePackage
         return $this->helper->encode($defaultSettings);
     }
 
-    public function getDefaultDependencies($type = null)
+    public function getDefaultDependencies($type, $isSubView = false)
     {
+        // For all - core, apptype
+        // For components - packages, middlewares, views (only subview), externals
+        // For packages - middlewares, externals
+        // For middlewares - packages, externals
+        // For views (baseview) - (for all)
+        // For views (sub) - views (only baseview)
+        // For bundles - components, packages, middlewares, views, bundles, externals
+
         $defaultDependencies =
             [
                 'core'                      => [],
-                'apptype'                   => [],
-                'components'                => [],
-                'packages'                  => [],
-                'middlewares'               => [],
-                'views'                     => []
+                'apptype'                   => []
             ];
 
-        if ($type && $type !== 'views') {
-            if ($type === 'bundles') {
-                $defaultDependencies['bundles'] = [];
-            }
-
-            $defaultDependencies['external'] =
+        $externalDependencies =
+            [
+                'composer'              =>
                 [
-                    'composer'              =>
-                    [
-                        'require'           => []
-                    ],
-                    'config'                =>
-                    [
-                        'allow-plugins'     => []
-                    ],
-                    'extra'                 =>
-                    [
-                        'patches'           => []
-                    ]
-                ];
+                    'require'           => []
+                ],
+                'config'                =>
+                [
+                    'allow-plugins'     => []
+                ],
+                'extra'                 =>
+                [
+                    'patches'           => []
+                ]
+            ];
+
+        if ($type === 'components') {
+            $defaultDependencies['packages'] = [];
+            $defaultDependencies['middlewares'] = [];
+            $defaultDependencies['views'] = [];
+            $defaultDependencies['externals'] = $externalDependencies;
+        } else if ($type === 'packages') {
+            $defaultDependencies['middlewares'] = [];
+            $defaultDependencies['externals'] = $externalDependencies;
+        } else if ($type === 'middlewares') {
+            $defaultDependencies['packages'] = [];
+            $defaultDependencies['externals'] = $externalDependencies;
+        } else if ($type === 'views') {
+            if ($isSubView) {
+                $defaultDependencies['views'] = [];
+            }
+        } else if ($type === 'bundles') {
+            $defaultDependencies['components'] = [];
+            $defaultDependencies['packages'] = [];
+            $defaultDependencies['middlewares'] = [];
+            $defaultDependencies['views'] = [];
+            $defaultDependencies['bundles'] = [];
+            $defaultDependencies['externals'] = $externalDependencies;
         }
 
         return $this->helper->encode($defaultDependencies);
