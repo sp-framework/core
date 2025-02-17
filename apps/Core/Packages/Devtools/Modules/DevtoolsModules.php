@@ -952,7 +952,11 @@ class DevtoolsModules extends BasePackage
 
                 $routePath = implode('/', $pathArr) . '/Install/';
             } else if ($data['module_type'] === 'views') {
-                if ($data['base_view_module_id'] == 0) {
+                if ($data['is_subview'] == true &&
+                    $data['base_view_module_id'] == 0
+                ) {
+                    throw new \Exception('View dependency for this subview not set.');
+                } else if ($data['base_view_module_id'] == 0) {
                     $routePath = $data['name'] . '/';
                 } else {
                     $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
@@ -3051,6 +3055,12 @@ $file .= '
 
             if ($data['module_type'] === 'views' && isset($data['is_subview']) && $data['is_subview'] == 'true') {
                 $baseView = $this->modules->views->getViewById($data['base_view_module_id']);
+
+                if (!$baseView) {
+                    $this->addResponse('View dependency for this subview not set.', 1);
+
+                    return false;
+                }
             }
 
             if ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types') {
