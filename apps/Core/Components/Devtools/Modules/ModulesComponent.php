@@ -132,7 +132,7 @@ class ModulesComponent extends BaseComponent
 			// For components - packages, middlewares, views (only subview), externals
 			// For packages - middlewares, externals
 			// For middlewares - packages, externals
-			// For views (baseview) - (for all)
+			// For views (baseview) - packages (for any tag packages like adminltetags)
 			// For views (sub) - views (only baseview)
 			// For bundles - components, packages, middlewares, views, bundles, externals
 			if ($this->getData()['type'] === 'components') {
@@ -159,7 +159,6 @@ class ModulesComponent extends BaseComponent
 			} else if ($this->getData()['type'] === 'views') {
 				unset($modules['components']);
 				unset($modules['middlewares']);
-				unset($modules['packages']);
 				unset($modules['bundles']);
 				if (!isset($this->view->subview)) {
 					unset($modules['views']);

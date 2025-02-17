@@ -677,7 +677,7 @@ class DevtoolsModules extends BasePackage
         // For components - packages, middlewares, views (only subview), externals
         // For packages - middlewares, externals
         // For middlewares - packages, externals
-        // For views (baseview) - (for all)
+        // For views (baseview) - packages (for any tag packages like adminltetags)
         // For views (sub) - views (only baseview)
         // For bundles - components, packages, middlewares, views, bundles, externals
 
@@ -715,6 +715,7 @@ class DevtoolsModules extends BasePackage
             $defaultDependencies['packages'] = [];
             $defaultDependencies['externals'] = $externalDependencies;
         } else if ($type === 'views') {
+            $defaultDependencies['packages'] = [];
             if ($isSubView == 'true') {
                 $defaultDependencies['views'] = [];
             }
