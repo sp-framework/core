@@ -715,7 +715,7 @@ class DevtoolsModules extends BasePackage
             $defaultDependencies['packages'] = [];
             $defaultDependencies['externals'] = $externalDependencies;
         } else if ($type === 'views') {
-            if ($isSubView) {
+            if ($isSubView == 'true') {
                 $defaultDependencies['views'] = [];
             }
         } else if ($type === 'bundles') {
@@ -726,6 +726,8 @@ class DevtoolsModules extends BasePackage
             $defaultDependencies['bundles'] = [];
             $defaultDependencies['externals'] = $externalDependencies;
         }
+
+        $this->addResponse('Generated default dependencies', 0, ['defaultDependencies' => $defaultDependencies]);
 
         return $this->helper->encode($defaultDependencies);
     }

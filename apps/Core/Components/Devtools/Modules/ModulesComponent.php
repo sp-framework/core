@@ -138,6 +138,13 @@ class ModulesComponent extends BaseComponent
 			if ($this->getData()['type'] === 'components') {
 				unset($modules['components']);
 				unset($modules['bundles']);
+				if (count($modules['views']['childs']) > 0) {
+					foreach ($modules['views']['childs'] as $childKey => $child) {
+						if ($child['is_subview'] != true) {
+							unset($modules['views']['childs'][$childKey]);
+						}
+					}
+				}
 			} else if ($this->getData()['type'] === 'packages') {
 				unset($modules['packages']);
 				unset($modules['views']);
@@ -757,6 +764,22 @@ class ModulesComponent extends BaseComponent
 		$this->requestIsPost();
 
 		$this->modulesPackage->generateModuleRepoUrl($this->postData());
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
+
+		if ($this->modulesPackage->packagesData->responseData) {
+			$this->view->responseData = $this->modulesPackage->packagesData->responseData;
+		}
+	}
+
+	public function getDefaultDependenciesAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->getDefaultDependencies($this->postData()['type'], $this->postData()['is_subview']);
 
 		$this->addResponse(
 			$this->modulesPackage->packagesData->responseMessage,
