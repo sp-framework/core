@@ -664,7 +664,7 @@ class Queues extends BasePackage
                                     continue;//we dont process dependencies for anything other than install/update
                                 }
 
-                                if ($dependencyType === 'composer' || $dependencyType === 'external') {
+                                if ($dependencyType === 'composer' || $dependencyType === 'externals') {
                                     $this->checkComposerAndAddToQueue($dependencies, $module);
 
                                     continue;
@@ -688,7 +688,6 @@ class Queues extends BasePackage
                                             if (!isset($this->queueTasks[$taskName][$dependencyType])) {
                                                 $this->queueTasks[$taskName][$dependencyType] = [];
                                             }
-
                                             $dependencyModuleMethod = 'get' . ucfirst(substr($dependencyType, 0, -1)) . 'ByRepo';
                                             $dependencyModule = $this->modules->$dependencyType->$dependencyModuleMethod($dependency['repo']);
 

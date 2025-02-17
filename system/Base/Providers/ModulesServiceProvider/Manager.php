@@ -924,13 +924,9 @@ class Manager extends BasePackage
                         $registerRemotePackage['menu'] = 'false';
                     }
                 } else if ($registerRemotePackage['module_type'] === 'views') {
-                    if (count($registerRemotePackage['dependencies']['views']) === 0 &&
-                        (!isset($registerRemotePackage['base_view_module_id']) ||
-                         (isset($registerRemotePackage['base_view_module_id']) && $registerRemotePackage['base_view_module_id'] === null)
-                        )
-                    ) {
+                    if (array_key_exists('is_subview', $registerRemotePackage) && $registerRemotePackage['is_subview'] == false) {
                         $registerRemotePackage['base_view_module_id'] = 0;
-                    } else if (count($registerRemotePackage['dependencies']['views']) === 1) {
+                    } else if (array_key_exists('is_subview', $registerRemotePackage) && $registerRemotePackage['is_subview'] == true) {
                         $baseView = $this->modules->views->getViewByRepo($registerRemotePackage['dependencies']['views'][0]['repo']);
 
                         if ($baseView) {//Add Baseview ID here or during installation.
