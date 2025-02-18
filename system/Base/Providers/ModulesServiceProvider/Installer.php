@@ -1492,6 +1492,14 @@ class Installer extends BasePackage
                         false
                     );
                 }
+            } else {
+                try {
+                    $this->localContent->deleteDirectory($modulePath);
+                } catch (FilesystemException | UnableToDeleteFile | UnableToDeleteDirectory | \throwable $e) {
+                    $this->addResponse($e->getMessage(), 1);
+
+                    return false;
+                }
             }
 
             return true;

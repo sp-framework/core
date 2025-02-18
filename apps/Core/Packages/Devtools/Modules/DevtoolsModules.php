@@ -6,6 +6,8 @@ use Apps\Core\Packages\Devtools\Modules\Settings;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToCreateDirectory;
+use League\Flysystem\UnableToDeleteDirectory;
+use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
@@ -70,6 +72,7 @@ class DevtoolsModules extends BasePackage
         $data['repo'] = trim(str_replace('(clone)', '', $data['repo']));
         $data['installed'] = '1';
         $data['updated_by'] = '0';
+        $data['version'] = '0.0.0';
 
         if ($data['module_type'] === 'bundles') {
             if ($this->modules->{$data['module_type']}->add($data)) {
@@ -129,18 +132,22 @@ class DevtoolsModules extends BasePackage
         if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {
             $data['view_modules_version'] = '0.0.0';
         }
+        $viewPublic = true;
+        if ($data['module_type'] === 'views' && $data['is_subview'] == true) {
+            $viewPublic = false;
+        }
 
         if ($data['apps'] === '') {
             $data['apps'] = $this->helper->encode([]);
         }
 
         try {
-            if ($this->modules->{$data['module_type']}->add($data) &&
-                $this->updateModuleJson($data, false, true) &&
-                $this->generateNewFiles($data)
+            if ($this->generateNewFiles($data) &&
+                $this->updateModuleJson($data, false, $viewPublic) &&
+                $this->modules->{$data['module_type']}->add($data)
             ) {
                 if ($data['createrepo'] == true) {
-                    if ($data['module_type'] === 'views' && $data['base_view_module_id'] == 0) {//Create public repository as well
+                    if ($data['module_type'] === 'views' && $data['is_subview'] == false) {//Create public repository as well
                         if (!$this->checkRepo($data)) {
                             if (strtolower($data['app_type']) !== 'core') {
                                 $newRepo['base'] = $this->createRepo($data);
@@ -278,8 +285,12 @@ class DevtoolsModules extends BasePackage
 
                 $module = array_merge($module, $data);
 
-                if ($this->modules->{$data['module_type']}->update($module) &&
-                    $this->updateModuleJson($data, false, true)
+                $viewPublic = true;
+                if ($module['module_type'] === 'views' && $module['is_subview'] == true) {
+                    $viewPublic = false;
+                }
+                if ($this->updateModuleJson($data, false, $viewPublic) &&
+                    $this->modules->{$data['module_type']}->update($module)
                 ) {
                     if ($data['module_type'] === 'components') {
                         $this->addUpdateComponentMenu($data);
@@ -377,26 +388,217 @@ class DevtoolsModules extends BasePackage
 
     public function removeModule($data)
     {
-        if ($data['module_type'] !== 'core') {
-            if (isset($data['module_type']) && $data['module_type'] === 'apptypes') {
-                $this->apps->types->removeAppType($data);
-                $this->addResponse('Removed app type from DB. Remove files manually...');
-
-                return true;
+        try {
+            if ($data['module_type'] !== 'apptypes') {
+                $module = $this->modules->{$data['module_type']}->getById($data['id']);
+            } else {
+                $module = $this->apps->types->getById($data['id']);
             }
 
-            $module = $this->modules->{$data['module_type']}->getById($data['id']);
-        } else {
-            $this->addResponse('Cannot remove Core!.', 1);
+            if ($data['module_type'] !== 'bundles') {
+                if ($data['module_type'] !== 'views' &&
+                    $data['module_type'] !== 'apptypes'
+                ) {
+                    $classArr = explode('\\', $module['class']);
+
+                    $classArr = array_slice($classArr, 0, -1);
+
+                    $class = implode('\\', $classArr) . '\\Install\\Install';
+
+                    $path = lcfirst(str_replace('\\', '/', $class) . '.php');
+
+                    try {
+                        if ($this->localContent->fileExists($path)) {
+                            $class = new $class;
+
+                            if (method_exists($class, 'uninstall')) {
+                                $class->init()->uninstall(true);
+                            }
+                        }
+                    } catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
+                        $this->addResponse($e->getMessage(), 1);
+
+                        return false;
+                    }
+                }
+
+                if (isset($data['remove_files']) &&
+                    $data['remove_files'] == 'true' &&
+                    !$this->cleanup($this->getModuleFilesLocation($module))
+                ) {
+                    return false;
+                }
+
+                if ($data['module_type'] === 'views' &&
+                    $module['is_subview'] == false
+                ) {
+                    if (isset($data['remove_files']) &&
+                        $data['remove_files'] == 'true' &&
+                        !$this->cleanup($this->getModuleFilesLocation($module, true))
+                    ) {
+                        return false;
+                    }
+                }
+            }
+
+            //Remove the module
+            if ($data['module_type'] === 'apptypes') {
+                $this->apps->types->removeAppType($data);
+            } else {
+                $this->modules->{$module['module_type']}->remove($module['id']);
+            }
+
+            $this->addResponse('Removed module from DB & files from the system...');
+
+            return true;
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
 
             return false;
         }
+    }
 
-        if ($module && $this->modules->{$data['module_type']}->remove($module['id'])) {
-            $this->addResponse('Removed module from DB. Remove files manually...');
-        } else {
-            $this->addResponse('Error removing module.', 1);
+    public function cleanup($modulePath)
+    {
+        $files = $this->basepackages->utils->scanDir($modulePath);
+
+        if (count($files['files']) > 0) {
+            try {
+                foreach ($files['files'] as $file) {
+                    $this->localContent->delete($file);
+                }
+            } catch (FilesystemException | UnableToDeleteFile | \throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
         }
+
+        if (count($files['dirs']) > 0) {
+            try {
+                foreach ($files['dirs'] as $dir) {
+                    $this->localContent->deleteDirectory($dir);
+                }
+
+                //cleanup path by checking if any of the path directory is empty. If empty, we delete the directory.
+                $pathArr = explode('/', $modulePath);
+
+                foreach ($pathArr as $path) {
+                    $path = null;//We dont need path as we will be popping it in the end.
+
+                    $checkPath = join('/', $pathArr);
+
+                    $folders = $this->localContent->listContents($checkPath)->toArray();
+
+                    if (count($folders) === 0) {
+                        $this->localContent->deleteDirectory($checkPath);
+                    } else if (count($folders) === 1) {
+                        $filePath = $folders[0]->path();
+
+                        if (str_contains($filePath, '.gitkeep')) {
+                            $this->localContent->delete($filePath);
+                            $this->localContent->deleteDirectory($checkPath);
+                        }
+                    }
+
+                    array_pop($pathArr);
+                }
+            } catch (FilesystemException | UnableToDeleteFile | UnableToDeleteDirectory | \throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+        } else {
+            try {
+                $this->localContent->deleteDirectory($modulePath);
+            } catch (FilesystemException | UnableToDeleteFile | UnableToDeleteDirectory | \throwable $e) {
+                $this->addResponse($e->getMessage(), 1);
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected function getModuleFilesLocation($module, $viewPublic = false)
+    {
+        if (!isset($module['module_type']) &&
+            ($module['app_type'] === strtolower($module['name']))
+        ) {
+            return 'apps/' . ucfirst($module['app_type']) . '/';
+        } else if ($module['module_type'] === 'components') {
+            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Components/';
+
+            $routeArr = explode('/', $module['route']);
+
+            foreach ($routeArr as &$path) {
+                $path = ucfirst($path);
+            }
+
+            $routePath = implode('/', $routeArr) . '/';
+        } else if ($module['module_type'] === 'packages') {
+            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Packages/';
+
+            $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+            $routePath = implode('/', $pathArr) . '/';
+        } else if ($module['module_type'] === 'middlewares') {
+            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Middlewares/';
+
+            $routePath = $module['name'] . '/';
+        } else if ($module['module_type'] === 'views') {
+            $moduleLocation = 'apps/' . ucfirst($module['app_type']) . '/Views/';
+
+            if ($viewPublic) {
+                $moduleLocation = 'public/' . $module['app_type'] . '/' . strtolower($module['name']) . '/';
+
+                return $moduleLocation;
+            }
+
+            if ($module['is_subview'] == 0) {
+                $routePath = $module['name'] . '/';
+            } else {
+                if (is_string($module['dependencies'])) {
+                    $module['dependencies'] = $this->helper->decode($module['dependencies'], true);
+                }
+                if (!isset($module['dependencies']['views']) ||
+                    (isset($module['dependencies']['views']) && count($module['dependencies']['views']) === 0)
+                ) {
+                    throw new \Exception('Base view dependencies for sub view missing in module dependencies.');
+                }
+
+                foreach ($module['dependencies']['views'] as $view) {
+                    $view = $this->modules->views->getViewByRepo($view['repo']);
+
+                    if ($view && $view['is_subview'] == false) {
+                        $baseView = $view;
+
+                        break;
+                    }
+                }
+
+                if (!isset($baseView)) {
+                    throw new \Exception('Base view dependencies for sub view not found on the system.');
+                }
+
+                $pathArr = preg_split('/(?=[A-Z])/', ucfirst($module['name']), -1, PREG_SPLIT_NO_EMPTY);
+
+                if (count($pathArr) > 1) {
+                    foreach ($pathArr as &$path) {
+                        $path = strtolower($path);
+                    }
+                } else {
+                    $pathArr[0] = strtolower($pathArr[0]);
+                }
+
+                $module['route'] = implode('/', $pathArr);
+
+                $routePath = $baseView['name'] . '/html/' . $module['route'] . '/';
+            }
+        }
+
+        return $moduleLocation . $routePath;
     }
 
     protected function runInstallUninstallTruncateTable($data)
@@ -1457,7 +1659,7 @@ $file .= '
 
     protected function generateNewViewsFiles($moduleFilesLocation, $data)
     {
-        if ($data['base_view_module_id'] == 0) {
+        if ($data['is_subview'] == false) {
             $modulePublicFilesLocation = $this->getNewFilesLocation($data, true);
 
             try {

@@ -201,7 +201,7 @@
     </div>
 </div>
 <script>
-/* globals BazContentLoader Pace BazCore paginatedPNotify */
+/* globals BazContentLoader Pace BazCore paginatedPNotify Swal dataCollection  */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -300,7 +300,38 @@ dataCollectionSection =
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     postData['id'] = id;
                     postData['module_type'] = label;
+                    postData['remove_files'] = false;
 
+                    Swal.fire({
+                        title                       : '<span class="text-danger"> Remove files from the system?</span>',
+                        icon                        : 'question',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Yes',
+                        cancelButtonText            : 'No',
+                        customClass                 : {
+                            'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        didOpen                     : function() {
+                            dataCollection.env.sounds.swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                            postData['remove_files'] = true;
+                            remove(postData);
+                        } else {
+                            remove(postData);
+                        }
+                    });
+                });
+
+                function remove(postData) {
                     $.post('{{links.url("devtools/modules/remove")}}', postData, function(response) {
                         if (response.tokenKey && response.token) {
                             $('#security-token').attr('name', response.tokenKey);
@@ -318,8 +349,7 @@ dataCollectionSection =
                             paginatedPNotify('error', {'text': response.responseMessage});
                         }
                     }, 'json');
-                });
-
+                }
                 $('#{{componentId}}-{{sectionId}}-generate-new-release').off();
                 $('#{{componentId}}-{{sectionId}}-generate-new-release').click(function() {
                     if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
