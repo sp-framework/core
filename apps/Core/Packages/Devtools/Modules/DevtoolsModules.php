@@ -355,10 +355,10 @@ class DevtoolsModules extends BasePackage
                         $this->core->update($core);
                     }
 
-                    if ((isset($data['reinstall_table']) && $data['reinstall_table'] == true) ||
+                    if ((isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) ||
                         (isset($data['truncate_table']) && $data['truncate_table'] == true)
                     ) {
-                        $this->reinstallTruncateTable($data);
+                        $this->runInstallUninstallTruncateTable($data);
                     }
 
                     $this->addResponse('Module updated');
@@ -399,7 +399,7 @@ class DevtoolsModules extends BasePackage
         }
     }
 
-    protected function reinstallTruncateTable($data)
+    protected function runInstallUninstallTruncateTable($data)
     {
         $moduleToReinstall = $this->modules->manager->getModuleInfo(
             [
@@ -431,7 +431,7 @@ class DevtoolsModules extends BasePackage
                     $coreInstall = new CoreInstall;
 
                     if ($data['type'] === 'core') {
-                        if (isset($data['reinstall_table']) && $data['reinstall_table'] == true) {
+                        if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
                             $coreInstall->init()->install();
                         }
                     } else if ($data['type'] === 'packages') {
@@ -439,16 +439,25 @@ class DevtoolsModules extends BasePackage
 
                         if (isset($data['truncate_table']) && $data['truncate_table'] == true) {
                             $coreInstall->init([$moduleModel->getSource()])->truncate();
-                        } else if (isset($data['reinstall_table']) && $data['reinstall_table'] == true) {
-                            $coreInstall->init([$moduleModel->getSource()])->install();
+                        } else if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
+                            if ($data['installed'] == true) {
+                                $coreInstall->init([$moduleModel->getSource()])->install();
+                            } else {
+                                $coreInstall->init([$moduleModel->getSource()])->uninstall();
+                            }
                         }
                     }
                 } else {
                     $module = new $class();
+
                     if (isset($data['truncate_table']) && $data['truncate_table'] == true && method_exists($module, 'truncate')) {
                         $module->init()->truncate();
-                    } else if (isset($data['reinstall_table']) && $data['reinstall_table'] == true) {
-                        $module->init()->install();
+                    } else if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
+                        if ($data['installed'] == true) {
+                            $module->init()->install();
+                        } else {
+                            $module->init()->uninstall();
+                        }
                     }
                 }
             }
