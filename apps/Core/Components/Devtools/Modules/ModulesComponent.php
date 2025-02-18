@@ -28,6 +28,14 @@ class ModulesComponent extends BaseComponent
 	 */
 	public function viewAction()
 	{
+		if (isset($this->getData()['repo']) &&
+			isset($this->getData()['id'])
+		) {
+			$this->view->pick('modules/repo');
+
+			return;
+		}
+
 		$this->view->bundles = false;
 		$this->view->bundlesjson = false;
 		if (isset($this->getData()['bundles'])) {
@@ -490,6 +498,10 @@ class ModulesComponent extends BaseComponent
 
 			$this->view->pick('modules/view');
 		} else {
+			unset($apis[0]);//Remove local
+			unset($apis[1]);//Remove core
+			$this->view->apis = $apis;
+
 			$this->view->pick('modules/list');
 		}
 	}

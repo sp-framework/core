@@ -11,193 +11,288 @@
     {% set middlewaresURL = middlewaresURL ~ '/includecoremodules/true' %}
     {% set viewsURL = viewsURL ~ '/includecoremodules/true' %}
 {% endif %}
-<div class="row">
+<div class="row vdivide">
     <div class="col">
-        {% set includeCoreModulesChecked = false %}
-        {% if includecoremodules is defined and includecoremodules == true %}
-            {% set includeCoreModulesChecked = true %}
-        {% endif %}
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'include_core_modules',
-                'fieldLabel'                     : 'Include Core Modules?',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Include Core modules in the list of modules?',
-                'fieldType'                      : 'checkbox',
-                'fieldCheckboxType'              : 'info',
-                'fieldCheckboxChecked'           : includeCoreModulesChecked,
-                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazScan'                   : true
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('buttons',
-            [
-                'componentId'                       : componentId,
-                'sectionId'                         : sectionId,
-                'buttonType'                        : 'DropdownSplitButtons',
-                'buttonLabel'                       : false,
-                'dropdownButtonId'                  : 'main',
-                'dropdownButtonTitle'               : 'Add new',
-                'dropdownButtonIcon'                : 'plus',
-                'dropdownButtonAdditionalClass'     : 'text-uppercase',
-                'dropdownAlign'                     : 'right',
-                'buttonPosition'                    : 'right',
-                'dropdowns'                         :
-                    {
-                        'apptypes' : {
-                            'title'                   : 'App Type',
-                            'type'                    : 'primary',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : apptypesURL
-                        },
-                        'components' : {
-                            'title'                   : 'Component',
-                            'type'                    : 'primary',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : componentsURL
-                        },
-                        'packages' : {
-                            'title'                   : 'Package',
-                            'type'                    : 'primary',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : packagesURL
-                        },
-                        'middlewares' : {
-                            'title'                   : 'Middleware',
-                            'type'                    : 'primary',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : middlewaresURL
-                        },
-                        'views' : {
-                            'title'                   : 'View',
-                            'type'                    : 'primary',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : viewsURL
-                        },
-                        'subviews' : {
-                            'title'                   : 'Sub View',
-                            'type'                    : 'primary',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : subViewsURL
-                        },
-                        'divider' : 'divider',
-                        'bundles' : {
-                            'title'                   : 'Modules Bundle',
-                            'type'                    : 'primary',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : bundlesURL
-                        }
-                    }
-            ]
-        )}}
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                            : component,
-                'componentName'                        : componentName,
-                'componentId'                          : componentId,
-                'sectionId'                            : sectionId,
-                'fieldId'                              : 'modules',
-                'fieldLabel'                           : 'Select Module',
-                'fieldType'                            : 'select2',
-                'fieldHelp'                            : true,
-                'fieldHelpTooltipContent'              : 'Module',
-                'fieldRequired'                        : true,
-                'fieldBazScan'                         : true,
-                'fieldBazPostOnCreate'                 : true,
-                'fieldBazPostOnUpdate'                 : true,
-                'fieldDataSelect2AddDataAttrFromData'  : ['installed', 'is_subview'],
-                'fieldDataSelect2Options'              : modules,
-                'fieldDataSelect2OptionsKey'           : 'id',
-                'fieldDataSelect2OptionsValue'         : 'display_name:app_type|name:app_type',
-                'fieldDataSelect2OptionsSelected'      : ''
-            ]
-        )}}
-        {{adminltetags.useTag('buttons',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'buttonType'                    : 'button',
-                'buttons'                       :
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
                     [
-                        'modules-link'    : [
-                            'title'                   : 'link',
-                            'size'                    : 'xs',
-                            'disabled'                : true,
-                            'hidden'                  : true,
-                            'url'                     : '#'
-                        ]
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'local_modules',
+                        'fieldLabel'                            : 'Manage Local Modules',
+                        'fieldLabelLegend'                      : true,
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'html',
+                        'fieldBazScan'                          : false,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldHtmlContent'                      : ''
                     ]
-            ]
-        )}}
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('buttons',
-            [
-                'componentId'           : componentId,
-                'sectionId'             : sectionId,
-                'buttonType'            : 'button',
-                'buttons'               :
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {% set includeCoreModulesChecked = false %}
+                {% if includecoremodules is defined and includecoremodules == true %}
+                    {% set includeCoreModulesChecked = true %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
                     [
-                        'edit-module' : [
-                            'title'                   : 'Edit Module',
-                            'size'                    : 'xs',
-                            'type'                    : 'primary',
-                            'icon'                    : 'edit',
-                            'position'                : 'left',
-                            'disabled'                : true
-                        ],
-                        'clone-module' : [
-                            'title'                   : 'Clone Module',
-                            'size'                    : 'xs',
-                            'type'                    : 'primary',
-                            'icon'                    : 'copy',
-                            'position'                : 'left',
-                            'disabled'                : true
-                        ],
-                        'remove-module' : [
-                            'title'                   : 'Remove Module',
-                            'size'                    : 'xs',
-                            'type'                    : 'danger',
-                            'icon'                    : 'trash',
-                            'position'                : 'left',
-                            'disabled'                : true
-                        ],
-                        'generate-new-release' : [
-                            'title'                   : 'Generate New Release',
-                            'size'                    : 'xs',
-                            'type'                    : 'success',
-                            'position'                : 'right',
-                            'icon'                    : 'wand-magic-sparkles',
-                            'disabled'                : true
-                        ],
-                        'commit-bundle-json' : [
-                            'title'                   : 'Commit Bundle Json to repo',
-                            'size'                    : 'xs',
-                            'type'                    : 'primary',
-                            'position'                : 'left',
-                            'icon'                    : 'code',
-                            'disabled'                : true
-                        ]
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'include_core_modules',
+                        'fieldLabel'                     : 'Include Core Modules?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Include Core modules in the list of modules?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : includeCoreModulesChecked,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazScan'                   : true
                     ]
-            ]
-        )}}
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'componentId'                       : componentId,
+                        'sectionId'                         : sectionId,
+                        'buttonType'                        : 'DropdownSplitButtons',
+                        'buttonLabel'                       : false,
+                        'dropdownButtonId'                  : 'main',
+                        'dropdownButtonTitle'               : 'Add new',
+                        'dropdownButtonIcon'                : 'plus',
+                        'dropdownButtonAdditionalClass'     : 'text-uppercase',
+                        'dropdownAlign'                     : 'right',
+                        'buttonPosition'                    : 'right',
+                        'dropdowns'                         :
+                            {
+                                'apptypes' : {
+                                    'title'                   : 'App Type',
+                                    'type'                    : 'primary',
+                                    'additionalClass'         : 'contentAjaxLink',
+                                    'url'                     : apptypesURL
+                                },
+                                'components' : {
+                                    'title'                   : 'Component',
+                                    'type'                    : 'primary',
+                                    'additionalClass'         : 'contentAjaxLink',
+                                    'url'                     : componentsURL
+                                },
+                                'packages' : {
+                                    'title'                   : 'Package',
+                                    'type'                    : 'primary',
+                                    'additionalClass'         : 'contentAjaxLink',
+                                    'url'                     : packagesURL
+                                },
+                                'middlewares' : {
+                                    'title'                   : 'Middleware',
+                                    'type'                    : 'primary',
+                                    'additionalClass'         : 'contentAjaxLink',
+                                    'url'                     : middlewaresURL
+                                },
+                                'views' : {
+                                    'title'                   : 'View',
+                                    'type'                    : 'primary',
+                                    'additionalClass'         : 'contentAjaxLink',
+                                    'url'                     : viewsURL
+                                },
+                                'subviews' : {
+                                    'title'                   : 'Sub View',
+                                    'type'                    : 'primary',
+                                    'additionalClass'         : 'contentAjaxLink',
+                                    'url'                     : subViewsURL
+                                },
+                                'divider' : 'divider',
+                                'bundles' : {
+                                    'title'                   : 'Modules Bundle',
+                                    'type'                    : 'primary',
+                                    'additionalClass'         : 'contentAjaxLink',
+                                    'url'                     : bundlesURL
+                                }
+                            }
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'modules',
+                        'fieldLabel'                           : 'Select Module',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Module',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2AddDataAttrFromData'  : ['installed', 'is_subview'],
+                        'fieldDataSelect2Options'              : modules,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'display_name:app_type|name:app_type',
+                        'fieldDataSelect2OptionsSelected'      : ''
+                    ]
+                )}}
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'buttonType'                    : 'button',
+                        'buttons'                       :
+                            [
+                                'modules-link'    : [
+                                    'title'                   : 'link',
+                                    'size'                    : 'xs',
+                                    'disabled'                : true,
+                                    'hidden'                  : true,
+                                    'url'                     : '#'
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'componentId'           : componentId,
+                        'sectionId'             : sectionId,
+                        'buttonType'            : 'button',
+                        'buttons'               :
+                            [
+                                'edit-module' : [
+                                    'title'                   : 'Edit',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'primary',
+                                    'icon'                    : 'edit',
+                                    'position'                : 'left',
+                                    'disabled'                : true
+                                ],
+                                'clone-module' : [
+                                    'title'                   : 'Clone',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'primary',
+                                    'icon'                    : 'copy',
+                                    'position'                : 'left',
+                                    'disabled'                : true
+                                ],
+                                'remove-module' : [
+                                    'title'                   : 'Remove',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'danger',
+                                    'icon'                    : 'trash',
+                                    'position'                : 'left',
+                                    'disabled'                : true
+                                ],
+                                'generate-new-release' : [
+                                    'title'                   : 'Generate New Release',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'success',
+                                    'position'                : 'right',
+                                    'icon'                    : 'wand-magic-sparkles',
+                                    'disabled'                : true
+                                ],
+                                'commit-bundle-json' : [
+                                    'title'                   : 'Commit Bundle Json to repo',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'primary',
+                                    'position'                : 'right',
+                                    'icon'                    : 'code',
+                                    'disabled'                : true
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'remote_modules',
+                        'fieldLabel'                            : 'Manage Remote Modules',
+                        'fieldLabelLegend'                      : true,
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'html',
+                        'fieldBazScan'                          : false,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldHtmlContent'                      : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'api_id',
+                        'fieldLabel'                           : 'Remote Repo',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select repo to manage.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : false,
+                        'fieldBazPostOnUpdate'                 : false,
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2Options'              : apis,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsSelected'      : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'componentId'           : componentId,
+                        'sectionId'             : sectionId,
+                        'buttonType'            : 'button',
+                        'buttons'               :
+                            [
+                                'browse-remote-repo' : [
+                                    'title'                   : 'Browse Repo',
+                                    'position'                : 'right',
+                                    'disabled'                : true
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
     </div>
 </div>
 <script>
@@ -232,6 +327,22 @@ dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['curr
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-include_core_modules'                : { },
+        '{{componentId}}-{{sectionId}}-api_id'                              : {
+            placeholder: "SELECT REPO",
+            afterInit: function() {
+                var id;
+
+                $('#{{componentId}}-{{sectionId}}-api_id').on('select2:select', function(e) {
+                    id = e.params.data.id;
+
+                    $('#{{componentId}}-{{sectionId}}-browse-remote-repo').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-browse-remote-repo').off();
+                    $('#{{componentId}}-{{sectionId}}-browse-remote-repo').click(function() {
+                        dataCollectionSectionForm['funcs']['loadAjax'](id, null, false, false, false, false, false, true);
+                    });
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-modules'                             : {
             'placeholder'   : 'SELECT MODULE TO EDIT',
             'afterInit'     : function() {
@@ -374,7 +485,7 @@ dataCollectionSection =
     });
 
 dataCollectionSectionForm['funcs']['loadAjax'] =
-    function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false, bundlesjson = false, isSubView = false) {
+    function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false, bundlesjson = false, isSubView = false, isRemote = false) {
         if (id && label) {
             if (label === 'bundles' && !newrelease) {
                 dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/bundles/true/id/' + id + '")}}';
@@ -408,6 +519,10 @@ dataCollectionSectionForm['funcs']['loadAjax'] =
             }
         } else {
             dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+        }
+
+        if (id && isRemote) {
+            dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/repo/true/id/' + id + '")}}';
         }
 
         if (dataCollectionSectionForm['vars']['url'].charAt(0) !== 'h' &&
