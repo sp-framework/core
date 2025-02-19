@@ -31,6 +31,11 @@ class ModulesComponent extends BaseComponent
 		if (isset($this->getData()['repo']) &&
 			isset($this->getData()['id'])
 		) {
+			$this->modulesPackage->getRemoteModules($this->getData()['id']);
+
+			$this->view->remoteModules = $this->modulesPackage->packagesData->responseData['remoteModules'] ?? [];
+			$this->view->apiId = $this->modulesPackage->packagesData->responseData['api_id'] ?? 0;
+
 			$this->view->pick('modules/repo');
 
 			return;
@@ -537,6 +542,18 @@ class ModulesComponent extends BaseComponent
 		$this->requestIsPost();
 
 		$this->modulesPackage->removeModule($this->postData());
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
+	}
+
+	public function removeRepoAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->removeRepo($this->postData());
 
 		$this->addResponse(
 			$this->modulesPackage->packagesData->responseMessage,
