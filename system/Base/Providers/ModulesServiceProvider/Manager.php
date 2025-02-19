@@ -88,6 +88,10 @@ class Manager extends BasePackage
         }
 
         if (isset($module) && is_array($module)) {
+            if (is_string($module['dependencies'])) {
+                $module['dependencies'] = $this->helper->decode($module['dependencies'], true);
+            }
+
             if (array_key_exists('notification_subscriptions', $module)) {
                 unset($module['notification_subscriptions']);
             }
