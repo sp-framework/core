@@ -402,13 +402,13 @@ class Installer extends BasePackage
         $module = $args[1];
         $precheck = $args[2];
 
-        if ($module['module_type'] === 'external') {
+        if ($module['module_type'] === 'externals') {
             if ($precheck) {
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck'] = 'fail';
-                $preCheckQueueLogs = &$this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'];
+                $this->queue['results']['first']['externals'][explode('/', $module['name'])[1]]['precheck'] = 'fail';
+                $preCheckQueueLogs = &$this->queue['results']['first']['externals'][explode('/', $module['name'])[1]]['precheck_logs'];
             } else {
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['result'] = 'fail';
-                $resultQueueLogs = &$this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['result_logs'];
+                $this->queue['results']['first']['externals'][explode('/', $module['name'])[1]]['result'] = 'fail';
+                $resultQueueLogs = &$this->queue['results']['first']['externals'][explode('/', $module['name'])[1]]['result_logs'];
             }
 
             if (isset($module['hasPatch']) && $module['hasPatch'] === true) {
@@ -573,11 +573,11 @@ class Installer extends BasePackage
             }
 
             if ($precheck) {
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck'] = 'pass';
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $installLogs;
+                $this->queue['results']['first']['externals'][explode('/', $module['name'])[1]]['precheck'] = 'pass';
+                $this->queue['results']['first']['externals'][explode('/', $module['name'])[1]]['precheck_logs'] = $installLogs;
             } else {
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['result'] = 'pass';
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['result_logs'] = $installLogs;
+                $this->queue['results']['first']['externals'][explode('/', $module['name'])[1]]['result'] = 'pass';
+                $this->queue['results']['first']['externals'][explode('/', $module['name'])[1]]['result_logs'] = $installLogs;
 
                 //Merge package information to composer.json
                 try {
@@ -1586,7 +1586,7 @@ class Installer extends BasePackage
 
                 //External First
                 foreach ($modulesTypes as $module) {
-                    if ($moduleType === 'external') {
+                    if ($moduleType === 'externals') {
                         if (isset($module['hasPatch']) && $module['hasPatch'] === true) {
                             $this->addProgressMethods($this->runPrecheckProgressMethods, $module, 'first', 'first_external', true);
                         }
@@ -1618,7 +1618,7 @@ class Installer extends BasePackage
 
                     //For Views
                     foreach ($modules as $module) {
-                        if ($taskName === 'first' && $moduleType === 'external') {
+                        if ($taskName === 'first' && $moduleType === 'externals') {
                             continue;
                         }
 
@@ -1636,7 +1636,7 @@ class Installer extends BasePackage
                     }
 
                     foreach ($modules as $module) {
-                        if ($taskName === 'first' && $moduleType === 'external') {
+                        if ($taskName === 'first' && $moduleType === 'externals') {
                             continue;
                         }
 
@@ -1778,7 +1778,7 @@ class Installer extends BasePackage
 
                 //First we process external or first (core or other dependencies)
                 foreach ($modulesTypes as $module) {
-                    if ($moduleType === 'external') {
+                    if ($moduleType === 'externals') {
                         array_push($this->runProcessProgressMethods,
                             [
                                 'method'    => 'processExternalPackages-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
@@ -1806,7 +1806,7 @@ class Installer extends BasePackage
 
                     //For Views
                     foreach ($modules as $module) {
-                        if ($taskName === 'first' && $moduleType === 'external') {
+                        if ($taskName === 'first' && $moduleType === 'externals') {
                             continue;
                         }
 
@@ -1817,7 +1817,7 @@ class Installer extends BasePackage
 
                     //Then we process all other modules.
                     foreach ($modules as $module) {
-                        if ($taskName === 'first' && $moduleType === 'external') {
+                        if ($taskName === 'first' && $moduleType === 'externals') {
                             continue;
                         }
 

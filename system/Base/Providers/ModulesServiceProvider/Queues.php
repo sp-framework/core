@@ -549,7 +549,7 @@ class Queues extends BasePackage
             if (count($task) > 0) {
                 foreach ($task as $moduleType => $modules) {
                     if (count($modules) > 0) {
-                        if ($taskType === 'first' && $moduleType === 'external') {
+                        if ($taskType === 'first' && $moduleType === 'externals') {
                             $taskTypeName = 'install';
                         } else if ($taskType === 'first' && $moduleType === 'packages') {
                             $taskTypeName = 'update';
@@ -740,8 +740,8 @@ class Queues extends BasePackage
         if (isset($this->queueTasks['first']['packages']) && count($this->queueTasks['first']['packages']) > 0) {
             $this->queueTasks = array_merge(array_flip(['first', 'update', 'install', 'uninstall', 'remove']), $this->queueTasks);
 
-            if (isset($this->queueTasks['first']['external']) && count($this->queueTasks['first']['external']) > 0) {
-                $this->queueTasks['first'] = array_merge(array_flip(['external', 'packages']), $this->queueTasks['first']);
+            if (isset($this->queueTasks['first']['externals']) && count($this->queueTasks['first']['externals']) > 0) {
+                $this->queueTasks['first'] = array_merge(array_flip(['externals', 'packages']), $this->queueTasks['first']);
             }
         }
 
@@ -794,7 +794,7 @@ class Queues extends BasePackage
                         }
                     }
                 } else {
-                    if ($bundleType === 'external') {
+                    if ($bundleType === 'externals') {
                         $this->checkComposerAndAddToQueue($bundles, $module);
 
                         continue;
@@ -984,14 +984,14 @@ class Queues extends BasePackage
                     }
                     $package['root_module'] = $module;
 
-                    $this->addToQueueTasksAndResults('first', 'external', $package, $version);
+                    $this->addToQueueTasksAndResults('first', 'externals', $package, $version);
                 }
             } else {
                 $package['id'] = '0';
                 $package['name'] = $composerPackage;
                 $package['repo'] = 'Via composer';
                 $analyseLogs = 'Error reading composer json file from the external directory.';
-                $this->addToQueueTasksAndResults('first', 'external', $package, $version, 'fail', $analyseLogs);
+                $this->addToQueueTasksAndResults('first', 'externals', $package, $version, 'fail', $analyseLogs);
             }
         }
     }
@@ -1028,7 +1028,7 @@ class Queues extends BasePackage
             if ($moduleType === 'views' && array_key_exists('is_public', $module)) {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['is_public'] = $module['is_public'];
             }
-            if ($moduleType !== 'external') {
+            if ($moduleType !== 'externals') {
                 if (array_key_exists('app_type', $module)) {
                     $this->queueTasks[$taskName][$moduleType][$module['id']]['app_type'] = $module['app_type'];
                 }
