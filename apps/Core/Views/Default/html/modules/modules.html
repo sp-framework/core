@@ -872,7 +872,7 @@ dataCollectionSectionForm['funcs']['getSelectedModuleInfo'] = function(selected,
             moduleType = 'views';
         } else if (selected.startsWith('bundles')) {
             moduleType = 'bundles';
-        } else if (selected.startsWith('external')) {
+        } else if (selected.startsWith('externals')) {
             moduleType = 'externals';
         }
     }
@@ -1136,7 +1136,7 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
                     '           <td>' +  moduleData.bundle_modules[bundleModuleType]['version'] + '</td>' +
                     '           <td>' +  moduleData.bundle_modules[bundleModuleType]['repo'] + '</td>' +
                     '       </tr>';
-                } else if(bundleModuleType === 'external' &&
+                } else if(bundleModuleType === 'externals' &&
                           moduleData.bundle_modules[bundleModuleType]['composer'] &&
                           moduleData.bundle_modules[bundleModuleType]['composer']['require'] &&
                           Object.keys(moduleData.bundle_modules[bundleModuleType]['composer']['require']).length > 0

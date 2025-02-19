@@ -1723,7 +1723,8 @@ class Installer extends BasePackage
                 ]
             );
             if ($module['module_type'] !== 'views' &&
-                $module['module_type'] !== 'apptype'
+                $module['module_type'] !== 'apptype' &&
+                $module['module_type'] !== 'externals'
             ) {
                 array_push($methods,
                     [
@@ -1852,7 +1853,8 @@ class Installer extends BasePackage
                         );
 
                         if ($module['module_type'] !== 'views' &&
-                            $module['module_type'] !== 'apptype'
+                            $module['module_type'] !== 'apptype' &&
+                            $module['module_type'] !== 'externals'
                         ) {
                             array_push($this->runProcessProgressMethods,
                                 [
@@ -2037,7 +2039,8 @@ class Installer extends BasePackage
 
                 if ($module['module_type'] !== 'bundles') {
                     if ($module['module_type'] !== 'views' &&
-                        $module['module_type'] !== 'apptype'
+                        $module['module_type'] !== 'apptype' &&
+                        $module['module_type'] !== 'externals'
                     ) {
                         $classArr = explode('\\', $moduleToRemove['class']);
 

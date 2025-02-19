@@ -936,7 +936,6 @@ class DevtoolsModules extends BasePackage
             $defaultDependencies['middlewares'] = [];
             $defaultDependencies['views'] = [];
             $defaultDependencies['bundles'] = [];
-            $defaultDependencies['externals'] = $externalDependencies;
         }
 
         $this->addResponse('Generated default dependencies', 0, ['defaultDependencies' => $defaultDependencies]);

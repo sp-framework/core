@@ -1039,7 +1039,11 @@ class Queues extends BasePackage
             } else {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['version'] = $version;
             }
-            $this->queueTasks[$taskName][$moduleType][$module['id']]['repo'] = $module['repo'];
+            if ($moduleType === 'externals') {
+                $this->queueTasks[$taskName][$moduleType][$module['id']]['repo'] = 'Via composer';
+            } else {
+                $this->queueTasks[$taskName][$moduleType][$module['id']]['repo'] = $module['repo'];
+            }
             if (isset($module['composerJsonFile'])) {
                 $this->queueTasks[$taskName][$moduleType][$module['id']]['composerJsonFile'] = $module['composerJsonFile'];
 
