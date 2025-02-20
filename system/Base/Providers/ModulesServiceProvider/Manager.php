@@ -88,7 +88,9 @@ class Manager extends BasePackage
         }
 
         if (isset($module) && is_array($module)) {
-            if (is_string($module['dependencies'])) {
+            if (isset($module['dependencies']) &&
+                is_string($module['dependencies'])
+            ) {
                 $module['dependencies'] = $this->helper->decode($module['dependencies'], true);
             }
 
@@ -162,7 +164,7 @@ class Manager extends BasePackage
                         }
                     }
 
-                    $module['required_by'] = $requiredModules;
+                    $module['required_by_modules_names'] = $requiredModules;
                 }
             }
 

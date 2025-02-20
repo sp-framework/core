@@ -980,7 +980,7 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
         $('#category-field').attr('hidden', true);
         $('#developer-field').attr('hidden', false);
         $('#required_by-field').attr('hidden', false);
-        $('#required_by').html(BazHelpers.createHtmlList({'obj': moduleData.required_by}));
+        $('#required_by').html(BazHelpers.createHtmlList({'obj': moduleData.required_by_modules_names}));
         $('#required_by').attr('hidden', false);
         $($('#update_available').parents('.col')[0]).attr('hidden', true);
         $($('#update_version').parents('.col')[0]).attr('hidden', true);
@@ -1037,87 +1037,6 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
 
     if (moduleInfo.level_of_update && moduleInfo.level_of_update !== 'null') {
         $('#{{componentId}}-{{sectionId}}-level_of_update').val(moduleInfo.level_of_update).trigger('change');
-    }
-
-    if (moduleData['module_type'] === 'bundles') {
-        if ((dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
-             Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type]).length > 0 &&
-             BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type], moduleInfo.id) > -1) ||
-            (dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type] &&
-             Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type]).length > 0 &&
-             BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type], moduleInfo.id) > -1) ||
-            (dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type] &&
-             Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type]).length > 0 &&
-             BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type], moduleInfo.id) > -1)
-        ) {
-            dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
-        } else {
-            dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['install', 'uninstall', 'remove', 'repo-sync']);
-        }
-    } else {
-        if (moduleInfo.installed == '1') {
-            if (moduleInfo.update_available == '1') {
-                if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type] &&
-                    (BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type], moduleInfo.id) > -1)
-                ) {
-                    if (moduleData['module_type'] !== 'externals') {
-                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
-                    } else {
-                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
-                    }
-                } else {
-                    if (moduleData['module_type'] !== 'externals') {
-                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'uninstall', 'remove', 'repo-sync']);
-                    } else {
-                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'uninstall', 'remove'], false);
-                    }
-                }
-            } else {
-                if ((dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
-                     Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type]).length > 0 &&
-                     BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type], moduleInfo.id) > -1) ||
-                    (dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type] &&
-                     Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type]).length > 0 &&
-                     BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type], moduleInfo.id) > -1) ||
-                    (dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type] &&
-                     Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type]).length > 0 &&
-                     BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type], moduleInfo.id) > -1)
-                ) {
-                    if (moduleData['module_type'] !== 'externals') {
-                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
-                    } else {
-                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
-                    }
-                } else {
-                    if (moduleData['module_type'] !== 'externals') {
-                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['uninstall', 'remove', 'repo-sync']);
-                    } else {
-                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['uninstall', 'remove'], false);
-                    }
-                }
-            }
-        } else {
-            if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleData.module_type]) {
-                index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleData.module_type], moduleData.id);
-            }
-            if (!index && dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleData.module_type]) {
-                index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleData.module_type], moduleData.id);
-            }
-
-            if (index > -1) {
-                if (moduleData['module_type'] !== 'externals') {
-                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel', 'repo-sync']);
-                } else {
-                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel'], false);
-                }
-            } else {
-                if (moduleData['module_type'] !== 'externals') {
-                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
-                } else {
-                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove'], false);
-                }
-            }
-        }
     }
 
     if (moduleData['module_type'] === 'bundles') {
@@ -1181,39 +1100,104 @@ dataCollectionSectionForm['funcs']['processModuleInfo'] = function(moduleInfo) {
                 );
             }
         });
-        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], [], true, true);
+
+        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['install', 'repo-sync'], false, true, false, false);
     } else {
+        if (moduleInfo.installed == '1') {
+            if (moduleInfo.update_available == '1') {
+                if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type] &&
+                    (BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleInfo.module_type], moduleInfo.id) > -1)
+                ) {
+                    if (moduleData['module_type'] !== 'externals') {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
+                    } else {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
+                    }
+                } else {
+                    if (moduleData['module_type'] !== 'externals') {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'uninstall', 'remove', 'repo-sync']);
+                    } else {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['update', 'uninstall', 'remove'], false);
+                    }
+                }
+            } else {
+                if ((dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type] &&
+                     Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type]).length > 0 &&
+                     BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleInfo.module_type], moduleInfo.id) > -1) ||
+                    (dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type] &&
+                     Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type]).length > 0 &&
+                     BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['uninstall'][moduleInfo.module_type], moduleInfo.id) > -1) ||
+                    (dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type] &&
+                     Object.keys(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type]).length > 0 &&
+                     BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleInfo.module_type], moduleInfo.id) > -1)
+                ) {
+                    if (moduleData['module_type'] !== 'externals') {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel', 'repo-sync']);
+                    } else {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['cancel'], false);
+                    }
+                } else {
+                    if (moduleData['module_type'] !== 'externals') {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['uninstall', 'remove', 'repo-sync']);
+                    } else {
+                        dataCollectionSectionForm['funcs']['moduleinfo'](['info'], ['remove'], false);
+                    }
+                }
+            }
+        } else {
+            if (dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleData.module_type]) {
+                index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['install'][moduleData.module_type], moduleData.id);
+            }
+            if (!index && dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleData.module_type]) {
+                index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['remove'][moduleData.module_type], moduleData.id);
+            }
+
+            if (index > -1) {
+                if (moduleData['module_type'] !== 'externals') {
+                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel', 'repo-sync']);
+                } else {
+                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['cancel'], false);
+                }
+            } else {
+                if (moduleData['module_type'] !== 'externals') {
+                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove', 'repo-sync']);
+                } else {
+                    dataCollectionSectionForm['funcs']['moduleinfo']([], ['install', 'remove'], false);
+                }
+            }
+        }
+
         dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], []);
 
         if (moduleData['app_type'] === 'core') {
             if (moduleInfo['name'] !== 'Core' && moduleData['module_type'] !== 'externals') {
                 dataCollectionSectionForm['funcs']['moduleinfo'](['info'], [], false);
-            } else {
-                if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type]) {
-                    index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type], moduleData.id);
-                }
+            // } else {
+            //     if (dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type]) {
+            //         index = BazHelpers.getKeyByValue(dataCollectionSectionForm['vars']['queue']['tasks']['update'][moduleData.module_type], moduleData.id);
+            //     }
 
-                if (index !== 'undefined' && index > -1) {
-                    if (moduleData['module_type'] !== 'externals') {
-                        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
-                    } else {
-                        dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel'], false);
-                    }
-                } else {
-                    if (moduleData['module_type'] !== 'externals') {
-                        if (moduleInfo.update_available == '1') {
-                            dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'repo-sync']);
-                        } else {
-                            dataCollectionSectionForm['funcs']['moduleinfo']([], ['repo-sync']);
-                        }
-                    } else {
-                        if (moduleInfo.update_available == '1') {
-                            dataCollectionSectionForm['funcs']['moduleinfo']([], ['update']);
-                        } else {
-                            dataCollectionSectionForm['funcs']['moduleinfo']([], false, false);
-                        }
-                    }
-                }
+            //     if (index !== 'undefined' && index > -1) {
+            //         if (moduleData['module_type'] !== 'externals') {
+            //             dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
+            //         } else {
+            //             dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel'], false);
+            //         }
+            //     } else {
+            //         if (moduleData['module_type'] !== 'externals') {
+            //             if (moduleInfo.update_available == '1') {
+            //                 dataCollectionSectionForm['funcs']['moduleinfo']([], ['update', 'repo-sync']);
+            //             } else {
+            //                 dataCollectionSectionForm['funcs']['moduleinfo']([], ['repo-sync']);
+            //             }
+            //         } else {
+            //             if (moduleInfo.update_available == '1') {
+            //                 dataCollectionSectionForm['funcs']['moduleinfo']([], ['update']);
+            //             } else {
+            //                 dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['remove'], false);
+            //             }
+            //         }
+            //     }
             }
             $('a[href*="#{{componentId}}-{{sectionId}}-tabs-dependencies"]').parent().addClass('d-none');
         } else {
@@ -1475,7 +1459,9 @@ dataCollectionSectionForm['funcs']['updateQueue'] = function(id, moduleType, tas
             $('#queue-counter').empty().html(dataCollectionSectionForm['vars']['queue']['total']);
 
             if (task === 'install') {
-                dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
+                if (moduleType !== 'bundles') {
+                    dataCollectionSectionForm['funcs']['moduleinfo'](['info', 'buttons'], ['cancel', 'repo-sync']);
+                }
                 if (moduleType === 'apptype') {
                     dataCollectionSectionForm['funcs']['initQueueButtons']();
                 } else {
