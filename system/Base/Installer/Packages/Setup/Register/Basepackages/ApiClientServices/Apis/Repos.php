@@ -30,6 +30,7 @@ class Repos
                 'in_use'                => 1,
                 'used_by'               => json_encode($usedBy),
                 'setup'                 => 4,
+                'app_type'              => 'core',
                 'location'              => 'basepackages'
             ];
 
@@ -52,6 +53,7 @@ class Repos
                 'in_use'                => 1,
                 'used_by'               => json_encode($usedBy),
                 'setup'                 => 4,
+                'app_type'              => 'core',
                 'location'              => 'basepackages'
             ];
 

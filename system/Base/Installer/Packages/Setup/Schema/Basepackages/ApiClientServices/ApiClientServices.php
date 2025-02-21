@@ -82,6 +82,14 @@ class ApiClientServices
                     ]
                 ),
                 new Column(
+                    'app_type',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
                     'description',
                     [
                         'type'    => Column::TYPE_VARCHAR,

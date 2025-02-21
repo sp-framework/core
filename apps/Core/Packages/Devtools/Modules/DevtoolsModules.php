@@ -3422,7 +3422,7 @@ $file .= '
                 }
             }
         } else {
-            $apisArr = $this->basepackages->apiClientServices->getAll()->apiClientServices;
+            $apisArr = $this->basepackages->apiClientServices->getApiByAppType();
         }
 
         if (count($apisArr) > 0) {

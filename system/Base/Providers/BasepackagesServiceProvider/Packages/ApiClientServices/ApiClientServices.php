@@ -132,18 +132,26 @@ class ApiClientServices extends BasePackage
 
     protected function registerApiLocations()
     {
-        $this->apiLocations =
-            [
-                'basepackages'    =>
-                    [
-                        'id'    => 'basepackages',
-                        'name'  => 'Base Packages'
-                    ],
-            ];
+        if ($this->apps->app['app_type'] === 'core') {
+            $this->apiLocations =
+                [
+                    'basepackages'    =>
+                        [
+                            'id'    => 'basepackages',
+                            'name'  => 'Base Packages'
+                        ],
+                ];
+        } else {
+            $this->apiLocations = [];
+        }
 
         $appTypes = $this->apps->types->types;
 
         foreach ($appTypes as $type) {
+            if ($type['app_type'] === 'core') {
+                continue;
+            }
+
             $this->apiLocations[$type['app_type']]['id'] = $type['app_type'];
             $this->apiLocations[$type['app_type']]['name'] = $type['name'];
         }
@@ -164,9 +172,9 @@ class ApiClientServices extends BasePackage
 
                 $this->setModelToUse($modelClass . 'BasepackagesApiClientServicesApis' . $api['category'] . $api['provider']);
             } else {
-                $modelClass = 'Apps\\' . $api['location'] . '\\Packages\\System\\ApiClientServices\\Apis\\' . $api['category'] . '\\' . $api['provider'] . '\\';
+                $modelClass = 'Apps\\' . $api['location'] . '\\Packages\\Apis\\' . $api['category'] . '\\' . $api['provider'] . '\\';
 
-                $this->setModelToUse($modelClass . 'Model\\SystemApiApis' . $api['category'] . $api['provider']);
+                $this->setModelToUse($modelClass . 'Model\\Apps' . $api['location'] . 'Apis' . $api['category'] . $api['provider']);
             }
 
             $this->packageName = 'apiApis' . $api['category'] . $api['provider'];
@@ -185,6 +193,7 @@ class ApiClientServices extends BasePackage
         if ($data['provider'] === 'github' || $data['provider'] === 'gitea') {
             $data['location'] = 'basepackages';
         }
+        $data['app_type'] = $this->apps->getAppInfo()['app_type'];
 
         $data = $this->encryptPassToken($data);
 
@@ -218,22 +227,24 @@ class ApiClientServices extends BasePackage
         if ($data['provider'] === 'github' || $data['provider'] === 'gitea') {
             $data['location'] = 'basepackages';
         }
+        $data['app_type'] = $this->apps->getAppInfo()['app_type'];
 
         $data = $this->encryptPassToken($data);
 
         $this->switchApiModel($data);
 
-        $api = $this->getById($data['id'], false, false);
+        $apiId = $data['id'];
+        unset($data['id']);
 
+        $api = $this->getById($data['api_category_id'], false, false);
         $api = array_merge($api, $data);
 
         if ($this->update($api)) {
-
             $this->apiStats->initApiCallStats($api);
 
             $this->switchApiModel();
 
-            $api['id'] = $api['api_category_id'];
+            $api['id'] = $apiId;
 
             if ($this->update($api)) {
                 $this->addResponse('Updated ' . $data['name'] . ' API');
@@ -460,6 +471,27 @@ class ApiClientServices extends BasePackage
         }
 
         return false;
+    }
+
+    public function getApiByAppType($appType = null)
+    {
+        if (!$appType) {
+            $appType = $this->apps->getAppInfo()['app_type'];
+        }
+
+        $apisArr = $this->getAll()->apiClientServices;
+
+        $apis = [];
+
+        if (count($apisArr) > 0) {
+            foreach ($apisArr as $api) {
+                if ($api['app_type'] === $appType) {
+                    array_push($apis, $api);
+                }
+            }
+        }
+
+        return $apis;
     }
 
     protected function encryptPassToken(array $data)
