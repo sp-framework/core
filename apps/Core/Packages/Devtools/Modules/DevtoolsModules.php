@@ -1219,7 +1219,7 @@ class DevtoolsModules extends BasePackage
         }
     }
 
-    protected function generateNewFiles($data)
+    protected function generateNewFiles(&$data)
     {
         $moduleFilesLocation = $this->getNewFilesLocation($data);
 
@@ -1320,7 +1320,7 @@ class DevtoolsModules extends BasePackage
         }
     }
 
-    protected function generateNewComponentsFiles($moduleFilesLocation, $data)
+    protected function generateNewComponentsFiles($moduleFilesLocation, &$data)
     {
         $this->addUpdateComponentMenu($data);
 
@@ -1334,9 +1334,9 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
-        $data['class'] = explode('\\', $data['class']);
-        unset($data['class'][$this->helper->lastKey($data['class'])]);
-        $namespaceClass = implode('\\', $data['class']);
+        $dataClass = explode('\\', $data['class']);
+        unset($dataClass[$this->helper->lastKey($dataClass)]);
+        $namespaceClass = implode('\\', $dataClass);
 
         $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass, $file);
         $file = str_replace('"COMPONENTNAME"', $componentName, $file);
@@ -1351,7 +1351,7 @@ class DevtoolsModules extends BasePackage
         }
 
         if (isset($data['widgets']) && $data['widgets'] !== '') {
-            $data['widgets'] = $this->helper->decode($data['widgets'], true);
+            $dataWidgets = $this->helper->decode($data['widgets'], true);
 
             try {
                 $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ComponentWidget.txt');
@@ -1364,7 +1364,7 @@ class DevtoolsModules extends BasePackage
 
             $file = str_replace('"NAMESPACE"', 'namespace ' . $namespaceClass, $file);
 
-            foreach ($data['widgets'] as $widget) {
+            foreach ($dataWidgets as $widget) {
                 try {
                     $methodFile = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/ComponentWidgetMethod.txt');
                 } catch (FilesystemException | UnableToReadFile $exception) {
@@ -1724,7 +1724,7 @@ $file .= '
         return true;
     }
 
-    protected function addUpdateComponentMenu($data)
+    protected function addUpdateComponentMenu(&$data)
     {
         if ($data['menu_id'] != '' && $data['menu_id'] != '0') {
             if (!isset($data['is_clone']) ||
@@ -1760,12 +1760,13 @@ $file .= '
                 $menu = $this->basepackages->menus->addMenu($data);
 
                 if ($menu) {
-                    $module = $this->modules->{$data['module_type']}->packagesData->last;
+                    // $module = $this->modules->{$data['module_type']}->packagesData->last;
 
-                    $module['menu_id'] = $menu['id'];
+                    // $module['menu_id'] = $menu['id'];
+                    $data['menu_id'] = $menu['id'];
                 }
 
-                $this->modules->{$data['module_type']}->update($module);
+                // $this->modules->{$data['module_type']}->update($module);
             }
         }
     }
