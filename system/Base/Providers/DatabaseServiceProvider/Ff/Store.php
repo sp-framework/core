@@ -263,7 +263,9 @@ class Store
     public function getLastInsertedId(): int
     {
         if (!file_exists($this->storePath . '_cnt.sdb')) {
-            throw new IOException("File " . $this->storePath . '_cnt.sdb' . " does not exist.");
+            IoHelper::writeContentToFile($this->storePath . '_cnt.sdb', '{"totalEntries":0,"lastId":0}');
+
+            $this->count(true);
         }
 
         $counters = IoHelper::getFileContent($this->storePath . '_cnt.sdb');
@@ -1666,7 +1668,9 @@ class Store
     protected function increaseCounterAndGetNextId(): int
     {
         if (!file_exists($this->storePath . '_cnt.sdb')) {
-            throw new IOException("File " . $this->storePath . '_cnt.sdb' . " does not exist.");
+            IoHelper::writeContentToFile($this->storePath . '_cnt.sdb', '{"totalEntries":0,"lastId":0}');
+
+            $this->count(true);
         }
 
         $dataPath = $this->getDataPath();
