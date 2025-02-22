@@ -116,7 +116,11 @@ class DbInstaller extends BasePackage
                     $tableName = $tableClass['model']->getSource();
                 }
 
-                $config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model']);
+                $tableConfigParams = [];
+                if (isset($tableClass['configParams'])) {
+                    $tableConfigParams = $tableClass['configParams'];
+                }
+                $config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model'], $tableConfigParams);
                 $schema = $this->ff->generateSchema($tableName, $tableClass['schema'], $tableClass['model']);
 
                 $this->ff->store($tableName, $config, $schema, $this->ff);

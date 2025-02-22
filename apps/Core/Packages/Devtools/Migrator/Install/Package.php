@@ -42,7 +42,11 @@ class Package extends BasePackage
                         $tableName = $tableClass['model']->getSource();
                     }
 
-                    $config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model'], $this->db);
+                    $tableConfigParams = [];
+                    if (isset($tableClass['configParams'])) {
+                        $tableConfigParams = $tableClass['configParams'];
+                    }
+                    $config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model'], $tableConfigParams);
                     $schema = $this->ff->generateSchema($tableName, $tableClass['schema'], $tableClass['model']);
 
                     if ($redoDB) {
