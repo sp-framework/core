@@ -64,9 +64,9 @@ class DocumentFinder
             if (count($conditions) > 0) {
                 foreach ($conditions as $condition) {
                     if (isset($condition[0]) &&
-                        in_array($condition[0], $this->storeConfiguration['indexes'])
+                        in_array($condition[0][0], $this->storeConfiguration['indexes'])
                     ) {
-                        $keyword = trim($condition[2], '%');//This needs to extend
+                        $keyword = trim($condition[0][2], '%');//This needs to extend
 
                         if (strlen($keyword) < $this->storeConfiguration['min_index_chars']) {
                             continue;
@@ -76,7 +76,7 @@ class DocumentFinder
 
                         try {
                             $indexFile =
-                                IoHelper::getFileContent($this->storeConfiguration['indexesPath'] . $condition[0] . '/' . $indexChars . '.json');
+                                IoHelper::getFileContent($this->storeConfiguration['indexesPath'] . $condition[0][0] . '/' . $indexChars . '.json');
 
                             $indexJson = json_decode($indexFile, true);
 
@@ -84,14 +84,14 @@ class DocumentFinder
                                 foreach ($indexJson as $key => $ids) {
                                     $key = strtolower($key);
 
-                                    if (strtolower($condition[1]) === 'like') {
+                                    if (strtolower($condition[0][1]) === 'like') {
                                         if (str_starts_with($key, strtolower($keyword))) {
                                             foreach ($ids as $id) {
                                                 $found[] = $this->store->findById($id);
                                             }
                                         }
-                                    } else if ($condition[1] === '=' ||
-                                               $condition[1] === '==='
+                                    } else if ($condition[0][1] === '=' ||
+                                               $condition[0][1] === '==='
                                     ) {
                                         if ($key === strtolower($keyword)) {
                                             foreach ($ids as $id) {
