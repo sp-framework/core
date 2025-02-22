@@ -382,9 +382,9 @@ class Store
 
         $data = $this->writeNewDocumentToStore($data);
 
-        if ($this->ff->mode === 'hybrid') {
-            $this->ff->addToSync($this->model, $data[$this->primaryKey]);
-        }
+        // if ($this->ff->mode === 'hybrid') {
+        //     $this->ff->addToSync($this->model, $data[$this->primaryKey]);
+        // }
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
@@ -403,9 +403,9 @@ class Store
         foreach ($data as $document) {
             $result = $this->writeNewDocumentToStore($document);
 
-            if ($this->ff->mode === 'hybrid') {
-                $this->ff->addToSync($this->model, $result[$this->primaryKey]);
-            }
+            // if ($this->ff->mode === 'hybrid') {
+            //     $this->ff->addToSync($this->model, $result[$this->primaryKey]);
+            // }
 
             $results[] = $result;
         }
@@ -470,7 +470,14 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        if ($this->ff->mode === 'hybrid') {
+        // if ($this->ff->mode === 'hybrid') {
+        //     if ($insert) {
+        //         $this->ff->addToSync($this->model, $data[$this->primaryKey]);
+        //     } else {
+        //         $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+        //     }
+        // }
+
         if ($this->indexing) {
             if ($insert) {
                 (new IndexHandler($this->storeConfiguration))->setIndex($dataJSON);
@@ -541,7 +548,14 @@ class Store
                 throw $e;
             }
 
-            if ($this->ff->mode === 'hybrid') {
+            // if ($this->ff->mode === 'hybrid') {
+            //     if ($insert) {
+            //         $this->ff->addToSync($this->model, $document[$this->primaryKey]);
+            //     } else {
+            //         $this->ff->addToSync($this->model, $document[$this->primaryKey], 'update');
+            //     }
+            // }
+            //
             if ($this->indexing) {
                 if ($insert) {
                     (new IndexHandler($this->storeConfiguration))->setIndex($documentJSON);
@@ -599,8 +613,9 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        if ($this->ff->mode === 'hybrid') {
-            $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+        // if ($this->ff->mode === 'hybrid') {
+        //     $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+        // }
         if ($this->indexing) {
             (new IndexHandler($this->storeConfiguration))->resetIndex($current, $data);
         }
@@ -653,8 +668,9 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        if ($this->ff->mode === 'hybrid') {
-            $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+        // if ($this->ff->mode === 'hybrid') {
+        //     $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+        // }
         if ($this->indexing) {
             (new IndexHandler($this->storeConfiguration))->resetIndex($current, $data);
         }
@@ -690,13 +706,14 @@ class Store
         } else {
             $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-            if ($this->ff->mode === 'hybrid') {
-                $this->ff->addToSync($this->model, (int) $id, 'remove');
             $content = $this->findById($id);
 
             if ($this->indexing) {
                 (new IndexHandler($this->storeConfiguration))->removeFromIndex($content);
             }
+            // if ($this->ff->mode === 'hybrid') {
+            //     $this->ff->addToSync($this->model, (int) $id, 'remove');
+            // }
 
             return (!file_exists($this->getDataPath() . "$id.json") || true === @unlink($this->getDataPath() . "$id.json"));
         }
