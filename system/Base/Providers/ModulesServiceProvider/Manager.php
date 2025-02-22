@@ -1202,7 +1202,7 @@ class Manager extends BasePackage
         }
 
         if ($returnApis) {
-            return $apis;
+            return $apis ?? [];
         }
 
         return $apisArr;

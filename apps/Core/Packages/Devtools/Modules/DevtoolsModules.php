@@ -3451,7 +3451,7 @@ $file .= '
         }
 
         if ($returnApis) {
-            return $apis;
+            return $apis ?? [];
         }
 
         return $apisArr;
