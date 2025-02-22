@@ -920,6 +920,7 @@ class DevtoolsModules extends BasePackage
             $defaultDependencies['views'] = [];
             $defaultDependencies['externals'] = $externalDependencies;
         } else if ($type === 'packages') {
+            $defaultDependencies['packages'] = [];
             $defaultDependencies['middlewares'] = [];
             $defaultDependencies['externals'] = $externalDependencies;
         } else if ($type === 'middlewares') {

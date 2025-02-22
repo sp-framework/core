@@ -159,7 +159,6 @@ class ModulesComponent extends BaseComponent
 					}
 				}
 			} else if ($this->getData()['type'] === 'packages') {
-				unset($modules['packages']);
 				unset($modules['views']);
 				unset($modules['bundles']);
 				$this->view->packageSettingsModules = $modules;
