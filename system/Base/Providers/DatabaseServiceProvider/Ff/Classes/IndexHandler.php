@@ -56,9 +56,11 @@ class IndexHandler
         }
     }
 
-    public function setIndex(string $content)
+    public function setIndex($content, $remove = false)
     {
-        $content = json_decode($content, true);
+        if (is_string($content)) {
+            $content = json_decode($content, true);
+        }
 
         $indexPointer = $content['id'];
 
@@ -80,30 +82,30 @@ class IndexHandler
 
                                 $indexChars = strtolower(mb_substr($content, 0, $this->minIndexChars, 'UTF-8'));
 
-                                $this->writeIndex($indexPointer, $index, $indexChars, $content);
+                                $this->writeIndex($indexPointer, $index, $indexChars, $content, $remove);
                             }
                         } else {
                             $indexChars = strtolower(mb_substr($content[$index], 0, $this->minIndexChars, 'UTF-8'));
 
-                            $this->writeIndex($indexPointer, $index, $indexChars, $content[$index]);
+                            $this->writeIndex($indexPointer, $index, $indexChars, $content[$index], $remove);
                         }
                     } else {
-                        $this->writeIndex($indexPointer, $index, $content[$index], $content[$index]);
+                        $this->writeIndex($indexPointer, $index, $content[$index], $content[$index], $remove);
                     }
                 } else {
                     if (is_string($content[$index])) {
                         $indexChars = strtolower(mb_substr($content[$index], 0, $this->minIndexChars, 'UTF-8'));
 
-                        $this->writeIndex($indexPointer, $index, $indexChars, $content[$index]);
+                        $this->writeIndex($indexPointer, $index, $indexChars, $content[$index], $remove);
                     } else {
-                        $this->writeIndex($indexPointer, $index, $content[$index], $content[$index]);
+                        $this->writeIndex($indexPointer, $index, $content[$index], $content[$index], $remove);
                     }
                 }
             }
         }
     }
 
-    protected function writeIndex($indexPointer, $index, $indexChars, $content)
+    protected function writeIndex($indexPointer, $index, $indexChars, $content, $remove = false)
     {
         try {
             $indexFile = $this->getIndex($index, $indexChars);
@@ -114,11 +116,25 @@ class IndexHandler
         }
 
         if (isset($indexJson[$content])) {
-            if (!in_array($indexPointer, $indexJson[$content])) {
-                array_push($indexJson[$content], $indexPointer);
+            if ($remove) {
+                $key = array_search($indexPointer, $indexJson[$content]);
+
+                if ($key !== false) {
+                    unset($indexJson[$content][$key]);
+                }
+
+                if (count($indexJson[$content]) === 0) {
+                    return IoHelper::deleteFile($this->indexesPath . $index . '/' . $indexChars . '.json');
+                }
+            } else {
+                if (!in_array($indexPointer, $indexJson[$content])) {
+                    array_push($indexJson[$content], $indexPointer);
+                }
             }
         } else {
-            $indexJson[$content] = [$indexPointer];
+            if (!$remove) {
+                $indexJson[$content] = [$indexPointer];
+            }
         }
 
         IoHelper::writeContentToFile($this->indexesPath . $index . '/' . $indexChars . '.json', json_encode($indexJson));
@@ -127,6 +143,17 @@ class IndexHandler
     public function getIndex($index, $indexChars)
     {
         return IoHelper::getFileContent($this->indexesPath . $index . '/' . $indexChars . '.json');
+    }
+
+    public function removeFromIndex($content)
+    {
+        $this->setIndex($content, true);
+    }
+
+    public function resetIndex($remove, $add)
+    {
+        $this->setIndex($remove, true);
+        $this->setIndex($add);
     }
 
     public function removeIndex($index, $indexChars)

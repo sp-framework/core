@@ -62,7 +62,7 @@ class Apis extends BasePackage
                     "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Api\\";
         } else {
             $this->serviceClass =
-                    "Apps\\{$this->apiConfig['location']}\\Packages\\System\\ApiClientServices\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Api\\";
+                    "Apps\\{$this->apiConfig['location']}\\Packages\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Api\\";
         }
 
         return $this;
@@ -94,7 +94,7 @@ class Apis extends BasePackage
         if ($this->apiConfig['location'] === 'Basepackages') {
             $configurationClass = "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\ApiClientServices\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Configuration";
         } else {
-            $configurationClass = "Apps\\{$this->apiConfig['location']}\\Packages\\System\\ApiClientServices\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Configuration";
+            $configurationClass = "Apps\\{$this->apiConfig['location']}\\Packages\\Apis\\{$this->apiConfig['category']}\\{$this->apiConfig['provider']}\\Configuration";
         }
 
         $this->config = new $configurationClass;
@@ -156,16 +156,24 @@ class Apis extends BasePackage
         return false;
     }
 
-    public function toArray()
+    public function toArray($array = null)
     {
         $responseArr = [];
 
-        if ($this->response && is_array($this->response)) {
-            foreach ($this->response as $key => $response) {
-                $responseArr[$key] = ($response !== null) ? $this->helper->decode($response->__toString(), true) : null;
+        if (!$array) {
+            $array = $this->response;
+        }
+
+        if ($array && is_array($array)) {
+            foreach ($array as $key => $response) {
+                if (is_array($response)) {
+                    $responseArr[$key] = $this->toArray($response);
+                } else {
+                    $responseArr[$key] = ($response !== null) ? $this->helper->decode($response->__toString(), true) : null;
+                }
             }
         } else {
-            $responseArr = $this->helper->decode($this->response->__toString(), true);
+            $responseArr = $this->helper->decode($array->__toString(), true);
         }
 
         return $responseArr;

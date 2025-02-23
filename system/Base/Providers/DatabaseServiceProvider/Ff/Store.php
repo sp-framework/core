@@ -263,7 +263,9 @@ class Store
     public function getLastInsertedId(): int
     {
         if (!file_exists($this->storePath . '_cnt.sdb')) {
-            throw new IOException("File " . $this->storePath . '_cnt.sdb' . " does not exist.");
+            IoHelper::writeContentToFile($this->storePath . '_cnt.sdb', '{"totalEntries":0,"lastId":0}');
+
+            $this->count(true);
         }
 
         $counters = IoHelper::getFileContent($this->storePath . '_cnt.sdb');
@@ -382,9 +384,9 @@ class Store
 
         $data = $this->writeNewDocumentToStore($data);
 
-        if ($this->ff->mode === 'hybrid') {
-            $this->ff->addToSync($this->model, $data[$this->primaryKey]);
-        }
+        // if ($this->ff->mode === 'hybrid') {
+        //     $this->ff->addToSync($this->model, $data[$this->primaryKey]);
+        // }
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
@@ -403,9 +405,9 @@ class Store
         foreach ($data as $document) {
             $result = $this->writeNewDocumentToStore($document);
 
-            if ($this->ff->mode === 'hybrid') {
-                $this->ff->addToSync($this->model, $result[$this->primaryKey]);
-            }
+            // if ($this->ff->mode === 'hybrid') {
+            //     $this->ff->addToSync($this->model, $result[$this->primaryKey]);
+            // }
 
             $results[] = $result;
         }
@@ -470,11 +472,19 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        if ($this->ff->mode === 'hybrid') {
+        // if ($this->ff->mode === 'hybrid') {
+        //     if ($insert) {
+        //         $this->ff->addToSync($this->model, $data[$this->primaryKey]);
+        //     } else {
+        //         $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+        //     }
+        // }
+
+        if ($this->indexing) {
             if ($insert) {
-                $this->ff->addToSync($this->model, $data[$this->primaryKey]);
+                (new IndexHandler($this->storeConfiguration))->setIndex($dataJSON);
             } else {
-                $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+                (new IndexHandler($this->storeConfiguration))->resetIndex($current, $dataJSON);
             }
         }
 
@@ -540,11 +550,19 @@ class Store
                 throw $e;
             }
 
-            if ($this->ff->mode === 'hybrid') {
+            // if ($this->ff->mode === 'hybrid') {
+            //     if ($insert) {
+            //         $this->ff->addToSync($this->model, $document[$this->primaryKey]);
+            //     } else {
+            //         $this->ff->addToSync($this->model, $document[$this->primaryKey], 'update');
+            //     }
+            // }
+            //
+            if ($this->indexing) {
                 if ($insert) {
-                    $this->ff->addToSync($this->model, $document[$this->primaryKey]);
+                    (new IndexHandler($this->storeConfiguration))->setIndex($documentJSON);
                 } else {
-                    $this->ff->addToSync($this->model, $document[$this->primaryKey], 'update');
+                    (new IndexHandler($this->storeConfiguration))->resetIndex($current, $documentJSON);
                 }
             }
         }
@@ -597,8 +615,11 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        if ($this->ff->mode === 'hybrid') {
-            $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+        // if ($this->ff->mode === 'hybrid') {
+        //     $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+        // }
+        if ($this->indexing) {
+            (new IndexHandler($this->storeConfiguration))->resetIndex($current, $data);
         }
 
         $this->data = $data;
@@ -649,8 +670,11 @@ class Store
 
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-        if ($this->ff->mode === 'hybrid') {
-            $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+        // if ($this->ff->mode === 'hybrid') {
+        //     $this->ff->addToSync($this->model, $data[$this->primaryKey], 'update');
+        // }
+        if ($this->indexing) {
+            (new IndexHandler($this->storeConfiguration))->resetIndex($current, $data);
         }
 
         $this->data = $data;
@@ -684,9 +708,14 @@ class Store
         } else {
             $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
-            if ($this->ff->mode === 'hybrid') {
-                $this->ff->addToSync($this->model, (int) $id, 'remove');
+            $content = $this->findById($id);
+
+            if ($this->indexing) {
+                (new IndexHandler($this->storeConfiguration))->removeFromIndex($content);
             }
+            // if ($this->ff->mode === 'hybrid') {
+            //     $this->ff->addToSync($this->model, (int) $id, 'remove');
+            // }
 
             return (!file_exists($this->getDataPath() . "$id.json") || true === @unlink($this->getDataPath() . "$id.json"));
         }
@@ -1194,20 +1223,12 @@ class Store
             $this->storeSchema = json_encode($schema);
         }
 
-        if (array_key_exists("indexing", $configuration)) {
-            if (!is_bool($configuration["indexing"])) {
-                throw new InvalidConfigurationException("indexing has to be boolean");
+        if (array_key_exists("min_index_chars", $configuration)) {
+            if (!is_int($configuration["min_index_chars"])) {
+                throw new InvalidConfigurationException("min_index_chars has to be an integer");
             }
 
-            $this->indexing = $configuration["indexing"];
-        }
-
-        if (array_key_exists("minIndexChars", $configuration)) {
-            if (!is_int($configuration["minIndexChars"])) {
-                throw new InvalidConfigurationException("minIndexChars has to be an integer");
-            }
-
-            $this->minIndexChars = $configuration["minIndexChars"];
+            $this->minIndexChars = $configuration["min_index_chars"];
         }
 
         if (array_key_exists("multiWords", $configuration)) {
@@ -1237,6 +1258,18 @@ class Store
             }
 
             $this->indexes = $configuration["indexes"];
+
+            if (count($configuration["indexes"]) > 0) {
+                $configuration['indexing'] = true;
+            }
+        }
+
+        if (array_key_exists("indexing", $configuration)) {
+            if (!is_bool($configuration["indexing"])) {
+                throw new InvalidConfigurationException("indexing has to be boolean");
+            }
+
+            $this->indexing = $configuration["indexing"];
         }
 
         if (array_key_exists("auto_cache", $configuration)) {
@@ -1390,6 +1423,10 @@ class Store
             $this->decreaseCounter();
 
             throw $e;
+        }
+
+        if ($this->indexing) {
+            (new IndexHandler($this->storeConfiguration))->setIndex($storeData);
         }
 
         return $storeData;
@@ -1631,7 +1668,9 @@ class Store
     protected function increaseCounterAndGetNextId(): int
     {
         if (!file_exists($this->storePath . '_cnt.sdb')) {
-            throw new IOException("File " . $this->storePath . '_cnt.sdb' . " does not exist.");
+            IoHelper::writeContentToFile($this->storePath . '_cnt.sdb', '{"totalEntries":0,"lastId":0}');
+
+            $this->count(true);
         }
 
         $dataPath = $this->getDataPath();

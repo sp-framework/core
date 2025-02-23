@@ -88,6 +88,12 @@ class Manager extends BasePackage
         }
 
         if (isset($module) && is_array($module)) {
+            if (isset($module['dependencies']) &&
+                is_string($module['dependencies'])
+            ) {
+                $module['dependencies'] = $this->helper->decode($module['dependencies'], true);
+            }
+
             if (array_key_exists('notification_subscriptions', $module)) {
                 unset($module['notification_subscriptions']);
             }
@@ -158,7 +164,7 @@ class Manager extends BasePackage
                         }
                     }
 
-                    $module['required_by'] = $requiredModules;
+                    $module['required_by_modules_names'] = $requiredModules;
                 }
             }
 
@@ -233,12 +239,15 @@ class Manager extends BasePackage
 
                     if ($latestReleaseJson) {
                         $module['repo_details']['latestRelease']['moduleJson'] = $this->remoteModulesJson[$module['module_type']][$module['name']];
+
                         if ($module['module_type'] === 'bundles') {
                             $module['update_available'] = null;
                             $module['update_version'] = null;
                             $module['installed'] = null;
                             $module['version'] = $module['repo_details']['latestRelease']['name'];
+                            $module['bundle_modules'] = $module['repo_details']['latestRelease']['moduleJson']['bundle_modules'];
                         } else {
+                            $module['dependencies'] = $module['repo_details']['latestRelease']['moduleJson']['dependencies'];
                             if ($module['installed'] == '1') {
                                 $module['update_available'] = '1';
                                 $module['update_version'] = $module['repo_details']['latestRelease']['name'];
@@ -1165,7 +1174,7 @@ class Manager extends BasePackage
                 }
             }
         } else {
-            $apisArr = $this->basepackages->apiClientServices->getAll()->apiClientServices;
+            $apisArr = $this->basepackages->apiClientServices->getApiByAppType();
         }
 
         if (count($apisArr) > 0) {
@@ -1193,7 +1202,7 @@ class Manager extends BasePackage
         }
 
         if ($returnApis) {
-            return $apis;
+            return $apis ?? [];
         }
 
         return $apisArr;

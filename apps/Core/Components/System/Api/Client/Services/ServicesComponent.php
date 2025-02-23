@@ -100,10 +100,15 @@ class ServicesComponent extends BaseComponent
                 ]
             ];
 
+        $conditions =
+            [
+                'conditions'    => '-|app_type|equals|' . $this->apps->getAppInfo()['app_type'] . '&'
+            ];
+
         $this->generateDTContent(
             $this->apiPackage,
             'system/api/client/services/view',
-            null,
+            $conditions,
             ['name', 'category', 'provider', 'in_use', 'used_by', 'setup'],
             true,
             ['name', 'category', 'provider', 'in_use', 'used_by', 'setup'],

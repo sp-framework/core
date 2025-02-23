@@ -311,13 +311,23 @@ class Installer extends BasePackage
                     return true;
                 }
             } else {
+                if (isset($this->modulesToInstallOrUpdate['required_by'])) {
+                    $checkForCore = $this->preCheckModuleAppsBinding($taskName, $module, true);
+
+                    if (!$checkForCore) {
+                        return $checkForCore;
+                    }
+                }
+
                 if ($this->queue['settings']['installer']['forceUninstall']) {
                     $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'] = 'Precheck ignored due to force uninstall.';
 
                     return true;
                 }
 
-                if (isset($this->modulesToInstallOrUpdate['apps'])) {
+                if (isset($this->modulesToInstallOrUpdate['apps']) ||
+                    isset($this->modulesToInstallOrUpdate['required_by'])
+                ) {
                     return $this->preCheckModuleAppsBinding($taskName, $module);
                 }
 
@@ -360,25 +370,66 @@ class Installer extends BasePackage
         return false;
     }
 
-    protected function preCheckModuleAppsBinding($taskName, $module)
+    protected function preCheckModuleAppsBinding($taskName, $module, $checkForCore = false)
     {
         try {
-            if (is_string($this->modulesToInstallOrUpdate['apps'])) {
-                $this->modulesToInstallOrUpdate['apps'] = $this->helper->decode($this->modulesToInstallOrUpdate['apps'], true);
-            }
+            if (isset($this->modulesToInstallOrUpdate['apps'])) {
+                if (is_string($this->modulesToInstallOrUpdate['apps'])) {
+                    $this->modulesToInstallOrUpdate['apps'] = $this->helper->decode($this->modulesToInstallOrUpdate['apps'], true);
+                }
 
-            if (count($this->modulesToInstallOrUpdate['apps']) > 0) {
-                foreach ($this->modulesToInstallOrUpdate['apps'] as $appId => $appSettings) {
-                    if (array_key_exists('enabled', $appSettings) && $appSettings['enabled'] == true) {
-                        $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
+                if (count($this->modulesToInstallOrUpdate['apps']) > 0) {
+                    foreach ($this->modulesToInstallOrUpdate['apps'] as $appId => $appSettings) {
+                        if (array_key_exists('enabled', $appSettings) && $appSettings['enabled'] == true) {
+                            $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
 
-                        $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
+                            $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
 
-                        return $this->queueHasErrors(
-                            'Module ' . $this->modulesToInstallOrUpdate['name'] . ' (' . $this->modulesToInstallOrUpdate['module_type'] . ') is assigned to app with ID: ' . $appId . '. Either remove it via app or use force uninstall in the queue settings.',
-                            $preCheckQueueLogs,
-                            true
-                        );
+                            return $this->queueHasErrors(
+                                'Module ' . $this->modulesToInstallOrUpdate['name'] . ' (' . $this->modulesToInstallOrUpdate['module_type'] . ') is assigned to app with ID: ' . $appId . '. Either remove it via app or use force uninstall in the queue settings.',
+                                $preCheckQueueLogs,
+                                true
+                            );
+                        }
+                    }
+                }
+            } else if (isset($this->modulesToInstallOrUpdate['required_by'])) {
+                if (is_string($this->modulesToInstallOrUpdate['required_by'])) {
+                    $this->modulesToInstallOrUpdate['required_by'] = $this->helper->decode($this->modulesToInstallOrUpdate['required_by'], true);
+                }
+
+                if (count($this->modulesToInstallOrUpdate['required_by']) > 0) {
+                    foreach ($this->modulesToInstallOrUpdate['required_by'] as $moduleType => $requiredModulesArr) {
+                        if (count($requiredModulesArr) > 0) {
+                            foreach ($requiredModulesArr as $requiredModule) {
+                                $moduleIsInstalled = $this->modules->$moduleType->getById($requiredModule);
+
+                                if ($moduleIsInstalled &&
+                                    $checkForCore &&
+                                    $moduleIsInstalled['name'] === 'Core'
+                                ) {
+                                    $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
+
+                                    $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
+
+                                    return $this->queueHasErrors(
+                                        'Module ' . $this->modulesToInstallOrUpdate['display_name'] . ' (' . $this->modulesToInstallOrUpdate['module_type'] . ') is required by ' . $moduleType . ' with ID: ' . $moduleIsInstalled['id'] . ' (' . $moduleIsInstalled['display_name'] . '). This module cannot be removed. Please remove the external module from the queue and contact developer if you want to get this external module removed.',
+                                        $preCheckQueueLogs,
+                                        true
+                                    );
+                                } else if ($moduleIsInstalled) {
+                                    $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
+
+                                    $preCheckQueueLogs = &$this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck_logs'];
+
+                                    return $this->queueHasErrors(
+                                        'Module ' . $this->modulesToInstallOrUpdate['display_name'] . ' (' . $this->modulesToInstallOrUpdate['module_type'] . ') is required by ' . $moduleType . ' with ID: ' . $moduleIsInstalled['id'] . ' (' . $moduleIsInstalled['display_name'] . '). Uninstall the module first or use force uninstall in the queue settings.',
+                                        $preCheckQueueLogs,
+                                        true
+                                    );
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -399,155 +450,166 @@ class Installer extends BasePackage
 
     protected function processExternalPackages($args)
     {
+        $taskName = $args[0];
         $module = $args[1];
         $precheck = $args[2];
+        $externalComposerFileName = str_replace('/', '_', $module['display_name']) . '_composer.json';
 
-        if ($module['module_type'] === 'external') {
+        if ($module['module_type'] === 'externals') {
             if ($precheck) {
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck'] = 'fail';
-                $preCheckQueueLogs = &$this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'];
+                $this->queue['results'][$taskName]['externals'][$module['id']]['precheck'] = 'fail';
+                $preCheckQueueLogs = &$this->queue['results'][$taskName]['externals'][$module['id']]['precheck_logs'];
             } else {
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['result'] = 'fail';
-                $resultQueueLogs = &$this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['result_logs'];
+                $this->queue['results'][$taskName]['externals'][$module['id']]['result'] = 'fail';
+                $resultQueueLogs = &$this->queue['results'][$taskName]['externals'][$module['id']]['result_logs'];
             }
 
-            if (isset($module['hasPatch']) && $module['hasPatch'] === true) {
-                if (!isset($module['composerJsonFile']['extra']['patches'][$module['name']])) {
-                    $this->cleanup(['composer']);
+            if ($taskName !== 'uninstall' && $taskName !== 'remove') {
+                if (isset($module['hasPatch']) && $module['hasPatch'] === true) {
+                    if (!isset($module['composerJsonFile']['extra']['patches'][$module['name']])) {
+                        $this->cleanup(['composer']);
 
-                    if ($precheck) {
-                        return $this->queueHasErrors(
-                            'External packages should have package defined, but are missing from the composer json file for : ' . $module['name'],
-                            $preCheckQueueLogs
-                        );
-                    } else {
-                        return $this->queueHasErrors(
-                            'External packages should have package defined, but are missing from the composer json file for : ' . $module['name'],
-                            $resultQueueLogs,
-                            false
-                        );
-                    }
-                }
-
-                $patches = $this->basepackages->utils->scanDir($this->downloadLocation .
-                            $module['root_module']['repo_details']['details']['name'] . '-' .
-                            $module['root_module']['repo_details']['latestRelease']['name'] . '/' .
-                            $module['root_module']['repo_details']['details']['name'] . '-' .
-                            $module['root_module']['repo_details']['latestRelease']['name'] . '/external/patches/',
-                           false
-                );
-
-                $patches['files'] = arrayFilterKeywords($patches['files'], ['.patch']);
-
-                if (count($patches['files']) === 0) {
-                    $this->cleanup(['composer']);
-
-                    if ($precheck) {
-                        return $this->queueHasErrors(
-                            'External package requires a patch which is missing from the repository : ' . $module['root_module']['repo'],
-                            $preCheckQueueLogs
-                        );
-                    } else {
-                        return $this->queueHasErrors(
-                            'External package requires a patch which is missing from the repository : ' . $module['root_module']['repo'],
-                            $resultQueueLogs,
-                            false
-                        );
-                    }
-                }
-
-                $modulePatchName = str_replace(['/','-'], ['_','_'], $module['name']);
-                $patches['files'] = arrayFilterKeywords($patches['files'], [$modulePatchName]);
-
-                if (count($patches['files']) !== count($module['composerJsonFile']['extra']['patches'][$module['name']])) {
-                    $this->cleanup(['composer']);
-
-                    if ($precheck) {
-                        return $this->queueHasErrors(
-                            'External package number of patches do not match what is defined in the composer json file for repository : ' . $module['root_module']['repo'],
-                            $preCheckQueueLogs
-                        );
-                    } else {
-                        return $this->queueHasErrors(
-                            'External package number of patches do not match what is defined in the composer json file for repository : ' . $module['root_module']['repo'],
-                            $resultQueueLogs,
-                            false
-                        );
-                    }
-                }
-
-                $foundAll = [];
-                foreach ($patches['files'] as $file) {
-                    $fileName = $this->helper->last(explode('/', $file));
-                    foreach ($module['composerJsonFile']['extra']['patches'][$module['name']] as $key => $patch) {
-                        $foundAll[$key] = 'false';
-                        if (str_contains($patch, $fileName)) {
-                            $foundAll[$key] = 'true';
+                        if ($precheck) {
+                            return $this->queueHasErrors(
+                                'External packages should have package defined, but are missing from the composer json file for : ' . $module['name'],
+                                $preCheckQueueLogs
+                            );
+                        } else {
+                            return $this->queueHasErrors(
+                                'External packages should have package defined, but are missing from the composer json file for : ' . $module['name'],
+                                $resultQueueLogs,
+                                false
+                            );
                         }
                     }
-                }
 
-                if (in_array('false', $foundAll)) {
-                    $this->cleanup(['composer']);
+                    $patches = $this->basepackages->utils->scanDir($this->downloadLocation .
+                                $module['root_module']['repo_details']['details']['name'] . '-' .
+                                $module['root_module']['repo_details']['latestRelease']['name'] . '/' .
+                                $module['root_module']['repo_details']['details']['name'] . '-' .
+                                $module['root_module']['repo_details']['latestRelease']['name'] . '/external/patches/',
+                               false
+                    );
 
-                    if ($precheck) {
-                        return $this->queueHasErrors(
-                            'External package all patches not found in the external/patches directory as per the  composer json file for repository : ' . $module['root_module']['repo'],
-                            $preCheckQueueLogs
-                        );
-                    } else {
-                        return $this->queueHasErrors(
-                            'External package all patches not found in the external/patches directory as per the  composer json file for repository : ' . $module['root_module']['repo'],
-                            $resultQueueLogs,
-                            false
-                        );
+                    $patches['files'] = arrayFilterKeywords($patches['files'], ['.patch']);
+
+                    if (count($patches['files']) === 0) {
+                        $this->cleanup(['composer']);
+
+                        if ($precheck) {
+                            return $this->queueHasErrors(
+                                'External package requires a patch which is missing from the repository : ' . $module['root_module']['repo'],
+                                $preCheckQueueLogs
+                            );
+                        } else {
+                            return $this->queueHasErrors(
+                                'External package requires a patch which is missing from the repository : ' . $module['root_module']['repo'],
+                                $resultQueueLogs,
+                                false
+                            );
+                        }
+                    }
+
+                    $modulePatchName = str_replace(['/','-'], ['_','_'], $module['name']);
+                    $patches['files'] = arrayFilterKeywords($patches['files'], [$modulePatchName]);
+
+                    if (count($patches['files']) !== count($module['composerJsonFile']['extra']['patches'][$module['name']])) {
+                        $this->cleanup(['composer']);
+
+                        if ($precheck) {
+                            return $this->queueHasErrors(
+                                'External package number of patches do not match what is defined in the composer json file for repository : ' . $module['root_module']['repo'],
+                                $preCheckQueueLogs
+                            );
+                        } else {
+                            return $this->queueHasErrors(
+                                'External package number of patches do not match what is defined in the composer json file for repository : ' . $module['root_module']['repo'],
+                                $resultQueueLogs,
+                                false
+                            );
+                        }
+                    }
+
+                    $foundAll = [];
+                    foreach ($patches['files'] as $file) {
+                        $fileName = $this->helper->last(explode('/', $file));
+                        foreach ($module['composerJsonFile']['extra']['patches'][$module['name']] as $key => $patch) {
+                            $foundAll[$key] = 'false';
+                            if (str_contains($patch, $fileName)) {
+                                $foundAll[$key] = 'true';
+                            }
+                        }
+                    }
+
+                    if (in_array('false', $foundAll)) {
+                        $this->cleanup(['composer']);
+
+                        if ($precheck) {
+                            return $this->queueHasErrors(
+                                'External package all patches not found in the external/patches directory as per the  composer json file for repository : ' . $module['root_module']['repo'],
+                                $preCheckQueueLogs
+                            );
+                        } else {
+                            return $this->queueHasErrors(
+                                'External package all patches not found in the external/patches directory as per the  composer json file for repository : ' . $module['root_module']['repo'],
+                                $resultQueueLogs,
+                                false
+                            );
+                        }
+                    }
+
+                    try {
+                        foreach ($patches['files'] as $file) {
+                            $fileName = $this->helper->last(explode('/', $file));
+
+                            $this->localContent->copy($file, 'external/patches/' . $fileName);
+                        }
+                    } catch (FilesystemException | UnableToCopyFile $e) {
+                        $this->cleanup(['composer']);
+
+                        return $this->queueHasErrors('Error copying file : ' . $fileName, $preCheckQueueLogs);
                     }
                 }
 
                 try {
-                    foreach ($patches['files'] as $file) {
-                        $fileName = $this->helper->last(explode('/', $file));
-
-                        $this->localContent->copy($file, 'external/patches/' . $fileName);
-                    }
-                } catch (FilesystemException | UnableToCopyFile $e) {
+                    $this->localContent->write('external/' . $externalComposerFileName, $this->helper->encode($module['composerJsonFile']));
+                } catch (FilesystemException | UnableToWriteFile $e) {
                     $this->cleanup(['composer']);
 
-                    return $this->queueHasErrors('Error copying file : ' . $fileName, $preCheckQueueLogs);
-                }
-            }
-
-            try {
-                $externalComposerFileName = str_replace('/', '_', $module['name']) . '_composer.json';
-
-                $this->localContent->write('external/' . $externalComposerFileName, $this->helper->encode($module['composerJsonFile']));
-            } catch (FilesystemException | UnableToWriteFile $e) {
-                $this->cleanup(['composer']);
-
-                if ($precheck) {
-                    return $this->queueHasErrors(
-                        'Error writing file external package composer file : ' . $externalComposerFileName,
-                        $preCheckQueueLogs
-                    );
-                } else {
-                    return $this->queueHasErrors(
-                        'Error writing file external package composer file : ' . $externalComposerFileName,
-                        $resultQueueLogs,
-                        false
-                    );
+                    if ($precheck) {
+                        return $this->queueHasErrors(
+                            'Error writing file external package composer file : ' . $externalComposerFileName,
+                            $preCheckQueueLogs
+                        );
+                    } else {
+                        return $this->queueHasErrors(
+                            'Error writing file external package composer file : ' . $externalComposerFileName,
+                            $resultQueueLogs,
+                            false
+                        );
+                    }
                 }
             }
 
             try {
                 putenv('COMPOSER_HOME=' . base_path('external/'));
-                putenv('COMPOSER=' . $externalComposerFileName);
-
-                $stream = fopen(base_path('external/' . $externalComposerFileName . '.install'), 'w');
-                if ($precheck) {
-                    $input = new \Symfony\Component\Console\Input\StringInput('install --dry-run -d ' . base_path('external/'));
-                } else {
-                    $input = new \Symfony\Component\Console\Input\StringInput('install -d ' . base_path('external/'));
+                if ($taskName !== 'uninstall' && $taskName !== 'remove') {
+                    putenv('COMPOSER=' . $externalComposerFileName);
                 }
+
+                $stream = fopen(base_path('external/' . str_replace('_composer.json', '', $externalComposerFileName) . '.install'), 'w');
+
+                $process = 'install';
+                if ($taskName === 'uninstall' || $taskName === 'remove') {
+                    $process = 'remove ' . $module['display_name'];
+                }
+
+                if ($precheck) {
+                    $input = new \Symfony\Component\Console\Input\StringInput($process . ' --dry-run -d ' . base_path('external/'));
+                } else {
+                    $input = new \Symfony\Component\Console\Input\StringInput($process . ' -d ' . base_path('external/'));
+                }
+
                 $output = new \Symfony\Component\Console\Output\StreamOutput($stream);
 
                 $application = new \Composer\Console\Application();
@@ -555,11 +617,15 @@ class Installer extends BasePackage
 
                 $app = $application->run($input, $output);
 
-                $installLogs = $this->localContent->read('external/' . $externalComposerFileName . '.install');
-            } catch (\throwable | UnableToReadFile $e) {
+                $installLogs = $this->localContent->read('external/' . str_replace('_composer.json', '', $externalComposerFileName) . '.install');
+            } catch (\throwable | UnableToReadFile | UnableToWriteFile $e) {
                 $this->cleanup(['composer']);
 
-                return $this->queueHasErrors($e->getMessage(), $preCheckQueueLogs, $precheck);
+                if ($precheck) {
+                    return $this->queueHasErrors($e->getMessage(), $preCheckQueueLogs, $precheck);
+                } else {
+                    return $this->queueHasErrors($e->getMessage(), $resultQueueLogs, $precheck);
+                }
             }
 
             if ($app !== 0) {
@@ -573,57 +639,65 @@ class Installer extends BasePackage
             }
 
             if ($precheck) {
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck'] = 'pass';
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['precheck_logs'] = $installLogs;
+                $this->queue['results'][$taskName]['externals'][$module['id']]['precheck'] = 'pass';
+                $this->queue['results'][$taskName]['externals'][$module['id']]['precheck_logs'] = $installLogs;
             } else {
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['result'] = 'pass';
-                $this->queue['results']['first']['external'][explode('/', $module['name'])[1]]['result_logs'] = $installLogs;
+                $this->queue['results'][$taskName]['externals'][$module['id']]['result'] = 'pass';
+                $this->queue['results'][$taskName]['externals'][$module['id']]['result_logs'] = $installLogs;
 
                 //Merge package information to composer.json
-                try {
-                    $this->localContent->write('external/composer.json', $this->helper->encode(array_replace($this->getComposerJsonFile(), $module['composerJsonFile'])));
-                } catch (FilesystemException | UnableToWriteFile $e) {
-                    return $this->queueHasErrors('Could not rewrite the composer.json file with new package information: ' . $module['name'], $resultQueueLogs, false);
-                }
+                if ($taskName !== 'uninstall' && $taskName !== 'remove') {
+                    try {
+                        $this->localContent->write('external/composer.json', $this->helper->encode(array_replace($this->getComposerJsonFile(), $module['composerJsonFile'])));
+                    } catch (FilesystemException | UnableToWriteFile $e) {
+                        return $this->queueHasErrors('Could not rewrite the composer.json file with new package information: ' . $module['name'], $resultQueueLogs, false);
+                    }
 
-                //add to externals DB
-                $installedComposerPackages = $this->getComposerPackageInfo();
-                try {
-                    $installedComposerPackages = $this->helper->decode($installedComposerPackages, true);
-                } catch (\throwable $e) {
-                    return $this->queueHasErrors($e->getMessage(), $resultQueueLogs, false);
-                }
-                $externalPackageNameArr = explode('/', $module['name']);
+                    //add to externals DB
+                    try {
+                        $installedComposerPackages = $this->getComposerPackageInfo();
 
-                $externalPackage = $this->modules->externals->getExternalByName($externalPackageNameArr[1]);
-                foreach ($installedComposerPackages['installed'] as $installedComposerPackagesKey => $installedComposerPackage) {
-                    $installedComposerPackages[$installedComposerPackage['name']] = $installedComposerPackage;
-                }
-                unset($installedComposerPackages['installed']);
+                        $installedComposerPackages = $this->helper->decode($installedComposerPackages, true);
+                    } catch (\throwable $e) {
+                        return $this->queueHasErrors($e->getMessage(), $resultQueueLogs, false);
+                    }
 
-                if ($externalPackage) {
-                    $externalPackage['version'] =
-                        (isset($installedComposerPackages[$module['name']]['version'])) ? $installedComposerPackages[$module['name']]['version'] : '';
-                    $externalPackage['description'] =
-                        (isset($installedComposerPackages[$module['name']]['description'])) ? $installedComposerPackages[$module['name']]['description'] : '';
-                    $externalPackage['patches'] =
-                        (isset($module['composerJsonFile']['extra']['patches'][$module['name']])) ?
-                            $this->helper->encode($module['composerJsonFile']['extra']['patches'][$module['name']]) :
-                            $this->helper->encode([]);
-                    $externalPackage['abandoned'] =
-                        (isset($installedComposerPackages[$module['name']]['abandoned'])) ? (($installedComposerPackages[$module['name']]['abandoned'] == true) ? 1 : 0) : 0;
+                    $externalPackageNameArr = explode('/', $module['name']);
 
-                    if (isset($externalPackage['required_by'])) {
-                        if (is_string($externalPackage['required_by'])) {
-                            $externalPackage['required_by'] = $this->helper->decode($externalPackage['required_by'], true);
-                        }
+                    $externalPackage = $this->modules->externals->getExternalByName($externalPackageNameArr[1]);
 
-                        if (isset($externalPackage['required_by'][$module['root_module']['module_type']])) {
-                            if (is_array($externalPackage['required_by'][$module['root_module']['module_type']]) &&
-                                count($externalPackage['required_by'][$module['root_module']['module_type']]) > 0
-                            ) {
-                                if (!in_array($module['root_module']['id'], $externalPackage['required_by'][$module['root_module']['module_type']])) {
-                                    array_push($externalPackage['required_by'][$module['root_module']['module_type']], $module['root_module']['id']);
+                    foreach ($installedComposerPackages['installed'] as $installedComposerPackagesKey => $installedComposerPackage) {
+                        $installedComposerPackages[$installedComposerPackage['name']] = $installedComposerPackage;
+                    }
+
+                    unset($installedComposerPackages['installed']);
+
+                    if ($externalPackage) {
+                        $externalPackage['version'] =
+                            (isset($installedComposerPackages[$module['name']]['version'])) ? $installedComposerPackages[$module['name']]['version'] : '';
+                        $externalPackage['description'] =
+                            (isset($installedComposerPackages[$module['name']]['description'])) ? $installedComposerPackages[$module['name']]['description'] : '';
+                        $externalPackage['patches'] =
+                            (isset($module['composerJsonFile']['extra']['patches'][$module['name']])) ?
+                                $this->helper->encode($module['composerJsonFile']['extra']['patches'][$module['name']]) :
+                                $this->helper->encode([]);
+                        $externalPackage['abandoned'] =
+                            (isset($installedComposerPackages[$module['name']]['abandoned'])) ? (($installedComposerPackages[$module['name']]['abandoned'] == true) ? 1 : 0) : 0;
+
+                        if (isset($externalPackage['required_by'])) {
+                            if (is_string($externalPackage['required_by'])) {
+                                $externalPackage['required_by'] = $this->helper->decode($externalPackage['required_by'], true);
+                            }
+
+                            if (isset($externalPackage['required_by'][$module['root_module']['module_type']])) {
+                                if (is_array($externalPackage['required_by'][$module['root_module']['module_type']]) &&
+                                    count($externalPackage['required_by'][$module['root_module']['module_type']]) > 0
+                                ) {
+                                    if (!in_array($module['root_module']['id'], $externalPackage['required_by'][$module['root_module']['module_type']])) {
+                                        array_push($externalPackage['required_by'][$module['root_module']['module_type']], $module['root_module']['id']);
+                                    }
+                                } else {
+                                    $externalPackage['required_by'] = $this->helper->encode(['packages' => [$module['root_module']['id']]]);
                                 }
                             } else {
                                 $externalPackage['required_by'] = $this->helper->encode(['packages' => [$module['root_module']['id']]]);
@@ -631,39 +705,48 @@ class Installer extends BasePackage
                         } else {
                             $externalPackage['required_by'] = $this->helper->encode(['packages' => [$module['root_module']['id']]]);
                         }
+
+                        $this->modules->externals->update($externalPackage);
                     } else {
-                        $externalPackage['required_by'] = $this->helper->encode(['packages' => [$module['root_module']['id']]]);
-                    }
+                        $bindToModules = [];
+                        if (isset($module['bind_to_modules']) && is_array($module['bind_to_modules']) && count($module['bind_to_modules']) > 0) {
+                            foreach ($module['bind_to_modules'] as $bindToModule) {
+                                if (!isset($bindToModules[$bindToModule['module_type']])) {
+                                    $bindToModules[$bindToModule['module_type']] = [];
+                                }
 
-                    $this->modules->externals->update($externalPackage);
-                } else {
-                    $externalPackage =
-                        [
-                            'developer'             => $externalPackageNameArr[0],
-                            'name'                  => $externalPackageNameArr[1],
-                            'display_name'          => $module['name'],
-                            'description'           =>
-                                (isset($installedComposerPackages[$module['name']]['description'])) ? $installedComposerPackages[$module['name']]['description'] : '',
-                            'module_type'           => 'externals',
-                            'app_type'              => 'core',
-                            'version'               =>
-                                (isset($installedComposerPackages[$module['name']]['version'])) ? $installedComposerPackages[$module['name']]['version'] : '',
-                            'patches'               =>
-                                (isset($module['composerJsonFile']['extra']['patches'][$module['name']])) ?
-                                    $this->helper->encode($module['composerJsonFile']['extra']['patches'][$module['name']]) :
-                                    $this->helper->encode([]),
-                            'abandoned'             =>
-                                (isset($installedComposerPackages[$module['name']]['abandoned'])) ? (($installedComposerPackages[$module['name']]['abandoned'] == true) ? 1 : 0) : 0,
-                            'installed'             => 1,
-                            'required_by'           => $this->helper->encode(['packages' => [$module['root_module']['id']]]),
-                            'updated_by'            => 0
-                        ];
-
-                        if ($this->access->auth->account() && isset($this->access->auth->account()['id'])) {
-                            $externalPackage['updated_by'] = $this->access->auth->account()['id'];
+                                array_push($bindToModules[$bindToModule['module_type']], $bindToModule['id']);
+                            }
                         }
 
-                    $this->modules->externals->add($externalPackage);
+                        $externalPackage =
+                            [
+                                'developer'             => $externalPackageNameArr[0],
+                                'name'                  => $externalPackageNameArr[1],
+                                'display_name'          => $module['name'],
+                                'description'           =>
+                                    (isset($installedComposerPackages[$module['name']]['description'])) ? $installedComposerPackages[$module['name']]['description'] : '',
+                                'module_type'           => 'externals',
+                                'app_type'              => 'core',
+                                'version'               =>
+                                    (isset($installedComposerPackages[$module['name']]['version'])) ? $installedComposerPackages[$module['name']]['version'] : '',
+                                'patches'               =>
+                                    (isset($module['composerJsonFile']['extra']['patches'][$module['name']])) ?
+                                        $this->helper->encode($module['composerJsonFile']['extra']['patches'][$module['name']]) :
+                                        $this->helper->encode([]),
+                                'abandoned'             =>
+                                    (isset($installedComposerPackages[$module['name']]['abandoned'])) ? (($installedComposerPackages[$module['name']]['abandoned'] == true) ? 1 : 0) : 0,
+                                'installed'             => 1,
+                                'required_by'           => $this->helper->encode($bindToModules),
+                                'updated_by'            => 0
+                            ];
+
+                            if ($this->access->auth->account() && isset($this->access->auth->account()['id'])) {
+                                $externalPackage['updated_by'] = $this->access->auth->account()['id'];
+                            }
+
+                        $this->modules->externals->add($externalPackage);
+                    }
                 }
 
                 $this->cleanup(['composer']);
@@ -1492,6 +1575,14 @@ class Installer extends BasePackage
                         false
                     );
                 }
+            } else {
+                try {
+                    $this->localContent->deleteDirectory($modulePath);
+                } catch (FilesystemException | UnableToDeleteFile | UnableToDeleteDirectory | \throwable $e) {
+                    $this->addResponse($e->getMessage(), 1);
+
+                    return false;
+                }
             }
 
             return true;
@@ -1578,7 +1669,7 @@ class Installer extends BasePackage
 
                 //External First
                 foreach ($modulesTypes as $module) {
-                    if ($moduleType === 'external') {
+                    if ($moduleType === 'externals') {
                         if (isset($module['hasPatch']) && $module['hasPatch'] === true) {
                             $this->addProgressMethods($this->runPrecheckProgressMethods, $module, 'first', 'first_external', true);
                         }
@@ -1610,7 +1701,7 @@ class Installer extends BasePackage
 
                     //For Views
                     foreach ($modules as $module) {
-                        if ($taskName === 'first' && $moduleType === 'external') {
+                        if ($taskName === 'first' && $moduleType === 'externals') {
                             continue;
                         }
 
@@ -1628,7 +1719,7 @@ class Installer extends BasePackage
                     }
 
                     foreach ($modules as $module) {
-                        if ($taskName === 'first' && $moduleType === 'external') {
+                        if ($taskName === 'first' && $moduleType === 'externals') {
                             continue;
                         }
 
@@ -1669,6 +1760,16 @@ class Installer extends BasePackage
                                 'args'      => [$taskName, $module],
                             ]
                         );
+
+                        if ($moduleType === 'externals') {
+                            array_push($this->runPrecheckProgressMethods,
+                                [
+                                    'method'    => 'processExternalPackages-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Perform precheck for external package ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
+                                    'args'      => [$taskName, $module, true],
+                                ]
+                            );
+                        }
                     }
                 }
             }
@@ -1715,7 +1816,8 @@ class Installer extends BasePackage
                 ]
             );
             if ($module['module_type'] !== 'views' &&
-                $module['module_type'] !== 'apptype'
+                $module['module_type'] !== 'apptype' &&
+                $module['module_type'] !== 'externals'
             ) {
                 array_push($methods,
                     [
@@ -1770,7 +1872,7 @@ class Installer extends BasePackage
 
                 //First we process external or first (core or other dependencies)
                 foreach ($modulesTypes as $module) {
-                    if ($moduleType === 'external') {
+                    if ($moduleType === 'externals') {
                         array_push($this->runProcessProgressMethods,
                             [
                                 'method'    => 'processExternalPackages-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
@@ -1798,7 +1900,7 @@ class Installer extends BasePackage
 
                     //For Views
                     foreach ($modules as $module) {
-                        if ($taskName === 'first' && $moduleType === 'external') {
+                        if ($taskName === 'first' && $moduleType === 'externals') {
                             continue;
                         }
 
@@ -1809,7 +1911,7 @@ class Installer extends BasePackage
 
                     //Then we process all other modules.
                     foreach ($modules as $module) {
-                        if ($taskName === 'first' && $moduleType === 'external') {
+                        if ($taskName === 'first' && $moduleType === 'externals') {
                             continue;
                         }
 
@@ -1844,13 +1946,24 @@ class Installer extends BasePackage
                         );
 
                         if ($module['module_type'] !== 'views' &&
-                            $module['module_type'] !== 'apptype'
+                            $module['module_type'] !== 'apptype' &&
+                            $module['module_type'] !== 'externals'
                         ) {
                             array_push($this->runProcessProgressMethods,
                                 [
                                     'method'    => 'runModuleInstallScripts-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
                                     'text'      => 'Running module install scripts for ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ')...',
                                     'args'      => [$taskName, $module, true],
+                                ]
+                            );
+                        }
+
+                        if ($moduleType === 'externals') {
+                            array_push($this->runProcessProgressMethods,
+                                [
+                                    'method'    => 'processExternalPackages-' . $module['id'] . '-' . strtolower(str_replace(' ', '', $module['name'])),
+                                    'text'      => 'Process external package ' . $module['name'] . ' (' . ucfirst($module['module_type']) . ') ...',
+                                    'args'      => [$taskName, $module, false],
                                 ]
                             );
                         }
@@ -2029,7 +2142,8 @@ class Installer extends BasePackage
 
                 if ($module['module_type'] !== 'bundles') {
                     if ($module['module_type'] !== 'views' &&
-                        $module['module_type'] !== 'apptype'
+                        $module['module_type'] !== 'apptype' &&
+                        $module['module_type'] !== 'externals'
                     ) {
                         $classArr = explode('\\', $moduleToRemove['class']);
 
@@ -2058,19 +2172,24 @@ class Installer extends BasePackage
                         }
                     }
 
-                    $cleanup = $this->cleanup(['modulePath'], $this->getModuleFilesLocation($moduleToRemove));
-
-                    if ($cleanup !== true) {
-                        return $cleanup;
-                    }
-
-                    if ($module['module_type'] === 'views' &&
-                        $moduleToRemove['is_subview'] == false
-                    ) {
-                        $cleanup = $this->cleanup(['modulePath'], $this->getModuleFilesLocation($moduleToRemove, true));
+                    if ($module['module_type'] === 'externals') {
+                        //Execute Composer
+                        //
+                    } else {
+                        $cleanup = $this->cleanup(['modulePath'], $this->getModuleFilesLocation($moduleToRemove));
 
                         if ($cleanup !== true) {
                             return $cleanup;
+                        }
+
+                        if ($module['module_type'] === 'views' &&
+                            $moduleToRemove['is_subview'] == false
+                        ) {
+                            $cleanup = $this->cleanup(['modulePath'], $this->getModuleFilesLocation($moduleToRemove, true));
+
+                            if ($cleanup !== true) {
+                                return $cleanup;
+                            }
                         }
                     }
                 }

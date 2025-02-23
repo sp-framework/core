@@ -64,9 +64,9 @@ class DocumentFinder
             if (count($conditions) > 0) {
                 foreach ($conditions as $condition) {
                     if (isset($condition[0]) &&
-                        in_array($condition[0], $this->storeConfiguration['indexes'])
+                        in_array($condition[0][0], $this->storeConfiguration['indexes'])
                     ) {
-                        $keyword = trim($condition[2], '%');//This needs to extend
+                        $keyword = trim($condition[0][2], '%');//This needs to extend
 
                         if (strlen($keyword) < $this->storeConfiguration['min_index_chars']) {
                             continue;
@@ -75,27 +75,40 @@ class DocumentFinder
                         $indexChars = strtolower(substr($keyword, 0, $this->storeConfiguration['min_index_chars']));
 
                         try {
-                            $indexFile =
-                                IoHelper::getFileContent($this->storeConfiguration['indexesPath'] . $condition[0] . '/' . $indexChars . '.json');
+                            $indexFile = IoHelper::getFileContent(
+                                $this->storeConfiguration['indexesPath'] . $condition[0][0] . '/' . $indexChars . '.json'
+                            );
+
+                            $indexFile = strtolower($indexFile);
 
                             $indexJson = json_decode($indexFile, true);
 
                             if (count($indexJson) > 0) {
-                                foreach ($indexJson as $key => $ids) {
-                                    $key = strtolower($key);
-
-                                    if (strtolower($condition[1]) === 'like') {
-                                        if (str_starts_with($key, strtolower($keyword))) {
-                                            foreach ($ids as $id) {
-                                                $found[] = $this->store->findById($id);
-                                            }
+                                if (isset($indexJson[strtolower($keyword)])) {
+                                    if (count($indexJson[strtolower($keyword)]) === 1) {
+                                        $found[] = $this->store->findById($indexJson[strtolower($keyword)][0]);
+                                    } else {
+                                        foreach ($indexJson[strtolower($keyword)] as $id) {
+                                            $found[] = $this->store->findById($id);
                                         }
-                                    } else if ($condition[1] === '=' ||
-                                               $condition[1] === '==='
-                                    ) {
-                                        if ($key === strtolower($keyword)) {
-                                            foreach ($ids as $id) {
-                                                $found[] = $this->store->findById($id);
+                                    }
+                                } else {
+                                    foreach ($indexJson as $key => $ids) {
+                                        $key = strtolower($key);
+
+                                        if (strtolower($condition[0][1]) === 'like') {
+                                            if (str_starts_with($key, strtolower($keyword))) {
+                                                foreach ($ids as $id) {
+                                                    $found[] = $this->store->findById($id);
+                                                }
+                                            }
+                                        } else if ($condition[0][1] === '=' ||
+                                                   $condition[0][1] === '==='
+                                        ) {
+                                            if ($key === strtolower($keyword)) {
+                                                foreach ($ids as $id) {
+                                                    $found[] = $this->store->findById($id);
+                                                }
                                             }
                                         }
                                     }

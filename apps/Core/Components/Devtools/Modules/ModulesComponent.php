@@ -28,6 +28,19 @@ class ModulesComponent extends BaseComponent
 	 */
 	public function viewAction()
 	{
+		if (isset($this->getData()['repo']) &&
+			isset($this->getData()['id'])
+		) {
+			$this->modulesPackage->getRemoteModules($this->getData()['id']);
+
+			$this->view->remoteModules = $this->modulesPackage->packagesData->responseData['remoteModules'] ?? [];
+			$this->view->apiId = $this->modulesPackage->packagesData->responseData['api_id'] ?? 0;
+
+			$this->view->pick('modules/repo');
+
+			return;
+		}
+
 		$this->view->bundles = false;
 		$this->view->bundlesjson = false;
 		if (isset($this->getData()['bundles'])) {
@@ -146,7 +159,6 @@ class ModulesComponent extends BaseComponent
 					}
 				}
 			} else if ($this->getData()['type'] === 'packages') {
-				unset($modules['packages']);
 				unset($modules['views']);
 				unset($modules['bundles']);
 				$this->view->packageSettingsModules = $modules;
@@ -490,6 +502,10 @@ class ModulesComponent extends BaseComponent
 
 			$this->view->pick('modules/view');
 		} else {
+			unset($apis[0]);//Remove local
+			unset($apis[1]);//Remove core
+			$this->view->apis = $apis;
+
 			$this->view->pick('modules/list');
 		}
 	}
@@ -525,6 +541,18 @@ class ModulesComponent extends BaseComponent
 		$this->requestIsPost();
 
 		$this->modulesPackage->removeModule($this->postData());
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
+	}
+
+	public function removeRepoAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->removeRepo($this->postData());
 
 		$this->addResponse(
 			$this->modulesPackage->packagesData->responseMessage,

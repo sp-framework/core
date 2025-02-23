@@ -1,0 +1,209 @@
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+{% set repoHtml = '' %}
+{% if remoteModules|length > 0 %}
+    {% for remoteModule in remoteModules %}
+        {% set moduleSynced = '-' %}
+        {% if remoteModule['synced'] != false %}
+            {% if remoteModule['module_type'] == 'bundles' %}
+                {% set url = links.url('devtools/modules/q/bundles/true/' ~ '/id/' ~ remoteModule['synced']) %}
+            {% else %}
+                {% set url = links.url('devtools/modules/q/module/true/type/' ~ remoteModule['module_type'] ~ '/id/' ~ remoteModule['synced']) %}
+            {% endif %}
+            {% set moduleSynced =
+                '<button href="' ~ url ~ '" type="button" data-id="' ~ remoteModule['synced'] ~ '" data-type="' ~ remoteModule['module_type'] ~ '" class="ml-1 mr-1 text-white btn btn-primary btn-xs editModule">' ~
+                '   <i class="fas fa-fw fa-xs fa-edit"></i>' ~
+                '</button>'
+            %}
+        {% endif %}
+        {% set repoHtml = repoHtml ~ '<tr>' ~
+        '           <td>' ~  remoteModule['name'] ~ '</td>' ~
+        '           <td>' ~  remoteModule['module_type'] ~ '</td>' ~
+        '           <td><a href="' ~  remoteModule['html_url'] ~ '" target="blank">' ~  remoteModule['html_url'] ~ '</td>' ~
+        '           <td id="{{componentId}}-{{sectionId}}-repo-modules-' ~ remoteModule['name'] ~ '">' ~  moduleSynced ~ '</td>' ~
+        '           <td id="{{componentId}}-{{sectionId}}-repo-modules-options-' ~ remoteModule['name'] ~ '">' ~
+        '               <button href="#" type="button" data-repo="' ~ remoteModule['name'] ~ '" class="ml-1 mr-1 text-white btn btn-danger btn-xs removeModule">' ~
+        '                   <i class="fas fa-fw fa-xs fa-trash"></i>' ~
+        '               </button>' ~
+        '           </td>' ~
+        '       </tr>' %}
+    {% endfor %}
+{% endif %}
+{% if repoHtml != '' %}
+    <div class="row">
+        <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'buttonType'                    : 'button',
+                        'buttons'                       :
+                            [
+                                'modules-link'    : [
+                                    'title'                   : 'link',
+                                    'size'                    : 'xs',
+                                    'disabled'                : true,
+                                    'hidden'                  : true,
+                                    'url'                     : '#'
+                                ]
+                            ]
+                    ]
+                )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col height-control-400">
+            <table id="{{componentId}}-{{sectionId}}-repo-table" class="table table-sm table-hover responsive nowrap mb-0" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th class="text-uppercase">Name</th>
+                        <th class="text-uppercase">Module Type</th>
+                        <th class="text-uppercase">Repository</th>
+                        <th class="text-uppercase">Synced</th>
+                        <th class="text-uppercase">Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{repoHtml}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <div id="installer-progress" class="mb-3" hidden></div>
+        </div>
+    </div>
+{% endif %}
+{% set remoteModules = json_encode(remoteModules, 16) %}
+<script>
+/*global paginatedPNotify BazProgress BazContentFields BazHelpers BazContentLoader Pace BazCore Swal dataCollection */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+if (!window['dataCollection']) {
+    window['dataCollection'] = { };
+}
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['apiId'] = '{{apiId}}';
+dataCollectionSectionForm['vars']['remoteModules'] = JSON.parse('{{remoteModules}}');
+dataCollectionSectionForm['funcs'] = { };
+dataCollectionSectionForm['funcs']['init'] = function() {
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-repo-table')) {
+        $('#{{componentId}}-{{sectionId}}-repo-table').DataTable({
+            columns: [
+                null,
+                null,
+                null,
+                null,
+                { orderable: false }
+            ],
+            lengthMenu: [
+                [50, 100, -1],
+                [50, 100, 'All']
+            ]
+        });
+    }
+
+    $('.removeModule').off();
+    $('.removeModule').click(function(e) {
+        e.preventDefault();
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+        postData['api_id'] = dataCollectionSectionForm['vars']['apiId'];
+        postData['repo'] = $(this).data('repo');
+
+        (async () => { await Swal.fire({
+                title                       : "Confirmation",
+                input                       : "checkbox",
+                inputValue                  : 0,
+                inputPlaceholder            : 'Confirm deletion of remote repo ' + $(this).data('repo'),
+                confirmButtonText           : 'Remove&nbsp;<i class="fa fa-trash"></i>',
+                buttonsStyling              : false,
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-danger btn-sm text-uppercase'
+                },
+                inputValidator: (result) => {
+                    if (!result) {
+                        return "You need check the confirmation checkbox.";
+                    }
+
+                    remove(postData);
+                }
+            });
+        })();
+    });
+
+    function remove(postData) {
+        $.post('{{links.url("devtools/modules/removeRepo")}}', postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+
+            if (response.responseCode == 0) {
+                paginatedPNotify('success', {'text': response.responseMessage});
+
+                dataCollectionSectionForm['funcs']['browse'](window.location);
+            } else {
+                paginatedPNotify('error', {'text': response.responseMessage});
+            }
+        }, 'json');
+    }
+
+    $('.editModule').off();
+    $('.editModule').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['browse']($(this).attr('href'));
+    });
+}
+
+dataCollectionSectionForm['funcs']['browse'] = function(url) {
+    $('#{{componentId}}-{{sectionId}}-modules-link').attr('href', url);
+
+    BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-modules-link'), {
+        ajaxBefore                      : function () {
+                                            Pace.restart();
+                                            $("#baz-content").empty();
+                                            $("#loader").attr('hidden', false);
+                                        },
+        ajaxFinished                    : function () {
+                                            BazCore.updateBreadcrumb();
+                                            $("#loader").attr('hidden', true);
+                                        },
+        ajaxError                       : function () {
+                                            $("#loader").attr('hidden', true);
+                                            BazCore.updateBreadcrumb();
+                                        }
+    });
+}
+
+$(document).ready(function() {
+    dataCollectionSectionForm['funcs']['init']();
+});
+</script>
+<!-- htmlmin:ignore -->

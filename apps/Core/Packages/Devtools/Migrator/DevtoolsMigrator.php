@@ -665,7 +665,7 @@ class DevtoolsMigrator extends BasePackage
                 }
             }
         } else {
-            $apisArr = $this->basepackages->apiClientServices->getAll()->apiClientServices;
+            $apisArr = $this->basepackages->apiClientServices->getApiByAppType();
         }
 
         if (count($apisArr) > 0) {
@@ -693,7 +693,7 @@ class DevtoolsMigrator extends BasePackage
         }
 
         if (isset($apis) && $returnApis) {
-            return $apis;
+            return $apis ?? [];
         }
 
         return $apisArr;

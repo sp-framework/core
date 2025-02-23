@@ -463,7 +463,7 @@
                 )}}
             </div>
         {% endif %}
-        {% if type === 'packages' or type === 'core' %}
+        {% if type != 'views' %}
             <div class="col-md-2">
                 {{adminltetags.useTag('fields',
                     [
@@ -471,11 +471,11 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'reinstall_table',
-                        'fieldLabel'                     : 'Reinstall Table?',
+                        'fieldId'                        : 'run_install_uninstall',
+                        'fieldLabel'                     : 'Run Install/Uninstall script?',
                         'fieldHelp'                      : true,
                         'fieldDisabled'                  : false,
-                        'fieldHelpTooltipContent'        : 'This will reinstall the table structure.',
+                        'fieldHelpTooltipContent'        : 'If installed is checked, install method of the Install.php script will be executed. If installed is unchecked, uninstall method of the Install.php script will be executed.',
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'danger',
                         'fieldCheckboxChecked'           : false,

@@ -313,9 +313,14 @@ class Ff
         return $schema;
     }
 
-    public function generateConfig($tableName, $tableClass, $tableModel)
+    public function generateConfig($tableName, $tableClass, $tableModel, $configArr = [])
     {
         $config = [];
+
+        if (count($configArr) > 0) {
+            $config = array_merge($config, $configArr);
+        }
+
         $config['indexes'] = [];
 
         if ($tableModel) {
