@@ -548,6 +548,7 @@ class Utils extends BasePackage
             $now = microtime(true);
             $microtime['difference'] = $now - $this->microtime;
             $this->microtime = $now;
+            $microtime['formatted_difference'] = date("H:i:s", floor($microtime['difference']));
         }
 
         if ($calculateMemoryUsage) {
@@ -580,6 +581,6 @@ class Utils extends BasePackage
     {
         $unit=array('b','kb','mb','gb','tb','pb');
 
-        return @round($bytes/pow(1024,($i=floor(log(abs($bytes),1024)))),2).' '.$unit[$i];
+        return @round(abs($bytes)/pow(1024,($i=floor(log(abs($bytes),1024)))),2).' '.$unit[$i];
     }
 }

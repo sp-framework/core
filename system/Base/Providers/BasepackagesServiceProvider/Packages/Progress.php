@@ -15,7 +15,7 @@ class Progress extends BasePackage
 
     protected $progressFileName;
 
-    protected $remoteWebCountersTimer;
+    protected $countersTimer;
 
     public function init($container = null, $fileName = null)
     {
@@ -161,7 +161,7 @@ class Progress extends BasePackage
         }
     }
 
-    public function updateProgress($method, $callResult = null, $deleteFile = true, $child = null, array $remoteWebCounters = null)
+    public function updateProgress($method, $callResult = null, $deleteFile = true, $child = null, array $counters = null, $text = null)
     {
         if (!$this->progressFileName) {
             $this->progressFileName = $this->session->getId();
@@ -185,11 +185,16 @@ class Progress extends BasePackage
                                 $runners['remainingChilds'] = count($progressFile['processes'][$progressFileKey]['childs']);
                                 $currentProcess = current($progressFileMethod['childs']);
 
-                                if (isset($currentProcess['remoteWeb']) && $currentProcess['remoteWeb'] === true && $remoteWebCounters) {
-                                    $currentProcess = array_merge($currentProcess, ['remoteWebCounters' => $remoteWebCounters]);
+                                if (isset($currentProcess['remoteWeb']) && $currentProcess['remoteWeb'] === true && $counters) {
+                                    $currentProcess = array_merge($currentProcess, ['remoteWebCounters' => $counters]);
+                                } else if (isset($currentProcess['steps']) && $currentProcess['steps'] === true && $counters) {
+                                    $currentProcess = array_merge($currentProcess, ['stepsCounters' => $counters]);
                                 }
 
                                 $runners['running'] = $currentProcess;
+                                if ($text) {
+                                    $runners['running']['text'] = $text;
+                                }
                                 $runners['next'] = next($progressFileMethod['childs']);
 
                                 break;
@@ -206,11 +211,16 @@ class Progress extends BasePackage
 
                         $currentProcess = current($progressFile['processes']);
 
-                        if (isset($currentProcess['remoteWeb']) && $currentProcess['remoteWeb'] === true && $remoteWebCounters) {
-                            $currentProcess = array_merge($currentProcess, ['remoteWebCounters' => $remoteWebCounters]);
+                        if (isset($currentProcess['remoteWeb']) && $currentProcess['remoteWeb'] === true && $counters) {
+                            $currentProcess = array_merge($currentProcess, ['remoteWebCounters' => $counters]);
+                        } else if (isset($currentProcess['steps']) && $currentProcess['steps'] === true && $counters) {
+                            $currentProcess = array_merge($currentProcess, ['stepsCounters' => $counters]);
                         }
 
                         $runners['running'] = $currentProcess;
+                        if ($text) {
+                            $runners['running']['text'] = $text;
+                        }
                         $runners['next'] = next($progressFile['processes']);
                     }
 
@@ -228,10 +238,10 @@ class Progress extends BasePackage
                 $callResult = true;
             }
 
-            $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult, $child, $remoteWebCounters);
+            $this->writeProgressFile($progressFile['processes'], false, false, true, $runners, null, $method, $callResult, $child, $counters);
 
             if ($callResult === true) {
-                $this->sendNotification($callResult, $remoteWebCounters);
+                $this->sendNotification($callResult, $counters);
             }
 
             return true;
@@ -253,18 +263,21 @@ class Progress extends BasePackage
         }
     }
 
-    protected function sendNotification($callResult, $remoteWebCounters = null)
+    protected function sendNotification($callResult, $counters = null)
     {
-        if ($remoteWebCounters &&
-            $remoteWebCounters['downloadTotal'] !== $remoteWebCounters['downloadedBytes']
+        if ($counters &&
+            (isset($counters['downloadTotal']) && ($counters['downloadTotal'] !== $counters['downloadedBytes']) ||
+             isset($counters['uploadTotal']) && ($counters['uploadTotal'] !== $counters['uploadedBytes']) ||
+             isset($counters['stepsTotal']) && ($counters['stepsTotal'] !== $counters['stepsCurrent'])
+            )
         ) {//only for remoteWebCounters
-            if (!$this->remoteWebCountersTimer) {
-                $this->remoteWebCountersTimer = time();
+            if (!$this->countersTimer) {
+                $this->countersTimer = time();
             } else {
-                if ((time() - $this->remoteWebCountersTimer) < 1) {
+                if ((time() - $this->countersTimer) < 1) {
                     return false;//To minimize chatting on ws, we add a 1 second delay.
                 } else {
-                    $this->remoteWebCountersTimer = time();
+                    $this->countersTimer = time();
                 }
             }
         }
@@ -311,6 +324,16 @@ class Progress extends BasePackage
 
             if ($webProgress > -1) {
                 $percentComplete = (float) number_format($webProgress);
+            }
+        } else if (isset($progressFile['runners']['running']['stepsCounters'])) {
+            $stepsProgress = 0;
+
+            if (isset($progressFile['runners']['running']['stepsCounters']['stepsTotal']) && $progressFile['runners']['running']['stepsCounters']['stepsTotal'] > 0) {
+                $stepsProgress = Percentage::calculate($progressFile['runners']['running']['stepsCounters']['stepsCurrent'], $progressFile['runners']['running']['stepsCounters']['stepsTotal']);
+            }
+
+            if ($stepsProgress > -1) {
+                $percentComplete = (float) number_format($stepsProgress);
             }
         }
 
@@ -387,7 +410,7 @@ class Progress extends BasePackage
         $method = null,
         $callResult = null,
         $child = null,
-        array $remoteWebCounters = null
+        array $counters = null
     ) {
         if ($progressFile) {
             $file = $progressFile;
@@ -440,8 +463,10 @@ class Progress extends BasePackage
                                         $allProcess['callExecTime'] = gettimeofday(true) - $allProcess['callExecTime'];
                                     }
 
-                                    if (isset($allProcess['remoteWeb']) && $allProcess['remoteWeb'] === true && $remoteWebCounters) {
-                                        $allProcess = array_merge($allProcess, $remoteWebCounters);
+                                    if (isset($allProcess['remoteWeb']) && $allProcess['remoteWeb'] === true && $counters) {
+                                        $allProcess = array_merge($allProcess, $counters);
+                                    } else if (isset($allProcess['steps']) && $allProcess['steps'] === true && $counters) {
+                                        $allProcess = array_merge($allProcess, $counters);
                                     }
                                 }
                             }
