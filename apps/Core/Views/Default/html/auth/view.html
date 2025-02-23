@@ -65,6 +65,7 @@ BazCore.header({
                                     'fieldPlaceholder'                      : '2FA OTP Code',
                                     'fieldGroupPreAddonButtonId'            : 'switch_to_email',
                                     'fieldGroupPreAddonButtonValue'         : '<i class="fas fa-fw fa-repeat"></i>',
+                                    'fieldGroupPreAddonButtonHidden'        : true,
                                     'fieldGroupPreAddonButtonTooltipTitle'  : 'Switch to 2FA (Email)',
                                     'fieldDataInputMinLength'               : 4,
                                     'fieldDataInputMaxLength'               : 8
@@ -89,6 +90,7 @@ BazCore.header({
                                     'fieldGroupPostAddonButtonValue'        : '<i class="fas fa-fw fa-paper-plane"></i>',
                                     'fieldGroupPostAddonButtonTooltipTitle' : 'Email new Code',
                                     'fieldGroupPreAddonButtonId'            : 'switch_to_otp',
+                                    'fieldGroupPreAddonButtonHidden'        : true,
                                     'fieldGroupPreAddonButtonValue'         : '<i class="fas fa-fw fa-repeat"></i>',
                                     'fieldGroupPreAddonButtonTooltipTitle'  : 'Switch to 2FA (OTP)',
                                     'fieldDataInputMinLength'               : 4,
@@ -280,6 +282,12 @@ $(document).ready(function(){
                     return (className.match (/(^|\s)fa-\S+/g) || []).join(' ');
                 }).addClass('fa-exclamation-circle');
             }
+        } else if ($('#{{componentId}}-form-generate-code').length > 0) {
+            url = '{{links.url("auth/enableTwoFaOtp")}}';
+            postData = {
+                'user'              : $('#{{componentId}}-form-user').val().trim(),
+                'pass'              : $('#{{componentId}}-form-pass').val().trim()
+            };
         } else if ($('#{{componentId}}-form-verify').length > 0) {
             if (thisButton.id === '{{componentId}}-form-agent-verification-email_code') {
                 url = '{{links.url("auth/sendVerification")}}';
@@ -289,12 +297,6 @@ $(document).ready(function(){
                 };
                 url = '{{links.url("auth/verify")}}';
             }
-        } else if ($('#{{componentId}}-form-generate-code').length > 0) {
-            url = '{{links.url("auth/enableTwoFaOtp")}}';
-            postData = {
-                'user'              : $('#{{componentId}}-form-user').val().trim(),
-                'pass'              : $('#{{componentId}}-form-pass').val().trim()
-            };
         }
         postData[$('#security-token').attr('name')] = $('#security-token').val();
     }
@@ -483,10 +485,17 @@ $(document).ready(function(){
             $('#{{componentId}}-form-twofa-otp').parents('.form-group').removeClass('d-none');
             $('#twofa-otp').removeClass('d-none');
             $('#{{componentId}}-form-twofa-otp').focus();
+            if (response.responseData['allowed_methods'].includes('email')) {
+                $('#{{componentId}}-form-twofa-otp-switch_to_email').removeClass('d-none')
+            }
         } else if (response.responseData['allowed_methods'].includes('email')) {
             $('#{{componentId}}-form :input').prop('disabled', false);
             $('#{{componentId}}-form-twofa-email').parents('.form-group').removeClass('d-none');
             $('#twofa-email').removeClass('d-none');
+            $('#{{componentId}}-form-twofa-email').focus();
+            if (response.responseData['allowed_methods'].includes('otp')) {
+                $('#{{componentId}}-form-twofa-otp-switch_to_otp').removeClass('d-none')
+            }
         }
 
         setTimeout(function () {
@@ -816,11 +825,13 @@ $(document).ready(function(){
         $('#{{componentId}}-form-twofa-otp').val('');
         $('#twofa-otp').addClass('d-none');
         $('#twofa-email').removeClass('d-none');
+        $('#{{componentId}}-form-twofa-email-switch_to_otp').removeClass('d-none')
     });
     $('#{{componentId}}-form-twofa-email-switch_to_otp').click(function() {
         $('#{{componentId}}-form-twofa-email').val('');
         $('#twofa-otp').removeClass('d-none');
         $('#twofa-email').addClass('d-none');
+        $('#{{componentId}}-form-twofa-otp-switch_to_email').removeClass('d-none')
     });
 });
 </script>

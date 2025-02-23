@@ -80,6 +80,10 @@
             ]
         )}}
     </div>
+    {% set enforce2FADisabled = true %}
+    {% if core.core['settings']['security']['twofa'] is defined and core.core['settings']['security']['twofa'] == 'true' %}
+        {% set enforce2FADisabled = false %}
+    {% endif %}
     <div class="col">
         {{adminltetags.useTag('fields',
             [
@@ -91,7 +95,8 @@
                 'fieldLabel'                     : 'Enforce 2FA at login?',
                 'fieldType'                      : 'checkbox',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Enforce user accounts to login/enable 2FA.',
+                'fieldDisabled'                  : enforce2FADisabled,
+                'fieldHelpTooltipContent'        : 'Enforce user accounts to login/enable 2FA. Will only work if twofa is enabled in core security settings.',
                 'fieldCheckboxType'              : 'success',
                 'fieldCheckboxChecked'           : enforce2FA,
                 'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
