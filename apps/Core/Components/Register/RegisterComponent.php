@@ -114,6 +114,8 @@ class RegisterComponent extends BaseComponent
             return;
         }
 
+        $this->view->refresh = false;
+
         if (isset($this->getData()['api'])) {
             $api = $this->api->getById($this->getData()['api']);
 
@@ -144,8 +146,6 @@ class RegisterComponent extends BaseComponent
             $this->response->setStatusCode(404);
 
             return $this->response->send();
-
-            exit;
         }
 
         $this->view->setLayout('auth');
