@@ -25,7 +25,7 @@ class Bundles
                         'name',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 50,
+                            'size'    => 100,
                             'notNull' => true,
                         ]
                     ),

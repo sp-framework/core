@@ -25,7 +25,7 @@ class Views
 						'name',
 						[
 							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 50,
+							'size'    => 100,
 							'notNull' => true,
 						]
 					),
@@ -33,7 +33,7 @@ class Views
 						'display_name',
 						[
 							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 50,
+							'size'    => 255,
 							'notNull' => true,
 						]
 					),
@@ -65,7 +65,7 @@ class Views
 						'category',
 						[
 							'type'    => Column::TYPE_VARCHAR,
-							'size'	  => 50,
+							'size'	  => 100,
 							'notNull' => true,
 						]
 					),
