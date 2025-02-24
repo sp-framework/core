@@ -368,14 +368,12 @@ class DynamicTable
                     }
 
                     foreach ($column as $controlKey => $control) {
-
                         $this->dtParams['dtControlsLinkClass'] =
                             isset($this->params['dtControlsLinkClass']) ?
                             $this->params['dtControlsLinkClass'] :
                             'contentAjaxLink';
 
                         if ($controlKey === 'view') {
-
                             if (is_array($control)) {
                                 $control = $control['link'];
                                 $title =
@@ -410,7 +408,6 @@ class DynamicTable
                                 ]
                             );
                         } else if ($controlKey === 'edit') {
-
                             if (is_array($control)) {
                                 $control = $control['link'];
                                 $title =
@@ -444,8 +441,41 @@ class DynamicTable
                                     ]
                                 ]
                             );
-                        } else if ($controlKey === 'remove') {
+                        } else if ($controlKey === 'clone') {
+                            if (is_array($control)) {
+                                $control = $control['link'];
+                                $title =
+                                    isset($control['title']) ?
+                                    strtoupper($control['title']) :
+                                    'CLONE';
+                                $icon =
+                                    isset($control['icon']) ?
+                                    strtoupper($control['icon']) :
+                                    'clone';
+                                $type =
+                                    isset($control['type']) ?
+                                    strtoupper($control['type']) :
+                                    'primary';
 
+                            } else {
+                                $title = 'CLONE';
+                                $icon = 'clone';
+                                $type = 'primary';
+                            }
+
+                            $controlButtons = array_merge($controlButtons,
+                                [
+                                    $controlKey =>
+                                    [
+                                        'title'             => $title,
+                                        'additionalClass'   => 'rowEdit ' . $this->dtParams['dtControlsLinkClass'],
+                                        'icon'              => $icon,
+                                        'buttonType'        => $type,
+                                        'link'              => $control
+                                    ]
+                                ]
+                            );
+                        } else if ($controlKey === 'remove') {
                             if (is_array($control)) {
                                 $control = $control['link'];
                                 $title =
