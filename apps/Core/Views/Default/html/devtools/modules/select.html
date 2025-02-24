@@ -65,6 +65,21 @@
             <div class="col">
                 {{adminltetags.useTag('buttons',
                     [
+                        'componentId'           : componentId,
+                        'sectionId'             : sectionId,
+                        'buttonType'            : 'button',
+                        'buttons'               :
+                            [
+                                'check-for-changes' : [
+                                    'title'                   : 'Check for module changes',
+                                    'type'                    : 'primary',
+                                    'icon'                    : 'code'
+                                ]
+                            ]
+                    ]
+                )}}
+                {{adminltetags.useTag('buttons',
+                    [
                         'componentId'                       : componentId,
                         'sectionId'                         : sectionId,
                         'buttonType'                        : 'DropdownSplitButtons',
@@ -475,6 +490,11 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-commit-bundle-json').click(function() {
                     dataCollectionSectionForm['funcs']['loadAjax'](id, label, false, false, false, true);
                 });
+
+                $('#{{componentId}}-{{sectionId}}-check-for-changes').off();
+                $('#{{componentId}}-{{sectionId}}-check-for-changes').click(function() {
+                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, true);
+                });
             }
         },
         '{{componentId}}-{{sectionId}}-form'                                : {
@@ -486,7 +506,7 @@ dataCollectionSection =
     });
 
 dataCollectionSectionForm['funcs']['loadAjax'] =
-    function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false, bundlesjson = false, isSubView = false, isRemote = false) {
+    function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false, bundlesjson = false, isSubView = false, isRemote = false, isChanges = false) {
         if (id && label) {
             if (label === 'bundles' && !newrelease) {
                 dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/bundles/true/id/' + id + '")}}';
@@ -524,6 +544,9 @@ dataCollectionSectionForm['funcs']['loadAjax'] =
 
         if (id && isRemote) {
             dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/repo/true/id/' + id + '")}}';
+        }
+        if (isChanges) {
+            dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/changes/true")}}';
         }
 
         if (dataCollectionSectionForm['vars']['url'].charAt(0) !== 'h' &&

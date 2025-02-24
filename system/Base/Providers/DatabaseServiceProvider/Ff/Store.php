@@ -1714,6 +1714,10 @@ class Store
 
     protected function updateCounters($counters)
     {
+        if ($counters['totalEntries'] === 0) {
+            $counters['lastId'] = 0;
+        }
+
         $updateCounters = IoHelper::updateFileContent(
             $this->storePath . '_cnt.sdb',
             function () use ($counters) {

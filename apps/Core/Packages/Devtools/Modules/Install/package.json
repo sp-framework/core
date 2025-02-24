@@ -20,9 +20,13 @@
 		"packages" : [],
 		"middlewares" : [],
 		"views" : [],
-		"external" : []
+		"external" : [],
+		"externals" : []
 	},
-	"settings" : {
-		"api_clients" : [1,2]
+	"settings" : 
+	{
+		"api_clients" : [1,
+			2
+		]
 	}
 }

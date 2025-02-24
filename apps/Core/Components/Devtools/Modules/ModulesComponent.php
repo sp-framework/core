@@ -3,6 +3,10 @@
 namespace Apps\Core\Components\Devtools\Modules;
 
 use Apps\Core\Packages\Devtools\Modules\DevtoolsModules;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckExistence;
+use League\Flysystem\UnableToListContents;
+use League\Flysystem\UnableToRetrieveMetadata;
 use System\Base\BaseComponent;
 use z4kn4fein\SemVer\Version;
 
@@ -176,6 +180,30 @@ class ModulesComponent extends BaseComponent
 					unset($modules['views']);
 				}
 			}
+		} else if (isset($this->getData()['changes']) &&
+			$this->getData()['changes'] == true
+		) {
+			unset($modules['core']);
+			unset($modules['apptypes']);
+			unset($modules['bundles']);
+
+			foreach ($modules as $moduleType => &$modulesTypeArr) {
+				if (isset($modulesTypeArr['childs']) && count($modulesTypeArr['childs']) > 0) {
+					foreach ($modulesTypeArr['childs'] as $childKey => &$child) {
+						$child = $this->modulesPackage->validateFilesHash($child);
+
+						if ($child['repoExists'] && !$child['isModified']) {
+							unset($modules[$moduleType]['childs'][$childKey]);
+						}
+					}
+				}
+			}
+
+			$this->view->modules = $modules;
+
+			$this->view->pick('modules/changes');
+
+			return;
 		}
 
 		$this->view->modules = $modules;
