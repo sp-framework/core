@@ -177,7 +177,9 @@ class Progress extends BasePackage
         if (isset($progressFile['processes']) && count($progressFile['processes']) > 0) {
             if ($progressFile['allProcesses'][0]['method'] === $method &&
                 !$callResult &&
-                $progressFile['completed'] === 0
+                !$child &&
+                $progressFile['completed'] === 0 &&
+                $progressFile['pid'] > 0
             ) {
                 $this->checkProcessIsRunning($progressFile);
             }
@@ -586,7 +588,7 @@ class Progress extends BasePackage
             $file['pid'] = 0;
         }
 
-        if (!isset($file['pid'])) {
+        if (!array_key_exists('pid', $file)) {
             $file['pid'] = getmypid();
         }
 
