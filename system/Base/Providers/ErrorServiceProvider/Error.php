@@ -93,6 +93,10 @@ class Error
 
 		$customHandler = $this->customHandler();
 
+		if ($this->logger) {
+			$this->logger->commit();
+		}
+
 		if (!$customHandler) {
 			if ($this->appDebug) {
 				$this->showOnScreen();

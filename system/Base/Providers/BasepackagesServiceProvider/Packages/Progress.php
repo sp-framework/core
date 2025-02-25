@@ -8,6 +8,7 @@ use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToWriteFile;
 use Mattiasgeniar\Percentage\Percentage;
 use System\Base\BasePackage;
+use System\Base\Exceptions\DuplicateProgressException;
 
 class Progress extends BasePackage
 {
@@ -44,8 +45,9 @@ class Progress extends BasePackage
             $this->progressFileName = $fileName;
         }
 
-        if ($this->readProgressFile()) {
-            return true;
+        $progressFile = $this->readProgressFile();
+        if ($progressFile) {
+            return $progressFile;
         }
 
         return false;
@@ -68,6 +70,8 @@ class Progress extends BasePackage
         }
 
         $progressFile = $this->readProgressFile();
+
+        $this->checkProcessIsRunning($progressFile);
 
         if ($progressFile && isset($progressFile['processes']) && count($progressFile['processes']) > 0) {
             foreach ($methods as $method) {
@@ -132,11 +136,12 @@ class Progress extends BasePackage
 
         $progress =
             [
-                'total'             => $progressFile['total'],
-                'completed'         => $progressFile['completed'],
-                'preCheckComplete'  => $progressFile['preCheckComplete'],
-                'percentComplete'   => $this->getPercentComplete($progressFile),
-                'runners'           => $progressFile['runners'] ?? false
+                'total'                 => $progressFile['total'],
+                'completed'             => $progressFile['completed'],
+                'preCheckComplete'      => $progressFile['preCheckComplete'],
+                'totalPercentComplete'  => $this->getPercentComplete($progressFile, false),
+                'percentComplete'       => $this->getPercentComplete($progressFile),
+                'runners'               => $progressFile['runners'] ?? false
             ];
 
         if ($returnArray) {
@@ -170,6 +175,13 @@ class Progress extends BasePackage
         $progressFile = $this->readProgressFile();
 
         if (isset($progressFile['processes']) && count($progressFile['processes']) > 0) {
+            if ($progressFile['allProcesses'][0]['method'] === $method &&
+                !$callResult &&
+                $progressFile['completed'] === 0
+            ) {
+                $this->checkProcessIsRunning($progressFile);
+            }
+
             $runners = [];
 
             foreach ($progressFile['processes'] as $progressFileKey => $progressFileMethod) {
@@ -250,6 +262,32 @@ class Progress extends BasePackage
         return false;
     }
 
+    public function checkProcessIsRunning($progressFile = null)
+    {
+        if (!$progressFile) {
+            $progressFile = $this->checkProgressFile();
+        }
+
+        //Check if process is already running
+        //If a user tries to reinitiate same process from start, we should return an error.
+        if ($progressFile &&
+            ($progressFile['runners']['running'] !== false) &&
+            $progressFile['pid'] > 0
+        ) {
+            if (isset($progressFile['pid']) && $progressFile['pid'] > 0) {
+                exec('ps -aux | grep ' . $progressFile['pid'], $output, $result);
+
+                if ($result === 0 &&
+                    count($output) > 0
+                ) {
+                    if (str_contains($output[0], 'php')) {
+                        throw new DuplicateProgressException('Process is already running with process ID: ' . $progressFile['pid']);
+                    }
+                }
+            }
+        }
+    }
+
     protected function checkNotificationTunnel()
     {
         if (!$this->notificationsTunnel && isset($this->apps)) {
@@ -295,12 +333,15 @@ class Progress extends BasePackage
                             'responseMessage'   => 'Ok',
                             'responseData'      =>
                                 [
-                                    'total'             => $progressFile['total'],
-                                    'completed'         => $progressFile['completed'],
-                                    'preCheckComplete'  => $progressFile['preCheckComplete'],
-                                    'percentComplete'   => $this->getPercentComplete($progressFile),
-                                    'runners'           => $progressFile['runners'] ?? false,
-                                    'callResult'        => $callResult
+                                    'progressFile'          => $this->progressFileName,
+                                    'pid'                   => $progressFile['pid'] ?? false,
+                                    'total'                 => $progressFile['total'],
+                                    'completed'             => $progressFile['completed'],
+                                    'preCheckComplete'      => $progressFile['preCheckComplete'],
+                                    'totalPercentComplete'  => $this->getPercentComplete($progressFile, false),
+                                    'percentComplete'       => $this->getPercentComplete($progressFile),
+                                    'runners'               => $progressFile['runners'] ?? false,
+                                    'callResult'            => $callResult
                                 ]
                         ]
                     ]
@@ -309,31 +350,33 @@ class Progress extends BasePackage
         }
     }
 
-    protected function getPercentComplete($progressFile)
+    protected function getPercentComplete($progressFile, $counters = true)
     {
         $percentComplete = (float) number_format(($progressFile['completed'] * 100) / $progressFile['total']);
 
-        if (isset($progressFile['runners']['running']['remoteWebCounters'])) {
-            $webProgress = 0;
+        if ($counters) {
+            if (isset($progressFile['runners']['running']['remoteWebCounters'])) {
+                $webProgress = 0;
 
-            if (isset($progressFile['runners']['running']['remoteWebCounters']['downloadTotal']) && $progressFile['runners']['running']['remoteWebCounters']['downloadTotal'] > 0) {
-                $webProgress = Percentage::calculate($progressFile['runners']['running']['remoteWebCounters']['downloadedBytes'], $progressFile['runners']['running']['remoteWebCounters']['downloadTotal']);
-            } else if (isset($progressFile['runners']['running']['remoteWebCounters']['uploadTotal']) && $progressFile['runners']['running']['remoteWebCounters']['uploadTotal'] > 0) {
-                $webProgress = Percentage::calculate($progressFile['runners']['running']['remoteWebCounters']['uploadedBytes'], $progressFile['runners']['running']['remoteWebCounters']['uploadTotal']);
-            }
+                if (isset($progressFile['runners']['running']['remoteWebCounters']['downloadTotal']) && $progressFile['runners']['running']['remoteWebCounters']['downloadTotal'] > 0) {
+                    $webProgress = Percentage::calculate($progressFile['runners']['running']['remoteWebCounters']['downloadedBytes'], $progressFile['runners']['running']['remoteWebCounters']['downloadTotal']);
+                } else if (isset($progressFile['runners']['running']['remoteWebCounters']['uploadTotal']) && $progressFile['runners']['running']['remoteWebCounters']['uploadTotal'] > 0) {
+                    $webProgress = Percentage::calculate($progressFile['runners']['running']['remoteWebCounters']['uploadedBytes'], $progressFile['runners']['running']['remoteWebCounters']['uploadTotal']);
+                }
 
-            if ($webProgress > -1) {
-                $percentComplete = (float) number_format($webProgress);
-            }
-        } else if (isset($progressFile['runners']['running']['stepsCounters'])) {
-            $stepsProgress = 0;
+                if ($webProgress > -1) {
+                    $percentComplete = (float) number_format($webProgress);
+                }
+            } else if (isset($progressFile['runners']['running']['stepsCounters'])) {
+                $stepsProgress = 0;
 
-            if (isset($progressFile['runners']['running']['stepsCounters']['stepsTotal']) && $progressFile['runners']['running']['stepsCounters']['stepsTotal'] > 0) {
-                $stepsProgress = Percentage::calculate($progressFile['runners']['running']['stepsCounters']['stepsCurrent'], $progressFile['runners']['running']['stepsCounters']['stepsTotal']);
-            }
+                if (isset($progressFile['runners']['running']['stepsCounters']['stepsTotal']) && $progressFile['runners']['running']['stepsCounters']['stepsTotal'] > 0) {
+                    $stepsProgress = Percentage::calculate($progressFile['runners']['running']['stepsCounters']['stepsCurrent'], $progressFile['runners']['running']['stepsCounters']['stepsTotal']);
+                }
 
-            if ($stepsProgress > -1) {
-                $percentComplete = (float) number_format($stepsProgress);
+                if ($stepsProgress > -1) {
+                    $percentComplete = (float) number_format($stepsProgress);
+                }
             }
         }
 
@@ -377,6 +420,49 @@ class Progress extends BasePackage
         }
 
         return true;
+    }
+
+    public function cancelProgress($fileName = null)
+    {
+        $progressFile = $this->checkProgressFile($fileName);
+
+        if ($progressFile) {
+            if (isset($progressFile['pid']) && $progressFile['pid'] > 0) {
+                exec('ps -aux | grep ' . $progressFile['pid'], $output, $result);
+
+                if ($result === 0 &&
+                    count($output) > 0
+                ) {
+                    if (str_contains($output[0], 'php')) {
+                        exec('kill -9 ' . $progressFile['pid'], $output, $result);
+
+                        if ($result !== 0) {
+                            $this->addResponse('Error terminating process', 1, ['output' => $output]);
+
+                            return false;
+                        }
+
+                        $this->writeProgressFile(methods: [],progressFile: $progressFile);
+
+                        $this->addResponse('Successfully terminating process');
+
+                        return $this->resetProgress();
+                    }
+                }
+            }
+
+            $progressFile['runners']['running'] = false;
+            $progressFile['runners']['next'] = false;
+            $this->writeProgressFile(methods: [], progressFile: $progressFile, register: true);
+
+            $this->addResponse('Process not running', 1);
+
+            return false;
+        } else {
+            $this->addResponse('Error loading progressfile!', 1);
+
+            return false;
+        }
     }
 
     protected function readProgressFile($session = null)
@@ -496,6 +582,14 @@ class Progress extends BasePackage
 
         $file['notifications_tunnel'] = $this->notificationsTunnel;
 
+        if ($register) {
+            $file['pid'] = 0;
+        }
+
+        if (!isset($file['pid'])) {
+            $file['pid'] = getmypid();
+        }
+
         if ($this->opCache) {
             if ($progressFile) {
                 $this->opCache->resetCache($this->progressFileName, $file, 'progress');
@@ -513,6 +607,8 @@ class Progress extends BasePackage
 
     public function deleteProgressFile()
     {
+        $this->checkProcessIsRunning();
+
         if (!$this->progressFileName) {
             $this->progressFileName = $this->session->getId();
         }

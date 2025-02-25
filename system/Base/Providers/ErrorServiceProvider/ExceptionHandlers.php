@@ -95,6 +95,13 @@ class ExceptionHandlers extends BaseComponent
 		return $this->sendJson();
 	}
 
+	public function handleDuplicateProgressException($exception)
+	{
+		$this->addResponse($exception->getMessage(), 1);
+
+		return $this->sendJson();
+	}
+
 	private function setViewsDir($partial)
 	{
 		$this->view->setViewsDir(base_path($this->baseErrorDir));

@@ -1,4 +1,53 @@
-Test
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : 'test',
+                'buttonType'                     : 'button',
+                'buttons'                        :
+                    {
+                        'download-extract' : {
+                            'title'                   : 'Process',
+                            'size'                    : 'sm',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true
+                        }
+                    }
+            ]
+        )}}
+    </div>
+</div>
+<div id="download-progress" hidden></div>
 <script>
-/* globals */
+/* globals BazProgress paginatedPNotify */
+BazProgress.buildProgressBar($('#download-progress'), false, false, true);
+
+$('#{{componentId}}-test-download-extract').click(function(e) {
+    e.preventDefault();
+
+    var url = "{{links.url('devtools/test/test')}}";
+    var postData = { };
+
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    $.post(url, postData, function(response) {
+        if (response.responseCode == 0) {
+            paginatedPNotify('success', {
+                'title' : response.responseMessage
+            });
+        } else {
+            paginatedPNotify('error', {
+                'title' : response.responseMessage
+            });
+        }
+
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+    }, 'json');
+});
 </script>
