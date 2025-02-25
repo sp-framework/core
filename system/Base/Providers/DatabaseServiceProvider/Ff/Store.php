@@ -133,6 +133,7 @@ class Store
 
                             if (count($relation) > 0 && isset($relation[2])) {
                                 try {
+                                    $relation[2] = explode('+', $relation[2])[0];
                                     $relationsStore = new Store($relation[2], $this->databasePath, $this->ff);
 
                                     $rmd = array_replace_recursive($rmd, $relationsStore->getSchemaMetaData());
@@ -1713,6 +1714,10 @@ class Store
 
     protected function updateCounters($counters)
     {
+        if ($counters['totalEntries'] === 0) {
+            $counters['lastId'] = 0;
+        }
+
         $updateCounters = IoHelper::updateFileContent(
             $this->storePath . '_cnt.sdb',
             function () use ($counters) {

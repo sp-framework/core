@@ -3,37 +3,24 @@
 namespace Apps\Core\Components\Devtools\Test;
 
 use Apps\Core\Packages\Devtools\DicExtractData\DevtoolsDicExtractData;
+use Apps\Core\Packages\Devtools\Test\DevtoolsTest;
 use System\Base\BaseComponent;
 
 class TestComponent extends BaseComponent
 {
+    protected $testPackage;
+
+    public function initialize()
+    {
+        $this->testPackage = new DevtoolsTest;
+    }
+
     /**
      * @acl(name=view)
      */
     public function viewAction()
     {
-        // $install = new \Apps\Fintech\Components\Dashboards\Install\Install;
-
-        // $install->init()->install();
-        // $adminComponents = $this->basepackages->utils->scanDir('apps/Core/Components/', true);
-
-        // foreach ($adminComponents['files'] as $adminComponentKey => $adminComponent) {
-        //     if (strpos($adminComponent, 'component.json')) {
-        //         try {
-        //             $jsonFile =
-        //                 $this->helper->decode(
-        //                     $this->localContent->read($adminComponent),
-        //                     true
-        //                 );
-        //         } catch (\throwable $e) {
-        //             throw new \Exception($e->getMessage() . '. Problem reading component.json at location ' . $adminComponent);
-        //         }
-
-        //         if ($jsonFile['menu'] && $jsonFile['menu'] !== 'false') {
-        //             $this->basepackages->menus->addMenu($jsonFile);
-        //         }
-        //     }
-        // }
+        return;
     }
 
     /**
@@ -81,5 +68,49 @@ class TestComponent extends BaseComponent
     public function apiRemoveAction()
     {
         $this->addResponse('Test', 0, ['remove' => true]);
+    }
+
+    public function testAction()
+    {
+        if ($this->basepackages->progress->checkProgressFile()) {
+            $this->basepackages->progress->deleteProgressFile();
+        }
+
+        $this->basepackages->progress->registerMethods(
+            [
+                [
+                    'method'    => 'testTest',
+                    'text'      => 'Test',
+                ],
+                [
+                    'method'    => 'testTest',
+                    'text'      => 'Test',
+                ],
+                [
+                    'method'    => 'testTest',
+                    'text'      => 'Test',
+                ],
+                [
+                    'method'    => 'testDownload',
+                    'text'      => 'Download Data...',
+                    'remoteWeb' => true
+                ],
+                // [
+                //     'method'    => 'testProcess',
+                //     'text'      => 'Process Data...',
+                //     'steps'     => true
+                // ]
+            ]
+        );
+
+        $this->testPackage->testTest();
+        $this->testPackage->testTest();
+        $this->testPackage->testTest();
+        $this->testPackage->testDownload();
+
+        $this->addResponse(
+            $this->testPackage->packagesData->responseMessage,
+            $this->testPackage->packagesData->responseCode
+        );
     }
 }

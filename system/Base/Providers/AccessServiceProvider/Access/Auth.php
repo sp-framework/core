@@ -82,7 +82,16 @@ class Auth extends BasePackage
                 if (str_contains(strtolower($validate), 'please contact administrator')) {
                     $validate = str_replace('Error! Please contact administrator.', '', $validate);
                 }
-                $this->addResponse($validate, 3, ['allowed_methods' => $this->core->core['settings']['security']['twofaSettings']['twofaUsing']]);
+
+                if ($this->account['security']['twofa_otp_status'] == true) {
+                    $this->addResponse($validate, 3, ['allowed_methods' => $this->core->core['settings']['security']['twofaSettings']['twofaUsing']]);
+                } else {//redirect to setup twofa
+                    $this->addResponse('2FA needed, but not set. Redirecting...');
+
+                    $this->packagesData->redirectUrl = $this->links->url('auth/q/setup2fa/true');
+
+                    return true;
+                }
             } else {
                 $this->addResponse($validate, 1);
             }
@@ -94,7 +103,10 @@ class Auth extends BasePackage
 
         $security = $this->getAccountSecurityObject();
 
-        if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
+        if ($this->core->core['settings']['security']['twofa'] == 'true' &&
+            isset($this->app['enforce_2fa']) &&
+            $this->app['enforce_2fa'] == '1'
+        ) {
             if (!$this->twoFa->validateTwoFaCode($security, $data)) {
                 $this->addResponse(
                     $this->twoFa->packagesData->responseMessage,
@@ -749,7 +761,10 @@ class Auth extends BasePackage
             $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid user name."]);
             $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
             if ($task === 'auth2fa') {
-                if (isset($this->app['enforce_2fa']) && $this->app['enforce_2fa'] == '1') {
+                if ($this->core->core['settings']['security']['twofa'] == 'true' &&
+                    isset($this->app['enforce_2fa']) &&
+                    $this->app['enforce_2fa'] == '1'
+                ) {
                     $this->validation->add('twofa_using', PresenceOf::class, ["message" => "Error! Please contact administrator."]);
                     $this->validation->add('code', PresenceOf::class, ["message" => "Enter valid 2FA code"]);
                     if (isset($data['twofa_using'])) {

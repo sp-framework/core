@@ -1,6 +1,10 @@
 {% if api['id'] is defined %}
     {% set apiId = api['id'] %}
     {% set title = 'API:' ~ api['category'] ~ ':' ~ api['provider'] ~ ' - ' ~ api['name'] %}
+    {% if clone is defined and clone == true %}
+        {% set apiId = '' %}
+        {% set title = title ~ ' (Clone)' %}
+    {% endif %}
 {% else %}
     {% set apiId = '' %}
     {% set title = 'New API:' ~ api['category'] ~ ':' ~ api['provider'] %}

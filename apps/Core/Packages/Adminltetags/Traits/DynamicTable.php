@@ -219,6 +219,10 @@ trait DynamicTable {
                                 $actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
                             }
                         }
+
+                        if ($key === 'clone') {
+                            $actions[$key] = $actions[$key] . '/clone/true';
+                        }
                     }
 
                     $row["__control"] = $actions;

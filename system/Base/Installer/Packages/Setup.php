@@ -359,7 +359,7 @@ class Setup
 
 	protected function buildSchema()
 	{
-		$databases = (new Schema)->getSchema();
+		$databases = (new Schema)->getSchema($this->postData['dev']);
 
 		if (isset($this->postData['databasetype']) && $this->postData['databasetype'] !== 'ff') {
 			foreach ($databases as $tableName => $tableClass) {

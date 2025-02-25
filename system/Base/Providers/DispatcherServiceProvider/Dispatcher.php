@@ -76,6 +76,10 @@ class Dispatcher
                     $dispatcher->getDi()->getShared('logger')->logExceptions->critical(json_trace($exception));
                 }
 
+                if ($dispatcher->getDi()->getShared('request')->isPost()) {
+                    throw $exception;
+                }
+
                 if (!str_contains($exception->getMessage(), 'handler class cannot be loaded')) {//Handle any other exceptions, like variable not found, etc
                     $class = (new \ReflectionClass($exception))->getShortName();
 

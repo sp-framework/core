@@ -1,11 +1,17 @@
 {% set locationDisabled = false %}
 {% if api['id'] is defined %}
     {% set apiId = api['id'] %}
-    {% set apiCategoryId = api['api_category_id'] %}
     {% set apiName = api['name'] %}
-    {% set apiProvider = api['provider']|lower %}
     {% set apiInUse = api['in_use'] %}
     {% set apiUsedBy = api['used_by'] %}
+    {% if clone is defined and clone == true %}
+        {% set apiId = '' %}
+        {% set apiName = api['name'] ~ ' (Clone)' %}
+        {% set apiInUse = '' %}
+        {% set apiUsedBy = '' %}
+    {% endif %}
+    {% set apiCategoryId = api['api_category_id'] %}
+    {% set apiProvider = api['provider']|lower %}
     {% set apiSetup = api['setup'] %}
     {% set apiLocation = api['location'] %}
     {% set apiDescription = api['description'] %}

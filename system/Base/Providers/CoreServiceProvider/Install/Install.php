@@ -14,7 +14,7 @@ class Install extends BasePackage
 
     public function init($schemaNames = [])
     {
-        $databases = (new Schema)->getSchema();
+        $databases = (new Schema)->getSchema($this->core->core['settings']['dev']);
 
         $this->databases = $databases;
 

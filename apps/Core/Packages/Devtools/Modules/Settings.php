@@ -12,7 +12,7 @@ class Settings extends BasePackage
             $package['settings'] = $this->helper->decode($package['settings'], true);
         }
 
-        $apiClientServices = $this->basepackages->apiClientServices->getAll(true)->apiClientServices;
+        $apiClientServices = $this->basepackages->apiClientServices->getApiByAppType();
 
         if (count($package['settings']['api_clients']) > 0) {
             foreach ($apiClientServices as $api) {

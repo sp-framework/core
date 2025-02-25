@@ -27,6 +27,10 @@ class ServicesComponent extends BaseComponent
         $this->view->apiLocations = $this->apiPackage->apiLocations;
 
         if (isset($this->getData()['id'])) {
+            if (isset($this->getData()['clone'])) {
+                $this->view->clone = true;
+            }
+
             if ($this->getData()['id'] != 0) {
                 $api = $this->apiPackage->getApiById($this->getData()['id']);
 
@@ -96,6 +100,7 @@ class ServicesComponent extends BaseComponent
                 'actionsToEnable'       =>
                 [
                     'edit'      => 'system/api/client/services',
+                    'clone'     => 'system/api/client/services',
                     'remove'    => 'system/api/client/services/remove'
                 ]
             ];
