@@ -3809,7 +3809,17 @@ $file .= '
             }
 
             try {
-                $modulesArr = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+                $page = 1;
+                $getRemoteModules = [];
+                $modulesArr = [];
+                while ($getRemoteModules !== false) {
+                    $args['page'] = $page;
+                    $getRemoteModules = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+                    if ($getRemoteModules) {
+                        $modulesArr = array_merge($modulesArr, $getRemoteModules);
+                    }
+                    $page++;
+                }
             } catch (\throwable | ClientException $e) {
                 $this->addResponse($e->getMessage(), 1);
 
