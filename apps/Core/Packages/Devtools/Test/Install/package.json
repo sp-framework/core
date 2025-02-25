@@ -1,0 +1,39 @@
+{
+	"name" : "DevtoolsTest",
+	"display_name" : "Test",
+	"description" : "<p>Test package for devtools</p>",
+	"module_type" : "packages",
+	"app_type" : "core",
+	"category" : "devtools",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "Apps\\Core\\Packages\\Devtools\\Test\\DevtoolsTest",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"apptype" : [],
+		"packages" : [],
+		"middlewares" : [],
+		"externals" : 
+		{
+			"composer" : 
+			{
+				"require" : []
+			},
+			"config" : 
+			{
+				"allow-plugins" : []
+			},
+			"extra" : 
+			{
+				"patches" : []
+			}
+		}
+	},
+	"settings" : []
+}

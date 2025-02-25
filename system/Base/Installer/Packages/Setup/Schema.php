@@ -369,6 +369,10 @@ class Schema
                     'schema'    => new \Apps\Core\Packages\Devtools\Modules\Install\Schema\FilesHash,
                     'model'     => new \Apps\Core\Packages\Devtools\Modules\Model\AppsCoreDevtoolsFilesHash,
                 ];
+            $schema['devtools_test'] = [
+                    'schema'    => new \Apps\Core\Packages\Devtools\Test\Install\Schema\DevtoolsTest,
+                    'model'     => new \Apps\Core\Packages\Devtools\Test\Model\DevtoolsTest,
+                ];
         }
 
         return $schema;
