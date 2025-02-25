@@ -392,10 +392,10 @@
         </footer>
         <script type="text/javascript">
             <?php if ($precheckFail) { ?>
-                BazProgress.buildProgressBar($('#installer-progress'), true);
+                BazProgress.buildProgressBar($('#installer-progress'), true, false, false, false);
             <?php } else { ?>
                 <?php if (!$onlyUpdateDb) { ?>
-                    BazProgress.buildProgressBar($('#installer-progress'), false, true);
+                    BazProgress.buildProgressBar($('#installer-progress'), false, true, false ,false);
 
                     $('#databasetype').change(function() {
                         if ($('#databasetype').find(':selected').val() === 'ff') {

@@ -250,7 +250,7 @@ dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['queue'] = JSON.parse('{{queue}}');
 dataCollectionSectionForm['funcs'] = { };
 dataCollectionSectionForm['funcs']['init'] = function() {
-    BazProgress.buildProgressBar($('#installer-progress'), false, true, true);
+    BazProgress.buildProgressBar($('#installer-progress'), false, true, true, false);
 
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-queue-table')) {
         $('#{{componentId}}-{{sectionId}}-queue-table').DataTable({
