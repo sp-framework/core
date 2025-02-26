@@ -13,18 +13,21 @@ class Sqlite
         //
     }
 
-    public function init()
+    public function init($file = null)
     {
-        $this->databaseDir = base_path('.sql/');
+        if (!$file) {
+            $this->databaseDir = base_path('.sql/');
 
-        $this->checkDatabasePath();
+            $this->checkDatabasePath();
+
+            $file = $this->databaseDir . 'sp.sqlite';
+        }
 
         return new PhalconSqlite(
             [
-                'dbname'    => $this->databaseDir . 'baz.sqlite'
+                'dbname'    => $file
             ]
         );
-
     }
 
     protected function checkDatabasePath()
