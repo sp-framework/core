@@ -178,6 +178,7 @@ class Progress extends BasePackage
             if ($progressFile['allProcesses'][0]['method'] === $method &&
                 !$callResult &&
                 !$child &&
+                !$counters &&
                 $progressFile['completed'] === 0 &&
                 $progressFile['pid'] > 0
             ) {
@@ -401,7 +402,7 @@ class Progress extends BasePackage
         $progressFile = $this->readProgressFile();
 
         if ($progressFile) {
-            $this->deleteProgressFile();
+            $this->deleteProgressFile(true);
 
             if ($reRegisterMethods) {
                 $this->registerMethods($progressFile['allProcesses']);
@@ -607,9 +608,11 @@ class Progress extends BasePackage
         }
     }
 
-    public function deleteProgressFile()
+    public function deleteProgressFile($reset = false)
     {
-        $this->checkProcessIsRunning();
+        if (!$reset) {
+            $this->checkProcessIsRunning();
+        }
 
         if (!$this->progressFileName) {
             $this->progressFileName = $this->session->getId();

@@ -10073,7 +10073,7 @@ var BazContentFieldsValidator = function() {
     return bazContentFieldsValidatorConstructor;
 }();
 /* exported BazTunnels */
-/* globals BazNotifications BazMessenger BazAnnouncements BazProgress ab BazHelpers */
+/* globals BazNotifications BazMessenger BazProgress ab BazHelpers */
 /*
 * @title                    : BazTunnels
 * @description              : Baz Tunnels Lib for wstunnels
@@ -10178,17 +10178,17 @@ var BazTunnels = function() {
                         });
                     }
 
-                    if (tunnelsToInit.includes('messengerNotifications')) {
-                        dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
-                            BazMessenger.onMessage(data);
-                        });
-                    }
+                    // if (tunnelsToInit.includes('messengerNotifications')) {
+                    //     dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
+                    //         BazMessenger.onMessage(data);
+                    //     });
+                    // }
 
-                    if (tunnelsToInit.includes('systemAnnouncements')) {
-                        dataCollection.env.wsTunnels.pusher.subscribe('systemAnnouncements', function(topic, data) {
-                            BazAnnouncements.onMessage('systemAnnouncements', data);
-                        });
-                    }
+                    // if (tunnelsToInit.includes('systemAnnouncements')) {
+                    //     dataCollection.env.wsTunnels.pusher.subscribe('systemAnnouncements', function(topic, data) {
+                    //         BazAnnouncements.onMessage('systemAnnouncements', data);
+                    //     });
+                    // }
 
                     if (tunnelsToInit.includes('progress')) {
                         dataCollection.env.wsTunnels.pusher.subscribe('progress', function(topic, data) {
@@ -10202,12 +10202,12 @@ var BazTunnels = function() {
                         if (tunnelsToInit.includes('systemNotifications')) {
                             BazNotifications.serviceOnline();
                         }
-                        if (tunnelsToInit.includes('messengerNotifications')) {
-                            BazMessenger.serviceOnline();
-                        }
-                        if (tunnelsToInit.includes('systemAnnouncements')) {
-                            BazAnnouncements.serviceOnline();
-                        }
+                        // if (tunnelsToInit.includes('messengerNotifications')) {
+                        //     BazMessenger.serviceOnline();
+                        // }
+                        // if (tunnelsToInit.includes('systemAnnouncements')) {
+                        //     BazAnnouncements.serviceOnline();
+                        // }
                         if (tunnelsToInit.includes('progress')) {
                             BazProgress.serviceOnline();
                         }
@@ -10215,12 +10215,12 @@ var BazTunnels = function() {
                         if (tunnelsToInit.includes('systemNotifications')) {
                             BazNotifications.init();
                         }
-                        if (tunnelsToInit.includes('messengerNotifications')) {
-                            BazMessenger.init();
-                        }
-                        if (tunnelsToInit.includes('systemAnnouncements')) {
-                            BazAnnouncements.init();
-                        }
+                        // if (tunnelsToInit.includes('messengerNotifications')) {
+                        //     BazMessenger.init();
+                        // }
+                        // if (tunnelsToInit.includes('systemAnnouncements')) {
+                        //     BazAnnouncements.init();
+                        // }
                         if (tunnelsToInit.includes('progress')) {
                             BazProgress.init();
                         }
@@ -10238,12 +10238,12 @@ var BazTunnels = function() {
                     if (tunnelsToInit.includes('systemNotifications')) {
                         BazNotifications.serviceOffline();
                     }
-                    if (tunnelsToInit.includes('messengerNotifications')) {
-                        BazMessenger.serviceOffline();
-                    }
-                    if (tunnelsToInit.includes('systemAnnouncements')) {
-                        BazAnnouncements.serviceOffline();
-                    }
+                    // if (tunnelsToInit.includes('messengerNotifications')) {
+                    //     BazMessenger.serviceOffline();
+                    // }
+                    // if (tunnelsToInit.includes('systemAnnouncements')) {
+                    //     BazAnnouncements.serviceOffline();
+                    // }
                     if (tunnelsToInit.includes('progress')) {
                         BazProgress.serviceOffline();
                     }
@@ -11992,6 +11992,8 @@ var BazProgress = function() {
                                         'title' : response.responseMessage
                                     });
 
+                                    $('body').trigger('bazProgressCancelled');
+
                                     resetProgressCounter();
                                 } else {
                                     paginatedPNotify('error', {
@@ -12273,12 +12275,16 @@ var BazProgress = function() {
                 responseData['runners']['running']['remoteWebCounters']['downloadTotal'] > 0
             ) {
                 isDownload = true;
+                isUpload = false;
+                isSteps = false;
                 downloadTotal = responseData['runners']['running']['remoteWebCounters']['downloadTotal'];
                 downloadedBytes = responseData['runners']['running']['remoteWebCounters']['downloadedBytes'];
             } else if (responseData['runners']['running']['remoteWebCounters']['uploadTotal'] &&
                 responseData['runners']['running']['remoteWebCounters']['uploadTotal'] > 0
             ) {
                 isUpload = true;
+                isDownload = false;
+                isSteps = false;
                 uploadTotal = responseData['runners']['running']['remoteWebCounters']['uploadTotal'];
                 uploadedBytes = responseData['runners']['running']['remoteWebCounters']['uploadedBytes'];
             }
@@ -12287,6 +12293,8 @@ var BazProgress = function() {
                 responseData['runners']['running']['stepsCounters']['stepsTotal'] > 0
             ) {
                 isSteps = true;
+                isDownload = false;
+                isUpload = false;
                 stepsTotal = responseData['runners']['running']['stepsCounters']['stepsTotal'];
                 stepsCurrent = responseData['runners']['running']['stepsCounters']['stepsCurrent'];
             }

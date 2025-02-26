@@ -298,7 +298,11 @@ abstract class BaseComponent extends Controller
 
 				if (!$packageModule ||
 					($packageModule &&
-					 ($packageModule['installed'] == false || $packageModule['apps'][$this->app['id']]['enabled'] == false)
+					 ($packageModule['installed'] == false ||
+					  (isset($packageModule['apps'][$this->app['id']]) &&
+					   $packageModule['apps'][$this->app['id']]['enabled'] == false
+					  )
+					 )
 					)
 				) {
 					$this->setErrorDispatcher('controllerDependencyError', ['error' => true]);

@@ -165,6 +165,8 @@ var BazProgress = function() {
                                         'title' : response.responseMessage
                                     });
 
+                                    $('body').trigger('bazProgressCancelled');
+
                                     resetProgressCounter();
                                 } else {
                                     paginatedPNotify('error', {
@@ -446,12 +448,16 @@ var BazProgress = function() {
                 responseData['runners']['running']['remoteWebCounters']['downloadTotal'] > 0
             ) {
                 isDownload = true;
+                isUpload = false;
+                isSteps = false;
                 downloadTotal = responseData['runners']['running']['remoteWebCounters']['downloadTotal'];
                 downloadedBytes = responseData['runners']['running']['remoteWebCounters']['downloadedBytes'];
             } else if (responseData['runners']['running']['remoteWebCounters']['uploadTotal'] &&
                 responseData['runners']['running']['remoteWebCounters']['uploadTotal'] > 0
             ) {
                 isUpload = true;
+                isDownload = false;
+                isSteps = false;
                 uploadTotal = responseData['runners']['running']['remoteWebCounters']['uploadTotal'];
                 uploadedBytes = responseData['runners']['running']['remoteWebCounters']['uploadedBytes'];
             }
@@ -460,6 +466,8 @@ var BazProgress = function() {
                 responseData['runners']['running']['stepsCounters']['stepsTotal'] > 0
             ) {
                 isSteps = true;
+                isDownload = false;
+                isUpload = false;
                 stepsTotal = responseData['runners']['running']['stepsCounters']['stepsTotal'];
                 stepsCurrent = responseData['runners']['running']['stepsCounters']['stepsCurrent'];
             }

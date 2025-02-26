@@ -583,3 +583,61 @@ if (!function_exists('arrayReplace')) {
         return $array;
     }
 }
+
+if (!function_exists('getRemoteFilesize')) {
+    /**
+     *  Get the file size of any remote resource (using get_headers()),
+     *  either in bytes or - default - as human-readable formatted string.
+     *
+     *  @author  Stephan Schmitz <eyecatchup@gmail.com>
+     *  @license MIT <http://eyecatchup.mit-license.org/>
+     *  @url     <https://gist.github.com/eyecatchup/f26300ffd7e50a92bc4d>
+     *
+     *  @param   string   $url          Takes the remote object's URL.
+     *  @param   boolean  $formatSize   Whether to return size in bytes or formatted.
+     *  @param   boolean  $useHead      Whether to use HEAD requests. If false, uses GET.
+     *  @return  string                 Returns human-readable formatted size
+     *                                  or size in bytes (default: formatted).
+     */
+    function getRemoteFilesize($url, $formatSize = false, $useHead = false) {
+        if ($useHead) {
+            stream_context_set_default(array('http' => array('method' => 'HEAD')));
+        }
+
+        $head = array_change_key_case(get_headers($url, 1));
+
+        // content-length of download (in bytes), read from Content-Length: field
+        $clen = isset($head['content-length']) ? $head['content-length'] : 0;
+
+        if (!$clen) {
+            return false;
+        }
+
+        $size = $clen;
+
+        if (is_array($clen) && count($clen) > 0) {
+            array_walk($clen, function($len, $index) use (&$size) {
+                if ($len > (int) 0) {
+                    $size = (int) $len;
+
+                    return;
+                }
+            });
+        }
+
+        if ($formatSize) {
+            switch ($size) {
+                case $size < 1024:
+                    $size = $size .' B'; break;
+                case $size < 1048576:
+                    $size = round($size / 1024, 2) .' KiB'; break;
+                case $size < 1073741824:
+                    $size = round($size / 1048576, 2) . ' MiB'; break;
+                case $size < 1099511627776:
+                    $size = round($size / 1073741824, 2) . ' GiB'; break;
+            }
+        }
+
+        return $size;
+    }
+}

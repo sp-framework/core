@@ -1,5 +1,5 @@
 /* exported BazTunnels */
-/* globals BazNotifications BazMessenger BazAnnouncements BazProgress ab BazHelpers */
+/* globals BazNotifications BazMessenger BazProgress ab BazHelpers */
 /*
 * @title                    : BazTunnels
 * @description              : Baz Tunnels Lib for wstunnels
@@ -104,17 +104,17 @@ var BazTunnels = function() {
                         });
                     }
 
-                    if (tunnelsToInit.includes('messengerNotifications')) {
-                        dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
-                            BazMessenger.onMessage(data);
-                        });
-                    }
+                    // if (tunnelsToInit.includes('messengerNotifications')) {
+                    //     dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
+                    //         BazMessenger.onMessage(data);
+                    //     });
+                    // }
 
-                    if (tunnelsToInit.includes('systemAnnouncements')) {
-                        dataCollection.env.wsTunnels.pusher.subscribe('systemAnnouncements', function(topic, data) {
-                            BazAnnouncements.onMessage('systemAnnouncements', data);
-                        });
-                    }
+                    // if (tunnelsToInit.includes('systemAnnouncements')) {
+                    //     dataCollection.env.wsTunnels.pusher.subscribe('systemAnnouncements', function(topic, data) {
+                    //         BazAnnouncements.onMessage('systemAnnouncements', data);
+                    //     });
+                    // }
 
                     if (tunnelsToInit.includes('progress')) {
                         dataCollection.env.wsTunnels.pusher.subscribe('progress', function(topic, data) {
@@ -128,12 +128,12 @@ var BazTunnels = function() {
                         if (tunnelsToInit.includes('systemNotifications')) {
                             BazNotifications.serviceOnline();
                         }
-                        if (tunnelsToInit.includes('messengerNotifications')) {
-                            BazMessenger.serviceOnline();
-                        }
-                        if (tunnelsToInit.includes('systemAnnouncements')) {
-                            BazAnnouncements.serviceOnline();
-                        }
+                        // if (tunnelsToInit.includes('messengerNotifications')) {
+                        //     BazMessenger.serviceOnline();
+                        // }
+                        // if (tunnelsToInit.includes('systemAnnouncements')) {
+                        //     BazAnnouncements.serviceOnline();
+                        // }
                         if (tunnelsToInit.includes('progress')) {
                             BazProgress.serviceOnline();
                         }
@@ -141,12 +141,12 @@ var BazTunnels = function() {
                         if (tunnelsToInit.includes('systemNotifications')) {
                             BazNotifications.init();
                         }
-                        if (tunnelsToInit.includes('messengerNotifications')) {
-                            BazMessenger.init();
-                        }
-                        if (tunnelsToInit.includes('systemAnnouncements')) {
-                            BazAnnouncements.init();
-                        }
+                        // if (tunnelsToInit.includes('messengerNotifications')) {
+                        //     BazMessenger.init();
+                        // }
+                        // if (tunnelsToInit.includes('systemAnnouncements')) {
+                        //     BazAnnouncements.init();
+                        // }
                         if (tunnelsToInit.includes('progress')) {
                             BazProgress.init();
                         }
@@ -164,12 +164,12 @@ var BazTunnels = function() {
                     if (tunnelsToInit.includes('systemNotifications')) {
                         BazNotifications.serviceOffline();
                     }
-                    if (tunnelsToInit.includes('messengerNotifications')) {
-                        BazMessenger.serviceOffline();
-                    }
-                    if (tunnelsToInit.includes('systemAnnouncements')) {
-                        BazAnnouncements.serviceOffline();
-                    }
+                    // if (tunnelsToInit.includes('messengerNotifications')) {
+                    //     BazMessenger.serviceOffline();
+                    // }
+                    // if (tunnelsToInit.includes('systemAnnouncements')) {
+                    //     BazAnnouncements.serviceOffline();
+                    // }
                     if (tunnelsToInit.includes('progress')) {
                         BazProgress.serviceOffline();
                     }
