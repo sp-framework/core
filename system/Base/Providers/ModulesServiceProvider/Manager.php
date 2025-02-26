@@ -233,6 +233,12 @@ class Manager extends BasePackage
 
                 $latestRelease = $this->moduleNeedsUpgrade($responseArr, $module);
 
+                if (!$latestRelease &&
+                    (isset($data['getLatestRelease']) && $data['getLatestRelease'] === true)
+                ) {
+                    $latestRelease = $this->getLatestRelease($module['repo_details']['details']);
+                }
+
                 if ($latestRelease) {
                     $module['repo_details']['latestRelease'] = $latestRelease;
                     $latestReleaseJson = $this->getRemoteModuleJson($module['module_type'], $module, true);

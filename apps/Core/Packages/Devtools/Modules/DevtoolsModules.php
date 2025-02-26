@@ -605,17 +605,27 @@ class DevtoolsModules extends BasePackage
             $moduleLocation = $this->getNewFilesLocation($module);
 
             $module['repoExists'] = false;
+            $module['latestRelease'] = false;
             if ($this->localContent->directoryExists($moduleLocation . '.git')) {
-                $module['repoExists'] = true;
-
-                if (!isset($module['repo_details'])) {
-                    $this->modules->manager->getModuleInfo(
+                if (!isset($module['repo_details']) ||
+                    !isset($module['repo_details']['latestRelease'])
+                ) {
+                    $module = $this->modules->manager->getModuleInfo(
                         [
-                            'module_type'   => $module['module_type'],
-                            'module_id'     => $module['id'],
-                            'sync'          => true
+                            'module_type'       => $module['module_type'],
+                            'module_id'         => $module['id'],
+                            'sync'              => true,
+                            'getLatestRelease'  => (!isset($module['repo_details']['latestRelease'])) ? true : false
                         ]
                     );
+                }
+
+                $module['repoExists'] = true;
+
+                if (isset($module['repo_details']['latestRelease']['name'])) {
+                    $module['latestRelease'] = $module['repo_details']['latestRelease']['name'];
+                } else {
+                    $module['latestRelease'] = false;
                 }
             }
 
