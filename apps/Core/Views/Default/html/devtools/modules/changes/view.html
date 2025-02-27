@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set changesHtml = '' %}
 {% if modules|length > 0 %}
     {% for moduleType, modulesArr in modules %}
@@ -119,6 +119,7 @@ dataCollectionSectionForm['funcs']['init'] = function() {
                 null,
                 null,
                 null,
+                null,
                 { orderable: false }
             ],
             lengthMenu: [
@@ -207,3 +208,4 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
+<!-- htmlmin:ignore -->
