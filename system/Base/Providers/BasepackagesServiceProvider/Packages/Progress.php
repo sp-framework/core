@@ -274,6 +274,7 @@ class Progress extends BasePackage
         //Check if process is already running
         //If a user tries to reinitiate same process from start, we should return an error.
         if ($progressFile &&
+            array_key_exists('runners', $progressFile) &&
             ($progressFile['runners']['running'] !== false) &&
             $progressFile['pid'] > 0
         ) {
