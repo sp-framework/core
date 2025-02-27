@@ -39,27 +39,7 @@ class DevtoolsModules extends BasePackage
 
     public function addModule($data)
     {
-        if ($data['api_id'] != '0' &&
-            ($data['repo'] === 'https://.../' || $data['repo'] === '')
-        ) {
-            $this->addResponse('Repository is not local, please provide correct module repo url.', 1);
-
-            return false;
-        }
-
-        if (!isset($data['module_type']) ||
-            (isset($data['module_type']) &&
-             ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types')
-            )
-        ) {
-            $ignoreChars = [' '];
-        } else {
-            $ignoreChars = [''];
-        }
-
-        if (!checkCtype($data['name'], 'alpha', $ignoreChars)) {
-            $this->addResponse('Name cannot have special chars or numbers.', 1);
-
+        if (!$this->precheck($data)) {
             return false;
         }
 
@@ -111,19 +91,8 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
-        if ($data['module_type'] === 'components') {
-            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndRepoAndRoute';
-            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['route']);
-        } else if ($data['module_type'] === 'packages' || $data['module_type'] === 'middlewares') {
-            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndRepoAndClass';
-            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['class']);
-        } else if ($data['module_type'] === 'views') {
-            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndRepoAndName';
-            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['name']);
-        }
-
-        if ($module) {
-            $this->addResponse('Module already exists!', 1);
+        if ($this->searchModule($data)) {
+            $this->addResponse('Module already exists! Check name & class', 1);
 
             return false;
         }
@@ -218,27 +187,7 @@ class DevtoolsModules extends BasePackage
 
     public function updateModule($data)
     {
-        if ($data['api_id'] != '0' &&
-            ($data['repo'] === 'https://.../' || $data['repo'] === '')
-        ) {
-            $this->addResponse('Repository is not local, please provide correct module repo url.', 1);
-
-            return false;
-        }
-
-        if (!isset($data['module_type']) ||
-            (isset($data['module_type']) &&
-             ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types')
-            )
-        ) {
-            $ignoreChars = [' '];
-        } else {
-            $ignoreChars = [''];
-        }
-
-        if (!checkCtype($data['name'], 'alpha', $ignoreChars)) {
-            $this->addResponse('Name cannot have special chars or numbers.', 1);
-
+        if (!$this->precheck($data)) {
             return false;
         }
 
@@ -289,6 +238,14 @@ class DevtoolsModules extends BasePackage
                 }
             } else {
                 $module = $this->modules->{$data['module_type']}->getById($data['id']);
+
+                if ($searchModule = $this->searchModule($data)) {
+                    if ($searchModule['id'] !== $module['id']) {
+                        $this->addResponse('Module already exists! Check name & class', 1);
+
+                        return false;
+                    }
+                }
 
                 $module = array_merge($module, $data);
 
@@ -395,6 +352,83 @@ class DevtoolsModules extends BasePackage
         }
 
         $this->addResponse('Error updating Module', 1);
+    }
+
+    protected function precheck($data)
+    {
+        if ($data['api_id'] != '0' &&
+            ($data['repo'] === 'https://.../' || $data['repo'] === '')
+        ) {
+            $this->addResponse('Repository is not local, please provide correct module repo url.', 1);
+
+            return false;
+        }
+
+        if (!isset($data['module_type']) ||
+            (isset($data['module_type']) &&
+             ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types')
+            )
+        ) {
+            $ignoreChars = [' '];
+        } else {
+            $ignoreChars = [''];
+        }
+
+        if (!checkCtype($data['name'], 'alpha', $ignoreChars)) {
+            $this->addResponse('Name cannot have special chars or numbers.', 1);
+
+            return false;
+        }
+
+        if ($data['module_type'] === 'components') {
+            $data = $this->checkAppType($data);
+            $data = $this->checkModuleTypeAndCategory($data);
+            $data['class'] = str_replace('Apps\\' . ucfirst($data['app_type']) . '\\' . ucfirst($data['module_type']) . '\\', '', $data['class']);
+            $data['class'] = str_replace('Component', '', $data['class']);
+            $classArr = explode('\\', $data['class']);
+            array_pop($classArr);
+
+            $routeArr = explode('/', trim($data['route'], '/'));
+            array_walk($routeArr, function(&$route) {
+                $route = ucfirst($route);
+            });
+
+            $compare = array_diff($classArr, $routeArr);
+
+            if (count($compare) > 0) {
+                $this->addResponse('Route and class do not match!', 1);
+
+                return false;
+            }
+        } else if ($data['module_type'] === 'packages' || $data['module_type'] === 'middlewares') {
+            $classArr = explode('\\', $data['class']);
+
+            if (strtolower($this->helper->last($classArr)) !== strtolower($data['name'])) {
+                $this->addResponse('Name and class do not match!', 1);
+
+                return false;
+            }
+        } else if ($data['module_type'] === 'views') {
+            //
+        }
+
+        return true;
+    }
+
+    protected function searchModule($data)
+    {
+        if ($data['module_type'] === 'components') {
+            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndRoute';
+            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['route']);
+        } else if ($data['module_type'] === 'packages' || $data['module_type'] === 'middlewares') {
+            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndClass';
+            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['class']);
+        } else if ($data['module_type'] === 'views') {
+            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndName';
+            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['name']);
+        }
+
+        return $module;
     }
 
     public function removeModule($data)
@@ -937,35 +971,6 @@ class DevtoolsModules extends BasePackage
                 }
 
                 $data['app_type'] = $data['app_type']['data'][0];
-            } else if (isset($data['app_type']['newTags'][0])) {
-                if (!checkCtype($data['app_type']['newTags'][0], 'alpha', [''])) {
-                    $this->addResponse('AppType cannot have special chars or numbers.', 1);
-
-                    return false;
-                }
-
-                $appType = $this->apps->types->getFirst('app_type', strtolower($data['app_type']['newTags'][0]));
-
-                if (!$appType) {
-                    $appType =
-                        [
-                            'name'          => $data['app_type']['newTags'][0],
-                            'app_type'      => strtolower($data['app_type']['newTags'][0]),
-                            'dashboards'    => $data['dashboards'],
-                            'description'   => 'Added via devtools module add.',
-                            'version'       => $data['version'],
-                            'api_id'        => $data['api_id'],
-                            'repo'          => $data['repo'],
-                            'updated_by'    => '0',
-                            'installed'     => $data['installed']
-                        ];
-
-                    $this->apps->types->add($appType);
-
-                    $this->addUpdateAppTypeFiles($appType);
-                }
-
-                $data['app_type'] = strtolower($data['app_type']['newTags'][0]);
             }
         } else if (isset($data['app_type']) &&
                    !isset($data['module_type'])
@@ -3509,6 +3514,7 @@ $file .= '
         $this->validation->init()->add('api_id', PresenceOf::class, ["message" => "Please provide api id."]);
         $this->validation->add('app_type', PresenceOf::class, ["message" => "Please provide app type."]);
         $this->validation->add('module_type', PresenceOf::class, ["message" => "Please provide module type."]);
+        $this->validation->add('category', PresenceOf::class, ["message" => "Please provide module category."]);
 
         if (!$this->validateData($data)) {
             return false;
