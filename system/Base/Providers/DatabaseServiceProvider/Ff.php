@@ -364,7 +364,6 @@ class Ff
             foreach ($tableClass->columns()['columns'] as $column) {
                 $columns[$column->getName()] = $column;
             }
-
             foreach ($tableClass->indexes() as $index) {
                 if ($index->getType() === 'UNIQUE' && $index->getColumns() && count($index->getColumns()) > 0) {
                     if (isset($config['uniqueFields']) && count($config['uniqueFields']) > 0) {
@@ -378,7 +377,7 @@ class Ff
                     foreach ($index->getColumns() as $indexColumn) {
                         if (isset($columns[$indexColumn])) {
                             if (in_array($columns[$indexColumn]->getType(), $columnsTypeToIndex)) {
-                                $config['indexes'] = array_merge($config['indexes'], $index->getColumns());
+                                array_push($config['indexes'], $indexColumn);
                             }
                         }
                     }

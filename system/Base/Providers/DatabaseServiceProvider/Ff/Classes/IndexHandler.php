@@ -82,10 +82,18 @@ class IndexHandler
 
                                 $indexChars = strtolower(mb_substr($content, 0, $this->minIndexChars, 'UTF-8'));
 
+                                if (str_contains($indexChars, '/')) {//this will result in subdirectories
+                                    continue;
+                                }
+
                                 $this->writeIndex($indexPointer, $index, $indexChars, $content, $remove);
                             }
                         } else {
                             $indexChars = strtolower(mb_substr($content[$index], 0, $this->minIndexChars, 'UTF-8'));
+
+                            if (str_contains($indexChars, '/')) {//this will result in subdirectories
+                                continue;
+                            }
 
                             $this->writeIndex($indexPointer, $index, $indexChars, $content[$index], $remove);
                         }
@@ -95,6 +103,10 @@ class IndexHandler
                 } else {
                     if (is_string($content[$index])) {
                         $indexChars = strtolower(mb_substr($content[$index], 0, $this->minIndexChars, 'UTF-8'));
+
+                        if (str_contains($indexChars, '/')) {//this will result in subdirectories
+                            continue;
+                        }
 
                         $this->writeIndex($indexPointer, $index, $indexChars, $content[$index], $remove);
                     } else {

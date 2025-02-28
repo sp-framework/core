@@ -86,10 +86,18 @@ class DocumentFinder
                             if (count($indexJson) > 0) {
                                 if (isset($indexJson[strtolower($keyword)])) {
                                     if (count($indexJson[strtolower($keyword)]) === 1) {
-                                        $found[] = $this->store->findById($indexJson[strtolower($keyword)][0]);
+                                        $indexIdData = $this->store->findById($indexJson[strtolower($keyword)][0]);
+
+                                        if ($indexIdData) {
+                                            $found[] = $indexIdData;
+                                        }
                                     } else {
                                         foreach ($indexJson[strtolower($keyword)] as $id) {
-                                            $found[] = $this->store->findById($id);
+                                            $indexIdData = $this->store->findById($id);
+
+                                            if ($indexIdData) {
+                                                $found[] = $indexIdData;
+                                            }
                                         }
                                     }
                                 } else {
@@ -99,7 +107,11 @@ class DocumentFinder
                                         if (strtolower($condition[0][1]) === 'like') {
                                             if (str_starts_with($key, strtolower($keyword))) {
                                                 foreach ($ids as $id) {
-                                                    $found[] = $this->store->findById($id);
+                                                    $indexIdData = $this->store->findById($id);
+
+                                                    if ($indexIdData) {
+                                                        $found[] = $indexIdData;
+                                                    }
                                                 }
                                             }
                                         } else if ($condition[0][1] === '=' ||
@@ -107,7 +119,11 @@ class DocumentFinder
                                         ) {
                                             if ($key === strtolower($keyword)) {
                                                 foreach ($ids as $id) {
-                                                    $found[] = $this->store->findById($id);
+                                                    $indexIdData = $this->store->findById($id);
+
+                                                    if ($indexIdData) {
+                                                        $found[] = $indexIdData;
+                                                    }
                                                 }
                                             }
                                         }
