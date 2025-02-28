@@ -175,7 +175,8 @@ class Progress extends BasePackage
         $progressFile = $this->readProgressFile();
 
         if (isset($progressFile['processes']) && count($progressFile['processes']) > 0) {
-            if ($progressFile['allProcesses'][0]['method'] === $method &&
+            if (isset($progressFile['allProcesses'][0]) &&
+                $progressFile['allProcesses'][0]['method'] === $method &&
                 !$callResult &&
                 !$child &&
                 !$counters &&
