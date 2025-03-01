@@ -288,7 +288,11 @@ class Progress extends BasePackage
                     count($output) > 0
                 ) {
                     if (str_contains($output[0], 'php')) {
-                        throw new DuplicateProgressException('Process is already running with process ID: ' . $progressFile['pid']);
+                        $this->errors = ['PID running' => 'Progress is already running with process ID: ' . $progressFile['pid']];
+
+                        $this->sendNotification('pid_running');
+
+                        throw new DuplicateProgressException('Progress is already running with process ID: ' . $progressFile['pid']);
                     }
                 }
             }

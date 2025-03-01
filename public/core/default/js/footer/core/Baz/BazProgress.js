@@ -18,7 +18,7 @@ var BazProgress = function() {
     var initialized = false;
     var progressCounter = 0;
     var online = false;
-    var element, manualShowHide, hasChild, hasSubProcess, hasCancelButton;
+    var element, manualShowHide, hasChild, hasSubProcess, hasCancelButton, hasDetails;
     var callableFunc = null;
     var url
     var postData = { };
@@ -68,12 +68,13 @@ var BazProgress = function() {
         console.log('Progress service offline');
     }
 
-    function buildProgressBar(el, mSH = false, hC = false, hSP = false, hCB = true) {
+    function buildProgressBar(el, mSH = false, hC = false, hSP = false, hCB = true, hD = true) {
         element = el;
         manualShowHide = mSH;
         hasChild = hC;
         hasSubProcess = hSP;
         hasCancelButton = hCB;
+        hasDetails = hD;
 
         $(element).html(
             '<div class="progress active progress-xs">' +
@@ -179,6 +180,19 @@ var BazProgress = function() {
                 }
             });
         }
+
+        if (hasDetails) {
+            $(element).append(
+                '<div class="row" id="details-div" hidden>' +
+                    '<div class="col">' +
+                        '<div class="form-group">' +
+                            '<label class="text-uppercase text-xs" for="username">Progress Details</label>' +
+                            '<textarea id="details-data" class="form-control form-control-sm rounded-0" rows="10" disabled></textarea>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>'
+            );
+        }
     }
 
     function getProgress(options) {
@@ -187,6 +201,7 @@ var BazProgress = function() {
         if (callableFunc && callableFunc['beforeStart']) {
             if (callableFunc['beforeStart']() === false) {
                 resetProgressCounter();
+
                 return;
             }
         }
@@ -219,6 +234,7 @@ var BazProgress = function() {
         if (callableFunc && callableFunc['beforeProcess']) {
             if (callableFunc['beforeProcess'](response) === false) {
                 resetProgressCounter();
+
                 return;
             }
         }
@@ -244,9 +260,28 @@ var BazProgress = function() {
                 }
 
                 if (responseData['preCheckComplete'] == false ||
-                    (responseData['callResult'] && responseData['callResult'] === 'reset')
+                    (responseData['callResult'] && responseData['callResult'] === 'reset') ||
+                    (responseData['callResult'] && responseData['callResult'] === 'pid_running')
                 ) {
-                    resetProgressCounter();
+                    if (responseData['errors']) {
+                        $('#details-div').attr('hidden', false);
+                        $('#details-data').val(responseData['errors']);
+                        $('#details-data').scrollTop($('#details-data')[0].scrollHeight);
+                    }
+
+                    if (responseData['callResult'] === 'pid_running') {
+                        $('#' + $(element)[0].id).attr('hidden', false);
+                        $('#' + $(element)[0].id + '-cancel').attr('hidden', false);
+                        $('#' + $(element)[0].id + '-cancel-button').text('Cancel Process: ' + responseData['pid']);
+                    }
+
+                    if (responseData['callResult'] && responseData['callResult'] === 'reset') {
+                        if (responseData['errors']) {
+                            resetProgressCounter(false);
+                        } else {
+                            resetProgressCounter();
+                        }
+                    }
 
                     return false;
                 }
@@ -486,7 +521,7 @@ var BazProgress = function() {
         return text;
     }
 
-    function resetProgressCounter() {
+    function resetProgressCounter(hideDiv = true) {
         if (progressCounter !== 60) {
             progressCounter ++;
 
@@ -498,10 +533,14 @@ var BazProgress = function() {
             }
         }
 
-        $('#' + $(element)[0].id).attr('hidden', true);
+        if (hideDiv) {
+            $('#' + $(element)[0].id).attr('hidden', true);
+            $('#details-div').attr('hidden', true);
+        }
         $('.' + $(element)[0].id + '-bar').css('width', '0%');
         $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', 0);
         switchProgressBarColor('.' + $(element)[0].id + '-bar', 'info');
+        $('#' + $(element)[0].id + '-cancel-button').text('Cancel');
         downloadTotal = 0;
         downloadedBytes = 0;
         uploadTotal = 0;
@@ -551,8 +590,8 @@ var BazProgress = function() {
                 getProgress(options);
             }
         }
-        BazProgress.buildProgressBar = function(el, mSH = false, child = false, hasSubProcess = false, hasCancelButton = true) {
-            buildProgressBar(el, mSH, child, hasSubProcess, hasCancelButton);
+        BazProgress.buildProgressBar = function(el, mSH = false, child = false, hasSubProcess = false, hasCancelButton = true, hasDetails = true) {
+            buildProgressBar(el, mSH, child, hasSubProcess, hasCancelButton, hasDetails);
         }
         BazProgress.switchProgressBarColor = function(el, color) {
             switchProgressBarColor(el, color);
