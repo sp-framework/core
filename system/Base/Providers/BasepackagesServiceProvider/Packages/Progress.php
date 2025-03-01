@@ -370,7 +370,8 @@ class Progress extends BasePackage
                         }
 
                         $processCallResult = 'Running...';
-                        if ($progressFile['runners']['running']['method'] !== $process['method']) {
+                        if (isset($progressFile['runners']['running']) &&
+                            $progressFile['runners']['running']['method'] !== $process['method']) {
                             if ($process['callResult'] === true) {
                                 $processCallResult = 'Done';
                             } else if ($process['callResult'] === false) {
