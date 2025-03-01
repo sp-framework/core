@@ -18,6 +18,8 @@ class Progress extends BasePackage
 
     protected $countersTimer;
 
+    protected $errors = [];
+
     public function init($container = null, $fileName = null)
     {
         if ($container) {
@@ -329,6 +331,12 @@ class Progress extends BasePackage
             $progressFile = $this->readProgressFile();
 
             if ($progressFile) {
+                $errors = false;
+
+                if (is_array($this->errors) && count($this->errors) > 0) {
+                    $errors = $this->helper->encode($this->errors);
+                }
+
                 $this->wss->send(
                     [
                         'type'              => 'progress',
@@ -346,7 +354,8 @@ class Progress extends BasePackage
                                     'totalPercentComplete'  => $this->getPercentComplete($progressFile, false),
                                     'percentComplete'       => $this->getPercentComplete($progressFile),
                                     'runners'               => $progressFile['runners'] ?? false,
-                                    'callResult'            => $callResult
+                                    'callResult'            => $callResult,
+                                    'errors'                => $errors
                                 ]
                         ]
                     ]
@@ -414,6 +423,16 @@ class Progress extends BasePackage
         $this->sendNotification('reset');
 
         return true;
+    }
+
+    public function setErrors(array $errors)
+    {
+        $this->errors = $errors;
+    }
+
+    public function getErrors()
+    {
+        return $this->errors;
     }
 
     protected function checkProgressPath()
@@ -594,6 +613,8 @@ class Progress extends BasePackage
         if (!array_key_exists('pid', $file)) {
             $file['pid'] = getmypid();
         }
+
+        $file['errors'] = $this->errors;
 
         if ($this->opCache) {
             if ($progressFile) {
