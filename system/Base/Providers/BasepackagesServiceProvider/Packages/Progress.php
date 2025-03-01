@@ -20,6 +20,8 @@ class Progress extends BasePackage
 
     protected $errors = [];
 
+    protected $details = [];
+
     public function init($container = null, $fileName = null)
     {
         if ($container) {
@@ -111,10 +113,18 @@ class Progress extends BasePackage
                             foreach ($progressFile['processes'][$progressFileKey]['childs'] as $childKey => $child) {
                                 if (in_array($child[$using], $childs)) {
                                     unset($progressFile['processes'][$progressFileKey]['childs'][$childKey]);
+
+                                    if (isset($progressFile['registeredMethods'][$progressFileKey]['childs'][$childKey])) {
+                                        unset($progressFile['registeredMethods'][$progressFileKey]['childs'][$childKey]);
+                                    }
                                 }
                             }
                         } else {
                             unset($progressFile['processes'][$progressFileKey]);
+
+                            if (isset($progressFile['registeredMethods'][$progressFileKey])) {
+                                unset($progressFile['registeredMethods'][$progressFileKey]);
+                            }
                         }
                     }
                 }
@@ -136,16 +146,25 @@ class Progress extends BasePackage
             return false;
         }
 
+        $errors = false;
+
+        if (is_array($this->errors) && count($this->errors) > 0) {
+            $errors = $this->helper->encode($this->errors);
+        }
+
         $progress =
             [
+                'progressFile'          => $this->progressFileName,
+                'pid'                   => $progressFile['pid'] ?? false,
                 'total'                 => $progressFile['total'],
                 'completed'             => $progressFile['completed'],
                 'preCheckComplete'      => $progressFile['preCheckComplete'],
                 'totalPercentComplete'  => $this->getPercentComplete($progressFile, false),
                 'percentComplete'       => $this->getPercentComplete($progressFile),
-                'runners'               => $progressFile['runners'] ?? false
+                'runners'               => $progressFile['runners'] ?? false,
+                'callResult'            => $callResult,
+                'errors'                => $errors
             ];
-
         if ($returnArray) {
             return $progress;
         }
@@ -274,7 +293,7 @@ class Progress extends BasePackage
             $progressFile = $this->checkProgressFile();
         }
 
-        //Check if process is already running
+        //Check if process is running
         //If a user tries to reinitiate same process from start, we should return an error.
         if ($progressFile &&
             array_key_exists('runners', $progressFile) &&
@@ -288,11 +307,11 @@ class Progress extends BasePackage
                     count($output) > 0
                 ) {
                     if (str_contains($output[0], 'php')) {
-                        $this->errors = ['PID running' => 'Progress is already running with process ID: ' . $progressFile['pid']];
+                        $this->errors = ['PID running' => 'Progress is running with process ID: ' . $progressFile['pid']];
 
                         $this->sendNotification('pid_running');
 
-                        throw new DuplicateProgressException('Progress is already running with process ID: ' . $progressFile['pid']);
+                        throw new DuplicateProgressException('Progress is running with process ID: ' . $progressFile['pid']);
                     }
                 }
             }
@@ -341,6 +360,35 @@ class Progress extends BasePackage
                     $errors = $this->helper->encode($this->errors);
                 }
 
+                $details = false;
+                if (isset($progressFile['allProcesses']) && is_array($progressFile['allProcesses'])) {
+                    $details = [];
+
+                    foreach ($progressFile['allProcesses'] as $processKey => $process) {
+                        if (!array_key_exists('callResult', $process)) {
+                            continue;
+                        }
+
+                        $processCallResult = 'Running...';
+                        if ($progressFile['runners']['running']['method'] !== $process['method']) {
+                            if ($process['callResult'] === true) {
+                                $processCallResult = 'Done';
+                            } else if ($process['callResult'] === false) {
+                                $processCallResult = 'Error';
+                            }
+                            if (count($this->errors) > 0) {
+                                $processCallResult = 'Error';
+                            }
+                        }
+
+                        $details[$process['text']] = $processCallResult;
+                    }
+
+                    if (count($details) === 0) {
+                        $details = false;
+                    }
+                }
+
                 $this->wss->send(
                     [
                         'type'              => 'progress',
@@ -359,7 +407,8 @@ class Progress extends BasePackage
                                     'percentComplete'       => $this->getPercentComplete($progressFile),
                                     'runners'               => $progressFile['runners'] ?? false,
                                     'callResult'            => $callResult,
-                                    'errors'                => $errors
+                                    'errors'                => $errors,
+                                    'details'               => $details
                                 ]
                         ]
                     ]
@@ -420,7 +469,7 @@ class Progress extends BasePackage
             $this->deleteProgressFile(true);
 
             if ($reRegisterMethods) {
-                $this->registerMethods($progressFile['allProcesses']);
+                $this->registerMethods($progressFile['registeredMethods']);
             }
         }
 
@@ -536,10 +585,10 @@ class Progress extends BasePackage
                 $file['runners']['running'] = current($methods);
                 $file['runners']['next'] = next($methods);
                 if ($register) {
-                    $file['allProcesses'] = $methods;
+                    $file['allProcesses'] = $file['registeredMethods'] = $methods;
                 } else if ($unregister) {
                     $progressFile = $this->readProgressFile();
-                    $file['allProcesses'] = $progressFile['allProcesses'];
+                    $file['allProcesses'] = $progressFile['registeredMethods'];
                 }
             }
 
@@ -603,6 +652,8 @@ class Progress extends BasePackage
                 if ($runners) {
                     $file['runners'] = $runners;
                 }
+
+                $file['registeredMethods'] = $progressFile['registeredMethods'];
             }
 
             $file['processes'] = $methods;

@@ -3072,7 +3072,37 @@ var BazHelpers = function() {
                 output += bazCreateHtmlList(obj[k]);
                 output += '</li>';
             } else {
-                output += '<li>' + k + ' : ' + obj[k] + '</li>';
+                if (typeof obj[k] === 'string') {
+                    if (obj[k].startsWith('{')) {
+                        var regex = /{.*}/g;
+
+                        var found = obj[k].match(regex);
+
+                        if (found) {
+                            //eslint-disable-next-line
+                            var data = found[0].replaceAll('\"', '"');
+                            //eslint-disable-next-line
+                            data = data.replaceAll('\\', '\\\\\\\\');
+                            //eslint-disable-next-line
+                            data = data.replaceAll('\\\\\\u0022', '"');
+                            var objObject = JSON.parse(data);
+
+                            if (objObject) {
+                                output += '<li>' + k + ' : ';
+                                output += bazCreateHtmlList(objObject);
+                                output += '</li>';
+                            } else {
+                                output += '<li>' + k + ' : ' + obj[k] + '</li>';
+                            }
+                        } else {
+                            output += '<li>' + k + ' : ' + obj[k] + '</li>';
+                        }
+                    } else {
+                        output += '<li>' + k + ' : ' + obj[k] + '</li>';
+                    }
+                } else {
+                    output += '<li>' + k + ' : ' + obj[k] + '</li>';
+                }
             }
         });
         output += '</ul>';
@@ -11943,17 +11973,37 @@ var BazProgress = function() {
             );
         }
 
-        if (hasCancelButton) {
-            $(element).append(
-                '<div class="text-center mt-3" id="' + $(element)[0].id + '-cancel" hidden>' +
-                    '<button class="btn btn-sm btn-secondary mr-1" id="' + $(element)[0].id + '-cancel-button" role="button">' +
-                        'Cancel' +
-                    '</button>' +
-                '</div>'
-            );
+        var buttons = '<div class="row">';
 
-            $('#' + $(element)[0].id + '-cancel').off();
-            $('#' + $(element)[0].id + '-cancel').click(function() {
+        if (hasCancelButton) {
+            buttons +=
+                '<div class="col">' +
+                    '<div class="text-center mt-3" id="' + $(element)[0].id + '-cancel" hidden>' +
+                        '<button class="text-uppercase btn btn-sm btn-secondary mr-1" id="' + $(element)[0].id + '-cancel-button" role="button">' +
+                            'Cancel' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+        }
+
+        if (hasDetails) {
+            buttons +=
+                '<div class="col">' +
+                    '<div class="text-center mt-3" id="' + $(element)[0].id + '-details">' +
+                        '<button class="text-uppercase btn btn-sm btn-primary mr-1" id="' + $(element)[0].id + '-details-button" role="button">' +
+                            'Show Details' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+        }
+
+        buttons += '</div>';
+
+        $(element).append(buttons);
+
+        if (hasCancelButton) {
+            $('#' + $(element)[0].id + '-cancel-button').off();
+            $('#' + $(element)[0].id + '-cancel-button').click(function() {
                 if (pid > 0) {
                     Swal.fire({
                         title                       : '<span class="text-danger"> Cancel current process?</span>',
@@ -12009,12 +12059,25 @@ var BazProgress = function() {
         }
 
         if (hasDetails) {
+            $('#' + $(element)[0].id + '-details-button').off();
+            $('#' + $(element)[0].id + '-details-button').click(function() {
+                var text = $('#' + $(element)[0].id + '-details-button').text().toLowerCase();
+
+                if (text === 'show details') {
+                    $('#' + $(element)[0].id + '-details-button').text('Hide details');
+                    $('#details-div').attr('hidden', false);
+                } else if (text === 'hide details') {
+                    $('#' + $(element)[0].id + '-details-button').text('Show details');
+                    $('#details-div').attr('hidden', true);
+                }
+            });
+
             $(element).append(
                 '<div class="row" id="details-div" hidden>' +
                     '<div class="col">' +
                         '<div class="form-group">' +
                             '<label class="text-uppercase text-xs" for="username">Progress Details</label>' +
-                            '<textarea id="details-data" class="form-control form-control-sm rounded-0" rows="10" disabled></textarea>' +
+                            '<div id="details-data" class="height-control-400 overflow-scroll"></div>' +
                         '</div>' +
                     '</div>' +
                 '</div>'
@@ -12080,6 +12143,8 @@ var BazProgress = function() {
                 if (responseData['pid']) {
                     $('#' + $(element)[0].id + '-cancel').attr('hidden', false);
                     pid = responseData['pid'];
+
+                    $('#details-data').html('PID running : Progress is running with process ID: ' + pid + '<br>');
                 }
 
                 if (responseData['progressFile']) {
@@ -12092,7 +12157,29 @@ var BazProgress = function() {
                 ) {
                     if (responseData['errors']) {
                         $('#details-div').attr('hidden', false);
-                        $('#details-data').val(responseData['errors']);
+                        var html = responseData['errors'];
+                        var regex = /{.*}/g;
+                        var found = html.match(regex);
+
+                        if (found) {
+                            //eslint-disable-next-line
+                            var data = found[0].replaceAll('\"', '"');
+                            //eslint-disable-next-line
+                            data = data.replaceAll('\\', '\\\\\\\\');
+                            //eslint-disable-next-line
+                            data = data.replaceAll('\\\\\\u0022', '"');
+                            var obj = JSON.parse(data);
+
+                            if (obj) {
+                                $('#details-data').html(
+                                    '<div class="text-danger">' +
+                                        BazHelpers.createHtmlList({'obj': obj}));
+                                    '</div>'
+                            }
+                        } else {
+                            $('#details-data').html(html);
+                        }
+
                         $('#details-data').scrollTop($('#details-data')[0].scrollHeight);
                     }
 
@@ -12103,14 +12190,17 @@ var BazProgress = function() {
                     }
 
                     if (responseData['callResult'] && responseData['callResult'] === 'reset') {
-                        if (responseData['errors']) {
-                            resetProgressCounter(false);
-                        } else {
+                        if (!responseData['errors']) {
                             resetProgressCounter();
                         }
                     }
 
                     return false;
+                }
+
+                if (responseData['details']) {
+                    var pidHtml = $('#details-data').html();
+                    $('#details-data').html(pidHtml + BazHelpers.createHtmlList({'obj': responseData['details']}));
                 }
 
                 if (responseData['total'] !== 'undefined' && responseData['completed'] !== 'undefined') {
