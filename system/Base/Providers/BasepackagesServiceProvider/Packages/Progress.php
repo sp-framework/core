@@ -152,6 +152,8 @@ class Progress extends BasePackage
             $errors = $this->helper->encode($this->errors);
         }
 
+        $details = $this->getProgressDetails($progressFile);
+
         $progress =
             [
                 'progressFile'          => $this->progressFileName,
@@ -163,7 +165,8 @@ class Progress extends BasePackage
                 'percentComplete'       => $this->getPercentComplete($progressFile),
                 'runners'               => $progressFile['runners'] ?? false,
                 'callResult'            => $callResult,
-                'errors'                => $errors
+                'errors'                => $errors,
+                'details'               => $details
             ];
         if ($returnArray) {
             return $progress;
@@ -360,35 +363,7 @@ class Progress extends BasePackage
                     $errors = $this->helper->encode($this->errors);
                 }
 
-                $details = false;
-                if (isset($progressFile['allProcesses']) && is_array($progressFile['allProcesses'])) {
-                    $details = [];
-
-                    foreach ($progressFile['allProcesses'] as $processKey => $process) {
-                        if (!array_key_exists('callResult', $process)) {
-                            continue;
-                        }
-
-                        $processCallResult = 'Running...';
-                        if (isset($progressFile['runners']['running']['method']) &&
-                            $progressFile['runners']['running']['method'] !== $process['method']) {
-                            if ($process['callResult'] === true) {
-                                $processCallResult = 'Done';
-                            } else if ($process['callResult'] === false) {
-                                $processCallResult = 'Error';
-                            }
-                            if (count($this->errors) > 0) {
-                                $processCallResult = 'Error';
-                            }
-                        }
-
-                        $details[$process['text']] = $processCallResult;
-                    }
-
-                    if (count($details) === 0) {
-                        $details = false;
-                    }
-                }
+                $details = $this->getProgressDetails($progressFile);
 
                 $this->wss->send(
                     [
@@ -416,6 +391,44 @@ class Progress extends BasePackage
                 );
             }
         }
+    }
+
+    protected function getProgressDetails($progressFile)
+    {
+        $details = false;
+
+        if (isset($progressFile['allProcesses']) && is_array($progressFile['allProcesses'])) {
+            $details = [];
+
+            foreach ($progressFile['allProcesses'] as $process) {
+                if (!array_key_exists('callResult', $process)) {
+                    continue;
+                }
+
+                $processCallResult = 'Running...';
+                if (isset($progressFile['runners']['running']['method']) &&
+                    $progressFile['runners']['running']['method'] !== $process['method']) {
+                    if ($process['callResult'] === true) {
+                        $processCallResult = 'Done';
+                    } else if ($process['callResult'] === false) {
+                        $processCallResult = 'Error';
+                    }
+                    if (count($this->errors) > 0) {
+                        $processCallResult = 'Error';
+                    }
+                } else if ($progressFile['completed'] === $progressFile['total']) {
+                    $processCallResult = 'Done';
+                }
+
+                $details[$process['text']] = $processCallResult;
+            }
+
+            if (count($details) === 0) {
+                $details = false;
+            }
+        }
+
+        return $details;
     }
 
     protected function getPercentComplete($progressFile, $counters = true)
