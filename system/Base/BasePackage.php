@@ -2271,6 +2271,18 @@ abstract class BasePackage extends Controller
 		//Only if debug is enabled.
 	}
 
+	public function getDbCount($recount = false)
+	{
+		if ($this->config->databasetype === 'db') {
+			return $this->modelToUse::count();
+		} else {
+			if (!$this->ffStore) {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			}
+
+			return $this->ffStore->count($recount);
+		}
+	}
 	// protected function addRefId($data)
 	// {
 	// 	if (!isset($data['ref_id'])) {

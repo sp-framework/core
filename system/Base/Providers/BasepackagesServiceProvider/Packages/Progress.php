@@ -201,9 +201,9 @@ class Progress extends BasePackage
         if (isset($progressFile['processes']) && count($progressFile['processes']) > 0) {
             if (isset($progressFile['allProcesses'][0]) &&
                 $progressFile['allProcesses'][0]['method'] === $method &&
-                !$callResult &&
-                !$child &&
-                !$counters &&
+                is_null($callResult) &&
+                is_null($child) &&
+                is_null($counters) &&
                 $progressFile['completed'] === 0 &&
                 $progressFile['pid'] > 0
             ) {
@@ -700,7 +700,7 @@ class Progress extends BasePackage
         }
     }
 
-    public function deleteProgressFile($reset = false)
+    public function deleteProgressFile(bool $reset = false)
     {
         if (!$reset) {
             $this->checkProcessIsRunning();
