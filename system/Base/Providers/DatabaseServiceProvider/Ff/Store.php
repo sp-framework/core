@@ -1199,8 +1199,10 @@ class Store
                     $cacheLifetime = $configuration['cache_lifetime'];
                 }
 
-                $configuration = IoHelper::getFileContent($this->storePath . 'config.json');
-                $configuration = json_decode($configuration, true);
+                $oldConfiguration = IoHelper::getFileContent($this->storePath . 'config.json');
+                $oldConfiguration = json_decode($oldConfiguration, true);
+
+                $configuration = array_replace($oldConfiguration, $configuration);
 
                 if (isset($autoCache)) {
                     $configuration['auto_cache'] = $autoCache;
@@ -1213,8 +1215,10 @@ class Store
 
         if (count($schema) === 0) {
             if (file_exists($this->storePath . 'schema.json')) {
-                $schema = IoHelper::getFileContent($this->storePath . 'schema.json');
-                $schema = json_decode($schema, true);
+                $oldSchema = IoHelper::getFileContent($this->storePath . 'schema.json');
+                $oldSchema = json_decode($oldSchema, true);
+
+                $schema = array_replace($oldSchema, $schema);
             }
 
             if (count($schema) > 0) {
