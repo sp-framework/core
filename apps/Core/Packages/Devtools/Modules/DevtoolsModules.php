@@ -558,47 +558,54 @@ class DevtoolsModules extends BasePackage
                 $filesHash['module_id'] = $module['id'];
             }
 
-            $moduleLocation = $this->getModuleFilesLocation($module);
-
-            $moduleLocationFiles = $this->basepackages->utils->scanDir($moduleLocation, true, ['.git/', '.fileHashes']);
-
-            //In case you have .gitignore file, it can get complicated to sort which files to hash.
-            //So, the files you want to hash, just add them in .fileHashes in the same folder as .gitignore
-            //The file should have a list of all files to hash (1 filename per line)
-            //Example:
-            //.gitignore
-            // README.md
-            // view.html
-            // view.json
-            $filesToHash = [];
-            if ($this->localContent->fileExists($moduleLocation . '.fileHashes')) {
-                $filesToHash = $this->localContent->read($moduleLocation . '.fileHashes');
-
-                if ($filesToHash && $filesToHash !== '') {
-                    $filesToHash = str_replace("'", '', $filesToHash);
-                    $filesToHash = explode(PHP_EOL, $filesToHash);
-                }
-            }
+            $moduleLocationFiles['files'] = [];
 
             if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
-                $moduleLocation = $this->getModuleFilesLocation($module, true);
+                $moduleLocations = [$this->getModuleFilesLocation($module), $this->getModuleFilesLocation($module, true)];
+            } else {
+                $moduleLocations = [$this->getModuleFilesLocation($module)];
+            }
 
-                $viewFiles = $this->basepackages->utils->scanDir($moduleLocation, true, ['.git/', '.fileHashes']);
-
-                if ($viewFiles && count($viewFiles['files']) > 0) {
-                    $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $viewFiles['files']);
-                }
-
+            foreach ($moduleLocations as $moduleLocation) {
                 if ($this->localContent->fileExists($moduleLocation . '.fileHashes')) {
-                    $viewFilesToHash = $this->localContent->read($moduleLocation . '.fileHashes');
+                    $filesToHash = $this->localContent->read($moduleLocation . '.fileHashes');
 
-                    if ($viewFilesToHash && $viewFilesToHash !== '') {
-                        $viewFilesToHash = str_replace("'", '', $viewFilesToHash);
-                        $viewFilesToHash = explode(PHP_EOL, $viewFilesToHash);
+                    if ($filesToHash && $filesToHash !== '') {
+                        $filesToHash = str_replace("'", '', $filesToHash);
+                        $filesToHash = explode(PHP_EOL, $filesToHash);
 
-                        if (count($viewFilesToHash) > 0) {
-                            $filesToHash = array_merge($filesToHash, $viewFilesToHash);
+                        if (count($filesToHash) > 0) {
+                            $hashFiles = [];
+
+                            foreach ($filesToHash as $fileToHash) {
+                                if (str_ends_with($fileToHash, '/')) {
+                                    $fileToHashDirList = $this->basepackages->utils->scanDir($moduleLocation . $fileToHash, true);
+
+                                    if ($fileToHashDirList && count($fileToHashDirList['files']) > 0) {
+                                        $hashFiles = array_merge($hashFiles, $fileToHashDirList['files']);
+                                    }
+                                } else {
+                                    array_push($hashFiles, $moduleLocation . $fileToHash);
+                                }
+                            }
+
+                            if (count($hashFiles) > 0) {
+                                $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $hashFiles);
+                            }
                         }
+                    }
+                } else {
+                    $files = $this->basepackages->utils->scanDir(
+                        $moduleLocation,
+                        true,
+                        [
+                            '.git/',
+                            'linter-backup/'
+                        ]
+                    );
+
+                    if ($files && count($files['files']) > 0) {
+                        $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $files['files']);
                     }
                 }
             }
@@ -610,12 +617,6 @@ class DevtoolsModules extends BasePackage
                     $filePath = $file;
 
                     $file = str_replace($moduleLocation, '', $file);
-
-                    if (count($filesToHash) > 0) {
-                        if (!in_array($file, $filesToHash)) {
-                            continue;
-                        }
-                    }
 
                     $hash = hash_file('md5', base_path($filePath));
 
@@ -641,15 +642,17 @@ class DevtoolsModules extends BasePackage
             $module['repoExists'] = false;
             $module['latestRelease'] = false;
             if ($this->localContent->directoryExists($moduleLocation . '.git')) {
-                if (!isset($module['repo_details']) ||
-                    !isset($module['repo_details']['latestRelease'])
+                if ((!isset($module['repo_details']) ||
+                     !isset($module['repo_details']['latestRelease'])) ||
+                    (isset($module['repo_details']['latestRelease']['name']) &&
+                     $module['repo_details']['latestRelease']['name'] !== $module['version'])
                 ) {
                     $module = $this->modules->manager->getModuleInfo(
                         [
                             'module_type'       => $module['module_type'],
                             'module_id'         => $module['id'],
                             'sync'              => true,
-                            'getLatestRelease'  => (!isset($module['repo_details']['latestRelease'])) ? true : false
+                            'getLatestRelease'  => true
                         ]
                     );
                 }
@@ -672,60 +675,63 @@ class DevtoolsModules extends BasePackage
                 return $module;
             }
 
-            $moduleFiles = $this->basepackages->utils->scanDir($moduleLocation, true, ['.git/', '.fileHashes']);
-
-            //In case you have .gitignore file, it can get complicated to sort which files to hash.
-            //So, the files you want to hash, just add them in .fileHashes in the same folder as .gitignore
-            //The file should have a list of all files to hash (1 filename per line)
-            //Example:
-            //.gitignore
-            // README.md
-            // view.html
-            // view.json
-            $filesToHash = [];
-            if ($this->localContent->fileExists($moduleLocation . '.fileHashes')) {
-                $filesToHash = $this->localContent->read($moduleLocation . '.fileHashes');
-
-                if ($filesToHash && $filesToHash !== '') {
-                    $filesToHash = str_replace("'", '', $filesToHash);
-                    $filesToHash = explode(PHP_EOL, $filesToHash);
-                }
-            }
+            $moduleLocationFiles['files'] = [];
 
             if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
-                $moduleLocation = $this->getModuleFilesLocation($module, true);
+                $moduleLocations = [$this->getModuleFilesLocation($module), $this->getModuleFilesLocation($module, true)];
+            } else {
+                $moduleLocations = [$this->getModuleFilesLocation($module)];
+            }
 
-                $viewFiles = $this->basepackages->utils->scanDir($moduleLocation, true, ['.git/', '.fileHashes']);
-
-                if ($viewFiles && count($viewFiles['files']) > 0) {
-                    $moduleFiles['files'] = array_merge($moduleFiles['files'], $viewFiles['files']);
-                }
-
+            foreach ($moduleLocations as $moduleLocation) {
                 if ($this->localContent->fileExists($moduleLocation . '.fileHashes')) {
-                    $viewFilesToHash = $this->localContent->read($moduleLocation . '.fileHashes');
+                    $filesToHash = $this->localContent->read($moduleLocation . '.fileHashes');
 
-                    if ($viewFilesToHash && $viewFilesToHash !== '') {
-                        $viewFilesToHash = str_replace("'", '', $viewFilesToHash);
-                        $viewFilesToHash = explode(PHP_EOL, $viewFilesToHash);
+                    if ($filesToHash && $filesToHash !== '') {
+                        $filesToHash = str_replace("'", '', $filesToHash);
+                        $filesToHash = explode(PHP_EOL, $filesToHash);
 
-                        if (count($viewFilesToHash) > 0) {
-                            $filesToHash = array_merge($filesToHash, $viewFilesToHash);
+                        if (count($filesToHash) > 0) {
+                            $hashFiles = [];
+
+                            foreach ($filesToHash as $fileToHash) {
+                                if (str_ends_with($fileToHash, '/')) {
+                                    $fileToHashDirList = $this->basepackages->utils->scanDir($moduleLocation . $fileToHash, true);
+
+                                    if ($fileToHashDirList && count($fileToHashDirList['files']) > 0) {
+                                        $hashFiles = array_merge($hashFiles, $fileToHashDirList['files']);
+                                    }
+                                } else {
+                                    array_push($hashFiles, $moduleLocation . $fileToHash);
+                                }
+                            }
+
+                            if (count($hashFiles) > 0) {
+                                $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $hashFiles);
+                            }
                         }
+                    }
+                } else {
+                    $files = $this->basepackages->utils->scanDir(
+                        $moduleLocation,
+                        true,
+                        [
+                            '.git/',
+                            'linter-backup/'
+                        ]
+                    );
+
+                    if ($files && count($files['files']) > 0) {
+                        $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $files['files']);
                     }
                 }
             }
 
-            if ($moduleFiles && count($moduleFiles['files']) > 0) {
-                foreach ($moduleFiles['files'] as $file) {
+            if ($moduleLocationFiles && count($moduleLocationFiles['files']) > 0) {
+                foreach ($moduleLocationFiles['files'] as $file) {
                     $filePath = $file;
 
                     $file = str_replace($moduleLocation, '', $file);
-
-                    if (count($filesToHash) > 0) {
-                        if (!in_array($file, $filesToHash)) {
-                            continue;
-                        }
-                    }
 
                     $hash = hash_file('md5', base_path($filePath));
 
@@ -735,7 +741,7 @@ class DevtoolsModules extends BasePackage
                     ) {
                         $module['isModified'] = true;
 
-                        return $module;
+                        break;
                     }
                 }
             }

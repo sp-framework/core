@@ -255,11 +255,16 @@ class Manager extends BasePackage
                         } else {
                             $module['dependencies'] = $module['repo_details']['latestRelease']['moduleJson']['dependencies'];
                             if ($module['installed'] == '1') {
-                                $module['update_available'] = '1';
-                                $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                                if ($module['repo_details']['latestRelease']['name'] !== $module['version']) {
+                                    $module['update_available'] = '1';
+                                    $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                                } else {
+                                    $module['update_available'] = null;
+                                    $module['update_version'] = null;
+                                }
                             } else {
                                 $module['version'] = $module['repo_details']['latestRelease']['name'];
-                                $module['update_available'] = '0';
+                                $module['update_available'] = null;
                                 $module['update_version'] = null;
                             }
                         }
@@ -299,16 +304,21 @@ class Manager extends BasePackage
                     if ($latestRelease) {
                         $module['repo_details']['latestRelease'] = $latestRelease;
                         if ($module['installed'] == '1') {
-                            $module['update_available'] = '1';
-                            $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                            if ($module['repo_details']['latestRelease']['name'] !== $module['version']) {
+                                $module['update_available'] = '1';
+                                $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                            } else {
+                                $module['update_available'] = null;
+                                $module['update_version'] = null;
+                            }
                         } else {
-                            $module['update_available'] = '0';
+                            $module['update_available'] = null;
+                            $module['update_version'] = null;
                             $module['version'] = $module['repo_details']['latestRelease']['name'];
-                            $module['update_version'] = '-';
                         }
                     } else {
-                        $module['update_available'] = '0';
-                        $module['update_version'] = '-';
+                        $module['update_available'] = null;
+                        $module['update_version'] = null;
                     }
                 } else {
                     $module['repo_details'] = false;
