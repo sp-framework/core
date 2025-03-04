@@ -6851,10 +6851,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     // Control Column
                     if (datatableOptions.rowControls) {
                         listColumns[thisOptions.listOptions.tableName].push({
-                            data        : '__control',
-                            title       : 'ACTIONS',
-                            orderable   : false,
-                            className   : classes
+                            data                : '__control',
+                            title               : 'ACTIONS',
+                            orderable           : false,
+                            className           : classes,
+                            responsivePriority  : -1
                         });
                     }
 
