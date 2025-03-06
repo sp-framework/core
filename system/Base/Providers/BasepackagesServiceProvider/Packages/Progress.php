@@ -606,7 +606,11 @@ class Progress extends BasePackage
                     $file['allProcesses'] = $file['registeredMethods'] = $methods;
                 } else if ($unregister) {
                     $progressFile = $this->readProgressFile();
-                    $file['allProcesses'] = $progressFile['registeredMethods'];
+                    if (isset($progressFile['registeredMethods'])) {
+                        $file['allProcesses'] = $progressFile['registeredMethods'];
+                    } else {
+                        $file['allProcesses'] = $progressFile['allProcesses'];
+                    }
                 }
             }
 
