@@ -146,6 +146,7 @@ class Ff
         $schema['type'] = 'object';
         $schema['properties'] = [];
         $schema['required'] = [];
+        $schema['relations'] = [];
 
         foreach ($tableClass->columns()['columns'] as $column) {
             $schema['properties'][$column->getName()] = [];
@@ -216,11 +217,14 @@ class Ff
                         if ($relation['relationObj']->getReferencedModel() &&
                             is_string($relation['relationObj']->getReferencedModel())
                         ) {
+                            $references[$relationKey]['alias'] = $relationKey;
                             if (isset($relation['relationObj']->getOptions()['alias'])) {
                                 $references[$relationKey]['alias'] = $relation['relationObj']->getOptions()['alias'];
                             }
-
                             switch ($relation['relationObj']->getType()) {
+                                case '0':
+                                    $references[$relationKey]['type'] = 'belongsTo';
+                                    break;
                                 case '1':
                                     $references[$relationKey]['type'] = 'hasOne';
                                     break;
@@ -274,7 +278,7 @@ class Ff
                             }
 
                             if (isset($relation['relationObj']->getOptions()['params'])) {
-                                $references[$relationKey]['params'] = 'hasParams';
+                                $references[$relationKey]['hasParams'] = true;
                             }
                         }
                     }
@@ -282,31 +286,7 @@ class Ff
             }
 
             if (isset($references) && is_array($references)) {
-                foreach ($references as $key => $reference) {
-                    if (isset($reference['alias'])) {
-                        $schema['properties'][$reference['alias']] = [];
-                        $schema['properties'][$reference['alias']]['type'] = ['null','array'];
-
-                        if (isset($reference[0]) && isset($reference[1])) {
-                            if (isset($reference[0]['fields']) && count($reference[0]['fields']) > 0) {
-                                $reference[0]['fields'] = join(':', $reference[0]['fields']);
-                            }
-                            if (isset($reference[1]['fields']) && count($reference[1]['fields']) > 0) {
-                                $reference[1]['fields'] = join(':', $reference[1]['fields']);
-                            }
-
-                            $reference[0] = join('+', $reference[0]);
-                            $reference[1] = join('+', $reference[1]);
-                            $schema['properties'][$reference['alias']]['relation'] = join('|', $reference);
-                        } else {
-                            if (isset($reference['fields']) && count($reference['fields']) > 0) {
-                                $reference['fields'] = join(':', $reference['fields']);
-                            }
-
-                            $schema['properties'][$reference['alias']]['relation'] = join('|', $reference);
-                        }
-                    }
-                }
+                $schema['relations'] = $references;
             }
         }
 
@@ -364,7 +344,6 @@ class Ff
             foreach ($tableClass->columns()['columns'] as $column) {
                 $columns[$column->getName()] = $column;
             }
-
             foreach ($tableClass->indexes() as $index) {
                 if ($index->getType() === 'UNIQUE' && $index->getColumns() && count($index->getColumns()) > 0) {
                     if (isset($config['uniqueFields']) && count($config['uniqueFields']) > 0) {
@@ -378,7 +357,7 @@ class Ff
                     foreach ($index->getColumns() as $indexColumn) {
                         if (isset($columns[$indexColumn])) {
                             if (in_array($columns[$indexColumn]->getType(), $columnsTypeToIndex)) {
-                                $config['indexes'] = array_merge($config['indexes'], $index->getColumns());
+                                array_push($config['indexes'], $indexColumn);
                             }
                         }
                     }

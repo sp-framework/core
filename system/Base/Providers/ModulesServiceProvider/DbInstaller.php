@@ -131,6 +131,11 @@ class DbInstaller extends BasePackage
             }
 
             if (count($storesToIndex) > 0) {
+                //Increase Exectimeout to 1 hour as this process takes time to index
+                if ((int) ini_get('max_execution_time') < 3600) {
+                    set_time_limit(3600);
+                }
+
                 foreach ($storesToIndex as $storeToIndex) {
                     ($this->ff->store($storeToIndex))->reIndexStore();
                 }

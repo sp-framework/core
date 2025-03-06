@@ -108,7 +108,37 @@ var BazHelpers = function() {
                 output += bazCreateHtmlList(obj[k]);
                 output += '</li>';
             } else {
-                output += '<li>' + k + ' : ' + obj[k] + '</li>';
+                if (typeof obj[k] === 'string') {
+                    if (obj[k].startsWith('{')) {
+                        var regex = /{.*}/g;
+
+                        var found = obj[k].match(regex);
+
+                        if (found) {
+                            //eslint-disable-next-line
+                            var data = found[0].replaceAll('\"', '"');
+                            //eslint-disable-next-line
+                            data = data.replaceAll('\\', '\\\\\\\\');
+                            //eslint-disable-next-line
+                            data = data.replaceAll('\\\\\\u0022', '"');
+                            var objObject = JSON.parse(data);
+
+                            if (objObject) {
+                                output += '<li>' + k + ' : ';
+                                output += bazCreateHtmlList(objObject);
+                                output += '</li>';
+                            } else {
+                                output += '<li>' + k + ' : ' + obj[k] + '</li>';
+                            }
+                        } else {
+                            output += '<li>' + k + ' : ' + obj[k] + '</li>';
+                        }
+                    } else {
+                        output += '<li>' + k + ' : ' + obj[k] + '</li>';
+                    }
+                } else {
+                    output += '<li>' + k + ' : ' + obj[k] + '</li>';
+                }
             }
         });
         output += '</ul>';

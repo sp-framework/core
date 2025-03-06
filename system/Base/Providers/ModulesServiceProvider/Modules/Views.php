@@ -359,6 +359,19 @@ class Views extends BasePackage
         return false;
     }
 
+    public function getViewByAppTypeAndName($appType, $name)
+    {
+        foreach($this->views as $view) {
+            if ($view['app_type'] === $appType &&
+                strtolower($name) === strtolower($view['name'])
+            ) {
+                return $view;
+            }
+        }
+
+        return false;
+    }
+
     public function getViewsByApiId($apiId)
     {
         $views = [];

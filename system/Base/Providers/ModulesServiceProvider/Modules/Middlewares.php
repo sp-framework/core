@@ -115,6 +115,19 @@ class Middlewares extends BasePackage
 		return false;
 	}
 
+	public function getMiddlewareByAppTypeAndClass($appType, $class)
+	{
+		foreach($this->middlewares as $middleware) {
+			if ($middleware['app_type'] === $appType &&
+				trim($class, '\\') === trim($middleware['class'], '\\')
+			) {
+				return $middleware;
+			}
+		}
+
+		return false;
+	}
+
 	public function getMiddlewaresByApiId($apiId)
 	{
 		$middlewares = [];

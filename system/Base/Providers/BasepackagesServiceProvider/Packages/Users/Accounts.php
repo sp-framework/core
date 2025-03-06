@@ -26,7 +26,12 @@ class Accounts extends BasePackage
     {
         $this->setFFRelations(true);
 
-        $this->setFFRelationsConditions(['api_clients' => [['account_id', '=', $id], ['revoked', '=', false]]]);
+        $this->setFFRelationsConditions(
+            [
+                'api_clients' => [['revoked', '=', false]],
+                'identifier'  => [['session_id', '=', $this->session->getId()]]
+            ]
+        );
 
         $this->getFirst('id', $id);
 

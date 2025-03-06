@@ -18,7 +18,7 @@ var BazProgress = function() {
     var initialized = false;
     var progressCounter = 0;
     var online = false;
-    var element, manualShowHide, hasChild, hasSubProcess, hasCancelButton;
+    var element, manualShowHide, hasChild, hasSubProcess, hasCancelButton, hasDetails;
     var callableFunc = null;
     var url
     var postData = { };
@@ -68,12 +68,13 @@ var BazProgress = function() {
         console.log('Progress service offline');
     }
 
-    function buildProgressBar(el, mSH = false, hC = false, hSP = false, hCB = true) {
+    function buildProgressBar(el, mSH = false, hC = false, hSP = false, hCB = true, hD = true) {
         element = el;
         manualShowHide = mSH;
         hasChild = hC;
         hasSubProcess = hSP;
         hasCancelButton = hCB;
+        hasDetails = hD;
 
         $(element).html(
             '<div class="progress active progress-xs">' +
@@ -115,17 +116,37 @@ var BazProgress = function() {
             );
         }
 
-        if (hasCancelButton) {
-            $(element).append(
-                '<div class="text-center mt-3" id="' + $(element)[0].id + '-cancel" hidden>' +
-                    '<button class="btn btn-sm btn-secondary mr-1" id="' + $(element)[0].id + '-cancel-button" role="button">' +
-                        'Cancel' +
-                    '</button>' +
-                '</div>'
-            );
+        var buttons = '<div class="row">';
 
-            $('#' + $(element)[0].id + '-cancel').off();
-            $('#' + $(element)[0].id + '-cancel').click(function() {
+        if (hasCancelButton) {
+            buttons +=
+                '<div class="col">' +
+                    '<div class="text-center mt-3" id="' + $(element)[0].id + '-cancel" hidden>' +
+                        '<button class="text-uppercase btn btn-sm btn-secondary mr-1" id="' + $(element)[0].id + '-cancel-button" role="button">' +
+                            'Cancel' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+        }
+
+        if (hasDetails) {
+            buttons +=
+                '<div class="col">' +
+                    '<div class="text-center mt-3" id="' + $(element)[0].id + '-details">' +
+                        '<button class="text-uppercase btn btn-sm btn-primary mr-1" id="' + $(element)[0].id + '-details-button" role="button">' +
+                            'Show Details' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+        }
+
+        buttons += '</div>';
+
+        $(element).append(buttons);
+
+        if (hasCancelButton) {
+            $('#' + $(element)[0].id + '-cancel-button').off();
+            $('#' + $(element)[0].id + '-cancel-button').click(function() {
                 if (pid > 0) {
                     Swal.fire({
                         title                       : '<span class="text-danger"> Cancel current process?</span>',
@@ -165,6 +186,8 @@ var BazProgress = function() {
                                         'title' : response.responseMessage
                                     });
 
+                                    $('body').trigger('bazProgressCancelled');
+
                                     resetProgressCounter();
                                 } else {
                                     paginatedPNotify('error', {
@@ -177,6 +200,32 @@ var BazProgress = function() {
                 }
             });
         }
+
+        if (hasDetails) {
+            $('#' + $(element)[0].id + '-details-button').off();
+            $('#' + $(element)[0].id + '-details-button').click(function() {
+                var text = $('#' + $(element)[0].id + '-details-button').text().toLowerCase();
+
+                if (text === 'show details') {
+                    $('#' + $(element)[0].id + '-details-button').text('Hide details');
+                    $('#details-div').attr('hidden', false);
+                } else if (text === 'hide details') {
+                    $('#' + $(element)[0].id + '-details-button').text('Show details');
+                    $('#details-div').attr('hidden', true);
+                }
+            });
+
+            $(element).append(
+                '<div class="row" id="details-div" hidden>' +
+                    '<div class="col">' +
+                        '<div class="form-group">' +
+                            '<label class="text-uppercase text-xs" for="username">Progress Details</label>' +
+                            '<div id="details-data" class="height-control-400 overflow-scroll"></div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>'
+            );
+        }
     }
 
     function getProgress(options) {
@@ -185,6 +234,7 @@ var BazProgress = function() {
         if (callableFunc && callableFunc['beforeStart']) {
             if (callableFunc['beforeStart']() === false) {
                 resetProgressCounter();
+
                 return;
             }
         }
@@ -217,6 +267,7 @@ var BazProgress = function() {
         if (callableFunc && callableFunc['beforeProcess']) {
             if (callableFunc['beforeProcess'](response) === false) {
                 resetProgressCounter();
+
                 return;
             }
         }
@@ -235,6 +286,8 @@ var BazProgress = function() {
                 if (responseData['pid']) {
                     $('#' + $(element)[0].id + '-cancel').attr('hidden', false);
                     pid = responseData['pid'];
+
+                    $('#details-data').html('PID running : Progress is running with process ID: ' + pid + '<br>');
                 }
 
                 if (responseData['progressFile']) {
@@ -242,11 +295,55 @@ var BazProgress = function() {
                 }
 
                 if (responseData['preCheckComplete'] == false ||
-                    (responseData['callResult'] && responseData['callResult'] === 'reset')
+                    (responseData['callResult'] && responseData['callResult'] === 'reset') ||
+                    (responseData['callResult'] && responseData['callResult'] === 'pid_running')
                 ) {
-                    resetProgressCounter();
+                    if (responseData['errors']) {
+                        $('#details-div').attr('hidden', false);
+                        var html = responseData['errors'];
+                        var regex = /{.*}/g;
+                        var found = html.match(regex);
+
+                        if (found) {
+                            //eslint-disable-next-line
+                            var data = found[0].replaceAll('\"', '"');
+                            //eslint-disable-next-line
+                            data = data.replaceAll('\\', '\\\\\\\\');
+                            //eslint-disable-next-line
+                            data = data.replaceAll('\\\\\\u0022', '"');
+                            var obj = JSON.parse(data);
+
+                            if (obj) {
+                                $('#details-data').html(
+                                    '<div class="text-danger">' +
+                                        BazHelpers.createHtmlList({'obj': obj}));
+                                    '</div>'
+                            }
+                        } else {
+                            $('#details-data').html(html);
+                        }
+
+                        $('#details-data').scrollTop($('#details-data')[0].scrollHeight);
+                    }
+
+                    if (responseData['callResult'] === 'pid_running') {
+                        $('#' + $(element)[0].id).attr('hidden', false);
+                        $('#' + $(element)[0].id + '-cancel').attr('hidden', false);
+                        $('#' + $(element)[0].id + '-cancel-button').text('Cancel Process: ' + responseData['pid']);
+                    }
+
+                    if (responseData['callResult'] && responseData['callResult'] === 'reset') {
+                        if (!responseData['errors']) {
+                            resetProgressCounter();
+                        }
+                    }
 
                     return false;
+                }
+
+                if (responseData['details']) {
+                    var pidHtml = $('#details-data').html();
+                    $('#details-data').html(pidHtml + BazHelpers.createHtmlList({'obj': responseData['details']}));
                 }
 
                 if (responseData['total'] !== 'undefined' && responseData['completed'] !== 'undefined') {
@@ -446,12 +543,16 @@ var BazProgress = function() {
                 responseData['runners']['running']['remoteWebCounters']['downloadTotal'] > 0
             ) {
                 isDownload = true;
+                isUpload = false;
+                isSteps = false;
                 downloadTotal = responseData['runners']['running']['remoteWebCounters']['downloadTotal'];
                 downloadedBytes = responseData['runners']['running']['remoteWebCounters']['downloadedBytes'];
             } else if (responseData['runners']['running']['remoteWebCounters']['uploadTotal'] &&
                 responseData['runners']['running']['remoteWebCounters']['uploadTotal'] > 0
             ) {
                 isUpload = true;
+                isDownload = false;
+                isSteps = false;
                 uploadTotal = responseData['runners']['running']['remoteWebCounters']['uploadTotal'];
                 uploadedBytes = responseData['runners']['running']['remoteWebCounters']['uploadedBytes'];
             }
@@ -460,6 +561,8 @@ var BazProgress = function() {
                 responseData['runners']['running']['stepsCounters']['stepsTotal'] > 0
             ) {
                 isSteps = true;
+                isDownload = false;
+                isUpload = false;
                 stepsTotal = responseData['runners']['running']['stepsCounters']['stepsTotal'];
                 stepsCurrent = responseData['runners']['running']['stepsCounters']['stepsCurrent'];
             }
@@ -478,7 +581,7 @@ var BazProgress = function() {
         return text;
     }
 
-    function resetProgressCounter() {
+    function resetProgressCounter(hideDiv = true) {
         if (progressCounter !== 60) {
             progressCounter ++;
 
@@ -490,10 +593,14 @@ var BazProgress = function() {
             }
         }
 
-        $('#' + $(element)[0].id).attr('hidden', true);
+        if (hideDiv) {
+            $('#' + $(element)[0].id).attr('hidden', true);
+            $('#details-div').attr('hidden', true);
+        }
         $('.' + $(element)[0].id + '-bar').css('width', '0%');
         $('.' + $(element)[0].id + '-bar').attr('aria-valuenow', 0);
         switchProgressBarColor('.' + $(element)[0].id + '-bar', 'info');
+        $('#' + $(element)[0].id + '-cancel-button').text('Cancel');
         downloadTotal = 0;
         downloadedBytes = 0;
         uploadTotal = 0;
@@ -543,8 +650,8 @@ var BazProgress = function() {
                 getProgress(options);
             }
         }
-        BazProgress.buildProgressBar = function(el, mSH = false, child = false, hasSubProcess = false, hasCancelButton = true) {
-            buildProgressBar(el, mSH, child, hasSubProcess, hasCancelButton);
+        BazProgress.buildProgressBar = function(el, mSH = false, child = false, hasSubProcess = false, hasCancelButton = true, hasDetails = true) {
+            buildProgressBar(el, mSH, child, hasSubProcess, hasCancelButton, hasDetails);
         }
         BazProgress.switchProgressBarColor = function(el, color) {
             switchProgressBarColor(el, color);

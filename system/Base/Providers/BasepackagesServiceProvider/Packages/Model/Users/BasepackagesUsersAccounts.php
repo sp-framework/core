@@ -70,7 +70,13 @@ class BasepackagesUsersAccounts extends BaseModel
             BasepackagesUsersAccountsIdentifiers::class,
             ['account_id', 'session_id'],
             [
-                'alias'         => 'identifier'
+                'alias'         => 'identifier',
+                'params'        => [
+                    'conditions'    => 'session_id = :session_id:',
+                    'bind'          => [
+                        'session_id'       => $this->getDi()->getShared('session')->getId()
+                    ]
+                ]
             ]
         );
 
@@ -124,9 +130,8 @@ class BasepackagesUsersAccounts extends BaseModel
             [
                 'alias'         => 'api_clients',
                 'params'        => [
-                    'conditions'    => 'account_id = :account_id: AND revoked = :revoked:',
+                    'conditions'    => 'revoked = :revoked:',
                     'bind'          => [
-                        'account_id'    => $account_id,
                         'revoked'       => '0'
                     ]
                 ]

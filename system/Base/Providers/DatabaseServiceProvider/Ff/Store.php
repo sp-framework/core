@@ -53,6 +53,8 @@ class Store
 
     protected $storeSchema = [];
 
+    protected $relationStores = [];
+
     public $data;
 
     protected $ff;
@@ -83,12 +85,14 @@ class Store
 
         $this->indexesPath = $this->databasePath . $this->storeName . 'indexes/';
 
-        $this->setConfigurationAndSchema($configuration, $schema);
-
         $this->createDatabasePath();
 
         if (count($schema) > 0) {
+            $this->setConfigurationAndSchema($configuration, $schema, true);
+
             $this->createStore($configuration, $schema);
+        } else {
+            $this->setConfigurationAndSchema($configuration, $schema);
         }
     }
 
@@ -289,7 +293,7 @@ class Store
         return $this->storeName;
     }
 
-    public function findAll(array $orderBy = null, int $limit = null, int $offset = null): array
+    public function findAll(array $orderBy = null, int $limit = null, int $offset = null, $getRelations = false, $relationsConditions = false): array
     {
         try {
             $qb = $this->createQueryBuilder();
@@ -305,8 +309,17 @@ class Store
             if (!is_null($offset)) {
                 $qb->skip($offset);
             }
+            $dataArr = $qb->getQuery()->fetch();
 
-            $this->data = $qb->getQuery()->fetch();
+            if ($dataArr && count($dataArr) > 0) {
+                if ($getRelations) {
+                    foreach ($dataArr as &$data) {
+                        $data = $this->getRelations($data, $relationsConditions);
+                    }
+                }
+            }
+
+            $this->data = $dataArr;
         } catch (\Exception $e) {
             throw $e;
         }
@@ -335,7 +348,7 @@ class Store
         return $data;
     }
 
-    public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null): array
+    public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null, $getRelations = false, $relationsConditions = false): array
     {
         try {
             $qb = $this->createQueryBuilder();
@@ -352,7 +365,17 @@ class Store
                 $qb->skip($offset);
             }
 
-            $this->data = $qb->getQuery()->fetch();
+            $dataArr = $qb->getQuery()->fetch();
+
+            if ($dataArr && count($dataArr) > 0) {
+                if ($getRelations) {
+                    foreach ($dataArr as &$data) {
+                        $data = $this->getRelations($data, $relationsConditions);
+                    }
+                }
+            }
+
+            $this->data = $dataArr;
         } catch (\Exception $e) {
             throw $e;
         }
@@ -979,137 +1002,132 @@ class Store
             $schema = json_decode($this->storeSchema, true);
         }
 
-        if (isset($schema['properties']) && count($schema['properties']) > 0) {
-            foreach ($schema['properties'] as $propertyKey => $property) {
-                if (!is_array($property['type'])) {
-                    continue;
+        if (!isset($schema['relations']) ||
+            isset($schema['relations']) && count($schema['relations']) === 0
+        ) {
+            return true;
+        }
+
+        foreach ($schema['relations'] as $relationKey => $relation) {
+            if ($relation['type'] === 'belongsTo') {//We dont want to get relations if it belongs to. This will cause infinite loop!
+                continue;
+            }
+
+            if ((isset($relation['hasParams']) &&
+                 $relationsConditions &&
+                 count($relationsConditions) === 0
+                ) ||
+                (isset($relation['hasParams']) &&
+                 $relationsConditions &&
+                 count($relationsConditions) > 0 &&
+                 !isset($relationsConditions[$relation['alias']])
+                )
+            ) {
+                throw new InvalidArgumentException('Model has params(conditions) set for ' . $relation['type'] . '. Please set ffRelationsConditions. Please refer to model file.');
+            }
+
+            if ($relation['type'] === 'hasOne' || $relation['type'] === 'hasMany') {
+                if (isset($relation['fields']) &&
+                    count($relation['fields']) > 0 &&
+                    count($relation['fields']) % 2 == 0
+                ) {
+                    $fieldsArr = $this->ff->helper->chunk($relation['fields'], 2);
+
+                    $criteria = [];
+
+                    if (count($fieldsArr) === 1) {
+                        foreach ($fieldsArr as $fieldArr) {
+                            array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
+                        }
+                    } else {
+                        foreach ($fieldsArr as $fieldArrKey => $fieldArr) {
+                            array_push($criteria, [$fieldArr[$fieldArrKey], '=', $data[$fieldArr[$fieldArrKey]]]);
+                        }
+                    }
+
+                    if (isset($relationsConditions[$relation['alias']])) {//Relation with condition
+                        $criteria = array_merge($criteria, $relationsConditions[$relation['alias']]);
+                    }
+
+                    try {
+                        $directRelationStoreData = $this->relationStores[$relation['table']]->findBy($criteria);
+
+                        if ($directRelationStoreData && count($directRelationStoreData) > 0) {
+                            if ($relation['type'] === 'hasOne') {
+                                $data[$relation['alias']] = $directRelationStoreData[0];
+                            } else if ($relation['type'] === 'hasMany') {
+                                $data[$relation['alias']] = $directRelationStoreData;
+                            }
+                        } else {
+                            $data[$relation['alias']] = null;
+                        }
+                    } catch (\Exception $e) {
+                        continue;
+                    }
                 }
+            } else if ($relation['type'] === 'hasOneThrough' || $relation['type'] === 'hasManyThrough') {
+                if (isset($relation[0]['fields']) &&
+                    count($relation[0]['fields']) > 0 &&
+                    count($relation[0]['fields']) % 2 == 0
+                ) {
+                    $fieldsArr = $this->ff->helper->chunk($relation[0]['fields'], 2);
 
-                if (in_array('array', $property['type']) && isset($property['relation'])) {
-                    $relation = explode('|', $property['relation']);
+                    $criteria = [];
 
-                    if (count($relation) > 0) {
-                        if ($relation[1] === 'hasOne' || $relation[1] === 'hasMany') {
+                    if (count($fieldsArr) === 1) {
+                        foreach ($fieldsArr as $fieldArr) {
+                            array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
+                        }
+                    } else {
+                        foreach ($fieldsArr as $fieldArrKey => $fieldArr) {
+                            array_push($criteria, [$fieldArr[$fieldArrKey], '=', $data[$fieldArr[$fieldArrKey]]]);
+                        }
+                    }
 
-                            if ((in_array('hasParams', $relation) && $relationsConditions && count($relationsConditions) === 0) ||
-                                (in_array('hasParams', $relation) && $relationsConditions && count($relationsConditions) > 0 && !isset($relationsConditions[$relation[0]]))
+                    if (isset($relationsConditions[$relation['alias']])) {//Relation with condition
+                        $criteria = array_merge($criteria, $relationsConditions[$relation['alias']]);
+                    }
+
+                    try {
+                        $intermediateStoreDataArr = $this->relationStores[$relation[0]['table']]->findBy($criteria);
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+
+                    if (!$intermediateStoreDataArr) {
+                        continue;
+                    }
+
+                    if (count($intermediateStoreDataArr) > 0) {
+                        foreach ($intermediateStoreDataArr as $intermediateStoreData) {
+                            if (isset($relation[1]['fields']) &&
+                                count($relation[1]['fields']) > 0 &&
+                                count($relation[1]['fields']) % 2 == 0
                             ) {
-                                throw new InvalidArgumentException('Model has params(conditions) set for ' . $relation[0] . '. Please set ffRelationsConditions. Please refer to model file.');
-                            }
+                                $fieldsArr = $this->ff->helper->chunk($relation[1]['fields'], 2);
 
-                            if (isset($relation[4])) {
-                                if (isset($relationsConditions[$relation[0]])) {
-                                    try {
-                                        $store = new Store($relation[2], $this->databasePath, $this->ff);
-
-                                        $storeData = $store->findBy($relationsConditions[$relation[0]]);
-
-                                        if ($storeData && count($storeData) > 0) {
-                                            if ($relation[1] === 'hasOne') {
-                                                $data[$relation[0]] = $storeData[0];
-                                            } else if ($relation[1] === 'hasMany') {
-                                                $data[$relation[0]] = $storeData;
-                                            }
-                                        } else {
-                                            $data[$relation[0]] = null;
-                                        }
-                                    } catch (\Exception $e) {
-                                        continue;
-                                    }
-                                } else {
-                                    $fields = explode(':', $relation[4]);
-
-                                    if (count($fields) > 0 && count($fields) % 2 == 0) {
-                                        $fieldsArr = $this->ff->helper->chunk($fields, 2);
-                                        $criteria = [];
-
-                                        foreach ($fieldsArr as $fieldArr) {
-                                            array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
-                                        }
-
-                                        try {
-                                            $store = new Store($relation[2], $this->databasePath, $this->ff);
-
-                                            $storeData = $store->findBy($criteria);
-
-                                            if ($storeData && count($storeData) > 0) {
-                                                if ($relation[1] === 'hasOne') {
-                                                    $data[$relation[0]] = $storeData[0];
-                                                } else if ($relation[1] === 'hasMany') {
-                                                    $data[$relation[0]] = $storeData;
-                                                }
-                                            } else {
-                                                $data[$relation[0]] = null;
-                                            }
-                                        } catch (\Exception $e) {
-                                            continue;
-                                        }
-                                    }
-                                }
-                            }
-                        } else if ($relation[1] === 'hasOneThrough' || $relation[1] === 'hasManyThrough') {
-                            if (isset($relation[2]) && isset($relation[3])) {
-                                $relation[2] = explode('+', $relation[2]);
-                                $relation[3] = explode('+', $relation[3]);
-                            }
-
-                            if (isset($relation[2][2]) && isset($relation[3][2])) {
-                                $intermediateFields = explode(':', $relation[2][2]);
-                                $fields = explode(':', $relation[3][2]);
-                            }
-
-                            if ((count($intermediateFields) > 0 && count($intermediateFields) % 2 == 0) &&
-                                (count($fields) > 0 && count($fields) % 2 == 0)
-                            ) {
-                                $fieldsArr = $this->ff->helper->chunk($intermediateFields, 2);
                                 $criteria = [];
-
                                 if (count($fieldsArr) === 1) {
                                     foreach ($fieldsArr as $fieldArr) {
-                                        array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
+                                        array_push($criteria, [$fieldArr[1], '=', $intermediateStoreData[$fieldArr[0]]]);
                                     }
                                 } else {
                                     foreach ($fieldsArr as $fieldArrKey => $fieldArr) {
-                                        array_push($criteria, [$fieldArr[$fieldArrKey], '=', $data[$fieldArr[$fieldArrKey]]]);
+                                        array_push($criteria, [$fieldArr[$fieldArrKey], '=', $intermediateStoreData[$fieldArr[$fieldArrKey]]]);
                                     }
                                 }
 
                                 try {
-                                    $store = new Store($relation[2][0], $this->databasePath, $this->ff);
+                                    $finalRelationStoreData = $this->relationStores[$relation[1]['table']]->findBy($criteria);
 
-                                    $storeData = $store->findOneBy($criteria);
-
-                                    $fieldsArr = $this->ff->helper->chunk($fields, 2);
-                                    $criteria = [];
-
-                                    if ($storeData && count($storeData) > 0) {
-                                        if (count($fieldsArr) === 1) {
-                                            foreach ($fieldsArr as $fieldArr) {
-                                                array_push($criteria, [$fieldArr[1], '=', $storeData[$fieldArr[0]]]);
-                                            }
-                                        } else {
-                                            foreach ($fieldsArr as $fieldArrKey => $fieldArr) {
-                                                array_push($criteria, [$fieldArr[$fieldArrKey], '=', $storeData[$fieldArr[$fieldArrKey]]]);
-                                            }
-                                        }
-                                    }
-
-                                    if (count($criteria) > 0) {
-                                        $store = new Store($relation[3][0], $this->databasePath, $this->ff);
-
-                                        $storeData = $store->findBy($criteria);
-
-                                        if ($storeData && count($storeData) > 0) {
-                                            if ($relation[1] === 'hasOneThrough') {
-                                                $data[$relation[0]] = $storeData[0];
-                                            } else if ($relation[1] === 'hasManyThrough') {
-                                                $data[$relation[0]] = $storeData;
-                                            }
-                                        } else {
-                                            $data[$relation[0]] = null;
+                                    if ($finalRelationStoreData && count($finalRelationStoreData) > 0) {
+                                        if ($relation['type'] === 'hasOneThrough') {
+                                            $data[$relation['alias']] = $finalRelationStoreData[0];
+                                        } else if ($relation['type'] === 'hasManyThrough') {
+                                            $data[$relation['alias']] = $finalRelationStoreData;
                                         }
                                     } else {
-                                        $data[$relation[0]] = null;
+                                        $data[$relation['alias']] = null;
                                     }
                                 } catch (\Exception $e) {
                                     continue;
@@ -1188,8 +1206,9 @@ class Store
         IoHelper::createFolder($this->databasePath, $this->folderPermissions);
     }
 
-    protected function setConfigurationAndSchema(array $configuration = [], array $schema = [])
+    protected function setConfigurationAndSchema(array $configuration = [], array $schema = [], $createStore = false)
     {
+        //Configuration
         if (count($configuration) === 0 || !array_key_exists('primary_key', $configuration)) {
             if (file_exists($this->storePath . 'config.json')) {
                 if (isset($configuration['auto_cache'])) {
@@ -1199,8 +1218,10 @@ class Store
                     $cacheLifetime = $configuration['cache_lifetime'];
                 }
 
-                $configuration = IoHelper::getFileContent($this->storePath . 'config.json');
-                $configuration = json_decode($configuration, true);
+                $oldConfiguration = IoHelper::getFileContent($this->storePath . 'config.json');
+                $oldConfiguration = json_decode($oldConfiguration, true);
+
+                $configuration = array_replace($oldConfiguration, $configuration);
 
                 if (isset($autoCache)) {
                     $configuration['auto_cache'] = $autoCache;
@@ -1209,19 +1230,6 @@ class Store
                     $configuration['cache_lifetime'] = $cacheLifetime;
                 }
             }
-        }
-
-        if (count($schema) === 0) {
-            if (file_exists($this->storePath . 'schema.json')) {
-                $schema = IoHelper::getFileContent($this->storePath . 'schema.json');
-                $schema = json_decode($schema, true);
-            }
-
-            if (count($schema) > 0) {
-                $this->storeSchema = json_encode($schema);
-            }
-        } else {
-            $this->storeSchema = json_encode($schema);
         }
 
         if (array_key_exists("min_index_chars", $configuration)) {
@@ -1251,7 +1259,6 @@ class Store
 
             $this->minMultiWordsChars = $configuration["minMultiWordsChars"];
         }
-
 
         if (array_key_exists("indexes", $configuration)) {
             if (!is_array($configuration["indexes"])) {
@@ -1360,6 +1367,38 @@ class Store
         }
 
         $this->storeConfiguration();
+
+        //Schema
+        if (count($schema) === 0) {
+            if (file_exists($this->storePath . 'schema.json')) {
+                $oldSchema = IoHelper::getFileContent($this->storePath . 'schema.json');
+                $oldSchema = json_decode($oldSchema, true);
+                $schema = array_replace($oldSchema, $schema);
+            }
+        }
+
+        if (!$createStore &&
+            isset($schema['relations']) && count($schema['relations']) > 0
+        ) {
+            foreach ($schema['relations'] as $relation) {
+                if ($relation['type'] === 'belongsTo') {
+                    continue;
+                }
+
+                if (isset($relation['table'])) {
+                    $this->relationStores[$relation['table']] = new Store($relation['table'], $this->databasePath, $this->ff);
+                } else if (isset($relation[0]) && isset($relation[1])) {
+                    if (!isset($this->relationStores[$relation[0]['table']])) {
+                        $this->relationStores[$relation[0]['table']] = new Store($relation[0]['table'], $this->databasePath, $this->ff);
+                    }
+                    if (!isset($this->relationStores[$relation[1]['table']])) {
+                        $this->relationStores[$relation[1]['table']] = new Store($relation[1]['table'], $this->databasePath, $this->ff);
+                    }
+                }
+            }
+        }
+
+        $this->storeSchema = json_encode($schema);
     }
 
     protected function storeConfiguration()
@@ -1764,5 +1803,17 @@ class Store
         (new IndexHandler($this->storeConfiguration))->reIndex();
 
         return $this;
+    }
+
+    public function getIndexing()
+    {
+        return $this->indexing;
+    }
+
+    public function setIndexing($indexing = true)
+    {
+        $this->indexing = $indexing;
+
+        return $this->getIndexing();
     }
 }

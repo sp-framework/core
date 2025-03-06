@@ -181,7 +181,7 @@ class MiddlewaresServiceProvider extends Injectable
 
     protected function componentsNeedsAuth()
     {
-        $componentsArr = $this->modules->components->getComponentsForAppType($this->data['app']['app_type']);
+        $componentsArr = $this->modules->components->getComponentsForAppType($this->data['app']['app_type'], true);
 
         foreach ($componentsArr as $key => $componentValue) {
             $match = false;

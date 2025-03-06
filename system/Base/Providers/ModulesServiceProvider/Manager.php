@@ -233,6 +233,12 @@ class Manager extends BasePackage
 
                 $latestRelease = $this->moduleNeedsUpgrade($responseArr, $module);
 
+                if (!$latestRelease &&
+                    (isset($data['getLatestRelease']) && $data['getLatestRelease'] === true)
+                ) {
+                    $latestRelease = $this->getLatestRelease($module['repo_details']['details']);
+                }
+
                 if ($latestRelease) {
                     $module['repo_details']['latestRelease'] = $latestRelease;
                     $latestReleaseJson = $this->getRemoteModuleJson($module['module_type'], $module, true);
@@ -249,11 +255,16 @@ class Manager extends BasePackage
                         } else {
                             $module['dependencies'] = $module['repo_details']['latestRelease']['moduleJson']['dependencies'];
                             if ($module['installed'] == '1') {
-                                $module['update_available'] = '1';
-                                $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                                if ($module['repo_details']['latestRelease']['name'] !== $module['version']) {
+                                    $module['update_available'] = '1';
+                                    $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                                } else {
+                                    $module['update_available'] = null;
+                                    $module['update_version'] = null;
+                                }
                             } else {
                                 $module['version'] = $module['repo_details']['latestRelease']['name'];
-                                $module['update_available'] = '0';
+                                $module['update_available'] = null;
                                 $module['update_version'] = null;
                             }
                         }
@@ -293,16 +304,21 @@ class Manager extends BasePackage
                     if ($latestRelease) {
                         $module['repo_details']['latestRelease'] = $latestRelease;
                         if ($module['installed'] == '1') {
-                            $module['update_available'] = '1';
-                            $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                            if ($module['repo_details']['latestRelease']['name'] !== $module['version']) {
+                                $module['update_available'] = '1';
+                                $module['update_version'] = $module['repo_details']['latestRelease']['name'];
+                            } else {
+                                $module['update_available'] = null;
+                                $module['update_version'] = null;
+                            }
                         } else {
-                            $module['update_available'] = '0';
+                            $module['update_available'] = null;
+                            $module['update_version'] = null;
                             $module['version'] = $module['repo_details']['latestRelease']['name'];
-                            $module['update_version'] = '-';
                         }
                     } else {
-                        $module['update_available'] = '0';
-                        $module['update_version'] = '-';
+                        $module['update_available'] = null;
+                        $module['update_version'] = null;
                     }
                 } else {
                     $module['repo_details'] = false;
@@ -621,7 +637,17 @@ class Manager extends BasePackage
             }
 
             try {
-                $modulesArr = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+                $page = 1;
+                $getRemoteModules = [];
+                $modulesArr = [];
+                while ($getRemoteModules !== false) {
+                    $args['page'] = $page;
+                    $getRemoteModules = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+                    if ($getRemoteModules) {
+                        $modulesArr = array_merge($modulesArr, $getRemoteModules);
+                    }
+                    $page++;
+                }
             } catch (\throwable | ClientException $e) {
                 $this->addResponse($e->getMessage(), 1);
 

@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set changesHtml = '' %}
 {% if modules|length > 0 %}
     {% for moduleType, modulesArr in modules %}
@@ -11,8 +11,14 @@
                     '</button>'
                 %}
                 {% set moduleUrl = '-' %}
-                {% if moduleArr['repoExists'] != false and moduleArr['repo_details']['details']['html_url'] is defined %}
-                    {% set moduleUrl = '<a href="' ~  moduleArr['repo_details']['details']['html_url'] ~ '" target="blank">' ~  moduleArr['repo_details']['details']['html_url'] %}
+                {% set moduleVersion = '-' %}
+                {% if moduleArr['repoExists'] != false %}
+                    {% if moduleArr['repo_details']['details']['html_url'] is defined %}
+                        {% set moduleUrl = '<a href="' ~  moduleArr['repo_details']['details']['html_url'] ~ '" target="blank">' ~  moduleArr['repo_details']['details']['html_url'] %}
+                    {% endif %}
+                    {% if moduleArr['repo_details']['latestRelease'] is defined %}
+                        {% set moduleVersion = moduleArr['repo_details']['latestRelease']['name'] %}
+                    {% endif %}
                 {% endif %}
                 {% set moduleModified = '-' %}
                 {% if moduleArr['isModified'] != false %}
@@ -22,6 +28,7 @@
                 '           <td>' ~ moduleArr['name'] ~ '</td>' ~
                 '           <td>' ~ moduleArr['module_type'] ~ '</td>' ~
                 '           <td>' ~ moduleUrl ~ '</td>' ~
+                '           <td>' ~ moduleVersion ~ '</td>' ~
                 '           <td>' ~ moduleModified ~ '</td>' ~
                 '           <td id="{{componentId}}-{{sectionId}}-changes-modules-' ~ moduleArr['name'] ~ '">' ~  moduleEdit ~ '</td>' ~
                 '       </tr>' %}
@@ -61,6 +68,7 @@
                         <th class="text-uppercase">Name</th>
                         <th class="text-uppercase">Module Type</th>
                         <th class="text-uppercase">Repository</th>
+                        <th class="text-uppercase">Latest Version</th>
                         <th class="text-uppercase">Modified</th>
                         <th class="text-uppercase">Edit</th>
                     </tr>
@@ -107,6 +115,7 @@ dataCollectionSectionForm['funcs']['init'] = function() {
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-changes-table')) {
         $('#{{componentId}}-{{sectionId}}-changes-table').DataTable({
             columns: [
+                null,
                 null,
                 null,
                 null,
@@ -199,3 +208,4 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
+<!-- htmlmin:ignore -->

@@ -55,8 +55,9 @@ class DocumentFinder
         $skip = $queryBuilderProperties["skip"];
         $limit = $queryBuilderProperties["limit"];
         $fieldsToExclude = $queryBuilderProperties["fieldsToExclude"];
-
         unset($queryBuilderProperties);
+
+        $indexSearched = false;
 
         if ($this->storeConfiguration['indexing']) {
             // This has to be rewritten to include multiple keywords using spaces
@@ -66,6 +67,8 @@ class DocumentFinder
                     if (isset($condition[0]) &&
                         in_array($condition[0][0], $this->storeConfiguration['indexes'])
                     ) {
+                        $indexSearched = true;
+
                         $keyword = trim($condition[0][2], '%');//This needs to extend
 
                         if (strlen($keyword) < $this->storeConfiguration['min_index_chars']) {
@@ -84,22 +87,45 @@ class DocumentFinder
                             $indexJson = json_decode($indexFile, true);
 
                             if (count($indexJson) > 0) {
+                                if ($limit && count($indexJson) > 0) {
+                                    self::skip($indexJson, $skip);
+                                    self::limit($indexJson, $limit);
+                                }
+
                                 if (isset($indexJson[strtolower($keyword)])) {
                                     if (count($indexJson[strtolower($keyword)]) === 1) {
-                                        $found[] = $this->store->findById($indexJson[strtolower($keyword)][0]);
+                                        $indexIdData = $this->store->findById($indexJson[strtolower($keyword)][0]);
+
+                                        if ($indexIdData) {
+                                            $found[] = $indexIdData;
+                                        }
                                     } else {
                                         foreach ($indexJson[strtolower($keyword)] as $id) {
-                                            $found[] = $this->store->findById($id);
+                                            $indexIdData = $this->store->findById($id);
+
+                                            if ($indexIdData) {
+                                                $found[] = $indexIdData;
+                                            }
                                         }
                                     }
                                 } else {
                                     foreach ($indexJson as $key => $ids) {
+                                        if ($limit && count($ids) > $limit) {
+
+                                            self::skip($ids, $skip);
+                                            self::limit($ids, $limit);
+                                        }
+
                                         $key = strtolower($key);
 
                                         if (strtolower($condition[0][1]) === 'like') {
                                             if (str_starts_with($key, strtolower($keyword))) {
                                                 foreach ($ids as $id) {
-                                                    $found[] = $this->store->findById($id);
+                                                    $indexIdData = $this->store->findById($id);
+
+                                                    if ($indexIdData) {
+                                                        $found[] = $indexIdData;
+                                                    }
                                                 }
                                             }
                                         } else if ($condition[0][1] === '=' ||
@@ -107,7 +133,11 @@ class DocumentFinder
                                         ) {
                                             if ($key === strtolower($keyword)) {
                                                 foreach ($ids as $id) {
-                                                    $found[] = $this->store->findById($id);
+                                                    $indexIdData = $this->store->findById($id);
+
+                                                    if ($indexIdData) {
+                                                        $found[] = $indexIdData;
+                                                    }
                                                 }
                                             }
                                         }
@@ -122,88 +152,85 @@ class DocumentFinder
             }
         }
 
-        if (count($found) === 0) {
-            if ($handle = opendir($dataPath)) {
-                while (false !== ($entry = readdir($handle))) {
-                    if ($entry === "." || $entry === "..") {
-                        continue;
-                    }
+        if (!$indexSearched && count($found) === 0) {
+            $scanDir = scandir($dataPath);
+            $files = [];
+            array_walk($scanDir, function($file) use (&$files) {
+                if ($file !== '..' && $file !== '.') {
+                    array_push($files, (int) str_replace('.json', '', $file));
+                }
+            });
+            sort($files);
+            if ($limit && count($conditions) === 0 && count($files) > 0) {
+                self::skip($files, $skip);
+                self::limit($files, $limit);
+            }
 
-                    $documentPath = $dataPath . $entry;
+            foreach ($files as $entry) {
+                $documentPath = $dataPath . $entry . '.json';
 
-                    try {
-                        $data = IoHelper::getFileContent($documentPath);
-                    } catch (Exception $exception) {
-                        continue;
-                    }
-
-                    $data = @json_decode($data, true);
-
-                    if (!is_array($data)) {
-                        continue;
-                    }
-
-                    $storePassed = true;
-
-                    if (!empty($conditions)) {
-                        $storePassed = ConditionsHandler::handleWhereConditions($conditions, $data);
-                    }
-
-                    if ($storePassed === true && count($distinctFields) > 0) {
-                        $storePassed = ConditionsHandler::handleDistinct($found, $data, $distinctFields);
-                    }
-
-                    if ($storePassed === true) {
-                        $found[] = $data;
-
-                        if ($getOneDocument === true) {
-                            break;
-                        }
-                    }
+                try {
+                    $data = IoHelper::getFileContent($documentPath);
+                } catch (Exception $exception) {
+                    continue;
                 }
 
-                closedir($handle);
+                $data = @json_decode($data, true);
+
+                if (!is_array($data)) {
+                    continue;
+                }
+
+                $storePassed = true;
+
+                if (!empty($conditions)) {
+                    $storePassed = ConditionsHandler::handleWhereConditions($conditions, $data);
+                }
+
+                if ($storePassed === true && count($distinctFields) > 0) {
+                    $storePassed = ConditionsHandler::handleDistinct($found, $data, $distinctFields);
+                }
+
+                if ($storePassed === true) {
+                    $found[] = $data;
+
+                    if ($getOneDocument === true) {
+                        break;
+                    }
+                }
             }
         }
 
-        if ($reduceAndJoinPossible === true) {
-            DocumentReducer::joinData($found, $listOfJoins);
-        }
-
         if (count($found) > 0) {
+            if ($reduceAndJoinPossible === true) {
+                DocumentReducer::joinData($found, $listOfJoins);
+            }
+
             self::performSearch($found, $search, $searchOptions);
-        }
 
-        if ($reduceAndJoinPossible === true && !empty($groupBy) && count($found) > 0) {
-            DocumentReducer::handleGroupBy(
-                $found,
-                $groupBy,
-                $fieldsToSelect
-            );
-        }
+            if ($reduceAndJoinPossible === true && !empty($groupBy) && count($found) > 0) {
+                DocumentReducer::handleGroupBy(
+                    $found,
+                    $groupBy,
+                    $fieldsToSelect
+                );
+            }
 
-        if ($reduceAndJoinPossible === true && empty($groupBy) && count($found) > 0) {
-            DocumentReducer::selectFields($found, $primaryKey, $fieldsToSelect);
-        }
+            if ($reduceAndJoinPossible === true && empty($groupBy) && count($found) > 0) {
+                DocumentReducer::selectFields($found, $primaryKey, $fieldsToSelect);
+            }
 
-        if (count($found) > 0) {
             self::handleHaving($found, $havingConditions);
-        }
 
-        if ($reduceAndJoinPossible === true && count($found) > 0) {
-            DocumentReducer::excludeFields($found, $fieldsToExclude);
-        }
+            if ($reduceAndJoinPossible === true && count($found) > 0) {
+                DocumentReducer::excludeFields($found, $fieldsToExclude);
+            }
 
-        if (count($found) > 0) {
-            self::sort($found, $orderBy);
-        }
-
-        if (count($found) > 0) {
-            self::skip($found, $skip);
-        }
-
-        if (count($found) > 0) {
-            self::limit($found, $limit);
+            if (!$indexSearched && count($conditions) > 0) {
+                self::sort($found, $orderBy);
+                self::skip($found, $skip);
+                self::limit($found, $limit);
+            }
         }
 
         return $found;

@@ -328,7 +328,11 @@ class Local extends BasePackage
 
     protected function moveFileToLocationAsFileName()
     {
-        $this->file->moveTo(base_path($this->directory . '/' . $this->uuid));
+        if ($this->isPointer === 1) {
+            $this->file->moveTo(base_path($this->directory . '/' . $this->fileName));
+        } else {
+            $this->file->moveTo(base_path($this->directory . '/' . $this->uuid));
+        }
     }
 
     protected function addFileInfoToDb()

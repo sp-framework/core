@@ -42,13 +42,6 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 					return (new ModelsManager())->init();
 				}
 			);
-
-			$container->setShared(
-				'sqlite',
-				function () {
-					return (new Sqlite())->init();
-				}
-			);
 		} else {
 			if ($config->databasetype === 'hybrid') {
 				$container->setShared(
@@ -76,5 +69,12 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 				);
 			}
 		}
+
+		$container->setShared(
+			'sqlite',
+			function () {
+				return (new Sqlite())->init();
+			}
+		);
 	}
 }

@@ -39,27 +39,7 @@ class DevtoolsModules extends BasePackage
 
     public function addModule($data)
     {
-        if ($data['api_id'] != '0' &&
-            ($data['repo'] === 'https://.../' || $data['repo'] === '')
-        ) {
-            $this->addResponse('Repository is not local, please provide correct module repo url.', 1);
-
-            return false;
-        }
-
-        if (!isset($data['module_type']) ||
-            (isset($data['module_type']) &&
-             ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types')
-            )
-        ) {
-            $ignoreChars = [' '];
-        } else {
-            $ignoreChars = [''];
-        }
-
-        if (!checkCtype($data['name'], 'alpha', $ignoreChars)) {
-            $this->addResponse('Name cannot have special chars or numbers.', 1);
-
+        if (!$this->precheck($data)) {
             return false;
         }
 
@@ -111,19 +91,8 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
-        if ($data['module_type'] === 'components') {
-            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndRepoAndRoute';
-            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['route']);
-        } else if ($data['module_type'] === 'packages' || $data['module_type'] === 'middlewares') {
-            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndRepoAndClass';
-            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['class']);
-        } else if ($data['module_type'] === 'views') {
-            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndRepoAndName';
-            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['repo'], $data['name']);
-        }
-
-        if ($module) {
-            $this->addResponse('Module already exists!', 1);
+        if ($this->searchModule($data)) {
+            $this->addResponse('Module already exists! Check name & class', 1);
 
             return false;
         }
@@ -218,27 +187,7 @@ class DevtoolsModules extends BasePackage
 
     public function updateModule($data)
     {
-        if ($data['api_id'] != '0' &&
-            ($data['repo'] === 'https://.../' || $data['repo'] === '')
-        ) {
-            $this->addResponse('Repository is not local, please provide correct module repo url.', 1);
-
-            return false;
-        }
-
-        if (!isset($data['module_type']) ||
-            (isset($data['module_type']) &&
-             ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types')
-            )
-        ) {
-            $ignoreChars = [' '];
-        } else {
-            $ignoreChars = [''];
-        }
-
-        if (!checkCtype($data['name'], 'alpha', $ignoreChars)) {
-            $this->addResponse('Name cannot have special chars or numbers.', 1);
-
+        if (!$this->precheck($data)) {
             return false;
         }
 
@@ -289,6 +238,14 @@ class DevtoolsModules extends BasePackage
                 }
             } else {
                 $module = $this->modules->{$data['module_type']}->getById($data['id']);
+
+                if ($searchModule = $this->searchModule($data)) {
+                    if ($searchModule['id'] !== $module['id']) {
+                        $this->addResponse('Module already exists! Check name & class', 1);
+
+                        return false;
+                    }
+                }
 
                 $module = array_merge($module, $data);
 
@@ -395,6 +352,83 @@ class DevtoolsModules extends BasePackage
         }
 
         $this->addResponse('Error updating Module', 1);
+    }
+
+    protected function precheck($data)
+    {
+        if ($data['api_id'] != '0' &&
+            ($data['repo'] === 'https://.../' || $data['repo'] === '')
+        ) {
+            $this->addResponse('Repository is not local, please provide correct module repo url.', 1);
+
+            return false;
+        }
+
+        if (!isset($data['module_type']) ||
+            (isset($data['module_type']) &&
+             ($data['module_type'] === 'components' || $data['module_type'] === 'apps_types')
+            )
+        ) {
+            $ignoreChars = [' '];
+        } else {
+            $ignoreChars = [''];
+        }
+
+        if (!checkCtype($data['name'], 'alpha', $ignoreChars)) {
+            $this->addResponse('Name cannot have special chars or numbers.', 1);
+
+            return false;
+        }
+
+        if ($data['module_type'] === 'components') {
+            $data = $this->checkAppType($data);
+            $data = $this->checkModuleTypeAndCategory($data);
+            $data['class'] = str_replace('Apps\\' . ucfirst($data['app_type']) . '\\' . ucfirst($data['module_type']) . '\\', '', $data['class']);
+            $data['class'] = str_replace('Component', '', $data['class']);
+            $classArr = explode('\\', $data['class']);
+            array_pop($classArr);
+
+            $routeArr = explode('/', trim($data['route'], '/'));
+            array_walk($routeArr, function(&$route) {
+                $route = ucfirst($route);
+            });
+
+            $compare = array_diff($classArr, $routeArr);
+
+            if (count($compare) > 0) {
+                $this->addResponse('Route and class do not match!', 1);
+
+                return false;
+            }
+        } else if ($data['module_type'] === 'packages' || $data['module_type'] === 'middlewares') {
+            $classArr = explode('\\', $data['class']);
+
+            if (strtolower($this->helper->last($classArr)) !== strtolower($data['name'])) {
+                $this->addResponse('Name and class do not match!', 1);
+
+                return false;
+            }
+        } else if ($data['module_type'] === 'views') {
+            //
+        }
+
+        return true;
+    }
+
+    protected function searchModule($data)
+    {
+        if ($data['module_type'] === 'components') {
+            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndRoute';
+            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['route']);
+        } else if ($data['module_type'] === 'packages' || $data['module_type'] === 'middlewares') {
+            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndClass';
+            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['class']);
+        } else if ($data['module_type'] === 'views') {
+            $moduleMethod = 'get' . ucfirst(substr($data['module_type'], 0, -1)) . 'ByAppTypeAndName';
+            $module = $this->modules->{$data['module_type']}->{$moduleMethod}($data['app_type'], $data['name']);
+        }
+
+        return $module;
     }
 
     public function removeModule($data)
@@ -524,47 +558,54 @@ class DevtoolsModules extends BasePackage
                 $filesHash['module_id'] = $module['id'];
             }
 
-            $moduleLocation = $this->getModuleFilesLocation($module);
-
-            $moduleLocationFiles = $this->basepackages->utils->scanDir($moduleLocation, true, ['.git/', '.fileHashes']);
-
-            //In case you have .gitignore file, it can get complicated to sort which files to hash.
-            //So, the files you want to hash, just add them in .fileHashes in the same folder as .gitignore
-            //The file should have a list of all files to hash (1 filename per line)
-            //Example:
-            //.gitignore
-            // README.md
-            // view.html
-            // view.json
-            $filesToHash = [];
-            if ($this->localContent->fileExists($moduleLocation . '.fileHashes')) {
-                $filesToHash = $this->localContent->read($moduleLocation . '.fileHashes');
-
-                if ($filesToHash && $filesToHash !== '') {
-                    $filesToHash = str_replace("'", '', $filesToHash);
-                    $filesToHash = explode(PHP_EOL, $filesToHash);
-                }
-            }
+            $moduleLocationFiles['files'] = [];
 
             if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
-                $moduleLocation = $this->getModuleFilesLocation($module, true);
+                $moduleLocations = [$this->getModuleFilesLocation($module), $this->getModuleFilesLocation($module, true)];
+            } else {
+                $moduleLocations = [$this->getModuleFilesLocation($module)];
+            }
 
-                $viewFiles = $this->basepackages->utils->scanDir($moduleLocation, true, ['.git/', '.fileHashes']);
-
-                if ($viewFiles && count($viewFiles['files']) > 0) {
-                    $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $viewFiles['files']);
-                }
-
+            foreach ($moduleLocations as $moduleLocation) {
                 if ($this->localContent->fileExists($moduleLocation . '.fileHashes')) {
-                    $viewFilesToHash = $this->localContent->read($moduleLocation . '.fileHashes');
+                    $filesToHash = $this->localContent->read($moduleLocation . '.fileHashes');
 
-                    if ($viewFilesToHash && $viewFilesToHash !== '') {
-                        $viewFilesToHash = str_replace("'", '', $viewFilesToHash);
-                        $viewFilesToHash = explode(PHP_EOL, $viewFilesToHash);
+                    if ($filesToHash && $filesToHash !== '') {
+                        $filesToHash = str_replace("'", '', $filesToHash);
+                        $filesToHash = explode(PHP_EOL, $filesToHash);
 
-                        if (count($viewFilesToHash) > 0) {
-                            $filesToHash = array_merge($filesToHash, $viewFilesToHash);
+                        if (count($filesToHash) > 0) {
+                            $hashFiles = [];
+
+                            foreach ($filesToHash as $fileToHash) {
+                                if (str_ends_with($fileToHash, '/')) {
+                                    $fileToHashDirList = $this->basepackages->utils->scanDir($moduleLocation . $fileToHash, true);
+
+                                    if ($fileToHashDirList && count($fileToHashDirList['files']) > 0) {
+                                        $hashFiles = array_merge($hashFiles, $fileToHashDirList['files']);
+                                    }
+                                } else {
+                                    array_push($hashFiles, $moduleLocation . $fileToHash);
+                                }
+                            }
+
+                            if (count($hashFiles) > 0) {
+                                $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $hashFiles);
+                            }
                         }
+                    }
+                } else {
+                    $files = $this->basepackages->utils->scanDir(
+                        $moduleLocation,
+                        true,
+                        [
+                            '.git/',
+                            'linter-backup/'
+                        ]
+                    );
+
+                    if ($files && count($files['files']) > 0) {
+                        $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $files['files']);
                     }
                 }
             }
@@ -576,12 +617,6 @@ class DevtoolsModules extends BasePackage
                     $filePath = $file;
 
                     $file = str_replace($moduleLocation, '', $file);
-
-                    if (count($filesToHash) > 0) {
-                        if (!in_array($file, $filesToHash)) {
-                            continue;
-                        }
-                    }
 
                     $hash = hash_file('md5', base_path($filePath));
 
@@ -605,17 +640,29 @@ class DevtoolsModules extends BasePackage
             $moduleLocation = $this->getNewFilesLocation($module);
 
             $module['repoExists'] = false;
+            $module['latestRelease'] = false;
             if ($this->localContent->directoryExists($moduleLocation . '.git')) {
-                $module['repoExists'] = true;
-
-                if (!isset($module['repo_details'])) {
-                    $this->modules->manager->getModuleInfo(
+                if ((!isset($module['repo_details']) ||
+                     !isset($module['repo_details']['latestRelease'])) ||
+                    (isset($module['repo_details']['latestRelease']['name']) &&
+                     $module['repo_details']['latestRelease']['name'] !== $module['version'])
+                ) {
+                    $module = $this->modules->manager->getModuleInfo(
                         [
-                            'module_type'   => $module['module_type'],
-                            'module_id'     => $module['id'],
-                            'sync'          => true
+                            'module_type'       => $module['module_type'],
+                            'module_id'         => $module['id'],
+                            'sync'              => true,
+                            'getLatestRelease'  => true
                         ]
                     );
+                }
+
+                $module['repoExists'] = true;
+
+                if (isset($module['repo_details']['latestRelease']['name'])) {
+                    $module['latestRelease'] = $module['repo_details']['latestRelease']['name'];
+                } else {
+                    $module['latestRelease'] = false;
                 }
             }
 
@@ -628,60 +675,63 @@ class DevtoolsModules extends BasePackage
                 return $module;
             }
 
-            $moduleFiles = $this->basepackages->utils->scanDir($moduleLocation, true, ['.git/', '.fileHashes']);
-
-            //In case you have .gitignore file, it can get complicated to sort which files to hash.
-            //So, the files you want to hash, just add them in .fileHashes in the same folder as .gitignore
-            //The file should have a list of all files to hash (1 filename per line)
-            //Example:
-            //.gitignore
-            // README.md
-            // view.html
-            // view.json
-            $filesToHash = [];
-            if ($this->localContent->fileExists($moduleLocation . '.fileHashes')) {
-                $filesToHash = $this->localContent->read($moduleLocation . '.fileHashes');
-
-                if ($filesToHash && $filesToHash !== '') {
-                    $filesToHash = str_replace("'", '', $filesToHash);
-                    $filesToHash = explode(PHP_EOL, $filesToHash);
-                }
-            }
+            $moduleLocationFiles['files'] = [];
 
             if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
-                $moduleLocation = $this->getModuleFilesLocation($module, true);
+                $moduleLocations = [$this->getModuleFilesLocation($module), $this->getModuleFilesLocation($module, true)];
+            } else {
+                $moduleLocations = [$this->getModuleFilesLocation($module)];
+            }
 
-                $viewFiles = $this->basepackages->utils->scanDir($moduleLocation, true, ['.git/', '.fileHashes']);
-
-                if ($viewFiles && count($viewFiles['files']) > 0) {
-                    $moduleFiles['files'] = array_merge($moduleFiles['files'], $viewFiles['files']);
-                }
-
+            foreach ($moduleLocations as $moduleLocation) {
                 if ($this->localContent->fileExists($moduleLocation . '.fileHashes')) {
-                    $viewFilesToHash = $this->localContent->read($moduleLocation . '.fileHashes');
+                    $filesToHash = $this->localContent->read($moduleLocation . '.fileHashes');
 
-                    if ($viewFilesToHash && $viewFilesToHash !== '') {
-                        $viewFilesToHash = str_replace("'", '', $viewFilesToHash);
-                        $viewFilesToHash = explode(PHP_EOL, $viewFilesToHash);
+                    if ($filesToHash && $filesToHash !== '') {
+                        $filesToHash = str_replace("'", '', $filesToHash);
+                        $filesToHash = explode(PHP_EOL, $filesToHash);
 
-                        if (count($viewFilesToHash) > 0) {
-                            $filesToHash = array_merge($filesToHash, $viewFilesToHash);
+                        if (count($filesToHash) > 0) {
+                            $hashFiles = [];
+
+                            foreach ($filesToHash as $fileToHash) {
+                                if (str_ends_with($fileToHash, '/')) {
+                                    $fileToHashDirList = $this->basepackages->utils->scanDir($moduleLocation . $fileToHash, true);
+
+                                    if ($fileToHashDirList && count($fileToHashDirList['files']) > 0) {
+                                        $hashFiles = array_merge($hashFiles, $fileToHashDirList['files']);
+                                    }
+                                } else {
+                                    array_push($hashFiles, $moduleLocation . $fileToHash);
+                                }
+                            }
+
+                            if (count($hashFiles) > 0) {
+                                $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $hashFiles);
+                            }
                         }
+                    }
+                } else {
+                    $files = $this->basepackages->utils->scanDir(
+                        $moduleLocation,
+                        true,
+                        [
+                            '.git/',
+                            'linter-backup/'
+                        ]
+                    );
+
+                    if ($files && count($files['files']) > 0) {
+                        $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $files['files']);
                     }
                 }
             }
 
-            if ($moduleFiles && count($moduleFiles['files']) > 0) {
-                foreach ($moduleFiles['files'] as $file) {
+            if ($moduleLocationFiles && count($moduleLocationFiles['files']) > 0) {
+                foreach ($moduleLocationFiles['files'] as $file) {
                     $filePath = $file;
 
                     $file = str_replace($moduleLocation, '', $file);
-
-                    if (count($filesToHash) > 0) {
-                        if (!in_array($file, $filesToHash)) {
-                            continue;
-                        }
-                    }
 
                     $hash = hash_file('md5', base_path($filePath));
 
@@ -691,7 +741,7 @@ class DevtoolsModules extends BasePackage
                     ) {
                         $module['isModified'] = true;
 
-                        return $module;
+                        break;
                     }
                 }
             }
@@ -927,35 +977,6 @@ class DevtoolsModules extends BasePackage
                 }
 
                 $data['app_type'] = $data['app_type']['data'][0];
-            } else if (isset($data['app_type']['newTags'][0])) {
-                if (!checkCtype($data['app_type']['newTags'][0], 'alpha', [''])) {
-                    $this->addResponse('AppType cannot have special chars or numbers.', 1);
-
-                    return false;
-                }
-
-                $appType = $this->apps->types->getFirst('app_type', strtolower($data['app_type']['newTags'][0]));
-
-                if (!$appType) {
-                    $appType =
-                        [
-                            'name'          => $data['app_type']['newTags'][0],
-                            'app_type'      => strtolower($data['app_type']['newTags'][0]),
-                            'dashboards'    => $data['dashboards'],
-                            'description'   => 'Added via devtools module add.',
-                            'version'       => $data['version'],
-                            'api_id'        => $data['api_id'],
-                            'repo'          => $data['repo'],
-                            'updated_by'    => '0',
-                            'installed'     => $data['installed']
-                        ];
-
-                    $this->apps->types->add($appType);
-
-                    $this->addUpdateAppTypeFiles($appType);
-                }
-
-                $data['app_type'] = strtolower($data['app_type']['newTags'][0]);
             }
         } else if (isset($data['app_type']) &&
                    !isset($data['module_type'])
@@ -3499,6 +3520,7 @@ $file .= '
         $this->validation->init()->add('api_id', PresenceOf::class, ["message" => "Please provide api id."]);
         $this->validation->add('app_type', PresenceOf::class, ["message" => "Please provide app type."]);
         $this->validation->add('module_type', PresenceOf::class, ["message" => "Please provide module type."]);
+        $this->validation->add('category', PresenceOf::class, ["message" => "Please provide module category."]);
 
         if (!$this->validateData($data)) {
             return false;
@@ -3809,7 +3831,17 @@ $file .= '
             }
 
             try {
-                $modulesArr = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+                $page = 1;
+                $getRemoteModules = [];
+                $modulesArr = [];
+                while ($getRemoteModules !== false) {
+                    $args['page'] = $page;
+                    $getRemoteModules = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+                    if ($getRemoteModules) {
+                        $modulesArr = array_merge($modulesArr, $getRemoteModules);
+                    }
+                    $page++;
+                }
             } catch (\throwable | ClientException $e) {
                 $this->addResponse($e->getMessage(), 1);
 

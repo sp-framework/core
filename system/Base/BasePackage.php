@@ -383,6 +383,10 @@ abstract class BasePackage extends Controller
 				}
 			}
 
+			if (count($relationColumns) > 0) {
+				$this->ffRelations = true;
+			}
+
 			$order = null;
 			$limit = null;
 			$offset = null;
@@ -408,13 +412,16 @@ abstract class BasePackage extends Controller
 				$offset = $params['offset'];
 			}
 			if (isset($params['conditions']) && is_array($params['conditions']) && count($params['conditions']) > 0) {
-				$this->ffData = $this->ffStore->findBy($params['conditions'], $order, $limit, $offset);
+				$this->ffData =
+					$this->ffStore->findBy(
+						$params['conditions'], $order, $limit, $offset, $this->ffRelations, $this->ffRelationsConditions
+					);
 			} else if (isset($params['conditions']) &&
 					   ((is_array($params['conditions']) && count($params['conditions']) === 0) ||
 						 $params['conditions'] === ''
 					   )
 			) {
-				$this->ffData = $this->ffStore->findAll($order, $limit, $offset);
+				$this->ffData = $this->ffStore->findAll($order, $limit, $offset, $this->ffRelations, $this->ffRelationsConditions);
 			} else {
 				throw new \Exception('getByParams needs parameter conditions (array) to be set.');
 			}
@@ -461,7 +468,7 @@ abstract class BasePackage extends Controller
 					$relationRowData = $model->{$alias}->toArray();
 				}
 			} else {
-				$relationRowData = $this->ffStore->findById($row['id'], true);
+				$relationRowData = $row;
 			}
 
 			foreach ($relationColumns as $relationColumnKey => $relationColumn) {
@@ -2271,6 +2278,18 @@ abstract class BasePackage extends Controller
 		//Only if debug is enabled.
 	}
 
+	public function getDbCount($recount = false)
+	{
+		if ($this->config->databasetype === 'db') {
+			return $this->modelToUse::count();
+		} else {
+			if (!$this->ffStore) {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			}
+
+			return $this->ffStore->count($recount);
+		}
+	}
 	// protected function addRefId($data)
 	// {
 	// 	if (!isset($data['ref_id'])) {

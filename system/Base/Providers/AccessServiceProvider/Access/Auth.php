@@ -103,7 +103,8 @@ class Auth extends BasePackage
 
         $security = $this->getAccountSecurityObject();
 
-        if ($this->core->core['settings']['security']['twofa'] == 'true' &&
+        if (isset($this->core->core['settings']['security']['twofa']) &&
+            $this->core->core['settings']['security']['twofa'] == 'true' &&
             isset($this->app['enforce_2fa']) &&
             $this->app['enforce_2fa'] == '1'
         ) {
@@ -761,7 +762,8 @@ class Auth extends BasePackage
             $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid user name."]);
             $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
             if ($task === 'auth2fa') {
-                if ($this->core->core['settings']['security']['twofa'] == 'true' &&
+                if (isset($this->core->core['settings']['security']['twofa']) &&
+                    $this->core->core['settings']['security']['twofa'] == 'true' &&
                     isset($this->app['enforce_2fa']) &&
                     $this->app['enforce_2fa'] == '1'
                 ) {

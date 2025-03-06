@@ -27,7 +27,7 @@ class ServiceProviderApiScopes extends BaseModel implements ScopeEntityInterface
 
     public function initialize()
     {
-        $this->modelRelations['api']['relationObj'] = $this->hasMany(
+        $this->modelRelations['api']['relationObj'] = $this->belongsTo(
             'id',
             ServiceProviderApi::class,
             'scope_id',

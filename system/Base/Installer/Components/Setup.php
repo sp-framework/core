@@ -179,7 +179,7 @@ Class Setup
 			$this->helper = $this->container->getShared('helper');
 
 			if ($onlyUpdateDb === false) {
-				$this->progress = $this->basepackages->progress->init($this->container);
+				$this->progress = $this->basepackages->progress->init($this->container, 'setup');
 			}
 
 			$this->config = $configsObj->toArray();

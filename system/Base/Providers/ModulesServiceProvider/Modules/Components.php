@@ -80,6 +80,19 @@ class Components extends BasePackage
 		return false;
 	}
 
+	public function getComponentByAppTypeAndRoute($appType, $route)
+	{
+		foreach($this->components as $component) {
+			if ($component['app_type'] === $appType &&
+				trim($route, '/') === trim($component['route'], '/')
+			) {
+				return $component;
+			}
+		}
+
+		return false;
+	}
+
 	public function getComponentByRoute($route)
 	{
 		foreach($this->components as $component) {

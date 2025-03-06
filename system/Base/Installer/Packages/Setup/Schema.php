@@ -364,7 +364,7 @@ class Schema
                     ]
             ];
 
-        if ($dev == true) {
+        if ($dev == 'true') {
             $schema['apps_core_devtools_files_hash'] = [
                     'schema'    => new \Apps\Core\Packages\Devtools\Modules\Install\Schema\FilesHash,
                     'model'     => new \Apps\Core\Packages\Devtools\Modules\Model\AppsCoreDevtoolsFilesHash,
