@@ -483,7 +483,11 @@ class Progress extends BasePackage
             $this->deleteProgressFile(true);
 
             if ($reRegisterMethods) {
-                $this->registerMethods($progressFile['registeredMethods']);
+                if (isset($progressFile['registeredMethods'])) {
+                    $this->registerMethods($progressFile['registeredMethods']);
+                } else {
+                    $this->registerMethods($progressFile['allProcesses']);
+                }
             }
         }
 
