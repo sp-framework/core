@@ -1037,7 +1037,7 @@ class Store
                     }
 
                     if (isset($relationsConditions[$relation['alias']])) {//Relation with condition
-                        $criteria = array_merge($criteria, $relationsConditions[$relation['alias']]);
+                        array_push($criteria, [$relationsConditions[$relation['alias']]]);
                     }
 
                     try {
@@ -1076,7 +1076,7 @@ class Store
                     }
 
                     if (isset($relationsConditions[$relation['alias']])) {//Relation with condition
-                        $criteria = array_merge($criteria, $relationsConditions[$relation['alias']]);
+                        array_push($criteria, [$relationsConditions[$relation['alias']]]);
                     }
 
                     try {
