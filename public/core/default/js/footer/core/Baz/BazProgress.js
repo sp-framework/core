@@ -203,7 +203,9 @@ var BazProgress = function() {
 
         if (hasDetails) {
             $('#' + $(element)[0].id + '-details-button').off();
-            $('#' + $(element)[0].id + '-details-button').click(function() {
+            $('#' + $(element)[0].id + '-details-button').click(function(e) {
+                e.preventDefault();
+
                 var text = $('#' + $(element)[0].id + '-details-button').text().toLowerCase();
 
                 if (text === 'show details') {

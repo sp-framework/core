@@ -164,7 +164,6 @@ class Progress extends BasePackage
                 'totalPercentComplete'  => $this->getPercentComplete($progressFile, false),
                 'percentComplete'       => $this->getPercentComplete($progressFile),
                 'runners'               => $progressFile['runners'] ?? false,
-                'callResult'            => $callResult,
                 'errors'                => $errors,
                 'details'               => $details
             ];
