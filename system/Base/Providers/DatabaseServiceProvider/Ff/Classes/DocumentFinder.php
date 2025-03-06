@@ -111,7 +111,6 @@ class DocumentFinder
                                 } else {
                                     foreach ($indexJson as $key => $ids) {
                                         if ($limit && count($ids) > $limit) {
-
                                             self::skip($ids, $skip);
                                             self::limit($ids, $limit);
                                         }
@@ -119,7 +118,7 @@ class DocumentFinder
                                         $key = strtolower($key);
 
                                         if (strtolower($condition[0][1]) === 'like') {
-                                            if (str_starts_with($key, strtolower($keyword))) {
+                                            if (str_starts_with($key, strtolower($indexChars))) {
                                                 foreach ($ids as $id) {
                                                     $indexIdData = $this->store->findById($id);
 
@@ -131,7 +130,7 @@ class DocumentFinder
                                         } else if ($condition[0][1] === '=' ||
                                                    $condition[0][1] === '==='
                                         ) {
-                                            if ($key === strtolower($keyword)) {
+                                            if ($key === strtolower($indexChars)) {
                                                 foreach ($ids as $id) {
                                                     $indexIdData = $this->store->findById($id);
 
