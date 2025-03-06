@@ -129,27 +129,18 @@ class Store
             $rmd['columnUnique'] = [];
             $rmd['storeRelations'] = [];
 
-            if (isset($schemaArr['properties'])) {
-                foreach ($schemaArr['properties'] as $column => $property) {
-                    if (isset($property['type'][1]) && $property['type'][1] === 'array') {
-                        if (isset($property['relation'])) {
-                            $relation = explode('|', $property['relation']);
-
-                            if (count($relation) > 0 && isset($relation[2])) {
-                                try {
-                                    $relation[2] = explode('+', $relation[2])[0];
-                                    $relationsStore = new Store($relation[2], $this->databasePath, $this->ff);
-
-                                    $rmd = array_replace_recursive($rmd, $relationsStore->getSchemaMetaData());
-
-                                    $rmd['storeRelations'][$column] = [];
-                                    $rmd['storeRelations'][$column] = $relationsStore->getSchemaMetaData();
-                                    $rmd['storeRelations'][$column]['relationStore'] = $relation[2];
-                                } catch (\Exception $e) {
-                                    throw $e;
-                                }
-                            }
-                        }
+            if (isset($schemaArr['relations'])) {
+                foreach ($schemaArr['relations'] as $alias => $relation) {
+                    if (isset($relation['table']) && isset($this->relationStores[$relation['table']])) {
+                        $rmd = array_replace_recursive($rmd, $this->relationStores[$relation['table']]->getSchemaMetaData());
+                        $rmd['storeRelations'][$alias] = [];
+                        $rmd['storeRelations'][$alias] = $this->relationStores[$relation['table']]->getSchemaMetaData();
+                        $rmd['storeRelations'][$alias]['relationStore'] = $relation['table'];
+                    } else if (isset($relation[1]) && isset($this->relationStores[$relation[1]['table']])) {
+                        $rmd = array_replace_recursive($rmd, $this->relationStores[$relation[1]['table']]->getSchemaMetaData());
+                        $rmd['storeRelations'][$alias] = [];
+                        $rmd['storeRelations'][$alias] = $this->relationStores[$relation[1]['table']]->getSchemaMetaData();
+                        $rmd['storeRelations'][$alias]['relationStore'] = $relation[1]['table'];
                     }
                 }
             }
