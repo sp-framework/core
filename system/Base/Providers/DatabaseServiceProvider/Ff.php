@@ -287,32 +287,6 @@ class Ff
 
             if (isset($references) && is_array($references)) {
                 $schema['relations'] = $references;
-
-                foreach ($references as $key => $reference) {
-                    if (isset($reference['alias'])) {
-                        $schema['properties'][$reference['alias']] = [];
-                        $schema['properties'][$reference['alias']]['type'] = ['null','array'];
-
-                        if (isset($reference[0]) && isset($reference[1])) {
-                            if (isset($reference[0]['fields']) && count($reference[0]['fields']) > 0) {
-                                $reference[0]['fields'] = join(':', $reference[0]['fields']);
-                            }
-                            if (isset($reference[1]['fields']) && count($reference[1]['fields']) > 0) {
-                                $reference[1]['fields'] = join(':', $reference[1]['fields']);
-                            }
-
-                            $reference[0] = join('+', $reference[0]);
-                            $reference[1] = join('+', $reference[1]);
-                            $schema['properties'][$reference['alias']]['relation'] = join('|', $reference);
-                        } else {
-                            if (isset($reference['fields']) && count($reference['fields']) > 0) {
-                                $reference['fields'] = join(':', $reference['fields']);
-                            }
-
-                            $schema['properties'][$reference['alias']]['relation'] = join('|', $reference);
-                        }
-                    }
-                }
             }
         }
 
