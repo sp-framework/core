@@ -146,6 +146,7 @@ class Ff
         $schema['type'] = 'object';
         $schema['properties'] = [];
         $schema['required'] = [];
+        $schema['relations'] = [];
 
         foreach ($tableClass->columns()['columns'] as $column) {
             $schema['properties'][$column->getName()] = [];
@@ -216,11 +217,14 @@ class Ff
                         if ($relation['relationObj']->getReferencedModel() &&
                             is_string($relation['relationObj']->getReferencedModel())
                         ) {
+                            $references[$relationKey]['alias'] = $relationKey;
                             if (isset($relation['relationObj']->getOptions()['alias'])) {
                                 $references[$relationKey]['alias'] = $relation['relationObj']->getOptions()['alias'];
                             }
-
                             switch ($relation['relationObj']->getType()) {
+                                case '0':
+                                    $references[$relationKey]['type'] = 'belongsTo';
+                                    break;
                                 case '1':
                                     $references[$relationKey]['type'] = 'hasOne';
                                     break;
@@ -274,7 +278,7 @@ class Ff
                             }
 
                             if (isset($relation['relationObj']->getOptions()['params'])) {
-                                $references[$relationKey]['params'] = 'hasParams';
+                                $references[$relationKey]['hasParams'] = true;
                             }
                         }
                     }
@@ -282,6 +286,8 @@ class Ff
             }
 
             if (isset($references) && is_array($references)) {
+                $schema['relations'] = $references;
+
                 foreach ($references as $key => $reference) {
                     if (isset($reference['alias'])) {
                         $schema['properties'][$reference['alias']] = [];
