@@ -57,6 +57,8 @@ class DocumentFinder
         $fieldsToExclude = $queryBuilderProperties["fieldsToExclude"];
         unset($queryBuilderProperties);
 
+        $indexSearched = false;
+
         if ($this->storeConfiguration['indexing']) {
             // This has to be rewritten to include multiple keywords using spaces
             // Example: If we want to search for wes aus, it should search for all entries with Wes keyword and that also includes Aus keyword.
@@ -65,6 +67,8 @@ class DocumentFinder
                     if (isset($condition[0]) &&
                         in_array($condition[0][0], $this->storeConfiguration['indexes'])
                     ) {
+                        $indexSearched = true;
+
                         $keyword = trim($condition[0][2], '%');//This needs to extend
 
                         if (strlen($keyword) < $this->storeConfiguration['min_index_chars']) {
@@ -83,6 +87,11 @@ class DocumentFinder
                             $indexJson = json_decode($indexFile, true);
 
                             if (count($indexJson) > 0) {
+                                if ($limit && count($indexJson) > 0) {
+                                    self::skip($indexJson, $skip);
+                                    self::limit($indexJson, $limit);
+                                }
+
                                 if (isset($indexJson[strtolower($keyword)])) {
                                     if (count($indexJson[strtolower($keyword)]) === 1) {
                                         $indexIdData = $this->store->findById($indexJson[strtolower($keyword)][0]);
@@ -101,6 +110,12 @@ class DocumentFinder
                                     }
                                 } else {
                                     foreach ($indexJson as $key => $ids) {
+                                        if ($limit && count($ids) > $limit) {
+
+                                            self::skip($ids, $skip);
+                                            self::limit($ids, $limit);
+                                        }
+
                                         $key = strtolower($key);
 
                                         if (strtolower($condition[0][1]) === 'like') {
@@ -137,7 +152,7 @@ class DocumentFinder
             }
         }
 
-        if (count($found) === 0) {
+        if (!$indexSearched && count($found) === 0) {
             $scanDir = scandir($dataPath);
             $files = [];
             array_walk($scanDir, function($file) use (&$files) {
@@ -211,7 +226,7 @@ class DocumentFinder
                 DocumentReducer::excludeFields($found, $fieldsToExclude);
             }
 
-            if (count($conditions) > 0) {
+            if (!$indexSearched && count($conditions) > 0) {
                 self::sort($found, $orderBy);
                 self::skip($found, $skip);
                 self::limit($found, $limit);

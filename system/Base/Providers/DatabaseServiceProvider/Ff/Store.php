@@ -1804,4 +1804,16 @@ class Store
 
         return $this;
     }
+
+    public function getIndexing()
+    {
+        return $this->indexing;
+    }
+
+    public function setIndexing($indexing = true)
+    {
+        $this->indexing = $indexing;
+
+        return $this->getIndexing();
+    }
 }
