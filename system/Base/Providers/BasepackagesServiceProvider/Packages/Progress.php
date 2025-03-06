@@ -675,7 +675,11 @@ class Progress extends BasePackage
                     $file['runners'] = $runners;
                 }
 
-                $file['registeredMethods'] = $progressFile['registeredMethods'];
+                if (isset($progressFile['registeredMethods'])) {
+                    $file['registeredMethods'] = $progressFile['registeredMethods'];
+                } else {
+                    $file['registeredMethods'] = $progressFile['allProcesses'];
+                }
             }
 
             $file['processes'] = $methods;
