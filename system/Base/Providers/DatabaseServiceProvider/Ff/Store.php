@@ -27,6 +27,7 @@ class Store
     protected $defaultCacheLifetime = null;
 
     protected $indexesPath = '';
+    protected $readIndex = false;
     protected $indexing = false;
     protected $minIndexChars = 3;
     protected $multiWords = true;
@@ -1260,6 +1261,7 @@ class Store
 
             if (count($configuration["indexes"]) > 0) {
                 $configuration['indexing'] = true;
+                $configuration['readIndex'] = true;
             }
         }
 
@@ -1269,6 +1271,14 @@ class Store
             }
 
             $this->indexing = $configuration["indexing"];
+        }
+
+        if (array_key_exists("readIndex", $configuration)) {
+            if (!is_bool($configuration["readIndex"])) {
+                throw new InvalidConfigurationException("readIndex has to be boolean");
+            }
+
+            $this->readIndex = $configuration["readIndex"];
         }
 
         if (array_key_exists("auto_cache", $configuration)) {
@@ -1396,27 +1406,28 @@ class Store
     {
         $this->storeConfiguration =
         [
-            "auto_cache"            => $this->useCache,
-            "cache_lifetime"        => $this->defaultCacheLifetime,
-            "primary_key"           => $this->primaryKey,
+            "auto_cache"            => &$this->useCache,
+            "cache_lifetime"        => &$this->defaultCacheLifetime,
+            "primary_key"           => &$this->primaryKey,
             "search"                => [
-                "min_length"            => $this->searchOptions["minLength"],
-                "mode"                  => $this->searchOptions["mode"],
-                "score_key"             => $this->searchOptions["scoreKey"],
-                "algorithm"             => $this->searchOptions["algorithm"]
+                "min_length"            => &$this->searchOptions["minLength"],
+                "mode"                  => &$this->searchOptions["mode"],
+                "score_key"             => &$this->searchOptions["scoreKey"],
+                "algorithm"             => &$this->searchOptions["algorithm"]
             ],
-            "folder_permissions"    => $this->folderPermissions,
-            "indexing"              => $this->indexing,
-            "min_index_chars"       => $this->minIndexChars,
-            "multi_words"           => $this->multiWords,
-            "multi_words_separator" => $this->multiWordsSeparator,
-            "min_multi_words_chars" => $this->minMultiWordsChars,
-            "uniqueFields"          => $this->uniqueFields,
-            "indexes"               => $this->indexes,
-            "storePath"             => $this->storePath,
-            "databasePath"          => $this->databasePath,
-            "indexesPath"           => $this->indexesPath,
-            "model"                 => $this->model
+            "folder_permissions"    => &$this->folderPermissions,
+            "readIndex"             => &$this->readIndex,
+            "indexing"              => &$this->indexing,
+            "min_index_chars"       => &$this->minIndexChars,
+            "multi_words"           => &$this->multiWords,
+            "multi_words_separator" => &$this->multiWordsSeparator,
+            "min_multi_words_chars" => &$this->minMultiWordsChars,
+            "uniqueFields"          => &$this->uniqueFields,
+            "indexes"               => &$this->indexes,
+            "storePath"             => &$this->storePath,
+            "databasePath"          => &$this->databasePath,
+            "indexesPath"           => &$this->indexesPath,
+            "model"                 => &$this->model
         ];
     }
 
@@ -1801,10 +1812,22 @@ class Store
         return $this->indexing;
     }
 
-    public function setIndexing($indexing = true)
+    public function setIndexing($indexing)
     {
         $this->indexing = $indexing;
 
         return $this->getIndexing();
+    }
+
+    public function getReadIndex()
+    {
+        return $this->readIndex;
+    }
+
+    public function setReadIndex($index)
+    {
+        $this->readIndex = $index;
+
+        return $this->getReadIndex();
     }
 }

@@ -190,7 +190,9 @@ abstract class BasePackage extends Controller
 
 				return false;
 			} else {
-				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+				if (!$this->ffStore) {
+					$this->ffStore = $this->ff->store($this->ffStoreToUse);
+				}
 
 				$this->ffData = $this->ffStore->findById($id, $this->ffRelations, $this->ffRelationsConditions);
 
@@ -247,7 +249,9 @@ abstract class BasePackage extends Controller
 				throw $e;
 			}
 		} else {
-			$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			if (!$this->ffStore) {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			}
 
 			if ($by === 'id') {
 				$value = (int) $value;
@@ -277,7 +281,9 @@ abstract class BasePackage extends Controller
 			if ($this->config->databasetype === 'db') {
 				$allPackages = $this->getByParams(['conditions'=>''], $resetCache, $enableCache, $model);
 			} else {
-				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+				if (!$this->ffStore) {
+					$this->ffStore = $this->ff->store($this->ffStoreToUse);
+				}
 
 				$allPackages = $this->ffStore->findAll();
 
@@ -357,7 +363,9 @@ abstract class BasePackage extends Controller
 
 			throw new \Exception('getByParams needs parameter conditions to be set.');
 		} else {
-			$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			if (!$this->ffStore) {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			}
 
 			$relationColumns = [];
 
@@ -1234,7 +1242,9 @@ abstract class BasePackage extends Controller
 
 				$create = ${$this->packageNameModel}->create();
 			} else {
-				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+				if (!$this->ffStore) {
+					$this->ffStore = $this->ff->store($this->ffStoreToUse);
+				}
 
 				if ($this->ffAddUsingUpdateOrInsert) {
 					if (isset($data['id']) && (int) $data['id'] !== 0) {
@@ -1308,7 +1318,9 @@ abstract class BasePackage extends Controller
 
 				$update = ${$this->packageNameModel}->update();
 			} else {
-				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+				if (!$this->ffStore) {
+					$this->ffStore = $this->ff->store($this->ffStoreToUse);
+				}
 
 				$update = $this->ffData = $this->ffStore->update($data);
 

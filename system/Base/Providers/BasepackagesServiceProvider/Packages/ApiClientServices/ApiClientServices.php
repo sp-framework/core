@@ -183,6 +183,10 @@ class ApiClientServices extends BasePackage
 
             $this->packageName = 'apiClientServices';
         }
+
+        if ($this->config->databasetype !== 'db') {
+            $this->ffStore = null;
+        }
     }
 
     public function addApi(array $data)

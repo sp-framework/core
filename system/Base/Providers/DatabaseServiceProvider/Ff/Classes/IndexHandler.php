@@ -18,7 +18,7 @@ class IndexHandler
 
     protected $multiWordsSeparator = ' ';
 
-    protected $minMultiWordsChars = 5;
+    protected $minMultiWordsChars = 4;
 
     protected $folderPermissions = 0777;
 
@@ -102,6 +102,10 @@ class IndexHandler
                     }
                 } else {
                     if (is_string($content[$index])) {
+                        if (strlen($content[$index]) < $this->minIndexChars) {
+                            continue;
+                        }
+
                         $indexChars = strtolower(mb_substr($content[$index], 0, $this->minIndexChars, 'UTF-8'));
 
                         if (str_contains($indexChars, '/')) {//this will result in subdirectories

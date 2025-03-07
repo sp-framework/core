@@ -20,6 +20,14 @@ class DocumentFinder
 
     protected $storeConfiguration;
 
+    protected $minIndexChars = 3;
+
+    protected $multiWords = true;
+
+    protected $multiWordsSeparator = '+';
+
+    protected $minMultiWordsChars = 4;
+
     public function __construct(string $storePath, array $queryBuilderProperties, string $primaryKey, $store)
     {
         $this->storePath = $storePath;
@@ -31,6 +39,19 @@ class DocumentFinder
         $this->store = $store;
 
         $this->storeConfiguration = $this->store->getStoreConfiguration();
+
+        if (isset($this->storeConfiguration['min_index_chars'])) {
+            $this->minIndexChars = $this->storeConfiguration['min_index_chars'];
+        }
+        if (isset($this->storeConfiguration['multi_words'])) {
+            $this->multiWords = $this->storeConfiguration['multi_words'];
+        }
+        if (isset($this->storeConfiguration['multi_words_separator'])) {
+            $this->multiWordsSeparator = $this->storeConfiguration['multi_words_separator'];
+        }
+        if (isset($this->storeConfiguration['min_multi_words_chars'])) {
+            $this->minMultiWordsChars = $this->storeConfiguration['min_multi_words_chars'];
+        }
     }
 
     public function findDocuments(bool $getOneDocument, bool $reduceAndJoinPossible): array
@@ -59,9 +80,7 @@ class DocumentFinder
 
         $indexSearched = false;
 
-        if ($this->storeConfiguration['indexing']) {
-            // This has to be rewritten to include multiple keywords using spaces
-            // Example: If we want to search for wes aus, it should search for all entries with Wes keyword and that also includes Aus keyword.
+        if ($this->storeConfiguration['readIndex']) {
             if (count($conditions) > 0) {
                 foreach ($conditions as $condition) {
                     if (isset($condition[0]) &&
@@ -69,82 +88,29 @@ class DocumentFinder
                     ) {
                         $indexSearched = true;
 
-                        $keyword = trim($condition[0][2], '%');//This needs to extend
+                        //trim % (like), change space to + for multikeyword search.
+                        $keyword = str_replace(' ', '+', strtolower(trim($condition[0][2], '%')));
 
-                        if (strlen($keyword) < $this->storeConfiguration['min_index_chars']) {
-                            continue;
-                        }
+                        if ($this->multiWords === true && str_contains($keyword, '+')) {
+                            $keywordArr = explode('+', $keyword);
 
-                        $indexChars = strtolower(substr($keyword, 0, $this->storeConfiguration['min_index_chars']));
-
-                        try {
-                            $indexFile = IoHelper::getFileContent(
-                                $this->storeConfiguration['indexesPath'] . $condition[0][0] . '/' . $indexChars . '.json'
-                            );
-
-                            $indexFile = strtolower($indexFile);
-
-                            $indexJson = json_decode($indexFile, true);
-
-                            if (count($indexJson) > 0) {
-                                if ($limit && count($indexJson) > 0) {
-                                    self::skip($indexJson, $skip);
-                                    self::limit($indexJson, $limit);
+                            foreach ($keywordArr as $key => $keyword) {
+                                if (strlen($keyword) < $this->minMultiWordsChars) {
+                                    continue;
                                 }
 
-                                if (isset($indexJson[strtolower($keyword)])) {
-                                    if (count($indexJson[strtolower($keyword)]) === 1) {
-                                        $indexIdData = $this->store->findById($indexJson[strtolower($keyword)][0]);
+                                $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
 
-                                        if ($indexIdData) {
-                                            $found[] = $indexIdData;
-                                        }
-                                    } else {
-                                        foreach ($indexJson[strtolower($keyword)] as $id) {
-                                            $indexIdData = $this->store->findById($id);
-
-                                            if ($indexIdData) {
-                                                $found[] = $indexIdData;
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    foreach ($indexJson as $key => $ids) {
-                                        if ($limit && count($ids) > $limit) {
-                                            self::skip($ids, $skip);
-                                            self::limit($ids, $limit);
-                                        }
-
-                                        $key = strtolower($key);
-
-                                        if (strtolower($condition[0][1]) === 'like') {
-                                            if (str_starts_with($key, strtolower($indexChars))) {
-                                                foreach ($ids as $id) {
-                                                    $indexIdData = $this->store->findById($id);
-
-                                                    if ($indexIdData) {
-                                                        $found[] = $indexIdData;
-                                                    }
-                                                }
-                                            }
-                                        } else if ($condition[0][1] === '=' ||
-                                                   $condition[0][1] === '==='
-                                        ) {
-                                            if ($key === strtolower($indexChars)) {
-                                                foreach ($ids as $id) {
-                                                    $indexIdData = $this->store->findById($id);
-
-                                                    if ($indexIdData) {
-                                                        $found[] = $indexIdData;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                $found = array_merge($found, $this->searchIndexes($condition, $indexChars, $skip, $limit, $keyword));
                             }
-                        } catch (\Exception $e) {
-                            $found = [];
+                        } else {
+                            if (strlen($keyword) < $this->minIndexChars) {
+                                continue;
+                            }
+
+                            $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
+
+                            $found = array_merge($found, $this->searchIndexes($condition, $indexChars, $skip, $limit, $keyword));
                         }
                     }
                 }
@@ -230,6 +196,81 @@ class DocumentFinder
                 self::skip($found, $skip);
                 self::limit($found, $limit);
             }
+        }
+
+        return $found;
+    }
+
+    protected function searchIndexes($condition, $indexChars, $skip, $limit, $keyword)
+    {
+        try {
+            $indexFile = IoHelper::getFileContent(
+                $this->storeConfiguration['indexesPath'] . $condition[0][0] . '/' . $indexChars . '.json'
+            );
+
+            $indexFile = strtolower($indexFile);
+
+            $indexJson = json_decode($indexFile, true);
+
+            if (count($indexJson) > 0) {
+                if ($limit && count($indexJson) > 0) {
+                    self::skip($indexJson, $skip);
+                    self::limit($indexJson, $limit);
+                }
+
+                if (isset($indexJson[$keyword])) {
+                    if (count($indexJson[$keyword]) === 1) {
+                        $indexIdData = $this->store->findById($indexJson[$keyword][0]);
+
+                        if ($indexIdData) {
+                            $found[] = $indexIdData;
+                        }
+                    } else {
+                        foreach ($indexJson[$keyword] as $id) {
+                            $indexIdData = $this->store->findById($id);
+
+                            if ($indexIdData) {
+                                $found[] = $indexIdData;
+                            }
+                        }
+                    }
+                } else {
+                    foreach ($indexJson as $key => $ids) {
+                        if ($limit && count($ids) > $limit) {
+                            self::skip($ids, $skip);
+                            self::limit($ids, $limit);
+                        }
+
+                        $key = strtolower($key);
+
+                        if (strtolower($condition[0][1]) === 'like') {
+                            if (str_starts_with($key, $indexChars)) {
+                                foreach ($ids as $id) {
+                                    $indexIdData = $this->store->findById($id);
+
+                                    if ($indexIdData) {
+                                        $found[] = $indexIdData;
+                                    }
+                                }
+                            }
+                        } else if ($condition[0][1] === '=' ||
+                                   $condition[0][1] === '==='
+                        ) {
+                            if ($key === $indexChars) {
+                                foreach ($ids as $id) {
+                                    $indexIdData = $this->store->findById($id);
+
+                                    if ($indexIdData) {
+                                        $found[] = $indexIdData;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $found = [];
         }
 
         return $found;
