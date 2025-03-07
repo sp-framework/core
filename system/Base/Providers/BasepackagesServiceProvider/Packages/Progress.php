@@ -522,26 +522,8 @@ class Progress extends BasePackage
 
         if ($progressFile) {
             if (isset($progressFile['pid']) && $progressFile['pid'] > 0) {
-                exec('ps -aux | grep ' . $progressFile['pid'], $output, $result);
-
-                if ($result === 0 &&
-                    count($output) > 0
-                ) {
-                    if (str_contains($output[0], 'php')) {
-                        exec('kill -9 ' . $progressFile['pid'], $output, $result);
-
-                        if ($result !== 0) {
-                            $this->addResponse('Error terminating process', 1, ['output' => $output]);
-
-                            return false;
-                        }
-
-                        $this->writeProgressFile(methods: [],progressFile: $progressFile);
-
-                        $this->addResponse('Successfully terminating process');
-
-                        return $this->resetProgress();
-                    }
+                if ($this->terminatePid($progressFile['pid'] !== true)) {
+                    return false;
                 }
             }
 
@@ -557,6 +539,31 @@ class Progress extends BasePackage
 
             return false;
         }
+    }
+
+    public function terminatePid($pid)
+    {
+        exec('ps -aux | grep ' . $pid, $output, $result);
+
+        if ($result === 0 && count($output) > 0) {
+            if (str_contains($output[0], 'php')) {
+                exec('kill -9 ' . $pid, $output, $result);
+
+                if ($result !== 0) {
+                    $this->addResponse('Error terminating process', 1, ['output' => $output]);
+
+                    return false;
+                }
+
+                $this->writeProgressFile(methods: [],progressFile: $progressFile);
+
+                $this->addResponse('Successfully terminating process');
+
+                return $this->resetProgress();
+            }
+        }
+
+        return true;
     }
 
     protected function readProgressFile($session = null)
