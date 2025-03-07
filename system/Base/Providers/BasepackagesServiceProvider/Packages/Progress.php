@@ -522,18 +522,16 @@ class Progress extends BasePackage
 
         if ($progressFile) {
             if (isset($progressFile['pid']) && $progressFile['pid'] > 0) {
-                if ($this->terminatePid($progressFile['pid'] !== true)) {
-                    return false;
-                }
+                return $this->terminatePid($progressFile);
+            } else {
+                $progressFile['runners']['running'] = false;
+                $progressFile['runners']['next'] = false;
+                $this->writeProgressFile(methods: [], progressFile: $progressFile, register: true);
+
+                $this->addResponse('Process not running', 1);
+
+                return false;
             }
-
-            $progressFile['runners']['running'] = false;
-            $progressFile['runners']['next'] = false;
-            $this->writeProgressFile(methods: [], progressFile: $progressFile, register: true);
-
-            $this->addResponse('Process not running', 1);
-
-            return false;
         } else {
             $this->addResponse('Error loading progressfile!', 1);
 
@@ -541,13 +539,13 @@ class Progress extends BasePackage
         }
     }
 
-    public function terminatePid($pid)
+    public function terminatePid($progressFile)
     {
-        exec('ps -aux | grep ' . $pid, $output, $result);
+        exec('ps -aux | grep ' . $progressFile['pid'], $output, $result);
 
         if ($result === 0 && count($output) > 0) {
             if (str_contains($output[0], 'php')) {
-                exec('kill -9 ' . $pid, $output, $result);
+                exec('kill -9 ' . $progressFile['pid'], $output, $result);
 
                 if ($result !== 0) {
                     $this->addResponse('Error terminating process', 1, ['output' => $output]);
