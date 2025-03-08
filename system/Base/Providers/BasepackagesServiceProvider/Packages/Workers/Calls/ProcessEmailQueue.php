@@ -6,7 +6,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Calls;
 
 class ProcessEmailQueue extends Calls
 {
-    public $funcName = 'Process Email Queue';
+    public $funcDisplayName = 'Process Email Queue';
 
     protected $args;
 

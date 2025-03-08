@@ -66,12 +66,6 @@ class Tasks extends BasePackage
 
     public function addTask(array $data)
     {
-        if (isset($data['type']) && $data['type'] == 0) {
-            $this->addResponse('Cannot add system task.', 1);
-
-            return false;
-        }
-
         if (!isset($data['priority']) || (isset($data['priority']) && $data['priority'] == '0')) {
             $data['priority'] = '1';
         }
@@ -89,14 +83,6 @@ class Tasks extends BasePackage
     public function updateTask(array $data)
     {
         $task = $this->getById($data['id']);
-
-        if (!isset($data['via_job']) &&
-            (isset($task['type']) && $task['type'] == 0)
-        ) {
-            $this->addResponse('Cannot update system task.', 1);
-
-            return false;
-        }
 
         if (!isset($data['priority']) || (isset($data['priority']) && $data['priority'] == '0')) {
             $data['priority'] = '1';

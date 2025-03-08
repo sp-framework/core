@@ -3,12 +3,85 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
 use System\Base\BasePackage;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersCalls;
 
 class Calls extends BasePackage
 {
+    protected $modelToUse = BasepackagesWorkersCalls::class;
+
+    protected $packageName = 'calls';
+
+    public $calls;
+
     protected $startTime;
 
     protected $stopTime;
+
+    public function init(bool $resetCache = false)
+    {
+        $this->getAll($resetCache);
+
+        return $this;
+    }
+
+    public function getByCallName($name)
+    {
+        if ($this->config->databasetype === 'db') {
+            $conditions =
+                [
+                    'conditions'    => 'name = :name:',
+                    'bind'          =>
+                        [
+                            'name'  => $name
+                        ]
+                ];
+
+            $call = $this->getByParams($conditions);
+        } else {
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+            $call = $this->ffStore->findBy(['name', '=', $name]);
+        }
+
+        if ($call && count($call) > 0) {
+            return $call[0];
+        }
+
+        return false;
+    }
+
+    public function addCall(array $data)
+    {
+        if ($this->add($data)) {
+            $this->addResponse('Added new call ' . $data['name']);
+        } else {
+            $this->addResponse('Error adding new call', 1);
+        }
+    }
+
+    public function updateCall(array $data)
+    {
+        $call = $this->getById($data['id']);
+
+        $call = array_merge($call, $data);
+
+        if ($this->update($call)) {
+            $this->addResponse('Updated call ' . $call['name']);
+        } else {
+            $this->addResponse('Error updating call', 1);
+        }
+    }
+
+    public function removeCall(array $data)
+    {
+        $call = $this->getById($data['id']);
+
+        if ($this->remove($data['id'])) {
+            $this->addResponse('Call removed');
+        } else {
+            $this->addResponse('Error removing call', 1);
+        }
+    }
 
     public function updateJobTask($status, $args)
     {

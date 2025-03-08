@@ -2,6 +2,8 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
+use Phalcon\Db\Enum;
+
 class External
 {
     public function register($db, $ff, $composerJsonFile, $helper)
@@ -126,7 +128,7 @@ class External
                 );
 
             if ($core) {
-                return $core['id'];
+                return $core[0]['id'];
             }
         }
 

@@ -7,7 +7,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Calls;
 
 class ProcessImportExportQueue extends Calls
 {
-    public $funcName = 'Process Import/Export Queue';
+    public $funcDisplayName = 'Process Import/Export Queue';
 
     protected $args;
 

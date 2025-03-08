@@ -291,6 +291,10 @@ class Progress extends BasePackage
 
     public function checkProcessIsRunning($progressFile = null)
     {
+        if ($this->progressFileName === 'setup') {
+            return;
+        }
+
         if (!$progressFile) {
             $progressFile = $this->checkProgressFile();
         }

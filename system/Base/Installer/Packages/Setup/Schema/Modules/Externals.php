@@ -148,7 +148,8 @@ class Externals
                     new Index(
                         'column_UNIQUE',
                         [
-                            'name'
+                            'name',
+                            'developer'
                         ],
                         'UNIQUE'
                     )

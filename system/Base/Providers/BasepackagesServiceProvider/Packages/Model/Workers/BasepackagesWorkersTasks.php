@@ -26,7 +26,7 @@ class BasepackagesWorkersTasks extends BaseModel
 
     public $exec_type;
 
-    public $call;
+    public $cid;
 
     public $call_args;
 

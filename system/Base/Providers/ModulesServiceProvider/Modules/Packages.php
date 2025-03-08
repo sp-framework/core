@@ -171,6 +171,17 @@ class Packages extends BasePackage
 		return false;
 	}
 
+	public function getPackageByClass($class)
+	{
+		foreach($this->packages as $package) {
+			if (strtolower($package['class']) === strtolower($class)) {
+				return $package;
+			}
+		}
+
+		return false;
+	}
+
 	public function getPackagesForCategory($category)
 	{
 		$packages = [];

@@ -2,16 +2,16 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use GO\Scheduler;
 use Carbon\Carbon;
+use GO\Scheduler;
 use GO\Traits\Interval;
-use System\Base\BasePackage;
-use League\Flysystem\UnableToReadFile;
 use League\Flysystem\FilesystemException;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Jobs;
+use League\Flysystem\UnableToReadFile;
+use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Calls;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Tasks;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Jobs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Schedules;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Tasks;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Workers as WorkersWorkers;
 
 class Workers extends BasePackage
@@ -30,6 +30,8 @@ class Workers extends BasePackage
 
     public $jobs;
 
+    public $calls;
+
     protected $cron;
 
     protected $scheduledJobs = [];
@@ -46,11 +48,9 @@ class Workers extends BasePackage
 
     protected $enabledTasks;
 
-    protected $availableCalls;
+    // protected $availableCalls;
 
     protected $outputDir;
-
-    protected $calls;
 
     public function init(bool $resetCache = false)
     {
@@ -61,6 +61,8 @@ class Workers extends BasePackage
         $this->tasks = (new Tasks())->init(true);
 
         $this->jobs = (new Jobs())->init();
+
+        $this->calls = (new Calls())->init();
 
         if ($this->checkPath('var/workers')) {
             $this->schedulerSettings['tempDir'] = base_path('var/workers');
@@ -79,8 +81,8 @@ class Workers extends BasePackage
 
         $this->enabledTasks = $this->tasks->getEnabledTasks();
 
-        $this->availableCalls = array_keys($this->tasks->getAllCalls());
-
+        // $this->availableCalls = array_keys($this->tasks->getAllCalls());
+        // trace([$this->availableCalls]);
         return $this;
     }
 
@@ -670,7 +672,7 @@ class Workers extends BasePackage
             $args['job']['id'] => null
         ];
 
-        if (property_exists($class, 'php_args') && method_exists($class,'getPhpArgs')) {
+        if (method_exists($class,'getPhpArgs')) {
             $phpArgs = array_merge($phpArgs, (new $class)->getPhpArgs());
         }
 
@@ -813,21 +815,49 @@ class Workers extends BasePackage
 
     protected function scheduleRawSchedules($class, $args, $schedule)
     {
+        $class = new $class;
+
+        $rawCmd = null;
+
+        if (method_exists($class, 'getRawCmd')) {
+            $rawCmd = $class->getRawCmd();
+        }
+
+        if (is_null($rawCmd)) {
+            $this->calls->packagesData->responseCode = 1;
+            $this->calls->packagesData->responseMessage = 'Raw command not provided in the Calls class file.';
+
+            $this->calls->addJobResult($this->calls->packagesData, $args);
+
+            $this->calls->updateJobTask(4, $args);
+
+            return false;
+        }
+
         $rawArgs = [];
 
-        if (property_exists($class, 'raw_args') && method_exists($class,'getRawArgs')) {
-            $rawArgs = (new $class)->getRawArgs();
+        if (method_exists($class,'getRawArgs')) {
+            $rawArgs = $class->getRawArgs();
         }
 
         if ($schedule['type'] === 'everyminute') {
             $this->scheduler->raw(
-                $task['raw'],
+                $rawCmd,
                 $rawArgs,
                 $args['task']['id'] . '-' . $schedule['type']
-            )->everyminute();
+            )->
+            onlyOne(null, $this->removeStuckLockFile($args['task'], $schedule, null, $rawCmd))->
+            output($this->outputDir . '/' . $args['task']['id'] . '-' . $schedule['type'] . '.log')->
+            before(function() use ($args) {
+                $this->processBefore($args);
+            })->
+            then(function () use ($args) {
+                $this->processThen($args);
+            }, true)
+            ->everyminute();
         } else if ($schedule['type'] === 'everyxminutes') {
             $this->scheduler->raw(
-                $task['raw'],
+                $rawCmd,
                 $rawArgs,
                 $args['task']['id'] . '-' . $schedule['type']
             )->everyminute(
@@ -835,45 +865,90 @@ class Workers extends BasePackage
             );
         } else if ($schedule['type'] === 'everyxminutesbetween') {
             $this->scheduler->raw(
-                $task['raw'],
+                $rawCmd,
                 $rawArgs,
                 $args['task']['id'] . '-' . $schedule['type']
-            )->everyminute(
+            )->
+            onlyOne(null, $this->removeStuckLockFile($args['task'], $schedule, null, $rawCmd))->
+            output($this->outputDir . '/' . $args['task']['id'] . '-' . $schedule['type'] . '.log')->
+            before(function() use ($args) {
+                $this->processBefore($args);
+            })->
+            then(function () use ($args) {
+                $this->processThen($args);
+            }, true)
+            ->everyminute(
                 (int) $schedule['params']['minutes']
             );
         } else if ($schedule['type'] === 'hourly') {
             $this->scheduler->raw(
-                $task['raw'],
+                $rawCmd,
                 $rawArgs,
                 $args['task']['id'] . '-' . $schedule['type']
-            )->hourly(
+            )->
+            onlyOne(null, $this->removeStuckLockFile($args['task'], $schedule, null, $rawCmd))->
+            output($this->outputDir . '/' . $args['task']['id'] . '-' . $schedule['type'] . '.log')->
+            before(function() use ($args) {
+                $this->processBefore($args);
+            })->
+            then(function () use ($args) {
+                $this->processThen($args);
+            }, true)
+            ->hourly(
                 (int) $schedule['params']['hourly_minutes']
             );
         } else if ($schedule['type'] === 'daily') {
             $this->scheduler->raw(
-                $task['raw'],
+                $rawCmd,
                 $rawArgs,
                 $args['task']['id'] . '-' . $schedule['type']
-            )->daily(
+            )->
+            onlyOne(null, $this->removeStuckLockFile($args['task'], $schedule, null, $rawCmd))->
+            output($this->outputDir . '/' . $args['task']['id'] . '-' . $schedule['type'] . '.log')->
+            before(function() use ($args) {
+                $this->processBefore($args);
+            })->
+            then(function () use ($args) {
+                $this->processThen($args);
+            }, true)
+            ->daily(
                 (int) $schedule['params']['daily_hours'],
                 (int) $schedule['params']['daily_minutes']
             );
         } else if ($schedule['type'] === 'weekly') {
             $this->scheduler->raw(
-                $task['raw'],
+                $rawCmd,
                 $rawArgs,
                 $args['task']['id'] . '-' . $schedule['type'] . '-' . $day
-            )->weekly(
+            )->
+            onlyOne(null, $this->removeStuckLockFile($args['task'], $schedule, null, $rawCmd))->
+            output($this->outputDir . '/' . $args['task']['id'] . '-' . $schedule['type'] . '.log')->
+            before(function() use ($args) {
+                $this->processBefore($args);
+            })->
+            then(function () use ($args) {
+                $this->processThen($args);
+            }, true)
+            ->weekly(
                 $this->dayOfWeek,
                 (int) $schedule['params']['weekly_hours'],
                 (int) $schedule['params']['weekly_minutes']
             );
         } else if ($schedule['type'] === 'monthly') {
             $this->scheduler->raw(
-                $task['raw'],
+                $rawCmd,
                 $rawArgs,
                 $args['task']['id'] . '-' . $schedule['type'] . '-' . $month
-            )->monthly(
+            )->
+            onlyOne(null, $this->removeStuckLockFile($args['task'], $schedule, null, $rawCmd))->
+            output($this->outputDir . '/' . $args['task']['id'] . '-' . $schedule['type'] . '.log')->
+            before(function() use ($args) {
+                $this->processBefore($args);
+            })->
+            then(function () use ($args) {
+                $this->processThen($args);
+            }, true)
+            ->monthly(
                 (int) $this->month,
                 (int) $this->dateOfMonth,
                 (int) $schedule['params']['monthly_hours'],
@@ -884,14 +959,16 @@ class Workers extends BasePackage
 
     protected function processBefore($args)
     {
-        $this->calls = new Calls;
-
         $this->calls->updateJobTask(2, $args);
     }
 
-    protected function processThen($args)
+    protected function processThen($args, $rawCmd = false)
     {
-        $args['task']['pid'] = $this->getTaskProcessId($args['task'], base_path('public/index.php workers exec'));
+        if ($rawCmd) {
+            $args['task']['pid'] = $this->getTaskProcessId($args['task'], null, $rawCmd);
+        } else {
+            $args['task']['pid'] = $this->getTaskProcessId($args['task'], base_path('public/index.php workers exec'));
+        }
 
         $this->basepackages->workers->tasks->updateTask($args['task']);
         // var_dump($args);
@@ -951,6 +1028,7 @@ class Workers extends BasePackage
         } else if ($task['exec_type'] === 'raw' && $rawCommand) {
             //
         }
+
         return $pid;
     }
 
