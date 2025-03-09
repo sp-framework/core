@@ -89,7 +89,11 @@ class DocumentFinder
                         $indexSearched = true;
 
                         //trim % (like), change space to + for multikeyword search.
-                        $keyword = str_replace(' ', '+', strtolower(trim($condition[0][2], '%')));
+                        if (is_string($condition[0][2])) {
+                            $keyword = str_replace(' ', '+', strtolower(trim($condition[0][2], '%')));
+                        } else {
+                            $keyword = $condition[0][2];
+                        }
 
                         if ($this->multiWords === true && str_contains($keyword, '+')) {
                             $keywordArr = explode('+', $keyword);
@@ -99,7 +103,11 @@ class DocumentFinder
                                     continue;
                                 }
 
-                                $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
+                                if (is_string($keyword)) {
+                                    $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
+                                } else {
+                                    $indexChars = $keyword;
+                                }
 
                                 $found = array_merge($found, $this->searchIndexes($condition, $indexChars, $skip, $limit, $keyword));
                             }
@@ -108,7 +116,11 @@ class DocumentFinder
                                 continue;
                             }
 
-                            $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
+                            if (is_string($keyword)) {
+                                $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
+                            } else {
+                                $indexChars = $keyword;
+                            }
 
                             $found = array_merge($found, $this->searchIndexes($condition, $indexChars, $skip, $limit, $keyword));
                         }
