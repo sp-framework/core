@@ -24,6 +24,8 @@ class Accounts extends BasePackage
 
     public function getAccountById(int $id)
     {
+        $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
         $this->setFFRelations(true);
 
         $this->setFFRelationsConditions(
