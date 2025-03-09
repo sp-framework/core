@@ -9,6 +9,8 @@ class ProcessImportExportQueue extends Calls
 {
     public $funcDisplayName = 'Process Import/Export Queue';
 
+    public $funcDescription = 'Process import/export processes with this call.';
+
     protected $args;
 
     public function run(array $args = [])

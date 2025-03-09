@@ -24,44 +24,11 @@ class Tasks extends BasePackage
 
     public function init(bool $resetCache = false)
     {
+        $this->setFFRelations(true);
+
         $this->getAll($resetCache);
 
         return $this;
-    }
-
-    public function getAllCalls()
-    {
-        $callsArr =
-            $this->localContent->listContents($this->callsDir, true)
-            ->filter(fn (StorageAttributes $attributes) => $attributes->isFile())
-            ->map(fn (StorageAttributes $attributes) => $attributes->path())
-            ->toArray();
-
-        $calls = [];
-
-        if (count($callsArr) > 0) {
-            foreach ($callsArr as $key => $call) {
-                $call = ucfirst($call);
-                $call = str_replace('/', '\\', $call);
-                $call = str_replace('.php', '', $call);
-
-                try {
-                    $call = new $call();
-
-                    $calls[$call->packageName]['func'] = $call->packageName;
-                    $calls[$call->packageName]['name'] = $call->funcName;
-
-                } catch (\throwable $e) {
-
-                    if ($this->config->logs->exceptions) {
-                        $this->logger->logExceptions->critical(json_trace($e));
-                    }
-                    continue;
-                }
-            }
-        }
-
-        return $calls;
     }
 
     public function addTask(array $data)
@@ -116,6 +83,8 @@ class Tasks extends BasePackage
 
     public function forceNextRun(array $data)
     {
+        $this->setFFRelations(true);
+
         $task = $this->getById($data['id']);
 
         $task = array_merge($task, $data);
@@ -124,7 +93,7 @@ class Tasks extends BasePackage
 
         if (isset($data['cancel']) && $data['cancel'] == 'true') {
             if ($this->config->databasetype === 'hybrid' &&
-                $task['call'] === 'processdbsync'
+                $task['call']['name'] === 'ProcessDbSync'
             ) {
                 $this->ff->setSync(false);
             }
@@ -205,7 +174,7 @@ class Tasks extends BasePackage
         }
 
         foreach ($this->tasks as $taskKey => $task) {
-            if ($function && $task['call'] !== $function) {
+            if ($function && $task['call']['name'] !== $function) {
                 continue;
             }
 
@@ -228,7 +197,7 @@ class Tasks extends BasePackage
         }
 
         foreach ($this->tasks as $taskKey => $task) {
-            if ($task['call'] === $function) {
+            if ($task['call']['name'] === $function) {
                 return $task;
             }
         }

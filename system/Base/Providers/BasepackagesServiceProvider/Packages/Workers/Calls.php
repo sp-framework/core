@@ -19,6 +19,8 @@ class Calls extends BasePackage
 
     public function init(bool $resetCache = false)
     {
+        $this->setFFRelations(true);
+
         $this->getAll($resetCache);
 
         return $this;

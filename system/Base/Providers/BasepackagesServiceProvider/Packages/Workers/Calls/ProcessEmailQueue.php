@@ -8,6 +8,8 @@ class ProcessEmailQueue extends Calls
 {
     public $funcDisplayName = 'Process Email Queue';
 
+    public $funcDescription = 'Process email queue with this call.';
+
     protected $args;
 
     public function run(array $args = [])

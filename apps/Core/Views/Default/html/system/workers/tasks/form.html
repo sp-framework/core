@@ -22,7 +22,7 @@
         {% set taskScheduleDisabled = true %}
     {% endif %}
     {% set taskExecType = task['exec_type'] %}
-    {% set taskCall = task['call'] %}
+    {% set taskCall = task['cid'] %}
     {% set taskCallArgs = task['call_args'] %}
 {% else %}
     {% set taskId = '' %}
@@ -259,8 +259,8 @@
                                     'componentName'                         : componentName,
                                     'componentId'                           : componentId,
                                     'sectionId'                             : sectionId,
-                                    'fieldId'                               : 'call',
-                                    'fieldLabel'                            : 'Call Function',
+                                    'fieldId'                               : 'cid',
+                                    'fieldLabel'                            : 'Call Function (Package)',
                                     'fieldType'                             : 'select2',
                                     'fieldHelp'                             : true,
                                     'fieldHelpTooltipContent'               : "Task's function to call",
@@ -269,14 +269,34 @@
                                     'fieldBazPostOnCreate'                  : true,
                                     'fieldBazPostOnUpdate'                  : true,
                                     'fieldDataSelect2Options'               : calls,
-                                    'fieldDataSelect2OptionsKey'            : 'func',
-                                    'fieldDataSelect2OptionsValue'          : 'name',
+                                    'fieldDataSelect2OptionsKey'            : 'id',
+                                    'fieldDataSelect2OptionsValue'          : 'name:package_name',
                                     'fieldDataSelect2OptionsArray'          : true,
                                     'fieldDataSelect2OptionsSelected'       : taskCall
                                 ]
                             )}}
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'component'                      : component,
+                                    'componentName'                  : componentName,
+                                    'componentId'                    : componentId,
+                                    'sectionId'                      : sectionId,
+                                    'fieldId'                        : 'call_description',
+                                    'fieldLabel'                     : false,
+                                    'fieldType'                      : 'html',
+                                    'fieldHelp'                      : false,
+                                    'fieldHelpTooltipContent'        : '',
+                                    'fieldBazJstreeSearch'           : false,
+                                    'fieldBazScan'                   : false
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                    {% set calls = json_encode(calls, 16) %}
                     <div class="row">
                         <div class="col">
                             {{adminltetags.useTag('fields',
@@ -333,6 +353,9 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
 
+dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['calls'] = JSON.parse('{{calls}}');
+
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                      : { },
@@ -361,21 +384,40 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-schedule_id'             : {
             placeholder : "SELECT SCHEDULE"
         },
-        '{{componentId}}-{{sectionId}}-call'                    : {
-            placeholder : "SELECT FUNCTION TO CALL"
+        '{{componentId}}-{{sectionId}}-cid'                     : {
+            placeholder : "SELECT FUNCTION TO CALL",
+            afterInit: function() {
+                var id;
+
+                $('#{{componentId}}-{{sectionId}}-call').on('select2:select', function(e) {
+                    id = e.params.data.id;
+
+                    if (dataCollectionSectionForm['vars']['calls'][id]) {
+                        if (dataCollectionSectionForm['vars']['calls'][id]['description'] &&
+                            dataCollectionSectionForm['vars']['calls'][id]['description'] !== ''
+                        ) {
+                            $('#{{componentId}}-{{sectionId}}-call_description').html('<small class="text-info"><i class="fa-solid fa-circle-info"></i> ' + dataCollectionSectionForm['vars']['calls'][id]['description'] + '</small>');
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-call_description').html('');
+                        }
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-call_description').html('');
+                    }
+                });
+            }
         },
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'required',
                 '{{componentId}}-{{sectionId}}-priority'                : 'required',
                 '{{componentId}}-{{sectionId}}-schedule_id'             : 'required',
-                '{{componentId}}-{{sectionId}}-call'                    : 'required'
+                '{{componentId}}-{{sectionId}}-cid'                     : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'Please enter Service name',
                 '{{componentId}}-{{sectionId}}-priority'                : 'Please enter priority between 1 and 10',
                 '{{componentId}}-{{sectionId}}-schedule_id'             : 'Please select a schedule',
-                '{{componentId}}-{{sectionId}}-call'                    : 'Please select a function to call'
+                '{{componentId}}-{{sectionId}}-cid'                     : 'Please select a function to call'
             }
         }
     });

@@ -81,8 +81,24 @@ class Workers extends BasePackage
 
         $this->enabledTasks = $this->tasks->getEnabledTasks();
 
-        // $this->availableCalls = array_keys($this->tasks->getAllCalls());
-        // trace([$this->availableCalls]);
+        $this->availableCalls = [];
+
+        if ($this->calls->calls && count($this->calls->calls) > 0) {
+            foreach ($this->calls->calls as $thisCalls) {
+                if (!$thisCalls['package']) {
+                    continue;
+                }
+
+                if (!isset($calls[$thisCalls['id']])) {
+                    $calls[$thisCalls['id']] = [];
+                }
+
+                $this->availableCalls[$thisCalls['id']]['id'] = $thisCalls['id'];
+                $this->availableCalls[$thisCalls['id']]['name'] = $thisCalls['name'];
+                $this->availableCalls[$thisCalls['id']]['package_class'] = $thisCalls['package']['class'];
+            }
+        }
+
         return $this;
     }
 
@@ -110,8 +126,16 @@ class Workers extends BasePackage
             $schedule = $this->schedules->getSchedulesSchedule($task['schedule_id']);
             $class = null;
 
-            if (in_array($task['call'], $this->availableCalls)) {
-                $class = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Workers\\Calls\\' . ucfirst($task['call']);
+            if (isset($this->availableCalls[$task['cid']])) {
+                if (str_starts_with($this->availableCalls[$task['cid']]['package_class'], 'System')) {
+                    $class = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Workers\\Calls\\' . ucfirst($this->availableCalls[$task['cid']]['name']);
+                } else if (str_starts_with($this->availableCalls[$task['cid']]['package_class'], 'Apps')) {
+                    $packageClassArr = explode('\\', $this->availableCalls[$task['cid']]['package_class']);
+                    unset($packageClassArr[$this->helper->lastKey($packageClassArr)]);
+                    $this->availableCalls[$task['cid']]['package_class'] = implode('\\', $packageClassArr);
+
+                    $class = $this->availableCalls[$task['cid']]['package_class'] . '\\TaskCalls\\' . ucfirst($this->availableCalls[$task['cid']]['name']);
+                }
             } else {
                 $task['enabled'] = 0;
                 $task['status'] = 3;//Error

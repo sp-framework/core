@@ -3,9 +3,12 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers;
 
 use System\Base\BaseModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersCalls;
 
 class BasepackagesWorkersTasks extends BaseModel
 {
+    protected $modelRelations = [];
+
     public $id;
 
     public $name;
@@ -41,4 +44,27 @@ class BasepackagesWorkersTasks extends BaseModel
     public $email;
 
     public $result;
+
+    public function initialize()
+    {
+        $this->modelRelations['call']['relationObj'] = $this->hasOne(
+            'cid',
+            BasepackagesWorkersCalls::class,
+            'id',
+            [
+                'alias'         => 'call'
+            ]
+        );
+
+        parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        if (count($this->modelRelations) === 0) {
+            $this->initialize();
+        }
+
+        return $this->modelRelations;
+    }
 }

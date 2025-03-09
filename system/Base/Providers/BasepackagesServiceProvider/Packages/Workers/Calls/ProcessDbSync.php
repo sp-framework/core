@@ -9,6 +9,8 @@ class ProcessDbSync extends Calls
 {
     public $funcDisplayName = 'Process DB Sync (Hybrid mode)';
 
+    public $funcDescription = 'Process sync of FF data with DB data.';
+
     public function run(array $args = [])
     {
         $thisCall = $this;

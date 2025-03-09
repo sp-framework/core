@@ -285,7 +285,7 @@ abstract class BasePackage extends Controller
 					$this->ffStore = $this->ff->store($this->ffStoreToUse);
 				}
 
-				$allPackages = $this->ffStore->findAll();
+				$allPackages = $this->ffStore->findAll(null, null, null, $this->ffRelations, $this->ffRelationsConditions);
 
 				$this->setFfStoreToUse();
 			}
