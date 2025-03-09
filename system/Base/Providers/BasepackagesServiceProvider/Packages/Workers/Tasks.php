@@ -13,14 +13,7 @@ class Tasks extends BasePackage
 
     protected $packageName = 'tasks';
 
-    protected $callsDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Workers/Calls/';
-
     public $tasks;
-
-    public function getFunctionsDir()
-    {
-        return $this->callsDir;
-    }
 
     public function init(bool $resetCache = false)
     {
