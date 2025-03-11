@@ -788,7 +788,7 @@ Class Setup
 			$this->session->getId(),
 			time() + 600,
 			'/',
-			$this->postData['dev'] == 'true' ? false : true,
+			false,
 			null,
 			true,
 			[
