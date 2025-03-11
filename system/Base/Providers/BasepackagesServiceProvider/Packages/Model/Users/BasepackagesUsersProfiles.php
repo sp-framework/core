@@ -42,6 +42,10 @@ class BasepackagesUsersProfiles extends BaseModel
 
     public $contact_notes;
 
+    public $locale_country_id;
+
+    public $locale_timezone_id;
+
     public $settings;
 
     public function initialize()

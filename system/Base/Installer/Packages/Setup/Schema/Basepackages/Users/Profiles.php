@@ -138,6 +138,20 @@ class Profiles
                         ]
                     ),
                     new Column(
+                        'locale_country_id',
+                        [
+                            'type'          => Column::TYPE_SMALLINTEGER,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'locale_timezone_id',
+                        [
+                            'type'          => Column::TYPE_SMALLINTEGER,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
                         'settings',
                         [
                             'type'          => Column::TYPE_TEXT,
