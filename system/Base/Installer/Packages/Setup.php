@@ -303,8 +303,8 @@ class Setup
 			'0',
 			1,
 			'/',
-			null,
-			null,
+			false,
+			$this->request->getHttpHost(),
 			true
 		);
 
@@ -315,8 +315,8 @@ class Setup
 			'0',
 			1,
 			'/',
-			null,
-			null,
+			false,
+			$this->request->getHttpHost(),
 			true
 		);
 
@@ -325,8 +325,8 @@ class Setup
 			'0',
 			1,
 			'/',
-			null,
-			null,
+			false,
+			$this->request->getHttpHost(),
 			true
 		);
 
