@@ -789,7 +789,7 @@ Class Setup
 			time() + 600,
 			'/',
 			false,
-			null,
+			$this->request->getHttpHost(),
 			true,
 			[
 				'samesite'	=> 'Strict'
