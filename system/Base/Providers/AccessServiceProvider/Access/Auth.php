@@ -246,7 +246,7 @@ class Auth extends BasePackage
             '0',
             1,
             '/',
-            null,
+            true,
             $this->domains->getDomain()['name'],
             true
         );
@@ -258,7 +258,7 @@ class Auth extends BasePackage
             '0',
             1,
             '/',
-            null,
+            true,
             $this->domains->getDomain()['name'],
             true
         );
@@ -495,7 +495,7 @@ class Auth extends BasePackage
             $this->account['id'],
             $this->cookieTimeout,
             '/',
-            null,
+            true,
             $this->domains->getDomain()['name'],
             true
         );
@@ -647,7 +647,7 @@ class Auth extends BasePackage
             $identifier . $this->separator . $token,
             $this->cookieTimeout,
             '/',
-            null,
+            true,
             $this->domains->getDomain()['name'],
             true
         );

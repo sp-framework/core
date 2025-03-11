@@ -888,6 +888,8 @@ class Accounts extends BasePackage
         } else {
             $this->ffStoreToUse = 'basepackages_users_accounts_canlogin';
 
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
             $this->getByParams(['conditions' => [['account_id', '=', $id],['app_id', '=', $appId]]]);
 
             $canLogin = $this->ffData;
@@ -916,6 +918,8 @@ class Accounts extends BasePackage
             } else {
                 foreach ($canLogin as $login) {
                     $this->ffStoreToUse = 'basepackages_users_accounts_canlogin';
+
+                    $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
                     $this->remove($login['id']);
                 }
@@ -946,6 +950,8 @@ class Accounts extends BasePackage
 
         if ($this->ffData) {
             $this->ffStoreToUse = 'basepackages_users_accounts_sessions';
+
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
             $this->getByParams(['conditions' => [['account_id', '=', $id],['session_id', '=', $session]]]);
 
