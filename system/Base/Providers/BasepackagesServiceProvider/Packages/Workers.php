@@ -456,7 +456,6 @@ class Workers extends BasePackage
                     (int) $schedule['params']['minutes']
                 )->executionTime;
 
-            // $secsLeft = $this->cron->getNextRunDate()->getTimestamp() - time();
             $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
         } else if ($schedule['type'] === 'hourly') {
             $this->cron =
@@ -464,7 +463,6 @@ class Workers extends BasePackage
                     (int) $schedule['params']['hourly_minutes']
                 )->executionTime;
 
-            // $secsLeft = $this->cron->getNextRunDate()->getTimestamp() - time();
             $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
         } else if ($schedule['type'] === 'daily') {
             $this->cron =
@@ -473,7 +471,6 @@ class Workers extends BasePackage
                     (int) $schedule['params']['daily_minutes']
                 )->executionTime;
 
-            // $secsLeft = $this->cron->getNextRunDate()->getTimestamp() - time();
             $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
 
             if ($task['next_run'] !== $this->cron->getNextRunDate()) {
