@@ -112,11 +112,11 @@ class DocumentFinder
                                 $found = array_merge($found, $this->searchIndexes($condition, $indexChars, $skip, $limit, $keyword));
                             }
                         } else {
-                            if (strlen($keyword) < $this->minIndexChars) {
-                                continue;
-                            }
-
                             if (is_string($keyword)) {
+                                if (strlen($keyword) < $this->minIndexChars) {
+                                    continue;
+                                }
+
                                 $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
                             } else {
                                 $indexChars = $keyword;
@@ -285,7 +285,7 @@ class DocumentFinder
             $found = [];
         }
 
-        return $found;
+        return $found ?? [];
     }
 
     protected function getDataPath(): string
@@ -330,7 +330,7 @@ class DocumentFinder
             return;
         }
 
-        $found = array_slice($found, $skip);
+        $found = array_slice($found, $skip, null, true);
     }
 
     protected static function limit(array &$found, $limit)
@@ -339,7 +339,7 @@ class DocumentFinder
             return;
         }
 
-        $found = array_slice($found, 0, $limit);
+        $found = array_slice($found, 0, $limit, true);
     }
 
     protected static function performSearch(array &$found, array $search, array $searchOptions)
