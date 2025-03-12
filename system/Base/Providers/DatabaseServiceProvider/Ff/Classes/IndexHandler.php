@@ -142,6 +142,8 @@ class IndexHandler
                 if (count($indexJson[$content]) === 0) {
                     return IoHelper::deleteFile($this->indexesPath . $index . '/' . $indexChars . '.json');
                 }
+
+                $indexJson[$content] = array_values($indexJson[$content]);
             } else {
                 if (!in_array($indexPointer, $indexJson[$content])) {
                     array_push($indexJson[$content], $indexPointer);
@@ -150,6 +152,7 @@ class IndexHandler
         } else {
             if (!$remove) {
                 $indexJson[$content] = [$indexPointer];
+                $indexJson[$content] = array_values($indexJson[$content]);
             }
         }
 

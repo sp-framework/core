@@ -329,6 +329,8 @@ class Ff
             return $config;
         }
 
+        $config['uniqueFields'] = [];
+        $config['indexes'] = [];
         if (isset($tableClass->columns()['indexes'])) {
             foreach ($tableClass->columns()['indexes'] as $index) {
                 if ($index->getType() === 'UNIQUE' && $index->getColumns() && count($index->getColumns()) > 0) {

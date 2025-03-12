@@ -1496,10 +1496,32 @@ class Store
             }
 
             if (count($criteria) > 0) {
-                $found = $this->findOneBy($criteria);
+                $found = $this->findBy($criteria);
 
-                if ($found) {
-                    throw new IOException("Duplicate entry found for field: $uniqueField. $uniqueField should be unique. Store: " . $this->storeName);
+                $duplicate = false;
+
+                if ($found && count($found) > 0) {
+                    foreach ($found as $foundArr) {
+                        $match = false;
+
+                        foreach ($criteria as $criteriaArr) {
+                            if (isset($foundArr[$criteriaArr[0]]) && $foundArr[$criteriaArr[0]] === $criteriaArr[2]) {
+                                $match = true;
+                            } else {
+                                $match = false;
+                            }
+                        }
+
+                        if ($match) {
+                            $duplicate = $foundArr['id'];
+
+                            break;
+                        }
+                    }
+                }
+
+                if ($duplicate) {
+                    throw new IOException("Duplicate entry with ID: $duplicate found for field: $uniqueField. $uniqueField should be unique. Store: " . $this->storeName);
                 }
             }
         }
