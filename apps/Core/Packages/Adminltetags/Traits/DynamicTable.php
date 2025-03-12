@@ -21,7 +21,8 @@ trait DynamicTable {
         int $componentId = null,
         $resetCache = false,
         $enableCache = true,
-        $packageData = []
+        $packageData = [],
+        $excludeColumns = []
     ) {
         if (gettype($package) === 'string') {
             $package = $this->usePackage($package);
@@ -43,9 +44,9 @@ trait DynamicTable {
             $modelsColumnMap = $package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable));
 
             if (isset($modelsColumnMap['columns'])) {
-                $table['columns'] = $this->sortColumns($columnsForTable, $modelsColumnMap['columns']);
+                $table['columns'] = $this->sortColumns($columnsForTable, $modelsColumnMap['columns'], $excludeColumns);
             } else {
-                $table['columns'] = $this->sortColumns($columnsForTable, $modelsColumnMap);
+                $table['columns'] = $this->sortColumns($columnsForTable, $modelsColumnMap, $excludeColumns);
             }
 
             if ($dtReplaceColumnsTitle && count($dtReplaceColumnsTitle) > 0) {
@@ -80,9 +81,9 @@ trait DynamicTable {
                 $modelsColumnMap = $package->getModelsColumnMap($this->removeEscapeFromName($columnsForFilter));
 
                 if (isset($modelsColumnMap['columns'])) {
-                    $table['filterColumns'] = $this->sortColumns($columnsForFilter, $modelsColumnMap['columns']);
+                    $table['filterColumns'] = $this->sortColumns($columnsForFilter, $modelsColumnMap['columns'], $excludeColumns);
                 } else {
-                    $table['filterColumns'] = $this->sortColumns($columnsForFilter, $modelsColumnMap);
+                    $table['filterColumns'] = $this->sortColumns($columnsForFilter, $modelsColumnMap, $excludeColumns);
                 }
 
                 foreach ($filtersArr as $key => $filter) {
@@ -281,7 +282,7 @@ trait DynamicTable {
         return $rows;
     }
 
-    protected function sortColumns($columnsForTable, $dbColumns)
+    protected function sortColumns($columnsForTable, $dbColumns, $excludeColumns = [])
     {
         $columnsForTable = $this->removeEscapeFromName($columnsForTable);
 
@@ -290,6 +291,10 @@ trait DynamicTable {
         $sortedColumns = array_merge(['id' => $dbColumns['id']]);
 
         foreach ($columnsForTable as $key => $column) {
+            if (in_array($column, $excludeColumns)) {
+                continue;
+            }
+
             if ($column !== 'id') {
                 if ($dbColumns[$column]) {
                     $sortedColumns[$column] = $dbColumns[$column];
