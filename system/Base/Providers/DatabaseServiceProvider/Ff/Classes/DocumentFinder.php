@@ -80,50 +80,19 @@ class DocumentFinder
 
         $indexSearched = false;
 
+        //Note: for now index searches are using "OR" condition. If there are 2 more conditions to search,
+        //both conditions data will be searched. This needs to be extended to include keywords like "OR" and "AND"
         if ($this->storeConfiguration['readIndex']) {
             if (count($conditions) > 0) {
-                foreach ($conditions as $condition) {
-                    if (isset($condition[0]) &&
-                        in_array($condition[0][0], $this->storeConfiguration['indexes'])
-                    ) {
-                        $indexSearched = true;
+                foreach ($conditions as $conditionKey => $condition) {
+                    $conditionArr = $condition;
 
-                        //trim % (like), change space to + for multikeyword search.
-                        if (is_string($condition[0][2])) {
-                            $keyword = str_replace(' ', '+', strtolower(trim($condition[0][2], '%')));
-                        } else {
-                            $keyword = $condition[0][2];
+                    if (is_array($condition[0])) {
+                        foreach ($condition as $conditionArr) {
+                            $this->processIndexes($conditionArr, $found, $skip, $limit);
                         }
-
-                        if ($this->multiWords === true && str_contains($keyword, '+')) {
-                            $keywordArr = explode('+', $keyword);
-
-                            foreach ($keywordArr as $key => $keyword) {
-                                if (strlen($keyword) < $this->minMultiWordsChars) {
-                                    continue;
-                                }
-
-                                if (is_string($keyword)) {
-                                    $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
-                                } else {
-                                    $indexChars = $keyword;
-                                }
-
-                                $found = array_merge($found, $this->searchIndexes($condition, $indexChars, $skip, $limit, $keyword));
-                            }
-                        } else {
-                            if (is_string($keyword)) {
-                                if (strlen($keyword) < $this->minIndexChars) {
-                                    continue;
-                                }
-
-                                $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
-                            } else {
-                                $indexChars = $keyword;
-                            }
-
-                            $found = array_merge($found, $this->searchIndexes($condition, $indexChars, $skip, $limit, $keyword));
-                        }
+                    } else {
+                        $this->processIndexes($conditionArr, $found, $skip, $limit);
                     }
                 }
             }
@@ -213,11 +182,59 @@ class DocumentFinder
         return $found;
     }
 
+    protected function processIndexes($conditionArr, &$found, $skip, $limit)
+    {
+        if (isset($conditionArr[0]) &&
+            in_array($conditionArr[0], $this->storeConfiguration['indexes'])
+        ) {
+            $indexSearched = true;
+
+            //trim % (like), change space to + for multikeyword search.
+            if (is_string($conditionArr[2])) {
+                $keyword = str_replace(' ', '+', strtolower(trim($conditionArr[0][2], '%')));
+            } else {
+                $keyword = $conditionArr[2];
+            }
+
+            if ($this->multiWords === true && str_contains($keyword, '+')) {
+                $keywordArr = explode('+', $keyword);
+
+                foreach ($keywordArr as $key => $keyword) {
+                    if (strlen($keyword) < $this->minMultiWordsChars) {
+                        continue;
+                    }
+
+                    if (is_string($keyword)) {
+                        $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
+                    } else {
+                        $indexChars = $keyword;
+                    }
+
+                    $found = array_merge($found, $this->searchIndexes($conditionArr, $indexChars, $skip, $limit, $keyword));
+                }
+            } else {
+                if (is_string($keyword)) {
+                    if (strlen($keyword) < $this->minIndexChars) {
+                        return [];
+                    }
+
+                    $indexChars = strtolower(mb_substr($keyword, 0, $this->minIndexChars, 'UTF-8'));
+                } else {
+                    $indexChars = $keyword;
+                }
+
+                $found = array_merge($found, $this->searchIndexes($conditionArr, $indexChars, $skip, $limit, $keyword));
+            }
+        }
+
+        return $found ?? [];
+    }
+
     protected function searchIndexes($condition, $indexChars, $skip, $limit, $keyword)
     {
         try {
             $indexFile = IoHelper::getFileContent(
-                $this->storeConfiguration['indexesPath'] . $condition[0][0] . '/' . $indexChars . '.json'
+                $this->storeConfiguration['indexesPath'] . $condition[0] . '/' . $indexChars . '.json'
             );
 
             $indexFile = strtolower($indexFile);
@@ -255,7 +272,7 @@ class DocumentFinder
 
                         $key = strtolower($key);
 
-                        if (strtolower($condition[0][1]) === 'like') {
+                        if (strtolower($condition[1]) === 'like') {
                             if (str_starts_with($key, $indexChars)) {
                                 foreach ($ids as $id) {
                                     $indexIdData = $this->store->findById($id);
@@ -265,8 +282,8 @@ class DocumentFinder
                                     }
                                 }
                             }
-                        } else if ($condition[0][1] === '=' ||
-                                   $condition[0][1] === '==='
+                        } else if ($condition[1] === '=' ||
+                                   $condition[1] === '==='
                         ) {
                             if ($key === $indexChars) {
                                 foreach ($ids as $id) {
