@@ -32,7 +32,7 @@ class Store
     protected $minIndexChars = 3;
     protected $multiWords = true;
     protected $multiWordsSeparator = ' ';
-    protected $minMultiWordsChars = 5;
+    protected $minMultiWordsChars = 4;
 
     protected $indexes = [];
     protected $model = null;

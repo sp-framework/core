@@ -341,7 +341,7 @@ class Ff
 
         if (method_exists($tableClass, 'indexes')) {
             $columns = [];
-            $columnsTypeToIndex = [0,2,5,7,9,14];//int, chars, varchars
+            $columnsTypeToIndex = [0,2,5,7,9,14,22];//int, chars, varchars
 
             foreach ($tableClass->columns()['columns'] as $column) {
                 $columns[$column->getName()] = $column;

@@ -248,17 +248,19 @@ if (!function_exists('checkCtype')) {
             $ignoreChars = [' ', '&amp;', '&', ',', ':', ';'];
         }
 
+        $string = trim(str_replace($ignoreChars, '' , $str));
+
         if ($ctype === 'alnum') {
-            if (ctype_alnum(trim(str_replace($ignoreChars, '' , $str)))) {
-                return trim(str_replace($ignoreChars, '' , $str));
+            if (ctype_alnum($string)) {
+                return $string;
             }
         } else if ($ctype === 'alpha') {
-            if (ctype_alpha(trim(str_replace($ignoreChars, '' , $str)))) {
-                return trim(str_replace($ignoreChars, '' , $str));
+            if (ctype_alpha($string)) {
+                return $string;
             }
         } else if ($ctype === 'digits') {
-            if (ctype_digit(trim(str_replace($ignoreChars, '' , $str)))) {
-                return trim(str_replace($ignoreChars, '' , $str));
+            if (ctype_digit($string)) {
+                return $string;
             }
         }
 
