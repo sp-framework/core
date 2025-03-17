@@ -398,20 +398,21 @@ class Tree extends Adminltetags
                             $key = $itemValue[$this->fieldParams['fieldDataSelect' . $selectType . 'OptionsKey']];
 
                             if (count($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue']) === 1) {
-                                if (is_string($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'][0])) {
-                                    $optionsValueKey = explode(':', $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'][0]);
-                                }
+                                if (str_contains($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'][0], '/')) {
+                                    $hierarchyOptionValue = explode('/', $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'][0]);
 
-                                if (count($optionsValueKey) === 1) {
-                                    $optionsValueKey = $optionsValueKey[0];
-
-                                    if (isset($itemValue[$optionsValueKey])) {
-                                        $value = $itemValue[$optionsValueKey];
+                                    if (count($hierarchyOptionValue) === 1) {
+                                        $value = $itemValue[$hierarchyOptionValue[0]];
+                                    } else {
+                                        $itemValueArr = [];
+                                        $itemValueArr = $itemValue;
+                                        foreach ($hierarchyOptionValue as $optionsValueArr) {
+                                            $itemValueArr = $itemValueArr[$optionsValueArr];
+                                        }
+                                        $value = $itemValueArr;
                                     }
                                 } else {
-                                    if (isset($itemValue[$optionsValueKey[0]]) && isset($itemValue[$optionsValueKey[1]])) {
-                                        $value = $itemValue[$optionsValueKey[0]] . ' (' . $itemValue[$optionsValueKey[1]] . ')';
-                                    }
+                                    $value = $itemValue[$this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'][0]];
                                 }
                             } else {
                                 foreach ($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'] as $optionsValueKey) {
