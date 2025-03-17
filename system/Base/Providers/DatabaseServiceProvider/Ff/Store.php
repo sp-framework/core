@@ -1675,6 +1675,24 @@ class Store
                             }
                         }
 
+                        if ($type === 'string') {
+                            if (is_integer($data[$propertyKey]) || is_float($data[$propertyKey])) {
+                                $data[$propertyKey] = (string) $data[$propertyKey];
+                            }
+
+                            if (is_bool($data[$propertyKey])) {
+                                if ($data[$propertyKey] === true ||
+                                    $data[$propertyKey] === 1
+                                ) {
+                                    $data[$propertyKey] = 'true';
+                                } else if ($data[$propertyKey] === false ||
+                                           $data[$propertyKey] === 0
+                                ) {
+                                    $data[$propertyKey] = 'false';
+                                }
+                            }
+                        }
+
                         if ($type === 'boolean') {
                             if (is_string($data[$propertyKey])) {
                                 if ($data[$propertyKey] === 'false' ||
