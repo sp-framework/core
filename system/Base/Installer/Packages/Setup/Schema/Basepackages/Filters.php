@@ -29,6 +29,14 @@ class Filters
                     ]
                 ),
                 new Column(
+                    'app_type',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
                     'component_id',
                     [
                         'type'    => Column::TYPE_SMALLINTEGER,

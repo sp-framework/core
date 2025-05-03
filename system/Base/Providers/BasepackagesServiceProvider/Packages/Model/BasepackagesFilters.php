@@ -10,6 +10,8 @@ class BasepackagesFilters extends BaseModel
 
     public $name;
 
+    public $app_type;
+
     public $component_id;
 
     public $conditions;

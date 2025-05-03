@@ -22,82 +22,83 @@ class FiltersComponent extends BaseComponent
      */
     public function viewAction()
     {
-        if ($this->app['id'] == 1) {
-            $components = $this->modules->components->components;
+        if (isset($this->getData()['id'])) {
+            if ($this->getData()['id'] != 0) {
+                $filter = $this->filters->getById($this->getData()['id']);
+
+                if (!$filter) {
+                    return $this->throwIdNotFound();
+                }
+
+                $this->view->filter = $filter;
+            }
+
+            $this->view->pick('filters/view');
+
+            return;
+        } else {
+            if ($this->app['id'] == 1) {
+                $components = $this->modules->components->components;
+            } else {
+                $components = $this->modules->components->getComponentsForAppType($this->app['app_type']);
+            }
 
             foreach ($components as $key => $component) {
                 $components[$key]['name'] = $component['name'] . ' (' . $component['category'] . ')';
             }
 
             $this->view->components = $components;
+        }
 
-            if (isset($this->getData()['id'])) {
-                if ($this->getData()['id'] != 0) {
-                    $filter = $this->filters->getById($this->getData()['id']);
-
-                    if (!$filter) {
-                        return $this->throwIdNotFound();
-                    }
-
-                    $this->view->filter = $filter;
-                }
-
-                $this->view->pick('filters/view');
-
-                return;
-            }
-
-            if ($this->request->isPost()) {
-                $replaceColumns =
-                    [
-                        'filter_type' => ['html'  =>
-                            [
-                                '0' =>  'System',
-                                '1' =>  'User',
-                                '2' =>  'User',
-                            ]
-                        ],
-                        'is_default' => ['html'  =>
-                            [
-                                '0' =>  'No',
-                                '1' =>  'Yes'
-                            ]
-                        ],
-                        'auto_generated' => ['html'  =>
-                            [
-                                '0' =>  'No',
-                                '1' =>  'Yes'
-                            ]
-                        ]
-                    ];
-            } else {
-                $replaceColumns = null;
-            }
-
-            $controlActions =
+        if ($this->request->isPost()) {
+            $replaceColumns =
                 [
-                    'actionsToEnable'       =>
-                    [
-                        'edit'      => 'system/filters',
-                        'remove'    => 'system/filters/remove'
+                    'filter_type' => ['html'  =>
+                        [
+                            '0' =>  'System',
+                            '1' =>  'User'
+                        ]
+                    ],
+                    'is_default' => ['html'  =>
+                        [
+                            '0' =>  'No',
+                            '1' =>  'Yes'
+                        ]
+                    ],
+                    'auto_generated' => ['html'  =>
+                        [
+                            '0' =>  'No',
+                            '1' =>  'Yes'
+                        ]
                     ]
                 ];
-
-            $this->generateDTContent(
-                $this->filters,
-                'system/filters/view',
-                null,
-                ['name', 'filter_type', 'auto_generated', 'is_default'],
-                true,
-                ['name', 'filter_type', 'auto_generated', 'is_default'],
-                $controlActions,
-                null,
-                $replaceColumns,
-                'name'
-            );
-
-            $this->view->pick('filters/list');
+        } else {
+            $replaceColumns = null;
         }
+
+        $controlActions =
+            [
+                'actionsToEnable'       =>
+                [
+                    'edit'      => 'system/filters',
+                    'remove'    => 'system/filters/remove'
+                ]
+            ];
+
+        $this->generateDTContent(
+            $this->filters,
+            'system/filters/view',
+            null,
+            ['name', 'app_type', 'filter_type', 'auto_generated', 'is_default'],
+            true,
+            ['name', 'app_type', 'filter_type', 'auto_generated', 'is_default'],
+            $controlActions,
+            null,
+            $replaceColumns,
+            'name'
+        );
+
+        $this->view->pick('filters/list');
     }
 
     /**
@@ -112,7 +113,7 @@ class FiltersComponent extends BaseComponent
 
             $this->view->filters = $this->filters->packagesData->filters;
         } else {
-            //Adding close in add as cloning requires add permission so both add and clone can be performed in same action.
+            //Adding clone in add as cloning requires add permission so both add and clone can be performed in same action.
             if (isset($this->postData()['clone']) && $this->postData()['clone']) {
                 $this->filters->cloneFilter($this->postData());
             } else {

@@ -21,6 +21,7 @@ class Filter
             $filter =
                 [
                     'name'              => 'Exclude Auto Generated Filters',
+                    'app_type'          => 'core',
                     'component_id'      => $filterComponent[0]['id'],
                     'conditions'        => '-|auto_generated|equals|0&',
                     'filter_type'       => 0,
@@ -41,6 +42,7 @@ class Filter
             $filter =
                 [
                     'name'              => 'Exclude Auto Generated Filters',
+                    'app_type'          => 'core',
                     'component_id'      => $filterComponent['id'],
                     'conditions'        => '-|auto_generated|equals|0&',
                     'filter_type'       => 0,
