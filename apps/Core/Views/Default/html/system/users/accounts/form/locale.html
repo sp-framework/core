@@ -1,0 +1,60 @@
+{% set countryId = 0 %}
+{% if account['profile']['locale_country_id'] is defined %}
+    {% set countryId = account['profile']['locale_country_id'] %}
+{% endif %}
+{% set timezoneId = 0 %}
+{% if account['profile']['locale_timezone_id'] is defined %}
+    {% set timezoneId = account['profile']['locale_timezone_id'] %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'locale_country_id',
+                'fieldLabel'                           : 'Country',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select country',
+                'fieldRequired'                        : false,
+                'fieldBazScan'                         : true,
+                'fieldBazJstreeSearch'                 : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2Options'              : countries,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : countryId
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'locale_timezone_id',
+                'fieldLabel'                           : 'Timezone',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select timezone',
+                'fieldRequired'                        : false,
+                'fieldBazScan'                         : true,
+                'fieldBazJstreeSearch'                 : true,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldDataSelect2Options'              : timezones,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'zone_name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : timezoneId
+            ]
+        )}}
+    </div>
+</div>

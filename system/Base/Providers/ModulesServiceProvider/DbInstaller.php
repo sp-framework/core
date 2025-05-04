@@ -123,7 +123,7 @@ class DbInstaller extends BasePackage
                 $config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model'], $tableConfigParams);
                 $schema = $this->ff->generateSchema($tableName, $tableClass['schema'], $tableClass['model']);
 
-                $this->ff->store($tableName, $config, $schema, $this->ff);
+                $this->ff->store($tableName, $config, $schema);
 
                 if (method_exists($tableClass['schema'], 'indexes')) {
                     array_push($storesToIndex, $tableName);

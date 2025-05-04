@@ -82,6 +82,10 @@ class AccountsComponent extends BaseComponent
                 $this->view->apps = $this->accounts->packagesData->apps;
 
                 $this->view->roles = $this->accounts->packagesData->roles;
+
+                $this->view->countries = $this->basepackages->geoCountries->getAll()->geoCountries;
+
+                $this->view->timezones = $this->basepackages->geoTimezones->getAll()->geoTimezones;
             }
 
             $this->addResponse(

@@ -7,7 +7,9 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Calls;
 
 class ProcessDbSync extends Calls
 {
-    public $funcName = 'Process DB Sync (Hybrid mode)';
+    public $funcDisplayName = 'Process DB Sync (Hybrid mode)';
+
+    public $funcDescription = 'Process sync of FF data with DB data.';
 
     public function run(array $args = [])
     {

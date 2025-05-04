@@ -164,7 +164,6 @@ class Progress extends BasePackage
                 'totalPercentComplete'  => $this->getPercentComplete($progressFile, false),
                 'percentComplete'       => $this->getPercentComplete($progressFile),
                 'runners'               => $progressFile['runners'] ?? false,
-                'callResult'            => $callResult,
                 'errors'                => $errors,
                 'details'               => $details
             ];
@@ -292,6 +291,10 @@ class Progress extends BasePackage
 
     public function checkProcessIsRunning($progressFile = null)
     {
+        if ($this->progressFileName === 'setup') {
+            return;
+        }
+
         if (!$progressFile) {
             $progressFile = $this->checkProgressFile();
         }
@@ -483,7 +486,11 @@ class Progress extends BasePackage
             $this->deleteProgressFile(true);
 
             if ($reRegisterMethods) {
-                $this->registerMethods($progressFile['registeredMethods']);
+                if (isset($progressFile['registeredMethods'])) {
+                    $this->registerMethods($progressFile['registeredMethods']);
+                } else {
+                    $this->registerMethods($progressFile['allProcesses']);
+                }
             }
         }
 
@@ -519,41 +526,46 @@ class Progress extends BasePackage
 
         if ($progressFile) {
             if (isset($progressFile['pid']) && $progressFile['pid'] > 0) {
-                exec('ps -aux | grep ' . $progressFile['pid'], $output, $result);
+                return $this->terminatePid($progressFile);
+            } else {
+                $progressFile['runners']['running'] = false;
+                $progressFile['runners']['next'] = false;
+                $this->writeProgressFile(methods: [], progressFile: $progressFile, register: true);
 
-                if ($result === 0 &&
-                    count($output) > 0
-                ) {
-                    if (str_contains($output[0], 'php')) {
-                        exec('kill -9 ' . $progressFile['pid'], $output, $result);
+                $this->addResponse('Process not running', 1);
 
-                        if ($result !== 0) {
-                            $this->addResponse('Error terminating process', 1, ['output' => $output]);
-
-                            return false;
-                        }
-
-                        $this->writeProgressFile(methods: [],progressFile: $progressFile);
-
-                        $this->addResponse('Successfully terminating process');
-
-                        return $this->resetProgress();
-                    }
-                }
+                return false;
             }
-
-            $progressFile['runners']['running'] = false;
-            $progressFile['runners']['next'] = false;
-            $this->writeProgressFile(methods: [], progressFile: $progressFile, register: true);
-
-            $this->addResponse('Process not running', 1);
-
-            return false;
         } else {
             $this->addResponse('Error loading progressfile!', 1);
 
             return false;
         }
+    }
+
+    public function terminatePid($progressFile)
+    {
+        exec('ps -aux | grep ' . $progressFile['pid'], $output, $result);
+
+        if ($result === 0 && count($output) > 0) {
+            if (str_contains($output[0], 'php')) {
+                exec('kill -9 ' . $progressFile['pid'], $output, $result);
+
+                if ($result !== 0) {
+                    $this->addResponse('Error terminating process', 1, ['output' => $output]);
+
+                    return false;
+                }
+
+                $this->writeProgressFile(methods: [],progressFile: $progressFile);
+
+                $this->addResponse('Successfully terminating process');
+
+                return $this->resetProgress();
+            }
+        }
+
+        return true;
     }
 
     protected function readProgressFile($session = null)
@@ -602,7 +614,11 @@ class Progress extends BasePackage
                     $file['allProcesses'] = $file['registeredMethods'] = $methods;
                 } else if ($unregister) {
                     $progressFile = $this->readProgressFile();
-                    $file['allProcesses'] = $progressFile['registeredMethods'];
+                    if (isset($progressFile['registeredMethods'])) {
+                        $file['allProcesses'] = $progressFile['registeredMethods'];
+                    } else {
+                        $file['allProcesses'] = $progressFile['allProcesses'];
+                    }
                 }
             }
 
@@ -667,7 +683,11 @@ class Progress extends BasePackage
                     $file['runners'] = $runners;
                 }
 
-                $file['registeredMethods'] = $progressFile['registeredMethods'];
+                if (isset($progressFile['registeredMethods'])) {
+                    $file['registeredMethods'] = $progressFile['registeredMethods'];
+                } else {
+                    $file['registeredMethods'] = $progressFile['allProcesses'];
+                }
             }
 
             $file['processes'] = $methods;

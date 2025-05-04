@@ -329,6 +329,8 @@ class Ff
             return $config;
         }
 
+        $config['uniqueFields'] = [];
+        $config['indexes'] = [];
         if (isset($tableClass->columns()['indexes'])) {
             foreach ($tableClass->columns()['indexes'] as $index) {
                 if ($index->getType() === 'UNIQUE' && $index->getColumns() && count($index->getColumns()) > 0) {
@@ -339,7 +341,7 @@ class Ff
 
         if (method_exists($tableClass, 'indexes')) {
             $columns = [];
-            $columnsTypeToIndex = [0,2,5,7,9,14];//int, chars, varchars
+            $columnsTypeToIndex = [0,2,5,7,9,14,22];//int, chars, varchars
 
             foreach ($tableClass->columns()['columns'] as $column) {
                 $columns[$column->getName()] = $column;

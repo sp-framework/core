@@ -1125,6 +1125,8 @@
                                                             next        : '<i class="fas fa-angle-right"></i>'
                                                         },
                                         zeroRecords     : datatableOptions.zeroRecords,
+                                        emptyTable      : '<i class="fas fa-cog fa-spin"></i> Loading...',
+                                        info            : 'Showing _START_ to _END_ of _TOTAL_ entries',
                                         infoEmpty       : 'No entries found',
                                         infoFiltered    : ' - filtered from _MAX_ shown entries',
                                         searchPlaceholder: 'Search shown ' + thisOptions.listOptions.componentName + '...',
@@ -1211,6 +1213,18 @@
                     }
                     that._tableInit(reDraw);
                     that._registerEvents();
+                    if (response.rows) {
+                        if (typeof response.rows === 'string') {
+                            response.rows = JSON.parse(response.rows);
+                        }
+
+                        if (response.rows.data && response.rows.data.length === 0) {
+                            if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
+                                $('.dataTables_empty').last().html('No entries found');
+                                $('.dataTables_info').html('No entries found');
+                            }
+                        }
+                    }
                 });
                     // TODO: fix card-body height when more rows are loaded.
                     // TODO: BULK Edit/Delete
@@ -1298,43 +1312,36 @@
 
                     // Datatable Events
                     //Responsive
-                    thisOptions['datatable'].on('draw responsive-resize responsive-display', function() {
+                    thisOptions['datatable'].on('draw responsive-resize responsive-display', function(e, datatable, row, showHide) {
+                        if (e.type === 'responsive-display') {
+                            if (showHide) {
+                                $($(row.node()).next('.child')).find('li').prepend(
+                                    '<i class="fa fas fa-fw fa-plus-circle text-info dtr-expand mr-1 dataTable-pointer"><i>'
+                                );
+
+                                that._changeResponsiveLiWidths($($(row.node()).next('.child')));
+
+                                $($(row.node()).next('.child')).find('.dtr-expand').click(function() {
+                                    if ($(this).parent().is('.text-truncate')) {
+                                        $(this).parent().removeClass('text-truncate dt-colTextTruncate');
+                                        $(this).removeClass('fa-plus-circle text-info').addClass('fa-minus-circle text-danger');
+                                    } else {
+                                        $(this).parent().addClass('text-truncate dt-colTextTruncate');
+                                        $(this).removeClass('fa-minus-circle text-danger').addClass('fa-plus-circle text-info');
+                                        that._changeResponsiveLiWidths($($(row.node()).next('.child')));
+                                    }
+                                });
+                            }
+                        }
+
                         BazContentLoader.init({});
                         thisOptions['datatable'].columns.adjust().responsive.recalc();
-                    });
-
-                    //Toggle response rows open/close
-                    thisOptions['datatable'].on('responsive-display', function(e, datatable, row, showHide) {
-                        if (showHide) {
-                            $($(row.node()).next('.child')).find('li').prepend(
-                                '<i class="fa fas fa-fw fa-plus-circle text-info dtr-expand mr-1 dataTable-pointer"><i>'
-                            );
-
-                            that._changeResponsiveLiWidths($($(row.node()).next('.child')));
-
-                            $($(row.node()).next('.child')).find('.dtr-expand').click(function() {
-                                if ($(this).parent().is('.text-truncate')) {
-                                    $(this).parent().removeClass('text-truncate dt-colTextTruncate');
-                                    $(this).removeClass('fa-plus-circle text-info').addClass('fa-minus-circle text-danger');
-                                } else {
-                                    $(this).parent().addClass('text-truncate dt-colTextTruncate');
-                                    $(this).removeClass('fa-minus-circle text-danger').addClass('fa-plus-circle text-info');
-                                    that._changeResponsiveLiWidths($($(row.node()).next('.child')));
-                                }
-                            });
-                        }
                     });
 
                     //Search
                     $('.dataTables_filter').find('input').keyup(function() {
                         if ($(this).val() === '') {
                             that._updateCounters();
-                        }
-                    });
-
-                    thisOptions['datatable'].on('draw', function () {
-                        if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
-                            $('.dataTables_empty').last().html('No entries found');
                         }
                     });
 

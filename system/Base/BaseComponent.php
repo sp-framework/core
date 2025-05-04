@@ -7,8 +7,8 @@ use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\View;
 use System\Base\Exceptions\ControllerNotFoundException;
 use System\Base\Exceptions\IdNotFoundException;
-use System\Base\Providers\ErrorServiceProvider\Exceptions\IncorrectCSRF;
-use System\Base\Providers\ErrorServiceProvider\Exceptions\IncorrectRequestType;
+use System\Base\Providers\ErrorServiceProvider\Exceptions\IncorrectCSRFException;
+use System\Base\Providers\ErrorServiceProvider\Exceptions\IncorrectRequestTypeException;
 
 abstract class BaseComponent extends Controller
 {
@@ -179,11 +179,11 @@ abstract class BaseComponent extends Controller
 	protected function requestIsPost($checkCSRF = true)
 	{
 		if (!$this->request->isPost()) {
-			throw new IncorrectRequestType('post');
+			throw new IncorrectRequestTypeException('post');
 		}
 
-		if (!$this->checkCSRF()) {
-			return false;
+		if ($checkCSRF) {
+			$this->checkCSRF();
 		}
 	}
 
@@ -498,11 +498,12 @@ abstract class BaseComponent extends Controller
 	{
 		if ($this->request->isPost() || $this->request->isPut() || $this->request->isDelete()) {
 			if (!$this->security->checkToken(null, null, false)) {
-				$this->view->responseCode = 2;
+				throw new IncorrectCSRFException('CSRF Token Error! Please refresh page.');
+				// $this->view->responseCode = 2;
 
-				$this->view->responseMessage = 'CSRF Token Error! Please refresh page.';
+				// $this->view->responseMessage = 'CSRF Token Error! Please refresh page.';
 
-				return $this->sendJson();
+				// return $this->sendJson();
 			}
 		}
 

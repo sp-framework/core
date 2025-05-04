@@ -95,13 +95,19 @@ class ComputerPasswordGenerator extends AbstractPasswordGenerator
             $count = $this->getMinimumCount($option);
         } else if ($per === 'maximum') {
             $max = $this->getMaximumCount($option);
+
             $passwordLength = \strlen($this->password);
 
-            if (!$max) {
+            if ($max) {
+                if ($max < $this->getLength('minimum')) {
+                    $max = $this->getLength('minimum');
+                }
+            } else {
                 $max = $this->getLength('minimum');
             }
 
             $numbersOfCharsNeeded = $max - $passwordLength;
+
             $count = ceil($numbersOfCharsNeeded/$enabledOptionsCount);
 
             if ($count <= 0) {
@@ -124,15 +130,20 @@ class ComputerPasswordGenerator extends AbstractPasswordGenerator
     public function generatePassword()
     {
         $this->password = $this->getCharacters('minimum');
+
         $passwordLength = \strlen($this->password);
+
         $expectedPasswordLength = $this->getLength('minimum');
+
         if ($passwordLength < $expectedPasswordLength) {
             $this->password .= $this->getCharacters('maximum');
+
             $passwordLength = \strlen($this->password);
         }
 
         if ($passwordLength > $expectedPasswordLength) {
             $substrlength = $expectedPasswordLength - $passwordLength;
+
             $this->password = substr($this->password, 0, $substrlength);
         }
 

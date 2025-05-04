@@ -2,9 +2,11 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Calls;
+
 class Package
 {
-	public function register($db, $ff, $packageFile, $helper)
+	public function register($db, $ff, $packageFile, $helper, $basepackages, $container, $databasetype)
 	{
 		$package =
 			[
@@ -32,14 +34,30 @@ class Package
 				'updated_by'			=> 0
 			];
 
+		$corePackageId = null;
+
 		if ($db) {
 			$db->insertAsDict('modules_packages', $package);
+
+			if ($package['name'] === 'Core') {
+				$corePackageId = (int) $db->lastInsertId();
+			}
 		}
 
 		if ($ff) {
 			$packageStore = $ff->store('modules_packages');
 
 			$packageStore->updateOrInsert($package);
+
+			if ($package['name'] === 'Core') {
+				$corePackageId = (int) $packageStore->getLastInsertedId();
+			}
+		}
+
+		if ($corePackageId) {
+			$registerCalls = new Calls;
+
+			$registerCalls->register($db, $ff, $basepackages, $container, $corePackageId, $databasetype);
 		}
 	}
 }

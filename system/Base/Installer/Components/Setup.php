@@ -788,8 +788,8 @@ Class Setup
 			$this->session->getId(),
 			time() + 600,
 			'/',
-			null,
-			null,
+			false,
+			$this->request->getHttpHost(),
 			true,
 			[
 				'samesite'	=> 'Strict'

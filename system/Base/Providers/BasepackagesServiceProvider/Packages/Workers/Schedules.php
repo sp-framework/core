@@ -76,16 +76,24 @@ class Schedules extends BasePackage
             return false;
         }
 
-        $assignedToTasks =
-            $this->basepackages->workers->tasks->getByParams(
+        if ($this->config->databasetype === 'db') {
+            $params =
                 [
                     'conditions'    => 'schedule_id = :sid:',
                     'bind'          =>
                         [
                             'sid'   => $schedule['id']
                         ]
-                ]
-            );
+                ];
+            } else {
+                $params = [
+                    'conditions' => [
+                        ['schedule_id', '=', $schedule['id']]
+                    ]
+                ];
+            }
+
+        $assignedToTasks = $this->basepackages->workers->tasks->getByParams($params);
 
         if ($assignedToTasks && count($assignedToTasks) > 0) {
             $this->addResponse('Schedule assigned to task. Cannot remove schedule.', 1);

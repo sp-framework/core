@@ -647,7 +647,7 @@ class DevtoolsModules extends BasePackage
                     (isset($module['repo_details']['latestRelease']['name']) &&
                      $module['repo_details']['latestRelease']['name'] !== $module['version'])
                 ) {
-                    $module = $this->modules->manager->getModuleInfo(
+                    $moduleSync = $this->modules->manager->getModuleInfo(
                         [
                             'module_type'       => $module['module_type'],
                             'module_id'         => $module['id'],
@@ -655,11 +655,16 @@ class DevtoolsModules extends BasePackage
                             'getLatestRelease'  => true
                         ]
                     );
+
+                    if ($moduleSync) {
+                        $module = array_merge($module, $moduleSync);
+                    }
                 }
 
                 $module['repoExists'] = true;
 
                 if (isset($module['repo_details']['latestRelease']['name'])) {
+                    $module['latestRelease'] = [];
                     $module['latestRelease'] = $module['repo_details']['latestRelease']['name'];
                 } else {
                     $module['latestRelease'] = false;
@@ -3520,7 +3525,9 @@ $file .= '
         $this->validation->init()->add('api_id', PresenceOf::class, ["message" => "Please provide api id."]);
         $this->validation->add('app_type', PresenceOf::class, ["message" => "Please provide app type."]);
         $this->validation->add('module_type', PresenceOf::class, ["message" => "Please provide module type."]);
-        $this->validation->add('category', PresenceOf::class, ["message" => "Please provide module category."]);
+        if ($data['module_type'] !== 'bundles') {
+            $this->validation->add('category', PresenceOf::class, ["message" => "Please provide module category."]);
+        }
 
         if (!$this->validateData($data)) {
             return false;

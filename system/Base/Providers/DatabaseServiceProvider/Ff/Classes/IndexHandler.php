@@ -18,9 +18,11 @@ class IndexHandler
 
     protected $multiWordsSeparator = ' ';
 
-    protected $minMultiWordsChars = 5;
+    protected $minMultiWordsChars = 4;
 
     protected $folderPermissions = 0777;
+
+    protected $reIndexIndexes = [];
 
     public function __construct(array $storeConfiguration)
     {
@@ -56,13 +58,13 @@ class IndexHandler
         }
     }
 
-    public function setIndex($content, $remove = false)
+    public function setIndex($content, $remove = false, $reIndex = false)
     {
         if (is_string($content)) {
             $content = json_decode($content, true);
         }
 
-        $indexPointer = $content['id'];
+        $contentId = $content['id'];
 
         IoHelper::createFolder($this->indexesPath, $this->folderPermissions);
 
@@ -75,49 +77,110 @@ class IndexHandler
                         $contentArr = explode($this->multiWordsSeparator, $content[$index]);
 
                         if (count($contentArr) > 1) {
-                            foreach ($contentArr as $content) {
-                                if (strlen($content) < $this->minMultiWordsChars) {
+                            foreach ($contentArr as $contentWord) {
+                                $contentWord = strtolower($contentWord);
+
+                                if (strlen($contentWord) < $this->minMultiWordsChars) {
                                     continue;
                                 }
 
-                                $indexChars = strtolower(mb_substr($content, 0, $this->minIndexChars, 'UTF-8'));
+                                $indexChars = strtolower(mb_substr($contentWord, 0, $this->minIndexChars, 'UTF-8'));
 
                                 if (str_contains($indexChars, '/')) {//this will result in subdirectories
                                     continue;
                                 }
 
-                                $this->writeIndex($indexPointer, $index, $indexChars, $content, $remove);
+                                if (!checkCtype($contentWord, 'alpha')) {//Ignore Special chars
+                                    continue;
+                                }
+
+                                if ($reIndex) {
+                                    $this->addToReindexIndexes($contentId, $index, $indexChars, $contentWord);
+                                } else {
+                                    $this->writeIndex($contentId, $index, $indexChars, $contentWord, $remove);
+                                }
                             }
                         } else {
+                            $content[$index] = strtolower($content[$index]);
+
                             $indexChars = strtolower(mb_substr($content[$index], 0, $this->minIndexChars, 'UTF-8'));
 
                             if (str_contains($indexChars, '/')) {//this will result in subdirectories
                                 continue;
                             }
 
-                            $this->writeIndex($indexPointer, $index, $indexChars, $content[$index], $remove);
+                            if (!checkCtype($content[$index], 'alpha')) {//Ignore Special chars
+                                continue;
+                            }
+
+                            if ($reIndex) {
+                                $this->addToReindexIndexes($contentId, $index, $indexChars, $content[$index]);
+                            } else {
+                                $this->writeIndex($contentId, $index, $indexChars, $content[$index], $remove);
+                            }
                         }
                     } else {
-                        $this->writeIndex($indexPointer, $index, $content[$index], $content[$index], $remove);
+                        if ($reIndex) {
+                            $this->addToReindexIndexes($contentId, $index, $content[$index], $content[$index]);
+                        } else {
+                            $this->writeIndex($contentId, $index, $content[$index], $content[$index], $remove);
+                        }
                     }
                 } else {
                     if (is_string($content[$index])) {
+                        if (strlen($content[$index]) < $this->minIndexChars) {
+                            continue;
+                        }
+
+                        $content[$index] = strtolower($content[$index]);
+
                         $indexChars = strtolower(mb_substr($content[$index], 0, $this->minIndexChars, 'UTF-8'));
 
                         if (str_contains($indexChars, '/')) {//this will result in subdirectories
                             continue;
                         }
 
-                        $this->writeIndex($indexPointer, $index, $indexChars, $content[$index], $remove);
+                        if (!checkCtype($content[$index], 'alpha')) {//Ignore Special chars
+                            continue;
+                        }
+
+                        if ($reIndex) {
+                            $this->addToReindexIndexes($contentId, $index, $indexChars, $content[$index]);
+                        } else {
+                            $this->writeIndex($contentId, $index, $indexChars, $content[$index], $remove);
+                        }
                     } else {
-                        $this->writeIndex($indexPointer, $index, $content[$index], $content[$index], $remove);
+                        if ($reIndex) {
+                            $this->addToReindexIndexes($contentId, $index, $content[$index], $content[$index]);
+                        } else {
+                            $this->writeIndex($contentId, $index, $content[$index], $content[$index], $remove);
+                        }
                     }
                 }
             }
         }
     }
 
-    protected function writeIndex($indexPointer, $index, $indexChars, $content, $remove = false)
+    protected function addToReindexIndexes($contentId, $index, $indexChars, $content)
+    {
+        if (!isset($this->reIndexIndexes[$index])) {
+            $this->reIndexIndexes[$index] = [];
+        }
+
+        if (!isset($this->reIndexIndexes[$index][$indexChars])) {
+            $this->reIndexIndexes[$index][$indexChars] = [];
+        }
+
+        if (!isset($this->reIndexIndexes[$index][$indexChars][$content])) {
+            $this->reIndexIndexes[$index][$indexChars][$content] = [];
+        }
+
+        if (!in_array($contentId, $this->reIndexIndexes[$index][$indexChars][$content])) {
+            array_push($this->reIndexIndexes[$index][$indexChars][$content], $contentId);
+        }
+    }
+
+    protected function writeIndex($contentId, $index, $indexChars, $content, $remove = false)
     {
         try {
             $indexFile = $this->getIndex($index, $indexChars);
@@ -129,7 +192,7 @@ class IndexHandler
 
         if (isset($indexJson[$content])) {
             if ($remove) {
-                $key = array_search($indexPointer, $indexJson[$content]);
+                $key = array_search($contentId, $indexJson[$content]);
 
                 if ($key !== false) {
                     unset($indexJson[$content][$key]);
@@ -138,14 +201,17 @@ class IndexHandler
                 if (count($indexJson[$content]) === 0) {
                     return IoHelper::deleteFile($this->indexesPath . $index . '/' . $indexChars . '.json');
                 }
+
+                $indexJson[$content] = array_values($indexJson[$content]);
             } else {
-                if (!in_array($indexPointer, $indexJson[$content])) {
-                    array_push($indexJson[$content], $indexPointer);
+                if (!in_array($contentId, $indexJson[$content])) {
+                    array_push($indexJson[$content], $contentId);
                 }
             }
         } else {
             if (!$remove) {
-                $indexJson[$content] = [$indexPointer];
+                $indexJson[$content] = [$contentId];
+                $indexJson[$content] = array_values($indexJson[$content]);
             }
         }
 
@@ -183,24 +249,32 @@ class IndexHandler
             $dataPath = $this->storeConfiguration['storePath'] . 'data/';
         }
 
-        if ($handle = opendir($dataPath)) {
-            while (false !== ($entry = readdir($handle))) {
-                if ($entry === "." || $entry === "..") {
-                    continue;
-                }
-
-                $documentPath = $dataPath . $entry;
-
-                try {
-                    $data = IoHelper::getFileContent($documentPath);
-
-                    $this->setIndex($data);
-                } catch (\Exception $exception) {
-                    continue;
-                }
+        $scanDir = scandir($dataPath);
+        $files = [];
+        array_walk($scanDir, function($file) use (&$files) {
+            if ($file !== '..' && $file !== '.') {
+                array_push($files, (int) str_replace('.json', '', $file));
             }
+        });
+        sort($files);
 
-            closedir($handle);
+        foreach ($files as $entry) {
+            $documentPath = $dataPath . $entry . '.json';
+
+            try {
+                $data = IoHelper::getFileContent($documentPath);
+
+                $this->setIndex($data, false, true);
+            } catch (Exception $exception) {
+                continue;
+            }
+        }
+
+        //We write all index files here
+        foreach ($this->reIndexIndexes as $index => $files) {
+            foreach ($files as $content => $values) {
+                IoHelper::writeContentToFile($this->indexesPath . $index . '/' . $content . '.json', json_encode($values));
+            }
         }
     }
 }

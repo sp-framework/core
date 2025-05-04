@@ -66,11 +66,14 @@ class ExceptionHandlers extends BaseComponent
 		return $this->response->redirect($exception->getPath());
 	}
 
-	public function handleCsrfTokenException()
+	public function handleIncorrectCSRFException($exception)
 	{
-		$this->flash->now('warning', 'Session expired, please login again.');
+		if ($this->request->getBestAccept() === 'application/json') {
 
-		return $this->response->redirect('/auth/login');
+			$this->addResponse($exception->getMessage(), 1);
+
+			return $this->sendJson();
+		}
 	}
 
 	public function handleInvalidDataException($exception)

@@ -63,6 +63,11 @@
                                 [
                                     'tabTitle'          : 'Tools',
                                     'tabInclude'        : 'accounts/form/tools'
+                                ],
+                                'locale'   :
+                                [
+                                    'tabTitle'          : 'Locale',
+                                    'tabInclude'        : 'accounts/form/locale'
                                 ]
                             ]
                     ]
@@ -115,6 +120,12 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-force_pwreset'               : { },
         '{{componentId}}-{{sectionId}}-force_logout'                : { },
         '{{componentId}}-{{sectionId}}-disable_twofa_otp'           : { },
+        '{{componentId}}-{{sectionId}}-locale_country_id'           : {
+            placeholder : 'SELECT COUNTRY'
+        },
+        '{{componentId}}-{{sectionId}}-locale_timezone_id'          : {
+            placeholder : 'SELECT TIMEZONE'
+        },
         //Validation
         '{{componentId}}-{{sectionId}}-form' : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',

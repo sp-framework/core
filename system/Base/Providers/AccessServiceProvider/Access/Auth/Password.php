@@ -280,8 +280,8 @@ class Password extends BasePackage
         $stringLengthArr['max']['checkLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLengthMax'];
         $stringLengthArr['messageMinimum']['checkLength'] = "passwordPolicyLengthMin|Password minimum length requirement failed.";
         $stringLengthArr['messageMaximum']['checkLength'] = "passwordPolicyLengthMax|Password maximum length requirement failed.";
-        $stringLengthArr['includedMinimum']['checkLength'] = false;
-        $stringLengthArr['includedMaximum']['checkLength'] = false;
+        $stringLengthArr['includedMinimum']['checkLength'] = true;
+        $stringLengthArr['includedMaximum']['checkLength'] = true;
 
         //Uppercase
         if ($this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercase'] == true) {
@@ -305,8 +305,8 @@ class Password extends BasePackage
                     $stringLengthArr['max']['checkUpperLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyUppercaseMaxCount'];
                     $stringLengthArr['messageMinimum']['checkUpperLength'] = "passwordPolicyUppercaseMinCount|Password minimum length requirement failed.";
                     $stringLengthArr['messageMaximum']['checkUpperLength'] = "passwordPolicyUppercaseMaxCount|Password maximum length requirement failed.";
-                    $stringLengthArr['includedMinimum']['checkUpperLength'] = false;
-                    $stringLengthArr['includedMaximum']['checkUpperLength'] = false;
+                    $stringLengthArr['includedMinimum']['checkUpperLength'] = true;
+                    $stringLengthArr['includedMaximum']['checkUpperLength'] = true;
                 }
 
                 $this->passwordPolicyErrors['passwordPolicyUppercaseInclude'] = false;
@@ -329,8 +329,8 @@ class Password extends BasePackage
                     $stringLengthArr['max']['checkUpperInclude'] = 0;
                     $stringLengthArr['messageMinimum']['checkUpperInclude'] = "passwordPolicyUppercaseInclude|Password has invalid uppercase character.";
                     $stringLengthArr['messageMaximum']['checkUpperInclude'] = "passwordPolicyUppercaseInclude|Password has invalid uppercase character.";
-                    $stringLengthArr['includedMinimum']['checkUpperInclude'] = false;
-                    $stringLengthArr['includedMaximum']['checkUpperInclude'] = false;
+                    $stringLengthArr['includedMinimum']['checkUpperInclude'] = true;
+                    $stringLengthArr['includedMaximum']['checkUpperInclude'] = true;
                 }
             }
 
@@ -364,8 +364,8 @@ class Password extends BasePackage
                     $stringLengthArr['max']['checkLowerLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyLowercaseMaxCount'];
                     $stringLengthArr['messageMinimum']['checkLowerLength'] = "passwordPolicyLowercaseMinCount|Password minimum length requirement failed.";
                     $stringLengthArr['messageMaximum']['checkLowerLength'] = "passwordPolicyLowercaseMaxCount|Password maximum length requirement failed.";
-                    $stringLengthArr['includedMinimum']['checkLowerLength'] = false;
-                    $stringLengthArr['includedMaximum']['checkLowerLength'] = false;
+                    $stringLengthArr['includedMinimum']['checkLowerLength'] = true;
+                    $stringLengthArr['includedMaximum']['checkLowerLength'] = true;
                 }
 
                 $this->passwordPolicyErrors['passwordPolicyLowercaseInclude'] = false;
@@ -388,8 +388,8 @@ class Password extends BasePackage
                     $stringLengthArr['max']['checkLowerInclude'] = 0;
                     $stringLengthArr['messageMinimum']['checkLowerInclude'] = "passwordPolicyLowercaseInclude|Password has invalid lowercase character.";
                     $stringLengthArr['messageMaximum']['checkLowerInclude'] = "passwordPolicyLowercaseInclude|Password has invalid lowercase character.";
-                    $stringLengthArr['includedMinimum']['checkLowerInclude'] = false;
-                    $stringLengthArr['includedMaximum']['checkLowerInclude'] = false;
+                    $stringLengthArr['includedMinimum']['checkLowerInclude'] = true;
+                    $stringLengthArr['includedMaximum']['checkLowerInclude'] = true;
                 }
             }
 
@@ -423,8 +423,8 @@ class Password extends BasePackage
                     $stringLengthArr['max']['checkNumbersLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicyNumbersMaxCount'];
                     $stringLengthArr['messageMinimum']['checkNumbersLength'] = "passwordPolicyNumbersMinCount|Password minimum length requirement failed.";
                     $stringLengthArr['messageMaximum']['checkNumbersLength'] = "passwordPolicyNumbersMaxCount|Password maximum length requirement failed.";
-                    $stringLengthArr['includedMinimum']['checkNumbersLength'] = false;
-                    $stringLengthArr['includedMaximum']['checkNumbersLength'] = false;
+                    $stringLengthArr['includedMinimum']['checkNumbersLength'] = true;
+                    $stringLengthArr['includedMaximum']['checkNumbersLength'] = true;
                 }
 
                 $this->passwordPolicyErrors['passwordPolicyNumbersInclude'] = false;
@@ -447,8 +447,8 @@ class Password extends BasePackage
                     $stringLengthArr['max']['checkNumbersInclude'] = 0;
                     $stringLengthArr['messageMinimum']['checkNumbersInclude'] = "passwordPolicyNumbersInclude|Password has invalid numbers.";
                     $stringLengthArr['messageMaximum']['checkNumbersInclude'] = "passwordPolicyNumbersInclude|Password has invalid numbers.";
-                    $stringLengthArr['includedMinimum']['checkNumbersInclude'] = false;
-                    $stringLengthArr['includedMaximum']['checkNumbersInclude'] = false;
+                    $stringLengthArr['includedMinimum']['checkNumbersInclude'] = true;
+                    $stringLengthArr['includedMaximum']['checkNumbersInclude'] = true;
                 }
             }
 
@@ -482,8 +482,8 @@ class Password extends BasePackage
                     $stringLengthArr['max']['checkSymbolsLength'] = (int) $this->core->core['settings']['security']['passwordPolicySettings']['passwordPolicySymbolsMaxCount'];
                     $stringLengthArr['messageMinimum']['checkSymbolsLength'] = "passwordPolicySymbolsMinCount|Password minimum length requirement failed.";
                     $stringLengthArr['messageMaximum']['checkSymbolsLength'] = "passwordPolicySymbolsMaxCount|Password maximum length requirement failed.";
-                    $stringLengthArr['includedMinimum']['checkSymbolsLength'] = false;
-                    $stringLengthArr['includedMaximum']['checkSymbolsLength'] = false;
+                    $stringLengthArr['includedMinimum']['checkSymbolsLength'] = true;
+                    $stringLengthArr['includedMaximum']['checkSymbolsLength'] = true;
                 }
 
                 $this->passwordPolicyErrors['passwordPolicySymbolsInclude'] = false;
@@ -506,8 +506,8 @@ class Password extends BasePackage
                     $stringLengthArr['max']['checkSymbolsInclude'] = 0;
                     $stringLengthArr['messageMinimum']['checkSymbolsInclude'] = "passwordPolicySymbolsInclude|Password has invalid symbols.";
                     $stringLengthArr['messageMaximum']['checkSymbolsInclude'] = "passwordPolicySymbolsInclude|Password has invalid symbols.";
-                    $stringLengthArr['includedMinimum']['checkSymbolsInclude'] = false;
-                    $stringLengthArr['includedMaximum']['checkSymbolsInclude'] = false;
+                    $stringLengthArr['includedMinimum']['checkSymbolsInclude'] = true;
+                    $stringLengthArr['includedMaximum']['checkSymbolsInclude'] = true;
                 }
             }
 

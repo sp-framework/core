@@ -13,65 +13,19 @@ class Tasks extends BasePackage
 
     protected $packageName = 'tasks';
 
-    protected $callsDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Workers/Calls/';
-
     public $tasks;
-
-    public function getFunctionsDir()
-    {
-        return $this->callsDir;
-    }
 
     public function init(bool $resetCache = false)
     {
+        $this->setFFRelations(true);
+
         $this->getAll($resetCache);
 
         return $this;
     }
 
-    public function getAllCalls()
-    {
-        $callsArr =
-            $this->localContent->listContents($this->callsDir, true)
-            ->filter(fn (StorageAttributes $attributes) => $attributes->isFile())
-            ->map(fn (StorageAttributes $attributes) => $attributes->path())
-            ->toArray();
-
-        $calls = [];
-
-        if (count($callsArr) > 0) {
-            foreach ($callsArr as $key => $call) {
-                $call = ucfirst($call);
-                $call = str_replace('/', '\\', $call);
-                $call = str_replace('.php', '', $call);
-
-                try {
-                    $call = new $call();
-
-                    $calls[$call->packageName]['func'] = $call->packageName;
-                    $calls[$call->packageName]['name'] = $call->funcName;
-
-                } catch (\throwable $e) {
-
-                    if ($this->config->logs->exceptions) {
-                        $this->logger->logExceptions->critical(json_trace($e));
-                    }
-                    continue;
-                }
-            }
-        }
-
-        return $calls;
-    }
-
     public function addTask(array $data)
     {
-        if (isset($data['type']) && $data['type'] == 0) {
-            $this->addResponse('Cannot add system task.', 1);
-
-            return false;
-        }
-
         if (!isset($data['priority']) || (isset($data['priority']) && $data['priority'] == '0')) {
             $data['priority'] = '1';
         }
@@ -89,14 +43,6 @@ class Tasks extends BasePackage
     public function updateTask(array $data)
     {
         $task = $this->getById($data['id']);
-
-        if (!isset($data['via_job']) &&
-            (isset($task['type']) && $task['type'] == 0)
-        ) {
-            $this->addResponse('Cannot update system task.', 1);
-
-            return false;
-        }
 
         if (!isset($data['priority']) || (isset($data['priority']) && $data['priority'] == '0')) {
             $data['priority'] = '1';
@@ -130,6 +76,8 @@ class Tasks extends BasePackage
 
     public function forceNextRun(array $data)
     {
+        $this->setFFRelations(true);
+
         $task = $this->getById($data['id']);
 
         $task = array_merge($task, $data);
@@ -138,7 +86,7 @@ class Tasks extends BasePackage
 
         if (isset($data['cancel']) && $data['cancel'] == 'true') {
             if ($this->config->databasetype === 'hybrid' &&
-                $task['call'] === 'processdbsync'
+                $task['call']['name'] === 'ProcessDbSync'
             ) {
                 $this->ff->setSync(false);
             }
@@ -219,7 +167,7 @@ class Tasks extends BasePackage
         }
 
         foreach ($this->tasks as $taskKey => $task) {
-            if ($function && $task['call'] !== $function) {
+            if ($function && $task['call']['name'] !== $function) {
                 continue;
             }
 
@@ -242,7 +190,7 @@ class Tasks extends BasePackage
         }
 
         foreach ($this->tasks as $taskKey => $task) {
-            if ($task['call'] === $function) {
+            if ($task['call']['name'] === $function) {
                 return $task;
             }
         }

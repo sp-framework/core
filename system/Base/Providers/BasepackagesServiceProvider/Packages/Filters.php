@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-// use Apps\Core\Packages\Hrms\Employees\Employees;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesFilters;
 
@@ -20,7 +19,6 @@ class Filters extends BasePackage
 
         if ($checkShowAllFilters) {
             return $this->getFilters($componentId);
-
         } else {
             $this->addShowAllFilter($componentId);
 
@@ -48,15 +46,24 @@ class Filters extends BasePackage
             return
                 $this->getByParams(
                     [
-                        'conditions'    => 'component_id = :cid: AND auto_generated = :ag:',
+                        'conditions'    => 'component_id = :cid: AND auto_generated = :ag: AND app_type = :at:',
                         'bind'          => [
                             'cid'       => $componentId,
-                            'ag'        => 1
+                            'ag'        => 1,
+                            'at'        => $this->app['app_type']
                         ]
                     ], true
                 );
         } else {
-            return $this->getByParams(['conditions' => [['component_id', '=', $componentId], ['auto_generated', '=', 1]]]);
+            return $this->getByParams(
+                ['conditions' =>
+                    [
+                        ['component_id', '=', $componentId],
+                        ['auto_generated', '=', 1],
+                        ['app_type', '=', $this->app['app_type']]
+                    ]
+                ]
+            );
         }
     }
 
@@ -64,20 +71,15 @@ class Filters extends BasePackage
     {
         $component = $this->modules->components->getComponentById($componentId);
 
-        // $employeesPackage = $this->init()->checkPackage('Apps\Core\Packages\Hrms\Employees\Employees');
-
-        // if ($employeesPackage) {
-        //     $employeesPackage = new \Apps\Core\Packages\Hrms\Employees\Employees;
-        // }
-
         if ($account && isset($account['id'])) {
             if ($this->config->databasetype === 'db') {
                 $filtersArr =
                     $this->getByParams(
                         [
-                            'conditions'    => 'component_id = :cid: AND (account_id = :aid: OR account_id = :aid0:)',
+                            'conditions'    => 'component_id = :cid: AND app_type = :at: AND (account_id = :aid: OR account_id = :aid0:)',
                             'bind'          => [
                                 'cid'       => $componentId,
+                                'at'        => $this->app['app_type'],
                                 'aid'       => $account['id'],
                                 'aid0'      => 0
                             ]
@@ -90,6 +92,7 @@ class Filters extends BasePackage
                             'conditions'    =>
                                 [
                                     ['component_id', '=', $componentId],
+                                    ['app_type', '=', $this->app['app_type']]
                                 ],
                                 [
                                     ['account_id', '=', $account['id']],
@@ -150,18 +153,6 @@ class Filters extends BasePackage
                                             'name'  => $sharingAccount['email']
                                         ];
                                     }
-
-                                    // if ($employeesPackage) {
-                                    //     $employee = $employeesPackage->searchByAccountId($sharingAid);
-
-                                    //     if ($employee) {
-                                    //         $filter['shared_ids']['eids'][$sharingAidKey] =
-                                    //             [
-                                    //                 'id'    => $sharingAid,
-                                    //                 'name'  => $employee['full_name']
-                                    //             ];
-                                    //     }
-                                    // }
                                 }
                             }
 
@@ -176,9 +167,10 @@ class Filters extends BasePackage
                 $sharedFiltersArr =
                     $this->getByParams(
                         [
-                            'conditions'    => 'component_id = :cid: AND shared_ids IS NOT NULL',
+                            'conditions'    => 'component_id = :cid: AND app_type = :at: AND shared_ids IS NOT NULL',
                             'bind'          => [
-                                'cid'       => $componentId
+                                'cid'       => $componentId,
+                                'at'        => $this->app['app_type']
                             ]
                         ]
                     );
@@ -188,6 +180,7 @@ class Filters extends BasePackage
                         [
                             'conditions'    => [
                                 ['component_id', '=', $componentId],
+                                ['app_type', '=', $this->app['app_type']],
                                 ['shared_ids', '!=', null]
                             ]
                         ]
@@ -207,20 +200,11 @@ class Filters extends BasePackage
                         ) {
                             foreach ($filter['shared_ids']['rids'] as $ridKey => $rid) {
                                 if ($rid == $account['role_id']) {
+                                    $sharedBy = $this->basepackages->accounts->getById($filter['account_id']);
 
-                                    // if ($employeesPackage) {
-                                    //     $employee = $employeesPackage->searchByAccountId($filter['account_id']);
-
-                                    //     if ($employee) {
-                                    //         $filter['employee_full_name'] = $employee['full_name'];
-                                    //     }
-                                    // } else {
-                                        $sharedBy = $this->basepackages->accounts->getById($filter['account_id']);
-
-                                        if ($sharedBy) {
-                                            $filter['account_email'] = $sharedBy['email'];
-                                        }
-                                    // }
+                                    if ($sharedBy) {
+                                        $filter['account_email'] = $sharedBy['email'];
+                                    }
 
                                     $filter['shared_ids'] = $this->escaper->escapeHtml($this->helper->encode($filter['shared_ids']));
 
@@ -235,20 +219,11 @@ class Filters extends BasePackage
                         ) {
                             foreach ($filter['shared_ids']['aids'] as $aidKey => $aid) {
                                 if ($aid == $account['id']) {
+                                    $sharedBy = $this->basepackages->accounts->getById($filter['account_id']);
 
-                                    // if ($employeesPackage) {
-                                    //     $employee = $employeesPackage->searchByAccountId($filter['account_id']);
-
-                                    //     if ($employee) {
-                                    //         $filter['employee_full_name'] = $employee['full_name'];
-                                    //     }
-                                    // } else {
-                                        $sharedBy = $this->basepackages->accounts->getById($filter['account_id']);
-
-                                        if ($sharedBy) {
-                                            $filter['account_email'] = $sharedBy['email'];
-                                        }
-                                    // }
+                                    if ($sharedBy) {
+                                        $filter['account_email'] = $sharedBy['email'];
+                                    }
 
                                     $filter['shared_ids'] = $this->escaper->escapeHtml($this->helper->encode($filter['shared_ids']));
 
@@ -273,9 +248,10 @@ class Filters extends BasePackage
             $filtersArr =
                 $this->getByParams(
                     [
-                        'conditions'    => 'component_id = :cid:',
+                        'conditions'    => 'component_id = :cid: AND app_type = :at:',
                         'bind'          => [
-                            'cid'       => $componentId
+                            'cid'       => $componentId,
+                            'at'        => $this->app['app_type']
                         ]
                     ]
                 );
@@ -284,7 +260,8 @@ class Filters extends BasePackage
                 $this->getByParams(
                     [
                         'conditions'    => [
-                            ['component_id', '=', $componentId]
+                            ['component_id', '=', $componentId],
+                            ['app_type', '=', $this->app['app_type']]
                         ]
                     ]
                 );
@@ -332,6 +309,7 @@ class Filters extends BasePackage
         $this->addFilter(
             [
                 'name'              => 'Show All ' . $component['name'],
+                'app_type'          => $this->app['app_type'],
                 'conditions'        => '',
                 'component_id'      => $componentId,
                 'filter_type'       => 0,//System
@@ -386,6 +364,7 @@ class Filters extends BasePackage
                 $this->addFilter(
                     [
                         'name'              => $name,
+                        'app_type'          => $this->app['app_type'],
                         'conditions'        => $condition,
                         'component_id'      => $component['id'],
                         'filter_type'       => 0,//System
@@ -445,6 +424,7 @@ class Filters extends BasePackage
                 $this->addFilter(
                     [
                         'name'              => $name,
+                        'app_type'          => $this->app['app_type'],
                         'conditions'        => $condition,
                         'component_id'      => $component['id'],
                         'filter_type'       => 0,//System
@@ -504,6 +484,7 @@ class Filters extends BasePackage
                 $this->addFilter(
                     [
                         'name'              => $name,
+                        'app_type'          => $this->app['app_type'],
                         'conditions'        => $condition,
                         'component_id'      => $component['id'],
                         'filter_type'       => 0,//System
@@ -577,20 +558,8 @@ class Filters extends BasePackage
             }
 
             if (isset($data['shared_ids']) && is_array($data['shared_ids'])) {
-                //Convert EmployeeIds to AccountIds
                 $data['shared_ids']['aids'] = [];
-                // if (isset($data['shared_ids']['eids']) && count($data['shared_ids']['eids']) > 0) {
-                //     $employees = $this->usePackage(Employees::class);
 
-                //     foreach ($data['shared_ids']['eids'] as $eidKey => $eid) {
-                //         $searchEmployee = $employees->getById($eid);
-
-                //         if ($searchEmployee) {
-                //             array_push($data['shared_ids']['aids'], $searchEmployee['id']);
-                //         }
-                //     }
-                //     unset($data['shared_ids']['eids']);
-                // }
                 $data['shared_ids'] = $this->helper->encode($data['shared_ids']);
             }
 
@@ -701,30 +670,39 @@ class Filters extends BasePackage
             if ($this->config->databasetype === 'db') {
                 $params =
                     [
-                        'conditions'    => 'component_id = :cid: AND is_default = :isd: AND account_id = :aid:',
+                        'conditions'    => 'component_id = :cid: AND is_default = :isd: AND account_id = :aid: AND app_type = :at:',
                         'bind'          =>
                             [
                                 'cid'   => $componentId,
                                 'isd'   => '1',
-                                'aid'   => $account['id']
+                                'aid'   => $account['id'],
+                                'at'    => $this->app['app_type']
                             ]
                     ];
             } else {
-                $params = ['conditions' => [['component_id', '=', $componentId], ['is_default', '=', 1], ['account_id', '=', $account['id']]]];
+                $params = ['conditions' =>
+                    [
+                        ['component_id', '=', $componentId],
+                        ['is_default', '=', 1],
+                        ['account_id', '=', $account['id']],
+                        ['app_type', '=', $this->app['app_type']],
+                    ]
+                ];
             }
         } else {
             if ($this->config->databasetype === 'db') {
                 $params =
                     [
-                        'conditions'    => 'component_id = :cid: AND is_default = :isd:',
+                        'conditions'    => 'component_id = :cid: AND is_default = :isd: AND app_type = :at:',
                         'bind'          =>
                             [
                                 'cid'   => $componentId,
-                                'isd'   => '1'
+                                'isd'   => '1',
+                                'at'    => $this->app['app_type']
                             ]
                     ];
             } else {
-                $params = ['conditions' => [['component_id', '=', $componentId], ['is_default', '=', 1]]];
+                $params = ['conditions' => [['component_id', '=', $componentId], ['is_default', '=', 1], ['app_type', '=', $this->app['app_type']]]];
             }
         }
 

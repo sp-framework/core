@@ -143,7 +143,9 @@ class ButtonGroup
                     if ($this->params['groupRadioButtonChecked'] === $button['value']) {
                         $hasButtonChecked = 'checked';
                         $hasButtonCheckedClasses = 'active focus';
-                        if ($this->params['groupRadioButtonStyle'] === 'outline') {
+                        if (isset($this->params['groupRadioButtonStyle']) &&
+                            $this->params['groupRadioButtonStyle'] === 'outline'
+                        ) {
                             $hasButtonCheckedBgClass = '';
                         } else {
                             $hasButtonCheckedBgClass = 'bg-' . $button['type'];
@@ -157,7 +159,9 @@ class ButtonGroup
                     if (isset($button['checked']) && $button['checked'] === true) {
                         $hasButtonChecked = 'checked';
                         $hasButtonCheckedClasses = 'active focus';
-                        if ($this->params['groupRadioButtonStyle'] === 'outline') {
+                        if (isset($this->params['groupRadioButtonStyle']) &&
+                            $this->params['groupRadioButtonStyle'] === 'outline'
+                        ) {
                             $hasButtonCheckedBgClass = '';
                         } else {
                             $hasButtonCheckedBgClass = 'bg-' . $button['type'];
@@ -169,7 +173,7 @@ class ButtonGroup
                     }
                 }
 
-                if (isset($buton['disabled']) && $buton['disabled'] === true) {
+                if (isset($button['disabled']) && $button['disabled'] === true) {
                     $hasButtonDisabled = 'disabled';
                     $hasButtonCursor = 'style=cursor:default;';
                 } else {

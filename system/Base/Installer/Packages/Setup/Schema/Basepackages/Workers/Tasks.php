@@ -86,11 +86,10 @@ class Tasks
                             'notNull'       => true,
                         ]
                     ),
-                    new Column(
-                        'call',
+                    new Column(//Call ID
+                        'cid',
                         [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 2048,
+                            'type'          => Column::TYPE_INTEGER,
                             'notNull'       => false,
                         ]
                     ),
@@ -101,7 +100,7 @@ class Tasks
                             'notNull'       => false,
                         ]
                     ),
-                    new Column(
+                    new Column(//Raw Process Id
                         'pid',
                         [
                             'type'          => Column::TYPE_INTEGER,

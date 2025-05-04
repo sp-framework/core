@@ -27,11 +27,12 @@ class Store
     protected $defaultCacheLifetime = null;
 
     protected $indexesPath = '';
+    protected $readIndex = false;
     protected $indexing = false;
     protected $minIndexChars = 3;
     protected $multiWords = true;
     protected $multiWordsSeparator = ' ';
-    protected $minMultiWordsChars = 5;
+    protected $minMultiWordsChars = 4;
 
     protected $indexes = [];
     protected $model = null;
@@ -129,27 +130,18 @@ class Store
             $rmd['columnUnique'] = [];
             $rmd['storeRelations'] = [];
 
-            if (isset($schemaArr['properties'])) {
-                foreach ($schemaArr['properties'] as $column => $property) {
-                    if (isset($property['type'][1]) && $property['type'][1] === 'array') {
-                        if (isset($property['relation'])) {
-                            $relation = explode('|', $property['relation']);
-
-                            if (count($relation) > 0 && isset($relation[2])) {
-                                try {
-                                    $relation[2] = explode('+', $relation[2])[0];
-                                    $relationsStore = new Store($relation[2], $this->databasePath, $this->ff);
-
-                                    $rmd = array_replace_recursive($rmd, $relationsStore->getSchemaMetaData());
-
-                                    $rmd['storeRelations'][$column] = [];
-                                    $rmd['storeRelations'][$column] = $relationsStore->getSchemaMetaData();
-                                    $rmd['storeRelations'][$column]['relationStore'] = $relation[2];
-                                } catch (\Exception $e) {
-                                    throw $e;
-                                }
-                            }
-                        }
+            if (isset($schemaArr['relations'])) {
+                foreach ($schemaArr['relations'] as $alias => $relation) {
+                    if (isset($relation['table']) && isset($this->relationStores[$relation['table']])) {
+                        $rmd = array_replace_recursive($rmd, $this->relationStores[$relation['table']]->getSchemaMetaData());
+                        $rmd['storeRelations'][$alias] = [];
+                        $rmd['storeRelations'][$alias] = $this->relationStores[$relation['table']]->getSchemaMetaData();
+                        $rmd['storeRelations'][$alias]['relationStore'] = $relation['table'];
+                    } else if (isset($relation[1]) && isset($this->relationStores[$relation[1]['table']])) {
+                        $rmd = array_replace_recursive($rmd, $this->relationStores[$relation[1]['table']]->getSchemaMetaData());
+                        $rmd['storeRelations'][$alias] = [];
+                        $rmd['storeRelations'][$alias] = $this->relationStores[$relation[1]['table']]->getSchemaMetaData();
+                        $rmd['storeRelations'][$alias]['relationStore'] = $relation[1]['table'];
                     }
                 }
             }
@@ -1046,7 +1038,7 @@ class Store
                     }
 
                     if (isset($relationsConditions[$relation['alias']])) {//Relation with condition
-                        $criteria = array_merge($criteria, $relationsConditions[$relation['alias']]);
+                        array_push($criteria, [$relationsConditions[$relation['alias']]]);
                     }
 
                     try {
@@ -1085,7 +1077,7 @@ class Store
                     }
 
                     if (isset($relationsConditions[$relation['alias']])) {//Relation with condition
-                        $criteria = array_merge($criteria, $relationsConditions[$relation['alias']]);
+                        array_push($criteria, [$relationsConditions[$relation['alias']]]);
                     }
 
                     try {
@@ -1269,6 +1261,7 @@ class Store
 
             if (count($configuration["indexes"]) > 0) {
                 $configuration['indexing'] = true;
+                $configuration['readIndex'] = true;
             }
         }
 
@@ -1278,6 +1271,14 @@ class Store
             }
 
             $this->indexing = $configuration["indexing"];
+        }
+
+        if (array_key_exists("readIndex", $configuration)) {
+            if (!is_bool($configuration["readIndex"])) {
+                throw new InvalidConfigurationException("readIndex has to be boolean");
+            }
+
+            $this->readIndex = $configuration["readIndex"];
         }
 
         if (array_key_exists("auto_cache", $configuration)) {
@@ -1405,27 +1406,28 @@ class Store
     {
         $this->storeConfiguration =
         [
-            "auto_cache"            => $this->useCache,
-            "cache_lifetime"        => $this->defaultCacheLifetime,
-            "primary_key"           => $this->primaryKey,
+            "auto_cache"            => &$this->useCache,
+            "cache_lifetime"        => &$this->defaultCacheLifetime,
+            "primary_key"           => &$this->primaryKey,
             "search"                => [
-                "min_length"            => $this->searchOptions["minLength"],
-                "mode"                  => $this->searchOptions["mode"],
-                "score_key"             => $this->searchOptions["scoreKey"],
-                "algorithm"             => $this->searchOptions["algorithm"]
+                "min_length"            => &$this->searchOptions["minLength"],
+                "mode"                  => &$this->searchOptions["mode"],
+                "score_key"             => &$this->searchOptions["scoreKey"],
+                "algorithm"             => &$this->searchOptions["algorithm"]
             ],
-            "folder_permissions"    => $this->folderPermissions,
-            "indexing"              => $this->indexing,
-            "min_index_chars"       => $this->minIndexChars,
-            "multi_words"           => $this->multiWords,
-            "multi_words_separator" => $this->multiWordsSeparator,
-            "min_multi_words_chars" => $this->minMultiWordsChars,
-            "uniqueFields"          => $this->uniqueFields,
-            "indexes"               => $this->indexes,
-            "storePath"             => $this->storePath,
-            "databasePath"          => $this->databasePath,
-            "indexesPath"           => $this->indexesPath,
-            "model"                 => $this->model
+            "folder_permissions"    => &$this->folderPermissions,
+            "readIndex"             => &$this->readIndex,
+            "indexing"              => &$this->indexing,
+            "min_index_chars"       => &$this->minIndexChars,
+            "multi_words"           => &$this->multiWords,
+            "multi_words_separator" => &$this->multiWordsSeparator,
+            "min_multi_words_chars" => &$this->minMultiWordsChars,
+            "uniqueFields"          => &$this->uniqueFields,
+            "indexes"               => &$this->indexes,
+            "storePath"             => &$this->storePath,
+            "databasePath"          => &$this->databasePath,
+            "indexesPath"           => &$this->indexesPath,
+            "model"                 => &$this->model
         ];
     }
 
@@ -1494,10 +1496,32 @@ class Store
             }
 
             if (count($criteria) > 0) {
-                $found = $this->findOneBy($criteria);
+                $found = $this->findBy($criteria);
 
-                if ($found) {
-                    throw new IOException("Duplicate entry found for field: $uniqueField. $uniqueField should be unique. Store: " . $this->storeName);
+                $duplicate = false;
+
+                if ($found && count($found) > 0) {
+                    foreach ($found as $foundArr) {
+                        $match = false;
+
+                        foreach ($criteria as $criteriaArr) {
+                            if (isset($foundArr[$criteriaArr[0]]) && $foundArr[$criteriaArr[0]] === $criteriaArr[2]) {
+                                $match = true;
+                            } else {
+                                $match = false;
+                            }
+                        }
+
+                        if ($match) {
+                            $duplicate = $foundArr['id'];
+
+                            break;
+                        }
+                    }
+                }
+
+                if ($duplicate) {
+                    throw new IOException("Duplicate entry with ID: $duplicate found for field: $uniqueField. $uniqueField should be unique. Store: " . $this->storeName);
                 }
             }
         }
@@ -1648,6 +1672,24 @@ class Store
                         if ($type === 'integer') {
                             if (is_string($data[$propertyKey])) {
                                 $data[$propertyKey] = (int) $data[$propertyKey];
+                            }
+                        }
+
+                        if ($type === 'string') {
+                            if (is_integer($data[$propertyKey]) || is_float($data[$propertyKey])) {
+                                $data[$propertyKey] = (string) $data[$propertyKey];
+                            }
+
+                            if (is_bool($data[$propertyKey])) {
+                                if ($data[$propertyKey] === true ||
+                                    $data[$propertyKey] === 1
+                                ) {
+                                    $data[$propertyKey] = 'true';
+                                } else if ($data[$propertyKey] === false ||
+                                           $data[$propertyKey] === 0
+                                ) {
+                                    $data[$propertyKey] = 'false';
+                                }
                             }
                         }
 
@@ -1810,10 +1852,22 @@ class Store
         return $this->indexing;
     }
 
-    public function setIndexing($indexing = true)
+    public function setIndexing($indexing)
     {
         $this->indexing = $indexing;
 
         return $this->getIndexing();
+    }
+
+    public function getReadIndex()
+    {
+        return $this->readIndex;
+    }
+
+    public function setReadIndex($index)
+    {
+        $this->readIndex = $index;
+
+        return $this->getReadIndex();
     }
 }

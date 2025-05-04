@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\ErrorServiceProvider\Exceptions;
 
-class IncorrectRequestType extends \Exception
+class IncorrectCSRFException extends \Exception
 {
 
 }

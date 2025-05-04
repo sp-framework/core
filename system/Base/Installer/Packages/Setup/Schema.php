@@ -37,6 +37,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Tunn
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Profiles;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Roles;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Widgets;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Calls;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Jobs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Schedules;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Tasks;
@@ -105,6 +106,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accou
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersRoles;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersCalls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersJobs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersSchedules;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersTasks;
@@ -289,6 +291,10 @@ class Schema
                 'basepackages_workers_schedules'            => [
                         'schema'    => new Schedules,
                         'model'     => new BasepackagesWorkersSchedules,
+                    ],
+                'basepackages_workers_calls'                => [
+                        'schema'    => new Calls,
+                        'model'     => new BasepackagesWorkersCalls,
                     ],
                 'basepackages_workers_tasks'                => [
                         'schema'    => new Tasks,

@@ -11,11 +11,15 @@ class TasksComponent extends BaseComponent
 
     protected $tasks;
 
+    protected $calls;
+
     protected $schedules;
 
     public function initialize()
     {
         $this->tasks = $this->basepackages->workers->tasks;
+
+        $this->calls = $this->basepackages->workers->calls->calls;
     }
 
     /**
@@ -26,7 +30,29 @@ class TasksComponent extends BaseComponent
         $this->schedules = $this->basepackages->workers->schedules->schedules;
 
         if (isset($this->getData()['id'])) {
-            $calls = $this->tasks->getAllCalls();
+            $calls = [];
+
+            if ($this->calls && count($this->calls) > 0) {
+                foreach ($this->calls as $thisCalls) {
+                    if (!$thisCalls['package']) {
+                        continue;
+                    }
+
+                    if (!isset($calls[$thisCalls['id']])) {
+                        $calls[$thisCalls['id']] = [];
+                    }
+
+                    $calls[$thisCalls['id']]['id'] = $thisCalls['id'];
+                    $calls[$thisCalls['id']]['name'] = $thisCalls['display_name'] ?? $thisCalls['name'];
+                    $calls[$thisCalls['id']]['description'] = $thisCalls['description'];
+                    $calls[$thisCalls['id']]['package_id'] = $thisCalls['package_id'];
+                    $calls[$thisCalls['id']]['package_name'] = $thisCalls['package']['display_name'] ?? $thisCalls['package']['name'];
+                }
+            }
+
+            $this->tasks->setFFRelations(true);
+
+            // $calls = $this->tasks->getAllCalls();
 
             $this->view->calls = $calls;
 
@@ -45,6 +71,7 @@ class TasksComponent extends BaseComponent
 
                 $this->view->task = $task;
             }
+
             $this->view->pick('tasks/view');
 
             return;

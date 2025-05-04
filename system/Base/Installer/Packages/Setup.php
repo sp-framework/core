@@ -303,8 +303,8 @@ class Setup
 			'0',
 			1,
 			'/',
-			null,
-			null,
+			false,
+			$this->request->getHttpHost(),
 			true
 		);
 
@@ -315,8 +315,8 @@ class Setup
 			'0',
 			1,
 			'/',
-			null,
-			null,
+			false,
+			$this->request->getHttpHost(),
 			true
 		);
 
@@ -325,8 +325,8 @@ class Setup
 			'0',
 			1,
 			'/',
-			null,
-			null,
+			false,
+			$this->request->getHttpHost(),
 			true
 		);
 
@@ -611,7 +611,7 @@ class Setup
 
 	protected function registerCorePackage(array $packageFile)
 	{
-		return (new RegisterPackage())->register($this->db, $this->ff, $packageFile, $this->helper);
+		return (new RegisterPackage())->register($this->db, $this->ff, $packageFile, $this->helper, $this->basepackages, $this->container, $this->postData['databasetype']);
 	}
 
 	protected function registerCoreMiddleware(array $middlewareFile)
@@ -754,7 +754,7 @@ class Setup
 
 	protected function registerTasks()
 	{
-		(new RegisterTasks())->register($this->db, $this->ff);
+		(new RegisterTasks())->register($this->db, $this->ff, $this->postData['databasetype']);
 
 		return true;
 	}

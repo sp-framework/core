@@ -3515,16 +3515,18 @@ dataCollectionSection =
 
                         path += routeArr.join('/');
                     } else {
+                        var nameArr;
                         if (moduleType === 'views') {
                             if (dataCollectionSectionForm['vars']['subview']) {
                                 path += dataCollectionSectionForm['vars']['moduleDependencies']['views'][0]['name'] + '/html/';
-                                path += $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
+                                nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
+                                path += nameArr.join('/').toLowerCase();
                             } else {
                                 path += $('#{{componentId}}-{{sectionId}}-name').val();
                             }
                             pathPublic += $('#{{componentId}}-{{sectionId}}-name').val().toLowerCase();
                         } else {
-                            var nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
+                            nameArr = $('#{{componentId}}-{{sectionId}}-name').val().split(/(?=[A-Z])/);
                             path += nameArr.join('/');
                         }
                     }

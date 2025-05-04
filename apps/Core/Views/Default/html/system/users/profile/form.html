@@ -82,6 +82,12 @@
                                     'tabInclude'        : 'profile/form/contactdetails',
                                     'tabIncludeParams'  : ['profile' : profile, 'account' : account]
                                 ],
+                                'locale'   :
+                                [
+                                    'tabTitle'          : 'Locale',
+                                    'tabInclude'        : 'profile/form/locale',
+                                    'tabIncludeParams'  : ['profile' : profile, 'account' : account]
+                                ],
                                 'address'   :
                                 [
                                     'tabTitle'          : 'Address',
@@ -326,6 +332,12 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-secondary_email'                 : { },
         '{{componentId}}-{{sectionId}}-cc_emails_to_secondary_email'    : { },
         '{{componentId}}-{{sectionId}}-contact_notes'                   : { },
+        '{{componentId}}-{{sectionId}}-locale_country_id'               : {
+            placeholder : 'SELECT COUNTRY'
+        },
+        '{{componentId}}-{{sectionId}}-locale_timezone_id'              : {
+            placeholder : 'SELECT TIMEZONE'
+        },
         '{{componentId}}-{{sectionId}}-address_id'                      : { },
         '{{componentId}}-{{sectionId}}-current_password'                : {
             afterInit: function() {
