@@ -238,16 +238,16 @@ class Utils extends BasePackage
         $maxCountTotal = 0;
 
         if (isset($params['passwordpolicyuppercase'])) {
-            $uppercase = $params['passwordpolicyuppercase'] == true ? true : false ;
+            $uppercase = $params['passwordpolicyuppercase'] == 'true' ? true : false ;
         }
         if (isset($params['passwordpolicylowercase'])) {
-            $lowercase = $params['passwordpolicylowercase'] == true ? true : false ;
+            $lowercase = $params['passwordpolicylowercase'] == 'true' ? true : false ;
         }
         if (isset($params['passwordpolicynumbers'])) {
-            $numbers = $params['passwordpolicynumbers'] == true ? true : false ;
+            $numbers = $params['passwordpolicynumbers'] == 'true' ? true : false ;
         }
         if (isset($params['passwordpolicysymbols'])) {
-            $symbols = $params['passwordpolicysymbols'] == true ? true : false ;
+            $symbols = $params['passwordpolicysymbols'] == 'true' ? true : false ;
         }
         if (isset($params['passwordpolicyavoidsimilar'])) {
             $avoid_similar = $params['passwordpolicyavoidsimilar'] == 'true' ? true : false ;
