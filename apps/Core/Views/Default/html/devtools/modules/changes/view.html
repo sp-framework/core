@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+<!-- htmlhint tag-pair:false -->
 {% set changesHtml = '' %}
 {% if modules|length > 0 %}
     {% for moduleType, modulesArr in modules %}
@@ -24,8 +24,14 @@
                 {% if moduleArr['isModified'] != false %}
                     {% set moduleModified = 'Yes' %}
                 {% endif %}
+                {% set moduleName = moduleArr['name'] %}
+                {% if moduleArr['display_name'] is defined %}
+                    {% set moduleName = moduleArr['display_name'] ~ ' (' ~ moduleArr['name'] ~ ')' %}
+                {% elseif moduleArr['route'] is defined %}
+                    {% set moduleName = moduleArr['name'] ~ ' (' ~ moduleArr['route'] ~ ')' %}
+                {% endif %}
                 {% set changesHtml = changesHtml ~ '<tr>' ~
-                '           <td>' ~ moduleArr['name'] ~ '</td>' ~
+                '           <td>' ~ moduleName ~ '</td>' ~
                 '           <td>' ~ moduleArr['module_type'] ~ '</td>' ~
                 '           <td>' ~ moduleUrl ~ '</td>' ~
                 '           <td>' ~ moduleVersion ~ '</td>' ~
@@ -208,4 +214,3 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
-<!-- htmlmin:ignore -->
