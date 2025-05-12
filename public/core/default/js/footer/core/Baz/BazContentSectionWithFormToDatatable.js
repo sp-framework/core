@@ -1,4 +1,4 @@
-/* globals define exports BazContentFieldsValidator BazContentFields PNotify */
+/* globals define exports BazContentFieldsValidator BazContentFields paginatedPNotify */
 /*
 * @title                    : BazContentSectionWithFormToDatatable
 * @description              : Baz Lib for Content (Sections With Form)
@@ -521,7 +521,7 @@
                 }
 
                 if (found) {
-                    PNotify.notice({
+                    paginatedPNotify('notice', {
                         title: 'Input data already exists in table!'
                     });
 
