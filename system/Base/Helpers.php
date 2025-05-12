@@ -643,3 +643,21 @@ if (!function_exists('getRemoteFilesize')) {
         return $size;
     }
 }
+
+if (!function_exists('numberFormatPrecision')) {
+    function numberFormatPrecision($number, $precision = 2, $separator = '.') {
+        $numberParts = explode($separator, $number);
+        $response = $numberParts[0];
+
+        if (count($numberParts) > 1 && $precision > 0) {
+            $response .= $separator;
+            $response .= substr($numberParts[1], 0, $precision);
+        }
+
+        if ($response == '-0') {
+            $response = 0;
+        }
+
+        return (float) $response;
+    }
+}
