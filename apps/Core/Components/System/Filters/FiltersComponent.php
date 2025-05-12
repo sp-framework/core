@@ -3,7 +3,6 @@
 namespace Apps\Core\Components\System\Filters;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
-use Apps\Core\Packages\Hrms\Employees\Employees;
 use System\Base\BaseComponent;
 
 class FiltersComponent extends BaseComponent
@@ -22,6 +21,20 @@ class FiltersComponent extends BaseComponent
      */
     public function viewAction()
     {
+        if ($this->request->isGet()) {
+            if ($this->app['id'] == 1) {
+                $components = $this->modules->components->components;
+            } else {
+                $components = $this->modules->components->getComponentsForAppType($this->app['app_type']);
+            }
+
+            foreach ($components as $key => $component) {
+                $components[$key]['name'] = $component['name'] . ' (' . $component['category'] . ')';
+            }
+
+            $this->view->components = $components;
+        }
+
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
                 $filter = $this->filters->getById($this->getData()['id']);
@@ -36,18 +49,6 @@ class FiltersComponent extends BaseComponent
             $this->view->pick('filters/view');
 
             return;
-        } else {
-            if ($this->app['id'] == 1) {
-                $components = $this->modules->components->components;
-            } else {
-                $components = $this->modules->components->getComponentsForAppType($this->app['app_type']);
-            }
-
-            foreach ($components as $key => $component) {
-                $components[$key]['name'] = $component['name'] . ' (' . $component['category'] . ')';
-            }
-
-            $this->view->components = $components;
         }
 
         if ($this->request->isPost()) {
