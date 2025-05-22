@@ -375,21 +375,21 @@ class DynamicTable
 
                         if ($controlKey === 'view') {
                             if (is_array($control)) {
-                                $control = $control['link'];
+                                $controlLink = $control['link'];
                                 $title =
                                     isset($control['title']) ?
                                     strtoupper($control['title']) :
                                     'VIEW';
                                 $icon =
                                     isset($control['icon']) ?
-                                    strtoupper($control['icon']) :
+                                    $control['icon'] :
                                     'eye';
                                 $type =
                                     isset($control['type']) ?
-                                    strtoupper($control['type']) :
+                                    $control['type'] :
                                     'info';
-
                             } else {
+                                $controlLink = $control;
                                 $title = 'VIEW';
                                 $icon = 'eye';
                                 $type = 'info';
@@ -403,27 +403,27 @@ class DynamicTable
                                         'additionalClass'   => 'rowView ' . $this->dtParams['dtControlsLinkClass'],
                                         'icon'              => $icon,
                                         'buttonType'        => $type,
-                                        'link'              => $control
+                                        'link'              => $controlLink
                                     ]
                                 ]
                             );
                         } else if ($controlKey === 'edit') {
                             if (is_array($control)) {
-                                $control = $control['link'];
+                                $controlLink = $control['link'];
                                 $title =
                                     isset($control['title']) ?
                                     strtoupper($control['title']) :
                                     'EDIT';
                                 $icon =
                                     isset($control['icon']) ?
-                                    strtoupper($control['icon']) :
+                                    $control['icon'] :
                                     'edit';
                                 $type =
                                     isset($control['type']) ?
-                                    strtoupper($control['type']) :
+                                    $control['type'] :
                                     'primary';
-
                             } else {
+                                $controlLink = $control;
                                 $title = 'EDIT';
                                 $icon = 'edit';
                                 $type = 'primary';
@@ -437,27 +437,27 @@ class DynamicTable
                                         'additionalClass'   => 'rowEdit ' . $this->dtParams['dtControlsLinkClass'],
                                         'icon'              => $icon,
                                         'buttonType'        => $type,
-                                        'link'              => $control
+                                        'link'              => $controlLink
                                     ]
                                 ]
                             );
                         } else if ($controlKey === 'clone') {
                             if (is_array($control)) {
-                                $control = $control['link'];
+                                $controlLink = $control['link'];
                                 $title =
                                     isset($control['title']) ?
                                     strtoupper($control['title']) :
                                     'CLONE';
                                 $icon =
                                     isset($control['icon']) ?
-                                    strtoupper($control['icon']) :
+                                    $control['icon'] :
                                     'clone';
                                 $type =
                                     isset($control['type']) ?
-                                    strtoupper($control['type']) :
+                                    $control['type'] :
                                     'primary';
-
                             } else {
+                                $controlLink = $control;
                                 $title = 'CLONE';
                                 $icon = 'clone';
                                 $type = 'primary';
@@ -471,27 +471,27 @@ class DynamicTable
                                         'additionalClass'   => 'rowEdit ' . $this->dtParams['dtControlsLinkClass'],
                                         'icon'              => $icon,
                                         'buttonType'        => $type,
-                                        'link'              => $control
+                                        'link'              => $controlLink
                                     ]
                                 ]
                             );
                         } else if ($controlKey === 'remove') {
                             if (is_array($control)) {
-                                $control = $control['link'];
+                                $controlLink = $control['link'];
                                 $title =
                                     isset($control['title']) ?
                                     strtoupper($control['title']) :
                                     'REMOVE';
                                 $icon =
                                     isset($control['icon']) ?
-                                    strtoupper($control['icon']) :
+                                    $control['icon'] :
                                     'trash';
                                 $type =
                                     isset($control['type']) ?
-                                    strtoupper($control['type']) :
+                                    $control['type'] :
                                     'danger';
-
                             } else {
+                                $controlLink = $control;
                                 $title = 'REMOVE';
                                 $icon = 'trash';
                                 $type = 'danger';
@@ -505,7 +505,7 @@ class DynamicTable
                                         'additionalClass'   => 'rowRemove',
                                         'icon'              => $icon,
                                         'buttonType'        => $type,
-                                        'link'              => $control
+                                        'link'              => $controlLink
                                     ]
                                 ]
                             );
@@ -544,8 +544,6 @@ class DynamicTable
                     }
 
                     $column = $controlbuttons;
-
-                    // $this->dtParams['dtShowRowControls'] = true;
                 }
 
                 $rowData = array_merge($rowData, [$columnKey => $column]);
