@@ -388,11 +388,16 @@ class DynamicTable
                                     isset($control['type']) ?
                                     $control['type'] :
                                     'info';
+                                $additionalClass =
+                                    isset($control['additionalClass']) ?
+                                    $control['additionalClass'] :
+                                    $this->dtParams['dtControlsLinkClass'];
                             } else {
                                 $controlLink = $control;
                                 $title = 'VIEW';
                                 $icon = 'eye';
                                 $type = 'info';
+                                $additionalClass = $this->dtParams['dtControlsLinkClass'];
                             }
                         } else if ($controlKey === 'edit') {
                             if (is_array($control)) {
@@ -409,11 +414,16 @@ class DynamicTable
                                     isset($control['type']) ?
                                     $control['type'] :
                                     'primary';
+                                $additionalClass =
+                                    isset($control['additionalClass']) ?
+                                    $control['additionalClass'] :
+                                    $this->dtParams['dtControlsLinkClass'];
                             } else {
                                 $controlLink = $control;
                                 $title = 'EDIT';
                                 $icon = 'edit';
                                 $type = 'primary';
+                                $additionalClass = $this->dtParams['dtControlsLinkClass'];
                             }
                         } else if ($controlKey === 'clone') {
                             if (is_array($control)) {
@@ -430,11 +440,16 @@ class DynamicTable
                                     isset($control['type']) ?
                                     $control['type'] :
                                     'primary';
+                                $additionalClass =
+                                    isset($control['additionalClass']) ?
+                                    $control['additionalClass'] :
+                                    $this->dtParams['dtControlsLinkClass'];
                             } else {
                                 $controlLink = $control;
                                 $title = 'CLONE';
                                 $icon = 'clone';
                                 $type = 'primary';
+                                $additionalClass = $this->dtParams['dtControlsLinkClass'];
                             }
                         } else if ($controlKey === 'remove') {
                             if (is_array($control)) {
@@ -451,11 +466,16 @@ class DynamicTable
                                     isset($control['type']) ?
                                     $control['type'] :
                                     'danger';
+                                $additionalClass =
+                                    isset($control['additionalClass']) ?
+                                    $control['additionalClass'] :
+                                    '';
                             } else {
                                 $controlLink = $control;
                                 $title = 'REMOVE';
                                 $icon = 'trash';
                                 $type = 'danger';
+                                $additionalClass = '';
                             }
                         } else {
                             if ($controlKey === 'divider') {
@@ -475,11 +495,16 @@ class DynamicTable
                                         isset($control['type']) ?
                                         $control['type'] :
                                         'primary';
+                                    $additionalClass =
+                                        isset($control['additionalClass']) ?
+                                        $control['additionalClass'] :
+                                        '';
                                 } else {
                                     $controlLink = $control;
                                     $title = 'TITLE MISSING';
                                     $icon = 'circle-dot';
                                     $type = 'primary';
+                                    $additionalClass = '';
                                 }
                             }
                         }
@@ -492,7 +517,7 @@ class DynamicTable
                                     $controlKey =>
                                     [
                                         'title'             => $title,
-                                        'additionalClass'   => 'row' . ucfirst($controlKey),
+                                        'additionalClass'   => 'row' . ucfirst($controlKey) . ' ' . $additionalClass,
                                         'icon'              => $icon,
                                         'buttonType'        => $type,
                                         'link'              => $controlLink
