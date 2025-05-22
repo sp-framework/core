@@ -1438,13 +1438,15 @@ class Store
 
     protected function writeNewDocumentToStore(array $storeData): array
     {
-        if (isset($storeData[$this->primaryKey]) && $storeData[$this->primaryKey] != 0) {
+        $storeData = $this->validateData($storeData);
+
+        if (isset($storeData[$this->primaryKey]) &&
+            ($storeData[$this->primaryKey] != 0 || (is_string($storeData[$this->primaryKey]) && strlen($storeData[$this->primaryKey]) !== 0))
+        ) {
             throw new IdNotAllowedException(
                 "The $this->primaryKey\" index is reserved, please delete the $this->primaryKey key and try again"
             );
         }
-
-        $storeData = $this->validateData($storeData);
 
         $id = $this->increaseCounterAndGetNextId();
 
@@ -1821,6 +1823,10 @@ class Store
 
         if (is_string($id)) {
             $id = IoHelper::secureStringForFileAccess($id);
+
+            if (strlen($id) == 0) {
+                return 0;
+            }
         }
 
         if (!is_numeric($id)) {
