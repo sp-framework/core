@@ -522,6 +522,10 @@ class Filters extends BasePackage
             }
         }
 
+        if (!isset($data['app_type'])) {
+            $data['app_type'] = $this->app['app_type'];
+        }
+
         if ($this->checkDefaultFilter($data)) {
             $add = $this->add($data);
 
