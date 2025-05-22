@@ -179,10 +179,6 @@ trait DynamicTable {
                 return;
             }
 
-            if ($dtAdditionControlButtons && is_callable($dtAdditionControlButtons)) {
-                $dtAdditionControlButtons = $dtAdditionControlButtons($rows);
-            }
-
             if ($controlActions && is_callable($controlActions)) {
                 $rows = $controlActions($rows);
             } else if ($controlActions) {
@@ -263,6 +259,10 @@ trait DynamicTable {
 
                     $row["__control"] = $actions;
                 }
+            }
+
+            if ($dtAdditionControlButtons && is_callable($dtAdditionControlButtons)) {
+                $dtAdditionControlButtons = $dtAdditionControlButtons($rows);
             }
 
             if ($this->api->isApi()) {

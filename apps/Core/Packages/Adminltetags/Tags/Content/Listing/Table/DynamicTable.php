@@ -394,19 +394,6 @@ class DynamicTable
                                 $icon = 'eye';
                                 $type = 'info';
                             }
-
-                            $controlButtons = array_merge($controlButtons,
-                                [
-                                    $controlKey =>
-                                    [
-                                        'title'             => $title,
-                                        'additionalClass'   => 'rowView ' . $this->dtParams['dtControlsLinkClass'],
-                                        'icon'              => $icon,
-                                        'buttonType'        => $type,
-                                        'link'              => $controlLink
-                                    ]
-                                ]
-                            );
                         } else if ($controlKey === 'edit') {
                             if (is_array($control)) {
                                 $controlLink = $control['link'];
@@ -428,19 +415,6 @@ class DynamicTable
                                 $icon = 'edit';
                                 $type = 'primary';
                             }
-
-                            $controlButtons = array_merge($controlButtons,
-                                [
-                                    $controlKey =>
-                                    [
-                                        'title'             => $title,
-                                        'additionalClass'   => 'rowEdit ' . $this->dtParams['dtControlsLinkClass'],
-                                        'icon'              => $icon,
-                                        'buttonType'        => $type,
-                                        'link'              => $controlLink
-                                    ]
-                                ]
-                            );
                         } else if ($controlKey === 'clone') {
                             if (is_array($control)) {
                                 $controlLink = $control['link'];
@@ -462,19 +436,6 @@ class DynamicTable
                                 $icon = 'clone';
                                 $type = 'primary';
                             }
-
-                            $controlButtons = array_merge($controlButtons,
-                                [
-                                    $controlKey =>
-                                    [
-                                        'title'             => $title,
-                                        'additionalClass'   => 'rowEdit ' . $this->dtParams['dtControlsLinkClass'],
-                                        'icon'              => $icon,
-                                        'buttonType'        => $type,
-                                        'link'              => $controlLink
-                                    ]
-                                ]
-                            );
                         } else if ($controlKey === 'remove') {
                             if (is_array($control)) {
                                 $controlLink = $control['link'];
@@ -496,13 +457,42 @@ class DynamicTable
                                 $icon = 'trash';
                                 $type = 'danger';
                             }
+                        } else {
+                            if ($controlKey === 'divider') {
+                                $control = '';
+                            } else {
+                                if (is_array($control)) {
+                                    $controlLink = $control['link'];
+                                    $title =
+                                        isset($control['title']) ?
+                                        strtoupper($control['title']) :
+                                        'TITLE MISSING';
+                                    $icon =
+                                        isset($control['icon']) ?
+                                        $control['icon'] :
+                                        'circle-dot';
+                                    $type =
+                                        isset($control['type']) ?
+                                        $control['type'] :
+                                        'primary';
+                                } else {
+                                    $controlLink = $control;
+                                    $title = 'TITLE MISSING';
+                                    $icon = 'circle-dot';
+                                    $type = 'primary';
+                                }
+                            }
+                        }
 
+                        if ($controlKey === 'divider') {
+                            $controlButtons = array_merge($controlButtons, ['divider' => '<div class="dropdown-divider"></div>']);
+                        } else {
                             $controlButtons = array_merge($controlButtons,
                                 [
                                     $controlKey =>
                                     [
                                         'title'             => $title,
-                                        'additionalClass'   => 'rowRemove',
+                                        'additionalClass'   => 'row' . ucfirst($controlKey),
                                         'icon'              => $icon,
                                         'buttonType'        => $type,
                                         'link'              => $controlLink
