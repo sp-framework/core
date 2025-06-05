@@ -289,7 +289,9 @@ class Views extends BasePackage
     public function getViewByNameForAppId($name, $appId)
     {
         foreach($this->views as $view) {
-            $view['apps'] = $this->helper->decode($view['apps'], true);
+            if (is_string($view['apps'])) {
+                $view['apps'] = $this->helper->decode($view['apps'], true);
+            }
 
             if ((isset($view['apps'][$appId]['enabled']) &&
                 $view['apps'][$appId]['enabled'] == true) &&
@@ -308,7 +310,9 @@ class Views extends BasePackage
         $views = [];
 
         foreach($this->views as $view) {
-            $view['apps'] = $this->helper->decode($view['apps'], true);
+            if (is_string($view['apps'])) {
+                $view['apps'] = $this->helper->decode($view['apps'], true);
+            }
 
             if (isset($view['apps'][$appId]['enabled']) &&
                 $view['apps'][$appId]['enabled'] == 'true'
@@ -464,7 +468,9 @@ class Views extends BasePackage
         foreach ($views as $viewId => $status) {
             $view = $this->getById($viewId);
 
-            $view['apps'] = $this->helper->decode($view['apps'], true);
+            if (is_string($view['apps'])) {
+                $view['apps'] = $this->helper->decode($view['apps'], true);
+            }
 
             if ($status === true) {
                 $view['apps'][$data['id']]['enabled'] = true;

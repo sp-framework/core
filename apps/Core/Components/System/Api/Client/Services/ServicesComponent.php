@@ -39,7 +39,9 @@ class ServicesComponent extends BaseComponent
                 }
 
                 if (isset($api['used_by']) && $api['used_by'] !== '') {
-                    $api['used_by'] = $this->helper->decode($api['used_by'], true);
+                    if (is_string($api['used_by'])) {
+                        $api['used_by'] = $this->helper->decode($api['used_by'], true);
+                    }
                     $api['used_by'] = implode(', ', $api['used_by']);
                 } else if (isset($api['used_by']) && $api['used_by'] === '') {
                     $api['used_by'] = '-';
@@ -138,7 +140,9 @@ class ServicesComponent extends BaseComponent
             $data['category'] = ucfirst($data['category']);
 
             if (isset($data['used_by']) && $data['used_by'] !== '') {
-                $data['used_by'] = $this->helper->decode($data['used_by'], true);
+                if (is_string($data['used_by'])) {
+                    $data['used_by'] = $this->helper->decode($data['used_by'], true);
+                }
                 $data['used_by'] = implode(', ', $data['used_by']);
             } else if (isset($data['used_by']) && $data['used_by'] === '') {
                 $data['used_by'] = '-';

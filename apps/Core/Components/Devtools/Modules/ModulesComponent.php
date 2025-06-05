@@ -290,7 +290,7 @@ class ModulesComponent extends BaseComponent
 							if ($module['module_details']['module_type'] === 'components') {
 								$moduleLocation = 'apps/' . ucfirst($module['module_details']['app_type']) . '/Components/';
 								if ($module['module_details']['menu']) {
-									$this->view->moduleMenu = $this->helper->encode($this->helper->decode($module['module_details']['menu'], true));
+									$this->view->moduleMenu = $this->helper->encode($module['module_details']['menu']);
 									$this->view->menuBaseStructure = $this->basepackages->menus->getMenusForAppType($module['module_details']['app_type']);
 								} else {
 									$this->view->moduleMenu = false;

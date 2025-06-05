@@ -119,7 +119,9 @@ class Components extends BasePackage
 		}
 
 		foreach($this->components as $component) {
-			$component['apps'] = $this->helper->decode($component['apps'], true);
+			if (is_string($component['apps'])) {
+				$component['apps'] = $this->helper->decode($component['apps'], true);
+			}
 
 			if (isset($component['apps'][$appId])) {
 				if (isset($component['apps'][$appId]['enabled']) &&
@@ -137,7 +139,9 @@ class Components extends BasePackage
 	public function getComponentByNameForAppId($name, $appId)
 	{
 		foreach($this->components as $component) {
-			$component['apps'] = $this->helper->decode($component['apps'], true);
+			if (is_string($component['apps'])) {
+				$component['apps'] = $this->helper->decode($component['apps'], true);
+			}
 
 			if (isset($component['apps'][$appId])) {
 				if (isset($component['apps'][$appId]['enabled']) &&
@@ -180,7 +184,9 @@ class Components extends BasePackage
 		$classArr = explode('\\', $class);
 
 		foreach($this->components as $component) {
-			$component['apps'] = $this->helper->decode($component['apps'], true);
+			if (is_string($component['apps'])) {
+				$component['apps'] = $this->helper->decode($component['apps'], true);
+			}
 
 			if (count($classArr) === 1) {//Only Class Name Given
 				if (!str_contains($component['class'], $classArr[0])) {
@@ -211,7 +217,9 @@ class Components extends BasePackage
 		$components = [];
 
 		foreach($this->components as $component) {
-			$component['apps'] = $this->helper->decode($component['apps'], true);
+			if (is_string($component['apps'])) {
+				$component['apps'] = $this->helper->decode($component['apps'], true);
+			}
 
 			if (isset($component['apps'][$appId]['enabled']) &&
 				$component['apps'][$appId]['enabled'] === true
@@ -391,7 +399,9 @@ class Components extends BasePackage
 					$package = $this->modules->packages->getPackageByNameForRepo($dependencyPackage['name'], $dependencyPackage['repo']);
 
 					if ($package) {
-						$package['apps'] = $this->helper->decode($package['apps'], true);
+						if (is_string($package['apps'])) {
+							$package['apps'] = $this->helper->decode($package['apps'], true);
+						}
 
 						$package['apps'][$data['id']]['enabled'] = true;
 
@@ -411,7 +421,9 @@ class Components extends BasePackage
 						if (!$status && array_key_exists('is_subview', $view) && $view['is_subview'] == false) {
 							continue;
 						}
-						$view['apps'] = $this->helper->decode($view['apps'], true);
+						if (is_string($view['apps'])) {
+							$view['apps'] = $this->helper->decode($view['apps'], true);
+						}
 
 						$view['apps'][$data['id']]['enabled'] = (bool) $status;
 

@@ -33,7 +33,9 @@ class SchedulesComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
-                $schedule['schedule'] = $this->helper->decode($schedule['schedule'], true);
+                if (is_string($schedule['schedule'])) {
+                    $schedule['schedule'] = $this->helper->decode($schedule['schedule'], true);
+                }
 
                 if ($schedule['schedule']['type'] === 'everyxseconds') {
                     $schedule['schedule']['params']['seconds'] = implode(',', $schedule['schedule']['params']['seconds']);

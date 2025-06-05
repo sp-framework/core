@@ -123,13 +123,17 @@ class Menus extends BasePackage
             foreach ($menus as $menuId => $value) {
                 $menu = $this->getById($menuId);
 
-                $menu['apps'] = $this->helper->decode($menu['apps'], true);
+                if (is_string($menu['apps'])) {
+                    $menu['apps'] = $this->helper->decode($menu['apps'], true);
+                }
 
                 $menu['apps'] = array_replace($menu['apps'], $value);
 
                 $menu['apps'] = $this->helper->encode($menu['apps']);
 
-                $menu['menu'] = $this->helper->decode($menu['menu'], true);
+                if (is_string($menu['menu'])) {
+                    $menu['menu'] = $this->helper->decode($menu['menu'], true);
+                }
                 $menu['menu'] = $this->helper->encode($menu['menu'], JSON_UNESCAPED_SLASHES);
 
                 $this->update($menu);

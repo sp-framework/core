@@ -65,7 +65,7 @@ class Acl extends BaseMiddleware
         }
 
         if ($this->account) {
-            if (!is_array($this->account['security']['permissions'])) {
+            if (is_string($this->account['security']['permissions'])) {
                 $this->account['security']['permissions'] = $this->helper->decode($this->account['security']['permissions'], true);
             }
 

@@ -199,7 +199,7 @@ abstract class BasePackage extends Controller
 				$this->setFfStoreToUse();
 
 				if (is_array($this->ffData) && count($this->ffData) > 0) {
-					return $this->ffData;
+					return $this->jsonData($this->ffData, true);
 				}
 
 				return false;
@@ -254,9 +254,9 @@ abstract class BasePackage extends Controller
 			}
 
 			if ($by === 'id') {
-				$this->ffData = $this->ffStore->findById((int) $value, $this->ffRelations, $this->ffRelationsConditions);
+				$this->ffData = $this->jsonData($this->ffStore->findById((int) $value, $this->ffRelations, $this->ffRelationsConditions), true);
 			} else {
-				$this->ffData = $this->ffStore->findOneBy([$by, '=', $value], $this->ffRelations, $this->ffRelationsConditions);
+				$this->ffData = $this->jsonData($this->ffStore->findOneBy([$by, '=', $value], $this->ffRelations, $this->ffRelationsConditions), true);
 			}
 
 			$this->setFfStoreToUse();
@@ -451,7 +451,7 @@ abstract class BasePackage extends Controller
 					}
 				}
 
-				return $this->ffData;
+				return $this->jsonData($this->ffData, true);
 			}
 
 			return false;
