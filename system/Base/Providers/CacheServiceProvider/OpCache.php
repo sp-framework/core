@@ -52,7 +52,7 @@ class OpCache
         $this->setDirectory($directory);
 
         if ($key) {
-            if (opcache_is_script_cached(base_path($this->storagePath . $this->directory . '/' . $key . '.php'))) {
+            if ($this->checkCache($key, $directory)) {
                 if (!opcache_invalidate(base_path($this->storagePath . $this->directory . '/' . $key . '.php'), true)) {
                     return false;
                 }
@@ -126,5 +126,12 @@ class OpCache
         }
 
         $this->checkCachePath($this->directory);
+    }
+
+    public function checkCache($key, $directory = null)
+    {
+        $this->setDirectory($directory);
+
+        return file_exists(base_path($this->storagePath . $this->directory . '/' . $key . '.php'));
     }
 }
