@@ -20,7 +20,14 @@ class ErrorsComponent extends BaseComponent
         $this->addResponse('Component Not Found', 1);
     }
 
-    public function controllerDependencyErrorAction()
+    public function controllerPackageDependencyErrorAction()
+    {
+        $this->view->pick('errors/controllerdependencyerror');
+
+        $this->addResponse('Component Dependency Error', 1);
+    }
+
+    public function controllerViewDependencyErrorAction()
     {
         $this->view->pick('errors/controllerdependencyerror');
 

@@ -1,4 +1,10 @@
 {% set sectionId = 'controllerDependencyError' %}
+{% set moduleName = '' %}
+{% if dispatcher.getParams()['module']['display_name'] is defined %}
+    {% set moduleName = dispatcher.getParams()['module']['display_name'] %}
+{% elseif dispatcher.getParams()['module']['name'] is defined %}
+    {% set moduleName = dispatcher.getParams()['module']['name'] %}
+{% endif %}
 <div id="{{componentId}}-{{sectionId}}">
     <div class="row">
         <div class="col">
@@ -6,7 +12,8 @@
                 <h1>
                     <span class="text-white"><i class="fas fa-fw fa-fire"></i> Server Error! (Error:Controller Dependency Error)</span>
                 </h1>
-                <p class="lead">The component's controller is returning an internal error.</p>
+                <p class="lead">The component's controller is returning an internal error due to missing component dependency.</p>
+                <p class="lead">Missing dependency {{moduleName}}.</p>
                 <a href="#" class="btn btn-primary btn-lg text-center contentAjaxLink">
                     <span class="text-uppercase">Try Again</span>
                 </a>

@@ -305,7 +305,7 @@ abstract class BaseComponent extends Controller
 					 )
 					)
 				) {
-					$this->setErrorDispatcher('controllerDependencyError', ['error' => true]);
+					$this->setErrorDispatcher('controllerPackageDependencyError', ['error' => true, 'module' => $packageModule]);
 
 					return false;
 				}
@@ -330,7 +330,7 @@ abstract class BaseComponent extends Controller
 					 ($viewModule['installed'] == false || $viewModule['apps'][$this->app['id']]['enabled'] == false)
 					)
 				) {
-					$this->setErrorDispatcher('controllerDependencyError', ['error' => true]);
+					$this->setErrorDispatcher('controllerViewDependencyError', ['error' => true, 'module' => $viewModule]);
 
 					return false;
 				}
@@ -961,14 +961,15 @@ abstract class BaseComponent extends Controller
 				$packageName = implode('', $packageClass);
 			}
 		} else {
-			if ($this->checkPackage($packageClass)) {
-				$package = (new $packageClass())->init();
-				$packageName = $this->helper->last(explode('\\', $packageClass));
-			} else {
-				throw new \Exception(
-					'Package class : ' . $packageClass .
-					' not available for app ' . $this->app['name']
-				);
+			$package = (new $packageClass())->init();
+			$packageName = $this->helper->last(explode('\\', $packageClass));
+
+			if (!$this->checkPackage($packageClass)) {
+				$this->setErrorDispatcher('appPackagePermissionDenied', ['error' => true, 'module_name' => $packageName]);
+				// throw new \Exception(
+				// 	'Package class : ' . $packageClass .
+				// 	' not available for app ' . $this->app['name']
+				// );
 			}
 		}
 
@@ -1042,15 +1043,15 @@ abstract class BaseComponent extends Controller
 
 	protected function useComponent($componentClass)
 	{
-		if ($this->checkComponent($componentClass)) {
-			$component = new $componentClass();
+		$component = new $componentClass();
+		$componentName = $this->helper->last(explode('\\', $componentClass));
 
-			$componentName = $this->helper->last(explode('\\', $componentClass));
-		} else {
-			throw new \Exception(
-				'Component class : ' . $componentClass .
-				' not available for app ' . $this->app['name']
-			);
+		if (!$this->checkComponent($componentClass)) {
+			$this->setErrorDispatcher('appComponentPermissionDenied', ['error' => true, 'module_name' => $componentName]);
+			// throw new \Exception(
+			// 	'Component class : ' . $componentClass .
+			// 	' not available for app ' . $this->app['name']
+			// );
 		}
 
 		if (!isset($this->usedModules['components'])) {
