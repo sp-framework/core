@@ -121,6 +121,11 @@ class Input
             $this->params['fieldGroupPreAddonTextAdditionalClass'] :
             '';
 
+        $this->fieldParams['fieldGroupPostAddonTextAdditionalClass'] =
+            isset($this->params['fieldGroupPostAddonTextAdditionalClass']) ?
+            $this->params['fieldGroupPostAddonTextAdditionalClass'] :
+            '';
+
         if (isset($this->params['fieldGroupPreAddonText']) ||
             isset($this->params['fieldGroupPreAddonIcon']) ||
             isset($this->params['fieldGroupPreAddonDropdown']) ||
@@ -370,14 +375,14 @@ class Input
     protected function postAddon()
     {
         if (isset($this->params['fieldGroupPostAddonText'])) {
-
             $this->content .=
                 '<div class="input-group-append">
-                    <span class="input-group-text rounded-0">{{fieldGroupPostAddonText|raw}}</span>
+                    <span class="input-group-text rounded-0 ' . $this->fieldParams['fieldGroupPostAddonTextAdditionalClass'] . '">' . $this->params['fieldGroupPostAddonText'] . '</span>
                 </div>';
-        }
-        if (isset($this->params['fieldGroupPostAddonIcon'])) {
 
+        }
+
+        if (isset($this->params['fieldGroupPostAddonIcon'])) {
             $this->content .=
                 '<div class="input-group-append">
                     <span class="input-group-text rounded-0">
@@ -385,8 +390,8 @@ class Input
                     </span>
                 </div>';
         }
-        if (isset($this->params['fieldGroupPostAddonDropdown'])) {
 
+        if (isset($this->params['fieldGroupPostAddonDropdown'])) {
             $this->fieldParams['fieldGroupPostAddonDropdownButtonClass'] =
                 isset($this->params['fieldGroupPostAddonDropdownButtonClass']) ?
                 $this->params['fieldGroupPostAddonDropdownButtonClass'] :
