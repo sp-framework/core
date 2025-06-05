@@ -2302,6 +2302,21 @@ abstract class BasePackage extends Controller
 			return $this->ffStore->count($recount);
 		}
 	}
+
+	public function getLastInsertedId()
+	{
+		if ($this->config->databasetype === 'db') {
+			$data = $this->modelToUse::find();
+
+			return $data->getLast()['id'];
+		} else {
+			if (!$this->ffStore) {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			}
+
+			return $this->ffStore->getLastInsertedId();
+		}
+	}
 	// protected function addRefId($data)
 	// {
 	// 	if (!isset($data['ref_id'])) {
