@@ -29,6 +29,7 @@ class Store
     protected $indexesPath = '';
     protected $readIndex = false;
     protected $indexing = false;
+    protected $validateData = true;
     protected $minIndexChars = 3;
     protected $multiWords = true;
     protected $multiWordsSeparator = ' ';
@@ -1438,13 +1439,15 @@ class Store
 
     protected function writeNewDocumentToStore(array $storeData): array
     {
-        if (isset($storeData[$this->primaryKey]) && $storeData[$this->primaryKey] != 0) {
+        $storeData = $this->validateData($storeData);
+
+        if (isset($storeData[$this->primaryKey]) &&
+            ($storeData[$this->primaryKey] != 0 || (is_string($storeData[$this->primaryKey]) && strlen($storeData[$this->primaryKey]) !== 0))
+        ) {
             throw new IdNotAllowedException(
                 "The $this->primaryKey\" index is reserved, please delete the $this->primaryKey key and try again"
             );
         }
-
-        $storeData = $this->validateData($storeData);
 
         $id = $this->increaseCounterAndGetNextId();
 
@@ -1476,6 +1479,12 @@ class Store
 
     protected function validateData(array $data)
     {
+        if (!$this->validateData) {
+            $data = $this->normalizeData($data);
+
+            return $data;
+        }
+
         if (!isset($data['id']) && count($this->uniqueFields) > 0) {
             $criteria = [];
 
@@ -1821,6 +1830,10 @@ class Store
 
         if (is_string($id)) {
             $id = IoHelper::secureStringForFileAccess($id);
+
+            if (strlen($id) == 0) {
+                return 0;
+            }
         }
 
         if (!is_numeric($id)) {
@@ -1869,5 +1882,17 @@ class Store
         $this->readIndex = $index;
 
         return $this->getReadIndex();
+    }
+
+    public function getValidateData()
+    {
+        return $this->validateData;
+    }
+
+    public function setValidateData($validateData)
+    {
+        $this->validateData = $validateData;
+
+        return $this->getValidateData();
     }
 }

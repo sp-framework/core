@@ -50,19 +50,32 @@ class ImportexportComponent extends BaseComponent
                         $this->view->filters = $componentData['filters'];
                     }
 
-                    $importexport['fields'] = $this->helper->decode($importexport['fields'], true);
+                    if (is_string($importexport['fields'])) {
+                        $importexport['fields'] = $this->helper->decode($importexport['fields'], true);
+                    }
 
-                    $importexport['email_to'] = implode(',', $this->helper->decode($importexport['email_to'], true));
+                    if (is_string($importexport['email_to'])) {
+                        $importexport['email_to'] = $this->helper->decode($importexport['email_to'], true);
+                    }
+
+                    $importexport['email_to'] = implode(',', $importexport['email_to']);
 
                     if ($importexport['file'] && $importexport['file'] !== '') {
                         $importexport['file'] = $this->links->url('system/storages/q/uuid/' . $importexport['file']);
                     }
                 } else if ($importexport['type'] === 'import' && isset($importexport['component_id'])) {
-                    $importexport['email_to'] = implode(',', $this->helper->decode($importexport['email_to'], true));
+                    if (is_string($importexport['email_to'])) {
+                        $importexport['email_to'] = $this->helper->decode($importexport['email_to'], true);
+                    }
+
+                    $importexport['email_to'] = implode(',', $importexport['email_to']);
 
                     if ($importexport['file'] && $importexport['file'] !== '') {
                         try {
-                            $importexport['file'] = $this->helper->decode($importexport['file'], true);
+                            if (is_string($importexport['file'])) {
+                                $importexport['file'] = $this->helper->decode($importexport['file'], true);
+                            }
+
                             $importexport['file'] = $importexport['file'][0];
 
                             $this->view->file = $this->basepackages->storages->getFileInfo($importexport['file']);
@@ -167,8 +180,10 @@ class ImportexportComponent extends BaseComponent
                 $data['account_id'] = 'System (' . $data['account_id'] . ')';
             }
 
-            if ($data['email_to'] && $data['email_to'] !== '') {
-                $data['email_to'] = $this->helper->decode($data['email_to'], true);
+            if ($data['email_to']) {
+                if (is_string($data['email_to']) && $data['email_to'] !== '') {
+                    $data['email_to'] = $this->helper->decode($data['email_to'], true);
+                }
 
                 $data['email_to'] = implode(',', $data['email_to']);
             }

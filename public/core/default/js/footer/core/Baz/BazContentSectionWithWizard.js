@@ -1,5 +1,5 @@
 /* exported BazContentSectionWithWizard */
-/* globals PNotify */
+/* globals paginatedPNotify */
 /*
 * @title                    : BazContentSectionWithWizard
 * @description              : Baz Core Lib
@@ -463,7 +463,7 @@ var BazContentSectionWithWizard = function() {
                 success = true;
                 $('#' + sectionId + '-' + step + '-accordioncard-header').removeClass('bg-danger').addClass('bg-success');
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     title   : response.responseMessage,
                 });
                 $('#' + sectionId + '-next').children('i').attr('hidden', true);

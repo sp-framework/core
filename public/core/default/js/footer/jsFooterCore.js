@@ -4362,7 +4362,7 @@ exports.BazContentSectionWithForm = BazContentSectionWithForm;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
-/* globals define exports BazContentFieldsValidator BazContentFields PNotify */
+/* globals define exports BazContentFieldsValidator BazContentFields paginatedPNotify */
 /*
 * @title                    : BazContentSectionWithFormToDatatable
 * @description              : Baz Lib for Content (Sections With Form)
@@ -4885,7 +4885,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 }
 
                 if (found) {
-                    PNotify.notice({
+                    paginatedPNotify('notice', {
                         title: 'Input data already exists in table!'
                     });
 
@@ -5583,7 +5583,7 @@ exports.BazContentSectionWithFormToDatatable = BazContentSectionWithFormToDatata
 Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
-/* globals define exports BazContentLoader BazContentFields Swal PNotify */
+/* globals define exports BazContentLoader BazContentFields Swal paginatedPNotify */
 /*
 * @title                    : BazContentSectionWithListing
 * @description              : Baz Lib for Content (Sections With Form)
@@ -5807,14 +5807,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         // //Update Filter
                         $.post(url, postData, function(response) {
                             if (response.responseCode === 0) {
-                                PNotify.success({
+                                paginatedPNotify('success', {
                                     'title' : response.responseMessage
                                 });
                                 if (response.filters) {
                                     redoFiltersOptions(query, sectionId, response);
                                 }
                             } else {
-                                PNotify.error({
+                                paginatedPNotify('error', {
                                     'title' : response.responseMessage
                                 });
                             }
@@ -5890,7 +5890,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
 
                     if ($(selectedFilter).data()['conditions'] === '') {
-                        PNotify.error({'title': 'Show All filter cannot be cloned'});
+                        paginatedPNotify('error', {
+                            'title': 'Show All filter cannot be cloned'
+                        });
                         return;
                     }
 
@@ -5904,7 +5906,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     $.post(url, postData, function(response) {
                         if (response.responseCode === 0) {
-                            PNotify.success({
+                            paginatedPNotify('success', {
                                 'title'     : response.responseMessage
                             });
                             if (response.filters) {
@@ -5913,7 +5915,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             resetFilters();
                             toggleFilterButtons(sectionId + '-filter');
                         } else {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 'title'     : response.responseMessage
                             });
                         }
@@ -6073,7 +6075,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
                                 $('#' + sectionId + '-delete').addClass('disabled');
 
-                                PNotify.success({
+                                paginatedPNotify('success', {
                                     'title'     : selectedFilter.data()['name'] + ' deleted successfully.'
                                 });
                                 resetFilters();
@@ -6087,7 +6089,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                                 $.post(url, postData, function(response) {
                                     if (response.responseCode === 0) {
-                                        PNotify.success({
+                                        paginatedPNotify('success', {
                                             'title'     : selectedFilter.data()['name'] + ' deleted successfully.'
                                         });
                                         if (response.filters) {
@@ -6095,7 +6097,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                         }
                                         resetFilters();
                                     } else {
-                                        PNotify.error({
+                                        paginatedPNotify('error', {
                                             'title'     : 'Cannot delete filter.'
                                         });
                                     }
@@ -6348,14 +6350,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     //Update Filter
                     $.post(url, postData, function(response) {
                         if (response.responseCode === 0) {
-                            PNotify.success({
+                            paginatedPNotify('success', {
                                 'title' : response.responseMessage
                             });
                             if (response.filters) {
                                 redoFiltersOptions(query, sectionId, response);
                             }
                         } else {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 'title' : response.responseMessage
                             });
                         }
@@ -6776,7 +6778,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     data        : postData,
                     success     : function(response) {
                         if (response.responseCode != 0) {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 title   : response.responseMessage
                             });
                         }
@@ -7043,14 +7045,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 //                 dataType    : 'json',
                 //                 success     : function(response) {
                 //                     if (response.responseCode === 0) {
-                //                         PNotify.success({
+                //                         paginatedPNotify('success', {
                 //                             title           : notificationText,
                 //                             cornerClass     : 'ui-pnotify-sharp'
                 //                         });
                 //                         $(rowSwitchInput).attr('checked', status);
                 //                         document.getElementById(rowSwitchInputId).checked = true;
                 //                     } else {
-                //                         PNotify.error({
+                //                         paginatedPNotify('error', {
                 //                             title           : 'Error!',
                 //                             cornerClass     : 'ui-pnotify-sharp'
                 //                         });
@@ -7146,8 +7148,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 //                 dataType    : 'json',
                 //                 success     : function(response) {
                 //                     if (response.responseCode === 1) {
-                //                         PNotify.removeAll()
-                //                         PNotify.success({
+                //                         PNotify.removeAll();
+                //                         paginatedPNotify('success', {
                 //                             title           : notificationText,
                 //                             cornerClass     : 'ui-pnotify-sharp'
                 //                         });
@@ -7156,7 +7158,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 //                         $('#' + thisId).attr('checked', true);
                 //                         document.getElementById(thisId).checked = true;
                 //                     } else {
-                //                         PNotify.error({
+                //                         paginatedPNotify('error', {
                 //                             title           : 'Error!',
                 //                             cornerClass     : 'ui-pnotify-sharp'
                 //                         });
@@ -7224,7 +7226,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                             $('#security-token').val(response.token);
                                         }
                                         if (response.responseCode != 0) {
-                                            PNotify.error({
+                                            paginatedPNotify('error', {
                                                 title           : response.responseMessage,
                                             });
                                         }
@@ -8125,7 +8127,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
 });
 
 /* exported BazContentSectionWithWizard */
-/* globals PNotify */
+/* globals paginatedPNotify */
 /*
 * @title                    : BazContentSectionWithWizard
 * @description              : Baz Core Lib
@@ -8589,7 +8591,7 @@ var BazContentSectionWithWizard = function() {
                 success = true;
                 $('#' + sectionId + '-' + step + '-accordioncard-header').removeClass('bg-danger').addClass('bg-success');
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     title   : response.responseMessage,
                 });
                 $('#' + sectionId + '-next').children('i').attr('hidden', true);
@@ -8640,7 +8642,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete', function() {
 });
 
 /* exported BazContentFields */
-/* globals PNotify flatpickr */
+/* globals paginatedPNotify flatpickr */
 /*
 * @title                    : BazContentFields
 * @description              : Baz Lib for Content (Sections With Form)
@@ -9085,9 +9087,13 @@ var BazContentFields = function() {
                     var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/auth/generatePw'
                     $.post(url, postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success(response.responseMessage);
+                            paginatedPNotify('success',{
+                                title   : response.responseMessage
+                            });
                         } else {
-                            PNotify.error(response.responseMessage);
+                            paginatedPNotify('error',{
+                                title   : response.responseMessage
+                            });
                         }
                         if (response.responseData.password) {
                             $(fieldId).val(response.responseData.password).trigger('change');
@@ -9382,7 +9388,7 @@ var BazContentFields = function() {
                 // Check if node are selected and only 1 is selected
                 if ($(selectedNode).length !== 1) {
                     $('.ui-pnotify').remove();
-                    PNotify.notice({
+                    paginatedPNotify('notice', {
                         title: 'None or Multiple ' + options.bazJstreeOptions.treeName + ' selected!',
                         text: 'Please select only 1 ' + options.bazJstreeOptions.treeName + ' to create a new node under it'
                     });
@@ -9422,7 +9428,7 @@ var BazContentFields = function() {
             // Check if node are selected and only 1 is selected
                 if ($(selectedNode).length !== 1) {
                     $('.ui-pnotify').remove();
-                    PNotify.notice({
+                    paginatedPNotify('notice', {
                         title: 'None or Multiple ' + options.bazJstreeOptions.treeName + ' selected!',
                         text: 'Please select only 1 ' + options.bazJstreeOptions.treeName + ' to rename',
                     });
@@ -10619,7 +10625,7 @@ var BazNotifications = function() {
     return bazNotificationsConstructor;
 }();
 /* exported BazMessenger */
-/* globals PNotify EmojiPicker autoComplete dayjs Swal */
+/* globals paginatedPNotify EmojiPicker autoComplete dayjs Swal */
 /*
 * @title                    : BazMessenger
 * @description              : Baz Messenger Lib
@@ -10832,7 +10838,7 @@ var BazMessenger = function() {
                         getUnreadMessagesCount();
                     }
                 } else {
-                    PNotify.error({
+                    paginatedPNotify('error', {
                         text        : response.responseMessage,
                         textTrusted : true
                     });
@@ -10879,7 +10885,7 @@ var BazMessenger = function() {
                     $('#messenger-main-unmute').attr('hidden', false);
                     $('#messenger-button').children('i').removeClass('fa-comment').addClass('fa-comment-slash');
                 } else {
-                    PNotify.error({
+                    paginatedPNotify('error', {
                         title           : response.responseMessage,
                     });
                 }
@@ -10908,7 +10914,7 @@ var BazMessenger = function() {
                     $('#messenger-main-mute').attr('hidden', false);
                     $('#messenger-button').children('i').removeClass('fa-comment-slash').addClass('fa-comment');
                 } else {
-                    PNotify.error({
+                    paginatedPNotify('error', {
                         title           : response.responseMessage,
                     });
                 }
@@ -10959,7 +10965,9 @@ var BazMessenger = function() {
         } else if (currentMessengerWindows > 1 && currentMessengerWindows < 3) {
             fromLeft = (5 * currentMessengerWindows) + (currentMessengerWindows * 473) + 5;
         } else {
-            PNotify.error({text: "Only 3 chat windows can be opened at a given time. Please close other chat windows to allow this window to open."});
+            paginatedPNotify('error', {
+                text: "Only 3 chat windows can be opened at a given time. Please close other chat windows to allow this window to open."
+            });
             return;
         }
 
@@ -11105,7 +11113,7 @@ var BazMessenger = function() {
 
                 markAllMessagesRead(user);
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     text        : response.responseMessage,
                     textTrusted : true
                 });
@@ -11226,7 +11234,7 @@ var BazMessenger = function() {
                         $('#messenger-messages-load-more-' + toUser.user).closest('div.row').remove();
                         populateMessages(toUser, response.responseData.messages, response.responseData.paginationCounters, true);
                     } else {
-                        PNotify.error({
+                        paginatedPNotify('error', {
                             text        : response.responseMessage,
                             textTrusted : true
                         });
@@ -11289,7 +11297,7 @@ var BazMessenger = function() {
             if (response.responseCode == 0) {
                 //
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     text        : response.responseMessage,
                     textTrusted : true
                 });
@@ -11369,7 +11377,7 @@ var BazMessenger = function() {
                 $('#messenger-no-messages-' + user.user).attr('hidden', true);
                 $('#direct-chat-messages-' + user.user).scrollTop($('#direct-chat-messages-' + user.user).get(0).scrollHeight);
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     text        : response.responseMessage,
                     textTrusted : true
                 });
@@ -11450,7 +11458,7 @@ var BazMessenger = function() {
                             $('#messenger-message-' + postData['id'] + ' .messenger-message-remove').attr('hidden', true);
                             $('#messenger-message-' + postData['id']).off();
                         } else {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 text        : response.responseMessage,
                                 textTrusted : true
                             });
@@ -11680,7 +11688,7 @@ var BazMessenger = function() {
                     }
                 }
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     text        : response.responseMessage,
                     textTrusted : true
                 });
@@ -11703,7 +11711,7 @@ var BazMessenger = function() {
             if (response.responseCode == 0) {
                 //
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     text        : response.responseMessage,
                     textTrusted : true
                 });

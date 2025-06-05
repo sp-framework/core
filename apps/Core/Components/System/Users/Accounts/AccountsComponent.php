@@ -183,7 +183,7 @@ class AccountsComponent extends BaseComponent
         }
 
         if ($profilePackage) {
-            if (!is_array($profilePackage['settings'])) {
+            if (is_string($profilePackage['settings'])) {
                 $profilePackage['settings'] = $this->helper->decode($profilePackage['settings'], true);
             }
             if (isset($profilePackage['settings']['componentRoute'])) {

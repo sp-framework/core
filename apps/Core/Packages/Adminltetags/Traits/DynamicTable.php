@@ -179,10 +179,6 @@ trait DynamicTable {
                 return;
             }
 
-            if ($dtAdditionControlButtons && is_callable($dtAdditionControlButtons)) {
-                $dtAdditionControlButtons = $dtAdditionControlButtons($rows);
-            }
-
             if ($controlActions && is_callable($controlActions)) {
                 $rows = $controlActions($rows);
             } else if ($controlActions) {
@@ -197,9 +193,19 @@ trait DynamicTable {
                         ) {
                             if (!in_array($row['id'], $controlActions['disableActionsForIds'][$key])) {
                                 if (isset($controlActions['includeQ']) && $controlActions['includeQ'] == true) {
-                                    $actions[$key] = $this->links->url($action . '/id/' . $row['id']);
+                                    if (is_array($action) && isset($action['link'])) {
+                                        $actions[$key] = $action;
+                                        $actions[$key]['link'] = $this->links->url($action['link'] . '/id/' . $row['id']);
+                                    } else {
+                                        $actions[$key] = $this->links->url($action . '/id/' . $row['id']);
+                                    }
                                 } else {
-                                    $actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+                                    if (is_array($action) && isset($action['link'])) {
+                                        $actions[$key] = $action;
+                                        $actions[$key]['link'] = $this->links->url($action['link'] . '/q/id/' . $row['id']);
+                                    } else {
+                                        $actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+                                    }
                                 }
                             }
                         } else if (isset($controlActions['enableActionsForIds'][$key]) &&
@@ -208,26 +214,55 @@ trait DynamicTable {
                         ) {
                             if (in_array($row['id'], $controlActions['enableActionsForIds'][$key])) {
                                 if (isset($controlActions['includeQ']) && $controlActions['includeQ'] == true) {
-                                    $actions[$key] = $this->links->url($action . '/id/' . $row['id']);
+                                    if (is_array($action) && isset($action['link'])) {
+                                        $actions[$key] = $action;
+                                        $actions[$key]['link'] = $this->links->url($action['link'] . '/id/' . $row['id']);
+                                    } else {
+                                        $actions[$key] = $this->links->url($action . '/id/' . $row['id']);
+                                    }
                                 } else {
-                                    $actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+                                    if (is_array($action) && isset($action['link'])) {
+                                        $actions[$key] = $action;
+                                        $actions[$key]['link'] = $this->links->url($action['link'] . '/q/id/' . $row['id']);
+                                    } else {
+                                        $actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+                                    }
                                 }
                             }
                         } else {
                             if (isset($controlActions['includeQ']) && $controlActions['includeQ'] == true) {
-                                $actions[$key] = $this->links->url($action . '/id/' . $row['id']);
+                                if (is_array($action) && isset($action['link'])) {
+                                    $actions[$key] = $action;
+                                    $actions[$key]['link'] = $this->links->url($action['link'] . '/id/' . $row['id']);
+                                } else {
+                                    $actions[$key] = $this->links->url($action . '/id/' . $row['id']);
+                                }
                             } else {
-                                $actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+                                if (is_array($action) && isset($action['link'])) {
+                                    $actions[$key] = $action;
+                                    $actions[$key]['link'] = $this->links->url($action['link'] . '/q/id/' . $row['id']);
+                                } else {
+                                    $actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+                                }
                             }
                         }
 
                         if ($key === 'clone') {
-                            $actions[$key] = $actions[$key] . '/clone/true';
+                            if (is_array($action) && isset($action['link'])) {
+                                $actions[$key] = $action;
+                                $actions[$key]['link'] = $actions[$key]['link'] . '/clone/true';
+                            } else {
+                                $actions[$key] = $actions[$key] . '/clone/true';
+                            }
                         }
                     }
 
                     $row["__control"] = $actions;
                 }
+            }
+
+            if ($dtAdditionControlButtons && is_callable($dtAdditionControlButtons)) {
+                $dtAdditionControlButtons = $dtAdditionControlButtons($rows);
             }
 
             if ($this->api->isApi()) {

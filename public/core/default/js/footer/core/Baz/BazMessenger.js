@@ -1,5 +1,5 @@
 /* exported BazMessenger */
-/* globals PNotify EmojiPicker autoComplete dayjs Swal */
+/* globals paginatedPNotify EmojiPicker autoComplete dayjs Swal */
 /*
 * @title                    : BazMessenger
 * @description              : Baz Messenger Lib
@@ -212,7 +212,7 @@ var BazMessenger = function() {
                         getUnreadMessagesCount();
                     }
                 } else {
-                    PNotify.error({
+                    paginatedPNotify('error', {
                         text        : response.responseMessage,
                         textTrusted : true
                     });
@@ -259,7 +259,7 @@ var BazMessenger = function() {
                     $('#messenger-main-unmute').attr('hidden', false);
                     $('#messenger-button').children('i').removeClass('fa-comment').addClass('fa-comment-slash');
                 } else {
-                    PNotify.error({
+                    paginatedPNotify('error', {
                         title           : response.responseMessage,
                     });
                 }
@@ -288,7 +288,7 @@ var BazMessenger = function() {
                     $('#messenger-main-mute').attr('hidden', false);
                     $('#messenger-button').children('i').removeClass('fa-comment-slash').addClass('fa-comment');
                 } else {
-                    PNotify.error({
+                    paginatedPNotify('error', {
                         title           : response.responseMessage,
                     });
                 }
@@ -339,7 +339,9 @@ var BazMessenger = function() {
         } else if (currentMessengerWindows > 1 && currentMessengerWindows < 3) {
             fromLeft = (5 * currentMessengerWindows) + (currentMessengerWindows * 473) + 5;
         } else {
-            PNotify.error({text: "Only 3 chat windows can be opened at a given time. Please close other chat windows to allow this window to open."});
+            paginatedPNotify('error', {
+                text: "Only 3 chat windows can be opened at a given time. Please close other chat windows to allow this window to open."
+            });
             return;
         }
 
@@ -485,7 +487,7 @@ var BazMessenger = function() {
 
                 markAllMessagesRead(user);
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     text        : response.responseMessage,
                     textTrusted : true
                 });
@@ -606,7 +608,7 @@ var BazMessenger = function() {
                         $('#messenger-messages-load-more-' + toUser.user).closest('div.row').remove();
                         populateMessages(toUser, response.responseData.messages, response.responseData.paginationCounters, true);
                     } else {
-                        PNotify.error({
+                        paginatedPNotify('error', {
                             text        : response.responseMessage,
                             textTrusted : true
                         });
@@ -669,7 +671,7 @@ var BazMessenger = function() {
             if (response.responseCode == 0) {
                 //
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     text        : response.responseMessage,
                     textTrusted : true
                 });
@@ -749,7 +751,7 @@ var BazMessenger = function() {
                 $('#messenger-no-messages-' + user.user).attr('hidden', true);
                 $('#direct-chat-messages-' + user.user).scrollTop($('#direct-chat-messages-' + user.user).get(0).scrollHeight);
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     text        : response.responseMessage,
                     textTrusted : true
                 });
@@ -830,7 +832,7 @@ var BazMessenger = function() {
                             $('#messenger-message-' + postData['id'] + ' .messenger-message-remove').attr('hidden', true);
                             $('#messenger-message-' + postData['id']).off();
                         } else {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 text        : response.responseMessage,
                                 textTrusted : true
                             });
@@ -1060,7 +1062,7 @@ var BazMessenger = function() {
                     }
                 }
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     text        : response.responseMessage,
                     textTrusted : true
                 });
@@ -1083,7 +1085,7 @@ var BazMessenger = function() {
             if (response.responseCode == 0) {
                 //
             } else {
-                PNotify.error({
+                paginatedPNotify('error', {
                     text        : response.responseMessage,
                     textTrusted : true
                 });

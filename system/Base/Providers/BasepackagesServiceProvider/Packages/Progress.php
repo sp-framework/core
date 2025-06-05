@@ -548,7 +548,10 @@ class Progress extends BasePackage
         exec('ps -aux | grep ' . $progressFile['pid'], $output, $result);
 
         if ($result === 0 && count($output) > 0) {
-            if (str_contains($output[0], 'php')) {
+            if (str_contains($output[0], 'php') &&
+                str_contains($output[0], ' ' . $progressFile['pid'] . ' ') &&
+                str_starts_with($output[0], get_current_user())//Make sure we only remove the PID that is assigned via PHP User
+            ) {
                 exec('kill -9 ' . $progressFile['pid'], $output, $result);
 
                 if ($result !== 0) {
@@ -557,12 +560,16 @@ class Progress extends BasePackage
                     return false;
                 }
 
-                $this->writeProgressFile(methods: [],progressFile: $progressFile);
-
-                $this->addResponse('Successfully terminating process');
-
-                return $this->resetProgress();
+                $progressFile['pid'] = null;
+            } else {//We assume that PID does not exists and we remove it from file.
+                $progressFile['pid'] = null;
             }
+
+            $this->writeProgressFile(methods: [],progressFile: $progressFile);
+
+            $this->addResponse('Successfully terminating process');
+
+            return $this->resetProgress();
         }
 
         return true;

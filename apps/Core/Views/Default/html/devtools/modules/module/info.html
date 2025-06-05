@@ -35,6 +35,9 @@
     {% endif %}
     {% if type !== 'core' %}
         {% set moduleApps = module['module_details']['apps'] %}
+        {% if is_array(moduleApps) %}
+            {% set moduleApps = json_encode(moduleApps) %}
+        {% endif %}
     {% endif %}
     {% if clone is defined and clone == true %}
         {% set moduleId = '' %}

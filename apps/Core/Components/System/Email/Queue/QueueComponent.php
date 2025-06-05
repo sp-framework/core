@@ -135,7 +135,9 @@ class QueueComponent extends BaseComponent
 
     protected function formatToAddresses($rowId, $data)
     {
-        $data['to_addresses'] = $this->helper->decode($data['to_addresses'], true);
+        if (is_string($data['to_addresses'])) {
+            $data['to_addresses'] = $this->helper->decode($data['to_addresses'], true);
+        }
 
         $data['to_addresses'] = implode(',', $data['to_addresses']);
 

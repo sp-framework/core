@@ -83,24 +83,21 @@ class Local extends BasePackage
 
         $this->dataPath = $this->storagePath . '/' . $this->settingsDataPath . '/';
 
-        $this->storage['allowed_image_mime_types'] =
-            isset($this->storage['allowed_image_mime_types']) ?
-            $this->helper->decode($this->storage['allowed_image_mime_types']) :
-            [];
+        if (!isset($this->storage['allowed_image_mime_types'])) {
+            $this->storage['allowed_image_mime_types'] = [];
+        }
 
         $this->imageMimeTypes = $this->storage['allowed_image_mime_types'];
 
-        $this->storage['allowed_image_sizes'] =
-            isset($this->storage['allowed_image_sizes']) ?
-            $this->helper->decode($this->storage['allowed_image_sizes']) :
-            [30, 80, 200, 800, 1200, 2000];
+        if (!isset($this->storage['allowed_image_sizes'])) {
+            $this->storage['allowed_image_sizes'] = [30, 80, 200, 800, 1200, 2000];
+        }
 
         $this->allowedImageSizes = $this->storage['allowed_image_sizes'];
 
-        $this->storage['allowed_file_mime_types'] =
-            isset($this->storage['allowed_file_mime_types']) ?
-            $this->helper->decode($this->storage['allowed_file_mime_types']) :
-            [];
+        if (!isset($this->storage['allowed_file_mime_types'])) {
+            $this->storage['allowed_file_mime_types'] = [];
+        }
 
         $this->fileMimeTypes = $this->storage['allowed_file_mime_types'];
 
@@ -258,7 +255,6 @@ class Local extends BasePackage
             $this->storeFile();
 
             return true;
-
         } else {
             $this->addResponse('File Type Not Accepted', 1);
 
@@ -537,7 +533,7 @@ class Local extends BasePackage
         if (isset($file[0]['links']) &&
             ($file[0]['links'] !== null && $file[0]['links'] !== '')
         ) {
-            $file[0]['links'] = $this->helper->decode($file[0]['links'], true);
+            $file[0]['links'] = $file[0]['links'];
         }
 
         if ($width) {
@@ -583,7 +579,7 @@ class Local extends BasePackage
     protected function updateFileLink($file, $link, $width = null)
     {
         if ($file['links'] && !is_array($file['links'])) {
-            $file['links'] = $this->helper->decode($file['links'], true);
+            $file['links'] = $file['links'];
         }
 
         if ($width) {
@@ -758,7 +754,7 @@ class Local extends BasePackage
     {
         if ($array) {
             if ($oldUUID) {
-                $olduuids = $this->helper->decode($oldUUID, true);
+                $olduuids = $oldUUID;
 
                 foreach ($olduuids as $olduuidKey => $olduuid) {
                     if (!$status) {
@@ -770,7 +766,7 @@ class Local extends BasePackage
             }
 
             if ($newUUID) {
-                $uuids = $this->helper->decode($newUUID, true);
+                $uuids = $newUUID;
                 foreach ($uuids as $uuidKey => $newuuid) {
                     if (!$status) {
                         $status = 0;

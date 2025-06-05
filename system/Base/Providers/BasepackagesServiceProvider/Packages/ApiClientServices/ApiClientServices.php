@@ -179,7 +179,7 @@ class ApiClientServices extends BasePackage
 
             $this->packageName = 'apiApis' . $api['category'] . $api['provider'];
         } else {
-            $this->setModelToUse($modelToUse = BasepackagesApiClientServices::class);
+            $this->setModelToUse($this->modelToUse = BasepackagesApiClientServices::class);
 
             $this->packageName = 'apiClientServices';
         }

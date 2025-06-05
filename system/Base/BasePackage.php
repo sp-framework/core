@@ -199,7 +199,7 @@ abstract class BasePackage extends Controller
 				$this->setFfStoreToUse();
 
 				if (is_array($this->ffData) && count($this->ffData) > 0) {
-					return $this->ffData;
+					return $this->jsonData($this->ffData, true);
 				}
 
 				return false;
@@ -254,10 +254,10 @@ abstract class BasePackage extends Controller
 			}
 
 			if ($by === 'id') {
-				$value = (int) $value;
+				$this->ffData = $this->jsonData($this->ffStore->findById((int) $value, $this->ffRelations, $this->ffRelationsConditions), true);
+			} else {
+				$this->ffData = $this->jsonData($this->ffStore->findOneBy([$by, '=', $value], $this->ffRelations, $this->ffRelationsConditions), true);
 			}
-
-			$this->ffData = $this->ffStore->findOneBy([$by, '=', $value], $this->ffRelations, $this->ffRelationsConditions);
 
 			$this->setFfStoreToUse();
 
@@ -451,7 +451,7 @@ abstract class BasePackage extends Controller
 					}
 				}
 
-				return $this->ffData;
+				return $this->jsonData($this->ffData, true);
 			}
 
 			return false;
@@ -2300,6 +2300,21 @@ abstract class BasePackage extends Controller
 			}
 
 			return $this->ffStore->count($recount);
+		}
+	}
+
+	public function getLastInsertedId()
+	{
+		if ($this->config->databasetype === 'db') {
+			$data = $this->modelToUse::find();
+
+			return $data->getLast()['id'];
+		} else {
+			if (!$this->ffStore) {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			}
+
+			return $this->ffStore->getLastInsertedId();
 		}
 	}
 	// protected function addRefId($data)

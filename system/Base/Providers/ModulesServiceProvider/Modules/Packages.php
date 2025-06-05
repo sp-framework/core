@@ -29,7 +29,9 @@ class Packages extends BasePackage
 		}
 
 		foreach($this->packages as $package) {
-			$package['apps'] = $this->helper->decode($package['apps'], true);
+			if (is_string($package['apps'])) {
+				$package['apps'] = $this->helper->decode($package['apps'], true);
+			}
 
 			if (isset($package['apps'][$appId])) {
 				if (strtolower($package['name']) === strtolower($name) &&
@@ -54,7 +56,9 @@ class Packages extends BasePackage
 		}
 
 		foreach($this->packages as $package) {
-			$package['apps'] = $this->helper->decode($package['apps'], true);
+			if (is_string($package['apps'])) {
+				$package['apps'] = $this->helper->decode($package['apps'], true);
+			}
 
 			if ($package['class'] !== $class) {
 				continue;
@@ -218,7 +222,9 @@ class Packages extends BasePackage
 		$packages = [];
 
 		foreach($this->packages as $package) {
-			$package['apps'] = $this->helper->decode($package['apps'], true);
+			if (is_string($package['apps'])) {
+				$package['apps'] = $this->helper->decode($package['apps'], true);
+			}
 
 			if (isset($package['apps'][$appId]['enabled']) &&
 				$package['apps'][$appId]['enabled'] == 'true'
@@ -278,7 +284,7 @@ class Packages extends BasePackage
 				}
 
 				if ($this->packages[$packageId]['notification_subscriptions']) {
-					if (!is_array($this->packages[$packageId]['notification_subscriptions'])) {
+					if (is_string($this->packages[$packageId]['notification_subscriptions'])) {
 						$this->packages[$packageId]['notification_subscriptions'] = $this->helper->decode($this->packages[$packageId]['notification_subscriptions'], true);
 					}
 
@@ -390,7 +396,9 @@ class Packages extends BasePackage
 				$settingsData !== $this->security->getRequestToken()
 			) {
 				if (isset($package['settings'][$key])) {
-					$settingsData = $this->helper->decode($settingsData, true);
+					if (is_string($settingsData)) {
+						$settingsData = $this->helper->decode($settingsData, true);
+					}
 
 					$package['settings'][$key] = $settingsData;
 				}

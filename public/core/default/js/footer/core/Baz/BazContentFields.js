@@ -1,5 +1,5 @@
 /* exported BazContentFields */
-/* globals PNotify flatpickr */
+/* globals paginatedPNotify flatpickr */
 /*
 * @title                    : BazContentFields
 * @description              : Baz Lib for Content (Sections With Form)
@@ -444,9 +444,13 @@ var BazContentFields = function() {
                     var url = dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost + '/' + dataCollection.env.appRoute + '/auth/generatePw'
                     $.post(url, postData, function(response) {
                         if (response.responseCode == 0) {
-                            PNotify.success(response.responseMessage);
+                            paginatedPNotify('success',{
+                                title   : response.responseMessage
+                            });
                         } else {
-                            PNotify.error(response.responseMessage);
+                            paginatedPNotify('error',{
+                                title   : response.responseMessage
+                            });
                         }
                         if (response.responseData.password) {
                             $(fieldId).val(response.responseData.password).trigger('change');
@@ -741,7 +745,7 @@ var BazContentFields = function() {
                 // Check if node are selected and only 1 is selected
                 if ($(selectedNode).length !== 1) {
                     $('.ui-pnotify').remove();
-                    PNotify.notice({
+                    paginatedPNotify('notice', {
                         title: 'None or Multiple ' + options.bazJstreeOptions.treeName + ' selected!',
                         text: 'Please select only 1 ' + options.bazJstreeOptions.treeName + ' to create a new node under it'
                     });
@@ -781,7 +785,7 @@ var BazContentFields = function() {
             // Check if node are selected and only 1 is selected
                 if ($(selectedNode).length !== 1) {
                     $('.ui-pnotify').remove();
-                    PNotify.notice({
+                    paginatedPNotify('notice', {
                         title: 'None or Multiple ' + options.bazJstreeOptions.treeName + ' selected!',
                         text: 'Please select only 1 ' + options.bazJstreeOptions.treeName + ' to rename',
                     });

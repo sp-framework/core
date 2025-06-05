@@ -269,7 +269,7 @@ if (!function_exists('checkCtype')) {
 }
 
 if (!function_exists('msort')) {
-    function msort($array, $key, $sort_flags = SORT_REGULAR, $order = SORT_ASC) {
+    function msort($array, $key, $sort_flags = SORT_REGULAR, $order = SORT_ASC, $preserveKey = false) {
         if (is_array($array) && count($array) > 0) {
             if (!empty($key)) {
                 $mapping = array();
@@ -294,7 +294,11 @@ if (!function_exists('msort')) {
                 }
                 $sorted = array();
                 foreach ($mapping as $k => $v) {
-                    $sorted[] = $array[$k];
+                    if ($preserveKey) {
+                        $sorted[$k] = $array[$k];
+                    } else {
+                        $sorted[] = $array[$k];
+                    }
                 }
                 return $sorted;
             }
@@ -641,5 +645,23 @@ if (!function_exists('getRemoteFilesize')) {
         }
 
         return $size;
+    }
+}
+
+if (!function_exists('numberFormatPrecision')) {
+    function numberFormatPrecision($number, $precision = 2, $separator = '.') {
+        $numberParts = explode($separator, $number);
+        $response = $numberParts[0];
+
+        if (count($numberParts) > 1 && $precision > 0) {
+            $response .= $separator;
+            $response .= substr($numberParts[1], 0, $precision);
+        }
+
+        if ($response == '-0') {
+            $response = 0;
+        }
+
+        return (float) $response;
     }
 }

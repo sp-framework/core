@@ -1,4 +1,4 @@
-/* globals define exports BazContentLoader BazContentFields Swal PNotify */
+/* globals define exports BazContentLoader BazContentFields Swal paginatedPNotify */
 /*
 * @title                    : BazContentSectionWithListing
 * @description              : Baz Lib for Content (Sections With Form)
@@ -222,14 +222,14 @@
                         // //Update Filter
                         $.post(url, postData, function(response) {
                             if (response.responseCode === 0) {
-                                PNotify.success({
+                                paginatedPNotify('success', {
                                     'title' : response.responseMessage
                                 });
                                 if (response.filters) {
                                     redoFiltersOptions(query, sectionId, response);
                                 }
                             } else {
-                                PNotify.error({
+                                paginatedPNotify('error', {
                                     'title' : response.responseMessage
                                 });
                             }
@@ -305,7 +305,9 @@
                     var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
 
                     if ($(selectedFilter).data()['conditions'] === '') {
-                        PNotify.error({'title': 'Show All filter cannot be cloned'});
+                        paginatedPNotify('error', {
+                            'title': 'Show All filter cannot be cloned'
+                        });
                         return;
                     }
 
@@ -319,7 +321,7 @@
 
                     $.post(url, postData, function(response) {
                         if (response.responseCode === 0) {
-                            PNotify.success({
+                            paginatedPNotify('success', {
                                 'title'     : response.responseMessage
                             });
                             if (response.filters) {
@@ -328,7 +330,7 @@
                             resetFilters();
                             toggleFilterButtons(sectionId + '-filter');
                         } else {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 'title'     : response.responseMessage
                             });
                         }
@@ -488,7 +490,7 @@
                                 $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
                                 $('#' + sectionId + '-delete').addClass('disabled');
 
-                                PNotify.success({
+                                paginatedPNotify('success', {
                                     'title'     : selectedFilter.data()['name'] + ' deleted successfully.'
                                 });
                                 resetFilters();
@@ -502,7 +504,7 @@
 
                                 $.post(url, postData, function(response) {
                                     if (response.responseCode === 0) {
-                                        PNotify.success({
+                                        paginatedPNotify('success', {
                                             'title'     : selectedFilter.data()['name'] + ' deleted successfully.'
                                         });
                                         if (response.filters) {
@@ -510,7 +512,7 @@
                                         }
                                         resetFilters();
                                     } else {
-                                        PNotify.error({
+                                        paginatedPNotify('error', {
                                             'title'     : 'Cannot delete filter.'
                                         });
                                     }
@@ -763,14 +765,14 @@
                     //Update Filter
                     $.post(url, postData, function(response) {
                         if (response.responseCode === 0) {
-                            PNotify.success({
+                            paginatedPNotify('success', {
                                 'title' : response.responseMessage
                             });
                             if (response.filters) {
                                 redoFiltersOptions(query, sectionId, response);
                             }
                         } else {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 'title' : response.responseMessage
                             });
                         }
@@ -1191,7 +1193,7 @@
                     data        : postData,
                     success     : function(response) {
                         if (response.responseCode != 0) {
-                            PNotify.error({
+                            paginatedPNotify('error', {
                                 title   : response.responseMessage
                             });
                         }
@@ -1458,14 +1460,14 @@
                 //                 dataType    : 'json',
                 //                 success     : function(response) {
                 //                     if (response.responseCode === 0) {
-                //                         PNotify.success({
+                //                         paginatedPNotify('success', {
                 //                             title           : notificationText,
                 //                             cornerClass     : 'ui-pnotify-sharp'
                 //                         });
                 //                         $(rowSwitchInput).attr('checked', status);
                 //                         document.getElementById(rowSwitchInputId).checked = true;
                 //                     } else {
-                //                         PNotify.error({
+                //                         paginatedPNotify('error', {
                 //                             title           : 'Error!',
                 //                             cornerClass     : 'ui-pnotify-sharp'
                 //                         });
@@ -1561,8 +1563,8 @@
                 //                 dataType    : 'json',
                 //                 success     : function(response) {
                 //                     if (response.responseCode === 1) {
-                //                         PNotify.removeAll()
-                //                         PNotify.success({
+                //                         PNotify.removeAll();
+                //                         paginatedPNotify('success', {
                 //                             title           : notificationText,
                 //                             cornerClass     : 'ui-pnotify-sharp'
                 //                         });
@@ -1571,7 +1573,7 @@
                 //                         $('#' + thisId).attr('checked', true);
                 //                         document.getElementById(thisId).checked = true;
                 //                     } else {
-                //                         PNotify.error({
+                //                         paginatedPNotify('error', {
                 //                             title           : 'Error!',
                 //                             cornerClass     : 'ui-pnotify-sharp'
                 //                         });
@@ -1639,7 +1641,7 @@
                                             $('#security-token').val(response.token);
                                         }
                                         if (response.responseCode != 0) {
-                                            PNotify.error({
+                                            paginatedPNotify('error', {
                                                 title           : response.responseMessage,
                                             });
                                         }

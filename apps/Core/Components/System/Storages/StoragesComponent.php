@@ -36,9 +36,15 @@ class StoragesComponent extends BaseComponent
                         return $this->throwIdNotFound();
                     }
 
-                    $storage['allowed_image_mime_types'] = $this->helper->decode($storage['allowed_image_mime_types']);
-                    $storage['allowed_image_sizes'] = $this->helper->decode($storage['allowed_image_sizes']);
-                    $storage['allowed_file_mime_types'] = $this->helper->decode($storage['allowed_file_mime_types']);
+                    if (is_string($storage['allowed_image_mime_types'])) {
+                        $storage['allowed_image_mime_types'] = $this->helper->decode($storage['allowed_image_mime_types']);
+                    }
+                    if (is_string($storage['allowed_image_sizes'])) {
+                        $storage['allowed_image_sizes'] = $this->helper->decode($storage['allowed_image_sizes']);
+                    }
+                    if (is_string($storage['allowed_file_mime_types'])) {
+                        $storage['allowed_file_mime_types'] = $this->helper->decode($storage['allowed_file_mime_types']);
+                    }
 
                     $this->view->storage = $storage;
 

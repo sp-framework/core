@@ -244,7 +244,9 @@ class Middlewares extends BasePackage
 		foreach ($middlewares['middlewares'] as $middlewareId => $status) {
 			$middleware = $this->getById($middlewareId);
 
-			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
+			if (is_string($middleware['apps'])) {
+				$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
+			}
 
 			if ($status === true) {
 				$middleware['apps'][$data['id']]['enabled'] = true;
@@ -271,7 +273,9 @@ class Middlewares extends BasePackage
 		foreach ($middlewares['sequence'] as $sequence => $middlewareId) {
 			$middleware = $this->getById($middlewareId);
 
-			$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
+			if (is_string($middleware['apps'])) {
+				$middleware['apps'] = $this->helper->decode($middleware['apps'], true);
+			}
 
 			//System Middlewares
 			if ($middleware['name'] === 'IpFilter') {
