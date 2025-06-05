@@ -29,6 +29,7 @@ class Store
     protected $indexesPath = '';
     protected $readIndex = false;
     protected $indexing = false;
+    protected $validateData = true;
     protected $minIndexChars = 3;
     protected $multiWords = true;
     protected $multiWordsSeparator = ' ';
@@ -1478,6 +1479,12 @@ class Store
 
     protected function validateData(array $data)
     {
+        if (!$this->validateData) {
+            $data = $this->normalizeData($data);
+
+            return $data;
+        }
+
         if (!isset($data['id']) && count($this->uniqueFields) > 0) {
             $criteria = [];
 
@@ -1875,5 +1882,17 @@ class Store
         $this->readIndex = $index;
 
         return $this->getReadIndex();
+    }
+
+    public function getValidateData()
+    {
+        return $this->validateData;
+    }
+
+    public function setValidateData($validateData)
+    {
+        $this->validateData = $validateData;
+
+        return $this->getValidateData();
     }
 }
