@@ -359,9 +359,13 @@ class DevtoolsModules extends BasePackage
         if ($data['api_id'] != '0' &&
             ($data['repo'] === 'https://.../' || $data['repo'] === '')
         ) {
-            $this->addResponse('Repository is not local, please provide correct module repo url.', 1);
+            if ($data['app_type'] !== 'core' ||
+                ($data['app_type'] === 'core' && $data['name'] === 'Core')
+            ) {
+                $this->addResponse('Repository is not local, please provide correct module repo url.', 1);
 
-            return false;
+                return false;
+            }
         }
 
         if (!isset($data['module_type']) ||
