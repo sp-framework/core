@@ -1,8 +1,6 @@
 {% if country['id'] is defined %}
-    {% set countryId = country['id'] %}
     {% set title = 'Country (' ~ country['name'] ~ ')' %}
 {% else %}
-    {% set countryId = '' %}
     {% set title = 'New Country' %}
 {% endif %}
 
@@ -23,12 +21,6 @@
         'cardBodyInclude'               : 'countries/form',
         'formButtons'                   :
         [
-            'updateButtonId'                : countryId,
-            'addActionUrl'                  : 'system/geo/countries/add',
-            'addSuccessRedirectUrl'         : 'system/geo/countries',
-            'updateActionUrl'               : 'system/geo/countries/update',
-            'updateSuccessRedirectUrl'      : 'system/geo/countries',
-            'cancelActionUrl'               : 'system/geo/countries',
             'closeActionUrl'                : 'system/geo/countries'
         ]
     ]

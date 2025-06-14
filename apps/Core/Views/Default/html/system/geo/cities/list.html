@@ -17,24 +17,6 @@
         'dtFilters'                 : table['filters'],
         'dtFilterColumns'           : table['filterColumns'],
         'dtFixedHeader'             : true,
-        'dtPrimaryButtons'          :
-            {
-                'componentId'           : componentId,
-                'sectionId'             : 'listing',
-                'buttonType'            : 'button',
-                'buttons'               :
-                    {
-                        'add-city' : {
-                            'title'                   : 'Add New City',
-                            'size'                    : 'sm',
-                            'type'                    : 'primary',
-                            'icon'                    : 'plus',
-                            'buttonAdditionalClass'   : 'contentAjaxLink',
-                            'position'                : 'right',
-                            'url'                     : links.url('system/geo/cities/q/id/0')
-                        }
-                    }
-            },
         'dtTable'                   : table,
         'dtColumns'                 : table['columns'],
         'dtPostUrl'                 : table['postUrl'],
@@ -45,6 +27,6 @@
         'dtHideIdColumn'            : true,
         'dtNoOfColumnsToShow'       : 7,
         'dtTableCompact'            : true,
-        'dtZeroRecords'             : 'No cities data available. Make sure city is installed and enabled or add city by clicking the Add new city button.'
+        'dtZeroRecords'             : 'No cities data available. Cities are available when country is installed and enabled.'
     ]
 )}}

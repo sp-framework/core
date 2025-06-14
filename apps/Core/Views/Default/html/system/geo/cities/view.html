@@ -1,8 +1,6 @@
 {% if city['id'] is defined %}
-    {% set cityId = city['id'] %}
     {% set title = 'City (' ~ city['name'] ~ ')' %}
 {% else %}
-    {% set cityId = '' %}
     {% set title = 'New City' %}
 {% endif %}
 
@@ -23,12 +21,6 @@
         'cardBodyInclude'               : 'cities/form',
         'formButtons'                   :
         [
-            'updateButtonId'                : cityId,
-            'addActionUrl'                  : 'system/geo/cities/add',
-            'addSuccessRedirectUrl'         : 'system/geo/cities',
-            'updateActionUrl'               : 'system/geo/cities/update',
-            'updateSuccessRedirectUrl'      : 'system/geo/cities',
-            'cancelActionUrl'               : 'system/geo/cities',
             'closeActionUrl'                : 'system/geo/cities'
         ]
     ]

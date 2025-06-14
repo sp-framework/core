@@ -31,14 +31,13 @@ class GeoCountries extends BasePackage
             $searchCountries = $this->getByParams(['conditions' => ['name', 'LIKE', '%' . $countryQueryString . '%']]);
         }
 
+        $countries = [];
+
         if ($searchCountries) {
-            $countries = [];
-
             foreach ($searchCountries as $countryKey => $countryValue) {
-                // $country = $this->getById($countryValue['id']);
-
                 if ($all) {
                     $countries[$countryKey] = $countryValue;
+
                     continue;
                 }
 
@@ -46,79 +45,21 @@ class GeoCountries extends BasePackage
                     $countries[$countryKey] = $countryValue;
                 }
             }
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->countries = $countries;
-
-            return true;
-        }
-    }
-
-    public function addCountry(array $data)
-    {
-        if (!isset($data['installed'])) {
-            $data['installed'] = '1';
         }
 
-        $data['id'] = $this->getNextIdFromDB();
+        $this->addResponse('Ok', 0, ['countries' => $countries]);
 
-        if ($this->add($data)) {
-            if ($this->config->databasetype !== 'db') {
-                $this->ffStore->count(true);
-            }
-
-            $this->addResponse('Added country ' . $data['name']);
-        } else {
-            $this->addResponse('Error adding country ' . $data['name'], 1);
-        }
-    }
-
-    protected function getNextIdFromDB()
-    {
-        if ($this->config->databasetype === 'db') {
-            $model = new $this->modelToUse;
-            $table = $model->getSource();
-            $sql = "SELECT id FROM {$table} ORDER BY id DESC LIMIT 1";
-
-            $lastDBId = $this->executeSql($sql);
-            $lastDBId->setFetchMode(\Phalcon\Db\Enum::FETCH_ASSOC);
-
-            if ((int) $lastDBId->fetch()['id'] < 1000) {
-                return 1001;
-            } else {
-                return (int) $lastDBId->fetch()['id'] + 1;
-            }
-        } else {
-            $this->ffStore = $this->ff->store($this->ffStoreToUse);
-
-            $this->ffStore->count(true);
-
-            $this->setFFAddUsingUpdateOrInsert(true);
-
-            if ((int) $this->ffStore->getLastInsertedId() < 1000) {
-                return 1001;
-            } else {
-                return (int) $this->ffStore->getLastInsertedId() + 1;
-            }
-        }
-    }
-
-    public function updateCountry(array $data)
-    {
-        $country = $this->getById($data['id']);
-
-        $country = array_merge($country, $data);
-
-        if ($this->update($country)) {
-            $this->addResponse('Updated country ' . $data['name']);
-        } else {
-            $this->addResponse('Error updating country ' . $country['name'], 1);
-        }
+        return $countries;
     }
 
     public function installCountry(array $data)
     {
+        if (!isset($data['country_iso2'])) {
+            $this->addResponse('Please provide country in iso2 format', 1);
+
+            return false;
+        }
+
         if (!$this->downloadCountryData($data['country_iso2'])) {
             return false;
         }
@@ -130,10 +71,25 @@ class GeoCountries extends BasePackage
         $countryData = $this->helper->decode($this->localContent->read($this->sourceDir . $data['country_iso2'] . '.json'), true);
 
         $this->registerStates($countryData['states'], $countryData['id']);
-            // dump($countryData);
-        // $this->registerTimezones($countryData['timezones'], $countryData['id']);
 
         $country = $this->getById($data['country_id']);
+
+        $country['installed'] = 1;
+
+        if ($this->update($country)) {
+            $this->addResponse('Installed country ' . $country['name']);
+        } else {
+            $this->addResponse('Error installing country ' . $country['name'], 1);
+        }
+    }
+
+    public function uninstallCountry($data)
+    {
+        if (!isset($data['country_iso2'])) {
+            $this->addResponse('Please provide country in iso2 format', 1);
+
+            return false;
+        }
 
         $country['installed'] = 1;
 
@@ -156,6 +112,7 @@ class GeoCountries extends BasePackage
                         ['verify' => false]
                     )->getBody()->getContents()
                 );
+
             return true;
         } catch (\Exception $e) {
             $this->addResponse($e->getMessage(), 1);
@@ -215,8 +172,6 @@ class GeoCountries extends BasePackage
                 }
 
                 continue;
-            } else {
-                $this->basepackages->geoStates->addState($state);
             }
 
             if (isset($cities)) {
@@ -237,8 +192,6 @@ class GeoCountries extends BasePackage
 
             if (isset($city['id']) && $this->basepackages->geoCities->getById($city['id'])) {
                 $this->basepackages->geoCities->updateCity($city);
-            } else {
-                $this->basepackages->geoCities->addCity($city);
             }
         }
     }
@@ -269,15 +222,19 @@ class GeoCountries extends BasePackage
 
     public function isEnabled($returnData = false)
     {
-        $searchEnabledCountries =
-            $this->getByParams(
+        if ($this->config->databasetype === 'db') {
+            $conditions =
                 [
-                    'conditions'    => 'enabled = :cEnabled:',
+                    'conditions'    => 'currency_enabled = :cEnabled:',
                     'bind'          => [
                         'cEnabled'  => 1
                     ]
-                ]
-            );
+                ];
+        } else {
+            $conditions = ['conditions' => ['currency_enabled', '=', 1]];
+        }
+
+        $searchEnabledCountries = $this->getByParams($conditions);
 
         if ($searchEnabledCountries) {
             if ($returnData) {
@@ -292,15 +249,19 @@ class GeoCountries extends BasePackage
 
     public function currencyEnabled($returnData = false)
     {
-        $searchEnabledCurrencies =
-            $this->getByParams(
+        if ($this->config->databasetype === 'db') {
+            $conditions =
                 [
                     'conditions'    => 'currency_enabled = :cEnabled:',
                     'bind'          => [
                         'cEnabled'  => 1
                     ]
-                ]
-            );
+                ];
+        } else {
+            $conditions = ['conditions' => ['currency_enabled', '=', 1]];
+        }
+
+        $searchEnabledCurrencies = $this->getByParams($conditions);
 
         if ($searchEnabledCurrencies) {
             if ($returnData) {

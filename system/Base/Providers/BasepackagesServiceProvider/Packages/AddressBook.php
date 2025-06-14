@@ -90,7 +90,7 @@ class AddressBook extends BasePackage
     protected function getGeoLocation($data)
     {
         if ($this->basepackages->geoCities->searchCities($data['city_name'])) {
-            $cityData = $this->basepackages->geoCities->packagesData->cities;
+            $cityData = $this->basepackages->geoCities->packagesData->responseData['cities'];
 
             if (count($cityData) > 0) {
                 foreach ($cityData as $cityKey => $city) {
@@ -112,12 +112,13 @@ class AddressBook extends BasePackage
         $foundCountry = null;
 
         if ($this->basepackages->geoCountries->searchCountries($data['country_name'], true)) {
-            $countryData = $this->basepackages->geoCountries->packagesData->countries;
+            $countryData = $this->basepackages->geoCountries->packagesData->responseData['countries'];
 
             if (count($countryData) > 0) {
                 foreach ($countryData as $countryKey => $country) {
                     if (strtolower($country['name']) === strtolower($data['country_name'])) {
                         $foundCountry = $country;
+
                         break;
                     }
                 }
@@ -156,10 +157,10 @@ class AddressBook extends BasePackage
         $stateData = null;
 
         if ($this->basepackages->geoStates->searchStates($data['state_name'], true)) {
-            $stateData = $this->basepackages->geoStates->packagesData->states;
+            $stateData = $this->basepackages->geoStates->packagesData->responseData['states'];
         }
         if (!$stateData && $this->basepackages->geoStates->searchStatesByCode($data['state_name'], true)) {
-            $stateData = $this->basepackages->geoStates->packagesData->states;
+            $stateData = $this->basepackages->geoStates->packagesData->responseData['states'];
         }
 
         if ($stateData && is_array($stateData) && count($stateData) > 0) {

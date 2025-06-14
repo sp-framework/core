@@ -13,62 +13,6 @@ class GeoStates extends BasePackage
 
     public $geoStates;
 
-    public function addState(array $data)
-    {
-        $data['id'] = $this->getNextIdFromDB();
-
-        if ($this->add($data)) {
-            if (!isset($data['id'])) {
-                if ($this->config->databasetype !== 'db') {
-                    $this->ffStore->count(true);
-                }
-            }
-
-            $this->addResponse('Added ' . $data['name'] . ' state');
-        } else {
-            $this->addResponse('Error adding new state.', 1);
-        }
-    }
-
-    protected function getNextIdFromDB()
-    {
-        if ($this->config->databasetype === 'db') {
-            $model = new $this->modelToUse;
-            $table = $model->getSource();
-            $sql = "SELECT id FROM {$table} ORDER BY id DESC LIMIT 1";
-
-            $lastDBId = $this->executeSql($sql);
-            $lastDBId->setFetchMode(\Phalcon\Db\Enum::FETCH_ASSOC);
-
-            if ((int) $lastDBId->fetch()['id'] < 10000) {
-                return 10001;
-            } else {
-                return (int) $lastDBId->fetch()['id'] + 1;
-            }
-        } else {
-            $this->ffStore = $this->ff->store($this->ffStoreToUse);
-
-            $this->ffStore->count(true);
-
-            $this->setFFAddUsingUpdateOrInsert(true);
-
-            if ((int) $this->ffStore->getLastInsertedId() < 10000) {
-                return 10001;
-            } else {
-                return (int) $this->ffStore->getLastInsertedId() + 1;
-            }
-        }
-    }
-
-    public function updateState(array $data)
-    {
-        if ($this->update($data)) {
-            $this->addResponse('Updated ' . $data['name'] . ' state');
-        } else {
-            $this->addResponse('Error updating state.', 1);
-        }
-    }
-
     public function searchStates(string $stateQueryString)
     {
         if ($this->config->databasetype === 'db') {
@@ -85,9 +29,9 @@ class GeoStates extends BasePackage
             $searchStates = $this->getByParams(['conditions' => ['name', 'LIKE', '%' . $stateQueryString . '%']]);
         }
 
-        if ($searchStates) {
-            $states = [];
+        $states = [];
 
+        if ($searchStates) {
             foreach ($searchStates as $stateKey => $stateValue) {
                 $country = $this->basepackages->geoCountries->getById($stateValue['country_id']);
 
@@ -97,13 +41,11 @@ class GeoStates extends BasePackage
                     $states[$stateKey]['country_name'] = $country['name'];
                 }
             }
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->states = $states;
-
-            return true;
         }
+
+        $this->addResponse('Ok', 0, ['states' => $states]);
+
+        return $states;
     }
 
     public function searchStatesByCode(string $stateQueryString)
@@ -118,9 +60,9 @@ class GeoStates extends BasePackage
                 ]
             );
 
-        if ($searchStates) {
-            $states = [];
+        $states = [];
 
+        if ($searchStates) {
             foreach ($searchStates as $stateKey => $stateValue) {
                 $country = $this->basepackages->geoCountries->getById($stateValue['country_id']);
 
@@ -130,12 +72,10 @@ class GeoStates extends BasePackage
                     $states[$stateKey]['country_name'] = $country['name'];
                 }
             }
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->states = $states;
-
-            return true;
         }
+
+        $this->addResponse('Ok', 0, ['states' => $states]);
+
+        return $states;
     }
 }

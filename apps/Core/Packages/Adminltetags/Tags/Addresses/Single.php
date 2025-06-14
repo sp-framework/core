@@ -701,8 +701,9 @@ class Single
                                         $("#security-token").attr("name", response.tokenKey);
                                         $("#security-token").val(response.token);
                                     }
-                                    if (response.cities) {
-                                        return response.cities;
+
+                                    if (response.responseData.cities) {
+                                        return response.responseData.cities;
                                     } else {
                                         return [];
                                     }
@@ -827,8 +828,9 @@ class Single
                                         $("#security-token").attr("postcode", response.tokenKey);
                                         $("#security-token").val(response.token);
                                     }
-                                    if (response.postCodes) {
-                                        return response.postCodes;
+
+                                    if (response.responseData.postCodes) {
+                                        return response.responseData.postCodes;
                                     } else {
                                         return [];
                                     }
@@ -951,8 +953,9 @@ class Single
                                         $("#security-token").attr("name", response.tokenKey);
                                         $("#security-token").val(response.token);
                                     }
-                                    if (response.states) {
-                                        return response.states;
+
+                                    if (response.responseData.states) {
+                                        return response.responseData.states;
                                     } else {
                                         return [];
                                     }
@@ -1062,8 +1065,8 @@ class Single
                                         $("#security-token").val(response.token);
                                     }
 
-                                    if (response.countries) {
-                                        return response.countries;
+                                    if (response.responseData.countries) {
+                                        return response.responseData.countries;
                                     } else {
                                         return [];
                                     }

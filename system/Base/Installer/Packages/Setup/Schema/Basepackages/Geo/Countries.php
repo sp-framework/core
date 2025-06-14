@@ -30,23 +30,15 @@ class Countries
                     ]
                 ),
                 new Column(
-                    'iso3',
+                    'native',
                     [
-                        'type'          => Column::TYPE_CHAR,
-                        'size'          => 3,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
                         'notNull'       => false
                     ]
                 ),
                 new Column(
-                    'iso2',
-                    [
-                        'type'          => Column::TYPE_CHAR,
-                        'size'          => 2,
-                        'notNull'       => false
-                    ]
-                ),
-                new Column(
-                    'phone_code',
+                    'nationality',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 255,
@@ -62,7 +54,31 @@ class Countries
                     ]
                 ),
                 new Column(
+                    'iso2',
+                    [
+                        'type'          => Column::TYPE_CHAR,
+                        'size'          => 2,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'iso3',
+                    [
+                        'type'          => Column::TYPE_CHAR,
+                        'size'          => 3,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
                     'currency',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'currency_name',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 255,
@@ -85,10 +101,9 @@ class Countries
                     ]
                 ),
                 new Column(
-                    'native',
+                    'region_id',
                     [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 255,
+                        'type'          => Column::TYPE_SMALLINTEGER,
                         'notNull'       => false
                     ]
                 ),
@@ -101,10 +116,41 @@ class Countries
                     ]
                 ),
                 new Column(
+                    'subregion_id',
+                    [
+                        'type'          => Column::TYPE_SMALLINTEGER,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
                     'subregion',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 255,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'numeric_code',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 10,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'phone_code',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 10,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'tld',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
                         'notNull'       => false
                     ]
                 ),
@@ -185,6 +231,15 @@ class Countries
                     'name'
                 ],
                 'UNIQUE'
+            ),
+            new Index(
+                'column_INDEX',
+                [
+                    'name',
+                    'iso2',
+                    'iso3',
+                ],
+                'INDEX'
             )
         ];
     }
