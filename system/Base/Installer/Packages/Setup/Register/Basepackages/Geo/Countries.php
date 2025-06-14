@@ -2,6 +2,8 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\Geo;
 
+use Phalcon\Db\Enum;
+
 class Countries
 {
     public $trackCounter;
@@ -52,6 +54,12 @@ class Countries
                 $countryStore = $ff->store('basepackages_geo_countries');
 
                 $countryStore->updateOrInsert($countryToInsert, false);
+            }
+
+            if (strlen($country['region']) > 0 &&
+                strlen($country['subregion']) > 0
+            ) {
+                $this->checkRegion($db, $ff, $country);
             }
         }
 
@@ -236,6 +244,83 @@ class Countries
             return true;
         } catch (\Exception $e) {
             return false;
+        }
+    }
+
+    protected function checkRegion($db, $ff, $country)
+    {
+        $subregion = false;
+
+        if ($ff) {
+            $regionStore = $ff->store('basepackages_geo_regions');
+
+            $subregion = $regionStore->findById($country['subregion_id']);
+        }
+
+        if ($db) {
+            $subregion =
+                $db->fetchAll(
+                    "SELECT * FROM basepackages_geo_regions WHERE id LIKE :id",
+                    Enum::FETCH_ASSOC,
+                    [
+                        "id" => $country['subregion_id'],
+                    ]
+                );
+
+            if (isset($subregion[0])) {
+                $subregion = $subregion[0];
+            }
+        }
+
+        if (!$subregion) {
+            $newSubRegion['id'] = $country['subregion_id'];
+            $newSubRegion['name'] = $country['subregion'];
+            $newSubRegion['parent_region_id'] = $country['region_id'];
+            $newSubRegion['user_added'] = 0;
+
+            if ($ff) {
+                $regionStore->updateOrInsert($newSubRegion, false);
+            }
+
+            if ($db) {
+                $db->insertAsDict('basepackages_geo_regions', $newSubRegion);
+            }
+        }
+
+        $region = false;
+
+        if ($ff) {
+            $region = $regionStore->findById($country['region_id']);
+        }
+
+        if ($db) {
+            $region =
+                $db->fetchAll(
+                    "SELECT * FROM basepackages_geo_regions WHERE id LIKE :id",
+                    Enum::FETCH_ASSOC,
+                    [
+                        "id" => $country['region_id'],
+                    ]
+                );
+
+            if (isset($region[0])) {
+                $region = $region[0];
+            }
+        }
+
+        if (!$region) {
+            $newRegion['id'] = $country['region_id'];
+            $newRegion['name'] = $country['region'];
+            $newRegion['parent_region_id'] = null;
+            $newRegion['user_added'] = 0;
+
+            if ($ff) {
+                $regionStore->updateOrInsert($newRegion, false);
+            }
+
+            if ($db) {
+                $db->insertAsDict('basepackages_geo_regions', $newRegion);
+            }
         }
     }
 }

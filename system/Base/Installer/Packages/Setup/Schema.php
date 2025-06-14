@@ -16,6 +16,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV4;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV6;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Regions;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ImportExport;
@@ -93,6 +94,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\Basepac
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv4;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv6;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoRegions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Messenger\BasepackagesMessenger;
@@ -235,6 +237,10 @@ class Schema
                 'basepackages_filters'                      => [
                         'schema'    => new Filters,
                         'model'     => new BasepackagesFilters,
+                    ],
+                'basepackages_geo_regions'                  => [
+                        'schema'    => new Regions,
+                        'model'     => new BasepackagesGeoRegions,
                     ],
                 'basepackages_geo_countries'                => [
                         'schema'    => new Countries,

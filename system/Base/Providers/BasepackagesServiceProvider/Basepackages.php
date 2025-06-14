@@ -14,6 +14,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServic
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Filters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoRegions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ImportExport;
@@ -54,6 +55,8 @@ class Basepackages
 	protected $domains;
 
 	protected $menus;
+
+	protected $geoRegions;
 
 	protected $geoCountries;
 
@@ -172,6 +175,13 @@ class Basepackages
 		$this->menus = (new Menus())->init();
 
 		return $this->menus;
+	}
+
+	protected function initGeoRegions()
+	{
+		$this->geoRegions = (new GeoRegions())->init();
+
+		return $this->geoRegions;
 	}
 
 	protected function initGeoCountries()
