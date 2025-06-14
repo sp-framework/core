@@ -17,6 +17,4 @@ class BasepackagesGeoStates extends BaseModel
     public $longitude;
 
     public $country_id;
-
-    public $user_added;
 }

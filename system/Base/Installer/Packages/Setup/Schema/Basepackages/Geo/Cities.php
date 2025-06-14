@@ -68,13 +68,6 @@ class Cities
                         'type'          => Column::TYPE_INTEGER,
                         'notNull'       => true,
                     ]
-                ),
-                new Column(
-                    'user_added',
-                    [
-                        'type'          => Column::TYPE_TINYINTEGER,
-                        'notNull'       => false,
-                    ]
                 )
             ]
         ];

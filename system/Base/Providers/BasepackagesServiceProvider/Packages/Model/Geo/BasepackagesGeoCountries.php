@@ -55,6 +55,4 @@ class BasepackagesGeoCountries extends BaseModel
     public $installed;
 
     public $enabled;
-
-    public $user_added;
 }

@@ -209,13 +209,6 @@ class Countries
                         'type'          => Column::TYPE_TINYINTEGER,
                         'notNull'       => true,
                     ]
-                ),
-                new Column(
-                    'user_added',
-                    [
-                        'type'          => Column::TYPE_TINYINTEGER,
-                        'notNull'       => false,
-                    ]
                 )
             ]
         ];

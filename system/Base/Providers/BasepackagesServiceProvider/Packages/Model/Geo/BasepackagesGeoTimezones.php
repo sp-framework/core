@@ -21,6 +21,4 @@ class BasepackagesGeoTimezones extends BaseModel
     public $gmt_offset_name_dst;
 
     public $abbreviation;
-
-    public $user_added;
 }

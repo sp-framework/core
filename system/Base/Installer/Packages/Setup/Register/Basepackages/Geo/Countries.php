@@ -27,23 +27,29 @@ class Countries
                 [
                     'id'                => $country['id'],
                     'name'              => $country['name'],
-                    'iso3'              => $country['iso3'],
-                    'iso2'              => $country['iso2'],
-                    'phone_code'        => $country['phone_code'],
+                    'native'            => $country['native'],
+                    'nationality'       => $country['nationality'],
                     'capital'           => $country['capital'],
+                    'iso2'              => $country['iso2'],
+                    'iso3'              => $country['iso3'],
                     'currency'          => $country['currency'],
+                    'currency_name'     => $country['currency_name'],
                     'currency_symbol'   => $country['currency_symbol'],
                     'currency_enabled'  => 0,
-                    'native'            => $country['native'],
+                    'region_id'         => $country['region_id'],
                     'region'            => $country['region'],
+                    'subregion_id'      => $country['subregion_id'],
                     'subregion'         => $country['subregion'],
+                    'numeric_code'      => $country['numeric_code'],
+                    'phone_code'        => $country['phonecode'],
+                    'tld'               => $country['tld'],
                     'emoji'             => $country['emoji'],
                     'emojiU'            => $country['emojiU'],
-                    'translations'      => $helper->encode($country['translations']),
                     'latitude'          => (int) $country['latitude'],
                     'longitude'         => (int) $country['longitude'],
+                    'translations'      => $helper->encode($country['translations']),
                     'installed'         => 0,
-                    'enabled'           => 0,
+                    'enabled'           => 0
                 ];
 
             if ($db) {
@@ -142,7 +148,7 @@ class Countries
         }
     }
 
-    public function registerSelectedCountryStatesAndCities($ff, $localContent, $remoteWebContent, $country, $ip2location, $helper)
+    public function registerSelectedCountryStatesAndCities($ff, $localContent, $country, $ip2location, $helper)
     {
         // /etc/apache2.conf - Change the timeout to 3600 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
         // Timeout 3600
@@ -159,10 +165,14 @@ class Countries
 
         $countriesStore = $ff->store('basepackages_geo_countries');
         $country = $countriesStore->findOneBy(['iso3', '=', $country]);
+
         $statesStore = $ff->store('basepackages_geo_states');
         $citiesStore = $ff->store('basepackages_geo_cities');
-        $ipv4Store = $ff->store('basepackages_geo_cities_ip2locationv4');
-        $ipv6Store = $ff->store('basepackages_geo_cities_ip2locationv6');
+
+        if ($ip2location) {
+            $ipv4Store = $ff->store('basepackages_geo_cities_ip2locationv4');
+            $ipv6Store = $ff->store('basepackages_geo_cities_ip2locationv6');
+        }
 
         try {
 
@@ -276,7 +286,6 @@ class Countries
             $newSubRegion['id'] = $country['subregion_id'];
             $newSubRegion['name'] = $country['subregion'];
             $newSubRegion['parent_region_id'] = $country['region_id'];
-            $newSubRegion['user_added'] = 0;
 
             if ($ff) {
                 $regionStore->updateOrInsert($newSubRegion, false);
@@ -312,7 +321,6 @@ class Countries
             $newRegion['id'] = $country['region_id'];
             $newRegion['name'] = $country['region'];
             $newRegion['parent_region_id'] = null;
-            $newRegion['user_added'] = 0;
 
             if ($ff) {
                 $regionStore->updateOrInsert($newRegion, false);
