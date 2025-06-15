@@ -60,6 +60,27 @@ class GeoCities extends BasePackage
         return $cities;
     }
 
+    public function searchCitiesByCountryId($countryId)
+    {
+        if ($this->config->databasetype === 'db') {
+            $searchCities =
+                $this->getByParams(
+                    [
+                        'conditions'    => 'country_id = :countryId:',
+                        'bind'          => [
+                            'countryId'     => $countryId
+                        ]
+                    ]
+                );
+        } else {
+            $searchCities = $this->getByParams(['conditions' => ['country_id', '=', (int) $countryId]]);
+        }
+
+        $this->addResponse('Ok', 0, ['cities' => $searchCities]);
+
+        return $searchCities;
+    }
+
     public function searchPostCodes(string $postCodeQueryString)
     {
         if ($this->config->databasetype === 'db') {

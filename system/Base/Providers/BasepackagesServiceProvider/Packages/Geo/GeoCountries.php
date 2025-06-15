@@ -85,6 +85,11 @@ class GeoCountries extends BasePackage
 
         $countryData = $this->helper->decode($this->localContent->read($this->sourceDir . $data['country_iso2'] . '.json'), true);
 
+        //Increase Exectimeout to 10 mins as this process takes time to extract and merge data.
+        if ((int) ini_get('max_execution_time') < 360) {
+            set_time_limit(360);
+        }
+
         $this->registerStates($countryData['states'], $countryData['id']);
 
         $country = $this->getById($data['country_id']);
@@ -108,6 +113,24 @@ class GeoCountries extends BasePackage
 
         $country = $this->getById($data['country_id']);
 
+        //Remove States
+        $statesData = $this->basepackages->geoStates->searchStatesByCountryId($country['id']);
+
+        if ($statesData) {
+            foreach ($statesData as $state) {
+                $this->basepackages->geoStates->remove($state['id']);
+            }
+        }
+        //Remove Cities
+        $statesCities = $this->basepackages->geoCities->searchCitiesByCountryId($country['id']);
+
+        if ($statesCities) {
+            foreach ($statesCities as $city) {
+                $this->basepackages->geoCities->remove($city['id']);
+            }
+        }
+
+        //Delete files
         if ($this->localContent->fileExists($this->sourceDir . $country['iso2'] . '.json')) {
             $this->localContent->delete($this->sourceDir . $country['iso2'] . '.json');
         }
@@ -176,8 +199,6 @@ class GeoCountries extends BasePackage
 
     protected function registerStates($statesData, $country_id)
     {
-        $searchByCities = [];
-
         foreach ($statesData as $key => $state) {
             $state['country_id'] = $country_id;
 
@@ -186,25 +207,15 @@ class GeoCountries extends BasePackage
                 unset($state['cities']);
             }
 
-            if (isset($state['id']) && $this->basepackages->geoStates->getById($state['id'])) {
-                $this->basepackages->geoStates->updateState($state);
-            } else if (count($state) === 2 && isset($state['name'])) {//We make sure we have only state['name'] && state['cities'] set
-                $searchByCities[$key] = $state;
+            if (isset($state['id'])) {
+                $this->basepackages->geoStates->setFFAddUsingUpdateOrInsert(true);
 
-                if (isset($cities)) {
-                    $searchByCities[$key]['cities'] = $cities;
-                }
-
-                continue;
+                $this->basepackages->geoStates->add($state);
             }
 
             if (isset($cities)) {
                 $this->registerCities($cities, $country_id, $state['id']);
             }
-        }
-
-        if (count($searchByCities) > 0) {
-            $this->searchByCities($searchByCities, $country_id);
         }
     }
 
@@ -214,32 +225,10 @@ class GeoCountries extends BasePackage
             $city['state_id'] = $state_id;
             $city['country_id'] = $country_id;
 
-            if (isset($city['id']) && $this->basepackages->geoCities->getById($city['id'])) {
-                $this->basepackages->geoCities->updateCity($city);
-            }
-        }
-    }
+            if (isset($city['id'])) {
+                $this->basepackages->geoCities->setFFAddUsingUpdateOrInsert(true);
 
-    protected function searchByCities($searchByCities, $country_id)
-    {
-        foreach ($searchByCities as $stateKey => $state) {
-            if (count($state['cities']) > 0) {
-                foreach ($state['cities'] as $cityKey => $city) {
-                    $dbCityObj = $this->basepackages->geoCities->getFirst('name', $city['name']);
-
-                    if ($dbCityObj) {
-                        $dbCity = $dbCityObj->toArray();
-
-                        $dbCity = array_merge($dbCity, $city);
-
-                        $this->basepackages->geoCities->updateCity($dbCity);
-                    } else {
-                        $city['state_id'] = 0;
-                        $city['country_id'] = $country_id;
-
-                        $this->basepackages->geoCities->addCity($city);
-                    }
-                }
+                $this->basepackages->geoCities->add($city);
             }
         }
     }

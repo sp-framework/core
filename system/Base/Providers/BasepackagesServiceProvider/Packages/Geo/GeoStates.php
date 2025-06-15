@@ -50,15 +50,19 @@ class GeoStates extends BasePackage
 
     public function searchStatesByCode(string $stateQueryString)
     {
-        $searchStates =
-            $this->getByParams(
-                [
-                    'conditions'    => 'state_code LIKE :sCode:',
-                    'bind'          => [
-                        'sCode'     => '%' . $stateQueryString . '%'
+        if ($this->config->databasetype === 'db') {
+            $searchStates =
+                $this->getByParams(
+                    [
+                        'conditions'    => 'state_code LIKE :sCode:',
+                        'bind'          => [
+                            'sCode'     => '%' . $stateQueryString . '%'
+                        ]
                     ]
-                ]
-            );
+                );
+        } else {
+            $searchStates = $this->getByParams(['conditions' => ['state_code', 'LIKE', '%' . $stateQueryString . '%']]);
+        }
 
         $states = [];
 
@@ -77,5 +81,26 @@ class GeoStates extends BasePackage
         $this->addResponse('Ok', 0, ['states' => $states]);
 
         return $states;
+    }
+
+    public function searchStatesByCountryId($countryId)
+    {
+        if ($this->config->databasetype === 'db') {
+            $searchStates =
+                $this->getByParams(
+                    [
+                        'conditions'    => 'country_id = :countryId:',
+                        'bind'          => [
+                            'countryId'     => $countryId
+                        ]
+                    ]
+                );
+        } else {
+            $searchStates = $this->getByParams(['conditions' => ['country_id', '=', (int) $countryId]]);
+        }
+
+        $this->addResponse('Ok', 0, ['states' => $searchStates]);
+
+        return $searchStates;
     }
 }
