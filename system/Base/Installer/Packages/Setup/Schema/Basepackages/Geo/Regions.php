@@ -1,11 +1,11 @@
 <?php
 
-namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Regions;
+namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo;
 
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;
 
-class GeoRegions
+class Regions
 {
     public function columns()
     {
