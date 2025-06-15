@@ -16,6 +16,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV4;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV6;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Holidays\Holidays;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Regions;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
@@ -94,6 +95,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\Basepac
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv4;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv6;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoHolidays;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoRegions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoTimezones;
@@ -241,6 +243,10 @@ class Schema
                 'basepackages_geo_regions'                  => [
                         'schema'    => new Regions,
                         'model'     => new BasepackagesGeoRegions,
+                    ],
+                'basepackages_geo_holidays'                 => [
+                        'schema'    => new Holidays,
+                        'model'     => new BasepackagesGeoHolidays,
                     ],
                 'basepackages_geo_countries'                => [
                         'schema'    => new Countries,
