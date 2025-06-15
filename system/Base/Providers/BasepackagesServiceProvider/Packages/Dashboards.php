@@ -104,6 +104,10 @@ class Dashboards extends BasePackage
 
     public function updateDashboard(array $data)
     {
+        if ($this->apps->app['settings']['defaultDashboard'] == $data['id']) {
+            return true;
+        }
+
         $dashboard = $this->getDashboardById($data['id']);
 
         if (!$dashboard) {
@@ -174,6 +178,12 @@ class Dashboards extends BasePackage
     public function removeDashboard(array $data)
     {
         $dashboard = $this->getById($data['id']);
+
+        if ($this->apps->app['settings']['defaultDashboard'] == $data['id']) {
+            $this->addResponse('Cannot remove app default dashboard.', 1);
+
+            return false;
+        }
 
         if (!$dashboard) {
             throw new IdNotFoundException;
@@ -317,6 +327,8 @@ class Dashboards extends BasePackage
         $this->modelToUse = $this->useModel(BasepackagesDashboardsWidgets::class);
 
         $this->setFfStoreToUse();
+
+        $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
         try {
             $sequence = 0;

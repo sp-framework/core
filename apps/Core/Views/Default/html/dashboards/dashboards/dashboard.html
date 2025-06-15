@@ -5,6 +5,24 @@
     {% set dashboardId = '' %}
     {% set title = 'New Dashboard' %}
 {% endif %}
+{% set formButtons =
+    [
+        'updateButtonId'                : dashboardId,
+        'addActionUrl'                  : 'dashboards/add',
+        'addSuccessRedirectUrl'         : 'dashboards',
+        'updateActionUrl'               : 'dashboards/update',
+        'updateSuccessRedirectUrl'      : 'dashboards',
+        'cancelActionUrl'               : 'dashboards',
+        'closeActionUrl'                : 'dashboards'
+    ]
+%}
+{% if dashboard['app_default'] is defined and dashboard['app_default'] == true %}
+{% set formButtons =
+    [
+        'closeActionUrl'                : 'dashboards'
+    ]
+%}
+{% endif %}
 {{adminltetags.useTag('content',
     [
         'component'                     : component,
@@ -20,15 +38,6 @@
         'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'dashboards/dashboards/form',
-        'formButtons'                   :
-        [
-            'updateButtonId'                : dashboardId,
-            'addActionUrl'                  : 'dashboards/add',
-            'addSuccessRedirectUrl'         : 'dashboards',
-            'updateActionUrl'               : 'dashboards/update',
-            'updateSuccessRedirectUrl'      : 'dashboards',
-            'cancelActionUrl'               : 'dashboards',
-            'closeActionUrl'                : 'dashboards'
-        ]
+        'formButtons'                   : formButtons
     ]
 )}}
