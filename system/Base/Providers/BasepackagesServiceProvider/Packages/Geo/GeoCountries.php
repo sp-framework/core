@@ -15,6 +15,21 @@ class GeoCountries extends BasePackage
 
     protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/';
 
+    public function updateCountry(array $data)
+    {
+        $country = $this->getById($data['id']);
+
+        if ($country) {
+            $country = array_merge($country, $data);
+
+            if ($this->update($country)) {
+                $this->addResponse('Updated country ' . $country['name']);
+            } else {
+                $this->addResponse('Error updating country ' . $country['name'], 1);
+            }
+        }
+    }
+
     public function searchCountries(string $countryQueryString, $all = false)
     {
         if ($this->config->databasetype === 'db') {
@@ -85,18 +100,27 @@ class GeoCountries extends BasePackage
 
     public function uninstallCountry($data)
     {
-        if (!isset($data['country_iso2'])) {
-            $this->addResponse('Please provide country in iso2 format', 1);
+        if (!isset($data['country_id'])) {
+            $this->addResponse('Please provide country id', 1);
 
             return false;
         }
 
-        $country['installed'] = 1;
+        $country = $this->getById($data['country_id']);
+
+        if ($this->localContent->fileExists($this->sourceDir . $country['iso2'] . '.json')) {
+            $this->localContent->delete($this->sourceDir . $country['iso2'] . '.json');
+        }
+        if ($this->localContent->fileExists($this->sourceDir . $country['iso2'] . '.zip')) {
+            $this->localContent->delete($this->sourceDir . $country['iso2'] . '.zip');
+        }
+
+        $country['installed'] = 0;
 
         if ($this->update($country)) {
-            $this->addResponse('Installed country ' . $country['name']);
+            $this->addResponse('Uninstalled country ' . $country['name']);
         } else {
-            $this->addResponse('Error installing country ' . $country['name'], 1);
+            $this->addResponse('Error uninstalling country ' . $country['name'], 1);
         }
     }
 

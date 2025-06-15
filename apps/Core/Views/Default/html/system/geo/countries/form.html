@@ -61,33 +61,70 @@
         </div>
         <div class="row">
             <div class="col">
+                {% set installHidden = true %}
+                {% set uninstallHidden = true %}
                 {% if country['installed'] is defined and country['installed'] == 0 %}
-                    {# {% set cacheButtonHidden = 'd-none' %} #}
                     {% set enableCheckboxHidden = true %}
-                    {{adminltetags.useTag('buttons',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'buttonType'                     : 'button',
-                            'buttons'                        :
-                                {
-                                    'install-country' : {
-                                        'title'                   : 'Install',
-                                        'size'                    : 'sm',
-                                        'type'                    : 'success',
-                                        'icon'                    : 'cog fa-spin',
-                                        'iconHidden'              : true,
-                                        'url'                     : links.url('system/geo/countries/install')
-                                    }
-                                }
-                        ]
-                    )}}
+                    {% set installHidden = false %}
                 {% else %}
-                    {# {% set cacheButtonHidden = '' %} #}
                     {% set enableCheckboxHidden = false %}
+                    {% set uninstallHidden = false %}
                 {% endif %}
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'buttonType'                     : 'button',
+                        'buttons'                        :
+                            {
+                                'install-country' : {
+                                    'title'                   : 'Install',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'success',
+                                    'icon'                    : 'cog fa-spin',
+                                    'iconHidden'              : true,
+                                    'hidden'                  : installHidden,
+                                    'url'                     : links.url('system/geo/countries/install')
+                                },
+                                'uninstall-country' : {
+                                    'title'                   : 'Uninstall',
+                                    'size'                    : 'xs',
+                                    'type'                    : 'danger',
+                                    'icon'                    : 'cog fa-spin',
+                                    'iconHidden'              : true,
+                                    'hidden'                  : uninstallHidden,
+                                    'url'                     : links.url('system/geo/countries/uninstall')
+                                }
+                            }
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'flag',
+                        'fieldLabel'                     : 'Country Flag',
+                        'fieldType'                      : 'html',
+                        'fieldHelp'                      : false,
+                        'fieldHelpTooltipContent'        : 'Country Flag',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldHtmlContent'               : '<h4>' ~ countryFlag ~ '</h4>'
+                    ]
+                )}}
+            </div>
+            <div class="col">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -105,117 +142,11 @@
                         'fieldCheckboxChecked'           : enableChecked,
                         'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase m-0',
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnCreate'           : false,
                         'fieldBazPostOnUpdate'           : true
                     ]
                 )}}
             </div>
-{#             <div class="col">
-                {% if not country['cached'] or country['cached'] == 0 %}
-                    {% set cacheButtonDisabled = false %}
-                    {% set cacheButtonTitle = 'Cache' %}
-                    {% set cacheButtonType = 'primary' %}
-                {% else %}
-                    {% set cacheButtonDisabled = true %}
-                    {% set cacheButtonTitle = 'Cached' %}
-                    {% set cacheButtonType = 'success' %}
-                {% endif %}
-                <div id="cache-button" class="{{cacheButtonHidden}}">
-                    {{adminltetags.useTag('buttons',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldHidden'                    : cacheButtonHidden,
-                            'buttonLabel'                    : 'Caching',
-                            'buttonType'                     : 'button',
-                            'buttons'                        :
-                                {
-                                    'install-country' : {
-                                        'title'                   : cacheButtonTitle,
-                                        'size'                    : 'xs',
-                                        'type'                    : cacheButtonType,
-                                        'icon'                    : 'cog fa-spin',
-                                        'iconHidden'              : true,
-                                        'disabled'                : cacheButtonDisabled,
-                                        'url'                     : links.url('system/geo/q/cache/' ~ country['id'])
-                                    }
-                                }
-                        ]
-                    )}}
-                </div>
-            </div> #}
-        </div>
-        <hr>
-        <div class="row">
-            {% if country['id'] is defined %}
-                <div class="col-md-4 col-xs-12">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'flag',
-                            'fieldLabel'                     : 'Country Flag',
-                            'fieldType'                      : 'html',
-                            'fieldHelp'                      : false,
-                            'fieldHelpTooltipContent'        : 'Country Flag',
-                            'fieldRequired'                  : false,
-                            'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldHtmlContent'               : '<h4>' ~ countryFlag ~ '</h4>'
-                        ]
-                    )}}
-                </div>
-            {% else %}
-                <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'emoji',
-                            'fieldLabel'                     : 'Country Flag Emoji Code',
-                            'fieldType'                      : 'input',
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'Country Flag Emoji Example: &#127462;&#127482; for Australia',
-                            'fieldRequired'                  : false,
-                            'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : true,
-                            'fieldBazPostOnUpdate'           : true,
-                            'fieldDataInputMinLength'        : 1,
-                            'fieldDataInputMaxLength'        : 100,
-                            'fieldValue'                     : countryFlag
-                        ]
-                    )}}
-                </div>
-                <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'emojiU',
-                            'fieldLabel'                     : 'Country Flag Emoji Unicode',
-                            'fieldType'                      : 'input',
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'Country Flag Emoji Unicode Example: U+1F1E6 U+1F1FA for Australia',
-                            'fieldRequired'                  : false,
-                            'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : true,
-                            'fieldBazPostOnUpdate'           : true,
-                            'fieldDataInputMinLength'        : 1,
-                            'fieldDataInputMaxLength'        : 100,
-                            'fieldValue'                     : countryFlagU
-                        ]
-                    )}}
-                </div>
-            {% endif %}
         </div>
         <div class="row">
             <div class="col">
@@ -232,8 +163,8 @@
                         'fieldHelpTooltipContent'        : 'Name Example: Australia',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 100,
                         'fieldValue'                     : countryName
@@ -254,8 +185,8 @@
                         'fieldHelpTooltipContent'        : 'Native Language Name Example: Australia',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 100,
                         'fieldValue'                     : countryNameNative
@@ -276,8 +207,8 @@
                         'fieldHelpTooltipContent'        : 'Capital Example: Canberra for Australia',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 100,
                         'fieldValue'                     : countryCapital
@@ -300,8 +231,8 @@
                         'fieldHelpTooltipContent'        : 'Currency Code. Example: AUD for Australia',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 10,
                         'fieldValue'                     : countryCurrency
@@ -322,8 +253,8 @@
                         'fieldHelpTooltipContent'        : 'Currency Symbol Example: $ for Australia',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 10,
                         'fieldValue'                     : countryCurrencySymbol
@@ -344,8 +275,8 @@
                         'fieldHelpTooltipContent'        : 'Phone Code Example: 61 for Australia',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 10,
                         'fieldValue'                     : countryPhoneCode
@@ -368,8 +299,8 @@
                         'fieldHelpTooltipContent'        : 'Country ISO2 Name. Example: AU for Australia',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 2,
                         'fieldValue'                     : countryIso2
@@ -390,8 +321,8 @@
                         'fieldHelpTooltipContent'        : 'Country ISO3 Name. Example: AUS for Australia',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 3,
                         'fieldValue'                     : countryIso3
@@ -414,8 +345,8 @@
                         'fieldHelpTooltipContent'        : 'Country Region Name. Example: Oceania for Australia',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 100,
                         'fieldValue'                     : countryRegion
@@ -436,8 +367,8 @@
                         'fieldHelpTooltipContent'        : 'Country Subregion Name. Example: Australia & New Zealand for Australia',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 100,
                         'fieldValue'                     : countrySubregion
@@ -478,33 +409,61 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                      : { },
         '{{componentId}}-{{sectionId}}-enabled'                 : {
             afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-install-country').click(function(e) {
+                $('#{{componentId}}-{{sectionId}}-install-country, #{{componentId}}-{{sectionId}}-uninstall-country').click(function(e) {
                     e.preventDefault();
+
                     $(this).addClass('disabled');
-                    $('#{{componentId}}-{{sectionId}}-install-country').children().attr('hidden', false);
+                    var buttonId = $(this)[0].id;
 
                     var url = $(this).attr('href');
+
                     var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    if (buttonId === '{{componentId}}-{{sectionId}}-install-country') {
+                        $('#{{componentId}}-{{sectionId}}-install-country').children().attr('hidden', false);
+                        postData['country_iso2'] = $('#{{componentId}}-{{sectionId}}-iso2').val();
+                    } else if (buttonId === '{{componentId}}-{{sectionId}}-uninstall-country') {
+                        $('#{{componentId}}-{{sectionId}}-uninstall-country').children().attr('hidden', false);
+                    }
 
                     postData['country_id'] = $('#{{componentId}}-{{sectionId}}-id').val();
-                    postData['country_iso2'] = $('#{{componentId}}-{{sectionId}}-iso2').val();
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
                     $.post(url, postData, function(response) {
                         if (response.responseCode == 0) {
                             paginatedPNotify('success', {
                                 'title' : response.responseMessage
                             });
-                            $('#{{componentId}}-{{sectionId}}-install-country').attr('hidden', true);
-                            $('#{{componentId}}-{{sectionId}}-install-country').siblings().removeClass('d-none');
 
+                            $('#{{componentId}}-{{sectionId}}-install-country').removeClass('disabled');
+                            $('#{{componentId}}-{{sectionId}}-uninstall-country').removeClass('disabled');
+                            $('#{{componentId}}-{{sectionId}}-install-country').children().attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-uninstall-country').children().attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-enabled')[0].checked = false;
+
+                            if (buttonId === '{{componentId}}-{{sectionId}}-install-country') {
+                                $('#{{componentId}}-{{sectionId}}-install-country').attr('hidden', true);
+                                $('#{{componentId}}-{{sectionId}}-uninstall-country').attr('hidden', false);
+                                $('#{{componentId}}-{{sectionId}}-enabled').parents('.form-group').removeClass('d-none');
+                            } else if (buttonId === '{{componentId}}-{{sectionId}}-uninstall-country') {
+                                $('#{{componentId}}-{{sectionId}}-install-country').attr('hidden', false);
+                                $('#{{componentId}}-{{sectionId}}-uninstall-country').attr('hidden', true);
+                                $('#{{componentId}}-{{sectionId}}-enabled').parents('.form-group').addClass('d-none');
+                            }
                         } else {
                             paginatedPNotify('error', {
                                 'title' : response.responseMessage
                             });
-                            $('#{{componentId}}-{{sectionId}}-install-country').removeClass('disabled');
-                            $('#{{componentId}}-{{sectionId}}-install-country').children().attr('hidden', true);
 
+                            if (buttonId === '{{componentId}}-{{sectionId}}-install-country') {
+                                $('#{{componentId}}-{{sectionId}}-install-country').removeClass('disabled');
+                                $('#{{componentId}}-{{sectionId}}-install-country').children().attr('hidden', true);
+                            } else if (buttonId === '{{componentId}}-{{sectionId}}-install-country') {
+                                $('#{{componentId}}-{{sectionId}}-uninstall-country').removeClass('disabled');
+                                $('#{{componentId}}-{{sectionId}}-uninstall-country').children().attr('hidden', true);
+                            }
                         }
+
                         if (response.tokenKey && response.token) {
                             $('#security-token').attr('name', response.tokenKey);
                             $('#security-token').val(response.token);

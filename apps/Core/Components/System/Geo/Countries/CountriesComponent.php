@@ -41,7 +41,7 @@ class CountriesComponent extends BaseComponent
             [
                 'actionsToEnable'       =>
                 [
-                    'view'      => 'system/geo/countries',
+                    'edit'      => 'system/geo/countries',
                 ]
             ];
 
@@ -117,6 +117,21 @@ class CountriesComponent extends BaseComponent
         }
     }
 
+    /**
+     * @acl(name=update)
+     */
+    public function updateAction()
+    {
+        $this->requestIsPost();
+
+        $this->geoCountries->updateCountry($this->postData());
+
+        $this->addResponse(
+            $this->geoCountries->packagesData->responseMessage,
+            $this->geoCountries->packagesData->responseCode
+        );
+    }
+
     public function installAction()
     {
         $this->requestIsPost();
@@ -132,7 +147,15 @@ class CountriesComponent extends BaseComponent
 
     public function uninstallAction()
     {
-        //
+        $this->requestIsPost();
+
+        $this->geoCountries->uninstallCountry($this->postData());
+
+        $this->addResponse(
+            $this->geoCountries->packagesData->responseMessage,
+            $this->geoCountries->packagesData->responseCode,
+            $this->geoCountries->packagesData->responseData ?? []
+        );
     }
 
     public function searchCountryAction()
