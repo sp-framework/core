@@ -16,7 +16,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV4;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV6;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Holidays\Holidays;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Holidays;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Regions;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
