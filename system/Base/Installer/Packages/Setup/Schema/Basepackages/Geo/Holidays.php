@@ -38,23 +38,16 @@ class Holidays
                     ]
                 ),
                 new Column(
-                    'state_id',
-                    [
-                        'type'          => Column::TYPE_INTEGER,
-                        'notNull'       => true,
-                    ]
-                ),
-                new Column(
-                    'is_regional_holiday',
+                    'is_national_holiday',
                     [
                         'type'          => Column::TYPE_BOOLEAN,
                         'notNull'       => false,
                     ]
                 ),
                 new Column(
-                    'is_national_holiday',
+                    'state_ids',
                     [
-                        'type'          => Column::TYPE_BOOLEAN,
+                        'type'          => Column::TYPE_JSON,
                         'notNull'       => false,
                     ]
                 )
@@ -64,8 +57,7 @@ class Holidays
                     'column_UNIQUE',
                     [
                         'name',
-                        'date',
-                        'state_id'
+                        'date'
                     ],
                     'UNIQUE'
                 )
@@ -84,8 +76,7 @@ class Holidays
                 'column_INDEX',
                 [
                     'name',
-                    'date',
-                    'state_id'
+                    'date'
                 ],
                 'INDEX'
             )

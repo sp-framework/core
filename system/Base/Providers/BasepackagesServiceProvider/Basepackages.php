@@ -14,6 +14,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServic
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Filters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoHolidays;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoRegions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
@@ -57,6 +58,8 @@ class Basepackages
 	protected $menus;
 
 	protected $geoRegions;
+
+	protected $geoHolidays;
 
 	protected $geoCountries;
 
@@ -182,6 +185,13 @@ class Basepackages
 		$this->geoRegions = (new GeoRegions())->init();
 
 		return $this->geoRegions;
+	}
+
+	protected function initGeoHolidays()
+	{
+		$this->geoHolidays = (new GeoHolidays())->init();
+
+		return $this->geoHolidays;
 	}
 
 	protected function initGeoCountries()

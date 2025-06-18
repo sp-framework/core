@@ -12,9 +12,7 @@ class BasepackagesGeoHolidays extends BaseModel
 
     public $date;
 
-    public $state_id;
-
-    public $is_regional_holiday;
-
     public $is_national_holiday;
+
+    public $state_ids;
 }

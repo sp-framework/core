@@ -1,7 +1,9 @@
-{% if state['id'] is defined %}
-    {% set title = 'State (' ~ state['name'] ~ ')' %}
+{% if holiday['id'] is defined %}
+    {% set title = 'Holiday (' ~ holiday['name'] ~ ')' %}
+    {% set holidayId = holiday['id'] %}
 {% else %}
-    {% set title = 'New State' %}
+    {% set title = 'New Holiday' %}
+    {% set holidayId = '' %}
 {% endif %}
 
 {{adminltetags.useTag('content',
@@ -18,10 +20,16 @@
         'cardIcon'                      : 'globe',
         'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
-        'cardBodyInclude'               : 'states/form',
+        'cardBodyInclude'               : 'holidays/form',
         'formButtons'                   :
         [
-            'closeActionUrl'                : 'system/geo/states'
+            'updateButtonId'                : holidayId,
+            'addActionUrl'                  : 'system/geo/holidays/add',
+            'addSuccessRedirectUrl'         : 'system/geo/holidays',
+            'updateActionUrl'               : 'system/geo/holidays/update',
+            'updateSuccessRedirectUrl'      : 'system/geo/holidays',
+            'cancelActionUrl'               : 'system/geo/holidays',
+            'closeActionUrl'                : 'system/geo/holidays'
         ]
     ]
 )}}

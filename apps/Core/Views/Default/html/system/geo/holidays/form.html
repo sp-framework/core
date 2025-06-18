@@ -1,13 +1,19 @@
-{% if state['id'] is defined %}
-    {% set stateId = state['id'] %}
-    {% set stateName = state['name'] %}
-    {% set stateCode = state['state_code'] %}
-    {% set stateCountry = state['country_id'] %}
+{% set holidayIsNationalChecked = false %}
+{% set statesDisabled = false %}
+{% if holiday['id'] is defined %}
+    {% set holidayId = holiday['id'] %}
+    {% set holidayName = holiday['name'] %}
+    {% set holidayDate = holiday['date'] %}
+    {% set holidayStates = holiday['state_ids'] %}
+    {% if holiday['is_national_holiday'] == 1 %}
+        {% set holidayIsNationalChecked = true %}
+        {% set statesDisabled = true %}
+    {% endif %}
 {% else %}
-    {% set stateId = '' %}
-    {% set stateName = '' %}
-    {% set stateCode = '' %}
-    {% set stateCountry = '' %}
+    {% set holidayId = '' %}
+    {% set holidayName = '' %}
+    {% set holidayDate = '' %}
+    {% set holidayStates = '' %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -20,17 +26,17 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'id',
-                        'fieldLabel'                     : 'State ID',
+                        'fieldLabel'                     : 'Holiday ID',
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'State ID',
+                        'fieldHelpTooltipContent'        : 'Holiday ID',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : false,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldHidden'                    : true,
                         'fieldDisabled'                  : true,
-                        'fieldValue'                     : stateId
+                        'fieldValue'                     : holidayId
                     ]
                 )}}
             </div>
@@ -44,17 +50,60 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'name',
-                        'fieldLabel'                     : 'Name',
+                        'fieldLabel'                     : 'Holiday Name',
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Name Example: Victoria',
+                        'fieldHelpTooltipContent'        : 'Name Example: New Years Day',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 100,
-                        'fieldValue'                     : stateName
+                        'fieldValue'                     : holidayName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'date',
+                        'fieldLabel'                     : 'Holiday Date',
+                        'fieldType'                      : 'flatpickr',
+                        'fieldFlatpickrClearButton'      : true,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Holiday Date Example: 01-01-2023',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldValue'                     : holidayDate
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'is_national_holiday',
+                        'fieldLabel'                     : 'Is National Holiday?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Is the holiday a national holiday, celebrated by all states?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : holidayIsNationalChecked,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazScan'                   : true
                     ]
                 )}}
             </div>
@@ -63,22 +112,26 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'state_code',
-                        'fieldLabel'                     : 'State Code',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'State Code Example: VIC for Victoria',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 100,
-                        'fieldValue'                     : stateCode
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'state_ids',
+                        'fieldLabel'                           : 'State(s)',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select State(s).',
+                        'fieldRequired'                        : true,
+                        'fieldDisabled'                        : statesDisabled,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : states,
+                        'fieldDataSelect2Multiple'             : true,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : holidayStates
                     ]
                 )}}
             </div>
@@ -89,28 +142,189 @@
                         'componentName'                        : componentName,
                         'componentId'                          : componentId,
                         'sectionId'                            : sectionId,
-                        'fieldId'                              : 'country_id',
-                        'fieldLabel'                           : 'Country',
+                        'fieldId'                              : 'tags',
+                        'fieldLabel'                           : 'Tags',
                         'fieldType'                            : 'select2',
                         'fieldHelp'                            : true,
-                        'fieldHelpTooltipContent'              : 'State Country Example: Australia.',
-                        'fieldRequired'                        : true,
+                        'fieldHelpTooltipContent'              : 'Select or add new tag(s)',
                         'fieldBazScan'                         : true,
                         'fieldBazPostOnCreate'                 : true,
                         'fieldBazPostOnUpdate'                 : true,
-                        'fieldDataSelect2Options'              : countries,
+                        'fieldDataSelect2Options'              : tags,
+                        'fieldDataSelect2Multiple'             : true,
+                        'fieldDataSelect2Create'               : true,
                         'fieldDataSelect2OptionsKey'           : 'id',
                         'fieldDataSelect2OptionsValue'         : 'name',
                         'fieldDataSelect2OptionsArray'         : true,
-                        'fieldDataSelect2OptionsSelected'      : stateCountry
+                        'fieldDataSelect2OptionsSelected'      : holidayTags
                     ]
                 )}}
             </div>
         </div>
+        {% if holidayId == '' %}
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'recurring_dates',
+                            'fieldLabel'                     : 'Recurring Dates',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 1024,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Recurring Dates. A same entry will be created on the following provided dates. Date format is Y-m-d (2023-01-01). Each date should be comma separated.',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazJstreeSearch'           : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 2048,
+                            'fieldTextareaRows'              : 3,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <did class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'recurring_date_genrator',
+                            'fieldLabel'                            : 'Recurring date generator',
+                            'fieldLabelLegend'                      : true,
+                            'fieldHidden'                           : false,
+                            'fieldType'                             : 'html',
+                            'fieldBazScan'                          : false,
+                            'fieldBazPostOnCreate'                  : false,
+                            'fieldBazPostOnUpdate'                  : false,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldHtmlContent'                      : ''
+                        ]
+                    )}}
+                </did>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {% set recurringOptions =
+                        [
+                            'yearly' :
+                                [
+                                    'id'            : 'yearly',
+                                    'name'          : 'YEARLY'
+                                ],
+                            'monthly' :
+                                [
+                                    'id'            : 'monthly',
+                                    'name'          : 'MONTHLY'
+                                ],
+                            'biweekly' :
+                                [
+                                    'id'            : 'biweekly',
+                                    'name'          : 'BIWEEKLY'
+                                ],
+                            'weekly' :
+                                [
+                                    'id'            : 'weekly',
+                                    'name'          : 'WEEKLY'
+                                ]
+                        ]
+                    %}
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                            : component,
+                            'componentName'                        : componentName,
+                            'componentId'                          : componentId,
+                            'sectionId'                            : sectionId,
+                            'fieldId'                              : 'type',
+                            'fieldLabel'                           : 'Type',
+                            'fieldType'                            : 'select2',
+                            'fieldHelp'                            : true,
+                            'fieldHelpTooltipContent'              : 'Check this if you want to generate a list of recurring holiday dates. Example, a yearly entry will create 10 entries 1 for each year. A monthly entry will create 24 entries for the holiday (2 years) and so on...',
+                            'fieldBazScan'                         : true,
+                            'fieldRequired'                        : true,
+                            'fieldBazPostOnCreate'                 : false,
+                            'fieldBazPostOnUpdate'                 : false,
+                            'fieldDataSelect2Options'              : recurringOptions,
+                            'fieldDataSelect2OptionsKey'           : 'id',
+                            'fieldDataSelect2OptionsValue'         : 'name',
+                            'fieldDataSelect2OptionsArray'         : true,
+                            'fieldDataSelect2OptionsSelected'      : 'none'
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'start_date',
+                            'fieldLabel'                     : 'Start Date',
+                            'fieldType'                      : 'flatpickr',
+                            'fieldFlatpickrClearButton'      : true,
+                            'fieldHelp'                      : true,
+                            'fieldRequired'                  : true,
+                            'fieldHelpTooltipContent'        : 'Start Date Example: 01-01-2030.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'end_date',
+                            'fieldLabel'                     : 'End Date',
+                            'fieldType'                      : 'flatpickr',
+                            'fieldFlatpickrClearButton'      : true,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'End Date Example: 01-01-2030. If not provided, recurring entries are only created for 1 additional year.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldValue'                     : ''
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'componentId'           : componentId,
+                            'sectionId'             : sectionId,
+                            'buttonType'            : 'button',
+                            'buttons'               :
+                                [
+                                    'generate_dates' : [
+                                        'title'                   : 'Generate Dates',
+                                        'size'                    : 'sm'
+                                    ]
+                                ]
+                        ]
+                    )}}
+                </div>
+            </div>
+        {% endif %}
     </fieldset>
 </form>
 <script>
-/* globals */
+/* globals paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -137,22 +351,103 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-id'                       : { },
-        '{{componentId}}-{{sectionId}}-name'                     : { },
-        '{{componentId}}-{{sectionId}}-state_code'               : { },
-        '{{componentId}}-{{sectionId}}-country_id'               : {
-            placeholder : 'SELECT COUNTRY'
+        '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-name'                                : { },
+        '{{componentId}}-{{sectionId}}-date'                                : {
+            dateFormat          : "Y-m-d",
+            altFormat           : "Y-m-d",
+            minDate             : "2000-01-01"
         },
-        '{{componentId}}-{{sectionId}}-form'                     : {
+        '{{componentId}}-{{sectionId}}-is_national_holiday'                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-is_national_holiday').click(function() {
+                    if ($(this)[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}}-state_ids').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-state_ids').val(0).trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-state_ids').valid();
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-state_ids').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-state_ids'                           : {
+            placeholder: 'SELECT STATES'
+        },
+        '{{componentId}}-{{sectionId}}-tags'                                : {
+            placeholder: 'SELECT OR CREATE NEW TAG(s)'
+        },
+        '{{componentId}}-{{sectionId}}-recurring_dates'                     : { },
+        '{{componentId}}-{{sectionId}}-type'                                : {
+            placeholder : 'SELECT RECURRING TYPE',
+            'allowClear' : true,
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-generate_dates').off();
+                $('#{{componentId}}-{{sectionId}}-generate_dates').click(function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['type'] = $('#{{componentId}}-{{sectionId}}-type').val();
+                    postData['start_date'] = $('#{{componentId}}-{{sectionId}}-start_date').val();
+                    postData['end_date'] = $('#{{componentId}}-{{sectionId}}-end_date').val();
+
+                    $.post('{{links.url("system/geo/holidays/generateRecurringDates")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
+                        }
+
+                        if (response.responseCode === 0) {
+                            if (response.responseData.recurringDates) {
+                                var currentVal = $('#{{componentId}}-{{sectionId}}-recurring_dates').val();
+                                var autoGenerated = 'AUTOGENERATED,';
+
+                                if (currentVal !== '') {
+                                    autoGenerated = ',AUTOGENERATED,';
+                                }
+
+                                $('#{{componentId}}-{{sectionId}}-recurring_dates').val(
+                                    currentVal.trim() + autoGenerated + response.responseData.recurringDates.join(',')
+                                );
+                            }
+                        } else {
+                            paginatedPNotify('error', {
+                                text : response.responseMessage
+                            });
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-start_date'                           : {
+            dateFormat          : "Y-m-d",
+            altFormat           : "Y-m-d",
+            minDate             : "2000-01-01",
+            onChange: function(selectedDates, dateStr, instance) {
+                if (dateStr !== '') {
+                    dataCollectionSection['{{componentId}}-{{sectionId}}-end_date']['flatpickr'].config.minDate = dateStr;
+                } else {
+                    dataCollectionSection['{{componentId}}-{{sectionId}}-end_date']['flatpickr'].config.minDate = '2000-01-01';
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-end_date'                            : {
+            dateFormat          : "Y-m-d",
+            altFormat           : "Y-m-d",
+            minDate             : "2000-01-01"
+        },
+        '{{componentId}}-{{sectionId}}-form'                                : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules: {
-                '{{componentId}}-{{sectionId}}-name'                : 'required',
-                '{{componentId}}-{{sectionId}}-state_code'          : 'required',
-                '{{componentId}}-{{sectionId}}-country_id'          : 'required'
+                '{{componentId}}-{{sectionId}}-name'                                : 'required',
+                '{{componentId}}-{{sectionId}}-date'                                : 'required',
+                '{{componentId}}-{{sectionId}}-state_ids'                           : 'required',
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-name'                : 'Please enter state name',
-                '{{componentId}}-{{sectionId}}-state_code'          : 'Please enter state code',
-                '{{componentId}}-{{sectionId}}-country_id'          : 'Please select country'
+                '{{componentId}}-{{sectionId}}-name'                                : 'Please enter state name',
+                '{{componentId}}-{{sectionId}}-date'                                : 'Please select date',
+                '{{componentId}}-{{sectionId}}-state_ids'                           : 'Please select state(s)',
             }
         }
     });

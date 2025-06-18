@@ -9,7 +9,7 @@
         'cardHeader'                : true,
         'cardType'                  : 'primary',
         'cardIcon'                  : 'globe',
-        'cardTitle'                 : 'Geo Locations (States)',
+        'cardTitle'                 : 'Geo Locations (Holidays)',
         'cardAdditionalClass'       : 'rounded-0',
         'cardShowTools'             : ['maximize'],
         'dtFilter'                  : true,
@@ -17,6 +17,24 @@
         'dtFilters'                 : table['filters'],
         'dtFilterColumns'           : table['filterColumns'],
         'dtFixedHeader'             : true,
+        'dtPrimaryButtons'          :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'add-account' : {
+                            'title'                   : 'Add New Holiday',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/geo/holidays/q/id/0')
+                        }
+                    }
+            },
         'dtTable'                   : table,
         'dtColumns'                 : table['columns'],
         'dtPostUrl'                 : table['postUrl'],
@@ -27,6 +45,6 @@
         'dtHideIdColumn'            : true,
         'dtNoOfColumnsToShow'       : 6,
         'dtTableCompact'            : true,
-        'dtZeroRecords'             : 'No states data available. States are available when country is installed and enabled.'
+        'dtZeroRecords'             : 'No holidays data available.'
     ]
 )}}
