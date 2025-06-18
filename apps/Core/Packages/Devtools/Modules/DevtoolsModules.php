@@ -923,7 +923,11 @@ class DevtoolsModules extends BasePackage
                    $moduleToReinstall['app_type'] === 'core'
         ) {//Core packages. This can be a problem for packages that are not registered in the system, example(modules_packages, modules_external...)
            //so, the user has to update whole core.
-            $class = 'System\\Base\\Providers\\CoreServiceProvider\\Install\\Install';
+            if ($moduleToReinstall['name'] === 'Core') {
+                $class = 'System\\Base\\Providers\\CoreServiceProvider\\Install\\Install';
+            } else {
+                $class = $moduleToReinstall['class'];
+            }
         }
 
         $path = lcfirst(str_replace('\\', '/', $class) . '.php');
