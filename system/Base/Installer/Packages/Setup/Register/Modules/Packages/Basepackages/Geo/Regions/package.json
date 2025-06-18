@@ -7,7 +7,7 @@
 	"category" : "basepackages",
 	"version" : "0.0.0",
 	"repo" : "https://.../",
-	"class" : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\GeoRegions",
+	"class" : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Geo\\GeoRegions",
 	"dependencies" : 
 	{
 		"core" : 
