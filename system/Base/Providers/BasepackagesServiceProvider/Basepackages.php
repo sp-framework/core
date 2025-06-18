@@ -29,6 +29,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Progress;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Pusher;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Qrcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Tags;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Templates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profiles;
@@ -108,6 +109,8 @@ class Basepackages
 	protected $murls;
 
 	protected $maintenance;
+
+	protected $tags;
 
 	public function __construct()
 	{
@@ -360,5 +363,12 @@ class Basepackages
 		$this->maintenance = (new Maintenance())->init();
 
 		return $this->maintenance;
+	}
+
+	protected function initTags()
+	{
+		$this->tags = (new Tags())->init();
+
+		return $this->tags;
 	}
 }

@@ -1,0 +1,217 @@
+{% if tag['id'] is defined %}
+    {% set tagId = tag['id'] %}
+    {% set tagName = tag['name'] %}
+    {% set tagPackage = tag['package_name'] %}
+    {% set tagDescription = tag['description'] %}
+    {% set tagSwatch = tag['swatch'] %}
+{% else %}
+    {% set tagId = '' %}
+    {% set tagName = '' %}
+    {% set tagPackage = '' %}
+    {% set tagDescription = '' %}
+    {% set tagSwatch = '#3498DB' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Tag ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Tag ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : tagId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Tag Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Name Example: OnSale. No special characters or spaces allowed.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : tagName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'package_name',
+                        'fieldLabel'                           : 'Package',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select Package',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : packages,
+                        'fieldDataSelect2OptionsKey'           : 'name',
+                        'fieldDataSelect2OptionsValue'         : 'display_name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : tagPackage
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'description',
+                        'fieldLabel'                     : 'Tag Description',
+                        'fieldType'                      : 'textarea',
+                        'fieldDataMaxLength'             : 1024,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Description of the tag',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : tagDescription
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'swatch',
+                        'fieldLabel'                     : 'Swatch',
+                        'fieldType'                      : 'colorpicker',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select color for swatch',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : tagSwatch
+                    ]
+                )}}
+            </div>
+            <did class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'preview',
+                        'fieldLabel'                            : 'Preview',
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'html',
+                        'fieldBazScan'                          : false,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldHtmlContent'                      : '<span id="swatch-preview" class="badge text-sm" style="background-color: ' ~ tagSwatch ~ '">' ~ tagName ~ '</span>'
+                    ]
+                )}}
+            </did>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals paginatedPNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-name'                                : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-name').keyup(function(e) {
+                    $('#swatch-preview').html($('#{{componentId}}-{{sectionId}}-name').val());
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-package_name'                        : {
+            placeholder: 'SELECT PACKAGE'
+        },
+        '{{componentId}}-{{sectionId}}-description'                         : { },
+        '{{componentId}}-{{sectionId}}-swatch'                              : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-swatch').on('colorpickerChange', function(e) {
+                    $('#swatch-preview').css('background-color', e.color.toString());
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                                : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                                : 'required',
+                '{{componentId}}-{{sectionId}}-package_name'                        : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                                : 'Please enter state name',
+                '{{componentId}}-{{sectionId}}-package_name'                        : 'Please package'
+            }
+        }
+    });
+</script>

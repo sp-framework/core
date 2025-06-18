@@ -1,0 +1,35 @@
+{% if tag['id'] is defined %}
+    {% set title = 'Tag (' ~ tag['name'] ~ ')' %}
+    {% set tagId = tag['id'] %}
+{% else %}
+    {% set title = 'New Tag' %}
+    {% set tagId = '' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'tags',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'tags/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : tagId,
+            'addActionUrl'                  : 'system/tags/add',
+            'addSuccessRedirectUrl'         : 'system/tags',
+            'updateActionUrl'               : 'system/tags/update',
+            'updateSuccessRedirectUrl'      : 'system/tags',
+            'cancelActionUrl'               : 'system/tags',
+            'closeActionUrl'                : 'system/tags'
+        ]
+    ]
+)}}

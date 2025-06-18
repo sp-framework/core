@@ -28,6 +28,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages\StoragesLocal;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Tags;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Templates;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Agents;
@@ -86,6 +87,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Basepackage
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesStorages;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesTags;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesTemplates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesWidgets;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Dashboards\BasepackagesDashboardsWidgets;
@@ -183,6 +185,10 @@ class Schema
                 'modules_externals'                         => [
                         'schema'    => new Externals,
                         'model'     => new ModulesExternals,
+                    ],
+                'basepackages_tags'                         => [
+                        'schema'    => new Tags,
+                        'model'     => new BasepackagesTags,
                     ],
                 'basepackages_email_services'               => [
                         'schema'    => new EmailServices,
