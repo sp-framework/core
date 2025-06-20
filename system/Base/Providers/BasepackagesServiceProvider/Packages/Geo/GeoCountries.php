@@ -235,7 +235,7 @@ class GeoCountries extends BasePackage
         }
     }
 
-    public function isEnabled($returnData = false)
+    public function isEnabled($countryId = null, $returnData = false)
     {
         if ($this->config->databasetype === 'db') {
             $conditions =
@@ -245,8 +245,18 @@ class GeoCountries extends BasePackage
                         'cEnabled'  => 1
                     ]
                 ];
+
+            if ($countryId) {
+                $conditions['conditions'] = 'enabled = :cEnabled: AND id = :cId:';
+                $conditions['bind']['cId'] = $countryId;
+            }
         } else {
             $conditions = ['conditions' => ['enabled', '=', 1]];
+
+            if ($countryId) {
+                $conditions['conditions'] = [$conditions['conditions']];
+                array_push($conditions['conditions'], ['id', '=', (int) $countryId]);
+            }
         }
 
         $searchEnabledCountries = $this->getByParams($conditions);
@@ -256,34 +266,13 @@ class GeoCountries extends BasePackage
                 return $searchEnabledCountries;
             }
 
-            return true;
-        }
-
-        return [];
-    }
-
-    public function currencyEnabled($returnData = false)
-    {
-        if ($this->config->databasetype === 'db') {
-            $conditions =
-                [
-                    'conditions'    => 'currency_enabled = :cEnabled:',
-                    'bind'          => [
-                        'cEnabled'  => 1
-                    ]
-                ];
-        } else {
-            $conditions = ['conditions' => ['currency_enabled', '=', 1]];
-        }
-
-        $searchEnabledCurrencies = $this->getByParams($conditions);
-
-        if ($searchEnabledCurrencies) {
-            if ($returnData) {
-                return $searchEnabledCurrencies;
+            if ($countryId) {
+                return true;
             }
+        }
 
-            return true;
+        if ($countryId) {
+            return false;
         }
 
         return [];
