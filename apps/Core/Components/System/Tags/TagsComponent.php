@@ -67,16 +67,16 @@ class TagsComponent extends BaseComponent
         }
 
         $this->generateDTContent(
-            $this->tags,
-            'system/tags/view',
-            null,
-            ['name', 'package_name', 'swatch', 'package_row_ids'],
-            true,
-            ['name', 'package_name', 'swatch'],
-            $controlActions,
-            ['package_row_ids' => '# of times used'],
-            $replaceColumns,
-            'name'
+            package : $this->tags,
+            postUrl : 'system/tags/view',
+            postUrlParams : null,
+            columnsForTable : ['name', 'package_name', 'swatch', 'package_row_ids'],
+            columnsForFilter : ['name', 'package_name', 'swatch'],
+            controlActions : $controlActions,
+            dtReplaceColumnsTitle : ['package_row_ids' => '# of times used'],
+            dtReplaceColumns :$replaceColumns,
+            dtNotificationTextFromColumn :'name',
+            excludeColumns : ['swatch']
         );
 
         $this->view->pick('tags/list');

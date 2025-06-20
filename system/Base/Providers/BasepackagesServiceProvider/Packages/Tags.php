@@ -64,7 +64,7 @@ class Tags extends BasePackage
         if (!isset($data['swatch']) ||
             (isset($data['swatch']) && $data['swatch'] === '')
         ) {
-            $data['swatch'] = strtoupper(\Colors\RandomColor::one(['luminosity' => 'light']));
+            unset($data['swatch']);
         }
 
         if (!$this->modules->packages->getPackageByName($data['package_name'])) {
