@@ -4,7 +4,6 @@ namespace Apps\Core\Components\System\Geo\Timezones;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use System\Base\BaseComponent;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoExtractData;
 
 class TimezonesComponent extends BaseComponent
 {

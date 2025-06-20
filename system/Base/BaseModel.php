@@ -2,7 +2,6 @@
 
 namespace System\Base;
 
-use Phalcon\Helper\Arr;
 use Phalcon\Mvc\Model;
 
 abstract class BaseModel extends Model
