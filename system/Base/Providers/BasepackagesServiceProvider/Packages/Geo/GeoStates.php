@@ -13,6 +13,8 @@ class GeoStates extends BasePackage
 
     public $geoStates;
 
+    protected $countries;
+
     public function searchStates(string $stateQueryString)
     {
         if ($this->config->databasetype === 'db') {
@@ -33,12 +35,14 @@ class GeoStates extends BasePackage
 
         if ($searchStates) {
             foreach ($searchStates as $stateKey => $stateValue) {
-                $country = $this->basepackages->geoCountries->getById($stateValue['country_id']);
+                if (!isset($this->countries[$stateValue['country_id']])) {
+                    $this->countries[$stateValue['country_id']] = $this->basepackages->geoCountries->getById($stateValue['country_id']);
+                }
 
-                if ($country['enabled'] == 1 && $country['installed'] == 1) {
+                if ($this->countries[$stateValue['country_id']]['enabled'] == 1 && $this->countries[$stateValue['country_id']]['installed'] == 1) {
                     $states[$stateKey] = $stateValue;
-                    $states[$stateKey]['country_id'] = $country['id'];
-                    $states[$stateKey]['country_name'] = $country['name'];
+                    $states[$stateKey]['country_id'] = $this->countries[$stateValue['country_id']]['id'];
+                    $states[$stateKey]['country_name'] = $this->countries[$stateValue['country_id']]['name'];
                 }
             }
         }
@@ -68,12 +72,14 @@ class GeoStates extends BasePackage
 
         if ($searchStates) {
             foreach ($searchStates as $stateKey => $stateValue) {
-                $country = $this->basepackages->geoCountries->getById($stateValue['country_id']);
+                if (!isset($this->countries[$stateValue['country_id']])) {
+                    $this->countries[$stateValue['country_id']] = $this->basepackages->geoCountries->getById($stateValue['country_id']);
+                }
 
-                if ($country['enabled'] == 1 && $country['installed'] == 1) {
+                if ($this->countries[$stateValue['country_id']]['enabled'] == 1 && $this->countries[$stateValue['country_id']]['installed'] == 1) {
                     $states[$stateKey] = $stateValue;
-                    $states[$stateKey]['country_id'] = $country['id'];
-                    $states[$stateKey]['country_name'] = $country['name'];
+                    $states[$stateKey]['country_id'] = $this->countries[$stateValue['country_id']]['id'];
+                    $states[$stateKey]['country_name'] = $this->countries[$stateValue['country_id']]['name'];
                 }
             }
         }

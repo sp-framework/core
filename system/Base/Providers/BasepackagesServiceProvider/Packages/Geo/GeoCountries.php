@@ -139,6 +139,8 @@ class GeoCountries extends BasePackage
         }
 
         $country['installed'] = 0;
+        $country['enabled'] = 0;
+        $country['currency_enabled'] = 0;
 
         if ($this->update($country)) {
             $this->addResponse('Uninstalled country ' . $country['name']);
@@ -238,13 +240,13 @@ class GeoCountries extends BasePackage
         if ($this->config->databasetype === 'db') {
             $conditions =
                 [
-                    'conditions'    => 'currency_enabled = :cEnabled:',
+                    'conditions'    => 'enabled = :cEnabled:',
                     'bind'          => [
                         'cEnabled'  => 1
                     ]
                 ];
         } else {
-            $conditions = ['conditions' => ['currency_enabled', '=', 1]];
+            $conditions = ['conditions' => ['enabled', '=', 1]];
         }
 
         $searchEnabledCountries = $this->getByParams($conditions);

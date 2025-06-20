@@ -13,6 +13,10 @@ class GeoCities extends BasePackage
 
     public $geoCities;
 
+    protected $countries = [];
+
+    protected $states = [];
+
     public function addCity(array $data)
     {
         //
@@ -42,15 +46,24 @@ class GeoCities extends BasePackage
 
         if ($searchCities) {
             foreach ($searchCities as $cityKey => $cityValue) {
-                $country = $this->basepackages->geoCountries->getById($cityValue['country_id']);
+                if (!isset($this->countries[$cityValue['country_id']])) {
+                    $this->countries[$cityValue['country_id']] = $this->basepackages->geoCountries->getById($cityValue['country_id']);
+                }
 
-                if ($country['enabled'] == 1 && $country['installed'] == 1) {
+                if ($this->countries[$cityValue['country_id']]['enabled'] == 1 && $this->countries[$cityValue['country_id']]['installed'] == 1) {
                     $cities[$cityKey] = $cityValue;
-                    $state = $this->basepackages->geoStates->getById($cityValue['state_id']);
-                    $cities[$cityKey]['state_id'] = $state['id'];
-                    $cities[$cityKey]['state_name'] = $state['name'];
-                    $cities[$cityKey]['country_id'] = $country['id'];
-                    $cities[$cityKey]['country_name'] = $country['name'];
+                    if (!isset($this->states[$cityValue['state_id']])) {
+                        $this->states[$cityValue['state_id']] = $this->basepackages->geoStates->getById($cityValue['state_id']);
+
+                        if (!$this->states[$cityValue['state_id']]) {
+                            continue;
+                        }
+                    }
+
+                    $cities[$cityKey]['state_id'] = $this->states[$cityValue['state_id']]['id'];
+                    $cities[$cityKey]['state_name'] = $this->states[$cityValue['state_id']]['name'];
+                    $cities[$cityKey]['country_id'] = $this->countries[$cityValue['country_id']]['id'];
+                    $cities[$cityKey]['country_name'] = $this->countries[$cityValue['country_id']]['name'];
                 }
             }
         }
@@ -100,15 +113,24 @@ class GeoCities extends BasePackage
 
         if ($searchPostCodes) {
             foreach ($searchPostCodes as $postCodeKey => $postCodeValue) {
-                $country = $this->basepackages->geoCountries->getById($postCodeValue['country_id']);
+                if (!isset($this->countries[$cityValue['country_id']])) {
+                    $this->countries[$cityValue['country_id']] = $this->basepackages->geoCountries->getById($postCodeValue['country_id']);
+                }
 
-                if ($country['enabled'] == 1 && $country['installed'] == 1) {
+                if ($this->countries[$cityValue['country_id']]['enabled'] == 1 && $this->countries[$cityValue['country_id']]['installed'] == 1) {
                     $postCodes[$postCodeKey] = $postCodeValue;
-                    $state = $this->basepackages->geoStates->getById($postCodeValue['state_id']);
-                    $postCodes[$postCodeKey]['state_id'] = $state['id'];
-                    $postCodes[$postCodeKey]['state_name'] = $state['name'];
-                    $postCodes[$postCodeKey]['country_id'] = $country['id'];
-                    $postCodes[$postCodeKey]['country_name'] = $country['name'];
+                    if (!isset($this->states[$postCodeValue['state_id']])) {
+                        $this->states[$postCodeValue['state_id']] = $this->basepackages->geoStates->getById($postCodeValue['state_id']);
+
+                        if (!$this->states[$postCodeValue['state_id']]) {
+                            continue;
+                        }
+                    }
+
+                    $postCodes[$postCodeKey]['state_id'] = $this->states[$postCodeValue['state_id']]['id'];
+                    $postCodes[$postCodeKey]['state_name'] = $this->states[$postCodeValue['state_id']]['name'];
+                    $postCodes[$postCodeKey]['country_id'] = $this->countries[$cityValue['country_id']]['id'];
+                    $postCodes[$postCodeKey]['country_name'] = $this->countries[$cityValue['country_id']]['name'];
                 }
             }
         }
