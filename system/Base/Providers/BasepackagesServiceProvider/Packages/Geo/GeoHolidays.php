@@ -213,10 +213,10 @@ class GeoHolidays extends BasePackage
             $counter = 1;
 
             for ($generateRecurring = 0; $generateRecurring < $recurr; $generateRecurring++) {
-                if (($type === 'yearly' && $generateRecurring === 9) ||
-                    ($type === 'monthly' && $generateRecurring === 23) ||
-                    ($type === 'biweekly' && $generateRecurring === 25) ||
-                    ($type === 'weekly' && $generateRecurring === 51)
+                if (!isset($data['end_date']) && ($type === 'yearly' && $generateRecurring === 9) ||
+                    !isset($data['end_date']) && ($type === 'monthly' && $generateRecurring === 23) ||
+                    !isset($data['end_date']) && ($type === 'biweekly' && $generateRecurring === 25) ||
+                    !isset($data['end_date']) && ($type === 'weekly' && $generateRecurring === 51)
                 ) {
                     break;
                 }

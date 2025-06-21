@@ -198,7 +198,6 @@
                             'fieldId'                        : 'recurring_dates',
                             'fieldLabel'                     : 'Recurring Dates',
                             'fieldType'                      : 'textarea',
-                            'fieldDataMaxLength'             : 1024,
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Recurring Dates. A same entry will be created on the following provided dates. Date format is Y-m-d (2023-01-01). Each date should be comma separated.',
                             'fieldRequired'                  : false,
@@ -206,8 +205,8 @@
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnCreate'           : true,
                             'fieldBazPostOnUpdate'           : true,
-                            'fieldDataInputMaxLength'        : 2048,
-                            'fieldTextareaRows'              : 3,
+                            'fieldDataInputMaxLength'        : 4096,
+                            'fieldTextareaRows'              : 4,
                             'fieldValue'                     : ''
                         ]
                     )}}
@@ -402,8 +401,8 @@
                                     'fieldHelpTooltipContent'               : 'Days of the week.',
                                     'fieldRequired'                         : true,
                                     'fieldBazScan'                          : true,
-                                    'fieldBazPostOnCreate'                  : true,
-                                    'fieldBazPostOnUpdate'                  : true,
+                                    'fieldBazPostOnCreate'                  : false,
+                                    'fieldBazPostOnUpdate'                  : false,
                                     'fieldDataSelect2Options'               : weekdays,
                                     'fieldDataSelect2OptionsKey'            : 'id',
                                     'fieldDataSelect2OptionsValue'          : 'name',
