@@ -15,6 +15,10 @@ class GeoHolidays extends BasePackage
 
     public function addHoliday($data)
     {
+        $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+        $this->ffStore->setReadIndex(false);
+
         $data = $this->jsonData($data, true);
 
         try {
@@ -25,14 +29,10 @@ class GeoHolidays extends BasePackage
             return false;
         }
 
-        if (isset($data['state_ids']['data'])) {
-            $data['state_ids'] = $data['state_ids']['data'];
-        }
-
         if (!isset($data['is_national_holiday']) ||
             (isset($data['is_national_holiday']) &&
              $data['is_national_holiday'] == 0 &&
-             count($data['state_ids']) === 0)
+             $data['state_id'] === 0)
         ) {
             $this->addResponse('Please provide state information', 1);
 
@@ -104,12 +104,6 @@ class GeoHolidays extends BasePackage
         }
 
         foreach ($dataArr as $dataEntry) {
-            // $dataEntryDate = explode('-', $dataEntry['date']);
-
-            // $dataEntry['year'] = $dataEntryDate[0];
-            // $dataEntry['month'] = $dataEntryDate[1];
-            // $dataEntry['date'] = $dataEntryDate[2];
-
             if ($this->add($dataEntry)) {
                 if (isset($data['tags']['data']) && count($data['tags']['data']) > 0) {
                     foreach ($data['tags']['data'] as $oldTag) {
@@ -164,42 +158,55 @@ class GeoHolidays extends BasePackage
             return false;
         }
 
-        $startDate = \Carbon\Carbon::parse($data['start_date']);
+        if (!isset($data['end_date']) ||
+            isset($data['end_date']) && $data['end_date'] === ''
+        ) {
+            $this->addResponse('Please provide end date', 1);
+
+            return false;
+        }
+
+        try {
+            $startDate = \Carbon\Carbon::parse($data['start_date']);
+            $endDate = \Carbon\Carbon::parse($data['end_date']);
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
 
         $type = $data['type'];
-
-        $endDate = false;
-        // trace([$data]);
-        if (isset($data['end_date']) &&
-            $data['end_date'] !== ''
-        ) {
-            try {
-                $endDate = \Carbon\Carbon::parse($data['end_date']);
-            } catch (\throwable $e) {
-                //Do nothing
-            }
-        }
 
         $recurringDates = [];
 
         $recurr = 1;
 
         if ($type === 'yearly') {
-            if ($endDate) {
-                $recurr = (int) floor($startDate->diffInYears($endDate));
-            }
+            $recurr = (int) floor($startDate->diffInYears($endDate));
         } else if ($type === 'monthly') {
-            if ($endDate) {
-                $recurr = (int) floor($startDate->diffInMonths($endDate));
-            }
+            $recurr = (int) floor($startDate->diffInMonths($endDate));
         } else if ($type === 'biweekly') {
-            if ($endDate) {
-                $recurr = (int) floor($startDate->diffInWeeks($endDate));
-            }
+            $recurr = (int) floor($startDate->diffInWeeks($endDate));
         } else if ($type === 'weekly') {
-            if ($endDate) {
-                $recurr = (int) floor($startDate->diffInWeeks($endDate));
+            $recurr = (int) floor($startDate->diffInWeeks($endDate));
+        } else if ($type === 'xth') {
+            if (!isset($data['xth']) ||
+                isset($data['xth']) && $data['xth'] === ''
+            ) {
+                $this->addResponse('Please provide xth value', 1);
+
+                return false;
             }
+
+            if (!isset($data['weekly_day']) ||
+                isset($data['weekly_day']) && $data['weekly_day'] === ''
+            ) {
+                $this->addResponse('Please provide weekly day', 1);
+
+                return false;
+            }
+
+            $recurr = (int) floor($startDate->diffInMonths($endDate)) + 1;
         }
 
         if ($recurr > 0) {
@@ -228,6 +235,52 @@ class GeoHolidays extends BasePackage
                     $counter++;
                 } else if ($type === 'weekly') {
                     $recurringDate = (\Carbon\Carbon::parse($data['start_date']))->addWeek($counter);
+                } else if ($type === 'xth') {
+                    if ($generateRecurring === 0) {
+                        $startOfMonth = (\Carbon\Carbon::parse($data['start_date']))->startOfMonth();
+                    } else {
+                        $startOfMonth = (\Carbon\Carbon::parse($data['start_date']))->addMonth($counter - 1)->startOfMonth();
+                    }
+
+                    $startOfMonthMonth = $startOfMonth->month;
+
+                    if ($startOfMonth->dayOfWeek == $data['weekly_day']) {
+                        $weekDays = $this->basepackages->workers->schedules->getWeekdays();
+
+                        if ($data['xth'] == '1') {
+                            $week = $startOfMonth->startOfWeek(\Carbon\Carbon::{strtoupper($weekDays[$data['weekly_day']]['name'])});
+                        } else {
+                            $week = $startOfMonth->addWeek((int) $data['xth'] - 1)->startOfWeek(\Carbon\Carbon::{strtoupper($weekDays[$data['weekly_day']]['name'])});
+                        }
+                    } else {
+                        if ($data['xth'] == '1') {
+                            $week = $startOfMonth;
+                        } else {
+                            if ($startOfMonth->dayOfWeek === 0) {
+                                if ($data['xth'] == '1') {
+                                    $week = $startOfMonth;
+                                } else {
+                                    $week = $startOfMonth->addWeek((int) $data['xth'])->startOfWeek();
+                                }
+                            } else {
+                                $week = $startOfMonth->addWeek((int) $data['xth'] - 1)->startOfWeek();
+                            }
+                        }
+                    }
+
+                    if ($week->dayOfWeek != $data['weekly_day']) {
+                        while ($week->dayOfWeek != $data['weekly_day']) {
+                            $week->addDay();
+                        }
+                    }
+
+                    if ($startOfMonthMonth !== $startOfMonth->month) {
+                        $counter++;
+
+                        continue;
+                    }
+
+                    $recurringDate = $week;
                 }
 
                 if ($recurringDate->gt(\Carbon\Carbon::parse($data['end_date']))) {
@@ -249,10 +302,6 @@ class GeoHolidays extends BasePackage
     {
         $data = $this->jsonData($data, true);
 
-        if (isset($data['state_ids']['data'])) {
-            $data['state_ids'] = $data['state_ids']['data'];
-        }
-
         if (isset($data['tags']['newTags']) && count($data['tags']['newTags']) > 0) {
             foreach ($data['tags']['newTags'] as $newTag) {
                 if (!$this->basepackages->tags->checkTag($newTag)) {
@@ -273,12 +322,6 @@ class GeoHolidays extends BasePackage
 
             return false;
         }
-
-        // $dataEntryDate = explode('-', $data['date']);
-
-        // $data['year'] = $dataEntryDate[0];
-        // $data['month'] = $dataEntryDate[1];
-        // $data['date'] = $dataEntryDate[2];
 
         $holiday = array_replace($holiday, $data);
 

@@ -21,31 +21,30 @@ class HolidaysComponent extends BaseComponent
      */
     public function viewAction()
     {
-        if (isset($this->getData()['id'])) {
-            $enabledCountries = $this->basepackages->geoCountries->isEnabled(true);
+        $enabledCountries = $this->basepackages->geoCountries->isEnabled(null, true);
 
-            $enabledStates = [];
+        $enabledStates = [];
 
-            if ($enabledCountries && count($enabledCountries) > 0) {
-                foreach ($enabledCountries as $enabledCountry) {
-                    $states = $this->basepackages->geoStates->searchStatesByCountryId($enabledCountry['id']);
+        if ($enabledCountries && count($enabledCountries) > 0) {
+            $enabledCountries = msort($enabledCountries, 'name');
 
-                    if ($states && count($states) > 0) {
-                        $enabledStates = array_merge($enabledStates, $states);
-                    }
+            foreach ($enabledCountries as $enabledCountry) {
+                $states = $this->basepackages->geoStates->searchStatesByCountryId($enabledCountry['id']);
+
+                $states = msort($states, 'name');
+
+                if ($states && count($states) > 0) {
+                    $enabledStates[$enabledCountry['id']] = $states;
                 }
             }
 
-            $this->view->states = $enabledStates;
+        }
 
-            $this->view->tags = $this->basepackages->tags->getTagsByPackageName('GeoHolidays');
-
+        if (isset($this->getData()['id'])) {
             $holidayTags = [];
 
             if ($this->getData()['id'] != 0) {
                 $holiday = $this->basepackages->geoHolidays->getById($this->getData()['id']);
-
-                $holiday['date'] = $holiday['year'] . '-' . $holiday['month'] . '-' . $holiday['date'];
 
                 $this->view->holiday = $holiday;
 
@@ -60,9 +59,17 @@ class HolidaysComponent extends BaseComponent
                         array_push($holidayTags, $tag['id']);
                     }
                 }
+            } else {
+                $this->view->weekdays = $this->basepackages->workers->schedules->getWeekdays();
             }
 
+            $this->view->countries = $enabledCountries;
+
+            $this->view->states = $enabledStates;
+
             $this->view->holidayTags = $holidayTags;
+
+            $this->view->tags = $this->basepackages->tags->getTagsByPackageName('GeoHolidays');
 
             $this->view->pick('holidays/view');
 
@@ -78,16 +85,40 @@ class HolidaysComponent extends BaseComponent
                 ]
             ];
 
+        $replaceColumns =
+            function ($dataArr) {
+                if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
+                    foreach ($dataArr as &$data) {
+                        if ($data['is_national_holiday'] == '1') {
+                            $data['is_national_holiday'] = 'Yes';
+                            $data['state_id'] = '-';
+                        } else {
+                            $data['is_national_holiday'] = 'No';
+
+                            $state = $this->basepackages->geoStates->getById($data['state_id']);
+
+                            if ($state) {
+                                $data['state_id'] = $state['name'];
+                            } else {
+                                $data['state_id'] = '-';
+                            }
+                        }
+                    }
+                }
+
+                return $dataArr;
+            };
+
         $this->generateDTContent(
             $this->geoHolidays,
             'system/geo/holidays/view',
             null,
-            ['name', 'date', 'is_national_holiday'],
+            ['name', 'date', 'is_national_holiday', 'state_id'],
             true,
-            ['name', 'date', 'is_national_holiday'],
+            ['name', 'date', 'is_national_holiday', 'state_id'],
             $controlActions,
-            [],
-            null,
+            ['state_id' => 'State'],
+            $replaceColumns,
             'name'
         );
 
