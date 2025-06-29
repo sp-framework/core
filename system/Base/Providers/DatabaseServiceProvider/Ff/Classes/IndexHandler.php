@@ -60,6 +60,10 @@ class IndexHandler
 
     public function setIndex($content, $remove = false, $reIndex = false)
     {
+        if (!$content) {
+            return false;
+        }
+
         if (is_string($content)) {
             $content = json_decode($content, true);
         }
@@ -90,7 +94,7 @@ class IndexHandler
                                     continue;
                                 }
 
-                                if (!checkCtype($contentWord, 'alpha')) {//Ignore Special chars
+                                if (!checkCtype($contentWord, 'alnum')) {//Ignore Special chars
                                     continue;
                                 }
 
@@ -109,7 +113,7 @@ class IndexHandler
                                 continue;
                             }
 
-                            if (!checkCtype($content[$index], 'alpha')) {//Ignore Special chars
+                            if (!checkCtype($content[$index], 'alnum')) {//Ignore Special chars
                                 continue;
                             }
 

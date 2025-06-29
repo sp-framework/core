@@ -1700,6 +1700,10 @@ class Store
                                     $data[$propertyKey] = 'false';
                                 }
                             }
+
+                            if (is_array($data[$propertyKey])) {
+                                $data[$propertyKey] = json_encode($data[$propertyKey]);
+                            }
                         }
 
                         if ($type === 'boolean') {
