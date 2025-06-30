@@ -128,6 +128,8 @@ class DocumentFinder
                     }
                 }
             }
+
+            $found = msort($found, 'id');
         }
 
         if (!$indexSearched && count($found) === 0) {
