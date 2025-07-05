@@ -413,7 +413,15 @@ class DevtoolsModules extends BasePackage
                 return false;
             }
         } else if ($data['module_type'] === 'views') {
-            //
+            if (isset($data['is_subview']) && $data['is_subview'] == true) {
+                if (!isset($data['base_view_module_id']) ||
+                    (isset($data['base_view_module_id']) && $data['base_view_module_id'] == 0)
+                ) {
+                    $this->addResponse('Please add base view in dependencies!', 1);
+
+                    return false;
+                }
+            }
         }
 
         return true;

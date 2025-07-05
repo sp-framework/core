@@ -4,7 +4,11 @@
     {% for moduleType, modulesArr in modules %}
         {% if modulesArr['childs'] is defined and modulesArr['childs']|length > 0 %}
             {% for moduleArr in modulesArr['childs'] %}
-                {% set url = links.url('devtools/modules/q/module/true/type/' ~ moduleArr['module_type'] ~ '/id/' ~ moduleArr['id']) %}
+                {% set isSubView = '' %}
+                {% if moduleArr['module_type'] == 'views' and  moduleArr['is_subview'] == true %}
+                    {% set isSubView = '/subview/true' %}
+                {% endif %}
+                {% set url = links.url('devtools/modules/q/module/true/type/' ~ moduleArr['module_type'] ~ '/id/' ~ moduleArr['id'] ~ isSubView) %}
                 {% set moduleEdit =
                     '<button href="' ~ url ~ '" type="button" data-id="' ~ moduleArr['id'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="ml-1 mr-1 text-white btn btn-primary btn-xs editModule">' ~
                     '   <i class="fas fa-fw fa-xs fa-edit"></i>' ~
