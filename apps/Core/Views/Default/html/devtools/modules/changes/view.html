@@ -8,10 +8,16 @@
                 {% if moduleArr['module_type'] == 'views' and  moduleArr['is_subview'] == true %}
                     {% set isSubView = '/subview/true' %}
                 {% endif %}
-                {% set url = links.url('devtools/modules/q/module/true/type/' ~ moduleArr['module_type'] ~ '/id/' ~ moduleArr['id'] ~ isSubView) %}
+                {% set editUrl = links.url('devtools/modules/q/module/true/type/' ~ moduleArr['module_type'] ~ '/id/' ~ moduleArr['id'] ~ isSubView) %}
+                {% set releaseUrl = links.url('devtools/modules/q/module/true/type/' ~ moduleArr['module_type'] ~ '/id/' ~ moduleArr['id'] ~ '/newrelease/true') %}
                 {% set moduleEdit =
-                    '<button href="' ~ url ~ '" type="button" data-id="' ~ moduleArr['id'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="ml-1 mr-1 text-white btn btn-primary btn-xs editModule">' ~
+                    '<button href="' ~ editUrl ~ '" type="button" data-id="' ~ moduleArr['id'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="ml-1 mr-1 text-white btn btn-primary btn-xs editModule">' ~
                     '   <i class="fas fa-fw fa-xs fa-edit"></i>' ~
+                    '</button>'
+                %}
+                {% set moduleRelease =
+                    '<button href="' ~ releaseUrl ~ '" type="button" data-id="' ~ moduleArr['id'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="ml-1 mr-1 text-white btn btn-success btn-xs releaseModule">' ~
+                    '   <i class="fas fa-fw fa-xs fa-wand-magic-sparkles"></i>' ~
                     '</button>'
                 %}
                 {% set moduleUrl = '-' %}
@@ -40,7 +46,7 @@
                 '           <td>' ~ moduleUrl ~ '</td>' ~
                 '           <td>' ~ moduleVersion ~ '</td>' ~
                 '           <td>' ~ moduleModified ~ '</td>' ~
-                '           <td id="{{componentId}}-{{sectionId}}-changes-modules-' ~ moduleArr['name'] ~ '">' ~  moduleEdit ~ '</td>' ~
+                '           <td id="{{componentId}}-{{sectionId}}-changes-modules-' ~ moduleArr['name'] ~ '">' ~  moduleEdit ~ moduleRelease ~ '</td>' ~
                 '       </tr>' %}
             {% endfor %}
         {% endif %}
@@ -80,7 +86,7 @@
                         <th class="text-uppercase">Repository</th>
                         <th class="text-uppercase">Latest Version</th>
                         <th class="text-uppercase">Modified</th>
-                        <th class="text-uppercase">Edit</th>
+                        <th class="text-uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -188,6 +194,13 @@ dataCollectionSectionForm['funcs']['init'] = function() {
 
     $('.editModule').off();
     $('.editModule').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['browse']($(this).attr('href'));
+    });
+
+    $('.releaseModule').off();
+    $('.releaseModule').click(function(e) {
         e.preventDefault();
 
         dataCollectionSectionForm['funcs']['browse']($(this).attr('href'));
