@@ -110,6 +110,7 @@
         </div>
     </fieldset>
 </form>
+{% set menuMenu = escaper.js(json_encode(menuMenu, 16)) %}
 <script>
 /* globals */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;

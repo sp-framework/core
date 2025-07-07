@@ -236,7 +236,7 @@
             <div class="row mb-3">
                 <div class="col">
                     {% set noMenuChecked = false %}
-                    {% if moduleMenu == 'false' %}
+                    {% if moduleMenu == 'false' or moduleMenu == '"false"' or moduleMenu == false %}
                         {% set noMenuChecked = true %}
                     {% endif %}
                     {{adminltetags.useTag('fields',

@@ -9691,6 +9691,7 @@ var BazContentFields = function() {
 // Object.defineProperty(exports, '__esModule', { value: true });
 
 // }));
+
 /* exported BazContentFieldsValidator */
 /* globals */
 /*
