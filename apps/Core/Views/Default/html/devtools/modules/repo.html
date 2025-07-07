@@ -5,14 +5,18 @@
         'componentId'                   : componentId,
         'parentComponentId'             : parent,
         'sectionId'                     : 'repo',
-        'contentType'                   : 'section',
+        'contentType'                   : 'sectionWithForm',
         'cardHeader'                    : true,
-        'cardFooter'                    : false,
+        'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'th',
         'cardTitle'                     : 'Remote Repo',
         'cardAdditionalClass'           : 'rounded-0',
         'cardShowTools'                 : ['packageSettings'],
-        'cardBodyInclude'               : 'modules/repo/view'
+        'cardBodyInclude'               : 'modules/repo/view',
+        'formButtons'                   :
+        [
+            'closeActionUrl'            : 'devtools/modules'
+        ]
     ]
 )}}
