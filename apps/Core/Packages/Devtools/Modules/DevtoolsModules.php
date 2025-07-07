@@ -384,42 +384,44 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
-        if ($data['module_type'] === 'components') {
-            $data = $this->checkAppType($data);
-            $data = $this->checkModuleTypeAndCategory($data);
-            $data['class'] = str_replace('Apps\\' . ucfirst($data['app_type']) . '\\' . ucfirst($data['module_type']) . '\\', '', $data['class']);
-            $data['class'] = str_replace('Component', '', $data['class']);
-            $classArr = explode('\\', $data['class']);
-            array_pop($classArr);
+        if (isset($data['module_type'])) {
+            if ($data['module_type'] === 'components') {
+                $data = $this->checkAppType($data);
+                $data = $this->checkModuleTypeAndCategory($data);
+                $data['class'] = str_replace('Apps\\' . ucfirst($data['app_type']) . '\\' . ucfirst($data['module_type']) . '\\', '', $data['class']);
+                $data['class'] = str_replace('Component', '', $data['class']);
+                $classArr = explode('\\', $data['class']);
+                array_pop($classArr);
 
-            $routeArr = explode('/', trim($data['route'], '/'));
-            array_walk($routeArr, function(&$route) {
-                $route = ucfirst($route);
-            });
+                $routeArr = explode('/', trim($data['route'], '/'));
+                array_walk($routeArr, function(&$route) {
+                    $route = ucfirst($route);
+                });
 
-            $compare = array_diff($classArr, $routeArr);
+                $compare = array_diff($classArr, $routeArr);
 
-            if (count($compare) > 0) {
-                $this->addResponse('Route and class do not match!', 1);
-
-                return false;
-            }
-        } else if ($data['module_type'] === 'packages' || $data['module_type'] === 'middlewares') {
-            $classArr = explode('\\', $data['class']);
-
-            if (strtolower($this->helper->last($classArr)) !== strtolower($data['name'])) {
-                $this->addResponse('Name and class do not match!', 1);
-
-                return false;
-            }
-        } else if ($data['module_type'] === 'views') {
-            if (isset($data['is_subview']) && $data['is_subview'] == true) {
-                if (!isset($data['base_view_module_id']) ||
-                    (isset($data['base_view_module_id']) && $data['base_view_module_id'] == 0)
-                ) {
-                    $this->addResponse('Please add base view in dependencies!', 1);
+                if (count($compare) > 0) {
+                    $this->addResponse('Route and class do not match!', 1);
 
                     return false;
+                }
+            } else if ($data['module_type'] === 'packages' || $data['module_type'] === 'middlewares') {
+                $classArr = explode('\\', $data['class']);
+
+                if (strtolower($this->helper->last($classArr)) !== strtolower($data['name'])) {
+                    $this->addResponse('Name and class do not match!', 1);
+
+                    return false;
+                }
+            } else if ($data['module_type'] === 'views') {
+                if (isset($data['is_subview']) && $data['is_subview'] == true) {
+                    if (!isset($data['base_view_module_id']) ||
+                        (isset($data['base_view_module_id']) && $data['base_view_module_id'] == 0)
+                    ) {
+                        $this->addResponse('Please add base view in dependencies!', 1);
+
+                        return false;
+                    }
                 }
             }
         }
@@ -505,7 +507,7 @@ class DevtoolsModules extends BasePackage
                 $this->modules->{$module['module_type']}->remove($module['id']);
             }
 
-            if ($data['module_type'] !== 'bundles') {
+            if (isset($module['module_type']) && $data['module_type'] !== 'bundles') {
                 $this->reCalculateFilesHash($module, true);
             }
 
@@ -3551,7 +3553,7 @@ $file .= '
         $this->validation->init()->add('api_id', PresenceOf::class, ["message" => "Please provide api id."]);
         $this->validation->add('app_type', PresenceOf::class, ["message" => "Please provide app type."]);
         $this->validation->add('module_type', PresenceOf::class, ["message" => "Please provide module type."]);
-        if ($data['module_type'] !== 'bundles') {
+        if ($data['module_type'] !== 'bundles' && $data['module_type'] !== 'apps_types') {
             $this->validation->add('category', PresenceOf::class, ["message" => "Please provide module category."]);
         }
 
