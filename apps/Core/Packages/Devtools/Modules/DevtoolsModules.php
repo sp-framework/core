@@ -549,8 +549,12 @@ class DevtoolsModules extends BasePackage
         return $filesHash;
     }
 
-    public function reCalculateFilesHash($module, $remove = false, $viaGenerateRelease = false, $viaValidation = false)
+    public function reCalculateFilesHash($module, $remove = false, $viaGenerateRelease = false, $viaValidation = false, $force = false)
     {
+        if ($force) {
+            $module = $this->modules->{$module['module_type']}->getById($module['id']);
+        }
+
         if (!$viaValidation) {
             $filesHash = $this->getFilesHash($module);
 
@@ -563,8 +567,8 @@ class DevtoolsModules extends BasePackage
             $filesHash = false;
         }
 
-        if (!$filesHash || $viaGenerateRelease) {//We only generate hash when there is no entry or when we generate a new release
-            if (!$viaGenerateRelease) {
+        if (!$filesHash || $viaGenerateRelease || $force) {//We only generate hash when there is no entry or when we generate a new release
+            if (!$viaGenerateRelease && !$force) {
                 $filesHash = [];
                 $filesHash['module_type'] = $module['module_type'];
                 $filesHash['module_id'] = $module['id'];
@@ -745,6 +749,8 @@ class DevtoolsModules extends BasePackage
             }
 
             if ($moduleLocationFiles && count($moduleLocationFiles['files']) > 0) {
+                $module['modified_files'] = [];
+
                 foreach ($moduleLocationFiles['files'] as $file) {
                     $filePath = $file;
 
@@ -756,9 +762,9 @@ class DevtoolsModules extends BasePackage
                         (isset($filesHash['files_hash'][$file]) &&
                          $filesHash['files_hash'][$file] !== $hash)
                     ) {
-                        $module['isModified'] = true;
+                        array_push($module['modified_files'], $file);
 
-                        break;
+                        $module['isModified'] = true;
                     }
                 }
             }
