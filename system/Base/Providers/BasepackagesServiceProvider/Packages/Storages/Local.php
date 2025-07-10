@@ -216,7 +216,9 @@ class Local extends BasePackage
         if (isset($this->request->getPost()['setOrphan']) &&
             $this->request->getPost()['setOrphan'] == 'false'
         ) {
-            $this->changeOrphanStatus($storageData['uuid']);
+            if ($this->flipOrphanStatus($storageData['uuid'], 0)) {
+                $storageData['orphan'] = false;
+            }
         }
 
         $this->addResponse('File(s) Uploaded', 0, ['storageData' => $storageData]);
