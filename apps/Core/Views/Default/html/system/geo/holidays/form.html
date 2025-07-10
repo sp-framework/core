@@ -1,5 +1,6 @@
 {% set holidayIsNationalChecked = false %}
 {% set statesDisabled = false %}
+{% set countryStates = [] %}
 {% if holiday['id'] is defined %}
     {% set holidayId = holiday['id'] %}
     {% set holidayName = holiday['name'] %}
@@ -9,6 +10,8 @@
     {% if holiday['is_national_holiday'] == 1 %}
         {% set holidayIsNationalChecked = true %}
         {% set statesDisabled = true %}
+    {% else %}
+        {% set countryStates = states[holiday['country_id']] %}
     {% endif %}
 {% else %}
     {% set holidayId = '' %}
@@ -152,7 +155,7 @@
                         'fieldBazScan'                         : true,
                         'fieldBazPostOnCreate'                 : true,
                         'fieldBazPostOnUpdate'                 : true,
-                        'fieldDataSelect2Options'              : [],
+                        'fieldDataSelect2Options'              : countryStates,
                         'fieldDataSelect2OptionsKey'           : 'id',
                         'fieldDataSelect2OptionsValue'         : 'name',
                         'fieldDataSelect2OptionsArray'         : true,

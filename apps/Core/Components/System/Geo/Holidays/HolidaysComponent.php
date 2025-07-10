@@ -37,7 +37,6 @@ class HolidaysComponent extends BaseComponent
                     $enabledStates[$enabledCountry['id']] = $states;
                 }
             }
-
         }
 
         if (isset($this->getData()['id'])) {
