@@ -311,7 +311,7 @@ class Dropzone
                                     }
 
                                     $this->content .=
-                                        '<li class="list-group-item list-group-item-secondary rounded-0" area-disabled="false" style="cursor: pointer" data-uuid="' . $attachment['uuid'] . '">';
+                                        '<li class="list-group-item list-group-item-secondary rounded-0" area-disabled="false" style="cursor: pointer; border: 1px solid rgba(0, 0, 0, 0.125);" data-uuid="' . $attachment['uuid'] . '">';
 
                                             if (isset($this->params['sortable']) &&
                                                 $this->params['sortable'] === true
@@ -631,7 +631,7 @@ class Dropzone
                                             var newList = "";
 
                                             newList +=
-                                                \'<li class="list-group-item list-group-item-secondary rounded-0" area-disabled="false" style="cursor: pointer" data-uuid="\' + response.responseData.uuid + \'">\';
+                                                \'<li class="list-group-item list-group-item-secondary rounded-0" area-disabled="false" style="cursor: pointer; border: 1px solid rgba(0, 0, 0, 0.125);" data-uuid="\' + response.responseData.uuid + \'">\';
 
                                             if (sortable === true) {
                                                 newList +=
