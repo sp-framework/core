@@ -1712,7 +1712,7 @@ class Store
                                     $data[$propertyKey] === '0'
                                 ) {
                                     $data[$propertyKey] = false;
-                                } else if ($data[$propertyKey] === 'false' ||
+                                } else if ($data[$propertyKey] === 'true' ||
                                            $data[$propertyKey] === '1'
                                 ) {
                                     $data[$propertyKey] = true;
