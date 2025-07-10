@@ -81,13 +81,6 @@ class Timezones
                         'size'          => 10,
                         'notNull'       => false
                     ]
-                ),
-                new Column(
-                    'user_added',
-                    [
-                        'type'          => Column::TYPE_TINYINTEGER,
-                        'notNull'       => false,
-                    ]
                 )
             ]
         ];

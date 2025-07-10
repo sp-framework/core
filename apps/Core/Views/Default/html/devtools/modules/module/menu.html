@@ -236,7 +236,7 @@
             <div class="row mb-3">
                 <div class="col">
                     {% set noMenuChecked = false %}
-                    {% if moduleMenu == 'false' %}
+                    {% if moduleMenu == 'false' or moduleMenu == '"false"' or moduleMenu == false %}
                         {% set noMenuChecked = true %}
                     {% endif %}
                     {{adminltetags.useTag('fields',
@@ -722,26 +722,27 @@ dataCollectionSection =
 
                 for (var i = 0; i < parents.length; i++) {
                     var parentNode = $('#{{componentId}}-{{sectionId}}-menu_structure').jstree().get_node(parents[i]);
-                    var parentNodeText = parentNode.text.toLowerCase();
+                    var parentNodeTitle = parentNode.text.toLowerCase();
+                    var parentNodeKey = parentNodeTitle.replace(/ /g, '');
 
-                    menu[parentNodeText] = { };
-                    menu[parentNodeText]['title'] = parentNodeText;
+                    menu[parentNodeKey] = { };
+                    menu[parentNodeKey]['title'] = parentNodeTitle;
 
                     if (parentNode.icon) {
                         $(parentNode.icon.split(' ')).each(function(i, iconText) {
                             if (iconText.startsWith('fa-')) {
                                 if (iconText !== 'fa-fw') {
-                                    menu[parentNodeText]['icon'] = iconText.replace('fa-', '');
+                                    menu[parentNodeKey]['icon'] = iconText.replace('fa-', '');
                                 }
                             }
                         });
                     }
 
                     if (parentNode.data && parentNode.data.link) {
-                        menu[parentNodeText]['link'] = parentNode.data.link;
+                        menu[parentNodeKey]['link'] = parentNode.data.link;
                     } else {
                         if (parents.length === 1) {
-                            menu[parentNodeText]['link'] = $('#{{componentId}}-{{sectionId}}-route').val();
+                            menu[parentNodeKey]['link'] = $('#{{componentId}}-{{sectionId}}-route').val();
                             if ($('#{{componentId}}-{{sectionId}}-route').val() === '') {
                                 paginatedPNotify('error', {text: 'Link is not added to menu item because component route is missing.'});
                             }
@@ -750,7 +751,7 @@ dataCollectionSection =
 
                     var [removed, ...nodeParents] = parents;
                     if (parents.length > 0) {
-                        menu[parentNodeText]['childs'] = generateMenuHierarchy(nodeParents);
+                        menu[parentNodeKey]['childs'] = generateMenuHierarchy(nodeParents);
                         break;
                     }
 

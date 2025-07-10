@@ -35,7 +35,7 @@ class RolesComponent extends BaseComponent
             if ($role) {
                 $app = $this->apps->getAppInfo();
 
-                $middlewares = $this->modules->middlewares->getMiddlewaresForAppType($app['app_type'],null);
+                $middlewares = $this->modules->middlewares->middlewares;
 
                 $middlewareEnabledForApps = [];
 
@@ -59,6 +59,7 @@ class RolesComponent extends BaseComponent
 
                 if (count($middlewareEnabledForApps) > 0) {
                     $this->view->aclMiddlewareEnabled = true;
+
                     foreach ($components as $key => $component) {
                         if (!in_array($component['id'], $middlewareEnabledForApps)) {
                             unset($components[$key]);

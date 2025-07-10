@@ -236,7 +236,12 @@ class Components extends BasePackage
 		$components = [];
 
 		foreach($this->components as $component) {
-			if ($component['app_id'] == $appId &&
+			if (is_string($component['apps'])) {
+				$component['apps'] = $this->helper->decode($component['apps'], true);
+			}
+
+			if (isset($component['apps'][$appId]['enabled']) &&
+				$component['apps'][$appId]['enabled'] === true &&
 				$component['app_type'] == $appType
 			) {
 				$components[$component['id']] = $component;

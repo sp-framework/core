@@ -28,34 +28,19 @@ class CitiesComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $city = $this->basepackages->geoCities->getById($this->getData()['id']);
 
-                if (!$city) {
-                    return $this->throwIdNotFound();
-                }
-
                 $this->view->city = $city;
-            } else {
-                $this->view->city = [];
             }
+
+            if (!$this->view->city) {
+                return $this->throwIdNotFound();
+            }
+
             $this->view->pick('cities/view');
 
-            $this->view->countries = $countriesArr;
-            $this->view->states = $statesArr;
+            $this->view->countries = [$countriesArr[$city['country_id']]];
+            $this->view->states = [$statesArr[$city['state_id']]];
+
             return;
-        }
-
-        $countries = [];
-        $states = [];
-
-        if ($countriesArr) {
-            foreach ($countriesArr as $countriesKey => $country) {
-                $countries[$country['id']] = $country['name'] . ' (' . $country['id'] . ')';
-            }
-        }
-
-        if ($statesArr) {
-            foreach ($statesArr as $statesKey => $state) {
-                $states[$state['id']] = $state['name'] . ' (' . $state['id'] . ')';
-            }
         }
 
         $controlActions =
@@ -63,11 +48,26 @@ class CitiesComponent extends BaseComponent
                 // 'includeQ'              => true,
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'system/geo/cities',
+                    'view'      => 'system/geo/cities',
                 ]
             ];
 
         if ($this->request->isPost()) {
+            $countries = [];
+            $states = [];
+
+            if ($countriesArr) {
+                foreach ($countriesArr as $countriesKey => $country) {
+                    $countries[$country['id']] = $country['name'] . ' (' . $country['id'] . ')';
+                }
+            }
+
+            if ($statesArr) {
+                foreach ($statesArr as $statesKey => $state) {
+                    $states[$state['id']] = $state['name'] . ' (' . $state['id'] . ')';
+                }
+            }
+
             $replaceColumns =
                 [
                     'country_id'  =>
@@ -141,13 +141,13 @@ class CitiesComponent extends BaseComponent
                 return;
             }
 
-            $searchCities = $this->basepackages->geoCities->searchCities($searchQuery);
+            $this->basepackages->geoCities->searchCities($searchQuery);
 
-            if ($searchCities) {
-                $this->view->responseCode = $this->basepackages->geoCities->packagesData->responseCode;
-
-                $this->view->cities = $this->basepackages->geoCities->packagesData->cities;
-            }
+            $this->addResponse(
+                $this->basepackages->geoCities->packagesData->responseMessage,
+                $this->basepackages->geoCities->packagesData->responseCode,
+                $this->basepackages->geoCities->packagesData->responseData ?? []
+            );
         } else {
             $this->addResponse('Search Query Missing', 1);
         }
@@ -164,13 +164,13 @@ class CitiesComponent extends BaseComponent
                 return;
             }
 
-            $searchPostCodes = $this->basepackages->geoCities->searchPostCodes($searchQuery);
+            $this->basepackages->geoCities->searchPostCodes($searchQuery);
 
-            if ($searchPostCodes) {
-                $this->view->responseCode = $this->basepackages->geoCities->packagesData->responseCode;
-
-                $this->view->postCodes = $this->basepackages->geoCities->packagesData->postCodes;
-            }
+            $this->addResponse(
+                $this->basepackages->geoCities->packagesData->responseMessage,
+                $this->basepackages->geoCities->packagesData->responseCode,
+                $this->basepackages->geoCities->packagesData->responseData ?? []
+            );
         } else {
             $this->addResponse('Search Query Missing', 1);
         }

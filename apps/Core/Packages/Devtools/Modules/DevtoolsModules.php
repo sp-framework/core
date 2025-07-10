@@ -359,9 +359,13 @@ class DevtoolsModules extends BasePackage
         if ($data['api_id'] != '0' &&
             ($data['repo'] === 'https://.../' || $data['repo'] === '')
         ) {
-            $this->addResponse('Repository is not local, please provide correct module repo url.', 1);
+            if ($data['app_type'] !== 'core' ||
+                ($data['app_type'] === 'core' && $data['name'] === 'Core')
+            ) {
+                $this->addResponse('Repository is not local, please provide correct module repo url.', 1);
 
-            return false;
+                return false;
+            }
         }
 
         if (!isset($data['module_type']) ||
@@ -380,36 +384,46 @@ class DevtoolsModules extends BasePackage
             return false;
         }
 
-        if ($data['module_type'] === 'components') {
-            $data = $this->checkAppType($data);
-            $data = $this->checkModuleTypeAndCategory($data);
-            $data['class'] = str_replace('Apps\\' . ucfirst($data['app_type']) . '\\' . ucfirst($data['module_type']) . '\\', '', $data['class']);
-            $data['class'] = str_replace('Component', '', $data['class']);
-            $classArr = explode('\\', $data['class']);
-            array_pop($classArr);
+        if (isset($data['module_type'])) {
+            if ($data['module_type'] === 'components') {
+                $data = $this->checkAppType($data);
+                $data = $this->checkModuleTypeAndCategory($data);
+                $data['class'] = str_replace('Apps\\' . ucfirst($data['app_type']) . '\\' . ucfirst($data['module_type']) . '\\', '', $data['class']);
+                $data['class'] = str_replace('Component', '', $data['class']);
+                $classArr = explode('\\', $data['class']);
+                array_pop($classArr);
 
-            $routeArr = explode('/', trim($data['route'], '/'));
-            array_walk($routeArr, function(&$route) {
-                $route = ucfirst($route);
-            });
+                $routeArr = explode('/', trim($data['route'], '/'));
+                array_walk($routeArr, function(&$route) {
+                    $route = ucfirst($route);
+                });
 
-            $compare = array_diff($classArr, $routeArr);
+                $compare = array_diff($classArr, $routeArr);
 
-            if (count($compare) > 0) {
-                $this->addResponse('Route and class do not match!', 1);
+                if (count($compare) > 0) {
+                    $this->addResponse('Route and class do not match!', 1);
 
-                return false;
+                    return false;
+                }
+            } else if ($data['module_type'] === 'packages' || $data['module_type'] === 'middlewares') {
+                $classArr = explode('\\', $data['class']);
+
+                if (strtolower($this->helper->last($classArr)) !== strtolower($data['name'])) {
+                    $this->addResponse('Name and class do not match!', 1);
+
+                    return false;
+                }
+            } else if ($data['module_type'] === 'views') {
+                if (isset($data['is_subview']) && $data['is_subview'] == true) {
+                    if (!isset($data['base_view_module_id']) ||
+                        (isset($data['base_view_module_id']) && $data['base_view_module_id'] == 0)
+                    ) {
+                        $this->addResponse('Please add base view in dependencies!', 1);
+
+                        return false;
+                    }
+                }
             }
-        } else if ($data['module_type'] === 'packages' || $data['module_type'] === 'middlewares') {
-            $classArr = explode('\\', $data['class']);
-
-            if (strtolower($this->helper->last($classArr)) !== strtolower($data['name'])) {
-                $this->addResponse('Name and class do not match!', 1);
-
-                return false;
-            }
-        } else if ($data['module_type'] === 'views') {
-            //
         }
 
         return true;
@@ -493,7 +507,7 @@ class DevtoolsModules extends BasePackage
                 $this->modules->{$module['module_type']}->remove($module['id']);
             }
 
-            if ($data['module_type'] !== 'bundles') {
+            if (isset($module['module_type']) && $data['module_type'] !== 'bundles') {
                 $this->reCalculateFilesHash($module, true);
             }
 
@@ -537,8 +551,12 @@ class DevtoolsModules extends BasePackage
         return $filesHash;
     }
 
-    public function reCalculateFilesHash($module, $remove = false, $viaGenerateRelease = false, $viaValidation = false)
+    public function reCalculateFilesHash($module, $remove = false, $viaGenerateRelease = false, $viaValidation = false, $force = false)
     {
+        if ($force) {
+            $module = $this->modules->{$module['module_type']}->getById($module['id']);
+        }
+
         if (!$viaValidation) {
             $filesHash = $this->getFilesHash($module);
 
@@ -551,8 +569,8 @@ class DevtoolsModules extends BasePackage
             $filesHash = false;
         }
 
-        if (!$filesHash || $viaGenerateRelease) {//We only generate hash when there is no entry or when we generate a new release
-            if (!$viaGenerateRelease) {
+        if (!$filesHash || $viaGenerateRelease || $force) {//We only generate hash when there is no entry or when we generate a new release
+            if (!$viaGenerateRelease && !$force) {
                 $filesHash = [];
                 $filesHash['module_type'] = $module['module_type'];
                 $filesHash['module_id'] = $module['id'];
@@ -733,6 +751,8 @@ class DevtoolsModules extends BasePackage
             }
 
             if ($moduleLocationFiles && count($moduleLocationFiles['files']) > 0) {
+                $module['modified_files'] = [];
+
                 foreach ($moduleLocationFiles['files'] as $file) {
                     $filePath = $file;
 
@@ -744,9 +764,9 @@ class DevtoolsModules extends BasePackage
                         (isset($filesHash['files_hash'][$file]) &&
                          $filesHash['files_hash'][$file] !== $hash)
                     ) {
-                        $module['isModified'] = true;
+                        array_push($module['modified_files'], $file);
 
-                        break;
+                        $module['isModified'] = true;
                     }
                 }
             }
@@ -919,7 +939,11 @@ class DevtoolsModules extends BasePackage
                    $moduleToReinstall['app_type'] === 'core'
         ) {//Core packages. This can be a problem for packages that are not registered in the system, example(modules_packages, modules_external...)
            //so, the user has to update whole core.
-            $class = 'System\\Base\\Providers\\CoreServiceProvider\\Install\\Install';
+            if ($moduleToReinstall['name'] === 'Core') {
+                $class = 'System\\Base\\Providers\\CoreServiceProvider\\Install\\Install';
+            } else {
+                $class = $moduleToReinstall['class'];
+            }
         }
 
         $path = lcfirst(str_replace('\\', '/', $class) . '.php');
@@ -940,7 +964,9 @@ class DevtoolsModules extends BasePackage
 
                         if (isset($data['truncate_table']) && $data['truncate_table'] == true) {
                             $coreInstall->init([$moduleModel->getSource()])->truncate();
-                        } else if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
+                        }
+
+                        if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
                             if ($data['installed'] == true) {
                                 $coreInstall->init([$moduleModel->getSource()])->install();
                             } else {
@@ -953,7 +979,9 @@ class DevtoolsModules extends BasePackage
 
                     if (isset($data['truncate_table']) && $data['truncate_table'] == true && method_exists($module, 'truncate')) {
                         $module->init()->truncate();
-                    } else if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
+                    }
+
+                    if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
                         if ($data['installed'] == true) {
                             $module->init()->install();
                         } else {
@@ -3525,7 +3553,7 @@ $file .= '
         $this->validation->init()->add('api_id', PresenceOf::class, ["message" => "Please provide api id."]);
         $this->validation->add('app_type', PresenceOf::class, ["message" => "Please provide app type."]);
         $this->validation->add('module_type', PresenceOf::class, ["message" => "Please provide module type."]);
-        if ($data['module_type'] !== 'bundles') {
+        if ($data['module_type'] !== 'bundles' && $data['module_type'] !== 'apps_types') {
             $this->validation->add('category', PresenceOf::class, ["message" => "Please provide module category."]);
         }
 

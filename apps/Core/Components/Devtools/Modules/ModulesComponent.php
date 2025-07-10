@@ -187,6 +187,7 @@ class ModulesComponent extends BaseComponent
 			unset($modules['apptypes']);
 			unset($modules['bundles']);
 
+			$modifiedModules = [];
 			foreach ($modules as $moduleType => &$modulesTypeArr) {
 				if (isset($modulesTypeArr['childs']) && count($modulesTypeArr['childs']) > 0) {
 					foreach ($modulesTypeArr['childs'] as $childKey => &$child) {
@@ -195,11 +196,17 @@ class ModulesComponent extends BaseComponent
 						if ($child['repoExists'] && !$child['isModified'] && $child['latestRelease']) {
 							unset($modules[$moduleType]['childs'][$childKey]);
 						}
+
+						if (isset($child['modified_files']) && count($child['modified_files']) > 0) {
+							$modifiedModules[$child['id']] = $child['modified_files'];
+						}
 					}
 				}
 			}
 
 			$this->view->modules = $modules;
+
+			$this->view->modifiedModules = $modifiedModules;
 
 			$this->view->pick('modules/changes');
 
@@ -385,7 +392,7 @@ class ModulesComponent extends BaseComponent
 
 								$module['id'] = $module['module_details']['id'];
 							} catch (\throwable $e) {
-								throw new \Exception($e->getMessage());
+								throw $e;
 							}
 						}
 					}
@@ -851,6 +858,30 @@ class ModulesComponent extends BaseComponent
 		$this->requestIsPost();
 
 		$this->modulesPackage->checkVersion($this->postData());
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
+	}
+
+	public function reCalculateFilesHashAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->reCalculateFilesHash($this->postData(), false, false, false, true);
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
+	}
+
+	public function getModifiedFilesHashAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->getModifiedFilesHash($this->postData());
 
 		$this->addResponse(
 			$this->modulesPackage->packagesData->responseMessage,

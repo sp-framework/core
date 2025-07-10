@@ -522,8 +522,8 @@ class Utils extends BasePackage
 
             $this->addResponse($e->getMessage(), 1);
 
+            throw $e;
             return false;
-            // throw $e;
         }
 
         if (isset($data['returnJson']) && $data['returnJson'] === 'array') {

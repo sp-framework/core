@@ -1,9 +1,9 @@
 {% if country['id'] is defined %}
-    {% set countryId = country['id'] %}
     {% set title = 'Country (' ~ country['name'] ~ ')' %}
+    {% set countryId = country['id'] %}
 {% else %}
-    {% set countryId = '' %}
     {% set title = 'New Country' %}
+    {% set countryId = '' %}
 {% endif %}
 
 {{adminltetags.useTag('content',
@@ -24,8 +24,6 @@
         'formButtons'                   :
         [
             'updateButtonId'                : countryId,
-            'addActionUrl'                  : 'system/geo/countries/add',
-            'addSuccessRedirectUrl'         : 'system/geo/countries',
             'updateActionUrl'               : 'system/geo/countries/update',
             'updateSuccessRedirectUrl'      : 'system/geo/countries',
             'cancelActionUrl'               : 'system/geo/countries',

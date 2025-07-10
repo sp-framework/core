@@ -9238,9 +9238,7 @@ var BazContentFields = function() {
             options.beforeInit();
         }
 
-        var id = $('#' + fieldId).parents('.input-group')[0].id;
-
-        dataCollection[componentId][sectionId][fieldId]['colorpicker'] = $('#' + id).colorpicker(options);
+        dataCollection[componentId][sectionId][fieldId]['colorpicker'] = $('#' + fieldId).colorpicker(options);
 
         if (options.afterInit) {
             options.afterInit(dataCollection, options);
@@ -9693,6 +9691,7 @@ var BazContentFields = function() {
 // Object.defineProperty(exports, '__esModule', { value: true });
 
 // }));
+
 /* exported BazContentFieldsValidator */
 /* globals */
 /*

@@ -1,0 +1,27 @@
+{
+	"name" : "Tags",
+	"display_name" : "Tags",
+	"description" : "<p>Package for assigning tags to any packages.</p>",
+	"module_type" : "packages",
+	"app_type" : "core",
+	"category" : "basepackages",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Tags",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : [],
+		"packages" : [],
+		"middlewares" : [],
+		"views" : [],
+		"external" : [],
+		"externals" : []
+	},
+	"settings" : []
+}

@@ -42562,3 +42562,6 @@ a.disabled {
     color: white;
   }
 }
+.flatpickr-wrapper {
+  width: 100%;
+}

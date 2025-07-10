@@ -5,14 +5,18 @@
         'componentId'                   : componentId,
         'parentComponentId'             : parent,
         'sectionId'                     : 'changes',
-        'contentType'                   : 'section',
+        'contentType'                   : 'sectionWithForm',
         'cardHeader'                    : true,
-        'cardFooter'                    : false,
+        'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'th',
         'cardTitle'                     : 'Changed Modules',
         'cardAdditionalClass'           : 'rounded-0',
         'cardShowTools'                 : [],
-        'cardBodyInclude'               : 'modules/changes/view'
+        'cardBodyInclude'               : 'modules/changes/view',
+        'formButtons'                   :
+        [
+            'closeActionUrl'                : 'devtools/modules'
+        ]
     ]
 )}}

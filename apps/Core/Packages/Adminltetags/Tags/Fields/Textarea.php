@@ -58,6 +58,10 @@ class Textarea
             'cols="' . $this->params['fieldTextareaCols'] . '"' :
             '';
 
+        if (is_array($this->fieldParams['fieldValue'])) {
+            $this->fieldParams['fieldValue'] = $this->adminLTETags->helper->encode($this->fieldParams['fieldValue']);
+        }
+
         $this->content .=
             '<textarea ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control form-control-sm rounded-0 ' . $this->fieldParams['fieldInputAdditionalClass'] .'" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" data-type="text" placeholder="' . strtoupper($this->fieldParams['fieldPlaceholder']) . '" ' . $this->fieldParams['fieldDataInputMinLength'] . ' ' . $this->fieldParams['fieldDataInputMaxLength'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldTextareaRows'] . ' ' . $this->fieldParams['fieldTextareaCols'] . '>' . $this->fieldParams['fieldValue'] . '</textarea>';
     }

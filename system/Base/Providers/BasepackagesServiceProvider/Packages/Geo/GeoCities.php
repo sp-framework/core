@@ -13,58 +13,18 @@ class GeoCities extends BasePackage
 
     public $geoCities;
 
+    protected $countries = [];
+
+    protected $states = [];
+
     public function addCity(array $data)
     {
-        $this->setFFAddUsingUpdateOrInsert(true);
-
-        if ($this->add($data)) {
-            if ($this->config->databasetype !== 'db') {
-                $this->ffStore->count(true);
-            }
-
-            $this->addResponse('Added ' . $data['name'] . ' city');
-        } else {
-            $this->addResponse('Error adding new city.', 1);
-        }
-    }
-
-    protected function getNextIdFromDB()
-    {
-        if ($this->config->databasetype === 'db') {
-            $model = new $this->modelToUse;
-            $table = $model->getSource();
-            $sql = "SELECT id FROM {$table} ORDER BY id DESC LIMIT 1";
-
-            $lastDBId = $this->executeSql($sql);
-            $lastDBId->setFetchMode(\Phalcon\Db\Enum::FETCH_ASSOC);
-
-            if ((int) $lastDBId->fetch()['id'] < 100000) {
-                return 100001;
-            } else {
-                return (int) $lastDBId->fetch()['id'] + 1;
-            }
-        } else {
-            $this->ffStore = $this->ff->store($this->ffStoreToUse);
-
-            $this->ffStore->count(true);
-
-            $this->setFFAddUsingUpdateOrInsert(true);
-
-            if ((int) $this->ffStore->getLastInsertedId() < 100000) {
-                return 100001;
-            } else {
-                return (int) $this->ffStore->getLastInsertedId() + 1;
-            }
-        }
+        //
     }
 
     public function updateCity(array $data)
     {
-        if ($this->update($data)) {
-            $this->addResponse('Updated ' . $data['name'] . ' city');
-        } else {
-            $this->addResponse('Error updating city.', 1);
-        }
+        //
     }
 
     public function searchCities(string $cityQueryString)
@@ -82,30 +42,56 @@ class GeoCities extends BasePackage
             $searchCities = $this->getByParams(['conditions' => ['name', 'LIKE', '%' . $cityQueryString . '%']]);
         }
 
+        $cities = [];
+
         if ($searchCities) {
-            $cities = [];
-
             foreach ($searchCities as $cityKey => $cityValue) {
-                $country = $this->basepackages->geoCountries->getById($cityValue['country_id']);
+                if (!isset($this->countries[$cityValue['country_id']])) {
+                    $this->countries[$cityValue['country_id']] = $this->basepackages->geoCountries->getById($cityValue['country_id']);
+                }
 
-                if ($country['enabled'] == 1 && $country['installed'] == 1) {
+                if ($this->countries[$cityValue['country_id']]['enabled'] == 1 && $this->countries[$cityValue['country_id']]['installed'] == 1) {
                     $cities[$cityKey] = $cityValue;
-                    $state = $this->basepackages->geoStates->getById($cityValue['state_id']);
-                    $cities[$cityKey]['state_id'] = $state['id'];
-                    $cities[$cityKey]['state_name'] = $state['name'];
-                    $cities[$cityKey]['country_id'] = $country['id'];
-                    $cities[$cityKey]['country_name'] = $country['name'];
+                    if (!isset($this->states[$cityValue['state_id']])) {
+                        $this->states[$cityValue['state_id']] = $this->basepackages->geoStates->getById($cityValue['state_id']);
+
+                        if (!$this->states[$cityValue['state_id']]) {
+                            continue;
+                        }
+                    }
+
+                    $cities[$cityKey]['state_id'] = $this->states[$cityValue['state_id']]['id'];
+                    $cities[$cityKey]['state_name'] = $this->states[$cityValue['state_id']]['name'];
+                    $cities[$cityKey]['country_id'] = $this->countries[$cityValue['country_id']]['id'];
+                    $cities[$cityKey]['country_name'] = $this->countries[$cityValue['country_id']]['name'];
                 }
             }
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->cities = $cities;
-
-            return true;
         }
 
-        return false;
+        $this->addResponse('Ok', 0, ['cities' => $cities]);
+
+        return $cities;
+    }
+
+    public function searchCitiesByCountryId($countryId)
+    {
+        if ($this->config->databasetype === 'db') {
+            $searchCities =
+                $this->getByParams(
+                    [
+                        'conditions'    => 'country_id = :countryId:',
+                        'bind'          => [
+                            'countryId'     => $countryId
+                        ]
+                    ]
+                );
+        } else {
+            $searchCities = $this->getByParams(['conditions' => ['country_id', '=', (int) $countryId]]);
+        }
+
+        $this->addResponse('Ok', 0, ['cities' => $searchCities]);
+
+        return $searchCities;
     }
 
     public function searchPostCodes(string $postCodeQueryString)
@@ -123,29 +109,34 @@ class GeoCities extends BasePackage
             $searchPostCodes = $this->getByParams(['conditions' => ['postcode', 'LIKE', '%' . $postCodeQueryString . '%']]);
         }
 
+        $postCodes = [];
+
         if ($searchPostCodes) {
-            $postCodes = [];
-
             foreach ($searchPostCodes as $postCodeKey => $postCodeValue) {
-                $country = $this->basepackages->geoCountries->getById($postCodeValue['country_id']);
+                if (!isset($this->countries[$cityValue['country_id']])) {
+                    $this->countries[$cityValue['country_id']] = $this->basepackages->geoCountries->getById($postCodeValue['country_id']);
+                }
 
-                if ($country['enabled'] == 1 && $country['installed'] == 1) {
+                if ($this->countries[$cityValue['country_id']]['enabled'] == 1 && $this->countries[$cityValue['country_id']]['installed'] == 1) {
                     $postCodes[$postCodeKey] = $postCodeValue;
-                    $state = $this->basepackages->geoStates->getById($postCodeValue['state_id']);
-                    $postCodes[$postCodeKey]['state_id'] = $state['id'];
-                    $postCodes[$postCodeKey]['state_name'] = $state['name'];
-                    $postCodes[$postCodeKey]['country_id'] = $country['id'];
-                    $postCodes[$postCodeKey]['country_name'] = $country['name'];
+                    if (!isset($this->states[$postCodeValue['state_id']])) {
+                        $this->states[$postCodeValue['state_id']] = $this->basepackages->geoStates->getById($postCodeValue['state_id']);
+
+                        if (!$this->states[$postCodeValue['state_id']]) {
+                            continue;
+                        }
+                    }
+
+                    $postCodes[$postCodeKey]['state_id'] = $this->states[$postCodeValue['state_id']]['id'];
+                    $postCodes[$postCodeKey]['state_name'] = $this->states[$postCodeValue['state_id']]['name'];
+                    $postCodes[$postCodeKey]['country_id'] = $this->countries[$cityValue['country_id']]['id'];
+                    $postCodes[$postCodeKey]['country_name'] = $this->countries[$cityValue['country_id']]['name'];
                 }
             }
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->postCodes = $postCodes;
-
-            return true;
         }
 
-        return false;
+        $this->addResponse('Ok', 0, ['postCodes' => $postCodes]);
+
+        return $postCodes;
     }
 }

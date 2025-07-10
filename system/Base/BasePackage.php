@@ -1362,13 +1362,22 @@ abstract class BasePackage extends Controller
 
 	protected function jsonData($data, $decode = false)
 	{
+		if (!$data) {
+			return false;
+		}
+
 		if ($decode) {
 			if (is_string($data)) {
+				if (strlen($data) === 0) {
+					return '';
+				}
+
 				$data = $this->helper->decode($data, true);
 			}
 
 			array_walk_recursive($data, 'json_decode_recursive');
 		} else {
+			//This might cause data to be encoded multiple times when being stored in the DB. check!
 			foreach ($data as $dataKey => $dataValue) {
 				if (is_array($dataValue)) {
 					$data[$dataKey] = $this->helper->encode($dataValue);
@@ -2308,7 +2317,11 @@ abstract class BasePackage extends Controller
 		if ($this->config->databasetype === 'db') {
 			$data = $this->modelToUse::find();
 
-			return $data->getLast()['id'];
+			$data = $data->getLast()->toArray();
+
+			if (count($data) === 1) {
+				return $data['id'];
+			}
 		} else {
 			if (!$this->ffStore) {
 				$this->ffStore = $this->ff->store($this->ffStoreToUse);
@@ -2316,6 +2329,8 @@ abstract class BasePackage extends Controller
 
 			return $this->ffStore->getLastInsertedId();
 		}
+
+		return false;
 	}
 	// protected function addRefId($data)
 	// {

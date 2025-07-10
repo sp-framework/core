@@ -14,6 +14,8 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServic
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Filters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoHolidays;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoRegions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ImportExport;
@@ -27,6 +29,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Progress;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Pusher;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Qrcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Tags;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Templates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profiles;
@@ -54,6 +57,10 @@ class Basepackages
 	protected $domains;
 
 	protected $menus;
+
+	protected $geoRegions;
+
+	protected $geoHolidays;
 
 	protected $geoCountries;
 
@@ -102,6 +109,8 @@ class Basepackages
 	protected $murls;
 
 	protected $maintenance;
+
+	protected $tags;
 
 	public function __construct()
 	{
@@ -172,6 +181,20 @@ class Basepackages
 		$this->menus = (new Menus())->init();
 
 		return $this->menus;
+	}
+
+	protected function initGeoRegions()
+	{
+		$this->geoRegions = (new GeoRegions())->init();
+
+		return $this->geoRegions;
+	}
+
+	protected function initGeoHolidays()
+	{
+		$this->geoHolidays = (new GeoHolidays())->init();
+
+		return $this->geoHolidays;
 	}
 
 	protected function initGeoCountries()
@@ -340,5 +363,12 @@ class Basepackages
 		$this->maintenance = (new Maintenance())->init();
 
 		return $this->maintenance;
+	}
+
+	protected function initTags()
+	{
+		$this->tags = (new Tags())->init();
+
+		return $this->tags;
 	}
 }

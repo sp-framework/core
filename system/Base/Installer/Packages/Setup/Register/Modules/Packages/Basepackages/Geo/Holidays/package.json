@@ -1,0 +1,27 @@
+{
+	"name" : "GeoHolidays",
+	"display_name" : "Geo Holidays",
+	"description" : "<p>Basepackage Geo Holidays</p>",
+	"module_type" : "packages",
+	"app_type" : "core",
+	"category" : "basepackages",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Geo\\GeoHolidays",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : [],
+		"packages" : [],
+		"middlewares" : [],
+		"views" : [],
+		"external" : [],
+		"externals" : []
+	},
+	"settings" : []
+}

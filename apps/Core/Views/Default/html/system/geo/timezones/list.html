@@ -17,24 +17,6 @@
         'dtFilters'                 : table['filters'],
         'dtFilterColumns'           : table['filterColumns'],
         'dtFixedHeader'             : true,
-        'dtPrimaryButtons'          :
-            {
-                'componentId'           : componentId,
-                'sectionId'             : 'listing',
-                'buttonType'            : 'button',
-                'buttons'               :
-                    {
-                        'add-timezone' : {
-                            'title'                   : 'Add New Timezone',
-                            'size'                    : 'sm',
-                            'type'                    : 'primary',
-                            'icon'                    : 'plus',
-                            'buttonAdditionalClass'   : 'contentAjaxLink',
-                            'position'                : 'right',
-                            'url'                     : links.url('system/geo/timezones/q/id/0')
-                        }
-                    }
-            },
         'dtTable'                   : table,
         'dtColumns'                 : table['columns'],
         'dtPostUrl'                 : table['postUrl'],
@@ -45,6 +27,6 @@
         'dtHideIdColumn'            : true,
         'dtNoOfColumnsToShow'       : 6,
         'dtTableCompact'            : true,
-        'dtZeroRecords'             : 'No timezones data available. Add timezone by clicking the add new timezone button.'
+        'dtZeroRecords'             : 'No timezones data available. Please contact developer.'
     ]
 )}}

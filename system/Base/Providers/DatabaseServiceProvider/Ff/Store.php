@@ -1700,6 +1700,10 @@ class Store
                                     $data[$propertyKey] = 'false';
                                 }
                             }
+
+                            if (is_array($data[$propertyKey])) {
+                                $data[$propertyKey] = json_encode($data[$propertyKey]);
+                            }
                         }
 
                         if ($type === 'boolean') {
@@ -1708,7 +1712,7 @@ class Store
                                     $data[$propertyKey] === '0'
                                 ) {
                                     $data[$propertyKey] = false;
-                                } else if ($data[$propertyKey] === 'false' ||
+                                } else if ($data[$propertyKey] === 'true' ||
                                            $data[$propertyKey] === '1'
                                 ) {
                                     $data[$propertyKey] = true;

@@ -1,14 +1,32 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set changesHtml = '' %}
 {% if modules|length > 0 %}
     {% for moduleType, modulesArr in modules %}
         {% if modulesArr['childs'] is defined and modulesArr['childs']|length > 0 %}
             {% for moduleArr in modulesArr['childs'] %}
-                {% set url = links.url('devtools/modules/q/module/true/type/' ~ moduleArr['module_type'] ~ '/id/' ~ moduleArr['id']) %}
-                {% set moduleEdit =
-                    '<button href="' ~ url ~ '" type="button" data-id="' ~ moduleArr['id'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="ml-1 mr-1 text-white btn btn-primary btn-xs editModule">' ~
-                    '   <i class="fas fa-fw fa-xs fa-edit"></i>' ~
-                    '</button>'
+                {% set isSubView = '' %}
+                {% if moduleArr['module_type'] == 'views' and  moduleArr['is_subview'] == true %}
+                    {% set isSubView = '/subview/true' %}
+                {% endif %}
+                {% set editUrl = links.url('devtools/modules/q/module/true/type/' ~ moduleArr['module_type'] ~ '/id/' ~ moduleArr['id'] ~ isSubView) %}
+                {% set releaseUrl = links.url('devtools/modules/q/module/true/type/' ~ moduleArr['module_type'] ~ '/id/' ~ moduleArr['id'] ~ '/newrelease/true') %}
+                {% set moduleButtons =
+                    '<div class="btn-group">
+                        <a href="' ~ editUrl ~ '" type="button" data-id="' ~ moduleArr['id'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="pl-2 pr-2 text-white btn btn-primary btn-xs editModule">
+                            <i class="fas fa-fw fa-xs fa-edit"></i> <span class="text-xs text-uppercase">Edit</span>
+                        </a>
+                        <button type="button" class="pl-2 pr-2 btn btn-default btn-xs dropdown-toggle dropdown-icon" data-toggle="dropdown" aria-expanded="false">
+                            <span class="sr-only">Toggle Dropdown</span>
+                            <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                <a href="' ~ releaseUrl ~ '" data-id="' ~ moduleArr['id'] ~ '" class="dropdown-item text-success releaseModule">
+                                    <i class="fas fa-fw fa-xs fa-wand-magic-sparkles"></i> <span class="text-xs text-uppercase">Generate Release</span>
+                                </a>
+                                <a href="#" data-id="' ~ moduleArr['id'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="dropdown-item text-warning recalculateHashModule">
+                                    <i class="fas fa-fw fa-xs fa-hashtag"></i> <span class="text-xs text-uppercase">Recalculate Hash</span>
+                                </a>
+                            </div>
+                        </button>
+                    </div>'
                 %}
                 {% set moduleUrl = '-' %}
                 {% set moduleVersion = '-' %}
@@ -22,7 +40,11 @@
                 {% endif %}
                 {% set moduleModified = '-' %}
                 {% if moduleArr['isModified'] != false %}
-                    {% set moduleModified = 'Yes' %}
+                    {% set moduleModified =
+                        '<button href="#" type="button" data-id="' ~ moduleArr['id'] ~ '" data-name="' ~ moduleArr['name'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="ml-1 mr-1 text-white btn btn-primary btn-xs moduleModified">' ~
+                        '   <i class="fas fa-fw fa-xs fa-eye"></i>' ~
+                        '</button>'
+                    %}
                 {% endif %}
                 {% set moduleName = moduleArr['name'] %}
                 {% if moduleArr['display_name'] is defined %}
@@ -36,7 +58,7 @@
                 '           <td>' ~ moduleUrl ~ '</td>' ~
                 '           <td>' ~ moduleVersion ~ '</td>' ~
                 '           <td>' ~ moduleModified ~ '</td>' ~
-                '           <td id="{{componentId}}-{{sectionId}}-changes-modules-' ~ moduleArr['name'] ~ '">' ~  moduleEdit ~ '</td>' ~
+                '           <td id="{{componentId}}-{{sectionId}}-changes-modules-' ~ moduleArr['name'] ~ '">' ~  moduleButtons ~ '</td>' ~
                 '       </tr>' %}
             {% endfor %}
         {% endif %}
@@ -76,7 +98,7 @@
                         <th class="text-uppercase">Repository</th>
                         <th class="text-uppercase">Latest Version</th>
                         <th class="text-uppercase">Modified</th>
-                        <th class="text-uppercase">Edit</th>
+                        <th class="text-uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,7 +108,26 @@
         </div>
     </div>
 {% endif %}
-{% set modules = json_encode(modules, 16) %}
+{% set modifiedModules = json_encode(modifiedModules, 16) %}
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'modifiedfiles-modal',
+            'modalBodyInclude'          : 'modules/changes/modifiedfiles',
+            'modalSize'                 : 'lg',
+            'modalType'                 : 'primary',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalHeaderCloseButton'    : true,
+            'modalEscClose'             : true,
+            'modalTitle'                : 'MODIFIED FILES : '
+        ]
+    )}}
+</div>
 <script>
 /*global paginatedPNotify BazProgress BazContentFields BazHelpers BazContentLoader Pace BazCore Swal dataCollection */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -116,6 +157,7 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 }
 
 dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['vars']['modifiedModules'] = JSON.parse('{{modifiedModules}}');
 dataCollectionSectionForm['funcs'] = { };
 dataCollectionSectionForm['funcs']['init'] = function() {
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-changes-table')) {
@@ -128,6 +170,7 @@ dataCollectionSectionForm['funcs']['init'] = function() {
                 null,
                 { orderable: false }
             ],
+            order: [[1, 'asc']],
             lengthMenu: [
                 [50, 100, -1],
                 [50, 100, 'All']
@@ -135,59 +178,86 @@ dataCollectionSectionForm['funcs']['init'] = function() {
         });
     }
 
-    // $('.removeModule').off();
-    // $('.removeModule').click(function(e) {
-    //     e.preventDefault();
-
-    //     var postData = { };
-    //     postData[$('#security-token').attr('name')] = $('#security-token').val();
-    //     postData['api_id'] = dataCollectionSectionForm['vars']['apiId'];
-    //     postData['repo'] = $(this).data('repo');
-
-    //     (async () => { await Swal.fire({
-    //             title                       : "Confirmation",
-    //             input                       : "checkbox",
-    //             inputValue                  : 0,
-    //             inputPlaceholder            : 'Confirm deletion of remote repo ' + $(this).data('repo'),
-    //             confirmButtonText           : 'Remove&nbsp;<i class="fa fa-trash"></i>',
-    //             buttonsStyling              : false,
-    //             customClass                 : {
-    //                 'confirmButton'             : 'btn btn-danger btn-sm text-uppercase'
-    //             },
-    //             inputValidator: (result) => {
-    //                 if (!result) {
-    //                     return "You need check the confirmation checkbox.";
-    //                 }
-
-    //                 remove(postData);
-    //             }
-    //         });
-    //     })();
-    // });
-
-    // function remove(postData) {
-    //     $.post('{{links.url("devtools/modules/removeRepo")}}', postData, function(response) {
-    //         if (response.tokenKey && response.token) {
-    //             $('#security-token').attr('name', response.tokenKey);
-    //             $('#security-token').val(response.token);
-    //         }
-
-    //         if (response.responseCode == 0) {
-    //             paginatedPNotify('success', {'text': response.responseMessage});
-
-    //             dataCollectionSectionForm['funcs']['browse'](window.location);
-    //         } else {
-    //             paginatedPNotify('error', {'text': response.responseMessage});
-    //         }
-    //     }, 'json');
-    // }
-
     $('.editModule').off();
     $('.editModule').click(function(e) {
         e.preventDefault();
 
         dataCollectionSectionForm['funcs']['browse']($(this).attr('href'));
     });
+
+    $('.releaseModule').off();
+    $('.releaseModule').click(function(e) {
+        e.preventDefault();
+
+        dataCollectionSectionForm['funcs']['browse']($(this).attr('href'));
+    });
+
+    $('.moduleModified').off();
+    $('.moduleModified').click(function(e) {
+        e.preventDefault();
+
+        $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal-label')
+            .html('<span class="text-uppercase"> MODIFIED FILES : ' + $(this).data()['name'] + ' (' + $(this).data()['type'] + ')</span>');
+
+        $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal .modal-body')
+            .html(BazHelpers.createHtmlList({'obj': dataCollectionSectionForm['vars']['modifiedModules'][$(this).data()['id']]}));
+
+        $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal').modal('show');
+    });
+
+    $('.recalculateHashModule').off();
+    $('.recalculateHashModule').click(function(e) {
+        e.preventDefault();
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+        postData['id'] = $(this).data()['id'];
+        postData['module_type'] = $(this).data()['type'];
+
+        Swal.fire({
+            title                       : '<span class="text-warning"> Recalculate Hash for module?</span>',
+            icon                        : 'question',
+            background                  : 'rgba(0,0,0,.8)',
+            backdrop                    : 'rgba(0,0,0,.6)',
+            buttonsStyling              : false,
+            confirmButtonText           : 'Yes',
+            cancelButtonText            : 'No',
+            customClass                 : {
+                'confirmButton'             : 'btn btn-warning btn-sm text-uppercase',
+                'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+            },
+            showCancelButton            : true,
+            keydownListenerCapture      : true,
+            allowOutsideClick           : true,
+            allowEscapeKey              : true,
+            didOpen                     : function() {
+                dataCollection.env.sounds.swalSound.play();
+            }
+        }).then((result) => {
+            if (result.value) {
+                reCalculateFilesHash(postData);
+            } else {
+                reCalculateFilesHash(postData);
+            }
+        });
+    });
+
+    function reCalculateFilesHash(postData) {
+        $.post('{{links.url("devtools/modules/reCalculateFilesHash")}}', postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+
+            if (response.responseCode == 0) {
+                paginatedPNotify('success', {'text': response.responseMessage});
+
+                dataCollectionSectionForm['funcs']['browse']('{{links.url("devtools/modules/q/changes/true")}}');
+            } else {
+                paginatedPNotify('error', {'text': response.responseMessage});
+            }
+        }, 'json');
+    }
 }
 
 dataCollectionSectionForm['funcs']['browse'] = function(url) {
@@ -214,3 +284,4 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
+<!-- htmlmin:ignore -->

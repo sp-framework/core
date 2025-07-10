@@ -4,7 +4,6 @@ namespace Apps\Core\Components\System\Geo\Countries;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use System\Base\BaseComponent;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoExtractData;
 
 class CountriesComponent extends BaseComponent
 {
@@ -26,14 +25,13 @@ class CountriesComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $country = $this->basepackages->geoCountries->getById($this->getData()['id']);
 
-                if (!$country) {
-                    return $this->throwIdNotFound();
-                }
-
                 $this->view->country = $country;
-            } else {
-                $this->view->country = [];
             }
+
+            if (!$this->view->country) {
+                return $this->throwIdNotFound();
+            }
+
             $this->view->pick('countries/view');
 
             return;
@@ -41,30 +39,11 @@ class CountriesComponent extends BaseComponent
 
         $controlActions =
             [
-                // 'includeQ'              => true,
                 'actionsToEnable'       =>
                 [
                     'edit'      => 'system/geo/countries',
                 ]
             ];
-
-        // $dtAdditionControlButtons =
-        //     [
-        //         'includeId'  => true,
-        //         // 'includeQ'   => true, //Only true when not adding /q/ in link below.
-        //         'buttons'    => [
-        //             'states'    => [
-        //                 'title'     => 'states',
-        //                 'icon'      => 'map-marked',
-        //                 'link'      => $this->links->url('system/geo/q/type/states')
-        //             ],
-        //             'cities'    => [
-        //                 'title'     => 'cities',
-        //                 'icon'      => 'map-marked-alt',
-        //                 'link'      => $this->links->url('system/geo/q/type/cities')
-        //             ]
-        //         ]
-        //     ];
 
         $replaceColumns =
             [
@@ -97,7 +76,6 @@ class CountriesComponent extends BaseComponent
             null,
             $replaceColumns,
             'name',
-            // $dtAdditionControlButtons
         );
 
         $this->view->pick('countries/list');
@@ -118,6 +96,7 @@ class CountriesComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
             }
+
             $this->addResponse('Ok', 0, ['data' => $geoCountry]);
 
             return;
@@ -132,27 +111,10 @@ class CountriesComponent extends BaseComponent
                     ['name', 'capital', 'currency', 'installed', 'enabled']
                 );
 
-            if ($data) {
-                $this->addResponse('Ok', 0, ['data' => $data]);
-            }
+            $this->addResponse('Ok', 0, ['data' => $data ?? []]);
 
             return;
         }
-    }
-
-    /**
-     * @acl(name=add)
-     */
-    public function addAction()
-    {
-        $this->requestIsPost();
-
-        $this->geoCountries->addCountry($this->postData());
-
-        $this->addResponse(
-            $this->geoCountries->packagesData->responseMessage,
-            $this->geoCountries->packagesData->responseCode
-        );
     }
 
     /**
@@ -178,13 +140,22 @@ class CountriesComponent extends BaseComponent
 
         $this->addResponse(
             $this->geoCountries->packagesData->responseMessage,
-            $this->geoCountries->packagesData->responseCode
+            $this->geoCountries->packagesData->responseCode,
+            $this->geoCountries->packagesData->responseData ?? []
         );
     }
 
     public function uninstallAction()
     {
-        //
+        $this->requestIsPost();
+
+        $this->geoCountries->uninstallCountry($this->postData());
+
+        $this->addResponse(
+            $this->geoCountries->packagesData->responseMessage,
+            $this->geoCountries->packagesData->responseCode,
+            $this->geoCountries->packagesData->responseData ?? []
+        );
     }
 
     public function searchCountryAction()
@@ -198,17 +169,15 @@ class CountriesComponent extends BaseComponent
                 return;
             }
 
-            $searchCountries = $this->geoCountries->searchCountries($searchQuery);
+            $countries = $this->geoCountries->searchCountries($searchQuery);
 
-            if ($searchCountries) {
-                $this->view->responseCode = $this->geoCountries->packagesData->responseCode;
+            $countries = msort($countries, 'id');
 
-                $countries = $this->geoCountries->packagesData->countries;
-
-                $countries = msort($countries, 'id');
-
-                $this->view->countries = $countries;
-            }
+            $this->addResponse(
+                $this->geoCountries->packagesData->responseMessage,
+                $this->geoCountries->packagesData->responseCode,
+                ['countries' => $countries] ?? []
+            );
         } else {
             $this->addResponse('Search Query Missing', 1);
         }

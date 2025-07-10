@@ -1,3 +1,4 @@
+{% set nameDisabled = false %}
 {% set defaultDisabled = false %}
 {% set defaultChecked = false %}
 {% set appDefaultChecked = false %}
@@ -10,6 +11,7 @@
     {% if dashboard['app_default'] is defined and dashboard['app_default'] == true %}
         {% set appDefaultChecked = true %}
         {% set defaultDisabled = true %}
+        {% set nameDisabled = true %}
     {% endif %}
     {% set dashboardShared = dashboard['shared'] %}
 {% else %}
@@ -56,6 +58,7 @@
                     'fieldHelp'                      : true,
                     'fieldHelpTooltipContent'        : 'Dashboard Name',
                     'fieldRequired'                  : true,
+                    'fieldDisabled'                  : nameDisabled,
                     'fieldBazScan'                   : true,
                     'fieldBazJstreeSearch'           : true,
                     'fieldBazPostOnCreate'           : true,
@@ -66,80 +69,85 @@
                 ]
             )}}
         </div>
-        <div class="col">
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                      : component,
-                    'componentName'                  : componentName,
-                    'componentId'                    : componentId,
-                    'sectionId'                      : sectionId,
-                    'fieldId'                        : 'user_default',
-                    'fieldLabel'                     : 'Dashboard is user default?',
-                    'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : "Check to make the dashboard user's default dashboard.",
-                    'fieldType'                      : 'checkbox',
-                    'fieldDisabled'                  : false,
-                    'fieldCheckboxType'              : 'info',
-                    'fieldCheckboxChecked'           : defaultChecked,
-                    'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                    'fieldBazPostOnCreate'           : true,
-                    'fieldBazPostOnUpdate'           : true,
-                    'fieldBazJstreeSearch'           : true,
-                    'fieldBazScan'                   : true
-                ]
-            )}}
-        </div>
-        <div class="col">
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                      : component,
-                    'componentName'                  : componentName,
-                    'componentId'                    : componentId,
-                    'sectionId'                      : sectionId,
-                    'fieldId'                        : 'app_default',
-                    'fieldLabel'                     : 'Dashboard is App default?',
-                    'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'Check to make the dashboard default dashboard.',
-                    'fieldType'                      : 'checkbox',
-                    'fieldDisabled'                  : true,
-                    'fieldCheckboxType'              : 'success',
-                    'fieldCheckboxChecked'           : appDefaultChecked,
-                    'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                    'fieldBazPostOnCreate'           : false,
-                    'fieldBazPostOnUpdate'           : false,
-                    'fieldBazJstreeSearch'           : true,
-                    'fieldBazScan'                   : true
-                ]
-            )}}
-        </div>
+        {% if not appDefaultChecked %}
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'user_default',
+                        'fieldLabel'                     : 'Dashboard is user default?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : "Check to make the dashboard user's default dashboard.",
+                        'fieldType'                      : 'checkbox',
+                        'fieldDisabled'                  : false,
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : defaultChecked,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        {% else %}
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'app_default',
+                        'fieldLabel'                     : 'Dashboard is App default?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Check to make the dashboard default dashboard.',
+                        'fieldType'                      : 'checkbox',
+                        'fieldDisabled'                  : true,
+                        'fieldCheckboxType'              : 'success',
+                        'fieldCheckboxChecked'           : appDefaultChecked,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        {% endif %}
     </div>
-    <div class="row">
-        <div class="col">
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                      : component,
-                    'componentName'                  : componentName,
-                    'componentId'                    : componentId,
-                    'sectionId'                      : sectionId,
-                    'fieldId'                        : 'shared',
-                    'fieldLabel'                     : 'Shared',
-                    'fieldType'                      : 'select2',
-                    'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'Select Accounts to share dashboard with',
-                    'fieldBazScan'                   : true,
-                    'fieldRequired'                  : false,
-                    'fieldBazPostOnCreate'           : true,
-                    'fieldBazPostOnUpdate'           : true,
-                    'fieldDataSelect2Options'        : sharedAccounts,
-                    'fieldDataSelect2Multiple'       : true,
-                    'fieldDataSelect2OptionsKey'     : 'id',
-                    'fieldDataSelect2OptionsValue'   : 'email',
-                    'fieldDataSelect2OptionsArray'   : true,
-                    'fieldDataSelect2OptionsSelected': dashboardShared
-                ]
-            )}}
+    {% if not appDefaultChecked %}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'shared',
+                        'fieldLabel'                     : 'Shared',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select Accounts to share dashboard with',
+                        'fieldBazScan'                   : true,
+                        'fieldRequired'                  : false,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataSelect2Options'        : sharedAccounts,
+                        'fieldDataSelect2Multiple'       : true,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'email',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': dashboardShared
+                    ]
+                )}}
+            </div>
         </div>
-    </div>
+    {% endif %}
 </form>
 <script>
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;

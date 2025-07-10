@@ -16,6 +16,8 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV4;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV6;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Holidays;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Regions;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ImportExport;
@@ -26,6 +28,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages\StoragesLocal;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Tags;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Templates;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Agents;
@@ -84,6 +87,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Basepackage
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesStorages;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesTags;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesTemplates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesWidgets;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Dashboards\BasepackagesDashboardsWidgets;
@@ -93,6 +97,8 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\Basepac
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv4;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv6;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoHolidays;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoRegions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Messenger\BasepackagesMessenger;
@@ -180,6 +186,10 @@ class Schema
                         'schema'    => new Externals,
                         'model'     => new ModulesExternals,
                     ],
+                'basepackages_tags'                         => [
+                        'schema'    => new Tags,
+                        'model'     => new BasepackagesTags,
+                    ],
                 'basepackages_email_services'               => [
                         'schema'    => new EmailServices,
                         'model'     => new BasepackagesEmailServices,
@@ -235,6 +245,14 @@ class Schema
                 'basepackages_filters'                      => [
                         'schema'    => new Filters,
                         'model'     => new BasepackagesFilters,
+                    ],
+                'basepackages_geo_regions'                  => [
+                        'schema'    => new Regions,
+                        'model'     => new BasepackagesGeoRegions,
+                    ],
+                'basepackages_geo_holidays'                 => [
+                        'schema'    => new Holidays,
+                        'model'     => new BasepackagesGeoHolidays,
                     ],
                 'basepackages_geo_countries'                => [
                         'schema'    => new Countries,

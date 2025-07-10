@@ -27,37 +27,36 @@ class StatesComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $state = $this->basepackages->geoStates->getById($this->getData()['id']);
 
-                if (!$state) {
-                    return $this->throwIdNotFound();
-                }
-
                 $this->view->state = $state;
-            } else {
-                $this->view->state = [];
             }
 
-            $this->view->countries = $countriesArr;
+            if (!$this->view->state) {
+                return $this->throwIdNotFound();
+            }
+
+            $this->view->countries = [$countriesArr[$state['country_id']]];
 
             $this->view->pick('states/view');
 
             return;
         }
 
-        $countries = [];
-
-        foreach ($countriesArr as $countriesKey => $country) {
-            $countries[$country['id']] = $country['name'] . ' (' . $country['id'] . ')';
-        }
         $controlActions =
             [
                 // 'includeQ'              => true,
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'system/geo/states',
+                    'view'      => 'system/geo/states',
                 ]
             ];
 
         if ($this->request->isPost()) {
+            $countries = [];
+
+            foreach ($countriesArr as $countriesKey => $country) {
+                $countries[$country['id']] = $country['name'] . ' (' . $country['id'] . ')';
+            }
+
             $replaceColumns =
                 [
                     'country_id'  =>
@@ -92,14 +91,7 @@ class StatesComponent extends BaseComponent
      */
     public function addAction()
     {
-        $this->requestIsPost();
-
-        $this->geoStates->addState($this->postData());
-
-        $this->addResponse(
-            $this->geoStates->packagesData->responseMessage,
-            $this->geoStates->packagesData->responseCode
-        );
+        //
     }
 
     /**
@@ -107,14 +99,7 @@ class StatesComponent extends BaseComponent
      */
     public function updateAction()
     {
-        $this->requestIsPost();
-
-        $this->geoStates->updateState($this->postData());
-
-        $this->addResponse(
-            $this->geoStates->packagesData->responseMessage,
-            $this->geoStates->packagesData->responseCode
-        );
+        //
     }
 
     public function searchStateAction()
@@ -128,13 +113,15 @@ class StatesComponent extends BaseComponent
                 return;
             }
 
-            $searchStates = $this->basepackages->geoStates->searchStates($searchQuery);
+            $states = $this->geoStates->searchStates($searchQuery);
 
-            if ($searchStates) {
-                $this->view->responseCode = $this->basepackages->geoStates->packagesData->responseCode;
+            $states = msort($states, 'id');
 
-                $this->view->states = $this->basepackages->geoStates->packagesData->states;
-            }
+            $this->addResponse(
+                $this->geoStates->packagesData->responseMessage,
+                $this->geoStates->packagesData->responseCode,
+                ['states' => $states] ?? []
+            );
         } else {
             $this->addResponse('Search Query Missing', 1);
         }

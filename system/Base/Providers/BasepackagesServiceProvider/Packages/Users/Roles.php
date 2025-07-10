@@ -140,7 +140,7 @@ class Roles extends BasePackage
         $appsArr = $this->apps->apps;
 
         foreach ($appsArr as $appKey => $app) {
-            $componentsArr = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
+            $componentsArr = msort($this->modules->components->getComponentsForAppIdAndAppType($app['id'], $app['app_type']), 'name');
 
             if (count($componentsArr) > 0) {
                 $components[strtolower($app['id'])] =

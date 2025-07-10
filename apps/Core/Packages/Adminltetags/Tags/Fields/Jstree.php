@@ -184,10 +184,16 @@ class Jstree
                     ]
                 );
 
-            if (!isset($this->params['fieldJstreeAdditionalClass'])) {
-                $this->fieldParams['fieldJstreeAdditionalClass'] = 'height-control-400';
+            if (!isset($this->params['fieldJstreeHeight'])) {
+                $this->fieldParams['fieldJstreeHeight'] = '400';
             } else {
-                $this->fieldParams['fieldJstreeAdditionalClass'] = $this->params['fieldJstreeAdditionalClass'] . ' height-control-400';
+                $this->fieldParams['fieldJstreeHeight'] = $this->params['fieldJstreeHeight'];
+            }
+
+            if (!isset($this->params['fieldJstreeAdditionalClass'])) {
+                $this->fieldParams['fieldJstreeAdditionalClass'] = 'height-control-' . $this->fieldParams['fieldJstreeHeight'];
+            } else {
+                $this->fieldParams['fieldJstreeAdditionalClass'] = $this->params['fieldJstreeAdditionalClass'] . ' height-control-' . $this->fieldParams['fieldJstreeHeight'];
             }
 
             $this->content .=

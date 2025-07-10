@@ -140,7 +140,9 @@ class EmailQueue extends BasePackage
 
                     $this->basepackages->email->setSender($queueEmailSettings['from_address'], $queueEmailSettings['from_address']);
 
-                    $queueEmail['to_addresses'] = $this->helper->decode($queueEmail['to_addresses'], true);
+                    if (is_string($queueEmail['to_addresses'])) {
+                        $queueEmail['to_addresses'] = $this->helper->decode($queueEmail['to_addresses'], true);
+                    }
                     if (count($queueEmail['to_addresses']) > 1) {
                         foreach ($queueEmail['to_addresses'] as $key => $toAddress) {
                             $this->basepackages->email->setRecipientTo($toAddress, $toAddress);

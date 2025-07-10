@@ -1,0 +1,128 @@
+{% if region['id'] is defined %}
+    {% set regionId = region['id'] %}
+    {% set regionName = region['name'] %}
+    {% set regionParentId = region['parent_region_id'] %}
+{% else %}
+    {% set regionId = '' %}
+    {% set regionName = '' %}
+    {% set regionParentId = '' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Region ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Region ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : regionId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Name Example: Asian',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : regionName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'parent_region_id',
+                        'fieldLabel'                           : 'Parent Region',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Parent Region',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : regions,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : regionParentId
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals BazContentFieldsValidator paginatedPNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-parent_region_id'        : {
+            placeholder : 'SELECT PARENT REGION'
+        },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter region name',
+            }
+        }
+    });
+</script>

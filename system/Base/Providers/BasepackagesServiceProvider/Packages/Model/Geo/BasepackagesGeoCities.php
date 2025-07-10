@@ -19,6 +19,4 @@ class BasepackagesGeoCities extends BaseModel
     public $state_id;
 
     public $country_id;
-
-    public $user_added;
 }

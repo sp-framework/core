@@ -88,14 +88,48 @@ class DocumentFinder
                     $conditionArr = $condition;
 
                     if (is_array($condition[0])) {
-                        foreach ($condition as $conditionArr) {
-                            $this->processIndexes($conditionArr, $found, $skip, $limit);
+                        $found = $this->processIndexes($condition[0], $found, $skip, $limit);
+
+                        if (count($found) > 0) {
+                            //Once our first condition is met, we do not process index anymore. We just process the data of first condition
+                            //This is like filtering. ex: we first search for data meeting one condition and once we have the data, we filter it
+                            //using following conditions.
+                            unset($condition[0]);
+
+                            foreach ($condition as $conditionArr) {
+                                //OR Condition
+                                if (is_string($conditionArr[1]) && strtolower($conditionArr[1]) === 'or') {
+                                    foreach ($found as $foundKey => $foundValue) {
+                                        if (isset($foundValue[$conditionArr[0][0]]) &&
+                                            isset($foundValue[$conditionArr[2][0]])
+                                        ) {
+                                            if ($foundValue[$conditionArr[0][0]] === $conditionArr[0][2] ||
+                                                $foundValue[$conditionArr[2][0]] === $conditionArr[2][2]
+                                            ) {
+                                                continue;
+                                            }
+
+                                            unset($found[$foundKey]);
+                                        }
+                                    }
+                                } else {//AndCondition
+                                    foreach ($found as $foundKey => $foundValue) {
+                                        if (isset($foundValue[$conditionArr[0]])) {
+                                            if ($foundValue[$conditionArr[0]] !== $conditionArr[2]) {
+                                                unset($found[$foundKey]);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     } else {
                         $this->processIndexes($conditionArr, $found, $skip, $limit);
                     }
                 }
             }
+
+            $found = msort($found, 'id');
         }
 
         if (!$indexSearched && count($found) === 0) {
@@ -191,7 +225,7 @@ class DocumentFinder
 
             //trim % (like), change space to + for multikeyword search.
             if (is_string($conditionArr[2])) {
-                $keyword = str_replace(' ', '+', strtolower(trim($conditionArr[0][2], '%')));
+                $keyword = str_replace(' ', '+', strtolower(trim($conditionArr[2], '%')));
             } else {
                 $keyword = $conditionArr[2];
             }
@@ -210,7 +244,7 @@ class DocumentFinder
                         $indexChars = $keyword;
                     }
 
-                    $found = array_merge($found, $this->searchIndexes($conditionArr, $indexChars, $skip, $limit, $keyword));
+                    $found = array_replace($found, $this->searchIndexes($conditionArr, $indexChars, $skip, $limit, $keyword));
                 }
             } else {
                 if (is_string($keyword)) {
@@ -223,7 +257,7 @@ class DocumentFinder
                     $indexChars = $keyword;
                 }
 
-                $found = array_merge($found, $this->searchIndexes($conditionArr, $indexChars, $skip, $limit, $keyword));
+                $found = array_replace($found, $this->searchIndexes($conditionArr, $indexChars, $skip, $limit, $keyword));
             }
         }
 
@@ -252,14 +286,14 @@ class DocumentFinder
                         $indexIdData = $this->store->findById($indexJson[$keyword][0]);
 
                         if ($indexIdData) {
-                            $found[] = $indexIdData;
+                            $found[$indexIdData['id']] = $indexIdData;
                         }
                     } else {
                         foreach ($indexJson[$keyword] as $id) {
                             $indexIdData = $this->store->findById($id);
 
                             if ($indexIdData) {
-                                $found[] = $indexIdData;
+                                $found[$indexIdData['id']] = $indexIdData;
                             }
                         }
                     }
@@ -278,7 +312,7 @@ class DocumentFinder
                                     $indexIdData = $this->store->findById($id);
 
                                     if ($indexIdData) {
-                                        $found[] = $indexIdData;
+                                        $found[$indexIdData['id']] = $indexIdData;
                                     }
                                 }
                             }
@@ -290,7 +324,7 @@ class DocumentFinder
                                     $indexIdData = $this->store->findById($id);
 
                                     if ($indexIdData) {
-                                        $found[] = $indexIdData;
+                                        $found[$indexIdData['id']] = $indexIdData;
                                     }
                                 }
                             }

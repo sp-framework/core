@@ -496,6 +496,7 @@ dataCollectionSection =
                         href +
                         e.params.data.id
                     );
+                    $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', true);
                     $('#{{componentId}}-{{sectionId}}-dashboard-loader').attr('hidden', false);
                     initGrid();
                     populateGridStructure();
