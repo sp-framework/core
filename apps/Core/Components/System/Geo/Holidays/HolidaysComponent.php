@@ -87,6 +87,8 @@ class HolidaysComponent extends BaseComponent
         $replaceColumns =
             function ($dataArr) {
                 if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
+                    $states = [];
+
                     foreach ($dataArr as &$data) {
                         if ($data['is_national_holiday'] == '1') {
                             $data['is_national_holiday'] = 'Yes';
@@ -94,9 +96,17 @@ class HolidaysComponent extends BaseComponent
                         } else {
                             $data['is_national_holiday'] = 'No';
 
-                            $state = $this->basepackages->geoStates->getById($data['state_id']);
+                            if (isset($states[$data['state_id']])) {
+                                $state = $states[$data['state_id']];
+                            } else {
+                                $state = $this->basepackages->geoStates->getById($data['state_id']);
+                            }
 
                             if ($state) {
+                                if (!isset($states[$state['id']])) {
+                                    $states[$state['id']] = $state;
+                                }
+
                                 $data['state_id'] = $state['name'];
                             } else {
                                 $data['state_id'] = '-';
