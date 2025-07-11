@@ -1479,13 +1479,7 @@ class Store
 
     protected function validateData(array $data)
     {
-        if (!$this->validateData) {
-            $data = $this->normalizeData($data);
-
-            return $data;
-        }
-
-        if (!isset($data['id']) && count($this->uniqueFields) > 0) {
+        if (count($this->uniqueFields) > 0) {//Search for unique data
             $criteria = [];
 
             $storeSchemaProperties = $this->getStoreSchema()['properties'];
@@ -1511,21 +1505,19 @@ class Store
 
                 if ($found && count($found) > 0) {
                     foreach ($found as $foundArr) {
-                        $match = false;
+                        if ($data['id'] == $foundArr['id']) {
+                            continue;
+                        }
 
                         foreach ($criteria as $criteriaArr) {
-                            if (isset($foundArr[$criteriaArr[0]]) && $foundArr[$criteriaArr[0]] === $criteriaArr[2]) {
-                                $match = true;
-                            } else {
-                                $match = false;
+                            if (isset($foundArr[$criteriaArr[0]]) && $foundArr[$criteriaArr[0]] !== $criteriaArr[2]) {
+                                continue 2;
                             }
                         }
 
-                        if ($match) {
-                            $duplicate = $foundArr['id'];
+                        $duplicate = $foundArr['id'];
 
-                            break;
-                        }
+                        break;
                     }
                 }
 
@@ -1533,6 +1525,12 @@ class Store
                     throw new IOException("Duplicate entry with ID: $duplicate found for field: $uniqueField. $uniqueField should be unique. Store: " . $this->storeName);
                 }
             }
+        }
+
+        if (!$this->validateData) {
+            $data = $this->normalizeData($data);
+
+            return $data;
         }
 
         if ($this->storeSchema === null) {

@@ -103,6 +103,15 @@ abstract class BasePackage extends Controller
 		$this->ffRelationsConditions = $conditions;
 	}
 
+	public function setFFValidation($validate = true)
+	{
+		if (!$this->ffStore) {
+			$this->ffStore = $this->ff->store($this->ffStoreToUse);
+		}
+
+		$this->ffStore->setValidateData($validate);
+	}
+
 	public function init()
 	{
 		$this->app = $this->apps->getAppInfo();
