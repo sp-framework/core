@@ -193,10 +193,11 @@ class ModulesComponent extends BaseComponent
 					foreach ($modulesTypeArr['childs'] as $childKey => &$child) {
 						$child = $this->modulesPackage->validateFilesHash($child);
 
-						if ($child['repoExists'] && !$child['isModified'] && $child['latestRelease']) {
+						if ($child['repoExists'] && !$child['isModified'] && !$child['releasePending'] && $child['latestRelease']) {
 							unset($modules[$moduleType]['childs'][$childKey]);
 						}
 
+						$modifiedModules[$child['id']] = [];
 						if (isset($child['modified_files']) && count($child['modified_files']) > 0) {
 							$modifiedModules[$child['id']] = $child['modified_files'];
 						}

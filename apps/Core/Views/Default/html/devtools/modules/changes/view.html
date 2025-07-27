@@ -24,6 +24,9 @@
                                 <a href="#" data-id="' ~ moduleArr['id'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="dropdown-item text-warning recalculateHashModule">
                                     <i class="fas fa-fw fa-xs fa-hashtag"></i> <span class="text-xs text-uppercase">Recalculate Hash</span>
                                 </a>
+                                <a href="#" data-id="' ~ moduleArr['id'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="dropdown-item text-info recalculateHashReleasePendingModule">
+                                    <i class="fas fa-fw fa-xs fa-hashtag"></i> <span class="text-xs text-uppercase">Recalculate Hash (Mark Release Pending)</span>
+                                </a>
                             </div>
                         </button>
                     </div>'
@@ -37,6 +40,10 @@
                     {% if moduleArr['repo_details']['latestRelease'] is defined %}
                         {% set moduleVersion = moduleArr['repo_details']['latestRelease']['name'] %}
                     {% endif %}
+                {% endif %}
+                {% set moduleReleasePending = '-' %}
+                {% if moduleArr['releasePending'] == true %}
+                    {% set moduleReleasePending = 'Yes' %}
                 {% endif %}
                 {% set moduleModified = '-' %}
                 {% if moduleArr['isModified'] != false %}
@@ -57,6 +64,7 @@
                 '           <td>' ~ moduleArr['module_type'] ~ '</td>' ~
                 '           <td>' ~ moduleUrl ~ '</td>' ~
                 '           <td>' ~ moduleVersion ~ '</td>' ~
+                '           <td>' ~ moduleReleasePending ~ '</td>' ~
                 '           <td>' ~ moduleModified ~ '</td>' ~
                 '           <td id="{{componentId}}-{{sectionId}}-changes-modules-' ~ moduleArr['name'] ~ '">' ~  moduleButtons ~ '</td>' ~
                 '       </tr>' %}
@@ -97,6 +105,7 @@
                         <th class="text-uppercase">Module Type</th>
                         <th class="text-uppercase">Repository</th>
                         <th class="text-uppercase">Latest Version</th>
+                        <th class="text-uppercase">Release pending</th>
                         <th class="text-uppercase">Modified</th>
                         <th class="text-uppercase">Actions</th>
                     </tr>
@@ -168,6 +177,7 @@ dataCollectionSectionForm['funcs']['init'] = function() {
                 null,
                 null,
                 null,
+                null,
                 { orderable: false }
             ],
             order: [[1, 'asc']],
@@ -216,6 +226,44 @@ dataCollectionSectionForm['funcs']['init'] = function() {
 
         Swal.fire({
             title                       : '<span class="text-warning"> Recalculate Hash for module?</span>',
+            icon                        : 'question',
+            background                  : 'rgba(0,0,0,.8)',
+            backdrop                    : 'rgba(0,0,0,.6)',
+            buttonsStyling              : false,
+            confirmButtonText           : 'Yes',
+            cancelButtonText            : 'No',
+            customClass                 : {
+                'confirmButton'             : 'btn btn-warning btn-sm text-uppercase',
+                'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+            },
+            showCancelButton            : true,
+            keydownListenerCapture      : true,
+            allowOutsideClick           : true,
+            allowEscapeKey              : true,
+            didOpen                     : function() {
+                dataCollection.env.sounds.swalSound.play();
+            }
+        }).then((result) => {
+            if (result.value) {
+                reCalculateFilesHash(postData);
+            } else {
+                reCalculateFilesHash(postData);
+            }
+        });
+    });
+
+    $('.recalculateHashReleasePendingModule').off();
+    $('.recalculateHashReleasePendingModule').click(function(e) {
+        e.preventDefault();
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+        postData['id'] = $(this).data()['id'];
+        postData['module_type'] = $(this).data()['type'];
+        postData['release_pending'] = 'true';
+
+        Swal.fire({
+            title                       : '<span class="text-warning"> Recalculate Hash (with release pending) for module?</span>',
             icon                        : 'question',
             background                  : 'rgba(0,0,0,.8)',
             backdrop                    : 'rgba(0,0,0,.6)',

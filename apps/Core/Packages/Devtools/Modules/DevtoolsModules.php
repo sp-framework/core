@@ -553,7 +553,13 @@ class DevtoolsModules extends BasePackage
 
     public function reCalculateFilesHash($module, $remove = false, $viaGenerateRelease = false, $viaValidation = false, $force = false)
     {
+        $releasePending = false;
+
         if ($force) {
+            if (isset($module['release_pending']) && $module['release_pending'] == 'true') {
+                $releasePending = true;
+            }
+
             $module = $this->modules->{$module['module_type']}->getById($module['id']);
         }
 
@@ -642,6 +648,12 @@ class DevtoolsModules extends BasePackage
                 }
             }
 
+            if ($releasePending) {
+                $filesHash['release_pending'] = true;
+            } else {
+                $filesHash['release_pending'] = false;
+            }
+
             if (isset($filesHash['id'])) {
                 $this->update($filesHash);
             } else {
@@ -692,8 +704,16 @@ class DevtoolsModules extends BasePackage
             $filesHash = $this->getFilesHash($module);
 
             $module['isModified'] = false;
+            $module['releasePending'] = false;
+
             if (!$filesHash) {
                 $this->reCalculateFilesHash($module, false, false, true);
+
+                return $module;
+            }
+
+            if (isset($filesHash['release_pending']) && $filesHash['release_pending'] == true) {
+                $module['releasePending'] = true;
 
                 return $module;
             }

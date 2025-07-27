@@ -42,6 +42,13 @@ class FilesHash
                         'type'          => Column::TYPE_JSON,
                         'notNull'       => true,
                     ]
+                ),
+                new Column(
+                    'release_pending',
+                    [
+                        'type'          => Column::TYPE_BOOLEAN,
+                        'notNull'       => false,
+                    ]
                 )
             ],
             'indexes' => [
