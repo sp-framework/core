@@ -42565,3 +42565,9 @@ a.disabled {
 .flatpickr-wrapper {
   width: 100%;
 }
+
+.swal2-popup {
+  width: auto !important;
+  max-width: none !important;
+  min-width: 32em;
+}
