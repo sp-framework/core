@@ -6763,6 +6763,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     $('#listing-data-loader').hide();
                     $('#listing-primary-buttons').attr('hidden', false);
                     $('#listing-secondary-buttons').attr('hidden', false);
+                    $('#listing-additional-fields').attr('hidden', false);
                     $('#listing-filters').attr('hidden', false);
                     that._tableInit(false);
                     that._registerEvents();
@@ -6785,13 +6786,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         $('#listing-data-loader').hide();
                         $('#listing-primary-buttons').attr('hidden', false);
                         $('#listing-secondary-buttons').attr('hidden', false);
+                        $('#listing-additional-fields').attr('hidden', false);
                         $('#listing-filters').attr('hidden', false);
                         $.extend(thisOptions.listOptions.datatable, JSON.parse(response.rows));
-                        $('body').trigger(
-                            {
-                                'type'     : 'sectionWithListingLoaded'
-                            }
-                        );
                     }
                 }).done(function(response) {
                     if (response.tokenKey && response.token) {
@@ -6812,6 +6809,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             }
                         }
                     }
+                    $('body').trigger(
+                        {
+                            'type'     : 'sectionWithListingLoaded'
+                        }
+                    );
                 });
                     // TODO: fix card-body height when more rows are loaded.
                     // TODO: BULK Edit/Delete

@@ -90,6 +90,15 @@ class DynamicTable
                 $this->content .= '</div>';
             }
 
+            if (isset($this->params['dtAdditionalFields'])) {
+                $this->content .=
+                    '<div class="col" id="listing-additional-fields" hidden>';
+
+                $this->content .= $this->params['dtAdditionalFields'];
+
+                $this->content .= '</div>';
+            }
+
             $this->content .= '</div></div></div>';
         }
 
