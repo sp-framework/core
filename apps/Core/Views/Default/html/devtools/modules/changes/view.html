@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+<!-- htmlhint tag-pair:false -->
 {% set changesHtml = '' %}
 {% if modules|length > 0 %}
     {% for moduleType, modulesArr in modules %}
@@ -21,9 +21,13 @@
                                 <a href="' ~ releaseUrl ~ '" data-id="' ~ moduleArr['id'] ~ '" class="dropdown-item text-success releaseModule">
                                     <i class="fas fa-fw fa-xs fa-wand-magic-sparkles"></i> <span class="text-xs text-uppercase">Generate Release</span>
                                 </a>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-divider"></div>
                                 <a href="#" data-id="' ~ moduleArr['id'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="dropdown-item text-warning recalculateHashModule">
                                     <i class="fas fa-fw fa-xs fa-hashtag"></i> <span class="text-xs text-uppercase">Recalculate Hash</span>
                                 </a>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-divider"></div>
                                 <a href="#" data-id="' ~ moduleArr['id'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="dropdown-item text-info recalculateHashReleasePendingModule">
                                     <i class="fas fa-fw fa-xs fa-hashtag"></i> <span class="text-xs text-uppercase">Recalculate Hash (Mark Release Pending)</span>
                                 </a>
@@ -332,4 +336,3 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
-<!-- htmlmin:ignore -->
