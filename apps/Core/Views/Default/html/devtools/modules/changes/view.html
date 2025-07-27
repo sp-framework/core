@@ -247,7 +247,7 @@ dataCollectionSectionForm['funcs']['init'] = function() {
             if (result.value) {
                 reCalculateFilesHash(postData);
             } else {
-                reCalculateFilesHash(postData);
+                return;
             }
         });
     });
@@ -285,7 +285,7 @@ dataCollectionSectionForm['funcs']['init'] = function() {
             if (result.value) {
                 reCalculateFilesHash(postData);
             } else {
-                reCalculateFilesHash(postData);
+                return;
             }
         });
     });
