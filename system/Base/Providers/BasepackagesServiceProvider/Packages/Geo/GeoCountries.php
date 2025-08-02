@@ -15,6 +15,23 @@ class GeoCountries extends BasePackage
 
     protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/';
 
+    public function init(bool $resetCache = false)
+    {
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('geoCountries', 'core')) {
+                $this->geoCountries = $this->opCache->getCache('geoCountries', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('geoCountries', $this->geoCountries, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
+
+        return $this;
+    }
+
     public function updateCountry(array $data)
     {
         $country = $this->getById($data['id']);

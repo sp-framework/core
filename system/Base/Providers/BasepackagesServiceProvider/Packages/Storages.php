@@ -16,7 +16,17 @@ class Storages extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('storages', 'core')) {
+                $this->storages = $this->opCache->getCache('storages', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('storages', $this->storages, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }

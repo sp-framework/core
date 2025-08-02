@@ -15,6 +15,23 @@ class GeoStates extends BasePackage
 
     protected $countries;
 
+    public function init(bool $resetCache = false)
+    {
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('geoStates', 'core')) {
+                $this->geoStates = $this->opCache->getCache('geoStates', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('geoStates', $this->geoStates, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
+
+        return $this;
+    }
+
     public function searchStates(string $stateQueryString)
     {
         if ($this->config->databasetype === 'db') {

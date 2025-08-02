@@ -13,7 +13,17 @@ class Bundles extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('bundles', 'core')) {
+                $this->bundles = $this->opCache->getCache('bundles', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('bundles', $this->bundles, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }

@@ -15,7 +15,17 @@ class Workers extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('workers', 'core')) {
+                $this->workers = $this->opCache->getCache('workers', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('workers', $this->workers, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }

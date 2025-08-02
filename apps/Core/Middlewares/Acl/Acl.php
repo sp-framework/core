@@ -43,7 +43,7 @@ class Acl extends BaseMiddleware
         $this->actions =
             ['view', 'add', 'update', 'remove', 'msview', 'msupdate'];
 
-        $rolesArr = $this->basepackages->roles->getAll()->roles;
+        $rolesArr = $this->basepackages->roles->roles;
         $roles = [];
         foreach ($rolesArr as $key => $value) {
             $roles[$value['id']] = $value;

@@ -15,7 +15,17 @@ class Menus extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('menus', 'core')) {
+                $this->menus = $this->opCache->getCache('menus', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('menus', $this->menus, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }

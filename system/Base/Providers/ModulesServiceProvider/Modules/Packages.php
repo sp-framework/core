@@ -13,7 +13,17 @@ class Packages extends BasePackage
 
 	public function init(bool $resetCache = false)
 	{
-		$this->getAll($resetCache);
+		if ($this->opCache) {
+			if (!$resetCache && $this->opCache->checkCache('packages', 'core')) {
+				$this->packages = $this->opCache->getCache('packages', 'core');
+			} else {
+				$this->getAll($resetCache);
+
+				$this->opCache->setCache('packages', $this->packages, 'core');
+			}
+		} else {
+			$this->getAll($resetCache);
+		}
 
 		return $this;
 	}

@@ -61,6 +61,10 @@ class Store
 
     protected $ff;
 
+    protected $app;
+
+    protected $opCache;
+
     const dataDirectory = "data/";
 
     public function __construct(string $storeName, string $databasePath, $ff, array $configuration = [], array $schema = [])
@@ -409,6 +413,12 @@ class Store
 
         $this->data = $data;
 
+        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
+        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
+        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+            $this->opCache->removeCache(null, 'core');
+        }
+
         return $this->data;
     }
 
@@ -432,6 +442,12 @@ class Store
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
         $this->data = $results;
+
+        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
+        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
+        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+            $this->opCache->removeCache(null, 'core');
+        }
 
         return $this->data;
     }
@@ -506,6 +522,12 @@ class Store
         }
 
         $this->data = $data;
+
+        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
+        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
+        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+            $this->opCache->removeCache(null, 'core');
+        }
 
         return $this->data;
     }
@@ -588,6 +610,11 @@ class Store
 
         $this->data = $data;
 
+        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
+        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
+        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+            $this->opCache->removeCache(null, 'core');
+        }
         return $this->data;
     }
 
@@ -640,6 +667,12 @@ class Store
         }
 
         $this->data = $data;
+
+        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
+        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
+        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+            $this->opCache->removeCache(null, 'core');
+        }
 
         return $this->data;
     }
@@ -696,6 +729,12 @@ class Store
 
         $this->data = $data;
 
+        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
+        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
+        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+            $this->opCache->removeCache(null, 'core');
+        }
+
         return $this->data;
     }
 
@@ -711,6 +750,12 @@ class Store
                     }
                 }
             }
+        }
+
+        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
+        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
+        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+            $this->opCache->removeCache(null, 'core');
         }
 
         return true;
@@ -733,6 +778,12 @@ class Store
             // if ($this->ff->mode === 'hybrid') {
             //     $this->ff->addToSync($this->model, (int) $id, 'remove');
             // }
+
+            $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
+            $this->opCache = $this->ff->request->getDi()->getShared('opCache');
+            if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+                $this->opCache->removeCache(null, 'core');
+            }
 
             return (!file_exists($this->getDataPath() . "$id.json") || true === @unlink($this->getDataPath() . "$id.json"));
         }

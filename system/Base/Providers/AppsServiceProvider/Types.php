@@ -15,7 +15,17 @@ class Types extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('types', 'core')) {
+                $this->types = $this->opCache->getCache('types', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('types', $this->types, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }

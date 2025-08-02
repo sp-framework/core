@@ -32,7 +32,17 @@ class Core extends BasePackage
 
 	public function init(bool $resetCache = false)
 	{
-		$this->getAll($resetCache);
+		if ($this->opCache) {
+			if (!$resetCache && $this->opCache->checkCache('core', 'core')) {
+				$this->core = $this->opCache->getCache('core', 'core');
+			} else {
+				$this->getAll($resetCache);
+
+				$this->opCache->setCache('core', $this->core, 'core');
+			}
+		} else {
+			$this->getAll($resetCache);
+		}
 
 		$this->core = $this->core[1];
 

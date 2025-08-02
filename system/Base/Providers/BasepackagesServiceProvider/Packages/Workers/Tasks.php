@@ -19,7 +19,17 @@ class Tasks extends BasePackage
     {
         $this->setFFRelations(true);
 
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('tasks', 'core')) {
+                $this->tasks = $this->opCache->getCache('tasks', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('tasks', $this->tasks, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }

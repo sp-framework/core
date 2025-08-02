@@ -24,6 +24,10 @@ class Accounts extends BasePackage
 
     public function getAccountById(int $id)
     {
+        if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
+            return $this->opCache->getCache('account_' . $id, 'core');
+        }
+
         $this->ffStore = $this->ff->store($this->ffStoreToUse);
 
         $this->setFFRelations(true);
@@ -107,6 +111,10 @@ class Accounts extends BasePackage
                 $account['api_user'] = $this->model->getApiUser()->toArray();
             }
 
+            if ($this->opCache) {
+                $this->opCache->setCache('account_' . $id, $account, 'core');
+            }
+
             return $account;
         } else {
             if ($this->ffData) {
@@ -129,6 +137,10 @@ class Accounts extends BasePackage
                 }
 
                 $this->ffData = $this->jsonData($this->ffData, true);
+
+                if ($this->opCache) {
+                    $this->opCache->setCache('account_' . $id, $this->ffData, 'core');
+                }
 
                 return $this->ffData;
             }

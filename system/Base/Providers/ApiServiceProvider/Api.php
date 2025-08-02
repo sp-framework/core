@@ -95,7 +95,17 @@ class Api extends BasePackage
         $this->clients = new Clients;
 
         if ($this->container) {
-            $this->getAll($resetCache);
+            if ($this->opCache) {
+                if (!$resetCache && $this->opCache->checkCache('apiServices', 'core')) {
+                    $this->apiServices = $this->opCache->getCache('apiServices', 'core');
+                } else {
+                    $this->getAll($resetCache);
+
+                    $this->opCache->setCache('apiServices', $this->apiServices, 'core');
+                }
+            } else {
+                $this->getAll($resetCache);
+            }
         }
 
         return $this;

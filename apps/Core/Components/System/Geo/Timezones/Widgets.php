@@ -9,7 +9,7 @@ class Widgets extends ComponentsWidgets
 {
     public function worldClock($widget, $dashboardWidget)
     {
-        $timezonesArr = $this->componentObj->getDi()->getShared('basepackages')->geoTimezones->getAll()->geoTimezones;
+        $timezonesArr = $this->componentObj->getDi()->getShared('basepackages')->geoTimezones->geoTimezones;
         $timezones = [];
 
         foreach ($timezonesArr as $timezone) {

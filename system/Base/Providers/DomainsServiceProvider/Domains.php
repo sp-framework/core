@@ -23,7 +23,17 @@ class Domains extends BasePackage
 
 	public function init(bool $resetCache = false)
 	{
-		$this->getAll($resetCache);
+		if ($this->opCache) {
+			if (!$resetCache && $this->opCache->checkCache('domains', 'core')) {
+				$this->domains = $this->opCache->getCache('domains', 'core');
+			} else {
+				$this->getAll($resetCache);
+
+				$this->opCache->setCache('domains', $this->domains, 'core');
+			}
+		} else {
+			$this->getAll($resetCache);
+		}
 
 		$this->getDomain();
 

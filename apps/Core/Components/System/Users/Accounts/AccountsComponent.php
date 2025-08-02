@@ -83,9 +83,9 @@ class AccountsComponent extends BaseComponent
 
                 $this->view->roles = $this->accounts->packagesData->roles;
 
-                $this->view->countries = $this->basepackages->geoCountries->getAll()->geoCountries;
+                $this->view->countries = $this->basepackages->geoCountries->geoCountries;
 
-                $this->view->timezones = $this->basepackages->geoTimezones->getAll()->geoTimezones;
+                $this->view->timezones = $this->basepackages->geoTimezones->geoTimezones;
             }
 
             $this->addResponse(

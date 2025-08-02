@@ -13,7 +13,17 @@ class Components extends BasePackage
 
 	public function init(bool $resetCache = false)
 	{
-		$this->getAll($resetCache);
+		if ($this->opCache) {
+			if (!$resetCache && $this->opCache->checkCache('components', 'core')) {
+				$this->components = $this->opCache->getCache('components', 'core');
+			} else {
+				$this->getAll($resetCache);
+
+				$this->opCache->setCache('components', $this->components, 'core');
+			}
+		} else {
+			$this->getAll($resetCache);
+		}
 
 		return $this;
 	}

@@ -13,7 +13,17 @@ class Widgets extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('widgets', 'core')) {
+                $this->widgets = $this->opCache->getCache('widgets', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('widgets', $this->widgets, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }

@@ -32,7 +32,17 @@ class Apps extends BasePackage
 
 		$this->reservedRoutes = $this->getReservedRoutes();
 
-		$this->getAll($resetCache);
+		if ($this->opCache) {
+			if (!$resetCache && $this->opCache->checkCache('apps', 'core')) {
+				$this->apps = $this->opCache->getCache('apps', 'core');
+			} else {
+				$this->getAll($resetCache);
+
+				$this->opCache->setCache('apps', $this->apps, 'core');
+			}
+		} else {
+			$this->getAll($resetCache);
+		}
 
 		$this->app = $this->getAppInfo();
 

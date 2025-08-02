@@ -17,6 +17,23 @@ class GeoCities extends BasePackage
 
     protected $states = [];
 
+    public function init(bool $resetCache = false)
+    {
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('geoCities', 'core')) {
+                $this->geoCities = $this->opCache->getCache('geoCities', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('geoCities', $this->geoCities, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
+
+        return $this;
+    }
+
     public function addCity(array $data)
     {
         //

@@ -13,7 +13,17 @@ class ViewsSettings extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('viewssettings', 'core')) {
+                $this->viewssettings = $this->opCache->getCache('viewssettings', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('viewssettings', $this->viewssettings, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }

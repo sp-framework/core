@@ -21,7 +21,7 @@ class Ff
 
     protected $cacheConfig = [];
 
-    protected $request;
+    public $request;
 
     public $helper;
 

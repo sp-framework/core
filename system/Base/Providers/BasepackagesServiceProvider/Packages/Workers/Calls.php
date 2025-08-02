@@ -21,7 +21,17 @@ class Calls extends BasePackage
     {
         $this->setFFRelations(true);
 
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('calls', 'core')) {
+                $this->calls = $this->opCache->getCache('calls', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('calls', $this->calls, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         return $this;
     }

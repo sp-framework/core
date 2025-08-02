@@ -1283,6 +1283,10 @@ abstract class BasePackage extends Controller
 					$this->resetCache();
 				}
 
+				if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+					$this->opCache->removeCache(null, 'core');
+				}
+
 				return true;
 			} else {
 				$this->transactionErrors = [];
@@ -1349,6 +1353,10 @@ abstract class BasePackage extends Controller
 					}
 				} else {
 					$this->packagesData->last = $update;
+				}
+
+				if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+					$this->opCache->removeCache(null, 'core');
 				}
 
 				return true;
@@ -1448,6 +1456,10 @@ abstract class BasePackage extends Controller
 					$this->resetCache($id, true);
 				}
 
+				if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+					$this->opCache->removeCache(null, 'core');
+				}
+
 				$this->addResponse(ucfirst($this->packageNameS) . " Deleted!");
 
 				return true;
@@ -1457,6 +1469,10 @@ abstract class BasePackage extends Controller
 		} else if ($this->ffStore && $this->ffData && $this->ffData['id'] == $id) {
 			if ($this->ffStore->deleteById((int) $id, $removeRelated, $this->ffRelationsConditions, $excludeRelatedAliases)) {
 				$this->addResponse(ucfirst($this->packageNameS) . " Deleted!");
+
+				if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+					$this->opCache->removeCache(null, 'core');
+				}
 
 				return true;
 			} else {

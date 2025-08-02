@@ -18,7 +18,17 @@ class EmailServices extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('emailServices', 'core')) {
+                $this->emailServices = $this->opCache->getCache('emailServices', 'core');
+            } else {
+                $this->getAll($resetCache);
+
+                $this->opCache->setCache('emailServices', $this->emailServices, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
         parent::init();
 
