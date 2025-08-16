@@ -1316,14 +1316,14 @@ div.dataTables_wrapper div.dataTables_length select {
 .flatpickr-calendar .hasWeeks .dayContainer {
   border-left: 0;
 }
-.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {
+.flatpickr-calendar.hasTime .flatpickr-time {
   height: 40px;
   border-top: 1px solid rgba(72,72,72,0.2);
 }
-.flatpickr-calendar.showTimeInput.hasTime .flatpickr-innerContainer {
+.flatpickr-calendar.hasTime .flatpickr-innerContainer {
   border-bottom: 0;
 }
-.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {
+.flatpickr-calendar.hasTime .flatpickr-time {
   border: 1px solid rgba(72,72,72,0.2);
 }
 .flatpickr-calendar.noCalendar.hasTime .flatpickr-time {
@@ -1341,9 +1341,16 @@ div.dataTables_wrapper div.dataTables_length select {
   left: 22px;
 }
 .flatpickr-calendar.rightMost:before,
-.flatpickr-calendar.rightMost:after {
+.flatpickr-calendar.arrowRight:before,
+.flatpickr-calendar.rightMost:after,
+.flatpickr-calendar.arrowRight:after {
   left: auto;
   right: 22px;
+}
+.flatpickr-calendar.arrowCenter:before,
+.flatpickr-calendar.arrowCenter:after {
+  left: 50%;
+  right: 50%;
 }
 .flatpickr-calendar:before {
   border-width: 5px;
@@ -1407,6 +1414,10 @@ div.dataTables_wrapper div.dataTables_length select {
 }
 .flatpickr-months .flatpickr-prev-month,
 .flatpickr-months .flatpickr-next-month {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   text-decoration: none;
   cursor: pointer;
   position: absolute;
@@ -2042,19 +2053,6 @@ span.flatpickr-weekday {
     opacity: 1;
     -webkit-transform: translate3d(0, 0, 0);
             transform: translate3d(0, 0, 0);
-  }
-}
-span.flatpickr-weekday {
-  display: inline-block;
-  width: 14.2857143%;
-}
-span.flatpickr-day {
-  width: 14.2857143%;
-  margin: 0 2.491071428571428px;
-}
-@media screen and (min-width: 0\0) {
-  div.flatpickr-current-month {
-    padding-top: 0px !important;
   }
 }
 

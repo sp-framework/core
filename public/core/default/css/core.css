@@ -42511,7 +42511,7 @@ a.disabled {
 
 .dropdown-menu {
   border-radius: 0;
-  min-width: 12rem !important;
+  min-width: 15rem !important;
 }
 
 .dropdown-menu > li > a:hover,
@@ -42564,6 +42564,10 @@ a.disabled {
 }
 .flatpickr-wrapper {
   width: 100%;
+}
+
+.flatpickr-calendar.static.open {
+  z-index: 9999;
 }
 
 .swal2-popup {

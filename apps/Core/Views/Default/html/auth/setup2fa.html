@@ -12,112 +12,110 @@ BazCore.header({
             </div>
             <div id="{{componentId}}-regular" hidden>
                 <p class="login-box-msg text-sm font-weight-bold p-1 mb-2">App requires 2 factor authentication. Setup now to login.</p>
-                <div id="{{componentId}}-form">
-                    <div id="credentials-div" style="margin: auto; width: 50%;">
-                        <div class="row">
-                            <div class="col">
-                                {{adminltetags.useTag('fields',
-                                    [
-                                        'componentId'                           : componentId,
-                                        'sectionId'                             : 'form',
-                                        'fieldId'                               : 'user',
-                                        'fieldLabel'                            : false,
-                                        'fieldType'                             : 'input',
-                                        'fieldInputType'                        : 'text',
-                                        'fieldPlaceholder'                      : 'Username',
-                                        'fieldBazScan'                          : true,
-                                        'fieldGroupPostAddonIcon'               : 'user'
-                                    ]
-                                )}}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                {{adminltetags.useTag('fields',
-                                    [
-                                        'componentId'                           : componentId,
-                                        'sectionId'                             : 'form',
-                                        'fieldId'                               : 'pass',
-                                        'fieldLabel'                            : false,
-                                        'fieldType'                             : 'input',
-                                        'fieldInputType'                        : 'password',
-                                        'fieldPlaceholder'                      : 'Current Password',
-                                        'fieldBazScan'                          : true,
-                                        'fieldGroupPostAddonIcon'               : 'lock'
-                                    ]
-                                )}}
-                            </div>
+                <div id="credentials-div" style="margin: auto; width: 50%;">
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : 'form',
+                                    'fieldId'                               : 'user',
+                                    'fieldLabel'                            : false,
+                                    'fieldType'                             : 'input',
+                                    'fieldInputType'                        : 'text',
+                                    'fieldPlaceholder'                      : 'Username',
+                                    'fieldBazScan'                          : true,
+                                    'fieldGroupPostAddonIcon'               : 'user'
+                                ]
+                            )}}
                         </div>
                     </div>
-                    <div id="generate-div" class="row text-center">
+                    <div class="row">
                         <div class="col">
-                            <button id="{{componentId}}-form-generate-code" type="button" class="btn btn-primary float-right btn-sm">
-                                <i class="fa fa-cog fa-spin login-spinner" hidden></i>
-                                <span class="text-uppercase">Generate 2 Factor Authentication Code</span>
-                            </button>
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : 'form',
+                                    'fieldId'                               : 'pass',
+                                    'fieldLabel'                            : false,
+                                    'fieldType'                             : 'input',
+                                    'fieldInputType'                        : 'password',
+                                    'fieldPlaceholder'                      : 'Current Password',
+                                    'fieldBazScan'                          : true,
+                                    'fieldGroupPostAddonIcon'               : 'lock'
+                                ]
+                            )}}
                         </div>
                     </div>
-                    <div id="regenerate-div" class="row m-3 text-center" hidden>
-                        <div class="col">
-                            <button id="{{componentId}}-form-regenerate-code" type="button" class="btn btn-primary float-right btn-sm">
-                                <i class="fa fa-cog fa-spin login-spinner" hidden></i>
-                                <span class="text-uppercase">Re-Generate 2 Factor Authentication Code</span>
-                            </button>
-                        </div>
+                </div>
+                <div id="generate-div" class="row text-center">
+                    <div class="col">
+                        <button id="{{componentId}}-form-generate-code" type="button" class="btn btn-primary float-right btn-sm">
+                            <i class="fa fa-cog fa-spin login-spinner" hidden></i>
+                            <span class="text-uppercase">Generate 2 Factor Authentication Code</span>
+                        </button>
                     </div>
-                    <div id="twofa-details" class="row vdivide" hidden>
-                        <div class="col-md-4 d-flex justify-content-center">
-                            <div id="twofa-qrcode"></div>
+                </div>
+                <div id="regenerate-div" class="row m-3 text-center" hidden>
+                    <div class="col">
+                        <button id="{{componentId}}-form-regenerate-code" type="button" class="btn btn-primary float-right btn-sm">
+                            <i class="fa fa-cog fa-spin login-spinner" hidden></i>
+                            <span class="text-uppercase">Re-Generate 2 Factor Authentication Code</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="twofa-details" class="row vdivide" hidden>
+                    <div class="col-md-4 d-flex justify-content-center">
+                        <div id="twofa-qrcode"></div>
+                    </div>
+                    <div class="col">
+                        <div id="twofa-instructions">
+                            <p>INSTRUCTIONS:</p>
+                            <ul>
+                                <li><span class="text-xs">Scan the shown QR Code on your authenticator app.</span></li>
+                                <li><span class="text-xs">If, for any reason, you cannot scan the QR Code, you can type in this secret code manually.</span> <br>Secret Code: <span class="font-weight-bold" id="twofa-secret"></span></li>
+                                <li><span class="text-xs">Once successfully added into your app, enter the generated code from the app and click verify.</span></li>
+                            </ul>
                         </div>
-                        <div class="col">
-                            <div id="twofa-instructions">
-                                <p>INSTRUCTIONS:</p>
-                                <ul>
-                                    <li><span class="text-xs">Scan the shown QR Code on your authenticator app.</span></li>
-                                    <li><span class="text-xs">If, for any reason, you cannot scan the QR Code, you can type in this secret code manually.</span> <br>Secret Code: <span class="font-weight-bold" id="twofa-secret"></span></li>
-                                    <li><span class="text-xs">Once successfully added into your app, enter the generated code from the app and click verify.</span></li>
-                                </ul>
-                            </div>
-                            <div id="twofa-verification">
-                                <p>VERIFICATION:</p>
-                                {{adminltetags.useTag('fields',
-                                    [
-                                        'componentId'                           : componentId,
-                                        'sectionId'                             : 'form',
-                                        'fieldId'                               : 'verifycode',
-                                        'fieldLabel'                            : false,
-                                        'fieldType'                             : 'input',
-                                        'fieldInputType'                        : 'text',
-                                        'fieldPlaceholder'                      : 'Generated Code',
-                                        'fieldDataInputMinLength'               : 6,
-                                        'fieldDataInputMaxLength'               : 6,
-                                        'fieldBazScan'                          : true,
-                                        'fieldGroupPostAddonButtons'            :
-                                            [
-                                                'verify'   : [
-                                                    'title'                     : 'Verify',
-                                                    'icon'                      : 'cog fa-spin',
-                                                    'iconHidden'                : true,
-                                                    'noMargin'                  : true,
-                                                    'disabled'                  : true,
-                                                    'buttonAdditionalClass'     : 'rounded-0 text-white',
-                                                    'position'                  : 'right'
-                                                ]
+                        <div id="twofa-verification">
+                            <p>VERIFICATION:</p>
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : 'form',
+                                    'fieldId'                               : 'verifycode',
+                                    'fieldLabel'                            : false,
+                                    'fieldType'                             : 'input',
+                                    'fieldInputType'                        : 'text',
+                                    'fieldPlaceholder'                      : 'Generated Code',
+                                    'fieldDataInputMinLength'               : 6,
+                                    'fieldDataInputMaxLength'               : 6,
+                                    'fieldBazScan'                          : true,
+                                    'fieldGroupPostAddonButtons'            :
+                                        [
+                                            'verify'   : [
+                                                'title'                     : 'Verify',
+                                                'icon'                      : 'cog fa-spin',
+                                                'iconHidden'                : true,
+                                                'noMargin'                  : true,
+                                                'disabled'                  : true,
+                                                'buttonAdditionalClass'     : 'rounded-0 text-white',
+                                                'position'                  : 'right'
                                             ]
-                                    ]
-                                )}}
-                            </div>
+                                        ]
+                                ]
+                            )}}
                         </div>
                     </div>
-                    <div class="row m-3 text-center">
-                        <div class="col-md-3">
-                            <a class="text-info" href="{{links.url('auth')}}">
-                                <span>Back to login</span>
-                            </a>
-                        </div>
-                        <div id="login-div" class="col" hidden>
-                            <a href="#" id="login" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Login with 2FA</a>
-                        </div>
+                </div>
+                <div class="row m-3 text-center">
+                    <div class="col-md-3">
+                        <a class="text-info" href="{{links.url('auth')}}">
+                            <span>Back to login</span>
+                        </a>
+                    </div>
+                    <div id="login-div" class="col" hidden>
+                        <a href="#" id="login" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Login with 2FA</a>
                     </div>
                 </div>
                 {% include 'auth/footer.html' %}
