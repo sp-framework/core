@@ -452,6 +452,10 @@ abstract class BasePackage extends Controller
 			if (is_array($this->ffData) && count($this->ffData) > 0) {
 				if (isset($params['columns']) && count($params['columns']) > 0) {//Filter Data as per requested columns
 					foreach ($this->ffData as $ffDataKey => $ffData) {
+						if (!$ffData) {
+							continue;
+						}
+
 						foreach ($ffData as $ffDataColumnKey => $ffDataColumnValue) {
 							if (!in_array($ffDataColumnKey, $params['columns'])) {
 								unset($this->ffData[$ffDataKey][$ffDataColumnKey]);
@@ -588,6 +592,26 @@ abstract class BasePackage extends Controller
 						0,
 				]
 			);
+
+		//Retrieve from Users Env
+		if (count($this->postData()) === 0) {
+			$envParams = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], false, true);
+
+			if ($envParams) {
+				if (isset($envParams['params'])) {
+					$params = $envParams['params'];
+				}
+
+				if (isset($envParams['pageParams'])) {
+					$pageParams = $envParams['pageParams'];
+				}
+			}
+		}
+
+		//Add to Users Env
+		if ($this->access->auth->account()) {
+			$this->basepackages->accounts->checkUpdateEnv($this->access->auth->account['id'], ['params' => $params, 'pageParams' => $pageParams]);
+		}
 
 		if (!$arrayData && isset($pageParams)) {
 			if ($this->config->databasetype === 'db') {

@@ -407,7 +407,6 @@
                     var columns = { };
 
                     $.each(conditionsColumns, function(index, column) {
-
                         columns[index] = { };
                         columns[index][0] = { };
                         columns[index][0]['id'] = sectionId + '-filter-andor';
@@ -1204,6 +1203,37 @@
                         $('#listing-additional-fields').attr('hidden', false);
                         $('#listing-filters').attr('hidden', false);
                         $.extend(thisOptions.listOptions.datatable, JSON.parse(response.rows));
+
+                        if (response.accountEnv) {
+                            dataCollection.env.accountEnv = response.accountEnv;
+                        }
+
+                        if (response.routeEnv && response.routeEnv.pageParams) {
+                            if (response.routeEnv.pageParams.limit) {
+                                thisOptions.listOptions.datatable.iDisplayLength = response.routeEnv.pageParams.limit;
+                            }
+
+                            if (response.routeEnv.pageParams.conditions && response.routeEnv.pageParams.conditions !== '') {
+                                if ($('#' + sectionId + '-filter-filters').find('[data-conditions="' + response.routeEnv.pageParams.conditions + '"]').length > 0) {
+                                    $('#' + sectionId + '-filter-filters').val(
+                                        $('#' + sectionId + '-filter-filters').find('[data-conditions="' + response.routeEnv.pageParams.conditions + '"]').val()
+                                    );
+                                    dataCollection.env['customConditions'] = [];
+                                } else {//Custom condition
+                                    var conditions = response.routeEnv.pageParams.conditions.substring(0, response.routeEnv.pageParams.conditions.length - 1);
+                                    var conditionsRows = conditions.split('&');
+                                    var customConditions = [];
+
+                                    $.each(conditionsRows, function(index, row) {
+                                        customConditions[index] = row.split('|');
+                                    });
+
+                                    dataCollection.env['customConditions'] = customConditions;
+                                }
+
+                                filter = true;
+                            }
+                        }
                     }
                 }).done(function(response) {
                     if (response.tokenKey && response.token) {
@@ -1224,6 +1254,7 @@
                             }
                         }
                     }
+
                     $('body').trigger(
                         {
                             'type'     : 'sectionWithListingLoaded'
@@ -1693,6 +1724,7 @@
                 if (datatableOptions.paginationCounters.current === datatableOptions.paginationCounters.last) {
                     counters.end = datatableOptions.paginationCounters.filtered_items;
                 }
+
                 if (query && filter) {
                     $('#' + sectionId + '-table_info').empty().html(
                         "Showing " + counters.start + " to " + counters.end +
@@ -1714,6 +1746,10 @@
                 }
                 if (!filterQuery) {
                     filterQuery = query;
+                }
+
+                if (filterQuery !== '') {
+                    filter = true;
                 }
 
                 thisOptions['datatable'].rows().clear().draw();

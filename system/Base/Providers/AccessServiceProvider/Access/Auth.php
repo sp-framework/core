@@ -163,6 +163,8 @@ class Auth extends BasePackage
 
         $this->basepackages->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
 
+        $this->basepackages->accounts->checkUpdateEnv($this->account['id']);
+
         $this->setSessionAndRecaller($data);
 
         if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
@@ -171,7 +173,12 @@ class Auth extends BasePackage
             $this->packagesData->redirectUrl = $this->links->url('home');
         }
 
+        if ($this->opCache && $this->opCache->checkCache('account_' . $this->account['id'], 'core')) {
+            $this->opCache->removeCache('account_' . $this->account['id'], 'core');
+        }
+
         $this->logger->log->debug($this->account['email'] . ' authenticated successfully on app ' . $this->app['name']);
+
 
         return true;
     }
@@ -191,6 +198,10 @@ class Auth extends BasePackage
         $this->clearAccountRecaller();
 
         $this->clearAccountSessionId();
+
+        if ($this->opCache && $this->opCache->checkCache('account_' . $this->account['id'], 'core')) {
+            $this->opCache->removeCache('account_' . $this->account['id'], 'core');
+        }
 
         if ($this->cookies->has($this->cookieKey)) {
             $this->cookies->delete($this->cookieKey);
@@ -481,7 +492,7 @@ class Auth extends BasePackage
 
         $this->setUserIdCooikie();
 
-        if (isset($data['remember']) && $data['remember'] === 'true') {
+        if (isset($data['remember']) && $data['remember'] == 'true') {
             $this->setRecaller();
         }
     }

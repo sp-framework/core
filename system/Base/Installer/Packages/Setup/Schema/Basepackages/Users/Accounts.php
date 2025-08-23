@@ -80,4 +80,19 @@ class Accounts
                 ]
             ];
     }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'email',
+                    'username'
+                ],
+                'INDEX'
+            )
+        ];
+    }
 }

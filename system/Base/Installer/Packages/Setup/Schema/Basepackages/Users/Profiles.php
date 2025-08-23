@@ -170,4 +170,18 @@ class Profiles
                 ]
             ];
     }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'account_id'
+                ],
+                'INDEX'
+            )
+        ];
+    }
 }

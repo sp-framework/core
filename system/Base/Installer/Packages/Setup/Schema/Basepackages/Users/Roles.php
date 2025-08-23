@@ -63,4 +63,18 @@ class Roles
                 ]
             ];
     }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'name'
+                ],
+                'INDEX'
+            )
+        ];
+    }
 }

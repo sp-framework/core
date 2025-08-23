@@ -57,4 +57,19 @@ class Sessions
                 ]
             ];
     }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'session_id',
+                    'account_id'
+                ],
+                'INDEX'
+            )
+        ];
+    }
 }

@@ -8,6 +8,7 @@ use System\Base\BasePackage;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsEnv;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSecurity;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
@@ -72,6 +73,11 @@ class Accounts extends BasePackage
             $account['tunnels'] = [];
             if ($this->model->gettunnels()) {
                 $account['tunnels'] = $this->model->gettunnels()->toArray();
+            }
+
+            $account['env'] = [];
+            if ($this->model->getenv()) {
+                $account['env'] = $this->model->getenv()->toArray();
             }
 
             $account['profile'] = [];
@@ -355,6 +361,10 @@ class Accounts extends BasePackage
             ) {
                 $this->removeRelatedData($accountObj, $account, false, false);
             }
+
+            if ($this->opCache && $this->opCache->checkCache('account_' . $data['id'], 'core')) {
+                $this->opCache->removeCache('account_' . $data['id'], 'core');
+            }
         } else {
             $this->addResponse('Error updating account.', 1);
         }
@@ -383,6 +393,12 @@ class Accounts extends BasePackage
                 if ($this->remove($data['id'], true, true, ['role'])) {
                     $this->addResponse('Removed account for ID: ' . $account['email']);
 
+                    if ($this->opCache && $this->opCache->checkCache('account_' . $data['id'], 'core')) {
+                        $this->opCache->removeCache('account_' . $data['id'], 'core');
+                    }
+
+                    $this->removeRelatedData($accountObj, $account);
+
                     return true;
                 } else {
                     $this->addResponse('Error removing account.', 1);
@@ -400,6 +416,12 @@ class Accounts extends BasePackage
 
                 if ($this->remove($data['id'], true, true, ['role'])) {
                     $this->addResponse('Removed account for ID: ' . $account['email']);
+
+                    if ($this->opCache && $this->opCache->checkCache('account_' . $data['id'], 'core')) {
+                        $this->opCache->removeCache('account_' . $data['id'], 'core');
+                    }
+
+                    $this->removeRelatedData($accountObj, $account);
 
                     return true;
                 } else {
@@ -470,7 +492,8 @@ class Accounts extends BasePackage
         $identifiers = true,
         $agents = true,
         $tunnels = true,
-        $api_clients = true
+        $api_clients = true,
+        $env = true
     ) {
         if ($security) {
             if ($this->config->databasetype === 'db' &&
@@ -627,6 +650,26 @@ class Accounts extends BasePackage
             }
         }
 
+        if ($env) {
+            if ($this->config->databasetype === 'db' &&
+                $accountObj->getenv()
+            ) {
+                $accountObj->getenv()->delete();
+            } else {
+                if ($account['env'] &&
+                    is_array($account['env']) &&
+                    count($account['env']) > 0
+                ) {
+                    $envStore = $this->ff->store((new BasepackagesUsersAccountsEnv)->getSource());
+                    $envCheck = $envStore->findById($account['env']['id']);
+
+                    if ($envCheck) {
+                        $envStore->deleteById($account['env']['id'], false);
+                    }
+                }
+            }
+        }
+
         return true;
     }
 
@@ -713,6 +756,130 @@ class Accounts extends BasePackage
         }
 
         return false;
+    }
+
+    public function checkUpdateEnv($id, $params = [], $getAppParams = false, $getRouteParams = false)
+    {
+        $envModel = new BasepackagesUsersAccountsEnv;
+
+        if ($this->config->databasetype === 'db') {
+            $accountEnv = $envModel::findFirst(['account_id = ' . $id]);
+        } else {
+            $envStore = $this->ff->store($envModel->getSource());
+
+            $accountEnv = $envStore->findOneBy(['account_id', '=', $id]);
+        }
+
+        $routeArr = explode('/q/', $this->request->getURI());
+        if ($this->domains->domain['exclusive_to_default_app']) {
+            $route = str_replace('/' . $this->apps->getAppInfo()['route'], '', $routeArr[0]);
+        } else {
+            $route = $routeArr[0];
+        }
+
+        if ($accountEnv) {
+            $update = false;
+
+            if (!isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
+                $accountEnv['params'][$this->apps->getAppInfo()['id']] = [];
+
+                $update = true;
+            }
+
+            if (count($params) > 0) {
+                if (!isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
+                    $accountEnv['params'][$this->apps->getAppInfo()['id']][$route] = [];
+                }
+
+                $accountEnv['params'][$this->apps->getAppInfo()['id']][$route] = $params;
+
+                $update = true;
+            }
+
+            if ($this->config->databasetype === 'db') {
+                if ($update) {
+                    $accountEnv->assign($accountEnv);
+
+                    $accountEnv->update();
+
+                    if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
+                        $this->opCache->removeCache('account_' . $id, 'core');
+                    }
+                }
+
+                if ($getAppParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
+                    return $accountEnv['params'][$this->apps->getAppInfo()['id']];
+                }
+
+                if ($getRouteParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
+                    return $accountEnv['params'][$this->apps->getAppInfo()['id']][$route];
+                }
+
+                return $accountEnv->getLast()->toArray();
+            } else {
+                if ($update) {
+                    $envStore->update($accountEnv);
+
+                    if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
+                        $this->opCache->removeCache('account_' . $id, 'core');
+                    }
+                }
+
+                if ($getAppParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
+                    return $accountEnv['params'][$this->apps->getAppInfo()['id']];
+                }
+
+                if ($getRouteParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
+                    return $accountEnv['params'][$this->apps->getAppInfo()['id']][$route];
+                }
+
+                return $envStore->getLast();
+            }
+        } else {
+            $accountEnv['account_id'] = $id;
+
+            if (count($params) > 0) {
+                $accountEnv['params'][$this->apps->getAppInfo()['id']][$route] = $params;
+            } else {
+                $accountEnv['params'] = $this->helper->encode([$this->apps->getAppInfo()['id'] => []]);
+            }
+
+            if ($this->config->databasetype === 'db') {
+                $envModel->assign($accountEnv);
+
+                $envModel->create();
+
+                if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
+                    $this->opCache->removeCache('account_' . $id, 'core');
+                }
+
+                if ($getAppParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
+                    return $accountEnv['params'][$this->apps->getAppInfo()['id']];
+                }
+
+                if ($getRouteParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
+                    return $accountEnv['params'][$this->apps->getAppInfo()['id']][$route];
+                }
+
+                return $accountEnv->getLast()->toArray();
+            } else {
+                $envStore->insert($accountEnv);
+
+                if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
+                    $this->opCache->removeCache('account_' . $id, 'core');
+                }
+
+                if ($getAppParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
+                    return $accountEnv['params'][$this->apps->getAppInfo()['id']];
+                }
+
+                if ($getRouteParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
+                    return $accountEnv['params'][$this->apps->getAppInfo()['id']][$route];
+                }
+
+                return $envStore->getLast();
+            }
+        }
     }
 
     public function addUpdateCanLogin($id, $canLogin)

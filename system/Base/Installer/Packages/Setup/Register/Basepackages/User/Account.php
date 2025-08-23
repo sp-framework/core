@@ -27,6 +27,8 @@ class Account
         }
 
         $this->registerAccountSecurity($db, $ff, $password, $helper);
+
+        $this->registerAccountEnv($db, $ff);
     }
 
     protected function registerAccountSecurity($db, $ff, $password, $helper)
@@ -49,6 +51,25 @@ class Account
             $securityStore = $ff->store('basepackages_users_accounts_security');
 
             $securityStore->updateOrInsert($security);
+        }
+    }
+
+    protected function registerAccountEnv($db, $ff, $helper)
+    {
+        $env =
+            [
+                'account_id'            => 1,
+                'params'                => $helper->encode(['1' => []])
+            ];
+
+        if ($db) {
+            $db->insertAsDict('basepackages_users_accounts_env', $env);
+        }
+
+        if ($ff) {
+            $envStore = $ff->store('basepackages_users_accounts_env');
+
+            $envStore->updateOrInsert($env);
         }
     }
 }

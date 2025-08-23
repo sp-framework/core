@@ -5,7 +5,7 @@ namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Account
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;
 
-class Tunnels
+class Env
 {
     public function columns()
     {
@@ -29,18 +29,20 @@ class Tunnels
                         ]
                     ),
                     new Column(
-                        'notifications_tunnel',
+                        'params',
                         [
-                            'type'          => Column::TYPE_SMALLINTEGER,
-                            'notNull'       => false,
+                            'type'          => Column::TYPE_JSON,
+                            'notNull'       => true,
                         ]
-                    ),
-                    new Column(
-                        'messenger_tunnel',
+                    )
+                ],
+                'indexes' => [
+                    new Index(
+                        'column_UNIQUE',
                         [
-                            'type'          => Column::TYPE_SMALLINTEGER,
-                            'notNull'       => false,
-                        ]
+                            'account_id',
+                        ],
+                        'UNIQUE'
                     )
                 ]
             ];

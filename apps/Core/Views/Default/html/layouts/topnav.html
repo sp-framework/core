@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {{assets.get('doctype').getCodes()[0].getContent()}}
 <html lang="en">
     <head>
@@ -66,7 +66,7 @@ if (!window.dataCollection) {
     dataCollection.env.sounds.messengerSound = new Audio(dataCollection.env.soundPath + 'messenger.mp3');
 
     dataCollection.env.notifications = { };
-    dataCollection.env.account = { };
+    dataCollection.env.accountEnv = JSON.parse('{{escaper.js(json_encode(access.auth.account()["env"]["params"][apps.getAppInfo()["id"]]))}}');
 
     dataCollection.env.fontsPath =
         dataCollection.env.rootPath +
@@ -102,3 +102,4 @@ if (localStorage.getItem('bazDevMode') === null) {
         </div>
     </body>
 </html>
+<!-- htmlmin:ignore -->

@@ -245,7 +245,7 @@ if (!function_exists('xmlToArray')) {
 if (!function_exists('checkCtype')) {
     function checkCtype($str, $ctype = 'alnum', $ignoreChars = null) {
         if (!$ignoreChars) {
-            $ignoreChars = [' ', '&amp;', '&', ',', ':', ';'];
+            $ignoreChars = [' ', '&amp;', '&', '.', ',', ':', ';', '&#64;', '@'];
         }
 
         $string = trim(str_replace($ignoreChars, '' , $str));

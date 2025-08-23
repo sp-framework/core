@@ -33,6 +33,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Templates;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Agents;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\CanLogin;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Env;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Identifiers;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Security;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Sessions;
@@ -105,6 +106,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Messenger\B
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Storages\BasepackagesStoragesLocal;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsEnv;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSecurity;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
@@ -225,6 +227,10 @@ class Schema
                 'basepackages_users_accounts_tunnels'       => [
                         'schema'    => new Tunnels,
                         'model'     => new BasepackagesUsersAccountsTunnels,
+                    ],
+                'basepackages_users_accounts_env'           => [
+                        'schema'    => new Env,
+                        'model'     => new BasepackagesUsersAccountsEnv,
                     ],
                 'basepackages_users_profiles'               => [
                         'schema'    => new Profiles,

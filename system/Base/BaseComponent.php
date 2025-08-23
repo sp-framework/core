@@ -599,6 +599,18 @@ abstract class BaseComponent extends Controller
 		}
 
 		if ($this->request->isPost() && $this->isJson()) {
+			$accountEnv = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], true);
+
+			if ($accountEnv) {
+				$this->view->accountEnv = $accountEnv;
+			}
+
+			$routeEnv = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], false, true);
+
+			if ($routeEnv) {
+				$this->view->routeEnv = $routeEnv;
+			}
+
 			return $this->sendJson();
 		}
 
