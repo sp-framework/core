@@ -785,7 +785,17 @@ class Store
                 $this->opCache->removeCache(null, 'core');
             }
 
-            return (!file_exists($this->getDataPath() . "$id.json") || true === @unlink($this->getDataPath() . "$id.json"));
+            if (file_exists($this->getDataPath() . "$id.json")) {
+                $delete = @unlink($this->getDataPath() . "$id.json");
+
+                if ($delete) {
+                    $this->count(true);
+                }
+
+                return true;
+            }
+
+            return false;
         }
     }
 
