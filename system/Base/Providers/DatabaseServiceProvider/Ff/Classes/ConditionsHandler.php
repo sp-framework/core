@@ -15,6 +15,21 @@ class ConditionsHandler
             return false;
         }
 
+        if (strlen($value) === 10 &&
+            str_contains($value, '-') &&
+            substr_count($value, '-') === 2
+        ) {
+            try {
+                $valueIsDate = new \DateTime($value);
+
+                if ($valueIsDate) {
+                    $value = $valueIsDate;
+                }
+            } catch (\throwable $e) {
+                return false;
+            }
+        }
+
         if ($value instanceof DateTime) {
             if (is_null($fieldValue)) {
                 return false;

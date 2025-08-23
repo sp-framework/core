@@ -59,7 +59,9 @@ class Store
 
     public $data;
 
-    protected $ff;
+    public $ff;
+
+    public $criteriaCount = null;
 
     protected $app;
 
@@ -280,6 +282,11 @@ class Store
         return (int) $counters['lastId'];
     }
 
+    public function getLast()
+    {
+        return $this->findById($this->getLastInsertedId());
+    }
+
     public function getStorePath(): string
     {
         return $this->storePath;
@@ -331,7 +338,7 @@ class Store
         try {
             $content = IoHelper::getFileContent($this->getDataPath() . "$id.json");
         } catch (Exception $exception) {
-            return null;
+            return false;
         }
 
         $data = @json_decode($content, true);
@@ -347,6 +354,15 @@ class Store
 
     public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null, $getRelations = false, $relationsConditions = false): array
     {
+        if (count($criteria) === 1 &&
+            $criteria[0][0] === 'id' &&
+            $criteria[0][1] === '='
+        ) {
+            $criteria[0][2] = preg_replace('/[^0-9]/', '', $criteria[0][2]);
+
+            return [$this->findById((int) $criteria[0][2])];
+        }
+
         try {
             $qb = $this->createQueryBuilder();
 
@@ -382,6 +398,12 @@ class Store
 
     public function findOneBy(array $criteria, $getRelations = false, $relationsConditions = false)
     {
+        if (count($criteria) === 1 &&
+            $criteria[0][0] === 'id'
+        ) {
+            return [$this->findById((int) $criteria[0][2])];
+        }
+
         $qb = $this->createQueryBuilder();
 
         $qb->where($criteria);
@@ -1088,7 +1110,6 @@ class Store
                     $fieldsArr = $this->ff->helper->chunk($relation['fields'], 2);
 
                     $criteria = [];
-
                     if (count($fieldsArr) === 1) {
                         foreach ($fieldsArr as $fieldArr) {
                             array_push($criteria, [$fieldArr[1], '=', $data[$fieldArr[0]]]);
@@ -1104,7 +1125,13 @@ class Store
                     }
 
                     try {
-                        $directRelationStoreData = $this->relationStores[$relation['table']]->findBy($criteria);
+                        if (count($criteria) === 1 &&
+                            $criteria[0][0] === 'id'
+                        ) {
+                            $directRelationStoreData = [$this->relationStores[$relation['table']]->findById((int) $criteria[0][2])];
+                        } else {
+                            $directRelationStoreData = $this->relationStores[$relation['table']]->findBy($criteria);
+                        }
 
                         if ($directRelationStoreData && count($directRelationStoreData) > 0) {
                             if ($relation['type'] === 'hasOne') {
@@ -1143,7 +1170,13 @@ class Store
                     }
 
                     try {
-                        $intermediateStoreDataArr = $this->relationStores[$relation[0]['table']]->findBy($criteria);
+                        if (count($criteria) === 1 &&
+                            $criteria[0][0] === 'id'
+                        ) {
+                            $intermediateStoreDataArr = [$this->relationStores[$relation[0]['table']]->findById((int) $criteria[0][2])];
+                        } else {
+                            $intermediateStoreDataArr = $this->relationStores[$relation[0]['table']]->findBy($criteria);
+                        }
                     } catch (\Exception $e) {
                         continue;
                     }
@@ -1161,6 +1194,7 @@ class Store
                                 $fieldsArr = $this->ff->helper->chunk($relation[1]['fields'], 2);
 
                                 $criteria = [];
+
                                 if (count($fieldsArr) === 1) {
                                     foreach ($fieldsArr as $fieldArr) {
                                         array_push($criteria, [$fieldArr[1], '=', $intermediateStoreData[$fieldArr[0]]]);
@@ -1172,7 +1206,13 @@ class Store
                                 }
 
                                 try {
-                                    $finalRelationStoreData = $this->relationStores[$relation[1]['table']]->findBy($criteria);
+                                    if (count($criteria) === 1 &&
+                                        $criteria[0][0] === 'id'
+                                    ) {
+                                        $finalRelationStoreData = [$this->relationStores[$relation[1]['table']]->findById($criteria[0][2])];
+                                    } else {
+                                        $finalRelationStoreData = $this->relationStores[$relation[1]['table']]->findBy($criteria);
+                                    }
 
                                     if ($finalRelationStoreData && count($finalRelationStoreData) > 0) {
                                         if ($relation['type'] === 'hasOneThrough') {
@@ -1203,7 +1243,9 @@ class Store
 
     public function count($recount = false, $criteria = null): int
     {
-        if ($criteria) {
+        if ($criteria && !is_null($this->criteriaCount)) {
+            return $this->criteriaCount;
+        } else if ($criteria) {
             $data = $this->findBy($criteria);
 
             if ($data && is_array($data)) {
@@ -1566,7 +1608,9 @@ class Store
 
                 if ($found && count($found) > 0) {
                     foreach ($found as $foundArr) {
-                        if ($data['id'] == $foundArr['id']) {
+                        if (isset($data['id']) &&
+                            $data['id'] == $foundArr['id']
+                        ) {
                             continue;
                         }
 
@@ -1589,7 +1633,7 @@ class Store
         }
 
         if (!$this->validateData) {
-            $data = $this->normalizeData($data);
+            $data = $this->normalizeData($data, true);
 
             return $data;
         }

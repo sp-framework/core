@@ -1099,25 +1099,24 @@ abstract class BasePackage extends Controller
 			if ($conditionArr[2] === 'between' || $conditionArr[2] === 'notbetween') {//!check this for BETWEEN
 				$valueArr = explode(',', $conditionArr[3]);
 
-				if ($conditionArr[2] === 'between') {
-					$condition .=
-						$conditionArr[1] . ' ' . $sign;
-				} else if ($conditionArr[2] === 'notbetween') {
-					$condition .=
-					'NOT ' . $conditionArr[1] . ' BETWEEN';
-				}
-
-				foreach ($valueArr as $valueKey => $valueValue) {
-					$condition .=
-						' :baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
-
-					$bind[
-						'baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
-					] = $valueValue;
-
-					if ($this->helper->lastKey($valueArr) !== $valueKey) {
-						$condition .= ' AND';
+				if (count($valueArr) > 1) {
+					foreach ($valueArr as $valueKey => &$valueValue) {
+						if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'integer') {
+							$valueValue = (int) $valueValue;
+						} else if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'number') {
+							$valueValue = (float) $valueValue;
+						} else if ($modelColumnMap['dataTypes'][$conditionArr[1]] === 'boolean') {
+							if ($valueValue == '1') {
+								$valueValue = true;
+							} else {
+								$valueValue = false;
+							}
+						}
 					}
+
+					array_push($this->filterConditions, [$conditionArr[1], $sign, $valueArr]);
+				} else {
+					return [];//Incorrect number of values for between.
 				}
 			} else if ($conditionArr[2] === 'empty' || $conditionArr[2] === 'notempty') {//!check this for NULL or NOT NULL
 				$condition .= $conditionArr[1] . ' ' . $sign;
@@ -1490,15 +1489,19 @@ abstract class BasePackage extends Controller
 			} else {
 				$this->addResponse("Could not delete " . ucfirst($this->packageNameS), 1);
 			}
-		} else if ($this->ffStore && $this->ffData && $this->ffData['id'] == $id) {
-			if ($this->ffStore->deleteById((int) $id, $removeRelated, $this->ffRelationsConditions, $excludeRelatedAliases)) {
-				$this->addResponse(ucfirst($this->packageNameS) . " Deleted!");
+		} else if ($this->ffStore && $this->ffData) {
+			if (isset($this->ffData['id']) && $this->ffData['id'] == $id) {
+				if ($this->ffStore->deleteById((int) $id, $removeRelated, $this->ffRelationsConditions, $excludeRelatedAliases)) {
+					$this->addResponse(ucfirst($this->packageNameS) . " Deleted!");
 
-				if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
-					$this->opCache->removeCache(null, 'core');
+					if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+						$this->opCache->removeCache(null, 'core');
+					}
+
+					return true;
+				} else {
+					$this->addResponse("Could not delete " . ucfirst($this->packageNameS), 1);
 				}
-
-				return true;
 			} else {
 				$this->addResponse("Could not delete " . ucfirst($this->packageNameS), 1);
 			}
