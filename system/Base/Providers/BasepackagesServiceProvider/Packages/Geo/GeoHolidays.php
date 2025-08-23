@@ -418,4 +418,50 @@ class GeoHolidays extends BasePackage
             $this->addResponse('Error removing holiday.', 1);
         }
     }
+
+    public function getNationalHolidays($countryId = null, $year = null)
+    {
+        if ($this->config->databasetype === 'db') {
+            $holidays =
+                $this->getByParams(
+                    [
+                        'conditions'    => 'is_national_holiday = :nh:',
+                        'bind'          => [
+                            'nh'        => true
+                        ]
+                    ]
+                );
+        } else {
+            $holidays =
+                $this->getByParams(
+                    [
+                        'conditions'    => [
+                            ['is_national_holiday', '=', true]
+                        ]
+                    ]
+                );
+        }
+
+        $sortedHolidays = [];
+
+        if ($holidays) {
+            foreach ($holidays as $holiday) {
+                if ($countryId && $holiday['countryId_id'] == $countryId) {
+                    $sortedHolidays[$holiday['id']] = $holiday;
+                }
+
+                if ($year && str_starts_with($holiday['date'], $year)) {
+                    $sortedHolidays[$holiday['id']] = $holiday;
+                }
+            }
+
+            if (count($sortedHolidays) > 0) {
+                return $sortedHolidays;
+            }
+
+            return $holidays;
+        }
+
+        return false;
+    }
 }
