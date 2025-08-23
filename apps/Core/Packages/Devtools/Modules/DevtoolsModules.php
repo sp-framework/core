@@ -602,7 +602,9 @@ class DevtoolsModules extends BasePackage
                             $hashFiles = [];
 
                             foreach ($filesToHash as $fileToHash) {
-                                if (str_ends_with($fileToHash, '/')) {
+                                if (str_ends_with($fileToHash, '#')) {//For Commenting
+                                    continue;
+                                } else if (str_ends_with($fileToHash, '/')) {
                                     $fileToHashDirList = $this->basepackages->utils->scanDir($moduleLocation . $fileToHash, true);
 
                                     if ($fileToHashDirList && count($fileToHashDirList['files']) > 0) {
@@ -616,6 +618,19 @@ class DevtoolsModules extends BasePackage
                             if (count($hashFiles) > 0) {
                                 $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $hashFiles);
                             }
+                        }
+                    } else {
+                        $files = $this->basepackages->utils->scanDir(
+                            $moduleLocation,
+                            true,
+                            [
+                                '.git/',
+                                'linter-backup/'
+                            ]
+                        );
+
+                        if ($files && count($files['files']) > 0) {
+                            $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $files['files']);
                         }
                     }
                 } else {
@@ -702,7 +717,6 @@ class DevtoolsModules extends BasePackage
             }
 
             $filesHash = $this->getFilesHash($module);
-
             $module['isModified'] = false;
             $module['releasePending'] = false;
 
@@ -714,8 +728,6 @@ class DevtoolsModules extends BasePackage
 
             if (isset($filesHash['release_pending']) && $filesHash['release_pending'] == true) {
                 $module['releasePending'] = true;
-
-                return $module;
             }
 
             $moduleLocationFiles['files'] = [];
@@ -738,7 +750,9 @@ class DevtoolsModules extends BasePackage
                             $hashFiles = [];
 
                             foreach ($filesToHash as $fileToHash) {
-                                if (str_ends_with($fileToHash, '/')) {
+                                if (str_ends_with($fileToHash, '#')) {//For Commenting
+                                    continue;
+                                } else if (str_ends_with($fileToHash, '/')) {
                                     $fileToHashDirList = $this->basepackages->utils->scanDir($moduleLocation . $fileToHash, true);
 
                                     if ($fileToHashDirList && count($fileToHashDirList['files']) > 0) {
@@ -752,6 +766,19 @@ class DevtoolsModules extends BasePackage
                             if (count($hashFiles) > 0) {
                                 $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $hashFiles);
                             }
+                        }
+                    } else {
+                        $files = $this->basepackages->utils->scanDir(
+                            $moduleLocation,
+                            true,
+                            [
+                                '.git/',
+                                'linter-backup/'
+                            ]
+                        );
+
+                        if ($files && count($files['files']) > 0) {
+                            $moduleLocationFiles['files'] = array_merge($moduleLocationFiles['files'], $files['files']);
                         }
                     }
                 } else {
@@ -975,7 +1002,9 @@ class DevtoolsModules extends BasePackage
                 if ($data['app_type'] === 'core') {
                     $coreInstall = new CoreInstall;
 
-                    if ($data['type'] === 'core') {
+                    if ($data['type'] === 'core' ||
+                        ($data['type'] === 'packages' && $data['name'] === 'Core')
+                    ) {
                         if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
                             $coreInstall->init()->install();
                         }
@@ -2073,7 +2102,7 @@ $file .= '
         if ($data['menu'] != 'false' && $data['menu'] != '') {
             $data['menu'] = $this->helper->decode($data['menu'], true);
 
-            if (isset($menu)) {
+            if (isset($menu) && $menu) {
                 $this->basepackages->menus->updateMenu($data['menu_id'], $data);
 
                 return;
