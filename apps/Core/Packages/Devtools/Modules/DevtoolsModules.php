@@ -655,7 +655,23 @@ class DevtoolsModules extends BasePackage
                 foreach ($moduleLocationFiles['files'] as $file) {
                     $filePath = $file;
 
-                    $file = str_replace($moduleLocation, '', $file);
+                    if (count($moduleLocations) === 1) {
+                        $file = str_replace($moduleLocations[0], '', $file);
+                    } else if (count($moduleLocations) === 2) {//Main View (with public)
+                        $moduleLocation = null;
+
+                        foreach ($moduleLocations as $moduleLocation) {
+                            if (str_contains($moduleLocation, 'public/')) {
+                                $file = str_replace($moduleLocation, 'pub-', $file);
+                            } else {
+                                $file = str_replace($moduleLocation, '', $file);
+                            }
+
+                            break;
+                        }
+                    } else {
+                        $file = str_replace($moduleLocations, '', $file);
+                    }
 
                     $hash = hash_file('md5', base_path($filePath));
 
@@ -802,16 +818,46 @@ class DevtoolsModules extends BasePackage
             if ($moduleLocationFiles && count($moduleLocationFiles['files']) > 0) {
                 $module['modified_files'] = [];
 
-                array_walk($filesHash['files_hash'], function($hash, $dbFile) use ($moduleLocation, $moduleLocationFiles, &$module) {
-                    if (!in_array($moduleLocation . $dbFile, $moduleLocationFiles['files'])) {
-                        array_push($module['modified_files'], $dbFile . ' (Removed)');
+                array_walk($filesHash['files_hash'], function($hash, $file) use ($moduleLocations, $moduleLocationFiles, &$module) {
+                    if (count($moduleLocations) === 1) {
+                        $file = $moduleLocations[0] . $file;
+                    } else if (count($moduleLocations) === 2) {//Main View (with public)
+                        $moduleLocation = null;
+
+                        foreach ($moduleLocations as $moduleLocation) {
+                            if (str_contains($moduleLocation, 'public') && str_contains($file, 'pub-')) {
+                                $file = str_replace('pub-', $moduleLocation, $file);
+                            } else if (!str_contains($moduleLocation, 'public') && !str_contains($file, 'pub-')) {
+                                $file = $moduleLocation . $file;
+                            }
+                        }
+                    } else {
+                        $file = $moduleLocation . $file;
+                    }
+
+                    if (!in_array($file, $moduleLocationFiles['files'])) {
+                        array_push($module['modified_files'], $file . ' (Removed)');
                     }
                 });
 
                 foreach ($moduleLocationFiles['files'] as $file) {
                     $filePath = $file;
 
-                    $file = str_replace($moduleLocation, '', $file);
+                    if (count($moduleLocations) === 1) {
+                        $file = str_replace($moduleLocations[0], '', $file);
+                    } else if (count($moduleLocations) === 2) {//Main View (with public)
+                        $moduleLocation = null;
+
+                        foreach ($moduleLocations as $moduleLocation) {
+                            if (str_contains($moduleLocation, 'public/')) {
+                                $file = str_replace($moduleLocation, 'pub-', $file);
+                            } else {
+                                $file = str_replace($moduleLocation, '', $file);
+                            }
+                        }
+                    } else {
+                        $file = str_replace($moduleLocations, '', $file);
+                    }
 
                     $hash = hash_file('md5', base_path($filePath));
 
