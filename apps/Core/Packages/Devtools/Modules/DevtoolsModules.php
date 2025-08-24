@@ -686,6 +686,7 @@ class DevtoolsModules extends BasePackage
 
             $module['repoExists'] = false;
             $module['latestRelease'] = false;
+
             if ($this->localContent->directoryExists($moduleLocation . '.git')) {
                 if ((!isset($module['repo_details']) ||
                      !isset($module['repo_details']['latestRelease'])) ||
@@ -717,6 +718,7 @@ class DevtoolsModules extends BasePackage
             }
 
             $filesHash = $this->getFilesHash($module);
+
             $module['isModified'] = false;
             $module['releasePending'] = false;
 
@@ -800,6 +802,12 @@ class DevtoolsModules extends BasePackage
             if ($moduleLocationFiles && count($moduleLocationFiles['files']) > 0) {
                 $module['modified_files'] = [];
 
+                array_walk($filesHash['files_hash'], function($hash, $dbFile) use ($moduleLocation, $moduleLocationFiles, &$module) {
+                    if (!in_array($moduleLocation . $dbFile, $moduleLocationFiles['files'])) {
+                        array_push($module['modified_files'], $dbFile . ' (Removed)');
+                    }
+                });
+
                 foreach ($moduleLocationFiles['files'] as $file) {
                     $filePath = $file;
 
@@ -807,14 +815,18 @@ class DevtoolsModules extends BasePackage
 
                     $hash = hash_file('md5', base_path($filePath));
 
-                    if (!isset($filesHash['files_hash'][$file]) ||
-                        (isset($filesHash['files_hash'][$file]) &&
-                         $filesHash['files_hash'][$file] !== $hash)
+                    if (!isset($filesHash['files_hash'][$file])
                     ) {
-                        array_push($module['modified_files'], $file);
-
-                        $module['isModified'] = true;
+                        array_push($module['modified_files'], $file . ' (Added)');
+                    } else if (isset($filesHash['files_hash'][$file]) &&
+                               $filesHash['files_hash'][$file] !== $hash
+                    ) {
+                        array_push($module['modified_files'], $file . ' (Modified)');
                     }
+                }
+
+                if (count($module['modified_files']) > 0) {
+                    $module['isModified'] = true;
                 }
             }
         } catch (\throwable | FilesystemException | UnableToCheckExistence $e) {
