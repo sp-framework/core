@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 <footer class="main-footer">
     <div class="row">
         <div class="col">
@@ -29,4 +29,6 @@
 <script>
 /* globals BazCore */
 BazCore.footer({loadFooterAt : '{{componentId}}'});
+window.dataCollection.env.accountEnv = JSON.parse('{{escaper.js(json_encode(access.auth.account()["env"]["params"][apps.getAppInfo()["id"]]))}}');
 </script>
+<!-- htmlmin:ignore -->

@@ -63,7 +63,6 @@ if (!window.dataCollection) {
     dataCollection.env.sounds.messengerSound = new Audio(dataCollection.env.soundPath + 'messenger.mp3');
 
     dataCollection.env.notifications = { };
-    dataCollection.env.accountEnv = JSON.parse('{{escaper.js(json_encode(access.auth.account()["env"]["params"][apps.getAppInfo()["id"]]))}}');
 
     dataCollection.env.fontsPath =
         dataCollection.env.rootPath +

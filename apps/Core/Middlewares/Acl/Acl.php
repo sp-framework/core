@@ -25,8 +25,6 @@ class Acl extends BaseMiddleware
 
     protected $accountPermissions;
 
-    protected $rolePermissions;
-
     protected $found = false;
 
     protected $isApi = false;
@@ -43,7 +41,7 @@ class Acl extends BaseMiddleware
         $this->actions =
             ['view', 'add', 'update', 'remove', 'msview', 'msupdate'];
 
-        $rolesArr = $this->basepackages->roles->roles;
+        $rolesArr = $this->basepackages->roles->getAll()->roles;
         $roles = [];
         foreach ($rolesArr as $key => $value) {
             $roles[$value['id']] = $value;
@@ -152,14 +150,15 @@ class Acl extends BaseMiddleware
             );
 
             if (is_string($this->role['permissions'])) {
-                $this->rolePermissions = $this->helper->decode($this->role['permissions'], true);
-            } else {
-                $this->rolePermissions = $this->role['permissions'];
+                $this->role['permissions'] = $this->helper->decode($this->role['permissions'], true);
             }
-            foreach ($this->rolePermissions as $appKey => $app) {
+
+            foreach ($this->role['permissions'] as $appKey => $app) {
                 foreach ($app as $componentKey => $permission) {
                     if ($this->app['id'] == $appKey) {
-                        if ($this->components[$componentKey]['route'] === $this->controllerRoute) {
+                        if (isset($this->components[$componentKey]) &&
+                            $this->components[$componentKey]['route'] === $this->controllerRoute
+                        ) {
                             if (($this->isApi && $this->helper->has($this->components[$componentKey]['api_acls'], $this->action)) ||
                                 (!$this->isApi && $this->helper->has($this->components[$componentKey]['acls'], $this->action))
                             ) {

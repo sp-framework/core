@@ -875,14 +875,14 @@ class Auth extends BasePackage
 
     public function getAccountSecurityObject()
     {
-        $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
-
         if ($this->config->databasetype === 'db') {
+            $accountsObj = $this->basepackages->accounts->getFirst('id', $this->account()['id']);
+
             return $accountsObj->getSecurity();
         } else {
-            $account = $accountsObj->toArray();
-
-            if ($account) {
+            if (isset($this->account()['security'])) {
+                return (object) $this->account()['security'];
+            } else {
                 $securityStore = $accountsObj->changeStore('basepackages_users_accounts_security');
 
                 $securityStore->findOneBy(['account_id', '=', $this->account()['id']]);
