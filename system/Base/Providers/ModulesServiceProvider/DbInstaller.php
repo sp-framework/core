@@ -92,7 +92,7 @@ class DbInstaller extends BasePackage
 
                     //Drop any indexes that are removed
                     foreach ($dbTableIndexes as $dbTableIndexKey => $dbTableIndex) {
-                        if (strtolower($dbTableIndexKey) === 'primary') {
+                        if (strtolower($dbTableIndexKey) === 'primary' || strtolower($dbTableIndexKey) === 'unique') {
                             continue;
                         }
 
@@ -164,7 +164,6 @@ class DbInstaller extends BasePackage
                     $this->dropTable($tableName);
                 }
             }
-
         }
 
         if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'db') {

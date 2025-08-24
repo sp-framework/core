@@ -73,6 +73,10 @@ class IndexHandler
         IoHelper::createFolder($this->indexesPath, $this->folderPermissions);
 
         foreach ($this->indexes as $index) {
+            if ($index === 'id') {
+                continue;
+            }
+
             if (isset($content[$index])) {
                 IoHelper::createFolder($this->indexesPath . $index . '/', $this->folderPermissions);
 

@@ -295,7 +295,9 @@ class DocumentFinder
     protected function processIndexes($conditionArr, &$found, $skip = 0, $limit = 0)
     {
         //Search for ID
-        array_push($this->storeConfiguration['indexes'], 'id');
+        if (!in_array('id', $this->storeConfiguration['indexes'])) {
+            array_push($this->storeConfiguration['indexes'], 'id');
+        }
 
         if (isset($conditionArr[0]) &&
             in_array($conditionArr[0], $this->storeConfiguration['indexes'])

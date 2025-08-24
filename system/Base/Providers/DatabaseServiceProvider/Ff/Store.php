@@ -695,7 +695,6 @@ class Store
         if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
             $this->opCache->removeCache(null, 'core');
         }
-
         return $this->data;
     }
 
