@@ -67,6 +67,8 @@ class Store
 
     protected $opCache;
 
+    protected $lockFile = null;
+
     const dataDirectory = "data/";
 
     public function __construct(string $storeName, string $databasePath, $ff, array $configuration = [], array $schema = [])
@@ -2000,5 +2002,56 @@ class Store
         $this->validateData = $validateData;
 
         return $this->getValidateData();
+    }
+
+    public function lockStore($timeout = 10)
+    {
+        if (!file_exists($this->storePath . 'lock')) {
+            IoHelper::writeContentToFile($this->storePath . 'lock', '');
+        }
+
+        $lockFilePath = $this->storePath . 'lock';
+
+        $this->lockFile = fopen($lockFilePath, 'w+');
+
+        if ($this->lockFile === false) {
+            return false;
+        }
+
+        $startTime = microtime(true);
+
+        while (!flock($this->lockFile, LOCK_EX | LOCK_NB)) {
+            if ((microtime(true) - $startTime) > $timeout) {
+                fclose($this->lockFile);
+
+                return false;
+            }
+
+            usleep(100000); // Wait 100ms before retrying
+        }
+
+        return $this->lockFile;
+    }
+
+    public function releaseStoreLock()
+    {
+        if ($this->storeIsLocked()) {
+            flock($this->lockFile, LOCK_UN);
+
+            fclose($this->lockFile);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function storeIsLocked()
+    {
+        if (is_resource($this->lockFile)) {
+            return true;
+        }
+
+        return false;
     }
 }
