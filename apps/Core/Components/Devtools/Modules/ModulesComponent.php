@@ -584,6 +584,18 @@ class ModulesComponent extends BaseComponent
 		);
 	}
 
+	public function toggleVisibilityRepoAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->toggleVisibilityRepo($this->postData());
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode
+		);
+	}
+
 	public function removeRepoAction()
 	{
 		$this->requestIsPost();

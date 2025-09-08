@@ -4046,8 +4046,88 @@ $file .= '
         return false;
     }
 
+    public function toggleVisibilityRepo($data)
+    {
+        if (!isset($data['id']) || (isset($data['id']) && $data['id'] === '')) {
+            $this->addResponse('Remote Repository not available', 1);
+
+            return false;
+        }
+
+        if (!isset($data['repo'])) {
+            $this->addResponse('Repo not set', 1);
+
+            return false;
+        }
+
+        if (!$this->initApi($data)) {
+            return false;
+        }
+
+        $moduleSync = $this->modules->manager->getModuleInfo(
+            [
+                'module_type'       => $data['module_type'],
+                'module_id'         => (int) $data['id']
+            ]
+        );
+
+        $visibility = ['private' => true];
+        if ($moduleSync['repo_details']['details']['private'] === true) {
+            $visibility = ['private' => false];
+        }
+
+        $this->apiClientConfig['repo_url'] = rtrim($this->apiClientConfig['repo_url'], '/');
+
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoUpdate';
+            $args = [$this->apiClientConfig['org_user']];
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+            $collection = 'ReposApi';
+            $method = 'reposUpdate';
+            $args = [$this->apiClientConfig['org_user'], $data['repo'], $visibility];
+        }
+
+        try {
+            $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+            $this->modules->manager->getModuleInfo(
+                [
+                    'module_type'       => $data['module_type'],
+                    'module_id'         => $data['id'],
+                    'sync'              => true,
+                    'getLatestRelease'  => true
+                ]
+            );
+
+            if ($visibility['private'] === true) {
+                $this->addResponse('Repo ' . $data['repo'] . ' marked as private');
+            } else {
+                $this->addResponse('Repo ' . $data['repo'] . ' marked as public');
+            }
+
+            return true;
+        } catch (\throwable | ClientException $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            if ($e->getCode() === 401) {
+                $this->addResponse('API Authentication failed.', 1);
+            } else if (str_contains($e->getMessage(), 'Connection timed out')) {
+                $this->addResponse('Error connecting to the repository.', 1);
+            }
+
+            return false;
+        }
+    }
+
     public function removeRepo($data)
     {
+        if (!isset($data['id']) || (isset($data['id']) && $data['id'] === '')) {
+            $this->addResponse('Remote Repository not available', 1);
+
+            return false;
+        }
+
         if (!isset($data['repo'])) {
             $this->addResponse('Repo not set', 1);
 
@@ -4059,44 +4139,31 @@ $file .= '
         }
 
         $this->apiClientConfig['repo_url'] = rtrim($this->apiClientConfig['repo_url'], '/');
-        //Get one or core repo details, no need to loop through all repos in the org.
-        if (!str_ends_with($this->apiClientConfig['repo_url'], '/' . $this->apiClientConfig['org_user'])) {
-            $repoUrlArr = explode('/', $this->apiClientConfig['repo_url']);
 
-            $remoteModule = $this->getRemoteModule($this->helper->last($repoUrlArr));
+        if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+            $collection = 'RepositoryApi';
+            $method = 'repoDelete';
+            $args = [$this->apiClientConfig['org_user']];
+        } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+            $collection = 'ReposApi';
+            $method = 'reposDelete';
+            $args = [$this->apiClientConfig['org_user'], $data['repo']];
+        }
 
-            if (!$remoteModule) {
-                return false;
+        try {
+            $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+            $this->addResponse('Repo ' . $data['repo'] . ' deleted from remote');
+        } catch (\throwable | ClientException $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            if ($e->getCode() === 401) {
+                $this->addResponse('API Authentication failed.', 1);
+            } else if (str_contains($e->getMessage(), 'Connection timed out')) {
+                $this->addResponse('Error connecting to the repository.', 1);
             }
 
-            $modulesArr = [$remoteModule];
-        } else {
-            //Process all repositories in the org as repourl and org name is the same
-            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
-                $collection = 'RepositoryApi';
-                $method = 'repoDelete';
-                $args = [$this->apiClientConfig['org_user']];
-            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
-                $collection = 'ReposApi';
-                $method = 'reposDelete';
-                $args = [$this->apiClientConfig['org_user'], $data['repo']];
-            }
-
-            try {
-                $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
-
-                $this->addResponse('Repo ' . $data['repo'] . ' deleted from remote');
-            } catch (\throwable | ClientException $e) {
-                $this->addResponse($e->getMessage(), 1);
-
-                if ($e->getCode() === 401) {
-                    $this->addResponse('API Authentication failed.', 1);
-                } else if (str_contains($e->getMessage(), 'Connection timed out')) {
-                    $this->addResponse('Error connecting to the repository.', 1);
-                }
-
-                return false;
-            }
+            return false;
         }
     }
 }

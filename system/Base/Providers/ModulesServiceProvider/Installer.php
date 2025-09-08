@@ -74,7 +74,7 @@ class Installer extends BasePackage
         $this->basepackages->progress->init(null, $this->progressFileName);
 
         if ($this->basepackages->progress->checkProgressFile()) {
-            $this->basepackages->progress->deleteProgressFile();
+            $this->basepackages->progress->deleteProgressFile(true);
         }
 
         if ($process === 'runprecheck') {
@@ -114,6 +114,8 @@ class Installer extends BasePackage
 
             return $call;
         }
+
+        $this->basepackages->progress->resetProgress();
 
         return false;
     }
