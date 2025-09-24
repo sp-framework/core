@@ -35,6 +35,10 @@ class Widgets extends BasePackage
         $widgetsTree = [];
 
         foreach ($componentsArr as $componentKey => $component) {
+            if ($component['app_type'] !== $this->apps->getAppInfo()['app_type']) {
+                continue;
+            }
+
             $componentWidgets = $this->getWidgetsByComponentId($component['id']);
 
             if (count($componentWidgets) > 0) {
@@ -56,6 +60,10 @@ class Widgets extends BasePackage
     public function getWidget(int $id, $task = null, $dashboardWidget = [])
     {
         $widget = $this->getById($id);
+
+        if (!$widget) {
+            return false;
+        }
 
         if (!$task) {
             return $widget;
@@ -112,5 +120,16 @@ class Widgets extends BasePackage
         }
 
         return $widgets;
+    }
+
+    public function getWidgetByMethod($method)
+    {
+        foreach($this->widgets as $widget) {
+            if ($widget['method'] === $method) {
+                return $widget;
+            }
+        }
+
+        return false;
     }
 }

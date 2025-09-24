@@ -66,7 +66,11 @@ class ComponentsWidgets
     public function getWidgetContent($widget, $data = [])
     {
         if (count($data) > 0) {
-            $widget['data'] = $data;
+            if (isset($widget['data'])) {
+                $widget['data'] = array_merge_recursive($widget['data'], $data);
+            } else {
+                $widget['data'] = $data;
+            }
         }
 
         try {

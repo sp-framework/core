@@ -106,6 +106,10 @@ class Dashboards extends BasePackage
         $data = $this->getSharedIds($data);
 
         if ($this->add($data)) {
+            if ($this->opCache) {
+                $this->opCache->removeCache('dashboards', 'core');
+            }
+
             $this->addResponse('Dashboard Added');
         } else {
             $this->addResponse('Error Adding Dashboard', 1);
@@ -160,6 +164,10 @@ class Dashboards extends BasePackage
         $data = $this->getSharedIds($data);
 
         if ($this->update($data)) {
+            if ($this->opCache) {
+                $this->opCache->removeCache('dashboards', 'core');
+            }
+
             $this->addResponse('Dashboard Updated');
         } else {
             $this->addResponse('Error Updating Dashboard', 1);
@@ -223,6 +231,10 @@ class Dashboards extends BasePackage
         }
 
         if ($this->remove($data['id'])) {
+            if ($this->opCache) {
+                $this->opCache->removeCache('dashboards', 'core');
+            }
+
             $this->addResponse('Dashboard Removed');
         } else {
             $this->addResponse('Error Removing Dashboard', 1);
@@ -337,8 +349,7 @@ class Dashboards extends BasePackage
         $this->modelToUse = $this->useModel(BasepackagesDashboardsWidgets::class);
 
         $this->setFfStoreToUse();
-
-        $this->ffStore = $this->ff->store($this->ffStoreToUse);
+        $this->ffStore = null;
 
         try {
             $sequence = 0;
@@ -396,6 +407,7 @@ class Dashboards extends BasePackage
         $this->modelToUse = $this->useModel(BasepackagesDashboardsWidgets::class);
 
         $this->setFfStoreToUse();
+        $this->ffStore = null;
 
         $dbWidget = $this->getFirst('id', $data['id']);
 
@@ -446,7 +458,14 @@ class Dashboards extends BasePackage
 
                 $widget = $this->basepackages->widgets->getWidget($dashboardWidget['widget_id'], 'content', $dashboardWidget);
 
-                $widgetsData[$key]['widget'] = $widget;
+                if ($widget) {
+                    $widgetsData[$key]['widget'] = $widget;
+                } else {
+                    unset($dashboard['widgets'][$key]);
+                    unset($widgetsData[$key]);
+
+                    $this->removeWidgetFromDashboard($dashboardWidget);
+                }
             }
 
             $widgetsData = msort($widgetsData, 'sequence');
