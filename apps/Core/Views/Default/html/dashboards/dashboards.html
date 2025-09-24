@@ -167,7 +167,11 @@ dataCollectionSection =
                             paginatedPNotify('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
                         }
                     } else if (response.responseCode === 1) {
-                        paginatedPNotify('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
+                        if (response.responseMessage.includes('CSRF')) {
+                            paginatedPNotify('error', {'text' : response.responseMessage});
+                        } else {
+                            paginatedPNotify('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
+                        }
                     } else if (response.responseCode === 2) {
                         if (response.responseMessage.includes('CSRF')) {
                             paginatedPNotify('error', {'text' : response.responseMessage});
