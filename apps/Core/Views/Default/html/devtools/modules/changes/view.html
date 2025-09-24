@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set changesHtml = '' %}
 {% if modules|length > 0 %}
     {% for moduleType, modulesArr in modules %}
@@ -214,7 +214,7 @@ dataCollectionSectionForm['funcs']['init'] = function() {
             .html('<span class="text-uppercase"> MODIFIED FILES : ' + $(this).data()['name'] + ' (' + $(this).data()['type'] + ')</span>');
 
         $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal .modal-body')
-            .html(BazHelpers.createHtmlList({'obj': dataCollectionSectionForm['vars']['modifiedModules'][$(this).data()['id']]}));
+            .html(BazHelpers.createHtmlList({'obj': dataCollectionSectionForm['vars']['modifiedModules'][$(this).data()['type']][$(this).data()['id']]}));
 
         $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal').modal('show');
     });
@@ -336,3 +336,4 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
+<!-- htmlmin:ignore -->

@@ -197,9 +197,8 @@ class ModulesComponent extends BaseComponent
 							unset($modules[$moduleType]['childs'][$childKey]);
 						}
 
-						$modifiedModules[$child['id']] = [];
 						if (isset($child['modified_files']) && count($child['modified_files']) > 0) {
-							$modifiedModules[$child['id']] = $child['modified_files'];
+							$modifiedModules[$child['module_type']][$child['id']] = $child['modified_files'];
 						}
 					}
 				}

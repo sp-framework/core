@@ -334,8 +334,8 @@ class DevtoolsModules extends BasePackage
                         $this->core->update($core);
                     }
 
-                    if ((isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) ||
-                        (isset($data['truncate_table']) && $data['truncate_table'] == true)
+                    if ((isset($data['run_install_uninstall']) && (bool) $data['run_install_uninstall'] == true) ||
+                        (isset($data['truncate_table']) && (bool) $data['truncate_table'] == true)
                     ) {
                         $this->runInstallUninstallTruncateTable($data);
                     }
@@ -666,8 +666,6 @@ class DevtoolsModules extends BasePackage
                             } else {
                                 $file = str_replace($moduleLocation, '', $file);
                             }
-
-                            break;
                         }
                     } else {
                         $file = str_replace($moduleLocations, '', $file);
@@ -1063,18 +1061,18 @@ class DevtoolsModules extends BasePackage
                     if ($data['type'] === 'core' ||
                         ($data['type'] === 'packages' && $data['name'] === 'Core')
                     ) {
-                        if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
+                        if (isset($data['run_install_uninstall']) && (bool) $data['run_install_uninstall'] == true) {
                             $coreInstall->init()->install();
                         }
                     } else if ($data['type'] === 'packages') {
                         $moduleModel = $module->useModel();
 
-                        if (isset($data['truncate_table']) && $data['truncate_table'] == true) {
+                        if (isset($data['truncate_table']) && (bool) $data['truncate_table'] == true) {
                             $coreInstall->init([$moduleModel->getSource()])->truncate();
                         }
 
-                        if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
-                            if ($data['installed'] == true) {
+                        if (isset($data['run_install_uninstall']) && (bool) $data['run_install_uninstall'] == true) {
+                            if ((bool) $data['installed'] == true) {
                                 $coreInstall->init([$moduleModel->getSource()])->install();
                             } else {
                                 $coreInstall->init([$moduleModel->getSource()])->uninstall();
@@ -1084,12 +1082,12 @@ class DevtoolsModules extends BasePackage
                 } else {
                     $module = new $class();
 
-                    if (isset($data['truncate_table']) && $data['truncate_table'] == true && method_exists($module, 'truncate')) {
+                    if (isset($data['truncate_table']) && (bool) $data['truncate_table'] == true && method_exists($module, 'truncate')) {
                         $module->init()->truncate();
                     }
 
-                    if (isset($data['run_install_uninstall']) && $data['run_install_uninstall'] == true) {
-                        if ($data['installed'] == true) {
+                    if (isset($data['run_install_uninstall']) && (bool) $data['run_install_uninstall'] == true) {
+                        if ((bool) $data['installed'] == true) {
                             $module->init()->install();
                         } else {
                             $module->init()->uninstall();

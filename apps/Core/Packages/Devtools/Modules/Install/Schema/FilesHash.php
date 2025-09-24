@@ -66,4 +66,19 @@ class FilesHash
             ]
         ];
     }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'module_type',
+                    'module_id'
+                ],
+                'INDEX'
+            )
+        ];
+    }
 }
