@@ -143,7 +143,6 @@ class MiddlewaresServiceProvider extends Injectable
             $this->data['givenRoute'] = $this->data['appRoute'] . '/home';
         }
 
-
         if ($this->request->isGet()) {
             $this->data['guestAccess'] =
             [
@@ -189,16 +188,18 @@ class MiddlewaresServiceProvider extends Injectable
             $methods = (new \ReflectionClass($componentValue['class']))->getMethods();
 
             foreach ($methods as $key => $method) {
-                if ((strtolower($method->class) === strtolower($componentValue['class']) && str_contains($method->name, 'Action')) ||
+                if ((strtolower($method->class) === strtolower($componentValue['class']) && str_ends_with(strtolower($method->name), 'action')) ||
                     $method->name === 'msviewAction' ||
                     $method->name === 'msupdateAction'
                 ) {
                     if (strtolower($this->data['givenRoute']) ===
                         strtolower(
-                            $this->data['appRoute'] . '/' . $componentValue['route'] . '/' . str_replace('Action', '', $method->name)
+                            $this->data['appRoute'] . '/' . $componentValue['route'] . '/' . substr($method->name, 0, -6)
                         )
                     ) {
                         $match = true;
+
+                        break;
                     }
                 }
             }
