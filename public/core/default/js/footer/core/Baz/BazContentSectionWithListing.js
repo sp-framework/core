@@ -873,6 +873,7 @@
                         $('#' + sectionId + '-filter-quick').attr('disabled', false);
                         $('#' + sectionId + '-filter-quick').val('');
                         $('#' + sectionId + '-filter-search').attr('disabled', false);
+                        $('#' + sectionId + '-filter-clear').attr('disabled', false);
 
                         $('#' + sectionId + '-filter-quick-prepend-dropdown-button span').text($(this).text().toUpperCase());
 
@@ -895,6 +896,18 @@
                             datatableOptions.paginationCounters.limit,
                             query
                         );
+                    });
+
+                    $('#' + sectionId + '-clear').click(function(e) {
+                        e.preventDefault();
+
+                        $('#' + sectionId + '-filter-quick').attr('disabled', true);
+                        $('#' + sectionId + '-filter-quick').val('');
+                        $('#' + sectionId + '-filter-search').attr('disabled', true);
+                        $('#' + sectionId + '-filter-clear').attr('disabled', true);
+                        $('#' + sectionId + '-filter-quick-prepend-dropdown-button span').text('SELECT FIELD');
+                        selectedId = null;
+                        dataType = null;
                     });
                 }
             }

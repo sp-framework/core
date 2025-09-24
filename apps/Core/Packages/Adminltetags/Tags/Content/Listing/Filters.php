@@ -3,7 +3,6 @@
 namespace Apps\Core\Packages\Adminltetags\Tags\Content\Listing;
 
 use Apps\Core\Packages\Adminltetags\Adminltetags;
-use Phalcon\Helper\Arr;
 
 class Filters extends Adminltetags
 {
@@ -206,6 +205,12 @@ class Filters extends Adminltetags
             $fieldGroupPreAddonDropdownButtonListTitle = [];
 
             foreach ($this->params['dtFilterColumns'] as $columnKey => $column) {
+                if (isset($this->params['dtQuickFilterColumns']) && count($this->params['dtQuickFilterColumns']) > 0) {
+                    if (!in_array($columnKey, $this->params['dtQuickFilterColumns'])) {
+                        continue;
+                    }
+                }
+
                 if (isset($this->params['dtTable']['columns'][$column['id']]) &&
                     $this->params['dtTable']['columns'][$column['id']]['name'] !== $column['name']
                 ) {
@@ -241,6 +246,15 @@ class Filters extends Adminltetags
                                             'title'                   => false,
                                             'type'                    => 'primary',
                                             'icon'                    => 'search',
+                                            'noMargin'                => true,
+                                            'disabled'                => true,
+                                            'buttonAdditionalClass'   => 'rounded-0 text-white',
+                                            'position'                => 'right'
+                                        ],
+                                        'clear'        => [
+                                            'title'                   => false,
+                                            'type'                    => 'secondary',
+                                            'icon'                    => 'times',
                                             'noMargin'                => true,
                                             'disabled'                => true,
                                             'buttonAdditionalClass'   => 'rounded-0 text-white',
