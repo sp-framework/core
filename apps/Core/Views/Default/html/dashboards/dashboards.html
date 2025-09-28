@@ -93,14 +93,17 @@ dataCollectionSection =
 
                 $('#grid-main').html('<div class="grid-stack"></div>');
                 grid = null;
+                GridStack.renderCB = function(el, w) {
+                    el.innerHTML = w.content;
+                };
                 grid = dataCollectionComponent['{{componentId}}-{{sectionId}}']['grid'] = GridStack.init({
                     'draggable'     :
                     {
                         'handle'    : '.btn-tool-move .fa-up-down-left-right'
                     },
                     'margin'        : '5px',
+                    'cellHeight'    : 1,
                     'animate'       : false,
-                    'sizeToContent' : true
                 });
 
                 grid.on('added', function(e, items) {
@@ -120,11 +123,8 @@ dataCollectionSection =
             }
             initGrid();
 
-
             function fixHeight(item) {
-                var itemHeight = $(item.el).find('.card')[0].offsetHeight + 20;//20 for padding
-
-                grid.cellHeight(itemHeight);
+                grid.resizeToContent(item.el);
             }
 
             $('body').off('widgetUpdate');
@@ -198,8 +198,8 @@ dataCollectionSection =
 
                 var url = '{{links.url("dashboards/q/widgets/content/id/' + item.id + '/did/' + item.dashboard_id + '/wid/' + item.widget_id + '")}}';
                 $(item.el).find('.card-body').load(url, null, function (response, status, xhr) {
-                    fixHeight(item);
                     addToken(xhr);
+                    fixHeight(item);
                 });
             }
 
@@ -494,7 +494,6 @@ dataCollectionSection =
                         href +
                         e.params.data.id
                     );
-                    $('#{{componentId}}-{{sectionId}}-no-widgets').attr('hidden', true);
                     $('#{{componentId}}-{{sectionId}}-dashboard-loader').attr('hidden', false);
                     initGrid();
                     populateGridStructure();
