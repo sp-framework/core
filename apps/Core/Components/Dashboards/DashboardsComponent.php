@@ -12,8 +12,6 @@ class DashboardsComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['widgets'])) {
-            $this->getNewToken();
-
             if ($this->getData()['widgets'] == 'info') {
                 return $this->basepackages->widgets->getWidget($this->getData()['id'], 'info')['info'];
             } else if ($this->getData()['widgets'] == 'content') {//This is when we add the widget via list of widgets in dashboard.
@@ -34,7 +32,7 @@ class DashboardsComponent extends BaseComponent
                 if ($this->getData()['id'] != 0) {
                     $dashboardId = $this->getData()['id'];
 
-                    $dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true, false);
+                    $dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true);
 
                     if (isset($this->app['settings']['defaultDashboard'])) {
                         if ($this->app['settings']['defaultDashboard'] == $dashboard['id']) {
@@ -134,9 +132,11 @@ class DashboardsComponent extends BaseComponent
 
                 $this->view->dashboards = $dashboards;
 
-                $this->view->dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true, false);
+                $this->view->dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true);
 
                 $this->view->widgetsTree = $this->basepackages->widgets->getWidgetsTree();
+
+                $this->getNewToken();//We need this token as we initiate a getDashboardWidgets();
             }
         }
     }
