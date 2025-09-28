@@ -59,13 +59,21 @@ class Widgets extends BasePackage
 
     public function getWidget(int $id, $task = null, $dashboardWidget = [])
     {
-        $widget = $this->getById($id);
+        if (isset($this->widgets[$id])) {
+            $widget = $this->widgets[$id];
+        } else {
+            $widget = $this->getById($id);
+        }
 
-        if (!$widget) {
+        if (!isset($widget)) {
             return false;
         }
 
         if (!$task) {
+            return $widget;
+        }
+
+        if ($this->opCache && isset($dashboardWidget['getWidgetData']) && isset($widget['content']) && $task === 'content') {
             return $widget;
         }
 
@@ -74,6 +82,7 @@ class Widgets extends BasePackage
                 $widget['settings'] = $this->helper->decode($widget['settings'], true);
             }
         }
+
         $widgetMethod = $widget['method'];
 
         $component = $this->modules->components->getComponentById($widget['component_id']);
@@ -83,27 +92,31 @@ class Widgets extends BasePackage
                 $componentObj = new $component['class'];
 
                 $componentObj->checkComponentWidgets();
+            }
 
-                $widgetClass = $componentObj->widgets->init($componentObj, $component);
+            if ($componentObj->widgets) {
+                $widgetsReflection = new \ReflectionClass($componentObj->widgets);
+
+                if (isset($widgetMethod) && $widgetsReflection->hasMethod($widgetMethod)) {
+                    if ($task === 'info') {
+                        $widget['info'] = $componentObj->widgets->info($widget);
+                    } else if ($task === 'content') {
+                        $widget['content'] = $componentObj->widgets->$widgetMethod($widget, $dashboardWidget);
+
+                        if ($this->opCache && isset($dashboardWidget['getWidgetData'])) {
+                            $this->widgets[$id] = $widget;
+
+                            $this->opCache->setCache('widgets', $this->widgets, 'core');
+                        }
+                    }
+
+                    return $widget;
+                }
+
+                return false;
             }
         } catch (\Exception $e) {
             throw $e;
-        }
-
-        if ($widgetClass) {
-            $widgetsReflection = new \ReflectionClass($widgetClass);
-
-            if (isset($widgetMethod) && $widgetsReflection->hasMethod($widgetMethod)) {
-                if ($task === 'info') {
-                    $widget['info'] = $widgetClass->info($widget);
-                } else if ($task === 'content') {
-                    $widget['content'] = $widgetClass->$widgetMethod($widget, $dashboardWidget);
-                }
-
-                return $widget;
-            }
-
-            return false;
         }
 
         return false;

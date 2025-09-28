@@ -33,8 +33,12 @@ class Dashboards extends BasePackage
         return $this;
     }
 
-    public function getDashboardById(int $id, $getwidgets = true, $getContent = false)
+    public function getDashboardById(int $id, $getwidgets = true)
     {
+        if (isset($this->dashboards[$id]['widgets'])) {
+            return $this->dashboards[$id];
+        }
+
         $this->setFFRelations(true);
 
         $this->getFirst('id', $id);
@@ -47,20 +51,21 @@ class Dashboards extends BasePackage
                 if ($this->model->getwidgets()) {
                     $dashboard['widgets'] = $this->model->getwidgets()->toArray();
                 }
-                if ($getContent) {
-                    $dashboard['widgets'] = $this->basepackages->widgets->getWidgetsContent($dashboard['widgets']);
-                }
+            }
+        } else {
+            if ($this->ffData) {
+                $dashboard = $this->ffData;
+            }
+        }
+
+        if (isset($dashboard)) {
+            $this->dashboards[$id] = $dashboard;
+
+            if ($this->opCache) {
+                $this->opCache->setCache('dashboards', $this->dashboards, 'core');
             }
 
             return $dashboard;
-        } else {
-            if ($this->ffData) {
-                if ($getContent) {
-                    $this->ffData['widgets'] = $this->basepackages->widgets->getWidgetsContent($this->ffData['widgets']);
-                }
-
-                return $this->ffData;
-            }
         }
 
         return false;
@@ -241,9 +246,9 @@ class Dashboards extends BasePackage
         }
     }
 
-    public function getDashboardWidgetById(int $id, int $dashboardId, $getContent = false)
+    public function getDashboardWidgetById(int $id, int $dashboardId)
     {
-        $dashboard = $this->getDashboardById($dashboardId, true, $getContent);
+        $dashboard = $this->getDashboardById($dashboardId);
 
         if (!$dashboard) {
             throw new IdNotFoundException;
@@ -327,6 +332,11 @@ class Dashboards extends BasePackage
             $newWidget['widget'] = $this->basepackages->widgets->getWidget($newWidget['widget_id'], 'content', $newWidget);
 
             $this->addResponse('Widget added to dashboard.', 0, $newWidget);
+
+            if ($this->opCache) {
+                $this->opCache->removeCache('dashboards', 'core');
+                $this->opCache->removeCache('widgets', 'core');
+            }
         } catch (\Exception $e) {
             $this->addResponse('Could not add widget to dashboard.', 1);
         }
@@ -385,6 +395,11 @@ class Dashboards extends BasePackage
             } else {
                 $this->addResponse('Dashboard widgets updated.', 0);
             }
+
+            if ($this->opCache) {
+                $this->opCache->removeCache('dashboards', 'core');
+                $this->opCache->removeCache('widgets', 'core');
+            }
         } catch (\Exception $e) {
             $this->addResponse('Error updating dashboard widgets.', 1);
         }
@@ -425,6 +440,11 @@ class Dashboards extends BasePackage
 
                 $this->remove($dbWidgetArr['id']);
             }
+
+            if ($this->opCache) {
+                $this->opCache->removeCache('dashboards', 'core');
+                $this->opCache->removeCache('widgets', 'core');
+            }
         } else {
             $this->addResponse('Error removing widget from dashboard.', 1);
         }
@@ -432,7 +452,7 @@ class Dashboards extends BasePackage
 
     public function getDashboardWidgets(array $data)
     {
-        $dashboard = $this->getDashboardById($data['dashboard_id'], true);
+        $dashboard = $this->getDashboardById($data['dashboard_id']);
 
         if (!$dashboard) {
             throw new IdNotFoundException;

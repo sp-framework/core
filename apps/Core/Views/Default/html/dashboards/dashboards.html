@@ -277,12 +277,6 @@ dataCollectionSection =
                 $('.btn-tool-settings').off();
                 $('.btn-tool-settings').click(function() {
                     $(this).parents('.card').first().find('.widgets-setting-modal').modal('show');
-
-                    BazContentFields.init({
-                        'componentId'   : "{{componentId}}",
-                        'sectionId'     : "{{componentId}}-{{sectionId}}",
-                        'fieldId'       : "{{componentId}}-{{sectionId}}-worldclock-" + $(this).parents('.grid-stack-item').attr('gs-id') + "-clocks"
-                    });
                 });
             }
 

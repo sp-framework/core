@@ -60,7 +60,7 @@
 )}}
 {% set widgetsData = json_encode(widget, 16) %}
 <script>
-/* globals paginatedPNotify BazHelpers */
+/* globals paginatedPNotify BazHelpers BazContentFields */
 var dataCollectionComponent, dataCollectionSection;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -335,5 +335,13 @@ if (dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func']) {
 $('body').off('widgetRemove');
 $('body').on('widgetRemove', function(e, data) {
     BazHelpers.setTimeoutTimers.stop(null, null, 'worldClock' + $($(data.gridWidget)[0]).attr('gs-id'));
+});
+
+$(document).ready(function() {
+    BazContentFields.init({
+        'componentId'   : "{{componentId}}",
+        'sectionId'     : "{{componentId}}-{{sectionId}}",
+        'fieldId'       : '{{componentId}}-{{sectionId}}-worldclock-' + widgetsData["data"]["id"] + '-clocks'
+    });
 });
 </script>
