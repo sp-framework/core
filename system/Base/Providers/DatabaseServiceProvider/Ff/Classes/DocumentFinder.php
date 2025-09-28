@@ -333,6 +333,26 @@ class DocumentFinder
 
                     $found = array_replace($found, $this->searchIndexes($conditionArr, $indexChars, $keyword, $skip, $limit));
                 }
+
+                if (count($found) > 0) {//match all keyword to narrow down search.
+                    foreach ($found as $foundKey => $foundArr) {
+                        $fieldString = strtolower($foundArr[$conditionArr[0]]);
+
+                        $foundAllKeywords = true;
+
+                        foreach ($keywordArr as $key => $keyword) {
+                            if (!str_contains($fieldString, $keyword)) {
+                                $foundAllKeywords = false;
+
+                                break;
+                            }
+                        }
+
+                        if (!$foundAllKeywords) {
+                            unset($found[$foundKey]);
+                        }
+                    }
+                }
             } else {
                 if (is_string($keyword)) {
                     if (strlen($keyword) === 10 &&

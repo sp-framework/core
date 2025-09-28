@@ -1212,8 +1212,9 @@ abstract class BasePackage extends Controller
 
 				$params['conditions'] = $this->filterConditions;
 				// -|name|like|%aus%&or|name|like|%ind%|&
-				// dump($params);die();
+				// trace([$params]);
 				$data = $this->getByParams($params, true, false);
+				// trace([$data]);
 			}
 		}
 		// var_dump($data);die();
