@@ -135,10 +135,12 @@ class Widgets extends BasePackage
         return $widgets;
     }
 
-    public function getWidgetByMethod($method)
+    public function getWidgetByMethodAndAppType($method, $appType)
     {
         foreach($this->widgets as $widget) {
-            if ($widget['method'] === $method) {
+            if ($widget['method'] === $method &&
+                $widget['app_type'] === $appType
+            ) {
                 return $widget;
             }
         }

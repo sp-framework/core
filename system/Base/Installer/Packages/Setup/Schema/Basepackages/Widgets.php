@@ -45,6 +45,14 @@ class Widgets
                     ]
                 ),
                 new Column(
+                    'app_type',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
                     'multiple',
                     [
                         'type'    => Column::TYPE_BOOLEAN,
@@ -70,7 +78,8 @@ class Widgets
                 new Index(
                     'column_UNIQUE',
                     [
-                        'method'
+                        'method',
+                        'app_type'
                     ],
                     'UNIQUE'
                 )

@@ -38,6 +38,7 @@ class Widgets
                 'name'                  => $widget['name'],
                 'method'                => $widget['method'],
                 'component_id'          => $registeredComponentId,
+                'app_type'              => 'core',
                 'multiple'              => isset($widget['multiple']) && $widget['multiple'] === true ? 1 : 0,
                 'max_multiple'          => isset($widget['max_multiple']) ? $widget['max_multiple'] : 5,//Max instances of same widget
                 'settings'              => isset($widget['settings']) ? $this->helper->encode($widget['settings']) : null

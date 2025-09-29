@@ -38,7 +38,7 @@ class WidgetInstaller extends BasePackage
                         continue;
                     }
 
-                    $widget = $this->basepackages->widgets->getWidgetByMethod($widgetArr['method']);
+                    $widget = $this->basepackages->widgets->getWidgetByMethodAndAppType($widgetArr['method'], $component['app_type']);
 
                     if ($widget) {
                         $widgetToUpdate =
@@ -47,6 +47,7 @@ class WidgetInstaller extends BasePackage
                                 'name'                  => $widgetArr['name'],
                                 'method'                => $widgetArr['method'],
                                 'component_id'          => $component['id'],
+                                'app_type'              => $component['app_type'],
                                 'multiple'              => isset($widgetArr['multiple']) && $widgetArr['multiple'] === true ? 1 : 0,
                                 'max_multiple'          => isset($widgetArr['max_multiple']) ? $widgetArr['max_multiple'] : 5,//Max instances of same widget
                                 'settings'              => isset($widgetArr['settings']) ? $this->helper->encode($widgetArr['settings']) : null
@@ -67,6 +68,7 @@ class WidgetInstaller extends BasePackage
                                 'name'                  => $widgetArr['name'],
                                 'method'                => $widgetArr['method'],
                                 'component_id'          => $component['id'],
+                                'app_type'              => $component['app_type'],
                                 'multiple'              => isset($widgetArr['multiple']) && $widgetArr['multiple'] === true ? 1 : 0,
                                 'max_multiple'          => isset($widgetArr['max_multiple']) ? $widgetArr['max_multiple'] : 5,//Max instances of same widget
                                 'settings'              => isset($widgetArr['settings']) ? $this->helper->encode($widgetArr['settings']) : null
@@ -111,7 +113,7 @@ class WidgetInstaller extends BasePackage
 
         if ($component) {
             foreach ($component['widgets'] as $componentWidget) {
-                $widget = $this->basepackages->widgets->getWidgetByMethod($componentWidget['method']);
+                $widget = $this->basepackages->widgets->getWidgetByMethodAndAppType($componentWidget['method'], $component['app_type']);
 
                 if ($widget) {
                     $this->basepackages->widgets->remove($widget['id']);
