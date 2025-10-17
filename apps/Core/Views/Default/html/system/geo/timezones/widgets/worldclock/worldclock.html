@@ -245,8 +245,6 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func'] =
                 }
             }
 
-            clockStr = monthArray[month] + " " + day + ", " + year + " " + hr + ":" + min + ":" + sec;
-
             if (clock['isDST'] == true) {
                 hr -= -1;
 
@@ -270,12 +268,17 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-worldclock-func'] =
                     }
                 }
 
+                clockStr = monthArray[month] + " " + day + ", " + year + " " + hr + ":" + min + ":" + sec;
+
                 if (!clock['abbreviation_dst'].includes('-') &&
                     !clock['abbreviation_dst'].includes('+')
                 ) {
+
                     clockStr = clockStr + " " + clock['abbreviation_dst'];
                 }
             } else {
+                clockStr = monthArray[month] + " " + day + ", " + year + " " + hr + ":" + min + ":" + sec;
+
                 if (!clock['abbreviation_dst'].includes('-') &&
                     !clock['abbreviation_dst'].includes('+')
                 ) {
