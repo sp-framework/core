@@ -54,7 +54,14 @@ class Apps
 					]
 				),
 				new Column(
-					'default_component',
+					'default_component_guests',
+					[
+						'type'    => Column::TYPE_TINYINTEGER,
+						'notNull' => true,
+					]
+				),
+				new Column(
+					'default_component_users',
 					[
 						'type'    => Column::TYPE_TINYINTEGER,
 						'notNull' => true,

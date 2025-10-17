@@ -1,8 +1,13 @@
 {% if components is defined and components|length > 0 %}
-    {% if app['default_component'] is defined and app['default_component'] != 0 %}
-        {% set appDefaultComponent = app['default_component'] %}
+    {% if app['default_component_guests'] is defined and app['default_component_guests'] != 0 %}
+        {% set appDefaultComponentGuests = app['default_component_guests'] %}
     {% else %}
-        {% set appDefaultComponent = 0 %}
+        {% set appDefaultComponentGuests = 0 %}
+    {% endif %}
+    {% if app['default_component_users'] is defined and app['default_component_users'] != 0 %}
+        {% set appDefaultComponentUsers = app['default_component_users'] %}
+    {% else %}
+        {% set appDefaultComponentUsers = 0 %}
     {% endif %}
     {% if app['errors_component'] is defined and app['errors_component'] != 0 %}
         {% set appErrorsComponent = app['errors_component'] %}
@@ -27,11 +32,11 @@
                     'componentName'                  : componentName,
                     'componentId'                    : componentId,
                     'sectionId'                      : sectionId,
-                    'fieldId'                        : 'default_component',
-                    'fieldLabel'                     : 'Default Component',
+                    'fieldId'                        : 'default_component_guests',
+                    'fieldLabel'                     : 'Default Component (Guests)',
                     'fieldType'                      : 'select2',
                     'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'Select a default component for this app.',
+                    'fieldHelpTooltipContent'        : 'Select a default component for this app for guests.',
                     'fieldBazScan'                   : true,
                     'fieldBazJstreeSearch'           : true,
                     'fieldBazPostOnCreate'           : true,
@@ -41,7 +46,32 @@
                     'fieldDataSelect2OptionsKey'     : 'id',
                     'fieldDataSelect2OptionsValue'   : 'name',
                     'fieldDataSelect2OptionsArray'   : true,
-                    'fieldDataSelect2OptionsSelected': appDefaultComponent
+                    'fieldDataSelect2OptionsSelected': appDefaultComponentGuests
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'default_component_users',
+                    'fieldLabel'                     : 'Default Component (Users)',
+                    'fieldType'                      : 'select2',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Select a default component for this app for logged in users.',
+                    'fieldBazScan'                   : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldRequired'                  : true,
+                    'fieldDataSelect2Options'        : selectComponents,
+                    'fieldDataSelect2OptionsKey'     : 'id',
+                    'fieldDataSelect2OptionsValue'   : 'name',
+                    'fieldDataSelect2OptionsArray'   : true,
+                    'fieldDataSelect2OptionsSelected': appDefaultComponentUsers
                 ]
             )}}
         </div>
@@ -154,8 +184,11 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-default_component'               : {
-            'placeholder'   : 'SELECT DEFAULT COMPONENT'
+        '{{componentId}}-{{sectionId}}-default_component_guests'        : {
+            'placeholder'   : 'SELECT DEFAULT COMPONENT FOR GUESTS'
+        },
+        '{{componentId}}-{{sectionId}}-default_component_users'         : {
+            'placeholder'   : 'SELECT DEFAULT COMPONENT FOR USERS'
         },
         '{{componentId}}-{{sectionId}}-errors_component'                : {
             'placeholder'   : 'SELECT ERRORS COMPONENT'
@@ -214,8 +247,10 @@ dataCollectionSection =
                                 // window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['menus'][menuId][appId]['enabled'] = true;
                             }
                         }
-                        $('#{{componentId}}-{{sectionId}}-default_component').find('[value="' + componentId + '"]').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-default_component').trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-default_component_guests').find('[value="' + componentId + '"]').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-default_component_guests').trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-default_component_users').find('[value="' + componentId + '"]').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-default_component_users').trigger('change');
                         $('#{{componentId}}-{{sectionId}}-errors_component').find('[value="' + componentId + '"]').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-errors_component').trigger('change');
                     } else {
@@ -231,8 +266,10 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-component-need_auth-' + componentId)[0].checked = false;
                             window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['need_auths'][componentId] = false;
                         }
-                        $('#{{componentId}}-{{sectionId}}-default_component').find('[value="' + componentId + '"]').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-default_component').trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-default_component_guests').find('[value="' + componentId + '"]').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-default_component_guests').trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-default_component_users').find('[value="' + componentId + '"]').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-default_component_users').trigger('change');
                         $('#{{componentId}}-{{sectionId}}-errors_component').find('[value="' + componentId + '"]').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-errors_component').trigger('change');
                     }
@@ -350,11 +387,13 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-form'                            : {
             rules: {
-                '{{componentId}}-{{sectionId}}-default_component'       : 'required',
+                '{{componentId}}-{{sectionId}}-default_component_guests': 'required',
+                '{{componentId}}-{{sectionId}}-default_component_users' : 'required',
                 '{{componentId}}-{{sectionId}}-errors_component'        : 'required',
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
+                '{{componentId}}-{{sectionId}}-default_component_guests': 'Please select app default component for guests',
+                '{{componentId}}-{{sectionId}}-default_component_users' : 'Please select app default component for users',
                 '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',
             }
         }

@@ -14,7 +14,8 @@ class App
 				'route' 							=> 'core',
 				'description' 						=> 'Core App',
 				'app_type'       					=> 'core',
-				'default_component'					=> 0,
+				'default_component_guests'  		=> 0,
+				'default_component_users'   		=> 0,
 				'errors_component'					=> 0,
 				'can_login_role_ids'				=> $helper->encode(['1']),
 				'acceptable_usernames'				=> $helper->encode(["email", "username"]),
@@ -38,6 +39,15 @@ class App
 	public function update($db, $ff)
 	{
 		if ($db) {
+			$homeComponent =
+				$db->fetchAll(
+					"SELECT * FROM modules_components WHERE route LIKE :route",
+					Enum::FETCH_ASSOC,
+					[
+						"route" => "home",
+					]
+				);
+
 			$dashboardsComponent =
 				$db->fetchAll(
 					"SELECT * FROM modules_components WHERE route LIKE :route",
@@ -59,8 +69,9 @@ class App
 			$db->updateAsDict(
 				'service_provider_apps',
 				[
-					'default_component' 	=> $dashboardsComponent[0]['id'],
-					'errors_component' 		=> $errorsComponent[0]['id']
+					'default_component_guests' 	=> $homeComponent[0]['id'],
+					'default_component_users' 	=> $dashboardsComponent[0]['id'],
+					'errors_component' 			=> $errorsComponent[0]['id']
 				],
 				"id = 1"
 			);
@@ -69,6 +80,7 @@ class App
 		if ($ff) {
 			$modulesStore = $ff->store('modules_components');
 
+			$homeComponent = $modulesStore->findOneBy(['route', '=', 'home']);
 			$dashboardsComponent = $modulesStore->findOneBy(['route', '=', 'dashboards']);
 			$errorsComponent = $modulesStore->findOneBy(['route', '=', 'errors']);
 
@@ -76,7 +88,8 @@ class App
 
 			$app = $appStore->findById('1');
 
-			$app['default_component'] = $dashboardsComponent['id'];
+			$app['default_component_guests'] = $homeComponent['id'];
+			$app['default_component_users'] = $dashboardsComponent['id'];
 			$app['errors_component'] = $errorsComponent['id'];
 
 			$appStore->updateOrInsert($app);

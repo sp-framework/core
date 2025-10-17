@@ -702,7 +702,15 @@ class Auth extends BasePackage
             return true;
         }
 
-        if ($this->hasUserInSession() || $this->hasRecaller()) {
+        if ($this->hasUserInSession()) {
+            $this->access->auth->setUserFromSession();
+
+            return true;
+        }
+
+        if ($this->hasRecaller()) {
+            $this->access->auth->setUserFromRecaller();
+
             return true;
         }
 

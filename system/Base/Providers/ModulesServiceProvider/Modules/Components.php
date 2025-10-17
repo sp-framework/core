@@ -365,17 +365,17 @@ class Components extends BasePackage
 		$components = $this->helper->decode($data['components'], true);
 		$needAuths = $this->helper->decode($data['need_auths'], true);
 
-		$homeNeedsAuth = false;
-		if (in_array(true, $needAuths)) {//If any of them is true, we have to make home true.
-			$homeNeedsAuth = true;
-		}
+		// $homeNeedsAuth = false;
+		// if (in_array(true, $needAuths)) {//If any of them is true, we have to make home true.
+		// 	$homeNeedsAuth = true;
+		// }
 
 		foreach ($components as $componentId => $status) {
 			$component = $this->getById($componentId);
 
-			if ($component['route'] === 'home' && $homeNeedsAuth) {
-				$needAuths[$componentId] = true;
-			}
+			// if ($component['route'] === 'home' && $homeNeedsAuth) {
+			// 	$needAuths[$componentId] = true;
+			// }
 
 			if (is_string($component['apps'])) {
 				$component['apps'] = $this->helper->decode($component['apps'], true);
@@ -385,7 +385,6 @@ class Components extends BasePackage
 				$component['settings'] = $this->helper->decode($component['settings'], true);
 			}
 
-			// if ($status === true) {
 			$component['apps'][$data['id']]['enabled'] = (bool) $status;
 
 			if (isset($needAuths[$componentId])) {
@@ -450,10 +449,6 @@ class Components extends BasePackage
 			}
 
 			$component['dependencies'] = $this->helper->encode($component['dependencies'], JSON_UNESCAPED_SLASHES);
-
-			// } else if ($status === false) {
-			// 	$component['apps'][$data['id']]['enabled'] = false;
-			// }
 
 			$component['apps'] = $this->helper->encode($component['apps']);
 

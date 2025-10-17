@@ -26,20 +26,38 @@ class AppsComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
-                if (!isset($app['default_component']) ||
-                    isset($app['default_component']) && $app['default_component'] == '0'
+                if (!isset($app['default_component_guests']) ||
+                    isset($app['default_component_guests']) && $app['default_component_guests'] == '0'
                 ) {
                     if ($app['app_type'] === 'core' || $app['app_type'] === 'dash') {
                         $dashboard = $this->modules->components->getComponentByNameForAppType('dashboards', $app['app_type']);
 
                         if ($dashboard) {
-                            $app['default_component'] = $dashboard['id'];
+                            $app['default_component_guests'] = $dashboard['id'];
                         }
                     } else {
                         $home = $this->modules->components->getComponentByNameForAppType('home', $app['app_type']);
 
                         if ($home) {
-                            $app['default_component'] = $home['id'];
+                            $app['default_component_guests'] = $home['id'];
+                        }
+                    }
+                }
+
+                if (!isset($app['default_component_users']) ||
+                    isset($app['default_component_users']) && $app['default_component_users'] == '0'
+                ) {
+                    if ($app['app_type'] === 'core' || $app['app_type'] === 'dash') {
+                        $dashboard = $this->modules->components->getComponentByNameForAppType('dashboards', $app['app_type']);
+
+                        if ($dashboard) {
+                            $app['default_component_users'] = $dashboard['id'];
+                        }
+                    } else {
+                        $home = $this->modules->components->getComponentByNameForAppType('home', $app['app_type']);
+
+                        if ($home) {
+                            $app['default_component_users'] = $home['id'];
                         }
                     }
                 }

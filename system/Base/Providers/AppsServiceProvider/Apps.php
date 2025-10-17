@@ -201,7 +201,8 @@ class Apps extends BasePackage
 			return false;
 		}
 
-		$data['default_component'] = 0;
+		$data['default_component_guests'] = 0;
+		$data['default_component_users'] = 0;
 		$data['errors_component'] = 0;
 		$data['incorrect_login_attempt_block_ip'] = 0;
 		$data['auto_unblock_ip_minutes'] = 0;

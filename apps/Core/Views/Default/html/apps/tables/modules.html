@@ -57,8 +57,11 @@
                 {% if moduleType === 'component' %}
                     {# {% set componentIds[componentId ~ '-' ~ sectionId ~ '-component-' ~ module['id']] = module['id'] %} #}
                     {% if module['name'] === 'Home' %}
-                        {% if app['default_component'] is defined and app['default_component'] == 0 %}
-                            {% set appDefaultComponent = module['id'] %}
+                        {% if app['default_component_guests'] is defined and app['default_component_guests'] == 0 %}
+                            {% set appDefaultComponentGuests = module['id'] %}
+                        {% endif %}
+                        {% if app['default_component_users'] is defined and app['default_component_users'] == 0 %}
+                            {% set appDefaultComponentUsers = module['id'] %}
                         {% endif %}
                     {% endif %}
 

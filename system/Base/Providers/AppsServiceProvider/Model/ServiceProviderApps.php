@@ -19,7 +19,9 @@ class ServiceProviderApps extends BaseModel
 
     public $app_type;
 
-    public $default_component;
+    public $default_component_guests;
+
+    public $default_component_users;
 
     public $errors_component;
 
