@@ -12,11 +12,19 @@ class HomeComponent extends BaseComponent
     public function viewAction()
     {
         try {
-            if ($this->app['default_component'] == 0) {
-                return;
-            }
+            if ($this->access->auth->check()) {
+                if ($this->app['default_component_users'] == 0) {
+                    return;
+                }
 
-            $defaultComponent = $this->modules->components->getById($this->app['default_component']);
+                $defaultComponent = $this->modules->components->getById($this->app['default_component_users']);
+            } else {
+                if ($this->app['default_component_guests'] == 0) {
+                    return;
+                }
+
+                $defaultComponent = $this->modules->components->getById($this->app['default_component_guests']);
+            }
 
             if ($defaultComponent['class'] === get_class($this)) {
                 return;
