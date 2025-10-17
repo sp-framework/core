@@ -133,6 +133,10 @@ class Menus extends BasePackage
             foreach ($menus as $menuId => $value) {
                 $menu = $this->getById($menuId);
 
+                if (!$menu) {
+                    continue;
+                }
+
                 if (is_string($menu['apps'])) {
                     $menu['apps'] = $this->helper->decode($menu['apps'], true);
                 }
