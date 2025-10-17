@@ -15,7 +15,8 @@ class ConditionsHandler
             return false;
         }
 
-        if (strlen($value) === 10 &&
+        if (is_string($value) &&
+            strlen($value) === 10 &&
             str_contains($value, '-') &&
             substr_count($value, '-') === 2
         ) {
