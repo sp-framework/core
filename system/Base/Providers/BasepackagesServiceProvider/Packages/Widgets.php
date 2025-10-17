@@ -91,7 +91,11 @@ class Widgets extends BasePackage
             if (class_exists($component['class'])) {
                 $componentObj = new $component['class'];
 
-                $componentObj->checkComponentWidgets();
+                try {
+                    $componentObj->checkComponentWidgets();
+                } catch (\throwable $e) {
+                    return false;
+                }
             }
 
             if ($componentObj->widgets) {

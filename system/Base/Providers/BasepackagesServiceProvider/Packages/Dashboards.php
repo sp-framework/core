@@ -483,8 +483,6 @@ class Dashboards extends BasePackage
                 } else {
                     unset($dashboard['widgets'][$key]);
                     unset($widgetsData[$key]);
-
-                    $this->removeWidgetFromDashboard($dashboardWidget);
                 }
             }
 
