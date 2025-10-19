@@ -594,22 +594,22 @@ abstract class BasePackage extends Controller
 			);
 
 		//Retrieve from Users Env
-		if (count($this->postData()) === 0) {
-			$envParams = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], false, true);
+		if ($this->access->auth->check()) {
+			if (count($this->postData()) === 0) {
+				$envParams = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], false, true);
 
-			if ($envParams) {
-				if (isset($envParams['params'])) {
-					$params = $envParams['params'];
-				}
+				if ($envParams) {
+					if (isset($envParams['params'])) {
+						$params = $envParams['params'];
+					}
 
-				if (isset($envParams['pageParams'])) {
-					$pageParams = $envParams['pageParams'];
+					if (isset($envParams['pageParams'])) {
+						$pageParams = $envParams['pageParams'];
+					}
 				}
 			}
-		}
 
-		//Add to Users Env
-		if ($this->access->auth->account()) {
+			//Add to Users Env
 			$this->basepackages->accounts->checkUpdateEnv($this->access->auth->account['id'], ['params' => $params, 'pageParams' => $pageParams]);
 		}
 
