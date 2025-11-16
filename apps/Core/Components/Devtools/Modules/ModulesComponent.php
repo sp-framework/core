@@ -195,9 +195,11 @@ class ModulesComponent extends BaseComponent
 
 						if ($child['repoExists'] && !$child['isModified'] && !$child['releasePending'] && $child['latestRelease']) {
 							unset($modules[$moduleType]['childs'][$childKey]);
+
+							continue;
 						}
 
-						if (isset($child['modified_files']) && count($child['modified_files']) > 0) {
+						if ($child['isModified'] && isset($child['modified_files'])) {
 							$modifiedModules[$child['module_type']][$child['id']] = $child['modified_files'];
 						}
 					}
@@ -898,6 +900,19 @@ class ModulesComponent extends BaseComponent
 		$this->addResponse(
 			$this->modulesPackage->packagesData->responseMessage,
 			$this->modulesPackage->packagesData->responseCode
+		);
+	}
+
+	public function getDiffAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->getDiff($this->postData());
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode,
+			$this->modulesPackage->packagesData->responseData ?? [],
 		);
 	}
 }

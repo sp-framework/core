@@ -815,6 +815,9 @@ class DevtoolsModules extends BasePackage
 
             if ($moduleLocationFiles && count($moduleLocationFiles['files']) > 0) {
                 $module['modified_files'] = [];
+                $module['modified_files']['added'] = [];
+                $module['modified_files']['removed'] = [];
+                $module['modified_files']['modified'] = [];
 
                 array_walk($filesHash['files_hash'], function($hash, $file) use ($moduleLocations, $moduleLocationFiles, &$module) {
                     if (count($moduleLocations) === 1) {
@@ -834,7 +837,7 @@ class DevtoolsModules extends BasePackage
                     }
 
                     if (!in_array($file, $moduleLocationFiles['files'])) {
-                        array_push($module['modified_files'], $file . ' (Removed)');
+                        array_push($module['modified_files']['removed'], $file);
                     }
                 });
 
@@ -861,15 +864,18 @@ class DevtoolsModules extends BasePackage
 
                     if (!isset($filesHash['files_hash'][$file])
                     ) {
-                        array_push($module['modified_files'], $file . ' (Added)');
+                        array_push($module['modified_files']['added'], $file);
                     } else if (isset($filesHash['files_hash'][$file]) &&
                                $filesHash['files_hash'][$file] !== $hash
                     ) {
-                        array_push($module['modified_files'], $file . ' (Modified)');
+                        array_push($module['modified_files']['modified'], $file);
                     }
                 }
 
-                if (count($module['modified_files']) > 0) {
+                if (count($module['modified_files']['added']) > 0 ||
+                    count($module['modified_files']['modified']) > 0 ||
+                    count($module['modified_files']['removed']) > 0
+                ) {
                     $module['isModified'] = true;
                 }
             }
@@ -4163,5 +4169,63 @@ $file .= '
 
             return false;
         }
+    }
+
+    public function getDiff($data)
+    {
+        $module = $this->modules->{$data['module_type']}->getById($data['id']);
+
+        if (!$module) {
+            $this->addResponse('Module not found!', 1);
+
+            return false;
+        }
+
+        if ($module['module_type'] === 'views' && $module['is_subview'] == false) {
+            $moduleLocations = [$this->getModuleFilesLocation($module), $this->getModuleFilesLocation($module, true)];
+        } else {
+            $moduleLocations = [$this->getModuleFilesLocation($module)];
+        }
+
+        if (count($moduleLocations) === 0) {
+            $this->addResponse('Module location not found!', 1);
+
+            return false;
+        }
+
+        $found = false;
+        $diff = null;
+
+        foreach ($moduleLocations as $moduleLocation) {
+            if ($this->localContent->fileExists($moduleLocation . $data['file'])) {
+                exec('cd ' . base_path($moduleLocation) . ' && git diff ' . $data['file'], $output, $result);
+
+                if ($result !== 0 || count($output) === 0) {
+                    $this->addResponse('Error while getting diff', 1, ['output' => $output]);
+
+                    return false;
+                }
+
+                if (count($output) > 200) {
+                    $this->addResponse('File diff > 200 lines, please use external app to view diff!', 1);
+
+                    return false;
+                }
+
+                $diff = $output;
+
+                $found = true;
+
+                break;
+            }
+        }
+
+        if (!$found) {
+            $this->addResponse('File not found at module location!', 1);
+
+            return false;
+        }
+
+        $this->addResponse('Diff for file', 0, ['diff' => $diff]);
     }
 }

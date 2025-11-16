@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set changesHtml = '' %}
 {% if modules|length > 0 %}
     {% for moduleType, modulesArr in modules %}
@@ -131,7 +131,7 @@
             'sectionId'                 : sectionId,
             'modalId'                   : 'modifiedfiles-modal',
             'modalBodyInclude'          : 'modules/changes/modifiedfiles',
-            'modalSize'                 : 'lg',
+            'modalSize'                 : 'xl',
             'modalType'                 : 'primary',
             'modalHeader'               : true,
             'modalFooter'               : true,
@@ -142,7 +142,7 @@
     )}}
 </div>
 <script>
-/*global paginatedPNotify BazProgress BazContentFields BazHelpers BazContentLoader Pace BazCore Swal dataCollection */
+/*global paginatedPNotify BazProgress BazContentFields BazHelpers BazContentLoader Pace BazCore Swal dataCollection Diff2HtmlUI */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 if (!window['dataCollection']) {
     window['dataCollection'] = { };
@@ -211,12 +211,55 @@ dataCollectionSectionForm['funcs']['init'] = function() {
         e.preventDefault();
 
         $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal-label')
-            .html('<span class="text-uppercase"> MODIFIED FILES : ' + $(this).data()['name'] + ' (' + $(this).data()['type'] + ')</span>');
+            .html('<span class="text-uppercase"> CHANGES FOR MODULE : ' + $(this).data()['name'] + ' (' + $(this).data()['type'] + ')</span>');
 
-        $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal .modal-body')
-            .html(BazHelpers.createHtmlList({'obj': dataCollectionSectionForm['vars']['modifiedModules'][$(this).data()['type']][$(this).data()['id']]}));
+        var moduleThatHasChanged = dataCollectionSectionForm['vars']['modifiedModules'][$(this).data()['type']][$(this).data()['id']];
+
+        var changedModule = { };
+        for (var changeType in moduleThatHasChanged) {
+            if (Object.keys(moduleThatHasChanged[changeType]).length === 0) {
+                changedModule[changeType.toUpperCase() + ' (0)'] = '-';
+            } else {
+                var modifiedModules = { };
+
+                for (var modifiedModuleCounter in moduleThatHasChanged[changeType]) {
+                    if (changeType === 'modified') {
+                        modifiedModules[modifiedModuleCounter] =
+                            moduleThatHasChanged[changeType][modifiedModuleCounter] +
+                            '<a href="#" class="diff" ' +
+                                'data-type="' + $(this).data()['type'] +
+                                '" data-id="' + $(this).data()['id'] +
+                                '" data-file="' + moduleThatHasChanged[changeType][modifiedModuleCounter] + '"> (diff)</a>';
+                    } else {
+                        modifiedModules[modifiedModuleCounter] = moduleThatHasChanged[changeType][modifiedModuleCounter];
+                    }
+                }
+
+                changedModule[changeType.toUpperCase() + ' (' + Object.keys(moduleThatHasChanged[changeType]).length + ')'] = modifiedModules;
+            }
+        }
+
+        var changes = BazHelpers.createHtmlList({'obj': changedModule});
+
+        $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal .modal-body').empty().html(changes + '<div id="diff"></div>');
 
         $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal').modal('show');
+
+        $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal').on('shown.bs.modal', function() {
+            $('#{{componentId}}-{{sectionId}}-modifiedfiles-modal').off('shown.bs.modal');
+
+            $('.diff').click(function(e) {
+                e.preventDefault();
+
+                var postData = { };
+                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                postData['id'] = $(this).data()['id'];
+                postData['module_type'] = $(this).data()['type'];
+                postData['file'] = $(this).data()['file'];
+
+                getDiff(postData);
+            });
+        });
     });
 
     $('.recalculateHashModule').off();
@@ -310,6 +353,35 @@ dataCollectionSectionForm['funcs']['init'] = function() {
             }
         }, 'json');
     }
+
+    function getDiff(postData) {
+        $.post('{{links.url("devtools/modules/getDiff")}}', postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+
+            if (response.responseCode == 0) {
+                var targetElement = document.getElementById('diff');
+                var configuration = {
+                    drawFileList: true,
+                    fileListToggle: false,
+                    fileListStartVisible: false,
+                    fileContentToggle: false,
+                    matching: 'lines',
+                    outputFormat: 'line-by-line',
+                    highlight: true,
+                    renderNothingWhenEmpty: false,
+                };
+
+                var diff2htmlUi = new Diff2HtmlUI(targetElement, response.responseData.diff.join("\r\n"), configuration);
+                diff2htmlUi.draw();
+                diff2htmlUi.highlightCode();
+            } else {
+                paginatedPNotify('error', {'text': response.responseMessage});
+            }
+        }, 'json');
+    }
 }
 
 dataCollectionSectionForm['funcs']['browse'] = function(url) {
@@ -336,3 +408,4 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
+<!-- htmlmin:ignore -->
