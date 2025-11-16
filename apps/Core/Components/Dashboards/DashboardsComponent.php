@@ -17,9 +17,20 @@ class DashboardsComponent extends BaseComponent
             } else if ($this->getData()['widgets'] == 'content') {//This is when we add the widget via list of widgets in dashboard.
                 $dashboardWidget = $this->basepackages->dashboards->getDashboardWidgetById($this->getData()['id'], $this->getData()['did']);
 
-                $dashboardWidget['getWidgetData'] = true;
+                if ($dashboardWidget) {
+                    $dashboardWidget['getWidgetData'] = true;
 
-                return $this->basepackages->widgets->getWidget($this->getData()['wid'], 'content', $dashboardWidget)['content'];
+                    $dashboardWidgetContent = $this->basepackages->widgets->getWidget($this->getData()['wid'], 'content', $dashboardWidget);
+
+                    if (isset($dashboardWidgetContent['content'])) {
+                        return $dashboardWidgetContent['content'];
+                    }
+                }
+
+                //Remove Widget as it might be stale as the source content would have been deleted.
+                $this->basepackages->dashboards->removeWidgetFromDashboard(['dashboard_id' => $this->getData()['did'], 'id' => $this->getData()['id']]);
+
+                return false;
             }
         } else {
             if (is_string($this->app['settings'])) {

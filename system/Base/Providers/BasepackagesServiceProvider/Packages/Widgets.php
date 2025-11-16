@@ -105,12 +105,16 @@ class Widgets extends BasePackage
                     if ($task === 'info') {
                         $widget['info'] = $componentObj->widgets->info($widget);
                     } else if ($task === 'content') {
-                        $widget['content'] = $componentObj->widgets->$widgetMethod($widget, $dashboardWidget);
+                        try {
+                            $widget['content'] = $componentObj->widgets->$widgetMethod($widget, $dashboardWidget);
 
-                        if ($this->opCache && isset($dashboardWidget['getWidgetData'])) {
-                            $this->widgets[$id] = $widget;
+                            if ($this->opCache && isset($dashboardWidget['getWidgetData'])) {
+                                $this->widgets[$id] = $widget;
 
-                            $this->opCache->setCache('widgets', $this->widgets, 'core');
+                                $this->opCache->setCache('widgets', $this->widgets, 'core');
+                            }
+                        } catch (\throwable $e) {
+                            return false;
                         }
                     }
 
