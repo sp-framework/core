@@ -1,150 +1,173 @@
 {
-    "name": "Default",
-    "display_name": "SP Framework Core Default View",
-    "description": "Default Core View",
-    "module_type": "views",
-    "app_type": "core",
-    "category": "tools",
-    "version": "0.0.0",
-    "repo": "https://.../",
-    "is_subview": false,
-    "dependencies":
-    {
-        "core":
-        {
-            "name": "Core",
-            "version": "0.0.0",
-            "repo": "https://.../"
-        },
-        "components":
-        [],
-        "packages":
-        [
-            {
-                "name": "Adminltetags",
-                "version": "0.0.0",
-                "repo": "https://.../"
-            }
-        ],
-        "middlewares":
-        [],
-        "views":
-        []
-    },
-    "settings":
-    {
-        "mandatory": true,
-        "layouts":
-        [
-            {
-                "view": "default",
-                "name": "Default"
-            },
-            {
-                "view": "topnav",
-                "name": "Top Navigation",
-                "active": true
-            },
-            {
-                "view": "topnavsidebar",
-                "name": "Top Navigation With Sidebar"
-            }
-        ],
-        "tags": "Adminltetags",
-        "branding":
-        [
-            {
-                "brand": "baz/logo/justlogo33x30.png",
-                "maxWidth": 35,
-                "maxHeight": 30
-            },
-            {
-                "brand": "baz/logo/fulllogo168x30.png",
-                "maxWidth": 200,
-                "maxHeight": 30
-            }
-        ],
-        "head":
-        {
-            "doctype": "XHTML5",
-            "title": "SP Framework Core",
-            "meta":
-            {
-                "author": "guru@bazaari.com.au",
-                "charset": "UTF-8",
-                "keywords": "HTML, CSS, JavaScript",
-                "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
-                "description": "SP Framework Core Views"
-            },
-            "link":
-            {
-                "href":
-                {
-                    "assets":
-                    {
-                        "dev":
-                        [
-                            {
-                                "local": true,
-                                "asset": "core/default/css/plugins.css"
-                            },
-                            {
-                                "local": true,
-                                "asset": "core/default/css/core.css"
-                            }
-                        ]
-                    }
-                }
-            },
-            "script":
-            {
-                "src":
-                {
-                    "assets":
-                    {
-                        "dev":
-                        [
-                            {
-                                "local": true,
-                                "asset": "core/default/js/header/jsHeaderDependencies.js"
-                            },
-                            {
-                                "local": true,
-                                "asset": "core/default/js/header/jsHeaderCore.js"
-                            },
-                            {
-                                "local": true,
-                                "asset": "core/default/js/header/jsHeaderPlugins.js"
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        "footer":
-        {
-            "copyright":
-            {
-                "fromYear": "2014",
-                "site": "https://github.com/sp-framework/core",
-                "name": "SP Framework"
-            },
-            "script":
-            {
-                "src":
-                {
-                    "assets":
-                    {
-                        "dev":
-                        [
-                            {
-                                "local": true,
-                                "asset": "core/default/js/footer/jsFooterDependencies.js"
-                            }
-                        ]
-                    }
-                }
-            }
-        }
-    }
+	"name" : "Default",
+	"display_name" : "SP Framework Core Default View",
+	"description" : "Default Core View",
+	"module_type" : "views",
+	"app_type" : "core",
+	"category" : "tools",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : [],
+		"packages" : 
+		[
+			{
+				"name" : "Adminltetags",
+				"version" : "0.0.0",
+				"repo" : "https://.../"
+			}
+		],
+		"middlewares" : [],
+		"views" : []
+	},
+	"is_subview" : false,
+	"settings" : 
+	{
+		"mandatory" : true,
+		"layouts" : 
+		[
+			{
+				"view" : "default",
+				"name" : "Default"
+			},
+			
+			{
+				"view" : "topnav",
+				"name" : "Top Navigation",
+				"active" : true
+			},
+			
+			{
+				"view" : "topnavsidebar",
+				"name" : "Top Navigation With Sidebar"
+			}
+		],
+		"tags" : "Adminltetags",
+		"branding" : 
+		[
+			{
+				"brand" : "baz/logo/justlogo33x30.png",
+				"maxWidth" : 35,
+				"maxHeight" : 30
+			},
+			
+			{
+				"brand" : "baz/logo/fulllogo168x30.png",
+				"maxWidth" : 200,
+				"maxHeight" : 30
+			}
+		],
+		"head" : 
+		{
+			"doctype" : "XHTML5",
+			"title" : "SP Framework Core",
+			"meta" : 
+			{
+				"author" : "guru@bazaari.com.au",
+				"charset" : "UTF-8",
+				"keywords" : "HTML, CSS, JavaScript",
+				"viewport" : "width=device-width, initial-scale=1, shrink-to-fit=no",
+				"description" : "SP Framework Core Views"
+			},
+			"link" : 
+			{
+				"href" : 
+				{
+					"assets" : 
+					{
+						"dev" : 
+						[
+							{
+								"local" : true,
+								"asset" : "core/default/css/plugins.css"
+							},
+							
+							{
+								"local" : true,
+								"asset" : "core/default/css/core.css"
+							},
+							
+							{
+								"local" : false,
+								"asset" : "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.1/styles/github.min.css"
+							},
+							
+							{
+								"local" : false,
+								"asset" : "https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css"
+							}
+						]
+					}
+				}
+			},
+			"script" : 
+			{
+				"src" : 
+				{
+					"assets" : 
+					{
+						"dev" : 
+						[
+							{
+								"local" : true,
+								"asset" : "core/default/js/header/jsHeaderDependencies.js"
+							},
+							
+							{
+								"local" : true,
+								"asset" : "core/default/js/header/jsHeaderCore.js"
+							},
+							
+							{
+								"local" : true,
+								"asset" : "core/default/js/header/jsHeaderPlugins.js"
+							},
+							
+							{
+								"local" : false,
+								"asset" : "https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html-ui.min.js"
+							}
+						]
+					}
+				}
+			}
+		},
+		"footer" : 
+		{
+			"copyright" : 
+			{
+				"fromYear" : "2014",
+				"site" : "https://github.com/sp-framework/core",
+				"name" : "SP Framework"
+			},
+			"script" : 
+			{
+				"src" : 
+				{
+					"assets" : 
+					{
+						"dev" : 
+						[
+							{
+								"local" : true,
+								"asset" : "core/default/js/footer/jsFooterDependencies.js"
+							},
+							
+							{
+								"local" : false,
+								"asset" : "https://blah.com/core/default/js/footer/jsFooterDependencies.js"
+							}
+						]
+					}
+				}
+			}
+		}
+	}
 }
