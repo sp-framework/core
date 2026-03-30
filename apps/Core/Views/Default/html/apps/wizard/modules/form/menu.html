@@ -618,6 +618,10 @@ dataCollectionSection =
             }
 
             function modifyStructure(checkbox) {
+                if (Object.keys(checkbox).length === 0) {
+                    return;
+                }
+
                 var id = $(checkbox)[0].id;
                 var route = $(checkbox).data('route');
                 var menuJstreeIds = document.querySelectorAll('[data-link="' + route + '"]')

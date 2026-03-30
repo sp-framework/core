@@ -744,12 +744,18 @@ abstract class BaseComponent extends Controller
 
 		if ($this->app && isset($this->componentRoute)) {
 			if ($this->componentRoute === '') {
-				$this->componentRoute = 'home';
+				$this->view->breadcrumb = 'home';
+			} else {
+				$this->view->breadcrumb = $this->componentRoute;
+			}
+
+			if (isset($this->view->getParamsToView()['breadcrumbName'])) {
+				$this->view->breadcrumb = $this->view->breadcrumb . '/' . $this->view->getParamsToView()['breadcrumbName'];
 			}
 
 			$this->response->setHeader(
 				'breadcrumb',
-				$this->componentRoute
+				$this->view->breadcrumb
 			);
 
 			if (isset($this->getData()['id'])) {

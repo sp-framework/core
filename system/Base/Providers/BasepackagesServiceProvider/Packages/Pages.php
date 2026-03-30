@@ -2,65 +2,59 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Spatie\Ssr\Engines\Node;
-use Spatie\Ssr\Renderer;
 use System\Base\BasePackage;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesTemplates;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesPages;
 
-class Templates extends BasePackage
+class Pages extends BasePackage
 {
-    protected $modelToUse = BasepackagesTemplates::class;
+    protected $modelToUse = BasepackagesPages::class;
 
-    protected $packageName = 'templates';
+    protected $packageName = 'pages';
 
-    public $templates;
+    public $pages;
 
-    protected $templatesDir;
+    protected $pagesDir;
 
     protected $engine;
 
     protected $renderer;
 
-    public function addTemplate(array $data)
+    public function addPage(array $data)
     {
         if (strpos($data['html_code'], '<script>') || strpos($data['html_code'], '</script>')) {
-            $this->addResponse('JavaScript is not supported in templates.', 1, []);
+            $this->addResponse('JavaScript is not supported in pages.', 1, []);
 
             return false;
         }
 
-        $data['in_use'] = 0;
-
-        $data['file_name'] = time() . '.html';
-
         if ($this->add($data)) {
-            $this->addResponse('Added new template');
+            $this->addResponse('Added new page');
         } else {
-            $this->addResponse('Error adding new template', 1);
+            $this->addResponse('Error adding new page', 1);
         }
     }
 
-    public function updateTemplate(array $data)
+    public function updatePage(array $data)
     {
         if (strpos($data['html_code'], '<script>') || strpos($data['html_code'], '</script>')) {
-            $this->addResponse('JavaScript is not supported in templates.', 1, []);
+            $this->addResponse('JavaScript is not supported in pages.', 1, []);
 
             return false;
         }
 
         if ($this->update($data)) {
-            $this->addResponse('Updated new template');
+            $this->addResponse('Updated new page');
         } else {
-            $this->addResponse('Error updating template', 1);
+            $this->addResponse('Error updating page', 1);
         }
     }
 
-    public function removeTemplate(array $data)
+    public function removePage(array $data)
     {
-        //
+        //Remove Murls associated with the page.
     }
 
-    public function testTemplate($data)
+    public function testPage($data)
     {
         $testData = [];
 
@@ -75,29 +69,29 @@ class Templates extends BasePackage
         }
 
         if (strpos($this->postData()['html_code'], '<script>') || strpos($this->postData()['html_code'], '</script>')) {
-            $this->addResponse('JavaScript is not supported in templates.', 1, []);
+            $this->addResponse('JavaScript is not supported in pages.', 1, []);
 
             return false;
         }
 
         $file = time();
 
-        $this->templatesDir = $this->modules->views->getPhalconViewPath() . 'system/templates/templates/test/';
+        $this->pagesDir = $this->modules->views->getPhalconViewPath() . 'system/pages/pages/test/';
 
-        $testDir = str_replace(base_path(), '', $this->modules->views->getPhalconViewPath()) . 'system/templates/templates/test/';
+        $testDir = str_replace(base_path(), '', $this->modules->views->getPhalconViewPath()) . 'system/pages/pages/test/';
 
         $this->localContent->write($testDir . $file . '.html', $this->postData()['html_code']);
 
-        $result = $this->generateTemplateData(null, $file, $testData, true);
+        $result = $this->generatePageData(null, $file, $testData, true);
 
         if ($result) {
-            $this->addResponse('Test Template Generated', 0, ['result' => $result], true);
+            $this->addResponse('Test Page Generated', 0, ['result' => $result], true);
         }
 
         $this->localContent->delete($testDir . $file . '.html');
     }
 
-    public function generateTemplateData(
+    public function generatePageData(
         $id = null,
         $file = null,
         $params = [],
@@ -107,17 +101,17 @@ class Templates extends BasePackage
         $headerJs = '',
         $footerJs = ''
     ) {
-        if (!$this->templatesDir) {
-            $this->templatesDir = $this->modules->views->getPhalconViewPath() . 'system/templates/templates/';
+        if (!$this->pagesDir) {
+            $this->pagesDir = $this->modules->views->getPhalconViewPath() . 'system/pages/pages/';
         }
 
-        $this->view->setViewsDir($this->templatesDir);
+        $this->view->setViewsDir($this->pagesDir);
 
         if ($id && !$file) {
-            $template = $this->templates->getById($id);
+            $page = $this->pages->getById($id);
 
-            if ($template) {
-                $file = $template['file_name'];
+            if ($page) {
+                $file = $page['file_name'];
             }
         }
 
@@ -224,11 +218,11 @@ class Templates extends BasePackage
     public function processJs($file)
     {
         if (!$this->checkJsPath()) {
-            throw new \Exception('Unable to create var/templates/js folder.');
+            throw new \Exception('Unable to create var/pages/js folder.');
         }
 
         try {
-            $this->engine = new Node('/usr/bin/nodejs', base_path('var/templates/js'));
+            $this->engine = new Node('/usr/bin/nodejs', base_path('var/pages/js'));
 
             $this->renderer = (new Renderer($this->engine))->debug($this->config->debug);
 
@@ -242,8 +236,8 @@ class Templates extends BasePackage
 
     protected function checkJsPath()
     {
-        if (!is_dir(base_path('var/templates/js'))) {
-            if (!mkdir(base_path('var/templates/js'), 0777, true)) {
+        if (!is_dir(base_path('var/pages/js'))) {
+            if (!mkdir(base_path('var/pages/js'), 0777, true)) {
                 return false;
             }
         }

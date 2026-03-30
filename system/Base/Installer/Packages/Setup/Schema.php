@@ -26,6 +26,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Messenger;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Murls;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Pages;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages\StoragesLocal;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Tags;
@@ -87,6 +88,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Basepackage
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMurls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotifications;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesPages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesStorages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesTags;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesTemplates;
@@ -191,6 +193,10 @@ class Schema
                 'basepackages_tags'                         => [
                         'schema'    => new Tags,
                         'model'     => new BasepackagesTags,
+                    ],
+                'basepackages_pages'                        => [
+                        'schema'    => new Pages,
+                        'model'     => new BasepackagesPages,
                     ],
                 'basepackages_email_services'               => [
                         'schema'    => new EmailServices,
