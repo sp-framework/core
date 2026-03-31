@@ -72,31 +72,12 @@ class PagesComponent extends BaseComponent
         $this->view->pick('pages/list');
     }
 
-    protected function replaceColumns($dataArr)
-    {
-        return $dataArr;
-    }
-
     /**
      * @acl(name=add)
      */
     public function addAction()
     {
         $this->requestIsPost();
-
-        if ($this->request->hasFiles()) {
-            if ($this->pages->storeFile()) {
-                $this->view->pageData = $this->pages->packagesData->pageData;
-            }
-
-            $this->addResponse(
-                $this->pages->packagesData->responseMessage,
-                $this->pages->packagesData->responseCode,
-                $this->pages->packagesData->responseData
-            );
-
-            return;
-        }
 
         $this->pages->addPage($this->postData());
 
@@ -134,21 +115,7 @@ class PagesComponent extends BaseComponent
 
         $this->addResponse(
             $this->pages->packagesData->responseMessage,
-            $this->pages->packagesData->responseCode,
-            $this->pages->packagesData->responseData
-        );
-    }
-
-    public function testPageAction()
-    {
-        $this->requestIsPost();
-
-        $this->pages->testPage($this->postData());
-
-        $this->addResponse(
-            $this->pages->packagesData->responseMessage,
-            $this->pages->packagesData->responseCode,
-            $this->pages->packagesData->responseData
+            $this->pages->packagesData->responseCode
         );
     }
 }

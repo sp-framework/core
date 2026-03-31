@@ -102,8 +102,12 @@ class Murls extends BasePackage
     {
         if ($this->remove($data['id'])) {
             $this->addResponse('Murl removed');
+
+            return true;
         } else {
             $this->addResponse('Error removing murl', 1);
+
+            return false;
         }
     }
 
