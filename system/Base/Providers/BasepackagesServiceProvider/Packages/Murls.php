@@ -270,4 +270,32 @@ class Murls extends BasePackage
 
         return false;
     }
+
+    public function getMurlByUrl($url)
+    {
+        if ($this->config->databasetype === 'db') {
+            $params =
+                [
+                    'conditions'    => 'url = :url:',
+                    'bind'          =>
+                        [
+                            'url'           => $url
+                        ]
+                ];
+        } else {
+            $params = [
+                'conditions' => [
+                    ['url', '=', $url]
+                ]
+            ];
+        }
+
+        $murl = $this->getByParams($params);
+
+        if ($murl && count($murl) > 0) {
+            return $murl;
+        }
+
+        return false;
+    }
 }
