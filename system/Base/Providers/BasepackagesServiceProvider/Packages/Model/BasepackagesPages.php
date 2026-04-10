@@ -12,7 +12,11 @@ class BasepackagesPages extends BaseModel
 
     public $description;
 
-    public $html_code;
+    public $content_source;
 
-    public $murl_ids;
+    public $visible_on_apps;
+
+    public $html_file;
+
+    public $html_code;
 }

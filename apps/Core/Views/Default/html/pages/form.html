@@ -1,13 +1,26 @@
+{% set fileHidden = 'hidden' %}
+{% set codeHidden = 'hidden' %}
 {% if page['id'] is defined %}
     {% set pageId = page['id'] %}
     {% set pageName = page['name'] %}
+    {% set pageVisibleOnApps = page['visible_on_apps'] %}
+    {% set pageContentSource = page['content_source'] %}
     {% set pageDescription = page['description'] %}
     {% set pageHtmlCode = page['html_code'] %}
+    {% set pageHtmlFile = page['html_file'] %}
+    {% if page['content_source'] == 'file' %}
+        {% set fileHidden = '' %}
+    {% elseif page['content_source'] == 'code' %}
+        {% set codeHidden = '' %}
+    {% endif %}
 {% else %}
     {% set pageId = '' %}
     {% set pageName = '' %}
+    {% set pageVisibleOnApps = [] %}
+    {% set pageContentSource = '' %}
     {% set pageDescription = '' %}
     {% set pageHtmlCode = '' %}
+    {% set pageHtmlFile = '' %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -58,6 +71,57 @@
                     ]
                 )}}
             </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'content_source',
+                        'fieldLabel'                           : 'Page Content Source',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select page content source, either from file or from provided html code. Note: Use HTML File option to include Javascript in your html page!',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : contentSources,
+                        'fieldDataSelect2OptionsKey'           : 'source',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : pageContentSource
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'visible_on_apps',
+                        'fieldLabel'                           : 'Visible on Apps',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'App type.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : apps,
+                        'fieldDataSelect2Multiple'             : true,
+                        'fieldDataSelect2OptionsKey'           : 'route',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : pageVisibleOnApps
+                    ]
+                )}}
+            </div>
         </div>
         <div class="row">
             <div class="col">
@@ -85,7 +149,31 @@
             </div>
         </div>
         
-        <div class="row">
+        <div class="row" id="html_file" {{fileHidden}}>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'html_file',
+                        'fieldLabel'                     : 'Page HTML File name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Page HTML File name without the extension. This file should be present in the files folder of the template. Example: if you are on default template and app type is Blog. Your file should be at location apps/Blog/Views/Default/html/pages/files/',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : pageHtmlFile
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row" id="html_code" {{codeHidden}}>
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -94,7 +182,7 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'html_code',
-                        'fieldLabel'                     : 'Page Html Code',
+                        'fieldLabel'                     : 'Page HTML Code',
                         'fieldType'                      : 'trumbowyg',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Design page using the tool provided or click on < > and write/paste HTML code.',
@@ -142,6 +230,24 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                                  : { },
         '{{componentId}}-{{sectionId}}-name'                                : { },
         '{{componentId}}-{{sectionId}}-description'                         : { },
+        '{{componentId}}-{{sectionId}}-visible_on_apps'                     : {
+            'placeholder'   : 'SELECT APPS'
+        },
+        '{{componentId}}-{{sectionId}}-content_source'                      : {
+            'placeholder'   : 'SELECT HTML CONTENT SOURCE',
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-content_source').on('select2:select', function (e) {
+                    if (e.params.data.id === 'file') {
+                        $("#html_file").attr('hidden', false);
+                        $("#html_code").attr('hidden', true);
+                    } else if (e.params.data.id === 'code') {
+                        $("#html_file").attr('hidden', true);
+                        $("#html_code").attr('hidden', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-html_file'                           : { },
         '{{componentId}}-{{sectionId}}-html_code'                           : {
             tagsToRemove: ['script', 'link']
         },
@@ -193,10 +299,16 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-form'                                : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                        : 'required',
+                '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
+                '{{componentId}}-{{sectionId}}-content_source'              : 'required',
+                '{{componentId}}-{{sectionId}}-html_file'                   : 'required',
                 '{{componentId}}-{{sectionId}}-html_code'                   : 'required',
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                        : 'Please enter template name',
+                '{{componentId}}-{{sectionId}}-app_type'                    : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-content_source'              : 'Please select page content source',
+                '{{componentId}}-{{sectionId}}-html_file'                   : 'Please enter html filename',
                 '{{componentId}}-{{sectionId}}-html_code'                   : 'Please enter html code',
             },
             onSubmitResponse : function(response) {

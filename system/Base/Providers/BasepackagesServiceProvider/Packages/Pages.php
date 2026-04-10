@@ -27,6 +27,24 @@ class Pages extends BasePackage
             return false;
         }
 
+        if ($data['content_source'] === 'file') {
+            $data['html_code'] = '';
+        } else if ($data['content_source'] === 'code') {
+            $data['html_file'] = '';
+        }
+
+        if (isset($data['visible_on_apps'])) {
+            if (is_string($data['visible_on_apps'])) {
+                $data['visible_on_apps'] = $this->helper->decode($data['visible_on_apps'], true);
+            }
+
+            if (isset($data['visible_on_apps']['data'])) {
+                $data['visible_on_apps'] = $this->helper->encode($data['visible_on_apps']['data']);
+            } else {
+                $data['visible_on_apps'] = $this->helper->encode($data['visible_on_apps']);
+            }
+        }
+
         if ($this->add($data)) {
             $this->addResponse('Added new page');
         } else {
@@ -48,6 +66,24 @@ class Pages extends BasePackage
             $this->addResponse('Page with ID does not exist', 1);
 
             return false;
+        }
+
+        if ($data['content_source'] === 'file') {
+            $data['html_code'] = '';
+        } else if ($data['content_source'] === 'code') {
+            $data['html_file'] = '';
+        }
+
+        if (isset($data['visible_on_apps'])) {
+            if (is_string($data['visible_on_apps'])) {
+                $data['visible_on_apps'] = $this->helper->decode($data['visible_on_apps'], true);
+            }
+
+            if (isset($data['visible_on_apps']['data'])) {
+                $data['visible_on_apps'] = $this->helper->encode($data['visible_on_apps']['data']);
+            } else {
+                $data['visible_on_apps'] = $this->helper->encode($data['visible_on_apps']);
+            }
         }
 
         if ($this->update($data)) {

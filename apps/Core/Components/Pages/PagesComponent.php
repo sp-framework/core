@@ -3,6 +3,8 @@
 namespace Apps\Core\Components\Pages;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckExistence;
 use System\Base\BaseComponent;
 
 class PagesComponent extends BaseComponent
@@ -24,6 +26,20 @@ class PagesComponent extends BaseComponent
         if (isset($this->getData()['id'])) {
             $this->view->mode = 'edit';
 
+            $this->view->contentSources =
+                [
+                    'file' => [
+                        'source'=> 'file',
+                        'name'  => 'HTML File'
+                    ],
+                    'code' => [
+                        'source'=> 'code',
+                        'name'  => 'HTML Code'
+                    ],
+                ];
+
+            $this->view->apps = $this->apps->apps;
+
             if ($this->getData()['id'] != 0) {
                 $page = $this->pages->getById($this->getData()['id']);
 
@@ -31,13 +47,39 @@ class PagesComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
+                $this->view->page = $page;
+
                 if (!isset($this->getData()['edit'])) {
+                    if (!in_array($this->apps->getAppInfo()['route'], $page['visible_on_apps'])) {
+                        return $this->throwIdNotFound();
+                    }
+
                     $this->getQueryArr['id'] = null;//Add this to disable token generation on page view.
 
                     $this->view->mode = 'view';
-                }
 
-                $this->view->page = $page;
+                    unset($this->view->contentSources);
+                    unset($this->view->apps);
+
+                    if ($page['content_source'] === 'file') {
+                        //Check file existence
+                        try {
+                            $path = str_replace(base_path(), '', $this->view->getViewsDir());
+
+                            if ($this->localContent->fileExists($path . 'pages/files/' . $page['html_file'] . '.html')) {
+                                $this->view->pick('pages/files/' . $page['html_file']);
+
+                                return;
+                            }
+
+                            $this->setErrorDispatcher('templateError');
+
+                            return;
+                        } catch (\throwable | FilesystemException | UnableToCheckExistence $e) {
+                            throw $e;
+                        }
+                    }
+                }
             }
 
             $this->view->pick('pages/view');

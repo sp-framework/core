@@ -38,19 +38,35 @@ class Pages
                         ]
                     ),
                     new Column(
-                        'html_code',
+                        'visible_on_apps',
                         [
-                            'type'          => Column::TYPE_MEDIUMTEXT,
+                            'type'          => Column::TYPE_JSON,
                             'notNull'       => true,
                         ]
                     ),
                     new Column(
-                        'murl_ids',
+                        'content_source',//html_file or html_code
                         [
-                            'type'          => Column::TYPE_JSON,
-                            'notNull'       => false
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 10,
+                            'notNull'       => true,
                         ]
                     ),
+                    new Column(
+                        'html_file',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 100,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'html_code',
+                        [
+                            'type'          => Column::TYPE_MEDIUMTEXT,
+                            'notNull'       => false,
+                        ]
+                    )
                 ]
             ];
     }
