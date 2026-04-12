@@ -210,10 +210,6 @@ class Apps extends BasePackage
 		$data['can_login_role_ids'] = $this->helper->encode(['1']);
 		$data['acceptable_usernames'] = $this->helper->encode(['email']);
 
-		if (isset($data['default_dashboard']) && $data['default_dashboard']) {
-			$data['settings']['defaultDashboard'] = $data['default_dashboard'];
-		}
-
 		if ($this->add($data)) {
 
 			$this->addActivityLog($data);
@@ -263,8 +259,14 @@ class Apps extends BasePackage
 
 		$app = $this->getById($data['id']);
 
-		if (isset($data['default_dashboard']) && $data['default_dashboard']) {
+		if (isset($data['default_dashboard']) && $data['default_dashboard'] && $data['default_dashboard'] !== 'null') {
 			$data['settings']['defaultDashboard'] = $data['default_dashboard'];
+		}
+		if (isset($data['default_guest_page']) && $data['default_guest_page'] && $data['default_guest_page'] !== 'null') {
+			$data['settings']['defaultGuestPage'] = $data['default_guest_page'];
+		}
+		if (isset($data['default_user_page']) && $data['default_user_page'] && $data['default_user_page'] !== 'null') {
+			$data['settings']['defaultUserPage'] = $data['default_user_page'];
 		}
 
 		$app = array_merge($app, $data);

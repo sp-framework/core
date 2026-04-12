@@ -1,4 +1,3 @@
-{% set defaultDashboardHidden = 'hidden' %}
 {% if app['id'] is defined %}
     {% set appId = app['id'] %}
     {% set appName = app['name'] %}
@@ -37,7 +36,6 @@
             {% set enforce2FA = true %}
         {% endif %}
     {% endif %}
-
     {% set appRegistrationRoleId = app['registration_role_id'] %}
     {% set appGuestRoleId = app['guest_role_id'] %}
     {% set appCanLoginRoleIds = app['can_login_role_ids'] %}
@@ -46,10 +44,6 @@
     {% set appAutoUnblockIpMinutes = app['auto_unblock_ip_minutes'] %}
     {% set appIncorrectLoginAttemptBlockIp = app['incorrect_login_attempt_block_ip'] %}
     {% set wizard = false %}
-    {% if app['settings']['defaultDashboard'] is defined %}
-        {% set defaultDashboardHidden = '' %}
-        {% set defaultDashboard = app['settings']['defaultDashboard'] %}
-    {% endif %}
 {% else %}
     {% set appId = '' %}
     {% set appName = '' %}
@@ -67,7 +61,6 @@
     {% set appAutoUnblockIpMinutes = '' %}
     {% set appIncorrectLoginAttemptBlockIp = '' %}
     {% set wizard = true %}
-    {% set defaultDashboard = '' %}
 {% endif %}
 {% if wizard === true %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
@@ -165,33 +158,7 @@
                         'fieldDataSelect2OptionsKey'           : 'app_type',
                         'fieldDataSelect2OptionsValue'         : 'name',
                         'fieldDataSelect2OptionsArray'         : true,
-                        'fieldDataSelect2AddDataAttrFromData'  : ['dashboards'],
                         'fieldDataSelect2OptionsSelected'      : appType
-                    ]
-                )}}
-            </div>
-            <div class="col" id="default_dashboard" {{defaultDashboardHidden}}>
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                            : component,
-                        'componentName'                        : componentName,
-                        'componentId'                          : componentId,
-                        'sectionId'                            : sectionId,
-                        'fieldId'                              : 'default_dashboard',
-                        'fieldLabel'                           : 'Default Dashboard',
-                        'fieldType'                            : 'select2',
-                        'fieldHelp'                            : true,
-                        'fieldHelpTooltipContent'              : 'Default dashboard for this app.',
-                        'fieldRequired'                        : true,
-                        'fieldBazScan'                         : true,
-                        'fieldBazJstreeSearch'                 : true,
-                        'fieldBazPostOnCreate'                 : true,
-                        'fieldBazPostOnUpdate'                 : true,
-                        'fieldDataSelect2Options'              : dashboards,
-                        'fieldDataSelect2OptionsKey'           : 'id',
-                        'fieldDataSelect2OptionsValue'         : 'name',
-                        'fieldDataSelect2OptionsArray'         : true,
-                        'fieldDataSelect2OptionsSelected'      : defaultDashboard
                     ]
                 )}}
             </div>
@@ -258,71 +225,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-name'                                : { },
         '{{componentId}}-{{sectionId}}-app_type'                            : {
             'placeholder'   : 'SELECT APP TYPE',
-            afterInit       : function() {
-                $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function (e) {
-                    var data = e.params.data;
-
-                    if ($(data.element).data()['dashboards'] && $(data.element).data()['dashboards'] == true) {
-                        var postData = { };
-                        postData[$('#security-token').attr('name')] = $('#security-token').val();
-                        postData['app_type'] = $(data.element).data()['value'];
-
-                        $.post('{{links.url("dashboards/getDashboardsByAppType")}}', postData, function(response) {
-                            if (response.tokenKey && response.token) {
-                                $("#security-token").attr("name", response.tokenKey);
-                                $("#security-token").val(response.token);
-                            }
-
-                            if (response.responseCode == 0) {
-                                if (response.responseData && response.responseData.dashboards) {
-                                    if (response.responseData.dashboards.length === 0) {
-                                        $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', true);
-                                        $('#default_dashboard').attr('hidden', true);
-                                        $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
-
-                                        paginatedPNotify('error', {
-                                            title   : 'No dashboards for app type ' + $(data.element).data()['value'] +  ' found! Contact developer.'
-                                        });
-
-                                        return;
-                                    }
-
-                                    for (var dashboard in response.responseData.dashboards) {
-                                        var newOption = new Option(
-                                            response.responseData.dashboards[dashboard]['name'],
-                                            response.responseData.dashboards[dashboard]['id'],
-                                            false,
-                                            false
-                                        );
-
-                                        $('#{{componentId}}-{{sectionId}}-default_dashboard').append(newOption).trigger('change');
-                                    }
-
-                                    $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', false);
-                                    $('#default_dashboard').attr('hidden', false);
-                                    $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
-                                    $('#{{componentId}}-{{sectionId}}-default_dashboard').on('select2:select', function() {
-                                        window.dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['formValidator'].valid();
-                                    });
-                                }
-
-                                return
-                            }
-
-                            paginatedPNotify('error', {
-                                title   : response.responseMessage
-                            });
-                        }, 'json');
-                    } else {
-                        $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', true);
-                        $('#default_dashboard').attr('hidden', true);
-                        $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
-                    }
-                });
-            }
-        },
-        '{{componentId}}-{{sectionId}}-default_dashboard'                   : {
-            'placeholder'   : 'SELECT DEFAULT DASHBOARD'
         },
         '{{componentId}}-{{sectionId}}-route'                               : { },
         '{{componentId}}-{{sectionId}}-description'                         : { },
@@ -351,7 +253,6 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-default_component_guests'    : 'required',
                 '{{componentId}}-{{sectionId}}-default_component_users'     : 'required',
                 '{{componentId}}-{{sectionId}}-errors_component'            : 'required',
-                '{{componentId}}-{{sectionId}}-default_dashboard'           : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'Please enter app name',
@@ -362,7 +263,6 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-default_component_guests': 'Please select app default component for guests',
                 '{{componentId}}-{{sectionId}}-default_component_users' : 'Please select app default component for users',
                 '{{componentId}}-{{sectionId}}-errors_component'        : 'Please select app errors component',
-                '{{componentId}}-{{sectionId}}-default_dashboard'       : 'Please select default dashboard'
             }
         }
     });

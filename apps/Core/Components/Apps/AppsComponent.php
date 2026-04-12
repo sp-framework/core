@@ -26,18 +26,18 @@ class AppsComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
+                $dashboard = $this->modules->components->getComponentByNameForAppType('dashboards', $app['app_type']);
+                $home = $this->modules->components->getComponentByNameForAppType('home', $app['app_type']);
+                $errors = $this->modules->components->getComponentByNameForAppType('errors', $app['app_type']);
+
                 if (!isset($app['default_component_guests']) ||
                     isset($app['default_component_guests']) && $app['default_component_guests'] == '0'
                 ) {
                     if ($app['app_type'] === 'core' || $app['app_type'] === 'dash') {
-                        $dashboard = $this->modules->components->getComponentByNameForAppType('dashboards', $app['app_type']);
-
                         if ($dashboard) {
                             $app['default_component_guests'] = $dashboard['id'];
                         }
                     } else {
-                        $home = $this->modules->components->getComponentByNameForAppType('home', $app['app_type']);
-
                         if ($home) {
                             $app['default_component_guests'] = $home['id'];
                         }
@@ -48,14 +48,10 @@ class AppsComponent extends BaseComponent
                     isset($app['default_component_users']) && $app['default_component_users'] == '0'
                 ) {
                     if ($app['app_type'] === 'core' || $app['app_type'] === 'dash') {
-                        $dashboard = $this->modules->components->getComponentByNameForAppType('dashboards', $app['app_type']);
-
                         if ($dashboard) {
                             $app['default_component_users'] = $dashboard['id'];
                         }
                     } else {
-                        $home = $this->modules->components->getComponentByNameForAppType('home', $app['app_type']);
-
                         if ($home) {
                             $app['default_component_users'] = $home['id'];
                         }
@@ -65,13 +61,9 @@ class AppsComponent extends BaseComponent
                 if (!isset($app['errors_component']) ||
                     isset($app['errors_component']) && $app['errors_component'] == '0'
                 ) {
-                    $errors = $this->modules->components->getComponentByNameForAppType('errors', $app['app_type']);
-
                     if ($errors) {
                         $app['errors_component'] = $errors['id'];
                     } else {
-                        $home = $this->modules->components->getComponentByNameForAppType('home', $app['app_type']);
-
                         if ($home) {
                             $app['errors_component'] = $home['id'];
                         }
@@ -139,7 +131,27 @@ class AppsComponent extends BaseComponent
                     $this->view->menuBaseStructure = $this->view->modulesMenus = [];
                 }
 
+                $selectGuestComponents = [];
+                $selectUserComponents = [];
+                $this->view->dashboardComponentId = 0;
+                $this->view->pageComponentId = 0;
                 foreach ($componentsArr as $key => &$componentValue) {
+                    if ($app['app_type'] === 'core' || $app['app_type'] === 'dash') {
+                        if ($componentValue['route'] !== 'home') {
+                            $selectUserComponents[$key] = $componentValue;
+                        }
+                        $selectGuestComponents[$key] = $componentValue;
+                    } else {
+                        $selectUserComponents[$key] = $componentValue;
+                        $selectGuestComponents[$key] = $componentValue;
+                    }
+
+                    if ($componentValue['route'] === 'dashboards') {
+                        $this->view->dashboardComponentId = $componentValue['id'];
+                    }
+                    if ($componentValue['route'] === 'pages') {
+                        $this->view->pageComponentId = $componentValue['id'];
+                    }
                     if ($componentValue['apps']) {
                         if (is_string($componentValue['apps'])) {
                             $componentValue['apps'] = $this->helper->decode($componentValue['apps'], true);
@@ -150,10 +162,10 @@ class AppsComponent extends BaseComponent
                         }
                     }
 
-                    if (isset($dashboard) && $dashboard) {
-                        if ($dashboard['id'] == $componentValue['id']) {
-                            $componentValue['apps'][$app['id']]['enabled'] = true;
-                        }
+                    if ($dashboard &&
+                        $dashboard['id'] == $componentValue['id']
+                    ) {
+                        $componentValue['apps'][$app['id']]['enabled'] = true;
                     }
 
                     if ($componentValue['settings']) {
@@ -182,7 +194,7 @@ class AppsComponent extends BaseComponent
                         }
                     }
 
-                    $components[$key] = $componentValue;
+                    $components[$componentValue['id']] = $componentValue;
                 }
 
                 //Middlewares
@@ -263,7 +275,9 @@ class AppsComponent extends BaseComponent
                     }
                 }
 
-                $this->view->components = msort($components, 'name');
+                $this->view->components = msort(array: $components, key: 'name', preserveKey: true);
+                $this->view->selectUserComponents = $selectUserComponents;
+                $this->view->selectGuestComponents = $selectGuestComponents;
                 $this->view->middlewares = msort($middlewares, 'sequence');
                 $this->view->views = msort($views, 'name');
                 $this->view->mandatoryComponents = $mandatoryComponents;
@@ -284,6 +298,7 @@ class AppsComponent extends BaseComponent
                 $this->view->acceptableUsernames = $this->apps->getAcceptableUsernamesForAppId();
 
                 $this->view->dashboards = $this->basepackages->dashboards->init()->getDashboardsByAppType($app['app_type']);
+                $this->view->pages = $this->basepackages->pages->init()->pages;
             } else {
                 $this->view->app = null;
                 $domains = $this->domains->domains;

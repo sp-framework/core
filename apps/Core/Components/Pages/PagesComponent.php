@@ -85,6 +85,24 @@ class PagesComponent extends BaseComponent
             $this->view->pick('pages/view');
 
             return;
+        } else {
+            if ($this->dispatcher->wasForwarded()) {
+                $pageId = 0;
+
+                if ($this->access->auth->account()) {
+                    if (isset($this->app['settings']['defaultUserPage'])) {
+                        $pageId = (int) $this->app['settings']['defaultUserPage'];
+                    }
+                } else {
+                    if (isset($this->app['settings']['defaultGuestPage'])) {
+                        $pageId = (int) $this->app['settings']['defaultGuestPage'];
+                    }
+                }
+
+                $this->getQueryArr['id'] = $pageId;
+
+                return $this->viewAction();
+            }
         }
 
         $controlActions =

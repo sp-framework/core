@@ -88,7 +88,6 @@ class Dashboards extends BasePackage
 
     public function addDashboard(array $data)
     {
-        $data['app_default'] = 0;
         if (!isset($data['app_type'])) {
             $data['app_type'] = $this->apps->app['app_type'];
         }

@@ -1138,7 +1138,6 @@ class DevtoolsModules extends BasePackage
             if (isset($appType)) {
                 $appType['name'] = $data['name'];
                 $appType['app_type'] = strtolower($data['app_type']);
-                $appType['dashboards'] = $data['dashboards'];
                 $appType['description'] = $data['description'];
                 $appType['version'] = $data['version'];
                 $appType['api_id'] = $data['api_id'];
@@ -1205,7 +1204,6 @@ class DevtoolsModules extends BasePackage
         $jsonFile = 'apps/' . ucfirst($appType['app_type']) . '/Install/type.json';
 
         $jsonContent["app_type"] = $appType["app_type"];
-        $jsonContent["dashboards"] = $appType["dashboards"];
         $jsonContent["name"] = $appType["name"];
         $jsonContent["description"] = $appType["description"];
         $jsonContent["version"] = $appType["version"];

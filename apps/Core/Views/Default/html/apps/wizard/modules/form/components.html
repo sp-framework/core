@@ -1,80 +1,187 @@
 {% if components is defined and components|length > 0 %}
+    {% set defaultDashboardHidden = 'hidden' %}
+    {% set defaultDashboard = 0 %}
+    {% set defaultGuestsPageHidden = 'hidden' %}
+    {% set defaultGuestsPage = 0 %}
+    {% set defaultUsersPageHidden = 'hidden' %}
+    {% set defaultUsersPage = 0 %}
     {% if app['default_component_guests'] is defined and app['default_component_guests'] != 0 %}
         {% set appDefaultComponentGuests = app['default_component_guests'] %}
     {% else %}
         {% set appDefaultComponentGuests = 0 %}
+    {% endif %}
+    {% if appDefaultComponentGuests == dashboardComponentId and dashboards|length > 0 %}
+        {% set defaultGuestsDashboardHidden = '' %}
+        {% if app['settings']['defaultGuestDashboard'] is defined %}
+            {% set defaultGuestsDashboard = app['settings']['defaultGuestDashboard'] %}
+        {% endif %}
+    {% endif %}
+    {% if appDefaultComponentGuests == pageComponentId %}
+        {% set defaultGuestsPageHidden = '' %}
+        {% if app['settings']['defaultGuestPage'] is defined %}
+            {% set defaultGuestsPage = app['settings']['defaultGuestPage'] %}
+        {% endif %}
     {% endif %}
     {% if app['default_component_users'] is defined and app['default_component_users'] != 0 %}
         {% set appDefaultComponentUsers = app['default_component_users'] %}
     {% else %}
         {% set appDefaultComponentUsers = 0 %}
     {% endif %}
+    {% if appDefaultComponentUsers == dashboardComponentId and dashboards|length > 0 %}
+        {% set defaultDashboardHidden = '' %}
+        {% if app['settings']['defaultDashboard'] is defined %}
+            {% set defaultDashboard = app['settings']['defaultDashboard'] %}
+        {% endif %}
+    {% endif %}
+    {% if appDefaultComponentUsers == pageComponentId %}
+        {% set defaultUsersPageHidden = '' %}
+        {% if app['settings']['defaultUserPage'] is defined %}
+            {% set defaultUsersPage = app['settings']['defaultUserPage'] %}
+        {% endif %}
+    {% endif %}
     {% if app['errors_component'] is defined and app['errors_component'] != 0 %}
         {% set appErrorsComponent = app['errors_component'] %}
     {% else %}
         {% set appErrorsComponent = 0 %}
     {% endif %}
-    {% set selectComponents = [] %}
-    {% for key, selectComponent in components %}
-        {% if app['app_type'] === 'core' or app['app_type'] === 'dash' %}
-            {% if selectComponent['route'] != 'home' %}
-                {% set selectComponents[key] = selectComponent %}
-            {% endif %}
-        {% else %}
-            {% set selectComponents[key] = selectComponent %}
-        {% endif %}
-    {% endfor %}
     <div class="row">
         <div class="col">
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                      : component,
-                    'componentName'                  : componentName,
-                    'componentId'                    : componentId,
-                    'sectionId'                      : sectionId,
-                    'fieldId'                        : 'default_component_guests',
-                    'fieldLabel'                     : 'Default Component (Guests)',
-                    'fieldType'                      : 'select2',
-                    'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'Select a default component for this app for guests.',
-                    'fieldBazScan'                   : true,
-                    'fieldBazJstreeSearch'           : true,
-                    'fieldBazPostOnCreate'           : true,
-                    'fieldBazPostOnUpdate'           : true,
-                    'fieldRequired'                  : true,
-                    'fieldDataSelect2Options'        : selectComponents,
-                    'fieldDataSelect2OptionsKey'     : 'id',
-                    'fieldDataSelect2OptionsValue'   : 'name',
-                    'fieldDataSelect2OptionsArray'   : true,
-                    'fieldDataSelect2OptionsSelected': appDefaultComponentGuests
-                ]
-            )}}
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'default_component_guests',
+                            'fieldLabel'                            : 'Default Component (Guests)',
+                            'fieldType'                             : 'select2',
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'Select a default component for this app for guests.',
+                            'fieldBazScan'                          : true,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldBazPostOnCreate'                  : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldRequired'                         : true,
+                            'fieldDataSelect2Options'               : selectGuestComponents,
+                            'fieldDataSelect2OptionsKey'            : 'id',
+                            'fieldDataSelect2OptionsValue'          : 'name',
+                            'fieldDataSelect2OptionsArray'          : true,
+                            'fieldDataSelect2AddDataAttrFromData'   : ['route'],
+                            'fieldDataSelect2OptionsSelected'       : appDefaultComponentGuests
+                        ]
+                    )}}
+                </div>
+                <div class="col" id="default_guest_page" {{defaultGuestsPageHidden}}>
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                            : component,
+                            'componentName'                        : componentName,
+                            'componentId'                          : componentId,
+                            'sectionId'                            : sectionId,
+                            'fieldId'                              : 'default_guest_page',
+                            'fieldLabel'                           : 'Default Guest Page',
+                            'fieldType'                            : 'select2',
+                            'fieldHelp'                            : true,
+                            'fieldHelpTooltipContent'              : 'Default guest page for this app.',
+                            'fieldRequired'                        : true,
+                            'fieldBazScan'                         : true,
+                            'fieldBazJstreeSearch'                 : true,
+                            'fieldBazPostOnCreate'                 : true,
+                            'fieldBazPostOnUpdate'                 : true,
+                            'fieldDataSelect2Options'              : pages,
+                            'fieldDataSelect2OptionsKey'           : 'id',
+                            'fieldDataSelect2OptionsValue'         : 'name',
+                            'fieldDataSelect2OptionsArray'         : true,
+                            'fieldDataSelect2OptionsSelected'      : defaultGuestsPage
+                        ]
+                    )}}
+                </div>
+            </div>
         </div>
         <div class="col">
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                      : component,
-                    'componentName'                  : componentName,
-                    'componentId'                    : componentId,
-                    'sectionId'                      : sectionId,
-                    'fieldId'                        : 'default_component_users',
-                    'fieldLabel'                     : 'Default Component (Users)',
-                    'fieldType'                      : 'select2',
-                    'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'Select a default component for this app for logged in users.',
-                    'fieldBazScan'                   : true,
-                    'fieldBazJstreeSearch'           : true,
-                    'fieldBazPostOnCreate'           : true,
-                    'fieldBazPostOnUpdate'           : true,
-                    'fieldRequired'                  : true,
-                    'fieldDataSelect2Options'        : selectComponents,
-                    'fieldDataSelect2OptionsKey'     : 'id',
-                    'fieldDataSelect2OptionsValue'   : 'name',
-                    'fieldDataSelect2OptionsArray'   : true,
-                    'fieldDataSelect2OptionsSelected': appDefaultComponentUsers
-                ]
-            )}}
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                             : component,
+                            'componentName'                         : componentName,
+                            'componentId'                           : componentId,
+                            'sectionId'                             : sectionId,
+                            'fieldId'                               : 'default_component_users',
+                            'fieldLabel'                            : 'Default Component (Users)',
+                            'fieldType'                             : 'select2',
+                            'fieldHelp'                             : true,
+                            'fieldHelpTooltipContent'               : 'Select a default component for this app for logged in users.',
+                            'fieldBazScan'                          : true,
+                            'fieldBazJstreeSearch'                  : true,
+                            'fieldBazPostOnCreate'                  : true,
+                            'fieldBazPostOnUpdate'                  : true,
+                            'fieldRequired'                         : true,
+                            'fieldDataSelect2Options'               : selectUserComponents,
+                            'fieldDataSelect2OptionsKey'            : 'id',
+                            'fieldDataSelect2OptionsValue'          : 'name',
+                            'fieldDataSelect2OptionsArray'          : true,
+                            'fieldDataSelect2AddDataAttrFromData'   : ['route'],
+                            'fieldDataSelect2OptionsSelected'       : appDefaultComponentUsers
+                        ]
+                    )}}
+                </div>
+                <div class="col" id="default_dashboard" {{defaultDashboardHidden}}>
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                            : component,
+                            'componentName'                        : componentName,
+                            'componentId'                          : componentId,
+                            'sectionId'                            : sectionId,
+                            'fieldId'                              : 'default_dashboard',
+                            'fieldLabel'                           : 'Default Dashboard',
+                            'fieldType'                            : 'select2',
+                            'fieldHelp'                            : true,
+                            'fieldHelpTooltipContent'              : 'Default dashboard for this app.',
+                            'fieldRequired'                        : true,
+                            'fieldBazScan'                         : true,
+                            'fieldBazJstreeSearch'                 : true,
+                            'fieldBazPostOnCreate'                 : true,
+                            'fieldBazPostOnUpdate'                 : true,
+                            'fieldDataSelect2Options'              : dashboards,
+                            'fieldDataSelect2OptionsKey'           : 'id',
+                            'fieldDataSelect2OptionsValue'         : 'name',
+                            'fieldDataSelect2OptionsArray'         : true,
+                            'fieldDataSelect2OptionsSelected'      : defaultDashboard
+                        ]
+                    )}}
+                </div>
+                <div class="col" id="default_user_page" {{defaultUsersPageHidden}}>
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                            : component,
+                            'componentName'                        : componentName,
+                            'componentId'                          : componentId,
+                            'sectionId'                            : sectionId,
+                            'fieldId'                              : 'default_user_page',
+                            'fieldLabel'                           : 'Default User Page',
+                            'fieldType'                            : 'select2',
+                            'fieldHelp'                            : true,
+                            'fieldHelpTooltipContent'              : 'Default user page for this app.',
+                            'fieldRequired'                        : true,
+                            'fieldBazScan'                         : true,
+                            'fieldBazJstreeSearch'                 : true,
+                            'fieldBazPostOnCreate'                 : true,
+                            'fieldBazPostOnUpdate'                 : true,
+                            'fieldDataSelect2Options'              : pages,
+                            'fieldDataSelect2OptionsKey'           : 'id',
+                            'fieldDataSelect2OptionsValue'         : 'name',
+                            'fieldDataSelect2OptionsArray'         : true,
+                            'fieldDataSelect2OptionsSelected'      : defaultUsersPage
+                        ]
+                    )}}
+                </div>
+            </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col">
             {{adminltetags.useTag('fields',
                 [
@@ -92,7 +199,7 @@
                     'fieldBazPostOnCreate'           : true,
                     'fieldBazPostOnUpdate'           : true,
                     'fieldRequired'                  : true,
-                    'fieldDataSelect2Options'        : selectComponents,
+                    'fieldDataSelect2Options'        : selectGuestComponents,
                     'fieldDataSelect2OptionsKey'     : 'id',
                     'fieldDataSelect2OptionsValue'   : 'name',
                     'fieldDataSelect2OptionsArray'   : true,
@@ -157,7 +264,7 @@
     {% set needAuthIds = json_encode([]) %}
 {% endif %}
 <script>
-/* globals Sortable */
+/* globals Sortable paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -185,10 +292,64 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-default_component_guests'        : {
-            'placeholder'   : 'SELECT DEFAULT COMPONENT FOR GUESTS'
+            'placeholder'   : 'SELECT DEFAULT COMPONENT FOR GUESTS',
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-default_component_guests').on('select2:select', function (e) {
+                    var data = e.params.data;
+
+                    if ($(data.element).data()['route'] && $(data.element).data()['route'] === 'dashboards') {
+                        $('#{{componentId}}-{{sectionId}}-default_component_guests').val(0).trigger('change');
+                        paginatedPNotify('error', {
+                            title   : 'Only logged in users can have dashboards!'
+                        });
+                    } else if ($(data.element).data()['route'] && $(data.element).data()['route'] === 'pages') {
+                        $('#{{componentId}}-{{sectionId}}-default_guest_page').attr('disabled', false);
+                        $('#default_guest_page').attr('hidden', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-default_guest_page').attr('disabled', true);
+                        $('#default_guest_page').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-default_guest_page').val(0).trigger('change');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-default_guest_page'              : {
+            'placeholder'   : 'SELECT DEFAULT PAGE FOR GUESTS'
         },
         '{{componentId}}-{{sectionId}}-default_component_users'         : {
-            'placeholder'   : 'SELECT DEFAULT COMPONENT FOR USERS'
+            'placeholder'   : 'SELECT DEFAULT COMPONENT FOR USERS',
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-default_component_users').on('select2:select', function (e) {
+                    var data = e.params.data;
+
+                    if ($(data.element).data()['route'] && $(data.element).data()['route'] === 'dashboards') {
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', false);
+                        $('#default_dashboard').attr('hidden', false);
+                        $('#{{componentId}}-{{sectionId}}-default_user_page').attr('disabled', true);
+                        $('#default_user_page').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-default_user_page').val(0).trigger('change');
+                    } else if ($(data.element).data()['route'] && $(data.element).data()['route'] === 'pages') {
+                        $('#{{componentId}}-{{sectionId}}-default_user_page').attr('disabled', false);
+                        $('#default_user_page').attr('hidden', false);
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', true);
+                        $('#default_dashboard').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').attr('disabled', true);
+                        $('#default_dashboard').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-default_dashboard').val(0).trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-default_user_page').attr('disabled', true);
+                        $('#default_user_page').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-default_user_page').val(0).trigger('change');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-default_dashboard'               : {
+            'placeholder'   : 'SELECT DEFAULT DASHBOARD FOR USERS'
+        },
+        '{{componentId}}-{{sectionId}}-default_user_page'               : {
+            'placeholder'   : 'SELECT DEFAULT PAGE FOR USERS'
         },
         '{{componentId}}-{{sectionId}}-errors_component'                : {
             'placeholder'   : 'SELECT ERRORS COMPONENT'
