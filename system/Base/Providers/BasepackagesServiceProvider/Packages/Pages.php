@@ -13,11 +13,22 @@ class Pages extends BasePackage
 
     public $pages;
 
-    protected $pagesDir;
+    public function init(bool $resetCache = false)
+    {
+        if ($this->opCache) {
+            if (!$resetCache && $this->opCache->checkCache('pages', 'core')) {
+                $this->pages = $this->opCache->getCache('pages', 'core');
+            } else {
+                $this->getAll($resetCache);
 
-    protected $engine;
+                $this->opCache->setCache('pages', $this->pages, 'core');
+            }
+        } else {
+            $this->getAll($resetCache);
+        }
 
-    protected $renderer;
+        return $this;
+    }
 
     public function addPage(array $data)
     {
