@@ -174,6 +174,7 @@ class DevtoolsModules extends BasePackage
                                     'newDirs'   => $this->newDirs
                                    ]
                                 );
+
                 return;
             }
         } catch (\Exception $e) {
@@ -253,6 +254,7 @@ class DevtoolsModules extends BasePackage
                 if ($module['module_type'] === 'views' && $module['is_subview'] == true) {
                     $viewPublic = false;
                 }
+
                 if ($this->updateModuleJson($data, false, $viewPublic) &&
                     $this->modules->{$data['module_type']}->update($module)
                 ) {
@@ -261,8 +263,10 @@ class DevtoolsModules extends BasePackage
                     }
 
                     if ($data['module_type'] === 'components') {
-                        $this->addUpdateComponentMenu($data);
+                        $this->addUpdateComponentMenu($module);
+                        $this->addUpdateComponentWidgets($module);
                     }
+
                     if ($data['module_type'] === 'views') {
                         $viewsSettings = $this->modules->viewsSettings->getViewsSettingsByViewId($data['id']);
 
@@ -337,6 +341,14 @@ class DevtoolsModules extends BasePackage
                     if ((isset($data['run_install_uninstall']) && (bool) $data['run_install_uninstall'] == true) ||
                         (isset($data['truncate_table']) && (bool) $data['truncate_table'] == true)
                     ) {
+                        if (strtolower($data['app_type']) === 'core' &&
+                            strtolower($data['name']) !== 'core'
+                        ) {
+                            $this->addResponse('Module updated. But, only core module can run install/uninstall!', 1);
+
+                            return;
+                        }
+
                         $this->runInstallUninstallTruncateTable($data);
                     }
 
@@ -1377,6 +1389,7 @@ class DevtoolsModules extends BasePackage
             $repo = $jsonContent['repo'];
         } else {
             $data = $this->jsonData($data, true);
+
             $jsonContent = [];
             $jsonContent["name"] = $data["name"];
             if ($data['module_type'] === 'components') {
@@ -1396,6 +1409,7 @@ class DevtoolsModules extends BasePackage
             $jsonContent["dependencies"] = $data["dependencies"];
             if ($data['module_type'] === 'components') {
                 $jsonContent["menu"] = $data["menu"];
+                $jsonContent["widgets"] = $data["widgets"];
             }
 
             if ($data['module_type'] === 'views') {
@@ -1408,9 +1422,6 @@ class DevtoolsModules extends BasePackage
             }
 
             $jsonContent["settings"] = $data["settings"];
-            if ($data['module_type'] === 'components') {
-                $jsonContent["widgets"] = $data["widgets"];
-            }
         }
 
         $jsonContent = $this->helper->encode($jsonContent, JSON_UNESCAPED_SLASHES);
@@ -2134,7 +2145,7 @@ $file .= '
         return true;
     }
 
-    protected function addUpdateComponentMenu(&$data)
+    protected function addUpdateComponentMenu($data)
     {
         if ($data['menu_id'] != '' && $data['menu_id'] != '0') {
             if (!isset($data['is_clone']) ||
@@ -2165,18 +2176,110 @@ $file .= '
             if (isset($menu) && $menu) {
                 $this->basepackages->menus->updateMenu($data['menu_id'], $data);
 
+                $module = $this->modules->{$data['module_type']}->packagesData->last;
+
+                $module['menu_id'] = $menu['id'];
+
+                $this->modules->{$data['module_type']}->update($module);
+
                 return;
             } else {
                 $menu = $this->basepackages->menus->addMenu($data);
 
                 if ($menu) {
-                    // $module = $this->modules->{$data['module_type']}->packagesData->last;
+                    $module = $this->modules->{$data['module_type']}->packagesData->last;
 
-                    // $module['menu_id'] = $menu['id'];
-                    $data['menu_id'] = $menu['id'];
+                    $module['menu_id'] = $menu['id'];
+
+                    $this->modules->{$data['module_type']}->update($module);
+                }
+            }
+        }
+    }
+
+    protected function addUpdateComponentWidgets($data)
+    {
+        if (isset($data['widgets'])) {
+            if (!is_array($data['widgets']) && $data['widgets'] !== '') {
+                $data['widgets'] = $this->helper->decode($data['widgets'], true);
+            }
+        }
+
+        if (isset($data['widgets']) &&
+            count($data['widgets']) > 0
+        ) {
+            foreach ($data['widgets'] as $widgetArr) {
+                if (!isset($widgetArr['method'])) {
+                    continue;
                 }
 
-                // $this->modules->{$data['module_type']}->update($module);
+                $widget = $this->basepackages->widgets->getWidgetByMethodAndAppType($widgetArr['method'], $data['app_type']);
+
+                if ($widget) {
+                    $widgetToUpdate =
+                        [
+                            'id'                    => $widget['id'],
+                            'name'                  => $widgetArr['name'],
+                            'method'                => $widgetArr['method'],
+                            'component_id'          => $data['id'],
+                            'app_type'              => $data['app_type'],
+                            'multiple'              => isset($widgetArr['multiple']) && $widgetArr['multiple'] === true ? 1 : 0,
+                            'max_multiple'          => isset($widgetArr['max_multiple']) ? $widgetArr['max_multiple'] : 5,//Max instances of same widget
+                            'settings'              => isset($widgetArr['settings']) ? $this->helper->encode($widgetArr['settings']) : $this->helper->encode([])
+                        ];
+
+                    if ($this->basepackages->widgets->update($widgetToUpdate)) {
+                        foreach ($data['widgets'] as &$dataWidget) {
+                            if ($dataWidget['method'] === $widgetToUpdate['method']) {
+                                $dataWidget['id'] = $widgetToUpdate['id'];
+                            }
+                        }
+
+                        $this->modules->components->update($data);
+                    }
+                } else {
+                    $widgetToAdd =
+                        [
+                            'name'                  => $widgetArr['name'],
+                            'method'                => $widgetArr['method'],
+                            'component_id'          => $data['id'],
+                            'app_type'              => $data['app_type'],
+                            'multiple'              => isset($widgetArr['multiple']) && $widgetArr['multiple'] === true ? 1 : 0,
+                            'max_multiple'          => isset($widgetArr['max_multiple']) ? $widgetArr['max_multiple'] : 5,//Max instances of same widget
+                            'settings'              => isset($widgetArr['settings']) ? $this->helper->encode($widgetArr['settings']) : $this->helper->encode([])
+                        ];
+
+                    if ($this->basepackages->widgets->add($widgetToAdd)) {
+                        $newWidget = $this->basepackages->widgets->packagesData->last;
+
+                        foreach ($data['widgets'] as &$dataWidget) {
+                            if ($dataWidget['method'] === $newWidget['method']) {
+                                $dataWidget['id'] = $newWidget['id'];
+                            }
+                        }
+
+                        $this->modules->components->update($data);
+                    }
+                }
+            }
+        }
+
+        //Remove widgets that dont exists
+        $componentWidgets = $this->basepackages->widgets->getWidgetsByComponentId((int) $data['id']);
+
+        if ($componentWidgets && count($componentWidgets) > 0) {
+            $componentWidgetsKeys = array_keys($componentWidgets);
+
+            if (isset($data['widgets']) &&
+                count($data['widgets']) > 0
+            ) {
+                foreach ($data['widgets'] as $widget) {
+                    if (isset($widget['id'])) {
+                        if (!in_array($widget['id'], $componentWidgetsKeys)) {
+                            $this->basepackages->widgets->remove((int) $widget['id']);
+                        }
+                    }
+                }
             }
         }
     }
