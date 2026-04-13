@@ -17,13 +17,17 @@ class MenuInstaller extends BasePackage
             if ($this->localContent->fileExists($file)) {
                 $installComponentJsonFile = $this->helper->decode($this->localContent->read($file), true);
 
+                $menu = $this->basepackages->menus->getMenusByRouteForAppType($installComponentJsonFile['route'], $installComponentJsonFile['app_type']);
+
                 if (!isset($installComponentJsonFile['menu']) ||
                     (isset($installComponentJsonFile['menu']) && (bool) $installComponentJsonFile['menu'] === false)
                 ) {
+                    if ($menu) {
+                        return $this->uninstallMenu($componentClass);
+                    }
+
                     return true;
                 }
-
-                $menu = $this->basepackages->menus->getMenusByRouteForAppType($installComponentJsonFile['route'], $installComponentJsonFile['app_type']);
 
                 if ($menu) {
                     $this->basepackages->menus->updateMenu($menu['id'], $installComponentJsonFile);
@@ -48,6 +52,10 @@ class MenuInstaller extends BasePackage
             throw $e;
         }
 
+        if ($this->opCache) {
+            $this->opCache->removeCache('menus', 'core');
+        }
+
         return true;
     }
 
@@ -60,7 +68,13 @@ class MenuInstaller extends BasePackage
         $component = $this->modules->components->getComponentByClass($componentClass);
 
         if ($component) {
+            if ($this->opCache) {
+                $this->opCache->removeCache('menus', 'core');
+            }
+
             return $this->basepackages->menus->remove($component['menu_id']);
         }
+
+        return false;
     }
 }
