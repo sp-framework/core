@@ -10,7 +10,7 @@
 	"class" : "Apps\\Core\\Components\\Pages\\PagesComponent",
 	"dependencies" : 
 	{
-		"core" :
+		"core" : 
 		{
 			"name" : "Core",
 			"version" : "0.0.0",
@@ -33,12 +33,21 @@
 		},
 		"seq" : "0"
 	},
-	"settings" :
+	"widgets" : 
+	[
+		{
+			"name" : "HTML Code",
+			"method" : "htmlCode",
+			"multiple" : true,
+			"max_multiple" : 20,
+			"settings" : []
+		}
+	],
+	"settings" : 
 	{
-		"mandatory" :
+		"mandatory" : 
 		{
 			"core" : true
 		}
-	},
-	"widgets" : []
+	}
 }
