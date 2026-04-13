@@ -89,95 +89,106 @@ dataCollectionSection =
                             [100, 'All']
                         ],
                     });
+
+                    dataCollectionSectionForm['vars']['modulesTable'].on('page', function() {
+                        resetButtons();
+                    });
+                    dataCollectionSectionForm['vars']['modulesTable'].on('search.dt', function() {
+                        resetButtons();
+                    });
                 }
 
-                var isSubView = false;
+                function resetButtons() {
+                    var isSubView = false;
 
-                $('.editModule').off();
-                $('.editModule').click(function(e) {
-                    e.preventDefault();
+                    $('.editModule').off();
+                    $('.editModule').click(function(e) {
+                        e.preventDefault();
 
-                    if ($(this).data()['type'] === 'views' && $(this).data()['subview'] === true) {
-                        isSubView = true;
-                    }
-
-                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, false, false, isSubView);
-                    } else {
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, false, isSubView);
-                    }
-                });
-
-                $('.cloneModule').off();
-                $('.cloneModule').click(function(e) {
-                    e.preventDefault();
-
-                    if ($(this).data()['type'] === 'views' && $(this).data()['subview'] === true) {
-                        isSubView = true;
-                    }
-
-                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, true, false, isSubView);
-                    } else {
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, true, false, isSubView);
-                    }
-                });
-
-                $('.removeModule').off();
-                $('.removeModule').click(function(e) {
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['id'] = $(this).data()['id'];
-                    postData['module_type'] = $(this).data()['type'];
-                    postData['remove_files'] = false;
-
-                    Swal.fire({
-                        title                       : '<span class="text-danger"> Remove module files from the system as well?</span>',
-                        icon                        : 'question',
-                        background                  : 'rgba(0,0,0,.8)',
-                        backdrop                    : 'rgba(0,0,0,.6)',
-                        buttonsStyling              : false,
-                        confirmButtonText           : 'Yes',
-                        cancelButtonText            : 'No',
-                        customClass                 : {
-                            'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
-                            'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
-                        },
-                        showCancelButton            : true,
-                        keydownListenerCapture      : true,
-                        allowOutsideClick           : true,
-                        allowEscapeKey              : true,
-                        didOpen                     : function() {
-                            dataCollection.env.sounds.swalSound.play();
+                        if ($(this).data()['type'] === 'views' && $(this).data()['subview'] === true) {
+                            isSubView = true;
                         }
-                    }).then((result) => {
-                        if (result.value) {
-                            postData['remove_files'] = true;
 
-                            remove(postData);
+                        if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, false, false, isSubView);
                         } else {
-                            remove(postData);
+                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, false, isSubView);
                         }
                     });
-                });
 
-                $('.generateRelease').off();
-                $('.generateRelease').click(function(e) {
-                    e.preventDefault();
+                    $('.cloneModule').off();
+                    $('.cloneModule').click(function(e) {
+                        e.preventDefault();
 
-                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, true);
-                    } else {
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, true);
-                    }
-                });
+                        if ($(this).data()['type'] === 'views' && $(this).data()['subview'] === true) {
+                            isSubView = true;
+                        }
 
-                $('.commitModuleJson').off();
-                $('.commitModuleJson').click(function(e) {
-                    e.preventDefault();
+                        if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, true, false, isSubView);
+                        } else {
+                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, true, false, isSubView);
+                        }
+                    });
 
-                    dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, true);
-                });
+                    $('.removeModule').off();
+                    $('.removeModule').click(function(e) {
+                        var postData = { };
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['id'] = $(this).data()['id'];
+                        postData['module_type'] = $(this).data()['type'];
+                        postData['remove_files'] = false;
+
+                        Swal.fire({
+                            title                       : '<span class="text-danger"> Remove module files from the system as well?</span>',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Yes',
+                            cancelButtonText            : 'No',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger btn-sm text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                dataCollection.env.sounds.swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                postData['remove_files'] = true;
+
+                                remove(postData);
+                            } else {
+                                remove(postData);
+                            }
+                        });
+                    });
+
+                    $('.generateRelease').off();
+                    $('.generateRelease').click(function(e) {
+                        e.preventDefault();
+
+                        if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, true);
+                        } else {
+                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, true);
+                        }
+                    });
+
+                    $('.commitModuleJson').off();
+                    $('.commitModuleJson').click(function(e) {
+                        e.preventDefault();
+
+                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, true);
+                    });
+                }
+
+                resetButtons();
 
                 $('#{{componentId}}-{{sectionId}}-include_core_modules').click(function() {
                     if ($(this)[0].checked === true) {
