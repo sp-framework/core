@@ -70,7 +70,7 @@ class Widgets
                     'settings',
                     [
                         'type'    => Column::TYPE_JSON,
-                        'notNull' => false
+                        'notNull' => true
                     ]
                 )
             ],

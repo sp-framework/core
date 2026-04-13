@@ -28,7 +28,7 @@ class Widgets extends BasePackage
         return $this;
     }
 
-    public function getWidgetsTree()
+    public function getWidgetsTree($componentName = 'dashboards')
     {
         $componentsArr = $this->modules->components->components;
 
@@ -36,6 +36,18 @@ class Widgets extends BasePackage
 
         foreach ($componentsArr as $componentKey => $component) {
             if ($component['app_type'] !== $this->apps->getAppInfo()['app_type']) {
+                continue;
+            }
+
+            if ($componentName === 'dashboards' &&
+                strtolower($component['name']) === 'pages'
+            ) {
+                continue;
+            }
+
+            if ($componentName === 'pages' &&
+                strtolower($component['name']) !== 'pages'
+            ) {
                 continue;
             }
 

@@ -145,7 +145,7 @@ class DashboardsComponent extends BaseComponent
 
                 $this->view->dashboard = $this->basepackages->dashboards->getDashboardById($dashboardId, true);
 
-                $this->view->widgetsTree = $this->basepackages->widgets->getWidgetsTree();
+                $this->view->widgetsTree = $this->basepackages->widgets->getWidgetsTree('dashboards');
 
                 $this->getNewToken();//We need this token as we initiate a getDashboardWidgets();
             }

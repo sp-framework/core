@@ -27,6 +27,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Murls;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Pages;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Pages\Widgets as PagesWidgets;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages\StoragesLocal;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Tags;
@@ -105,6 +106,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\Basepac
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Messenger\BasepackagesMessenger;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Pages\BasepackagesPagesWidgets;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Storages\BasepackagesStoragesLocal;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
@@ -197,6 +199,10 @@ class Schema
                 'basepackages_pages'                        => [
                         'schema'    => new Pages,
                         'model'     => new BasepackagesPages,
+                    ],
+                'basepackages_pages_widgets'                => [
+                        'schema'    => new PagesWidgets,
+                        'model'     => new BasepackagesPagesWidgets,
                     ],
                 'basepackages_email_services'               => [
                         'schema'    => new EmailServices,

@@ -1,0 +1,5 @@
+{% if widget['data']['settings']['htmlcode'] is defined %}
+    {{ widget['data']['settings']['htmlcode'] }}
+{% else %}
+    <p>Please set html code for this widget!</p>
+{% endif %}

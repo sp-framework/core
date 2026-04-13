@@ -30,6 +30,8 @@ class WidgetInstaller extends BasePackage
                     ((isset($installComponentJsonFile['widgets']) && (bool) $installComponentJsonFile['widgets'] === false) ||
                      (isset($installComponentJsonFile['widgets']) && count($installComponentJsonFile['widgets']) === 0))
                 ) {
+                    $this->uninstallWidget($componentClass);
+
                     return true;
                 }
 
@@ -50,7 +52,7 @@ class WidgetInstaller extends BasePackage
                                 'app_type'              => $component['app_type'],
                                 'multiple'              => isset($widgetArr['multiple']) && $widgetArr['multiple'] === true ? 1 : 0,
                                 'max_multiple'          => isset($widgetArr['max_multiple']) ? $widgetArr['max_multiple'] : 5,//Max instances of same widget
-                                'settings'              => isset($widgetArr['settings']) ? $this->helper->encode($widgetArr['settings']) : null
+                                'settings'              => isset($widgetArr['settings']) ? $this->helper->encode($widgetArr['settings']) : $this->helper->encode([])
                             ];
 
                         if ($this->basepackages->widgets->update($widgetToUpdate)) {
@@ -71,7 +73,7 @@ class WidgetInstaller extends BasePackage
                                 'app_type'              => $component['app_type'],
                                 'multiple'              => isset($widgetArr['multiple']) && $widgetArr['multiple'] === true ? 1 : 0,
                                 'max_multiple'          => isset($widgetArr['max_multiple']) ? $widgetArr['max_multiple'] : 5,//Max instances of same widget
-                                'settings'              => isset($widgetArr['settings']) ? $this->helper->encode($widgetArr['settings']) : null
+                                'settings'              => isset($widgetArr['settings']) ? $this->helper->encode($widgetArr['settings']) : $this->helper->encode([])
                             ];
 
                         if ($this->basepackages->widgets->add($widgetToAdd)) {
@@ -124,5 +126,7 @@ class WidgetInstaller extends BasePackage
         if ($this->opCache) {
             $this->opCache->removeCache('widgets', 'core');
         }
+
+        return true;
     }
 }

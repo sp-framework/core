@@ -1,0 +1,28 @@
+
+{% set pageHtmlCode = '' %}
+{% if widget['data']['settings']['htmlcode'] is defined %}
+    {% set pageHtmlCode = widget['data']['settings']['htmlcode'] %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'html_code',
+                'fieldLabel'                     : 'Page HTML Code',
+                'fieldType'                      : 'trumbowyg',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Design page using the tool provided or click on < > and write/paste HTML code.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 65535,
+                'fieldValue'                     : pageHtmlCode
+            ]
+        )}}
+    </div>
+</div>
