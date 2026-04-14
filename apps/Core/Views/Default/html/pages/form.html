@@ -148,7 +148,7 @@
                 )}}
             </div>
         </div>
-        
+        <!-- htmlmin:ignore -->
         <div class="row" id="html_file" {{fileHidden}}>
             <div class="col">
                 {{adminltetags.useTag('fields',
@@ -196,7 +196,7 @@
                 )}}
             </div>
         </div>
-        
+        <!-- htmlmin:ignore -->
     </fieldset>
 </form>
 <script>
@@ -249,7 +249,8 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-html_file'                           : { },
         '{{componentId}}-{{sectionId}}-html_code'                           : {
-            tagsToRemove: ['script', 'link']
+            tagsToRemove: ['script', 'link'],
+            semantic: false
         },
         '{{componentId}}-{{sectionId}}-result'                              : {
             afterInit: function() {
@@ -305,7 +306,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-html_code'                   : 'required',
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-name'                        : 'Please enter template name',
+                '{{componentId}}-{{sectionId}}-name'                        : 'Please enter page name',
                 '{{componentId}}-{{sectionId}}-app_type'                    : 'Please select app type',
                 '{{componentId}}-{{sectionId}}-content_source'              : 'Please select page content source',
                 '{{componentId}}-{{sectionId}}-html_file'                   : 'Please enter html filename',
