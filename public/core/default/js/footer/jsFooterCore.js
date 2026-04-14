@@ -4024,17 +4024,17 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                         //         }
                         //     });
                         // } else {
-                            var sectionToObj = that._sectionToObj();
+                            that._sectionToObj();
 
                             if (dataCollection[componentId][sectionId][sectionId + '-form']['onSubmit']) {
                                 if (dataCollection[componentId][sectionId][sectionId + '-form']['onSubmit']()) {
-                                    that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(sectionToObj));
+                                    that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(dataCollection[componentId][sectionId]['dataToSubmit']));
                                 } else {
                                     $(mainButton).attr('disabled', false);
                                     $(mainButton).children('i').attr('hidden', true);
                                 }
                             } else {
-                                that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(sectionToObj));
+                                that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(dataCollection[componentId][sectionId]['dataToSubmit']));
                             }
 
                         // }

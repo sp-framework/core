@@ -1,0 +1,36 @@
+{% set settingsNoWidgets = '' %}
+{% set settingsWidgetError = 'hidden' %}
+{% set settingsWidgetLoader = 'hidden' %}
+{% set settingsWidgetInfo = 'hidden' %}
+{% set settingsWidget = '' %}
+{% if pagewidget['settings'] is defined %}
+    {% set settingsNoWidgets = 'hidden' %}
+    {% set settingsWidgetInfo = '' %}
+    {% set settingsWidget = pagewidget['settings'] %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-widget-no-widget-settings" {{settingsNoWidgets}}>
+            <div class="col">
+                <h6><i class="fa fa-fw fa-info-circle text-info"></i> Select widget to show settings.</h6>
+            </div>
+        </div>
+        <div class="row text-center m-2" id="{{componentId}}-{{sectionId}}-widget-settings-error" {{settingsWidgetError}}>
+            <div class="col">
+                <h6><i class="fa fa-fw fa-info-circle text-danger"></i> Error loading widget settings. Please contact administrator.</h6>
+            </div>
+        </div>
+        <div class="row text-center" id="{{componentId}}-{{sectionId}}-widget-settings-loader" {{settingsWidgetLoader}}>
+            <div class="col">
+                <div class="fa-2x">
+                    <i class="fa fa-cog fa-spin"></i> Loading...
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div id="{{componentId}}-{{sectionId}}-widget-settings">{{settingsWidget}}</div>
+            </div>
+        </div>
+    </div>
+</div>

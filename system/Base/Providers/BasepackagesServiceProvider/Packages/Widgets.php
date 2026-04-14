@@ -54,14 +54,23 @@ class Widgets extends BasePackage
             $componentWidgets = $this->getWidgetsByComponentId($component['id']);
 
             if (count($componentWidgets) > 0) {
-                $widgetsTree[$componentKey]['id'] = $component['id'];
-                $widgetsTree[$componentKey]['title'] = $component['name'];
+                if ($componentName === 'dashboards') {
+                    $widgetsTree[$componentKey]['id'] = $component['id'];
+                    $widgetsTree[$componentKey]['title'] = $component['name'];
 
-                foreach ($componentWidgets as $key => $componentWidget) {
-                    $widgetsTree[$componentKey]['childs'][$key]['id'] = $componentWidget['id'];
-                    $widgetsTree[$componentKey]['childs'][$key]['title'] = $componentWidget['name'];
-                    $widgetsTree[$componentKey]['childs'][$key]['data']['method'] = $componentWidget['method'];
-                    $widgetsTree[$componentKey]['childs'][$key]['data']['component_id'] = $componentWidget['component_id'];
+                    foreach ($componentWidgets as $key => $componentWidget) {
+                        $widgetsTree[$componentKey]['childs'][$key]['id'] = $componentWidget['id'];
+                        $widgetsTree[$componentKey]['childs'][$key]['title'] = $componentWidget['name'];
+                        $widgetsTree[$componentKey]['childs'][$key]['data']['method'] = $componentWidget['method'];
+                        $widgetsTree[$componentKey]['childs'][$key]['data']['component_id'] = $componentWidget['component_id'];
+                    }
+                } else if ($componentName === 'pages') {
+                    foreach ($componentWidgets as $key => $componentWidget) {
+                        $widgetsTree[$key]['id'] = $componentWidget['id'];
+                        $widgetsTree[$key]['name'] = $componentWidget['name'];
+                        $widgetsTree[$key]['data']['method'] = $componentWidget['method'];
+                        $widgetsTree[$key]['data']['component_id'] = $componentWidget['component_id'];
+                    }
                 }
             }
         }
@@ -69,7 +78,7 @@ class Widgets extends BasePackage
         return $widgetsTree;
     }
 
-    public function getWidget(int $id, $task = null, $dashboardWidget = [])
+    public function getWidget(int $id, $task = null, $dashboardPageWidget = [])
     {
         if (isset($this->widgets[$id])) {
             $widget = $this->widgets[$id];
@@ -85,9 +94,9 @@ class Widgets extends BasePackage
             return $widget;
         }
 
-        if ($this->opCache && isset($dashboardWidget['getWidgetData']) && isset($widget['content']) && $task === 'content') {
-            return $widget;
-        }
+        // if ($this->opCache && isset($dashboardPageWidget['getWidgetData']) && isset($widget['content']) && $task === 'content') {
+        //     return $widget;
+        // }
 
         if ($widget['settings']) {
             if (is_string($widget['settings'])) {
@@ -116,15 +125,21 @@ class Widgets extends BasePackage
                 if (isset($widgetMethod) && $widgetsReflection->hasMethod($widgetMethod)) {
                     if ($task === 'info') {
                         $widget['info'] = $componentObj->widgets->info($widget);
+                    } else if ($task === 'settings') {
+                        if (count($dashboardPageWidget) > 0) {
+                            $widget['settings'] = $componentObj->widgets->settings($widget, $dashboardPageWidget);
+                        } else {
+                            $widget['settings'] = $componentObj->widgets->settings($widget);
+                        }
                     } else if ($task === 'content') {
                         try {
-                            $widget['content'] = $componentObj->widgets->$widgetMethod($widget, $dashboardWidget);
+                            $widget['content'] = $componentObj->widgets->$widgetMethod($widget, $dashboardPageWidget);
 
-                            if ($this->opCache && isset($dashboardWidget['getWidgetData'])) {
-                                $this->widgets[$id] = $widget;
+                            // if ($this->opCache && isset($dashboardPageWidget['getWidgetData'])) {
+                            //     $this->widgets[$id] = $widget;
 
-                                $this->opCache->setCache('widgets', $this->widgets, 'core');
-                            }
+                            //     $this->opCache->setCache('widgets', $this->widgets, 'core');
+                            // }
                         } catch (\throwable $e) {
                             return false;
                         }

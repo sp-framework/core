@@ -9,7 +9,7 @@
         'cardHeader'            : true,
         'cardType'              : 'primary',
         'cardIcon'              : 'file-code',
-        'cardTitle'             : 'Pages',
+        'cardTitle'             : 'Widgets',
         'cardAdditionalClass'   : 'rounded-0',
         'cardShowTools'         : ['maximize'],
         'dtFixedHeader'         : true,
@@ -20,13 +20,13 @@
                 'buttonType'            : 'button',
                 'buttons'               :
                     {
-                        'widgets' : {
-                            'title'                   : 'Widgets',
+                        'pages' : {
+                            'title'                   : 'Pages',
                             'size'                    : 'sm',
                             'type'                    : 'info',
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'position'                : 'right',
-                            'url'                     : links.url('pages/widgets')
+                            'url'                     : links.url('pages')
                         }
                     }
             },
@@ -37,14 +37,14 @@
                 'buttonType'            : 'button',
                 'buttons'               :
                     {
-                        'add-page' : {
-                            'title'                   : 'Add New Page',
+                        'add-page-widget' : {
+                            'title'                   : 'Add New Page Widget',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
                             'icon'                    : 'plus',
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'position'                : 'right',
-                            'url'                     : links.url('pages/q/id/0')
+                            'url'                     : links.url('pages/widgets/q/id/0')
                         }
                     }
             },
@@ -58,6 +58,6 @@
         'dtHideIdColumn'        : true,
         'dtNoOfColumnsToShow'   : 6,
         'dtTableCompact'        : true,
-        'dtZeroRecords'         : 'No pages available. Add by clicking the Add new page button.'
+        'dtZeroRecords'         : 'No page widgets available. Add by clicking the Add new page widget button.'
     ]
 )}}

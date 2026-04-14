@@ -47,8 +47,6 @@ class PagesComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
-                $this->view->page = $page;
-
                 if (!isset($this->getData()['edit'])) {
                     if (!in_array($this->apps->getAppInfo()['route'], $page['visible_on_apps'])) {
                         return $this->throwIdNotFound();
@@ -60,7 +58,6 @@ class PagesComponent extends BaseComponent
 
                     unset($this->view->contentSources);
                     unset($this->view->apps);
-
                     if ($page['content_source'] === 'file') {
                         //Check file existence
                         try {
@@ -79,7 +76,13 @@ class PagesComponent extends BaseComponent
                             throw $e;
                         }
                     }
+
+                    $page = $this->pages->processWidgets($page);
+
+                    $this->view->setViewsDir($this->modules->views->getPhalconViewPath());
                 }
+
+                $this->view->page = $page;
             }
 
             $this->view->pick('pages/view');

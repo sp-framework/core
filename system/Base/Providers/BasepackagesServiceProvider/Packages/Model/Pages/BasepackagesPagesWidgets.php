@@ -8,6 +8,8 @@ class BasepackagesPagesWidgets extends BaseModel
 {
     public $id;
 
+    public $name;
+
     public $widget_id;
 
     public $settings;

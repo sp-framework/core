@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Pages;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Widgets
 {
@@ -21,6 +22,14 @@ class Widgets
                     ]
                 ),
                 new Column(
+                    'name',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
                     'widget_id',
                     [
                         'type'          => Column::TYPE_INTEGER,
@@ -34,7 +43,31 @@ class Widgets
                         'notNull'       => true
                     ]
                 )
+            ],
+            'indexes' => [
+                new Index(
+                    'column_UNIQUE',
+                    [
+                        'name',
+                        'widget_id'
+                    ],
+                    'UNIQUE'
+                )
             ]
+        ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'widget_id'
+                ],
+                'INDEX'
+            )
         ];
     }
 }

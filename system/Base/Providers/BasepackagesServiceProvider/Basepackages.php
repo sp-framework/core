@@ -26,6 +26,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Murls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Pages;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\PagesWidgets;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Progress;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Pusher;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Qrcodes;
@@ -114,6 +115,8 @@ class Basepackages
 	protected $tags;
 
 	protected $pages;
+
+	protected $pageswidgets;
 
 	public function __construct()
 	{
@@ -380,5 +383,12 @@ class Basepackages
 		$this->pages = (new Pages())->init();
 
 		return $this->pages;
+	}
+
+	protected function initPagesWidgets()
+	{
+		$this->pageswidgets = (new PagesWidgets())->init();
+
+		return $this->pageswidgets;
 	}
 }

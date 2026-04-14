@@ -132,4 +132,41 @@ class Pages extends BasePackage
             $this->addResponse('Error removing page', 1);
         }
     }
+
+    public function processWidgets($page)
+    {
+        preg_match_all('/{{getWidgetContent.*?}}/', $page['html_code'], $pageHasWidgets);
+
+        if (isset($pageHasWidgets[0]) && count($pageHasWidgets[0]) > 0) {
+            $pageWidgetsContent = [];
+
+            foreach ($pageHasWidgets[0] as $pageWidgetRef) {
+                preg_match('/\d/', $pageWidgetRef, $pageWidgetId);
+
+                if (!isset($pageWidgetId[0])) {
+                    continue;
+                }
+
+                $pageWidget = null;
+
+                $pageWidget = $this->basepackages->pageswidgets->getById((int) $pageWidgetId[0]);
+
+                if ($pageWidget) {
+                    $pageWidget['getWidgetData'] = true;
+
+                    $pageWidgetContent = $this->basepackages->widgets->getWidget($pageWidget['widget_id'], 'content', $pageWidget);
+
+                    if (isset($pageWidgetContent['content'])) {
+                        $page['html_code'] = str_replace($pageWidgetRef, trim($pageWidgetContent['content']), $page['html_code']);
+                    } else {
+                        $page['html_code'] = str_replace($pageWidgetRef, '<p>Please set html code for this widget!</p>', $page['html_code']);
+                    }
+                } else {
+                    $page['html_code'] = str_replace($pageWidgetRef, '<p>Widget with ID ' . $pageWidgetId[0] . ' not found!</p>', $page['html_code']);
+                }
+            }
+        }
+
+        return $page;
+    }
 }

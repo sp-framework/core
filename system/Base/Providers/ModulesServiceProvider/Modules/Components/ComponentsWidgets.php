@@ -24,7 +24,11 @@ class ComponentsWidgets
 
         $this->view->component = $component;
 
-        $this->view->componentName = 'dashboards';
+        if ($component['route'] !== 'pages') {
+            $this->view->componentName = 'dashboards';
+        } else {
+            $this->view->componentName = 'widgets';
+        }
 
         $this->view->appRoute = $this->componentObj->apps->getAppInfo()['route'];
 
@@ -61,6 +65,11 @@ class ComponentsWidgets
     public function info($widget)
     {
         return $this->view->getPartial('widgets/' . strtolower($widget['method']) . '/info');
+    }
+
+    public function settings($widget, $pagewidget = null)
+    {
+        return $this->view->getPartial('widgets/' . strtolower($widget['method']) . '/settings', ['pagewidget' => $pagewidget]);
     }
 
     public function getWidgetContent($widget, $data = [])

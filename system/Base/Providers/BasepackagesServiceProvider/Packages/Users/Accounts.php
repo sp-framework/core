@@ -868,7 +868,6 @@ class Accounts extends BasePackage
                 return $envStore->getLast();
             }
         }
-
     }
 
     public function addUpdateCanLogin($id, $canLogin)

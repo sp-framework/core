@@ -1,0 +1,34 @@
+{% if pagewidget['id'] is defined %}
+    {% set pagewidgetId = pagewidget['id'] %}
+    {% set title = 'Page Widget (' ~ pagewidget['name'] ~ ')' %}
+{% else %}
+    {% set pagewidgetId = '' %}
+    {% set title = 'New Page Widget' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'file-code',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'widgets/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : pagewidgetId,
+            'addActionUrl'                  : 'pages/widgets/add',
+            'addSuccessRedirectUrl'         : 'pages/widgets',
+            'updateActionUrl'               : 'pages/widgets/update',
+            'updateSuccessRedirectUrl'      : 'pages/widgets',
+            'cancelActionUrl'               : 'pages/widgets',
+            'closeActionUrl'                : 'pages/widgets'
+        ]
+    ]
+)}}
