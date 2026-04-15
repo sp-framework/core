@@ -35,9 +35,9 @@ class Widgets extends BasePackage
         $widgetsTree = [];
 
         foreach ($componentsArr as $componentKey => $component) {
-            if ($component['app_type'] !== $this->apps->getAppInfo()['app_type']) {
-                continue;
-            }
+            // if ($component['app_type'] !== $this->apps->getAppInfo()['app_type']) {
+            //     continue;
+            // }
 
             if ($componentName === 'dashboards' &&
                 strtolower($component['name']) === 'pages'
@@ -63,13 +63,15 @@ class Widgets extends BasePackage
                         $widgetsTree[$componentKey]['childs'][$key]['title'] = $componentWidget['name'];
                         $widgetsTree[$componentKey]['childs'][$key]['data']['method'] = $componentWidget['method'];
                         $widgetsTree[$componentKey]['childs'][$key]['data']['component_id'] = $componentWidget['component_id'];
+                        $widgetsTree[$componentKey]['childs'][$key]['data']['app_type'] = $componentWidget['app_type'];
                     }
                 } else if ($componentName === 'pages') {
                     foreach ($componentWidgets as $key => $componentWidget) {
                         $widgetsTree[$key]['id'] = $componentWidget['id'];
-                        $widgetsTree[$key]['name'] = $componentWidget['name'];
+                        $widgetsTree[$key]['name'] = $componentWidget['name'] . ' (' . $componentWidget['app_type'] . ')';
                         $widgetsTree[$key]['data']['method'] = $componentWidget['method'];
                         $widgetsTree[$key]['data']['component_id'] = $componentWidget['component_id'];
+                        $widgetsTree[$key]['data']['app_type'] = $componentWidget['app_type'];
                     }
                 }
             }
@@ -93,7 +95,9 @@ class Widgets extends BasePackage
             return $widget;
         }
 
-        if ($this->apps->getAppInfo()['app_type'] !== $widget['app_type']) {
+        if ($task === 'content' &&
+            $this->apps->getAppInfo()['app_type'] !== $widget['app_type']
+        ) {
             return ['error' => 'Requested widget does not belong to this app type!'];
         }
 
@@ -116,7 +120,7 @@ class Widgets extends BasePackage
                 $componentObj = new $component['class'];
 
                 try {
-                    $componentObj->checkComponentWidgets($component['class']);
+                    $componentObj->checkComponentWidgets($widget['app_type']);
                 } catch (\throwable $e) {
                     return ['error' => $e->getMessage()];
                 }
@@ -127,12 +131,20 @@ class Widgets extends BasePackage
 
                 if (isset($widgetMethod) && $widgetsReflection->hasMethod($widgetMethod)) {
                     if ($task === 'info') {
-                        $widget['info'] = $componentObj->widgets->info($widget);
+                        try {
+                            $widget['info'] = $componentObj->widgets->info($widget);
+                        } catch (\throwable $e) {
+                            $widget['info'] = $e->getMessage();
+                        }
                     } else if ($task === 'settings') {
-                        if (count($dashboardPageWidget) > 0) {
-                            $widget['settings'] = $componentObj->widgets->settings($widget, $dashboardPageWidget);
-                        } else {
-                            $widget['settings'] = $componentObj->widgets->settings($widget);
+                        try {
+                            if (count($dashboardPageWidget) > 0) {
+                                $widget['settings'] = $componentObj->widgets->settings($widget, $dashboardPageWidget);
+                            } else {
+                                $widget['settings'] = $componentObj->widgets->settings($widget);
+                            }
+                        } catch (\throwable $e) {
+                            $widget['settings'] = $e->getMessage();
                         }
                     } else if ($task === 'content') {
                         try {
@@ -144,7 +156,7 @@ class Widgets extends BasePackage
                             //     $this->opCache->setCache('widgets', $this->widgets, 'core');
                             // }
                         } catch (\throwable $e) {
-                            return ['error' => $e->getMessage()];
+                            $widget['content'] = $e->getMessage();
                         }
                     }
 

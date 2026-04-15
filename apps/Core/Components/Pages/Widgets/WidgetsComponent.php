@@ -87,7 +87,7 @@ class WidgetsComponent extends BaseComponent
             true,
             ['name', 'widget_id'],
             $controlActions,
-            ['widget_id' => 'widget'],
+            ['widget_id' => 'widget (app type)'],
             $replaceColumns,
             'name'
         );

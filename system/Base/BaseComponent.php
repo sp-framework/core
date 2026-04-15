@@ -157,7 +157,7 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	public function checkComponentWidgets()
+	public function checkComponentWidgets($appType = null)
 	{
 		$namespace = $this->reflection->getNamespaceName();
 
@@ -165,9 +165,13 @@ abstract class BaseComponent extends Controller
 
 		try {
 			if (class_exists($widgetsClass)) {
-				$route = str_replace('apps/' . $this->app['app_type'] . '/components/', '', strtolower(str_replace('\\', '/', $namespace)));
+				if (!$appType) {
+					$appType = $this->apps->getAppInfo()['app_type'];
+				}
 
-				$component = $this->modules->components->getComponentByRouteForAppId($route, $this->app['id']);
+				$route = str_replace('apps/' . $appType . '/components/', '', strtolower(str_replace('\\', '/', $namespace)));
+
+				$component = $this->modules->components->getComponentByNameForAppType($route, $appType);
 
 				if ($component) {
 					$this->widgets = (new $widgetsClass())->init($this, $component);

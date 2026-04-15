@@ -55,7 +55,11 @@ class ComponentsWidgets
 
         $this->views = $this->componentObj->modules->views;
 
-        $this->views->setPhalconViewPath();
+        $viewsPath = base_path('apps/' .
+                              ucfirst($this->component['app_type']) .
+                              '/Views/' . $this->views->getViewInfo()['name'] .
+                              '/html/');
+        $this->views->setPhalconViewPath($viewsPath);
 
         $this->view->setViewsDir($this->views->getPhalconViewPath() . $this->component['route']);
 
