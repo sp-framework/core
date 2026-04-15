@@ -89,7 +89,6 @@ class Widgets extends BasePackage
         if (!isset($widget)) {
             return false;
         }
-
         if (!$task) {
             return $widget;
         }
@@ -122,7 +121,7 @@ class Widgets extends BasePackage
                     return ['error' => $e->getMessage()];
                 }
             }
-            trace([$componentObj->widgets]);
+
             if ($componentObj->widgets) {
                 $widgetsReflection = new \ReflectionClass($componentObj->widgets);
 
