@@ -38,7 +38,27 @@ class PagesComponent extends BaseComponent
                     ],
                 ];
 
-            $this->view->apps = $this->apps->apps;
+            $appTypesArr = $this->apps->types->types;
+            $appTypes = [];
+
+            foreach ($appTypesArr as $value) {
+                $appTypes[$value['app_type']]['id'] = $value['app_type'];
+                $appTypes[$value['app_type']]['name'] = $value['name'];
+            }
+
+            $this->view->appTypes = $appTypes;
+
+            $appsArr = $this->apps->apps;
+            $apps = [];
+
+            foreach ($appsArr as $app) {
+                $apps[$app['id']]['id'] = $app['id'];
+                $apps[$app['id']]['name'] = $app['name'];
+                $apps[$app['id']]['route'] = $app['route'];
+                $apps[$app['id']]['data']['app_type'] = $app['app_type'];
+            }
+
+            $this->view->apps = $apps;
 
             if ($this->getData()['id'] != 0) {
                 $page = $this->pages->getById($this->getData()['id']);
@@ -51,6 +71,9 @@ class PagesComponent extends BaseComponent
                     if (!in_array($this->apps->getAppInfo()['route'], $page['visible_on_apps'])) {
                         return $this->throwIdNotFound();
                     }
+                    if ($this->apps->getAppInfo()['app_type'] !== $page['app_type']) {
+                        return $this->throwIdNotFound();
+                    }
 
                     $this->getQueryArr['id'] = null;//Add this to disable token generation on page view.
 
@@ -58,6 +81,7 @@ class PagesComponent extends BaseComponent
 
                     unset($this->view->contentSources);
                     unset($this->view->apps);
+
                     if ($page['content_source'] === 'file') {
                         //Check file existence
                         try {
@@ -123,9 +147,9 @@ class PagesComponent extends BaseComponent
             $this->pages,
             'pages/view',
             null,
-            ['name'],
+            ['name', 'app_type', 'visible_on_apps'],
             true,
-            ['name'],
+            ['name', 'app_type', 'visible_on_apps'],
             $controlActions,
             [],
             null,

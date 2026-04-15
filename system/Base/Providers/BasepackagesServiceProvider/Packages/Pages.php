@@ -158,8 +158,9 @@ class Pages extends BasePackage
 
                     if (isset($pageWidgetContent['content'])) {
                         $page['html_code'] = str_replace($pageWidgetRef, trim($pageWidgetContent['content']), $page['html_code']);
-                    } else {
-                        $page['html_code'] = str_replace($pageWidgetRef, '<p>Please set html code for this widget!</p>', $page['html_code']);
+                    }
+                    if (isset($pageWidgetContent['error'])) {
+                        $page['html_code'] = str_replace($pageWidgetRef, $pageWidgetContent['error'], $page['html_code']);
                     }
                 } else {
                     $page['html_code'] = str_replace($pageWidgetRef, '<p>Widget with ID ' . $pageWidgetId[0] . ' not found!</p>', $page['html_code']);

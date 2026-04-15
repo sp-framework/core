@@ -1,8 +1,10 @@
 {% set fileHidden = 'hidden' %}
 {% set codeHidden = 'hidden' %}
+{% set appTypeApps = [] %}
 {% if page['id'] is defined %}
     {% set pageId = page['id'] %}
     {% set pageName = page['name'] %}
+    {% set pageAppType = page['app_type'] %}
     {% set pageVisibleOnApps = page['visible_on_apps'] %}
     {% set pageContentSource = page['content_source'] %}
     {% set pageDescription = page['description'] %}
@@ -13,14 +15,21 @@
     {% elseif page['content_source'] == 'code' %}
         {% set codeHidden = '' %}
     {% endif %}
+    {% for app in apps %}
+        {% if app['data']['app_type'] == pageAppType %}
+            {% set appTypeApps = array_merge(appTypeApps, [app]) %}
+        {% endif %}
+    {% endfor %}
 {% else %}
     {% set pageId = '' %}
     {% set pageName = '' %}
+    {% set pageAppType = [] %}
     {% set pageVisibleOnApps = [] %}
     {% set pageContentSource = '' %}
     {% set pageDescription = '' %}
     {% set pageHtmlCode = '' %}
     {% set pageHtmlFile = '' %}
+    {% set appTypeApps = apps %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -96,6 +105,33 @@
                     ]
                 )}}
             </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'app_type',
+                        'fieldLabel'                           : 'Page App Type',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select page app type.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : appTypes,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : pageAppType
+                    ]
+                )}}
+            </div>
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -113,7 +149,7 @@
                         'fieldBazJstreeSearch'                 : true,
                         'fieldBazPostOnCreate'                 : true,
                         'fieldBazPostOnUpdate'                 : true,
-                        'fieldDataSelect2Options'              : apps,
+                        'fieldDataSelect2Options'              : appTypeApps,
                         'fieldDataSelect2Multiple'             : true,
                         'fieldDataSelect2OptionsKey'           : 'route',
                         'fieldDataSelect2OptionsValue'         : 'name',
@@ -199,6 +235,7 @@
         <!-- htmlmin:ignore -->
     </fieldset>
 </form>
+{% set apps = escaper.js(json_encode(apps, 16)) %}
 <script>
 /* globals BazHelpers paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -229,6 +266,24 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                                  : { },
         '{{componentId}}-{{sectionId}}-name'                                : { },
+        '{{componentId}}-{{sectionId}}-app_type'                            : {
+            'placeholder'   : 'SELECT APP TYPE',
+            afterInit: function() {
+                var apps = JSON.parse('{{apps}}');
+
+                $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function (e) {
+                    $('#{{componentId}}-{{sectionId}}-visible_on_apps').empty().trigger('change');
+
+                    for (var app in apps) {
+                        if (apps[app]['data']['app_type'] === e.params.data.id) {
+                            $('#{{componentId}}-{{sectionId}}-visible_on_apps')
+                            .append(new Option(apps[app]['name'], apps[app]['route'], false, false))
+                            .trigger('change');
+                        }
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-description'                         : { },
         '{{componentId}}-{{sectionId}}-visible_on_apps'                     : {
             'placeholder'   : 'SELECT APPS'
@@ -301,6 +356,7 @@ dataCollectionSection =
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                        : 'required',
                 '{{componentId}}-{{sectionId}}-app_type'                    : 'required',
+                '{{componentId}}-{{sectionId}}-visible_on_apps'             : 'required',
                 '{{componentId}}-{{sectionId}}-content_source'              : 'required',
                 '{{componentId}}-{{sectionId}}-html_file'                   : 'required',
                 '{{componentId}}-{{sectionId}}-html_code'                   : 'required',
@@ -308,6 +364,7 @@ dataCollectionSection =
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                        : 'Please enter page name',
                 '{{componentId}}-{{sectionId}}-app_type'                    : 'Please select app type',
+                '{{componentId}}-{{sectionId}}-visible_on_apps'             : 'Please select page visible on apps',
                 '{{componentId}}-{{sectionId}}-content_source'              : 'Please select page content source',
                 '{{componentId}}-{{sectionId}}-html_file'                   : 'Please enter html filename',
                 '{{componentId}}-{{sectionId}}-html_code'                   : 'Please enter html code',

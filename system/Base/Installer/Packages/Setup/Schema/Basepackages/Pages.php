@@ -10,64 +10,82 @@ class Pages
     public function columns()
     {
         return
-            [
-               'columns' => [
-                    new Column(
-                        'id',
-                        [
-                            'type'          => Column::TYPE_INTEGER,
-                            'notNull'       => true,
-                            'autoIncrement' => true,
-                            'primary'       => true,
-                        ]
-                    ),
-                    new Column(
+        [
+           'columns' => [
+                new Column(
+                    'id',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => true,
+                        'autoIncrement' => true,
+                        'primary'       => true,
+                    ]
+                ),
+                new Column(
+                    'name',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
+                        'notNull'       => true
+                    ]
+                ),
+                new Column(
+                    'description',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'app_type',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
+                    'visible_on_apps',
+                    [
+                        'type'          => Column::TYPE_JSON,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
+                    'content_source',//html_file or html_code
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 10,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
+                    'html_file',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'html_code',
+                    [
+                        'type'          => Column::TYPE_MEDIUMTEXT,
+                        'notNull'       => false,
+                    ]
+                )
+            ],
+            'indexes' => [
+                new Index(
+                    'column_UNIQUE',
+                    [
                         'name',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 100,
-                            'notNull'       => true
-                        ]
-                    ),
-                    new Column(
-                        'description',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 1024,
-                            'notNull'       => false
-                        ]
-                    ),
-                    new Column(
-                        'visible_on_apps',
-                        [
-                            'type'          => Column::TYPE_JSON,
-                            'notNull'       => true,
-                        ]
-                    ),
-                    new Column(
-                        'content_source',//html_file or html_code
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 10,
-                            'notNull'       => true,
-                        ]
-                    ),
-                    new Column(
-                        'html_file',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 100,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'html_code',
-                        [
-                            'type'          => Column::TYPE_MEDIUMTEXT,
-                            'notNull'       => false,
-                        ]
-                    )
-                ]
-            ];
+                        'app_type'
+                    ],
+                    'UNIQUE'
+                )
+            ]
+        ];
     }
 }

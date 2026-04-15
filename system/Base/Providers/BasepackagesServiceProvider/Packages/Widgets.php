@@ -94,6 +94,10 @@ class Widgets extends BasePackage
             return $widget;
         }
 
+        if ($this->apps->getAppInfo()['app_type'] !== $widget['app_type']) {
+            return ['error' => 'Requested widget does not belong to this app type!'];
+        }
+
         // if ($this->opCache && isset($dashboardPageWidget['getWidgetData']) && isset($widget['content']) && $task === 'content') {
         //     return $widget;
         // }
@@ -113,12 +117,12 @@ class Widgets extends BasePackage
                 $componentObj = new $component['class'];
 
                 try {
-                    $componentObj->checkComponentWidgets();
+                    $componentObj->checkComponentWidgets($component['class']);
                 } catch (\throwable $e) {
-                    return false;
+                    return ['error' => $e->getMessage()];
                 }
             }
-
+            trace([$componentObj->widgets]);
             if ($componentObj->widgets) {
                 $widgetsReflection = new \ReflectionClass($componentObj->widgets);
 
@@ -141,20 +145,20 @@ class Widgets extends BasePackage
                             //     $this->opCache->setCache('widgets', $this->widgets, 'core');
                             // }
                         } catch (\throwable $e) {
-                            return false;
+                            return ['error' => $e->getMessage()];
                         }
                     }
 
                     return $widget;
                 }
 
-                return false;
+                return ['error' => 'Widget method does not exists!'];
             }
         } catch (\Exception $e) {
             throw $e;
         }
 
-        return false;
+        return ['error' => 'Error processing widget!'];
     }
 
     public function getWidgetsByComponentId($componentId)

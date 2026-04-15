@@ -189,6 +189,23 @@ class Apps extends BasePackage
 		return false;
 	}
 
+	public function getAppsByType($type)
+	{
+		if (!$type) {
+			return false;
+		}
+
+		$apps = [];
+
+		foreach($this->apps as $app) {
+			if (strtolower($app['app_type']) == strtolower($type)) {
+				$apps[$app['id']] = $app;
+			}
+		}
+
+		return $apps;
+	}
+
 	public function addApp(array $data)
 	{
 		if (!$this->checkType($data)) {
