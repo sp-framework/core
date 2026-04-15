@@ -437,12 +437,6 @@ class Store
 
         $this->data = $data;
 
-        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
-        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
-        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
-            $this->opCache->removeCache(null, 'core');
-        }
-
         return $this->data;
     }
 
@@ -466,12 +460,6 @@ class Store
         $this->createQueryBuilder()->getQuery()->getCache()->deleteAllWithNoLifetime();
 
         $this->data = $results;
-
-        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
-        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
-        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
-            $this->opCache->removeCache(null, 'core');
-        }
 
         return $this->data;
     }
@@ -546,12 +534,6 @@ class Store
         }
 
         $this->data = $data;
-
-        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
-        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
-        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
-            $this->opCache->removeCache(null, 'core');
-        }
 
         return $this->data;
     }
@@ -634,11 +616,6 @@ class Store
 
         $this->data = $data;
 
-        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
-        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
-        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
-            $this->opCache->removeCache(null, 'core');
-        }
         return $this->data;
     }
 
@@ -692,11 +669,6 @@ class Store
 
         $this->data = $data;
 
-        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
-        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
-        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
-            $this->opCache->removeCache(null, 'core');
-        }
         return $this->data;
     }
 
@@ -752,12 +724,6 @@ class Store
 
         $this->data = $data;
 
-        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
-        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
-        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
-            $this->opCache->removeCache(null, 'core');
-        }
-
         return $this->data;
     }
 
@@ -773,12 +739,6 @@ class Store
                     }
                 }
             }
-        }
-
-        $this->app = $this->ff->request->getDi()->getShared('apps')->getAppInfo();
-        $this->opCache = $this->ff->request->getDi()->getShared('opCache');
-        if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
-            $this->opCache->removeCache(null, 'core');
         }
 
         return true;
@@ -1626,7 +1586,6 @@ class Store
                         break;
                     }
                 }
-
                 if ($duplicate) {
                     throw new IOException("Duplicate entry with ID: $duplicate found for field: $uniqueField. $uniqueField should be unique. Store: " . $this->storeName);
                 }

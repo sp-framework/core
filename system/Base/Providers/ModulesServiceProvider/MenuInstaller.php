@@ -20,7 +20,7 @@ class MenuInstaller extends BasePackage
                 $menu = $this->basepackages->menus->getMenusByRouteForAppType($installComponentJsonFile['route'], $installComponentJsonFile['app_type']);
 
                 if (!isset($installComponentJsonFile['menu']) ||
-                    (isset($installComponentJsonFile['menu']) && (bool) $installComponentJsonFile['menu'] === false)
+                    (isset($installComponentJsonFile['menu']) && (bool) $installComponentJsonFile['menu'] == 'false')
                 ) {
                     if ($menu) {
                         return $this->uninstallMenu($componentClass);

@@ -1307,10 +1307,6 @@ abstract class BasePackage extends Controller
 					$this->resetCache();
 				}
 
-				if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
-					$this->opCache->removeCache(null, 'core');
-				}
-
 				return true;
 			} else {
 				$this->transactionErrors = [];
@@ -1377,10 +1373,10 @@ abstract class BasePackage extends Controller
 					}
 				} else {
 					$this->packagesData->last = $update;
-				}
 
-				if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
-					$this->opCache->removeCache(null, 'core');
+					if ($resetCache) {
+						$this->resetCache($this->packagesData->last['id']);
+					}
 				}
 
 				return true;
@@ -1480,10 +1476,6 @@ abstract class BasePackage extends Controller
 					$this->resetCache($id, true);
 				}
 
-				if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
-					$this->opCache->removeCache(null, 'core');
-				}
-
 				$this->addResponse(ucfirst($this->packageNameS) . " Deleted!");
 
 				return true;
@@ -1495,8 +1487,8 @@ abstract class BasePackage extends Controller
 				if ($this->ffStore->deleteById((int) $id, $removeRelated, $this->ffRelationsConditions, $excludeRelatedAliases)) {
 					$this->addResponse(ucfirst($this->packageNameS) . " Deleted!");
 
-					if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
-						$this->opCache->removeCache(null, 'core');
+					if ($resetCache) {
+						$this->resetCache($id, true);
 					}
 
 					return true;
@@ -1701,6 +1693,10 @@ abstract class BasePackage extends Controller
 		}
 
 		$this->cacheTools->resetCache($cacheName, $id, $removeId);
+
+		if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+			$this->opCache->removeCache(null, 'core');
+		}
 	}
 
 	public function getModel()

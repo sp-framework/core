@@ -169,7 +169,9 @@ abstract class BaseComponent extends Controller
 
 				$component = $this->modules->components->getComponentByRouteForAppId($route, $this->app['id']);
 
-				$this->widgets = (new $widgetsClass())->init($this, $component);
+				if ($component) {
+					$this->widgets = (new $widgetsClass())->init($this, $component);
+				}
 			}
 		} catch (\Exception $e) {
 			throw $e;

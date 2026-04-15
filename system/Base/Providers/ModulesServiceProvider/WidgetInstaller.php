@@ -55,14 +55,14 @@ class WidgetInstaller extends BasePackage
                                 'settings'              => isset($widgetArr['settings']) ? $this->helper->encode($widgetArr['settings']) : $this->helper->encode([])
                             ];
 
-                        if ($this->basepackages->widgets->update($widgetToUpdate)) {
+                        if ($this->basepackages->widgets->update($widgetToUpdate, false)) {
                             foreach ($component['widgets'] as &$componentWidget) {
                                 if ($componentWidget['method'] === $widgetToUpdate['method']) {
                                     $componentWidget['id'] = $widgetToUpdate['id'];
                                 }
                             }
 
-                            $this->modules->components->update($component);
+                            $this->modules->components->update($component, false);
                         }
                     } else {
                         $widgetToAdd =
@@ -76,7 +76,7 @@ class WidgetInstaller extends BasePackage
                                 'settings'              => isset($widgetArr['settings']) ? $this->helper->encode($widgetArr['settings']) : $this->helper->encode([])
                             ];
 
-                        if ($this->basepackages->widgets->add($widgetToAdd)) {
+                        if ($this->basepackages->widgets->add($widgetToAdd, false)) {
                             $newWidget = $this->basepackages->widgets->packagesData->last;
 
                             foreach ($component['widgets'] as &$componentWidget) {
@@ -85,7 +85,7 @@ class WidgetInstaller extends BasePackage
                                 }
                             }
 
-                            $this->modules->components->update($component);
+                            $this->modules->components->update($component, false);
                         }
                     }
                 }
