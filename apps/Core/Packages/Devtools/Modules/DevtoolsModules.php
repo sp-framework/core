@@ -262,7 +262,7 @@ class DevtoolsModules extends BasePackage
                         $this->reCalculateFilesHash($this->modules->{$data['module_type']}->packagesData->last);
                     }
 
-                    if ($data['module_type'] === 'components') {
+                    if ($data['module_type'] === 'components' && strtolower($data['app_type']) === 'core') {
                         $this->addUpdateComponentMenu($module);
                         $this->addUpdateComponentWidgets($module);
                     }
