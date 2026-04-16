@@ -30,6 +30,17 @@ class PagesWidgets extends BasePackage
         return $this;
     }
 
+    public function getPageWidgetById($id, $getWidgetDetails = true)
+    {
+        $pageWidget = $this->getById($id);
+
+        if ($pageWidget && isset($pageWidget['widget_id'])) {
+            $pageWidget['widget'] = $this->basepackages->widgets->getById($pageWidget['widget_id']);
+        }
+
+        return $pageWidget;
+    }
+
     public function addPagesWidget(array $data)
     {
         if ($this->add($data)) {

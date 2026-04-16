@@ -50,6 +50,19 @@ if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
 
 dataCollectionSection['{{componentId}}-{{sectionId}}-html_code'] = { };
 
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules'] = { };
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages'] = { };
+}
+
+dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']['{{componentId}}-{{sectionId}}-html_code'] = 'required';
+dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']['{{componentId}}-{{sectionId}}-html_code'] = 'Please enter HTML Code!';
+
 $(document).ready(function() {
     BazContentFields.init({
         'componentId'   : "{{componentId}}",

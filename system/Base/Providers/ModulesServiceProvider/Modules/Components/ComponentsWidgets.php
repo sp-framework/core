@@ -68,12 +68,12 @@ class ComponentsWidgets
 
     public function info($widget)
     {
-        return $this->view->getPartial('widgets/' . strtolower($widget['method']) . '/info');
+        return $this->view->getPartial('widgets/' . strtolower($widget['method']) . '/info', ['widget' => $widget]);
     }
 
     public function settings($widget, $pagewidget = null)
     {
-        return $this->view->getPartial('widgets/' . strtolower($widget['method']) . '/settings', ['pagewidget' => $pagewidget]);
+        return $this->view->getPartial('widgets/' . strtolower($widget['method']) . '/settings', ['widget' => $widget, 'pagewidget' => $pagewidget]);
     }
 
     public function getWidgetContent($widget, $data = [])

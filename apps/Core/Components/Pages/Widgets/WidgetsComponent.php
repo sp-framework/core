@@ -50,6 +50,14 @@ class WidgetsComponent extends BaseComponent
                 $pagewidget['settings'] = $this->basepackages->widgets->getWidget($pagewidget['widget_id'], 'settings', $pagewidget)['settings'];
 
                 $this->view->pagewidget = $pagewidget;
+
+                $viewsPath = base_path('apps/' .
+                                      ucfirst($this->component['app_type']) .
+                                      '/Views/' . $this->modules->views->getViewInfo()['name'] .
+                                      '/html/');
+                $this->modules->views->setPhalconViewPath($viewsPath);
+
+                $this->view->setViewsDir($this->modules->views->getPhalconViewPath() . 'pages/');
             }
 
             $this->view->pick('widgets/view');

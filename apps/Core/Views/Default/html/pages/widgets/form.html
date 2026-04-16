@@ -183,34 +183,46 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-form'                                : {
-            rules: {
-                '{{componentId}}-{{sectionId}}-name'                        : 'required',
-                '{{componentId}}-{{sectionId}}-widget_id'                   : 'required'
-            },
-            messages: {
-                '{{componentId}}-{{sectionId}}-name'                        : 'Please enter widget name',
-                '{{componentId}}-{{sectionId}}-widget_id'                   : 'Please select widget',
-            },
-            onSubmit: function() {
-                var dataToSubmit = { };
-                dataToSubmit['settings'] = { };
+    });
 
-                for (var dataKey in dataCollectionSection['dataToSubmit']) {
-                    if (dataKey === 'id' || dataKey === 'name' || dataKey === 'widget_id') {
-                        dataToSubmit[dataKey] = dataCollectionSection['dataToSubmit'][dataKey];
-                    } else if (dataKey === $('#security-token').attr('name')) {
-                        dataToSubmit[$('#security-token').attr('name')] = $('#security-token').attr('value');
-                    } else {
-                        dataToSubmit['settings'][dataKey] = dataCollectionSection['dataToSubmit'][dataKey];
-                    }
-                }
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules'] = { };
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']) {
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages'] = { };
+}
 
-                dataCollectionSection['dataToSubmit']['settings'] = JSON.stringify(dataToSubmit['settings']);
-                dataCollectionSection['dataToSubmit'] = dataToSubmit;
+dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules'] =
+    $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules'], {
+        '{{componentId}}-{{sectionId}}-name'                        : 'required',
+        '{{componentId}}-{{sectionId}}-widget_id'                   : 'required'
+    });
+dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages'] =
+    $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages'], {
+        '{{componentId}}-{{sectionId}}-name'                        : 'Please enter widget name',
+        '{{componentId}}-{{sectionId}}-widget_id'                   : 'Please select widget',
+    });
+dataCollectionSection['{{componentId}}-{{sectionId}}-form']['onSubmit'] =
+    function() {
+        var dataToSubmit = { };
+        dataToSubmit['settings'] = { };
 
-                return true;
+        for (var dataKey in dataCollectionSection['dataToSubmit']) {
+            if (dataKey === 'id' || dataKey === 'name' || dataKey === 'widget_id') {
+                dataToSubmit[dataKey] = dataCollectionSection['dataToSubmit'][dataKey];
+            } else if (dataKey === $('#security-token').attr('name')) {
+                dataToSubmit[$('#security-token').attr('name')] = $('#security-token').attr('value');
+            } else {
+                dataToSubmit['settings'][dataKey] = dataCollectionSection['dataToSubmit'][dataKey];
             }
         }
-    });
+
+        dataCollectionSection['dataToSubmit']['settings'] = JSON.stringify(dataToSubmit['settings']);
+        dataCollectionSection['dataToSubmit'] = dataToSubmit;
+
+        return true;
+    }
 </script>
