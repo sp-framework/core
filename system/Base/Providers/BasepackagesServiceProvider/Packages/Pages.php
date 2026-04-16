@@ -140,6 +140,8 @@ class Pages extends BasePackage
         if (isset($pageHasWidgets[0]) && count($pageHasWidgets[0]) > 0) {
             $pageWidgetsContent = [];
 
+            $widgetsCounter = [];
+
             foreach ($pageHasWidgets[0] as $pageWidgetRef) {
                 preg_match('/\d/', $pageWidgetRef, $pageWidgetId);
 
@@ -149,7 +151,24 @@ class Pages extends BasePackage
 
                 $pageWidget = null;
 
-                $pageWidget = $this->basepackages->pageswidgets->getById((int) $pageWidgetId[0]);
+                $pageWidget = $this->basepackages->pageswidgets->getPageWidgetById((int) $pageWidgetId[0]);
+
+                //Check for max widget counts!
+                if (isset($widgetsCounter[$pageWidget['widget_id']])) {
+                    if ($pageWidget['widget']['multiple'] == false && $widgetsCounter[$pageWidget['widget_id']] >= 1) {
+                        $page['html_code'] = str_replace($pageWidgetRef, 'Max multiple count of widgets reached!', $page['html_code']);
+
+                        continue;
+                    }
+
+                    if ($pageWidget['widget']['multiple'] &&
+                        $widgetsCounter[$pageWidget['widget_id']] >= (int) $pageWidget['widget']['max_multiple']
+                    ) {
+                        $page['html_code'] = str_replace($pageWidgetRef, 'Max multiple count of widgets reached!', $page['html_code']);
+
+                        continue;
+                    }
+                }
 
                 if ($pageWidget) {
                     $pageWidget['getWidgetData'] = true;
@@ -157,6 +176,12 @@ class Pages extends BasePackage
                     $pageWidgetContent = $this->basepackages->widgets->getWidget($pageWidget['widget_id'], 'content', $pageWidget);
 
                     if (isset($pageWidgetContent['content'])) {
+                        if (isset($widgetsCounter[$pageWidget['widget_id']])) {
+                            $widgetsCounter[$pageWidget['widget_id']]++;
+                        } else {
+                            $widgetsCounter[$pageWidget['widget_id']] = 1;
+                        }
+
                         $page['html_code'] = str_replace($pageWidgetRef, trim($pageWidgetContent['content']), $page['html_code']);
                     }
                     if (isset($pageWidgetContent['error'])) {
