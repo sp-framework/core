@@ -78,6 +78,30 @@
                         ]
                     )}}
                 </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'view_layout',
+                            'fieldLabel'                     : 'Select View Layout',
+                            'fieldType'                      : 'select2',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Select View layout.',
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldRequired'                  : true,
+                            'fieldDataSelect2Options'        : viewssettings['settings']['layouts'],
+                            'fieldDataSelect2OptionsKey'     : 'view',
+                            'fieldDataSelect2OptionsValue'   : 'name',
+                            'fieldDataSelect2OptionsArray'   : true,
+                            'fieldDataSelect2OptionsSelected': activeViewLayout
+                        ]
+                    )}}
+                </div>
             </div>
             <hr>
             {% if viewssettings['settings']['branding'] is defined and viewssettings['settings']['branding']|length > 0 %}
@@ -558,6 +582,9 @@ dataCollectionSection =
                     }
                 });
             }
+        },
+        '{{componentId}}-{{sectionId}}-view_layout'                             : {
+            placeholder: "SELECT VIEW LAYOUT"
         },
         '{{componentId}}-{{sectionId}}-head_title'                              : { },
         '{{componentId}}-{{sectionId}}-head_meta_keywords'                      : { },

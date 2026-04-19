@@ -128,6 +128,24 @@ class ViewsSettings extends BasePackage
             return $data['settings'];
         }
 
+        if (isset($data['view_layout'])) {
+            if (isset($view['settings']['layouts']) &&
+                is_array($view['settings']['layouts'])
+            ) {
+                foreach ($view['settings']['layouts'] as &$layout) {
+                    if (isset($layout['active']) && $layout['active'] == 'true') {
+                        unset($layout['active']);
+                    }
+
+                    if (strtolower($data['view_layout']) === $layout['view']) {
+                        $layout['active'] = true;
+                    }
+                }
+            }
+
+            unset($data['view_layout']);
+        }
+
         foreach ($view['settings']['branding'] as $brandingKey => $branding) {
             if (isset($data[$brandingKey])) {
                 if ($data[$brandingKey] !== $view['settings']['branding'][$brandingKey]['brand']) {

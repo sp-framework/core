@@ -1694,7 +1694,7 @@ abstract class BasePackage extends Controller
 
 		$this->cacheTools->resetCache($cacheName, $id, $removeId);
 
-		if ($this->opCache && $this->app && $this->app['name'] === 'Core') {
+		if ($this->opCache && $this->apps->getAppInfo() && $this->apps->getAppInfo()['name'] === 'Core') {
 			$this->opCache->removeCache(null, 'core');
 		}
 	}
