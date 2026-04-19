@@ -149,6 +149,12 @@ dataCollectionSection =
                     if (response.responseCode === 0) {
                         if (response.responseData && response.responseData.widgetsData) {
                             for (var widget in response.responseData.widgetsData) {
+                                if (response.responseData.widgetsData[widget]['widget']['error']) {
+                                    paginatedPNotify('error', {'text' : 'Error loading widgets for dashboard. Please contact administrator.'});
+
+                                    break;
+                                }
+
                                 addWidgetToGrid(response.responseData.widgetsData[widget]);
                             }
 

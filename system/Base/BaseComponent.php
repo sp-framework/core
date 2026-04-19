@@ -171,7 +171,7 @@ abstract class BaseComponent extends Controller
 
 				$route = str_replace('apps/' . $appType . '/components/', '', strtolower(str_replace('\\', '/', $namespace)));
 
-				$component = $this->modules->components->getComponentByNameForAppType($route, $appType);
+				$component = $this->modules->components->getComponentByAppTypeAndRoute($appType, $route);
 
 				if ($component) {
 					$this->widgets = (new $widgetsClass())->init($this, $component);
