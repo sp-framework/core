@@ -1,0 +1,31 @@
+<li class="nav-item">
+    {% set statusIcon = 'comment' %}
+    {% set messengerSettings = basepackages.profiles.getMessengerSettings() %}
+    {% if messengerSettings['mute'] is defined %}
+        {% if messengerSettings['mute'] == true %}
+            {% set statusIcon = 'comment-slash' %}
+        {% elseif messengerSettings['mute'] == false %}
+            {% set statusIcon = 'comment' %}
+        {% else %}
+            {% set statusIcon = 'comment' %}
+        {% endif %}
+    {% endif %}
+    {% set statusIconTextColor = 'secondary' %}
+    {% if messengerSettings['status'] is defined %}
+        {% if messengerSettings['status'] == 1 %}
+            {% set statusIconTextColor = 'success' %}
+        {% elseif messengerSettings['status'] == 2 %}
+            {% set statusIconTextColor = 'warning' %}
+        {% elseif messengerSettings['status'] == 3 %}
+            {% set statusIconTextColor = 'danger' %}
+        {% elseif messengerSettings['status'] == 4 %}
+            {% set statusIconTextColor = 'secondary' %}
+        {% endif %}
+    {% endif %}
+    <a id="messenger-button" class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+        <i id="messenger-button-icon" class="fa fa-fw fa-{{statusIcon}} text-{{statusIconTextColor}}" data-iconcolor="{{statusIconTextColor}}"></i>
+        <span id="messenger-button-counter" class="badge badge-info navbar-badge"></span>
+        <i id="messenger-otr-icon" class="fa fa-fw fa-circle text-orange" style="font-size: 6px;position: absolute;top: 8px;left: 16px;"></i>
+        <i id="messenger-offline-icon" class="fa fa-fw fa-circle text-danger" style="font-size: 6px;position: absolute;top: 8px;left: 16px;"></i>
+    </a>
+</li>

@@ -34,20 +34,5 @@
         ]
     )}}
 {% else %}
-    {{adminltetags.useTag('content',
-        [
-            'component'                     : component,
-            'componentName'                 : componentName,
-            'componentId'                   : componentId,
-            'parentComponentId'             : parent,
-            'sectionId'                     : 'content',
-            'contentType'                   : 'section',
-            'cardHeader'                    : false,
-            'cardFooter'                    : false,
-            'cardType'                      : 'primary',
-            'cardIcon'                      : 'file-code',
-            'cardAdditionalClass'           : 'rounded-0',
-            'cardBodyContent'               : page['html_code']
-        ]
-    )}}
+    {{ page['html_code'] }}
 {% endif %}

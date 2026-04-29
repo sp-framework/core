@@ -606,12 +606,12 @@ class Views extends BasePackage
         $title = $this->tag->newInstance('title');
 
         if (isset($this->viewSettings['head']['title'])) {
-            $title->set($this->viewSettings['head']['title'] . ' - ' . ucfirst($this->app['name']));
+            $title->set($this->viewSettings['head']['title']);
         } else {
             $title->set(ucfirst($this->app['name']));
         }
 
-        if (isset($this->componentName)) {
+        if (isset($this->componentName) && strtolower($this->componentName) !== 'home') {
             $title->append(' - ' . $this->componentName);
         }
 
