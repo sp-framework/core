@@ -364,16 +364,19 @@ dataCollectionSection =
             var enabledMenuItems = [];
             var swalSound = window['dataCollection'].env.sounds.swalSound;
 
-            JSON.parse('{{allMenuItems}}', function(key, value) {
-                if (key === 'link') {
-                    allMenuItems.push(value);
-                }
-            });
-            JSON.parse('{{enabledMenuItems}}', function(key, value) {
-                if (key === 'link') {
-                    enabledMenuItems.push(value);
-                }
-            });
+            function parseMenuData() {
+                JSON.parse('{{allMenuItems}}', function(key, value) {
+                    if (key === 'link') {
+                        allMenuItems.push(value);
+                    }
+                });
+
+                JSON.parse('{{enabledMenuItems}}', function(key, value) {
+                    if (key === 'link') {
+                        enabledMenuItems.push(value);
+                    }
+                });
+            }
 
             var menuIds = { };
             menuIds = JSON.parse('{{menuIds}}');
@@ -386,7 +389,7 @@ dataCollectionSection =
             function hideDisabledNodes() {
                 $(allMenuItems).each(function(index, menuItem) {
                     var searchJsTreeMenuItem = document.querySelectorAll('[data-link="' + menuItem + '"]');
-                    var searchCheckboxMenuItem = document.querySelectorAll('[data-route="' + menuItem + '"]');
+                    var searchCheckboxMenuItem = document.querySelectorAll('input[data-route="' + menuItem + '"]');
 
                     if (!enabledMenuItems.includes(menuItem)) {
                         if (searchJsTreeMenuItem.length === 1 &&
@@ -438,6 +441,7 @@ dataCollectionSection =
                 }
             }
 
+            parseMenuData();
             hideDisabledNodes();
             showNullTreeDiv();
 
