@@ -5,6 +5,9 @@ namespace Apps\Core\Components\Pages;
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToCheckExistence;
+use League\Flysystem\UnableToReadFile;
+// use League\Flysystem\UnableToDeleteFile;
+// use League\Flysystem\UnableToWriteFile;
 use System\Base\BaseComponent;
 
 class PagesComponent extends BaseComponent
@@ -88,17 +91,42 @@ class PagesComponent extends BaseComponent
                             $path = str_replace(base_path(), '', $this->view->getViewsDir());
 
                             if ($this->localContent->fileExists($path . 'pages/files/' . $page['html_file'] . '.html')) {
-                                $this->view->pick('pages/files/' . $page['html_file']);
+                                $page['html_code'] = $this->view->getPartial('pages/files/' . $page['html_file']);
+                            } else {
+                                $this->setErrorDispatcher('templateError');
 
                                 return;
                             }
-
-                            $this->setErrorDispatcher('templateError');
-
-                            return;
-                        } catch (\throwable | FilesystemException | UnableToCheckExistence $e) {
+                        } catch (\throwable | FilesystemException | UnableToCheckExistence | UnableToReadFile $e) {
                             throw $e;
                         }
+                    } else {
+                        if (strpos($page['html_code'], '<script>') || strpos($page['html_code'], '</script>')) {
+                            $page['html_code'] = 'JavaScript is not supported in pages. Page will not be processed!';
+
+                            $this->view->setViewsDir($this->modules->views->getPhalconViewPath());
+
+                            $this->view->page = $page;
+
+                            return;
+                        }
+
+                        //We write the content of the file to a temp location and then read the content again in case we need to render VOLT
+                        // if (str_contains($page['html_code'], '{%') || str_contains($page['html_code'], '{{')) {
+                        //     try {
+                        //         $path = str_replace(base_path(), '', $this->view->getViewsDir());
+
+                        //         if ($this->localContent->fileExists($path . 'pages/files/' . $page['name'] . '_temp.html')) {
+                        //             $this->localContent->delete($path . 'pages/files/' . $page['name'] . '_temp.html');
+                        //         }
+
+                        //         $this->localContent->write($path . 'pages/files/' . $page['name'] . '_temp.html', $page['html_code']);
+
+                        //         $page['html_code'] = $this->view->getPartial('pages/files/' . $page['name'] . '_temp');
+                        //     } catch (\throwable | FilesystemException | UnableToCheckExistence | UnableToReadFile | UnableToWriteFile | UnableToDeleteFile $e) {
+                        //         throw $e;
+                        //     }
+                        // }
                     }
 
                     $page = $this->pages->processWidgets($page);

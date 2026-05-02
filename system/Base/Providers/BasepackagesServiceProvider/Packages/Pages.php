@@ -135,7 +135,7 @@ class Pages extends BasePackage
 
     public function processWidgets($page)
     {
-        preg_match_all('/{{getWidgetContent.*?}}/', $page['html_code'], $pageHasWidgets);
+        preg_match_all('/{getWidgetContent.*?}/', $page['html_code'], $pageHasWidgets);
 
         if (isset($pageHasWidgets[0]) && count($pageHasWidgets[0]) > 0) {
             $pageWidgetsContent = [];
