@@ -216,11 +216,20 @@ dataCollectionSection['{{componentId}}-{{sectionId}}-form']['onSubmit'] =
             } else if (dataKey === $('#security-token').attr('name')) {
                 dataToSubmit[$('#security-token').attr('name')] = $('#security-token').attr('value');
             } else {
+                if (dataCollectionSection['dataToSubmit'][dataKey].startsWith("{")) {
+                    try {
+                        dataCollectionSection['dataToSubmit'][dataKey] = JSON.parse(dataCollectionSection['dataToSubmit'][dataKey]);
+                    } catch (e) {
+                        paginatedPNotify('error', {text : "Error while processing JSON content of " + $('#{{componentId}}-{{sectionId}}-' + dataKey).siblings('label').text()});
+
+                        return false;
+                    }
+                }
+
                 dataToSubmit['settings'][dataKey] = dataCollectionSection['dataToSubmit'][dataKey];
             }
         }
 
-        dataCollectionSection['dataToSubmit']['settings'] = JSON.stringify(dataToSubmit['settings']);
         dataCollectionSection['dataToSubmit'] = dataToSubmit;
 
         return true;
