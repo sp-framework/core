@@ -13,7 +13,11 @@ class WorkersTask extends Task
 
     public function runAction()
     {
-        $this->basepackages->workers->run();
+        try {
+            $this->basepackages->workers->run();
+        } catch (\Exception $e) {
+            var_dump($e);die();
+        }
     }
 
     public function execAction($taskId, $jobId)

@@ -19,12 +19,12 @@ class EmailServices extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('emailServices', 'core')) {
-                $this->emailServices = $this->opCache->getCache('emailServices', 'core');
+            if (!$resetCache && $this->opCache->checkCache('emailServices', 'core', $this->domains->getDomain()['name'])) {
+                $this->emailServices = $this->opCache->getCache('emailServices', 'core', $this->domains->getDomain()['name']);
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('emailServices', $this->emailServices, 'core');
+                $this->opCache->setCache('emailServices', $this->emailServices, 'core', $this->domains->getDomain()['name']);
             }
         } else {
             $this->getAll($resetCache);

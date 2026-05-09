@@ -16,12 +16,12 @@ class GeoRegions extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('geoRegions', 'core')) {
-                $this->geoRegions = $this->opCache->getCache('geoRegions', 'core');
+            if (!$resetCache && $this->opCache->checkCache('geoRegions', 'core', $this->domains->getDomain()['name'])) {
+                $this->geoRegions = $this->opCache->getCache('geoRegions', 'core', $this->domains->getDomain()['name']);
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('geoRegions', $this->geoRegions, 'core');
+                $this->opCache->setCache('geoRegions', $this->geoRegions, 'core', $this->domains->getDomain()['name']);
             }
         } else {
             $this->getAll($resetCache);

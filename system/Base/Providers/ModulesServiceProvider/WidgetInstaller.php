@@ -95,7 +95,7 @@ class WidgetInstaller extends BasePackage
         }
 
         if ($this->opCache) {
-            $this->opCache->removeCache('widgets', 'core');
+            $this->opCache->removeCache('widgets', 'core', $this->domains->getDomain()['name']);
         }
 
         return true;
@@ -124,7 +124,7 @@ class WidgetInstaller extends BasePackage
         }
 
         if ($this->opCache) {
-            $this->opCache->removeCache('widgets', 'core');
+            $this->opCache->removeCache('widgets', 'core', $this->domains->getDomain()['name']);
         }
 
         return true;

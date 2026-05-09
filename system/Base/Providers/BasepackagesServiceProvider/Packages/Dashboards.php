@@ -19,12 +19,12 @@ class Dashboards extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('dashboards', 'core')) {
-                $this->dashboards = $this->opCache->getCache('dashboards', 'core');
+            if (!$resetCache && $this->opCache->checkCache('dashboards', 'core', $this->domains->getDomain()['name'])) {
+                $this->dashboards = $this->opCache->getCache('dashboards', 'core', $this->domains->getDomain()['name']);
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('dashboards', $this->dashboards, 'core');
+                $this->opCache->setCache('dashboards', $this->dashboards, 'core', $this->domains->getDomain()['name']);
             }
         } else {
             $this->getAll($resetCache);
@@ -62,7 +62,7 @@ class Dashboards extends BasePackage
             $this->dashboards[$id] = $dashboard;
 
             if ($this->opCache) {
-                $this->opCache->setCache('dashboards', $this->dashboards, 'core');
+                $this->opCache->setCache('dashboards', $this->dashboards, 'core', $this->domains->getDomain()['name']);
             }
 
             return $dashboard;
@@ -111,7 +111,7 @@ class Dashboards extends BasePackage
 
         if ($this->add($data)) {
             if ($this->opCache) {
-                $this->opCache->removeCache('dashboards', 'core');
+                $this->opCache->removeCache('dashboards', 'core', $this->domains->getDomain()['name']);
             }
 
             $this->addResponse('Dashboard Added');
@@ -169,7 +169,7 @@ class Dashboards extends BasePackage
 
         if ($this->update($data)) {
             if ($this->opCache) {
-                $this->opCache->removeCache('dashboards', 'core');
+                $this->opCache->removeCache('dashboards', 'core', $this->domains->getDomain()['name']);
             }
 
             $this->addResponse('Dashboard Updated');
@@ -236,7 +236,7 @@ class Dashboards extends BasePackage
 
         if ($this->remove($data['id'])) {
             if ($this->opCache) {
-                $this->opCache->removeCache('dashboards', 'core');
+                $this->opCache->removeCache('dashboards', 'core', $this->domains->getDomain()['name']);
             }
 
             $this->addResponse('Dashboard Removed');
@@ -333,8 +333,8 @@ class Dashboards extends BasePackage
             $this->addResponse('Widget added to dashboard.', 0, $newWidget);
 
             if ($this->opCache) {
-                $this->opCache->removeCache('dashboards', 'core');
-                $this->opCache->removeCache('widgets', 'core');
+                $this->opCache->removeCache('dashboards', 'core', $this->domains->getDomain()['name']);
+                $this->opCache->removeCache('widgets', 'core', $this->domains->getDomain()['name']);
             }
         } catch (\Exception $e) {
             $this->addResponse('Could not add widget to dashboard.', 1);
@@ -396,8 +396,8 @@ class Dashboards extends BasePackage
             }
 
             if ($this->opCache) {
-                $this->opCache->removeCache('dashboards', 'core');
-                $this->opCache->removeCache('widgets', 'core');
+                $this->opCache->removeCache('dashboards', 'core', $this->domains->getDomain()['name']);
+                $this->opCache->removeCache('widgets', 'core', $this->domains->getDomain()['name']);
             }
         } catch (\Exception $e) {
             $this->addResponse('Error updating dashboard widgets.', 1);
@@ -441,8 +441,8 @@ class Dashboards extends BasePackage
             }
 
             if ($this->opCache) {
-                $this->opCache->removeCache('dashboards', 'core');
-                $this->opCache->removeCache('widgets', 'core');
+                $this->opCache->removeCache('dashboards', 'core', $this->domains->getDomain()['name']);
+                $this->opCache->removeCache('widgets', 'core', $this->domains->getDomain()['name']);
             }
         } else {
             $this->addResponse('Error removing widget from dashboard.', 1);

@@ -20,12 +20,12 @@ class Tasks extends BasePackage
         $this->setFFRelations(true);
 
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('tasks', 'core')) {
-                $this->tasks = $this->opCache->getCache('tasks', 'core');
+            if (!$resetCache && $this->opCache->checkCache('tasks', 'core', $this->domains->getDomain()['name'])) {
+                $this->tasks = $this->opCache->getCache('tasks', 'core', $this->domains->getDomain()['name']);
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('tasks', $this->tasks, 'core');
+                $this->opCache->setCache('tasks', $this->tasks, 'core', $this->domains->getDomain()['name']);
             }
         } else {
             $this->getAll($resetCache);

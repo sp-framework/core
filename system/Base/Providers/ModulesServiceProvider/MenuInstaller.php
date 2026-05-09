@@ -53,8 +53,8 @@ class MenuInstaller extends BasePackage
         }
 
         if ($this->opCache) {
-            $this->opCache->removeCache('menus', 'core');
-            $this->opCache->removeCache('components', 'core');
+            $this->opCache->removeCache('menus', 'core', $this->domains->getDomain()['name']);
+            $this->opCache->removeCache('components', 'core', $this->domains->getDomain()['name']);
         }
 
         return true;
@@ -70,7 +70,7 @@ class MenuInstaller extends BasePackage
 
         if ($component) {
             if ($this->opCache) {
-                $this->opCache->removeCache('menus', 'core');
+                $this->opCache->removeCache('menus', 'core', $this->domains->getDomain()['name']);
             }
 
             return $this->basepackages->menus->remove($component['menu_id']);

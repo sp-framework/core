@@ -16,12 +16,12 @@ class Pages extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('pages', 'core')) {
-                $this->pages = $this->opCache->getCache('pages', 'core');
+            if (!$resetCache && $this->opCache->checkCache('pages', 'core', $this->domains->getDomain()['name'])) {
+                $this->pages = $this->opCache->getCache('pages', 'core', $this->domains->getDomain()['name']);
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('pages', $this->pages, 'core');
+                $this->opCache->setCache('pages', $this->pages, 'core', $this->domains->getDomain()['name']);
             }
         } else {
             $this->getAll($resetCache);

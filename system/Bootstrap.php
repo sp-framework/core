@@ -17,6 +17,8 @@ use System\Base\Providers\SessionServiceProvider;
 
 final class Bootstrap
 {
+    protected $argvs;
+
     protected $providers;
 
     public $error;
@@ -29,13 +31,15 @@ final class Bootstrap
 
     public $response;
 
-    public function __construct()
+    public function __construct($argv = null)
     {
         include(__DIR__ . '/../system/Base/Loader/Service.php');
 
-        Service::Instance(__DIR__ . '/../')->load();
+        Service::Instance(__DIR__ . '/../')->load($argv);
 
         $this->providers = include(base_path('system/Base/Providers.php'));
+
+        $this->argvs = $argv;
     }
 
     public function mvc()
@@ -69,7 +73,11 @@ final class Bootstrap
         }
 
         foreach ($providers as $provider) {
-            $container->register(new $provider());
+            if (str_contains($provider, 'ConfigServiceProvider')) {
+                $container->register(new $provider($this->argvs));
+            } else {
+                $container->register(new $provider());
+            }
         }
 
         $this->config = $container->getShared('config');
@@ -130,7 +138,7 @@ final class Bootstrap
         }
     }
 
-    public function cli($argv)
+    public function cli()
     {
         if (PHP_SAPI !== 'cli') {
             echo "Cannot use anything other than cli on cli.php";
@@ -140,7 +148,11 @@ final class Bootstrap
         $container  = new Cli();
 
         foreach ($this->providers['cli'] as $provider) {
-            $container->register(new $provider());
+            if (str_contains($provider, 'ConfigServiceProvider')) {
+                $container->register(new $provider($this->argvs));
+            } else {
+                $container->register(new $provider());
+            }
         }
 
         $this->logger = $container->getShared('logger');
@@ -148,7 +160,7 @@ final class Bootstrap
         $dispatcher->setDefaultNamespace('System\Cli\Tasks');
 
         $arguments = [];
-        foreach ($argv as $k => $arg) {
+        foreach ($this->argvs as $k => $arg) {
             if ($k === 1) {
                 $arguments['task'] = $arg;
             } elseif ($k === 2) {

@@ -16,12 +16,12 @@ class Menus extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('menus', 'core')) {
-                $this->menus = $this->opCache->getCache('menus', 'core');
+            if (!$resetCache && $this->opCache->checkCache('menus', 'core', $this->domains->getDomain()['name'])) {
+                $this->menus = $this->opCache->getCache('menus', 'core', $this->domains->getDomain()['name']);
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('menus', $this->menus, 'core');
+                $this->opCache->setCache('menus', $this->menus, 'core', $this->domains->getDomain()['name']);
             }
         } else {
             $this->getAll($resetCache);

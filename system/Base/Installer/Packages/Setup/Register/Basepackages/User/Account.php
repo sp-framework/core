@@ -28,7 +28,7 @@ class Account
 
         $this->registerAccountSecurity($db, $ff, $password, $helper);
 
-        $this->registerAccountEnv($db, $ff);
+        $this->registerAccountEnv($db, $ff, $helper);
     }
 
     protected function registerAccountSecurity($db, $ff, $password, $helper)

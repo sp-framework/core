@@ -16,12 +16,12 @@ class Scopes extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('scopes', 'core')) {
-                $this->scopes = $this->opCache->getCache('scopes', 'core');
+            if (!$resetCache && $this->opCache->checkCache('scopes', 'core', $this->domains->getDomain()['name'])) {
+                $this->scopes = $this->opCache->getCache('scopes', 'core', $this->domains->getDomain()['name']);
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('scopes', $this->scopes, 'core');
+                $this->opCache->setCache('scopes', $this->scopes, 'core', $this->domains->getDomain()['name']);
             }
         } else {
             $this->getAll($resetCache);

@@ -275,7 +275,7 @@ class Acl extends BaseMiddleware
             !is_dir(
                 base_path(
                     'var/storage/cache/' .
-                    $this->app['app_type'] . '/' .
+                    $this->domains->getDomain()['name'] . '/' .
                     $this->app['route'] . '/acls/'
                 )
             )
@@ -284,7 +284,7 @@ class Acl extends BaseMiddleware
                 !mkdir(
                     base_path(
                         'var/storage/cache/' .
-                        $this->app['app_type'] . '/' .
+                        $this->domains->getDomain()['name'] . '/' .
                         $this->app['route'] . '/acls/'
                     ), 0777, true
                 )

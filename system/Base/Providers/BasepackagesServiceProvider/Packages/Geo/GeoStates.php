@@ -18,12 +18,12 @@ class GeoStates extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('geoStates', 'core')) {
-                $this->geoStates = $this->opCache->getCache('geoStates', 'core');
+            if (!$resetCache && $this->opCache->checkCache('geoStates', 'core', $this->domains->getDomain()['name'])) {
+                $this->geoStates = $this->opCache->getCache('geoStates', 'core', $this->domains->getDomain()['name']);
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('geoStates', $this->geoStates, 'core');
+                $this->opCache->setCache('geoStates', $this->geoStates, 'core', $this->domains->getDomain()['name']);
             }
         } else {
             $this->getAll($resetCache);

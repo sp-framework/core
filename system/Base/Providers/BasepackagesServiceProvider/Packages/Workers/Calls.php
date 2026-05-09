@@ -22,12 +22,12 @@ class Calls extends BasePackage
         $this->setFFRelations(true);
 
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('calls', 'core')) {
-                $this->calls = $this->opCache->getCache('calls', 'core');
+            if (!$resetCache && $this->opCache->checkCache('calls', 'core', $this->domains->getDomain()['name'])) {
+                $this->calls = $this->opCache->getCache('calls', 'core', $this->domains->getDomain()['name']);
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('calls', $this->calls, 'core');
+                $this->opCache->setCache('calls', $this->calls, 'core', $this->domains->getDomain()['name']);
             }
         } else {
             $this->getAll($resetCache);

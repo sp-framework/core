@@ -16,12 +16,12 @@ class PagesWidgets extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('pageswidgets', 'core')) {
-                $this->pageswidgets = $this->opCache->getCache('pageswidgets', 'core');
+            if (!$resetCache && $this->opCache->checkCache('pageswidgets', 'core', $this->domains->getDomain()['name'])) {
+                $this->pageswidgets = $this->opCache->getCache('pageswidgets', 'core', $this->domains->getDomain()['name']);
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('pageswidgets', $this->pageswidgets, 'core');
+                $this->opCache->setCache('pageswidgets', $this->pageswidgets, 'core', $this->domains->getDomain()['name']);
             }
         } else {
             $this->getAll($resetCache);

@@ -13,7 +13,9 @@ class AnnotationsServiceProvider implements ServiceProviderInterface
         $container->setShared(
             'annotations',
             function () {
-                return (new Annotations())->init();
+                $request = $container->getShared('request');
+
+                return (new Annotations($request))->init();
             }
         );
     }

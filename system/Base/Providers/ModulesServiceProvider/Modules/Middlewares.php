@@ -14,12 +14,12 @@ class Middlewares extends BasePackage
 	public function init(bool $resetCache = false)
 	{
 		if ($this->opCache) {
-			if (!$resetCache && $this->opCache->checkCache('middlewares', 'core')) {
-				$this->middlewares = $this->opCache->getCache('middlewares', 'core');
+			if (!$resetCache && $this->opCache->checkCache('middlewares', 'core', $this->domains->getDomain()['name'])) {
+				$this->middlewares = $this->opCache->getCache('middlewares', 'core', $this->domains->getDomain()['name']);
 			} else {
 				$this->getAll($resetCache);
 
-				$this->opCache->setCache('middlewares', $this->middlewares, 'core');
+				$this->opCache->setCache('middlewares', $this->middlewares, 'core', $this->domains->getDomain()['name']);
 			}
 		} else {
 			$this->getAll($resetCache);

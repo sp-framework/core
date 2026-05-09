@@ -29,12 +29,28 @@ class Service
 		return self::$instance;
 	}
 
-	public function load()
+	public function load($argv = null)
 	{
+		//Get Domain Specific Config
 		try {
-			$config = include(__DIR__ . '/../../../system/Configs/Base.php');
+			if (PHP_SAPI === 'cli') {
+				if (isset($argv[3]) && $argv[3] !== '') {
+					$domain = explode('=', $argv[3]);
+
+					if (isset($domain[0]) && $domain[0] === 'domain' && isset($domain[1])) {
+						$config = include(__DIR__ . '/../../../system/Configs/' . ucfirst($domain[1]) . '.php');
+					}
+				}
+			} else {
+				$config = include(__DIR__ . '/../../../system/Configs/' . ucfirst($_SERVER['HTTP_HOST']) . '.php');
+			}
 		} catch (\ErrorException $e) {
-			throw new \Exception("Base.php file in configs directory missing");
+			//Try Base Config
+			try {
+				$config = include(__DIR__ . '/../../../system/Configs/Base.php');
+			} catch (\ErrorException $e) {
+				throw new \Exception("Base.php file is missing in Configs directory");
+			}
 		}
 
 		if (isset($config['debug'])) {

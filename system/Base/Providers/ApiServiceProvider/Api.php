@@ -96,12 +96,12 @@ class Api extends BasePackage
 
         if ($this->container) {
             if ($this->opCache) {
-                if (!$resetCache && $this->opCache->checkCache('apiServices', 'core')) {
-                    $this->apiServices = $this->opCache->getCache('apiServices', 'core');
+                if (!$resetCache && $this->opCache->checkCache('apiServices', 'core', $this->domains->getDomain()['name'])) {
+                    $this->apiServices = $this->opCache->getCache('apiServices', 'core', $this->domains->getDomain()['name']);
                 } else {
                     $this->getAll($resetCache);
 
-                    $this->opCache->setCache('apiServices', $this->apiServices, 'core');
+                    $this->opCache->setCache('apiServices', $this->apiServices, 'core', $this->domains->getDomain()['name']);
                 }
             } else {
                 $this->getAll($resetCache);

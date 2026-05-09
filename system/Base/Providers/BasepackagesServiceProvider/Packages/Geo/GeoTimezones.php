@@ -16,12 +16,12 @@ class GeoTimezones extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('geoTimezones', 'core')) {
-                $this->geoTimezones = $this->opCache->getCache('geoTimezones', 'core');
+            if (!$resetCache && $this->opCache->checkCache('geoTimezones', 'core', $this->domains->getDomain()['name'])) {
+                $this->geoTimezones = $this->opCache->getCache('geoTimezones', 'core', $this->domains->getDomain()['name']);
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('geoTimezones', $this->geoTimezones, 'core');
+                $this->opCache->setCache('geoTimezones', $this->geoTimezones, 'core', $this->domains->getDomain()['name']);
             }
         } else {
             $this->getAll($resetCache);

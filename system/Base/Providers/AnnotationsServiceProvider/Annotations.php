@@ -6,10 +6,13 @@ use Phalcon\Annotations\Adapter\Stream;
 
 class Annotations
 {
+    protected $request;
+
     protected $annotations;
 
-    public function __construct()
+    public function __construct($request)
     {
+        $this->request = $request;
     }
 
     public function init()
