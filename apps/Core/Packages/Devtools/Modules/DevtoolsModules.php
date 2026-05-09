@@ -1840,7 +1840,7 @@ $file .= '
 
     protected function generateNewMiddlewaresFiles($moduleFilesLocation, $data)
     {
-        //Package File
+        //Middleware File
         try {
             $file = $this->localContent->read('apps/Core/Packages/Devtools/Modules/Files/Middleware.txt');
         } catch (FilesystemException | UnableToReadFile $exception) {
@@ -2147,6 +2147,10 @@ $file .= '
 
     protected function addUpdateComponentMenu($data)
     {
+        if (strtolower($data['app_type']) !== 'core') {
+            return true;
+        }
+
         if ($data['menu_id'] != '' && $data['menu_id'] != '0') {
             if (!isset($data['is_clone']) ||
                 (isset($data['is_clone']) && $data['is_clone'] == false)
@@ -2199,6 +2203,10 @@ $file .= '
 
     protected function addUpdateComponentWidgets($data)
     {
+        if (strtolower($data['app_type']) !== 'core') {
+            return true;
+        }
+
         if (isset($data['widgets'])) {
             if (!is_array($data['widgets']) && $data['widgets'] !== '') {
                 $data['widgets'] = $this->helper->decode($data['widgets'], true);
