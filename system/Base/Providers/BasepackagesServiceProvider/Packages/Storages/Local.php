@@ -170,7 +170,7 @@ class Local extends BasePackage
             file_put_contents($tempFile, $file);
 
             $this->file = new UploadedFile(
-                $tempFile,
+                fopen($tempFile, "r"),
                 $size,
                 UPLOAD_ERR_OK,
                 $fileName
@@ -189,7 +189,6 @@ class Local extends BasePackage
             }
 
             $storageData = $this->packagesData->last;
-
         } else if ($this->request->getUploadedFiles()) {
             foreach ($this->request->getUploadedFiles() as $key => $file) {
                 $this->file = $file;
@@ -211,6 +210,10 @@ class Local extends BasePackage
 
                 $storageData = $this->packagesData->last;
             }
+        } else {
+            $this->addResponse('No File(s) to uploaded', 1, []);
+
+            return false;
         }
 
         if (isset($this->request->getPost()['setOrphan']) &&
@@ -475,7 +478,17 @@ class Local extends BasePackage
             return false;
         }
 
-        $image = new Imagick(base_path($imageFile));
+        try {
+            $image = new Imagick(base_path($imageFile));
+        } catch (\throwable $e) {
+            if ($this->config->logs->exceptions) {
+                $this->logger->logExceptions->critical(json_trace($e));
+            }
+
+            $this->response->setStatusCode(500, 'Error loading image! Check exception logs.');
+
+            return false;
+        }
 
         // If max width of image is less than requested size, make width to image size.
         if ($image->getWidth() < $width) {
