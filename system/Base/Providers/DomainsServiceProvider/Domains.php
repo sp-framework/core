@@ -24,12 +24,12 @@ class Domains extends BasePackage
 	public function init(bool $resetCache = false)
 	{
 		if ($this->opCache) {
-			if (!$resetCache && $this->opCache->checkCache('domains', 'core', $this->getDomain()['name'])) {
-				$this->domains = $this->opCache->getCache('domains', 'core', $this->getDomain()['name']);
+			if (!$resetCache && $this->opCache->checkCache('domains', 'core')) {
+				$this->domains = $this->opCache->getCache('domains', 'core');
 			} else {
 				$this->getAll($resetCache);
 
-				$this->opCache->setCache('domains', $this->domains, 'core', $this->getDomain()['name']);
+				$this->opCache->setCache('domains', $this->domains, 'core');
 			}
 		} else {
 			$this->getAll($resetCache);
@@ -256,7 +256,7 @@ class Domains extends BasePackage
 	public function getDomainByName($name)
 	{
 		if (!$this->domains) {
-			$this->init(true);
+			$this->init();
 		}
 
 		foreach($this->domains as $domain) {
@@ -271,7 +271,7 @@ class Domains extends BasePackage
 	public function getDomainById($id)
 	{
 		if (!$this->domains) {
-			$this->init(true);
+			$this->init();
 		}
 
 		foreach($this->domains as $domain) {

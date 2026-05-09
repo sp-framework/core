@@ -1332,7 +1332,7 @@ class Installer extends BasePackage
             }
 
             try {
-                (new CoreInstall)->init()->install();//We are only installing/updating DB here, we need to add code for menu, widgets, views installation/update/remove
+                (new CoreInstall)->init()->install();
             } catch (\throwable $e) {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['result'] = 'fail';
 

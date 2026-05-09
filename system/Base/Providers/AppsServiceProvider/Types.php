@@ -16,12 +16,12 @@ class Types extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('types', 'core', $this->domains->getDomain()['name'])) {
-                $this->types = $this->opCache->getCache('types', 'core', $this->domains->getDomain()['name']);
+            if (!$resetCache && $this->opCache->checkCache('types', 'core')) {
+                $this->types = $this->opCache->getCache('types', 'core');
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('types', $this->types, 'core', $this->domains->getDomain()['name']);
+                $this->opCache->setCache('types', $this->types, 'core');
             }
         } else {
             $this->getAll($resetCache);

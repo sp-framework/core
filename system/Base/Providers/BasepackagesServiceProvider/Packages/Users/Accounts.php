@@ -25,8 +25,8 @@ class Accounts extends BasePackage
 
     public function getAccountById(int $id)
     {
-        if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core', $this->domains->getDomain()['name'])) {
-            return $this->opCache->getCache('account_' . $id, 'core', $this->domains->getDomain()['name']);
+        if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
+            return $this->opCache->getCache('account_' . $id, 'core');
         }
 
         $this->ffStore = $this->ff->store($this->ffStoreToUse);
@@ -118,7 +118,7 @@ class Accounts extends BasePackage
             }
 
             if ($this->opCache) {
-                $this->opCache->setCache('account_' . $id, $account, 'core', $this->domains->getDomain()['name']);
+                $this->opCache->setCache('account_' . $id, $account, 'core');
             }
 
             return $account;
@@ -145,7 +145,7 @@ class Accounts extends BasePackage
                 $this->ffData = $this->jsonData($this->ffData, true);
 
                 if ($this->opCache) {
-                    $this->opCache->setCache('account_' . $id, $this->ffData, 'core', $this->domains->getDomain()['name']);
+                    $this->opCache->setCache('account_' . $id, $this->ffData, 'core');
                 }
 
                 return $this->ffData;
@@ -362,8 +362,8 @@ class Accounts extends BasePackage
                 $this->removeRelatedData($accountObj, $account, false, false);
             }
 
-            if ($this->opCache && $this->opCache->checkCache('account_' . $data['id'], 'core', $this->domains->getDomain()['name'])) {
-                $this->opCache->removeCache('account_' . $data['id'], 'core', $this->domains->getDomain()['name']);
+            if ($this->opCache && $this->opCache->checkCache('account_' . $data['id'], 'core')) {
+                $this->opCache->removeCache('account_' . $data['id'], 'core');
             }
         } else {
             $this->addResponse('Error updating account.', 1);
@@ -393,8 +393,8 @@ class Accounts extends BasePackage
                 if ($this->remove($data['id'], true, true, ['role'])) {
                     $this->addResponse('Removed account for ID: ' . $account['email']);
 
-                    if ($this->opCache && $this->opCache->checkCache('account_' . $data['id'], 'core', $this->domains->getDomain()['name'])) {
-                        $this->opCache->removeCache('account_' . $data['id'], 'core', $this->domains->getDomain()['name']);
+                    if ($this->opCache && $this->opCache->checkCache('account_' . $data['id'], 'core')) {
+                        $this->opCache->removeCache('account_' . $data['id'], 'core');
                     }
 
                     $this->removeRelatedData($accountObj, $account);
@@ -417,8 +417,8 @@ class Accounts extends BasePackage
                 if ($this->remove($data['id'], true, true, ['role'])) {
                     $this->addResponse('Removed account for ID: ' . $account['email']);
 
-                    if ($this->opCache && $this->opCache->checkCache('account_' . $data['id'], 'core', $this->domains->getDomain()['name'])) {
-                        $this->opCache->removeCache('account_' . $data['id'], 'core', $this->domains->getDomain()['name']);
+                    if ($this->opCache && $this->opCache->checkCache('account_' . $data['id'], 'core')) {
+                        $this->opCache->removeCache('account_' . $data['id'], 'core');
                     }
 
                     $this->removeRelatedData($accountObj, $account);
@@ -808,8 +808,8 @@ class Accounts extends BasePackage
                 }
             }
 
-            if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core', $this->domains->getDomain()['name'])) {
-                $this->opCache->removeCache('account_' . $id, 'core', $this->domains->getDomain()['name']);
+            if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
+                $this->opCache->removeCache('account_' . $id, 'core');
             }
 
             if ($getAppParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
@@ -846,8 +846,8 @@ class Accounts extends BasePackage
                 $envStore->insert($accountEnv);
             }
 
-            if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core', $this->domains->getDomain()['name'])) {
-                $this->opCache->removeCache('account_' . $id, 'core', $this->domains->getDomain()['name']);
+            if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
+                $this->opCache->removeCache('account_' . $id, 'core');
             }
 
             if ($getAppParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {

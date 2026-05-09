@@ -21,9 +21,9 @@ class OpCache
         return $this;
     }
 
-    public function getCache($key, $directory = null, $domain = null)
+    public function getCache($key, $directory = null)
     {
-        $this->setDirectory($directory, $domain);
+        $this->setDirectory($directory);
 
         try {
             include base_path($this->storagePath . $this->directory . '/' . $key . '.php');
@@ -34,9 +34,9 @@ class OpCache
         return ${"value_".$key} ?? false;
     }
 
-    public function setCache($key, $value, $directory = null, $domain = null)
+    public function setCache($key, $value, $directory = null)
     {
-        $this->setDirectory($directory, $domain);
+        $this->setDirectory($directory);
 
         $value = var_export($value, true);
 
@@ -47,9 +47,9 @@ class OpCache
         return $this->getCache($key, $directory);
     }
 
-    public function removeCache($key = null, $directory = null, $domain = null)
+    public function removeCache($key = null, $directory = null)
     {
-        $this->setDirectory($directory, $domain);
+        $this->setDirectory($directory);
 
         if ($key) {
             if ($this->checkCache($key, $directory)) {
@@ -89,9 +89,9 @@ class OpCache
         }
     }
 
-    public function resetCache($key = null, $value = null, $directory = null, $domain = null)
+    public function resetCache($key = null, $value = null, $directory = null)
     {
-        $this->setDirectory($directory, $domain);
+        $this->setDirectory($directory);
 
         if ($key && $value) {
             if ($this->removeCache($key)) {
@@ -102,27 +102,7 @@ class OpCache
         }
     }
 
-    public function checkCache($key, $directory = null, $domain = null)
-    {
-        $this->setDirectory($directory, $domain);
-
-        return file_exists(base_path($this->storagePath . $this->directory . '/' . $key . '.php'));
-    }
-
-    protected function setDirectory($directory = null, $domain = null)
-    {
-        if ($directory) {
-            if ($domain) {
-                $this->directory = $directory . '/' . $domain . '/';
-            } else {
-                $this->directory = $directory;
-            }
-        }
-
-        $this->checkCachePath($this->directory);
-    }
-
-    protected function checkCachePath($directory = null, $domain = null)
+    protected function checkCachePath($directory = null)
     {
         if ($directory) {
             $path = $this->storagePath . $directory;
@@ -137,5 +117,21 @@ class OpCache
         }
 
         return true;
+    }
+
+    public function setDirectory($directory = null)
+    {
+        if ($directory) {
+            $this->directory = $directory;
+        }
+
+        $this->checkCachePath($this->directory);
+    }
+
+    public function checkCache($key, $directory = null)
+    {
+        $this->setDirectory($directory);
+
+        return file_exists(base_path($this->storagePath . $this->directory . '/' . $key . '.php'));
     }
 }

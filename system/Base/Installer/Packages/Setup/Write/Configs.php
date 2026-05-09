@@ -3,11 +3,10 @@
 namespace System\Base\Installer\Packages\Setup\Write;
 
 use League\Flysystem\FilesystemException;
-use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToWriteFile;
 
-class Config
+class Configs
 {
 	protected $container;
 
@@ -17,23 +16,19 @@ class Config
 
 	protected $baseFileContent;
 
-	protected $domain;
-
-	public function __construct($container, $postData, $coreJson = null, $domain = null)
+	public function __construct($container, $postData, $coreJson = null)
 	{
 		$this->container = $container;
 
 		$this->postData = $postData;
 
 		$this->coreJson = $coreJson;
-
-		$this->domain = $domain;
 	}
 
-	public function write($writeConfigFile = false)
+	public function write($writeBaseFile = false)
 	{
-		if ($writeConfigFile) {
-			$this->writeConfigFile();
+		if ($writeBaseFile) {
+			$this->writeBaseFile();
 
 			return $this->coreJson;
 		}
@@ -94,7 +89,7 @@ return
 			"cookies"						=> 86400
 		]
 	];';
-			$this->writeConfigFile();
+			$this->writeBaseFile();
 
 			return;
 		}
@@ -201,13 +196,13 @@ if ($this->coreJson['settings']['databasetype'] === 'hybrid') {
 		],
 		"ff" 				=>
 		[
-			"databaseDir" 					=> "' . $this->postData['ffDatabaseDir'] . '"
+			"databaseDir" 					=> "' . $this->coreJson['settings']['ffs']['sp']['databaseDir'] . '"
 		],';
 } else if ($this->coreJson['settings']['databasetype'] === 'ff') {
 		$this->baseFileContent .= '
 		"ff" 				=>
 		[
-			"databaseDir" 					=> "' . $this->postData['ffDatabaseDir'] . '"
+			"databaseDir" 					=> "' . $this->coreJson['settings']['ffs']['sp']['databaseDir'] . '"
 		],';
 } else if ($this->coreJson['settings']['databasetype'] === 'db') {
 		$this->baseFileContent .= '
@@ -260,18 +255,14 @@ if ($this->coreJson['settings']['databasetype'] === 'hybrid') {
 		return $this->coreJson;
 	}
 
-	protected function writeConfigFile()
+	protected function writeBaseFile()
 	{
 		if (!$this->baseFileContent) {
 			$this->writeBaseConfig();
 		}
 
 		try {
-			if ($this->domain) {
-				$this->container['localContent']->write('/system/Configs/' . $this->domain . '.php', $this->baseFileContent);
-			} else {
-				$this->container['localContent']->write('/system/Configs/Base.php', $this->baseFileContent);
-			}
+			$this->container['localContent']->write('/system/Configs/Base.php', $this->baseFileContent);
 		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}
@@ -306,16 +297,8 @@ if ($this->coreJson['settings']['databasetype'] === 'hybrid') {
 		$keys[$this->postData['dbname']] = $this->container['random']->base58(4);
 
 		try {
-			$dbKeys = [];
-
-			if ($this->container['localContent']->fileExists('system/.dbkeys')) {
-				$dbKeys = $this->container['helper']->decode($this->container['localContent']->read('system/.dbkeys'), true);
-			}
-
-			$dbKeys = array_merge($dbKeys, $keys);
-
-			$this->container['localContent']->write('system/.dbkeys', $this->container['helper']->encode($dbKeys), ['visibility' => 'private']);
-		} catch (\ErrorException | FilesystemException | UnableToCheckExistence | UnableToReadFile | UnableToWriteFile $exception) {
+			$this->container['localContent']->write('system/.dbkeys', $this->container['helper']->encode($keys), ['visibility' => 'private']);
+		} catch (\ErrorException | FilesystemException | UnableToWriteFile $exception) {
 			throw $exception;
 		}
 

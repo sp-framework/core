@@ -265,6 +265,8 @@ class Workers extends BasePackage
 
             $call->addJobResult((object) $data, $args);
         }
+
+        return;
     }
 
     protected function work($call, $args, $schedule)

@@ -16,12 +16,12 @@ class Roles extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('roles', 'core', $this->domains->getDomain()['name'])) {
-                $this->roles = $this->opCache->getCache('roles', 'core', $this->domains->getDomain()['name']);
+            if (!$resetCache && $this->opCache->checkCache('roles', 'core')) {
+                $this->roles = $this->opCache->getCache('roles', 'core');
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('roles', $this->roles, 'core', $this->domains->getDomain()['name']);
+                $this->opCache->setCache('roles', $this->roles, 'core');
             }
         } else {
             $this->getAll($resetCache);

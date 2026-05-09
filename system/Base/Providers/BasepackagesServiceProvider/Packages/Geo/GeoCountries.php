@@ -18,12 +18,12 @@ class GeoCountries extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('geoCountries', 'core', $this->domains->getDomain()['name'])) {
-                $this->geoCountries = $this->opCache->getCache('geoCountries', 'core', $this->domains->getDomain()['name']);
+            if (!$resetCache && $this->opCache->checkCache('geoCountries', 'core')) {
+                $this->geoCountries = $this->opCache->getCache('geoCountries', 'core');
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('geoCountries', $this->geoCountries, 'core', $this->domains->getDomain()['name']);
+                $this->opCache->setCache('geoCountries', $this->geoCountries, 'core');
             }
         } else {
             $this->getAll($resetCache);

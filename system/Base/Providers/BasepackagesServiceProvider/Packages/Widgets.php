@@ -14,12 +14,12 @@ class Widgets extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('widgets', 'core', $this->domains->getDomain()['name'])) {
-                $this->widgets = $this->opCache->getCache('widgets', 'core', $this->domains->getDomain()['name']);
+            if (!$resetCache && $this->opCache->checkCache('widgets', 'core')) {
+                $this->widgets = $this->opCache->getCache('widgets', 'core');
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('widgets', $this->widgets, 'core', $this->domains->getDomain()['name']);
+                $this->opCache->setCache('widgets', $this->widgets, 'core');
             }
         } else {
             $this->getAll($resetCache);
@@ -153,7 +153,7 @@ class Widgets extends BasePackage
                             // if ($this->opCache && isset($dashboardPageWidget['getWidgetData'])) {
                             //     $this->widgets[$id] = $widget;
 
-                            //     $this->opCache->setCache('widgets', $this->widgets, 'core', $this->domains->getDomain()['name']);
+                            //     $this->opCache->setCache('widgets', $this->widgets, 'core');
                             // }
                         } catch (\throwable $e) {
                             $widget['content'] = $e->getMessage();

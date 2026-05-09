@@ -32,7 +32,7 @@ use System\Base\Installer\Packages\Setup\Register\Providers\App\Type as Register
 use System\Base\Installer\Packages\Setup\Register\Providers\Core as RegisterCore;
 use System\Base\Installer\Packages\Setup\Register\Providers\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Schema;
-use System\Base\Installer\Packages\Setup\Write\Config;
+use System\Base\Installer\Packages\Setup\Write\Configs;
 use System\Base\Installer\Packages\Setup\Write\Pdo;
 use System\Base\Providers\DatabaseServiceProvider\Ff;
 
@@ -72,11 +72,9 @@ class Setup
 
 	protected $onlyUpdateDb = false;
 
-	protected $domain;
-
 	protected $storesToIndex = [];
 
-	public function __construct($container, $postData, $precheckFail = false, $onlyUpdateDb = false, $domain = null)
+	public function __construct($container, $postData, $precheckFail = false, $onlyUpdateDb = false)
 	{
 		$this->container = $container;
 
@@ -147,14 +145,11 @@ class Setup
 
 			$this->ff = (new Ff(
 				(object) [
-					'cache' 		=> (object) [
-						'enabled' 	=> false,
-						'timeout' 	=> 0
+					'cache' => (object) [
+						'enabled' => false,
+						'timeout' => 0
 					],
-					'databaseType' 	=> $this->postData['databasetype'],
-					'ff'			=> (object) [
-						'databaseDir'	=> isset($this->postData['ffDatabaseDir']) ? $this->postData['ffDatabaseDir'] : 'sp/'
-					]
+					'databaseType' => $this->postData['databasetype']
 				], $this->request, $this->helper))->init($reset, false);
 		}
 
@@ -168,8 +163,6 @@ class Setup
 		}
 
 		$this->onlyUpdateDb = $onlyUpdateDb;
-
-		$this->domain = $domain;
 	}
 
 	public function __call($method, $arguments)
@@ -218,13 +211,7 @@ class Setup
 
 	protected function cleanOldFfs()
 	{
-		$ffDatabaseDir = 'sp/';
-
-		if (isset($this->postData['ffDatabaseDir'])) {
-			$ffDatabaseDir = $this->helper->reduceSlashes($this->postData['ffDatabaseDir'] . '/');
-		}
-
-		$files = $this->basepackages->utils->init($this->container)->scanDir('.ff/' . $ffDatabaseDir);
+		$files = $this->basepackages->utils->init($this->container)->scanDir('.ff/');
 
 		foreach ($files['files'] as $key => $file) {
 			try {
@@ -251,13 +238,7 @@ class Setup
 
 	protected function cleanOldAPIKeys()
 	{
-		$ffDatabaseDir = 'sp/';
-
-		if (isset($this->postData['ffDatabaseDir'])) {
-			$ffDatabaseDir = $this->helper->reduceSlashes($this->postData['ffDatabaseDir'] . '/');
-		}
-
-		$files = $this->basepackages->utils->init($this->container)->scanDir('system/.api/' . $ffDatabaseDir);
+		$files = $this->basepackages->utils->init($this->container)->scanDir('system/.api/');
 
 		foreach ($files['files'] as $key => $file) {
 			try {
@@ -284,16 +265,10 @@ class Setup
 
 	protected function cleanOldBackups()
 	{
-		$ffDatabaseDir = 'sp/';
-
-		if (isset($this->postData['ffDatabaseDir'])) {
-			$ffDatabaseDir = $this->helper->reduceSlashes($this->postData['ffDatabaseDir'] . '/');
-		}
-
 		$dirs =
 			[
-				'.backupsdb/' . $ffDatabaseDir,
-				'.backupsff/' . $ffDatabaseDir
+				'.backupsdb/',
+				'.backupsff/'
 			];
 
 		foreach ($dirs as $dir) {
@@ -800,10 +775,10 @@ class Setup
 		return true;
 	}
 
-	protected function writeConfig($coreJson = null, $writeBaseFile = false, $onlyUpdateDb = false)
+	protected function writeConfigs($coreJson = null, $writeBaseFile = false, $onlyUpdateDb = false)
 	{
 		if (!$this->configs) {
-			$this->configs = new Config($this->container, $this->postData, $coreJson, $this->domain);
+			$this->configs = new Configs($this->container, $this->postData, $coreJson);
 		}
 
 		if ($onlyUpdateDb) {
@@ -818,14 +793,11 @@ class Setup
 
 			$this->ff = (new Ff(
 				(object) [
-					'cache' 		=> (object) [
-						'enabled' 	=> false,
-						'timeout' 	=> 0
+					'cache' => (object) [
+						'enabled' => false,
+						'timeout' => 0
 					],
-					'databaseType' 	=> $this->postData['databasetype'],
-					'ff'			=> (object) [
-						'databaseDir'	=> isset($this->postData['ffDatabaseDir']) ? $this->postData['ffDatabaseDir'] : 'sp/'
-					]
+					'databaseType' => $coreJson['settings']['databasetype']
 				], $this->request, $this->helper))->init(false, false);
 
 			(new RegisterCore())->onlyUpdateDb($coreJson['settings']['dbs'], $this->helper, $this->db, $this->ff);
@@ -839,7 +811,7 @@ class Setup
 	protected function revertBaseConfig($coreJson = null)
 	{
 		if (!$this->configs) {
-			$this->configs = new Config($this->container, $this->postData, $coreJson, $this->domain);
+			$this->configs = new Configs($this->container, $this->postData, $coreJson);
 		}
 
 		return $this->configs->revert();

@@ -43,12 +43,12 @@ class Views extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('views', 'core', $this->domains->getDomain()['name'])) {
-                $this->views = $this->opCache->getCache('views', 'core', $this->domains->getDomain()['name']);
+            if (!$resetCache && $this->opCache->checkCache('views', 'core')) {
+                $this->views = $this->opCache->getCache('views', 'core');
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('views', $this->views, 'core', $this->domains->getDomain()['name']);
+                $this->opCache->setCache('views', $this->views, 'core');
             }
         } else {
             $this->getAll($resetCache);

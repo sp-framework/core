@@ -34,8 +34,6 @@ Class Setup
 
 	protected $config;
 
-	protected $domain;
-
 	protected $request;
 
 	protected $response;
@@ -56,7 +54,7 @@ Class Setup
 
 	protected $progress;
 
-	public function __construct($session, $configsObj, $onlyUpdateDb = false, $domain = null)
+	public function __construct($session, $configsObj, $onlyUpdateDb = false)
 	{
 		try {
 			$container = new FactoryDefault();
@@ -187,8 +185,6 @@ Class Setup
 			$this->config = $configsObj->toArray();
 
 			$this->localContent = $this->container->getShared('localContent');
-
-			$this->domain = $domain;
 		} catch (\throwable $e) {
 			if (strpos($e->getMessage(), 'Class') !== false) {
 				if ($this->request->isGet()) {
@@ -208,7 +204,7 @@ Class Setup
 	{
 		try {
 			if (!isset($this->postData['session'])) {
-				$this->setupPackage = new SetupPackage($this->container, $this->postData, false, $onlyUpdateDb, $this->domain);
+				$this->setupPackage = new SetupPackage($this->container, $this->postData, false, $onlyUpdateDb);
 
 				if (!$onlyUpdateDb) {
 					if ($this->progress->checkProgressFile()) {
@@ -322,7 +318,7 @@ Class Setup
 							unset($this->postData['create-username']);
 							unset($this->postData['create-password']);
 
-							$this->setupPackage = new SetupPackage($this->container, $this->postData, false, $onlyUpdateDb, $this->domain);
+							$this->setupPackage = new SetupPackage($this->container, $this->postData, false, $onlyUpdateDb);
 						} catch (\Exception $e) {
 							$this->progress->preCheckComplete(false);
 
@@ -363,7 +359,7 @@ Class Setup
 					$this->coreJson['settings'] = array_replace($this->coreJson['settings'], $this->config);
 				}
 
-				$this->setupPackage->writeConfig($this->coreJson, true, true);
+				$this->setupPackage->writeConfigs($this->coreJson, true, true);
 
 				$this->view->responseCode = 0;
 
@@ -403,7 +399,7 @@ Class Setup
 
 				$this->setupPackage->registerDomain();
 
-				$baseConfig = $this->setupPackage->writeConfig($this->coreJson);
+				$baseConfig = $this->setupPackage->writeConfigs($this->coreJson);
 
 				$this->setupPackage->registerCore($baseConfig);
 
@@ -453,7 +449,7 @@ Class Setup
 
 				$this->setupPackage->cleanOldCookies();
 
-				$this->setupPackage->writeConfig(null, true);
+				$this->setupPackage->writeConfigs(null, true);
 
 				$this->view->responseCode = 0;
 
@@ -560,8 +556,8 @@ Class Setup
 					'text'		=> 'Registering domain...'
 				],
 				[
-					'method'	=> 'writeConfig',
-					'text'		=> 'Writing configurations...'
+					'method'	=> 'writeConfigs',
+					'text'		=> 'Writing base configurations...'
 				],
 				[
 					'method'	=> 'registerCore',
@@ -730,7 +726,7 @@ Class Setup
 						$this->view->responseMessage = 'External packages installation error!';
 					}
 				} else {
-					$this->setupPackage = new SetupPackage($this->container, $this->postData, $precheckFail, $onlyUpdateDb, $this->domain);
+					$this->setupPackage = new SetupPackage($this->container, $this->postData, $precheckFail);
 
 					$this->setupPackage->executeComposer();
 
@@ -826,9 +822,7 @@ Class Setup
 				'message' 		=> $message,
 				'request'		=> $this->request,
 				'security'		=> $this->security,
-				'session'		=> $this->session,
-				'domain'		=> $this->domain,
-				'ff'   			=> isset($this->domain) ? strtolower(str_replace('.', '_', $this->domain)) : 'sp'
+				'session'		=> $this->session
 			]
 		);
 	}

@@ -57,33 +57,22 @@ class MessengerTask extends Task
 
     protected function checkLogPath()
     {
-        if (isset($this->dispatcher->getParams()[0]) && $this->dispatcher->getParams()[0] !== '') {
-            $domain = explode('=', $this->dispatcher->getParams()[0]);
-
-            if (isset($domain[0]) && $domain[0] === 'domain' && isset($domain[1])) {
-                $domain = $domain[1] . '_';
-            } else {
-                $domain = '';
-            }
-        }
-
         if (!is_dir(base_path('var/log/'))) {
             if (!mkdir(base_path('var/log/'), 0777, true)) {
                 return false;
             }
         }
 
-        if (!file_exists(base_path('var/log/' . $domain . 'messenger-info.log'))) {
-            $file = fopen(base_path('var/log/' . $domain . 'messenger-info.log'), 'a+');
+        if (!file_exists(base_path('var/log/messenger-info.log'))) {
+            $file = fopen(base_path('var/log/messenger-info.log'), 'a+');
             fclose($file);
         }
 
-        if (!file_exists(base_path('var/log/' . $domain . 'messenger-error.log'))) {
-            $file = fopen(base_path('var/log/' . $domain . 'messenger-error.log'), 'a+');
+        if (!file_exists(base_path('var/log/messenger-error.log'))) {
+            $file = fopen(base_path('var/log/messenger-error.log'), 'a+');
             fclose($file);
         }
 
         return true;
-    }
     }
 }

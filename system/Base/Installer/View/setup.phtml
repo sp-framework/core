@@ -44,7 +44,7 @@
                                 <?php if ($onlyUpdateDb) { ?>
                                     <div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase rounded-0">SP Framework Database Update</div>
                                 <?php } else { ?>
-                                    <div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase rounded-0">SP Framework Core Setup <?php echo (isset($domain) ? '(For domain: ' . $domain . ') ' : ''); echo (isset($coreJson) ? '(' . $coreJson['version'] . ')' : ''); ?></div>
+                                    <div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase rounded-0">SP Framework Core Setup <?php echo (isset($coreJson) ? '(' . $coreJson['version'] . ')' : ''); ?></div>
                                 <?php } ?>
                                 <div class="card-body bg-white">
                                     <?php if (!$precheckFail) { ?>
@@ -55,7 +55,7 @@
                                                     <div class="row">
                                                         <div class="col">
                                                             <div class="form-group">
-                                                                <label class="text-uppercase text-xs">Select Database Type *</label>
+                                                                <label class="text-uppercase text-xs" for="host">Select Database Type *</label>
                                                                 <select class="custom-select rounded-0 input-xs" style="padding: 0.375rem 1.75rem 0.375rem 0.75rem;" id="databasetype">
                                                                     <option value="hybrid" selected="">Flat File + MySQL (Recommended)</option>
                                                                     <option value="ff">Flat File Only</option>
@@ -65,18 +65,6 @@
                                                         </div>
                                                     </div>
                                                 <?php } ?>
-                                                <div id="ff">
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <div class="form-group">
-                                                                <label class="text-uppercase text-xs" for="ffDatabaseDir">Flat File Directory *</label>
-                                                                <div class="input-group input-group-sm">
-                                                                    <input type="text" name="ffDatabaseDir" id="ffDatabaseDir" class="form-control rounded-0" value="<?php echo (isset($ff) ? $ff : 'sp');?>">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                                 <div id="mysql">
                                                     <div class="row">
                                                         <div class="col">
@@ -410,15 +398,10 @@
                     BazProgress.buildProgressBar($('#installer-progress'), false, true, false ,false);
 
                     $('#databasetype').change(function() {
-                        if ($('#databasetype').find(':selected').val() === 'hybrid') {
-                            $('#mysql').attr('hidden', false);
-                            $('#ff').attr('hidden', false);
-                        } else if ($('#databasetype').find(':selected').val() === 'ff') {
+                        if ($('#databasetype').find(':selected').val() === 'ff') {
                             $('#mysql').attr('hidden', true);
-                            $('#ff').attr('hidden', false);
                         } else {
                             $('#mysql').attr('hidden', false);
-                            $('#ff').attr('hidden', true);
                         }
                     });
 
@@ -511,13 +494,9 @@
                     }, timeout);
                 <?php } else { ?>
                     var onlyFf = false;
-                    var onlyDb = false;
 
                     if ($('#databasetype').find(':selected').val() === 'ff') {
                         onlyFf = true;
-                    }
-                    if ($('#databasetype').find(':selected').val() === 'db') {
-                        onlyDb = true;
                     }
 
                     <?php if (!$onlyUpdateDb) { ?>
@@ -525,12 +504,8 @@
                     <?php } else { ?>
                         var onlyUpdateDb = true;
                     <?php } ?>
-                    if ($('#ffDatabaseDir').val() === '' && !onlyDb) {
-                        $('#ffDatabaseDir').addClass('is-invalid');
-                        $('#ffDatabaseDir').focus(function() {
-                            $(this).removeClass('is-invalid');
-                        });
-                    } else if ($('#host').val() === '' && !onlyFf) {
+
+                    if ($('#host').val() === '' && !onlyFf) {
                         $('#host').addClass('is-invalid');
                         $('#host').focus(function() {
                             $(this).removeClass('is-invalid');
@@ -650,7 +625,6 @@
                         } else {
                             data = $.extend(data,
                                 {
-                                    "ffDatabaseDir"         : $('#ffDatabaseDir').val(),
                                     "host"                  : $('#host').val(),
                                     "port"                  : $('#port').val(),
                                     "dbname"                : $('#dbname').val(),

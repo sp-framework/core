@@ -14,12 +14,12 @@ class Externals extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('externals', 'core', $this->domains->getDomain()['name'])) {
-                $this->externals = $this->opCache->getCache('externals', 'core', $this->domains->getDomain()['name']);
+            if (!$resetCache && $this->opCache->checkCache('externals', 'core')) {
+                $this->externals = $this->opCache->getCache('externals', 'core');
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('externals', $this->externals, 'core', $this->domains->getDomain()['name']);
+                $this->opCache->setCache('externals', $this->externals, 'core');
             }
         } else {
             $this->getAll($resetCache);

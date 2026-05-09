@@ -20,11 +20,7 @@ class Notes extends BasePackage
         $notesSettings = $this->modules->packages->getPackageByName($this->packageName);
 
         if ($notesSettings) {
-            if (is_string($notesSettings['settings'])) {
-                $notesSettings['settings'] = $this->helper->decode($notesSettings['settings'], true);
-            }
-
-            $this->notesSettings = $notesSettings['settings'];
+            $this->notesSettings = $this->helper->decode($notesSettings['settings'], true);
 
             if (!isset($this->notesSettings['noteTypes'])) {
                 $this->notesSettings['noteTypes'] = $this->setNotesTypes;

@@ -16,12 +16,12 @@ class Schedules extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('schedules', 'core', $this->domains->getDomain()['name'])) {
-                $this->schedules = $this->opCache->getCache('schedules', 'core', $this->domains->getDomain()['name']);
+            if (!$resetCache && $this->opCache->checkCache('schedules', 'core')) {
+                $this->schedules = $this->opCache->getCache('schedules', 'core');
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('schedules', $this->schedules, 'core', $this->domains->getDomain()['name']);
+                $this->opCache->setCache('schedules', $this->schedules, 'core');
             }
         } else {
             $this->getAll($resetCache);

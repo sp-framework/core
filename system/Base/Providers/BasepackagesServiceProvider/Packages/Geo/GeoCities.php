@@ -20,12 +20,12 @@ class GeoCities extends BasePackage
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
-            if (!$resetCache && $this->opCache->checkCache('geoCities', 'core', $this->domains->getDomain()['name'])) {
-                $this->geoCities = $this->opCache->getCache('geoCities', 'core', $this->domains->getDomain()['name']);
+            if (!$resetCache && $this->opCache->checkCache('geoCities', 'core')) {
+                $this->geoCities = $this->opCache->getCache('geoCities', 'core');
             } else {
                 $this->getAll($resetCache);
 
-                $this->opCache->setCache('geoCities', $this->geoCities, 'core', $this->domains->getDomain()['name']);
+                $this->opCache->setCache('geoCities', $this->geoCities, 'core');
             }
         } else {
             $this->getAll($resetCache);
