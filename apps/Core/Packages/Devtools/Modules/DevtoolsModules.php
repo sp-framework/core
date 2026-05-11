@@ -341,15 +341,26 @@ class DevtoolsModules extends BasePackage
                     if ((isset($data['run_install_uninstall']) && (bool) $data['run_install_uninstall'] == true) ||
                         (isset($data['truncate_table']) && (bool) $data['truncate_table'] == true)
                     ) {
-                        if (strtolower($data['app_type']) === 'core' &&
-                            strtolower($data['name']) !== 'core'
-                        ) {
-                            $this->addResponse('Module updated. But, only core module can run install/uninstall!', 1);
+                        $reinstall = false;
+                        $truncate = false;
 
-                            return;
+                        if ((isset($data['run_install_uninstall']) && (bool) $data['run_install_uninstall'] == true)) {
+                            $reinstall = true;
+
+                            if (strtolower($data['app_type']) === 'core' &&
+                                strtolower($data['name']) !== 'core'
+                            ) {
+                                $this->addResponse('Module updated. But, only core module can run install/uninstall!', 1);
+
+                                return;
+                            }
                         }
 
-                        $this->runInstallUninstallTruncateTable($data);
+                        if ((isset($data['truncate_table']) && (bool) $data['truncate_table'] == true)) {
+                            $truncate = true;
+                        }
+
+                        $this->runInstallUninstallTruncateTable($data, $reinstall, $truncate);
                     }
 
                     $this->addResponse('Module updated');
@@ -1041,7 +1052,7 @@ class DevtoolsModules extends BasePackage
         return $moduleLocation . $routePath;
     }
 
-    protected function runInstallUninstallTruncateTable($data)
+    protected function runInstallUninstallTruncateTable($data, $reinstall, $truncate)
     {
         $moduleToReinstall = $this->modules->manager->getModuleInfo(
             [
@@ -1079,17 +1090,17 @@ class DevtoolsModules extends BasePackage
                     if ($data['type'] === 'core' ||
                         ($data['type'] === 'packages' && $data['name'] === 'Core')
                     ) {
-                        if (isset($data['run_install_uninstall']) && (bool) $data['run_install_uninstall'] == true) {
+                        if ($reinstall) {
                             $coreInstall->init()->install();
                         }
                     } else if ($data['type'] === 'packages') {
                         $moduleModel = $module->useModel();
 
-                        if (isset($data['truncate_table']) && (bool) $data['truncate_table'] == true) {
+                        if ($truncate) {
                             $coreInstall->init([$moduleModel->getSource()])->truncate();
                         }
 
-                        if (isset($data['run_install_uninstall']) && (bool) $data['run_install_uninstall'] == true) {
+                        if ($reinstall) {
                             if ((bool) $data['installed'] == true) {
                                 $coreInstall->init([$moduleModel->getSource()])->install();
                             } else {
@@ -1100,11 +1111,11 @@ class DevtoolsModules extends BasePackage
                 } else {
                     $module = new $class();
 
-                    if (isset($data['truncate_table']) && (bool) $data['truncate_table'] == true && method_exists($module, 'truncate')) {
+                    if ($truncate && method_exists($module, 'truncate')) {
                         $module->init()->truncate();
                     }
 
-                    if (isset($data['run_install_uninstall']) && (bool) $data['run_install_uninstall'] == true) {
+                    if ($reinstall) {
                         if ((bool) $data['installed'] == true) {
                             $module->init()->install();
                         } else {
