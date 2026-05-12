@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class EmailServices
 {
@@ -96,7 +97,17 @@ class EmailServices
                             'notNull' => false,
                         ]
                     )
-                ]
+                ],
+               'indexes' => [
+                    new Index(
+                        'column_UNIQUE',
+                        [
+                            'host',
+                            'port'
+                        ],
+                        'UNIQUE'
+                    )
+               ]
             ];
     }
 }

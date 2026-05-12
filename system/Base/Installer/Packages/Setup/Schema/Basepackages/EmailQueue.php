@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class EmailQueue
 {
@@ -119,5 +120,20 @@ class EmailQueue
                     )
                 ]
             ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'status',
+                    'priority'
+                ],
+                'INDEX'
+            )
+        ];
     }
 }
