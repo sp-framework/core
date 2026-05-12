@@ -60,15 +60,19 @@ class IndexHandler
 
     public function setIndex($content, $remove = false, $reIndex = false)
     {
-        if (!$content) {
+        if (!$content || ($content && $content === '')) {
             return false;
         }
 
-        if (is_string($content)) {
+        if (is_string($content) && $content !== '') {
             $content = json_decode($content, true);
         }
 
-        $contentId = $content['id'];
+        if (isset($content['id'])) {
+            $contentId = $content['id'];
+        } else {
+            return false;
+        }
 
         IoHelper::createFolder($this->indexesPath, $this->folderPermissions);
 

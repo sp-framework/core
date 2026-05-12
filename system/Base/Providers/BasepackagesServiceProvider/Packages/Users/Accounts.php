@@ -35,8 +35,8 @@ class Accounts extends BasePackage
 
         $this->setFFRelationsConditions(
             [
-                'api_clients' => [['revoked', '=', false]],
-                'identifier'  => [['session_id', '=', $this->session->getId()]]
+                'api_clients' => ['revoked', '=', false],
+                'identifier'  => ['session_id', '=', $this->session->getId()]
             ]
         );
 
@@ -501,7 +501,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->getsecurity()->delete();
             } else {
-                if ($account['security'] &&
+                if (isset($account['security']) &&
                     is_array($account['security']) &&
                     count($account['security']) > 0
                 ) {
@@ -521,7 +521,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->getcanlogin()->delete();
             } else {
-                if ($account['canlogin'] &&
+                if (isset($account['canlogin']) &&
                     is_array($account['canlogin']) &&
                     count($account['canlogin']) > 0
                 ) {
@@ -543,7 +543,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->getidentifiers()->delete();
             } else {
-                if ($account['identifier'] &&
+                if (isset($account['identifier']) &&
                     is_array($account['identifier']) &&
                     count($account['identifier']) > 0
                 ) {
@@ -563,7 +563,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->getagents()->delete();
             } else {
-                if ($account['agents'] &&
+                if (isset($account['agents']) &&
                     is_array($account['agents']) &&
                     count($account['agents']) > 0
                 ) {
@@ -585,7 +585,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->getsessions()->delete();
             } else {
-                if ($account['sessions'] &&
+                if (isset($account['sessions']) &&
                     is_array($account['sessions']) &&
                     count($account['sessions']) > 0
                 ) {
@@ -607,7 +607,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->gettunnels()->delete();
             } else {
-                if ($account['tunnels'] &&
+                if (isset($account['tunnels']) &&
                     is_array($account['tunnels']) &&
                     count($account['tunnels']) > 0
                 ) {
@@ -633,7 +633,7 @@ class Accounts extends BasePackage
                     }
                 }
             } else {
-                if ($account['api_clients'] &&
+                if (isset($account['api_clients']) &&
                     is_array($account['api_clients']) &&
                     count($account['api_clients']) > 0
                 ) {
@@ -656,7 +656,7 @@ class Accounts extends BasePackage
             ) {
                 $accountObj->getenv()->delete();
             } else {
-                if ($account['env'] &&
+                if (isset($account['env']) &&
                     is_array($account['env']) &&
                     count($account['env']) > 0
                 ) {

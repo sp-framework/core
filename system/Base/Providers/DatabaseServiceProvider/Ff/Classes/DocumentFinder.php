@@ -119,7 +119,7 @@ class DocumentFinder
 
                                 foreach ($conditionArr as $conditionArrKey => $conditionArrConditions) {
                                     //OR Condition
-                                    if (is_string($conditionArrConditions[1]) && strtolower($conditionArrConditions[1]) === 'or') {
+                                    if (isset($conditionArrConditions[1]) && is_string($conditionArrConditions[1]) && strtolower($conditionArrConditions[1]) === 'or') {
                                         foreach ($found as $foundKey => $foundValue) {
                                             if (isset($foundValue[$conditionArrConditions[0][0]]) &&
                                                 isset($foundValue[$conditionArrConditions[2][0]])
@@ -138,21 +138,21 @@ class DocumentFinder
                                         }
                                     } else {//AndCondition
                                         foreach ($found as $foundKey => $foundValue) {
-                                            if (isset($foundValue[$conditionArrConditions[0]])) {
-                                                if (isset($conditionsCount[$conditionArrConditions[0]]) &&
-                                                    count($conditionsCount[$conditionArrConditions[0]]) > 1
+                                            if (isset($foundValue[$conditionArrConditions[0][0]])) {
+                                                if (isset($conditionsCount[$conditionArrConditions[0][0]]) &&
+                                                    count($conditionsCount[$conditionArrConditions[0][0]]) > 1
                                                 ) {//OR conditions (multiple AND conditions)
                                                     $match = false;
 
-                                                    foreach ($conditionsCount[$conditionArrConditions[0]] as $conditionsCountIndex => $conditionsCountKey) {
-                                                        if (ConditionsHandler::verifyCondition($conditionArr[$conditionsCountKey][1], $foundValue[$conditionArrConditions[0]], $conditionArr[$conditionsCountKey][2])
+                                                    foreach ($conditionsCount[$conditionArrConditions[0][0]] as $conditionsCountIndex => $conditionsCountKey) {
+                                                        if (ConditionsHandler::verifyCondition($conditionArr[$conditionsCountKey][1], $foundValue[$conditionArrConditions[0][0]], $conditionArr[$conditionsCountKey][2])
                                                         ) {
                                                             if (strtolower($conditionArr[1]) === 'or') {
                                                                 $match = true;
 
                                                                 break;
                                                             } else if (strtolower($conditionArr[1]) === 'and') {
-                                                                if ($conditionsCountIndex === count($conditionsCount[$conditionArrConditions[0]]) - 1) {
+                                                                if ($conditionsCountIndex === count($conditionsCount[$conditionArrConditions[0][0]]) - 1) {
                                                                     $match = true;
 
                                                                     break;
@@ -171,7 +171,7 @@ class DocumentFinder
                                                         unset($found[$foundKey]);
                                                     }
                                                 } else {
-                                                    if (ConditionsHandler::verifyCondition($conditionArrConditions[1], $foundValue[$conditionArrConditions[0]], $conditionArrConditions[2])) {
+                                                    if (ConditionsHandler::verifyCondition($conditionArrConditions[0][1], $foundValue[$conditionArrConditions[0][0]], $conditionArrConditions[0][2])) {
                                                         continue;
                                                     }
 
