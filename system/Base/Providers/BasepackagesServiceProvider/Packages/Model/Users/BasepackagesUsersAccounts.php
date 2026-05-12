@@ -5,7 +5,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users
 use System\Base\BaseModel;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiClients;
 use System\Base\Providers\ApiServiceProvider\Model\ServiceProviderApiUsers;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesContactBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsEnv;
@@ -108,15 +108,15 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        $this->modelRelations['address']['relationObj'] = $this->hasOneThrough(
+        $this->modelRelations['contact']['relationObj'] = $this->hasOneThrough(
             'id',
             BasepackagesUsersProfiles::class,
             'account_id',
             'id',
-            BasepackagesAddressBook::class,
+            BasepackagesContactBook::class,
             'package_row_id',
             [
-                'alias'         => 'address'
+                'alias'         => 'contact'
             ]
         );
 

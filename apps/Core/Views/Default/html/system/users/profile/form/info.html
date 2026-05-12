@@ -5,13 +5,13 @@
 {% set canRemove = true %}
 <div class="row vdivide">
     <div class="col-md-3 col-sm-12">
-        {% if profile['portrait'] is defined and profile['portrait'] !== '' %}
-            {% set portraitLink = links.url('system/storages/q/uuid/' ~ profile['portrait'] ~ '/w/200') %}
+        {% if profile['contact']['portrait'] is defined and profile['contact']['portrait'] !== '' %}
+            {% set portraitLink = links.url('system/storages/q/uuid/' ~ profile['contact']['portrait'] ~ '/w/200') %}
         {% else %}
             {% set portraitLink = '' %}
         {% endif %}
-        {% if profile['initials_avatar']['large'] is defined and profile['initials_avatar']['large'] !== '' %}
-            {% set initialsAvatar = profile['initials_avatar'] %}
+        {% if profile['contact']['initials_avatar']['large'] is defined and profile['contact']['initials_avatar']['large'] !== '' %}
+            {% set initialsAvatar = profile['contact']['initials_avatar'] %}
         {% else %}
             {% set initialsAvatar = '' %}
         {% endif %}
@@ -24,7 +24,7 @@
                 'fieldId'                        : 'portrait',
                 'fieldLabel'                     : false,
                 'fieldType'                      : 'files/croppie',
-                'fieldValue'                     : profile['portrait'],
+                'fieldValue'                     : profile['contact']['portrait'],
                 'imageType'                      : 'portrait',
                 'initialsAvatar'                 : initialsAvatar,
                 'storageType'                    : 'private',
@@ -126,7 +126,7 @@
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 50,
-                        'fieldValue'                     : profile['first_name']
+                        'fieldValue'                     : profile['contact']['first_name']
                     ]
                 )}}
             </div>
@@ -150,7 +150,7 @@
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 50,
-                        'fieldValue'                     : profile['last_name']
+                        'fieldValue'                     : profile['contact']['last_name']
                     ]
                 )}}
             </div>

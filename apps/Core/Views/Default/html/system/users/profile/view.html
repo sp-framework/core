@@ -1,5 +1,5 @@
-{% if profile['full_name'] !== '' %}
-    {% set title = 'Profile (' ~ profile['full_name'] ~ ')' %}
+{% if profile['contact']['full_name'] !== '' %}
+    {% set title = 'Profile (' ~ profile['contact']['full_name'] ~ ')' %}
 {% else %}
     {% set title = 'Profile' %}
 {% endif %}

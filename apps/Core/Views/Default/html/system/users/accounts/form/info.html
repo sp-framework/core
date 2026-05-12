@@ -3,8 +3,8 @@
     {% set accountStatus = account['status'] %}
     {% set accountEmail = account['email'] %}
     {% set accountUsername = account['username'] %}
-    {% set accountFirstName = account['profile']['first_name'] %}
-    {% set accountLastName = account['profile']['last_name'] %}
+    {% set accountFirstName = account['contact']['first_name'] %}
+    {% set accountLastName = account['contact']['last_name'] %}
 {% else %}
     {% set accountId = '' %}
     {% set accountStatus = '' %}

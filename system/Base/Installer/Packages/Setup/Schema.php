@@ -7,6 +7,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\ApiClientServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\ApiClientServicesCalls;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\Apis\Repos;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\ContactBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards\Widgets as DashboardsWidgets;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
@@ -82,6 +83,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\ApiClientSe
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\ApiClientServices\BasepackagesApiClientServicesCalls;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesActivityLogs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesContactBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesDashboards;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesFilters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesImportExport;
@@ -299,6 +301,10 @@ class Schema
                 'basepackages_address_book'                 => [
                         'schema'    => new AddressBook,
                         'model'     => new BasepackagesAddressBook,
+                    ],
+                'basepackages_contact_book'                 => [
+                        'schema'    => new ContactBook,
+                        'model'     => new BasepackagesContactBook,
                     ],
                 'basepackages_storages'                     => [
                         'schema'    => new Storages,

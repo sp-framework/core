@@ -29,7 +29,7 @@
 /* globals BazCore */
 window.dataCollection.env.profile = { };
 window.dataCollection.env.profile.email = "{{access.auth.account()['email']}}";
-window.dataCollection.env.profile.fullName = "{{access.auth.account()['profile']['full_name']}}";
+window.dataCollection.env.profile.fullName = "{{access.auth.account()['contact']['full_name']}}";
 window.dataCollection.env.profile.portrait = "{{profilePortrait}}";
 
 $('#logout').click(function(e) {

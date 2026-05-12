@@ -1,4 +1,4 @@
-
+<!-- htmlmin:ignore -->
 <input id="security-token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
 {% if activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
     {% if activeLayout === 'topnav' %}
@@ -71,7 +71,7 @@
 /* globals BazCore */
 window.dataCollection.env.profile = { };
 window.dataCollection.env.profile.email = "{{access.auth.account()['email']}}";
-window.dataCollection.env.profile.fullName = "{{access.auth.account()['profile']['full_name']}}";
+window.dataCollection.env.profile.fullName = "{{access.auth.account()['contact']['full_name']}}";
 window.dataCollection.env.profile.portrait = "{{profilePortrait}}";
 
 $('#logout').click(function(e) {
@@ -96,3 +96,4 @@ $('#logout').click(function(e) {
     {% endif %}
 {% endif %}
 {% include modules.views.getPhalconViewPath() ~ 'layouts/common/header/breadcrumb' %}
+<!-- htmlmin:ignore -->

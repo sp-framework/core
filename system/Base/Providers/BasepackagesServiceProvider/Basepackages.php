@@ -7,6 +7,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\AddressBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ApiClientServices\ApiClientServices;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\BackupRestore;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Barcodes;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\ContactBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Dashboards;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\Email;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailQueue;
@@ -75,6 +76,8 @@ class Basepackages
 	protected $storages;
 
 	protected $addressbook;
+
+	protected $contactbook;
 
 	protected $activityLogs;
 
@@ -243,6 +246,13 @@ class Basepackages
 		$this->addressbook = (new AddressBook())->init();
 
 		return $this->addressbook;
+	}
+
+	protected function initContactbook()
+	{
+		$this->contactbook = (new ContactBook())->init();
+
+		return $this->contactbook;
 	}
 
 	protected function initActivityLogs()

@@ -10,16 +10,22 @@ class Profile
     {
         $profile =
             [
-                'account_id'            => 1,
+                'account_id'                    => 1,
+                'locale_country_id'             => 0,
+                'locale_timezone_id'            => 0,
+                'settings'                      => '[]'
+            ];
+
+        $profileContact =
+            [
                 'first_name'            => 'System',
                 'last_name'             => 'Administrator',
                 'full_name'             => 'System Administrator',
-                'contact_phone'         => '0',
-                'contact_mobile'        => '0',
-                'contact_address_id'    => 1
+                'package_name'          => 'UsersProfiles',
+                'package_row_id'        => 1
             ];
 
-        $profile['initials_avatar'] = json_encode($this->generateInitialsAvatar($profile));
+        $profileContact['initials_avatar'] = json_encode($this->generateInitialsAvatar($profileContact));
 
         $profileAddress =
             [
@@ -41,6 +47,7 @@ class Profile
         if ($db) {
             $db->insertAsDict('basepackages_users_profiles', $profile);
 
+            $db->insertAsDict('basepackages_contact_book', $profileContact);
             $db->insertAsDict('basepackages_address_book', $profileAddress);
         }
 
@@ -49,18 +56,21 @@ class Profile
 
             $profileStore->updateOrInsert($profile);
 
+            $contactStore = $ff->store('basepackages_contact_book');
+
+            $contactStore->updateOrInsert($profileContact);
             $addressStore = $ff->store('basepackages_address_book');
 
             $addressStore->updateOrInsert($profileAddress);
         }
     }
 
-    protected function generateInitialsAvatar($profile)
+    protected function generateInitialsAvatar($profileContact)
     {
         $avatar = new InitialAvatar();
 
-        $avatars['small'] = base64_encode($avatar->name($profile['full_name'])->autoColor()->height(30)->width(30)->generate()->stream('png', 100));
-        $avatars['large'] = base64_encode($avatar->name($profile['full_name'])->autoColor()->height(200)->width(200)->generate()->stream('png', 100));
+        $avatars['small'] = base64_encode($avatar->name($profileContact['full_name'])->autoColor()->height(30)->width(30)->generate()->stream('png', 100));
+        $avatars['large'] = base64_encode($avatar->name($profileContact['full_name'])->autoColor()->height(200)->width(200)->generate()->stream('png', 100));
 
         return $avatars;
     }

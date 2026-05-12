@@ -80,7 +80,7 @@ class Profiles extends BasePackage
             }
         } else {
             $this->setFFRelations(true);
-            $this->setFFRelationsConditions(['address' => ['package_name', '=', 'UsersProfiles']]);
+            $this->setFFRelationsConditions(['addresses' => ['package_name', '=', 'UsersProfiles'], 'contact' => ['package_name', '=', 'UsersProfiles']]);
 
             $profile = $this->getFirst('account_id', $accountId, false, true, null, [], true);
 
@@ -102,10 +102,6 @@ class Profiles extends BasePackage
         unset($data['id']);
 
         $data['account_id'] = $accountId;
-        $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
-        $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
-        $data['contact_phone'] = '0';
-        $data['contact_mobile'] = '0';
 
         if ($this->add($data)) {
             //To Update Address Book
@@ -127,6 +123,8 @@ class Profiles extends BasePackage
             $profile['contact_address_id'] = $this->addProfileAddress($profile);
 
             $this->update($profile);
+            $data['id'] = $this->packagesData->last['id'];
+            $this->addProfileContact($data);
 
             $this->addResponse('Profile added');
         } else {
@@ -139,9 +137,9 @@ class Profiles extends BasePackage
         $profile = $this->getProfile((int) $data['id']);
 
         if (isset($data['first_name']) && isset($data['last_name'])) {
-            if (($data['first_name'] !== $profile['first_name'] ||
-                $data['last_name'] !== $profile['last_name']) ||
-                !$profile['initials_avatar']
+            if (($data['first_name'] !== $profile['contact']['first_name'] ||
+                $data['last_name'] !== $profile['contact']['last_name']) ||
+                !$profile['contact']['initials_avatar']
             ) {
                 $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
             }
@@ -149,22 +147,30 @@ class Profiles extends BasePackage
 
         unset($data['id']);
 
-        $profile = array_merge($profile, $data);
+        $profile['contact'] = array_merge($profile['contact'], $data);
 
         if (isset($data['first_name']) && isset($data['last_name'])) {
-            $profile['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
+            $profile['contact']['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
         }
 
-        if ($profile['contact_phone'] === '') {
-            $profile['contact_phone'] = 0;
+        if ($profile['contact']['contact_phone'] === '') {
+            $profile['contact']['contact_phone'] = 0;
         }
-        if ($profile['contact_mobile'] === '') {
-            $profile['contact_mobile'] = 0;
+        if ($profile['contact']['contact_mobile'] === '') {
+            $profile['contact']['contact_mobile'] = 0;
         }
 
         if (is_array($profile['settings'])) {
             $profile['settings'] = $this->helper->encode($profile['settings']);
         }
+
+        $contact = $profile['contact'];
+
+        $contact['package_name'] = 'UsersProfiles';
+
+        $contact['package_row_id'] = $profile['id'];
+
+        $this->basepackages->contactbook->updateContact($contact);
 
         if ($this->update($profile)) {
             $this->addResponse('Profile updated');
@@ -181,8 +187,11 @@ class Profiles extends BasePackage
 
         if (isset($data['subscriptions']) && $data['subscriptions'] !== '') {
             $data['subscriptions'] = $this->helper->decode($data['subscriptions'], true);
+
             $this->modules->components->updateNotificationSubscriptions($data['subscriptions']);
+
             $this->modules->packages->updateNotificationSubscriptions($data['subscriptions']);
+
             unset($data['subscriptions']);
         }
 
@@ -195,20 +204,31 @@ class Profiles extends BasePackage
         if (($data['first_name'] !== $profile['first_name'] ||
             $data['last_name'] !== $profile['last_name']) ||
             !$profile['initials_avatar']
+        $portrait = $profile['contact']['portrait'];
+
+        if (($data['first_name'] !== $profile['contact']['first_name'] ||
+            $data['last_name'] !== $profile['contact']['last_name']) ||
+            !$profile['contact']['initials_avatar']
         ) {
             $data['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
         }
 
-        $profile = array_merge($profile, $data);
+        unset($data['id']);
 
-        $profile['full_name'] = $profile['first_name'] . ' ' . $profile['last_name'];
+        $profile['contact'] = array_merge($profile['contact'], $data);
 
-        if ($profile['contact_address_id']) {
-            $address = $profile;
+        if (isset($data['first_name']) && isset($data['last_name'])) {
+            $profile['contact']['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
+        }
 
-            $address['package_name'] = 'UsersProfiles';
+        if ($profile['contact']['contact_phone'] === '') {
+            $profile['contact']['contact_phone'] = 0;
+        }
+        if ($profile['contact']['contact_mobile'] === '') {
+            $profile['contact']['contact_mobile'] = 0;
+        }
 
-            $address['package_row_id'] = $profile['id'];
+        $contact = $profile['contact'];
 
             $this->basepackages->addressbook->mergeAndUpdate($address);
         } else {
@@ -231,22 +251,29 @@ class Profiles extends BasePackage
     }
 
     protected function addProfileAddress($profile)
+    protected function addProfileContact($data)
     {
-        $address = $profile;
-
-        $address['package_name'] = $this->packageName;
-
-        $address['package_row_id'] = $profile['id'];
-
-        if (isset($address['id'])) {
-            unset($address['id']);
+        $contact = [];
+        $contact['package_name'] = 'UsersProfiles';
+        $contact['package_row_id'] = $data['id'];
+        $contact['portrait'] = '';
+        $contact['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
+        $contact['prefix'] = '';
+        $contact['suffix'] = '';
+        $contact['first_name'] = $data['first_name'];
+        $contact['last_name'] = $data['last_name'];
+        if (isset($data['first_name']) && isset($data['last_name'])) {
+            $contact['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
+        } else {
+            $contact['full_name'] = '';
         }
+        $contact['contact_phone'] = 0;
+        $contact['contact_phone_ext'] = '';
+        $contact['contact_mobile'] = 0;
+        $contact['email'] = $data['email'];
 
-        $profileAddress = $this->basepackages->addressbook->addAddress($address);
-
-        if ($profileAddress) {
-            return $profileAddress['id'];
-        }
+        return $this->basepackages->contactbook->addContact($contact);
+    }
 
         return null;
     }
