@@ -422,7 +422,10 @@ class DevtoolsGeoExtractData extends BasePackage
                 },
                 'verify'            => false,
                 'connect_timeout'   => 5,
-                'sink'              => $sink
+                'sink'              => $sink,
+                'headers'           => [
+                    'User-Agent'    => 'Mozilla/5.0 (X11; Linux i686; rv:150.0) Gecko/20100101 Firefox/150.0'
+                ]
             ]
         );
 
