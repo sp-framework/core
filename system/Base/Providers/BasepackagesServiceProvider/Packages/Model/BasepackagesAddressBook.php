@@ -12,15 +12,17 @@ class BasepackagesAddressBook extends BaseModel
 
     public $package_row_id;
 
-    public $address_type;
-
-    public $is_primary;
+    public $address_reference;
 
     public $attention_to;
 
     public $street_address;
 
     public $street_address_2;
+
+    public $street_address_3;
+
+    public $street_address_4;
 
     public $city_id;
 

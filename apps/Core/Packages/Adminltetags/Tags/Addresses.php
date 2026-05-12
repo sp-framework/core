@@ -30,8 +30,6 @@ class Addresses extends Adminltetags
             return;
         }
 
-        $this->addressesParams['addressTypes'] = $this->basepackages->addressbook->getAddressesTypes();
-
         try {
             $address = 'Apps\\Core\\Packages\\Adminltetags\\Tags\\Addresses\\' . ucfirst($this->params['addressFieldType']);
 

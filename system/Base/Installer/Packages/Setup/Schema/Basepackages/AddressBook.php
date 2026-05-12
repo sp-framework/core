@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class AddressBook
 {
@@ -36,16 +37,10 @@ class AddressBook
                     ]
                 ),
                 new Column(
-                    'address_type',
+                    'address_reference',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => true
-                    ]
-                ),
-                new Column(
-                    'is_primary',
-                    [
-                        'type'    => Column::TYPE_TINYINTEGER,
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
                         'notNull' => true
                     ]
                 ),
@@ -67,6 +62,22 @@ class AddressBook
                 ),
                 new Column(
                     'street_address_2',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'street_address_3',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'street_address_4',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 100,
@@ -126,7 +137,31 @@ class AddressBook
                         'notNull' => false,
                     ]
                 ),
+            ],
+            'indexes' => [
+                new Index(
+                    'column_UNIQUE',
+                    [
+                        'package_row_id',
+                        'address_reference'
+                    ],
+                    'UNIQUE'
+                )
             ]
+        ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'package_row_id'
+                ],
+                'INDEX'
+            )
         ];
     }
 }

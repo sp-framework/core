@@ -29,25 +29,27 @@ class Profile
 
         $profileAddress =
             [
-                'address_type'        => 1,
-                'is_primary'          => 1,
-                'street_address'      => null,
-                'street_address_2'    => null,
-                'city_id'             => null,
-                'city_name'           => null,
-                'post_code'           => null,
-                'state_id'            => null,
-                'state_name'          => null,
-                'country_id'          => null,
-                'country_name'        => null,
-                'package_name'        => 'UsersProfiles',
-                'package_row_id'      => 1
+                'address_reference'     => 'Main',
+                'street_address'        => null,
+                'street_address_2'      => null,
+                'street_address_3'      => null,
+                'street_address_4'      => null,
+                'city_id'               => null,
+                'city_name'             => null,
+                'post_code'             => null,
+                'state_id'              => null,
+                'state_name'            => null,
+                'country_id'            => null,
+                'country_name'          => null,
+                'package_name'          => 'UsersProfiles',
+                'package_row_id'        => 1
             ];
 
         if ($db) {
             $db->insertAsDict('basepackages_users_profiles', $profile);
 
             $db->insertAsDict('basepackages_contact_book', $profileContact);
+
             $db->insertAsDict('basepackages_address_book', $profileAddress);
         }
 
@@ -59,6 +61,7 @@ class Profile
             $contactStore = $ff->store('basepackages_contact_book');
 
             $contactStore->updateOrInsert($profileContact);
+
             $addressStore = $ff->store('basepackages_address_book');
 
             $addressStore->updateOrInsert($profileAddress);

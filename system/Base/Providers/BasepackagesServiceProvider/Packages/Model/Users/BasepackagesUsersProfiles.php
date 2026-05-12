@@ -46,11 +46,13 @@ class BasepackagesUsersProfiles extends BaseModel
                 ]
             ]
         );
+
+        $this->modelRelations['addresses']['relationObj'] = $this->hasMany(
             'id',
             BasepackagesAddressBook::class,
             'package_row_id',
             [
-                'alias'                 => 'address',
+                'alias'                 => 'addresses',
                 'params'                => [
                     'conditions'        => 'package_name = :package_name:',
                     'bind'              => [
