@@ -277,7 +277,7 @@ class Multiple
                                 ]
                             ) .
                             '<ul class="list-group list-group-sortable" id="' . $this->compSecId . '-sortable-addresses-list">';
-                                if (isset($this->params['addresses']) && count($this->params['addresses']) > 0) {
+                                if (isset($this->params['addresses']) && is_array($this->params['addresses']) && count($this->params['addresses']) > 0) {
                                     $this->content .=
                                         '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-addresses-list-nodata" hidden>
                                             <div class="row">

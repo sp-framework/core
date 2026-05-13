@@ -24,7 +24,7 @@ class Single
 
     protected $compSecId;
 
-    public function __construct($view, $tag, $links, $escaper, $params, $addressesParams)
+    public function __construct($view, $tag, $links, $escaper, $params, $addressesParams = [])
     {
         $this->view = $view;
 
@@ -275,7 +275,7 @@ class Single
                             'fieldBazPostOnUpdate'                  => $this->addressesParams['streetAddressFieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'               => 1,
                             'fieldDataInputMaxLength'               => 100,
-                            'fieldValue'                            => $this->params['streetAddress']
+                            'fieldValue'                            => $this->addressesParams['streetAddress']
                         ]
                     ) .
                 '</div>
@@ -300,7 +300,7 @@ class Single
                             'fieldBazPostOnUpdate'                  => $this->addressesParams['streetAddress2FieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'               => 1,
                             'fieldDataInputMaxLength'               => 100,
-                            'fieldValue'                            => $this->params['streetAddress2']
+                            'fieldValue'                            => $this->addressesParams['streetAddress2']
                         ]
                     ) .
                 '</div>
@@ -332,7 +332,7 @@ class Single
                             'fieldBazPostOnUpdate'                  => $this->addressesParams['streetAddress3FieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'               => 1,
                             'fieldDataInputMaxLength'               => 100,
-                            'fieldValue'                            => $this->params['streetAddress3']
+                            'fieldValue'                            => $this->addressesParams['streetAddress3']
                         ]
                     ) .
                 '</div>
@@ -357,7 +357,7 @@ class Single
                             'fieldBazPostOnUpdate'                  => $this->addressesParams['streetAddress4FieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'               => 1,
                             'fieldDataInputMaxLength'               => 100,
-                            'fieldValue'                            => $this->params['streetAddress4']
+                            'fieldValue'                            => $this->addressesParams['streetAddress4']
                         ]
                     ) .
                 '</div>
@@ -381,7 +381,7 @@ class Single
                         'fieldBazScan'                          => true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['cityFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['cityFieldBazPostOnUpdate'],
-                        'fieldValue'                            => $this->params['cityId']
+                        'fieldValue'                            => $this->addressesParams['cityId']
                     ]
                 ) .
                 $this->adminLTETags->useTag('fields',
@@ -405,7 +405,7 @@ class Single
                         'fieldRequired'                         => $this->addressesParams['cityFieldRequired'],
                         'fieldDataInputMinLength'               => 1,
                         'fieldDataInputMaxLength'               => 100,
-                        'fieldValue'                            => $this->params['cityName']
+                        'fieldValue'                            => $this->addressesParams['cityName']
                     ]
                 ) .
             '</div>';
@@ -435,7 +435,7 @@ class Single
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['postCodeFieldBazPostOnUpdate'],
                         'fieldDataInputMinLength'               => 1,
                         'fieldDataInputMaxLength'               => 50,
-                        'fieldValue'                            => $this->params['postCode']
+                        'fieldValue'                            => $this->addressesParams['postCode']
                     ]
                 ) .
             '</div>';
@@ -458,7 +458,7 @@ class Single
                         'fieldBazScan'                          => true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['stateFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['stateFieldBazPostOnUpdate'],
-                        'fieldValue'                            => $this->params['stateId']
+                        'fieldValue'                            => $this->addressesParams['stateId']
                     ]
                 ) .
                 $this->adminLTETags->useTag('fields',
@@ -482,7 +482,7 @@ class Single
                         'fieldRequired'                         => $this->addressesParams['stateFieldRequired'],
                         'fieldDataInputMinLength'               => 1,
                         'fieldDataInputMaxLength'               => 100,
-                        'fieldValue'                            => $this->params['stateName']
+                        'fieldValue'                            => $this->addressesParams['stateName']
                     ]
                 ) .
             '</div>';
@@ -505,7 +505,7 @@ class Single
                         'fieldBazScan'                          => true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['countryFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['countryFieldBazPostOnUpdate'],
-                        'fieldValue'                            => $this->params['countryId']
+                        'fieldValue'                            => $this->addressesParams['countryId']
                     ]
                 ) .
                 $this->adminLTETags->useTag('fields',
@@ -529,7 +529,7 @@ class Single
                         'fieldRequired'                         => $this->addressesParams['countryFieldRequired'],
                         'fieldDataInputMinLength'               => 1,
                         'fieldDataInputMaxLength'               => 100,
-                        'fieldValue'                            => $this->params['countryName']
+                        'fieldValue'                            => $this->addressesParams['countryName']
                     ]
                 ) .
             '</div>';
