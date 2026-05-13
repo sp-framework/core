@@ -270,6 +270,33 @@ class Profiles extends BasePackage
         }
     }
 
+    public function removeProfile(array $data)
+    {
+        $profile = $this->getProfile($data['account_id']);
+
+        if (isset($profile['contact']['id'])) {
+            if (isset($profile['contact']['portrait']) && $profile['contact']['portrait'] !== '') {
+                $this->basepackages->storages->changeOrphanStatus(null, $profile['contact']['portrait']);
+            }
+
+            $this->basepackages->contactbook->removeContact($profile['contact']);
+        }
+
+        if (isset($profile['addresses']) && count($profile['addresses']) > 0) {
+            foreach ($profile['addresses'] as $address) {
+                if (isset($address['id'])) {
+                    $this->basepackages->addressbook->removeAddress($address);
+                }
+            }
+        }
+
+        if ($this->remove($profile['id'])) {
+            $this->addResponse('Profile removed');
+        } else {
+            $this->addResponse('Error removing profile.', 1);
+        }
+    }
+
     protected function addProfileContact($data)
     {
         $contact = [];

@@ -404,7 +404,7 @@ class Accounts extends BasePackage
                     $this->addResponse('Error removing account.', 1);
                 }
             } else if ($this->ffStore && $this->ffData) {
-                $account = $this->ffData;
+                $account = $this->getAccountById((int) $data['id']);
 
                 if ($this->ffData['id'] != $data['id']) {
                     $this->addResponse('Account with id not found', 1);
@@ -493,7 +493,8 @@ class Accounts extends BasePackage
         $agents = true,
         $tunnels = true,
         $api_clients = true,
-        $env = true
+        $env = true,
+        $profile = true,
     ) {
         if ($security) {
             if ($this->config->databasetype === 'db' &&
@@ -670,6 +671,14 @@ class Accounts extends BasePackage
             }
         }
 
+        if ($profile) {
+            if (isset($account['profile']) &&
+                is_array($account['profile']) &&
+                count($account['profile']) > 0
+            ) {
+                $this->basepackages->profiles->removeProfile($account['profile']);
+            }
+        }
         return true;
     }
 
