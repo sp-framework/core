@@ -35,9 +35,11 @@ class Widgets extends BasePackage
         $widgetsTree = [];
 
         foreach ($componentsArr as $componentKey => $component) {
-            // if ($component['app_type'] !== $this->apps->getAppInfo()['app_type']) {
-            //     continue;
-            // }
+            if ($componentName === 'dashboards' &&
+                $component['app_type'] !== $this->apps->getAppInfo()['app_type']
+            ) {
+                continue;
+            }
 
             if ($componentName === 'dashboards' &&
                 strtolower($component['name']) === 'pages'
