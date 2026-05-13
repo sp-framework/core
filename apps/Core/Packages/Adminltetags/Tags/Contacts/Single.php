@@ -24,7 +24,7 @@ class Single
 
     protected $compSecId;
 
-    public function __construct($view, $tag, $links, $escaper, $params, $contactsParams)
+    public function __construct($view, $tag, $links, $escaper, $params, $contactsParams = [])
     {
         $this->view = $view;
 
@@ -42,6 +42,8 @@ class Single
 
         $this->compSecId = $this->params['componentId'] . '-' . $this->params['sectionId'];
 
+        $this->buildSingleContactData();
+
         $this->buildSingleContactLayout();
     }
 
@@ -50,78 +52,184 @@ class Single
         return $this->content;
     }
 
+    protected function buildSingleContactData()
+    {
+        $fieldsArr = ['portrait','prefix','first_name','last_name','suffix','email','secondary_email','contact_phone','contact_phone_ext','contact_mobile','contact_other','contact_fax','contact_notes'];
+        foreach ($fieldsArr as $field) {
+            $this->contactsParams[$field] =
+                isset($this->params['contacts'][$field]) ?
+                $this->params['contacts'][$field] :
+                '';
+        }
+
+        $this->contactsParams['secondaryEmailFieldLabel'] =
+            isset($this->params['secondaryEmailFieldLabel']) ?
+            $this->params['secondaryEmailFieldLabel'] :
+            'Secondary Email';
+
+        $this->contactsParams['contactOtherFieldLabel'] =
+            isset($this->params['contactOtherFieldLabel']) ?
+            $this->params['contactOtherFieldLabel'] :
+            'Other Contact #';
+
+        $this->contactsParams['contactFaxFieldLabel'] =
+            isset($this->params['contactFaxFieldLabel']) ?
+            $this->params['contactFaxFieldLabel'] :
+            'Fax';
+
+        $this->contactsParams['contactNotesFieldLabel'] =
+            isset($this->params['contactNotesFieldLabel']) ?
+            $this->params['contactNotesFieldLabel'] :
+            'Contact Notes';
+
+        $fieldsArr = null;
+        $field = null;
+
+        $fieldsArr = ['includePortrait','includeNamePrefix','includeName','includeNameSuffix','includeEmail','includeOther','includeNotes','firstNameFieldHidden','firstNameFieldDisabled','firstNameFieldRequired','firstNameFieldBazPostOnCreate','firstNameFieldBazPostOnUpdate','lastNameFieldHidden','lastNameFieldDisabled','lastNameFieldRequired','lastNameFieldBazPostOnCreate','lastNameFieldBazPostOnUpdate','emailFieldHidden','emailFieldDisabled','emailFieldRequired','emailFieldBazPostOnCreate','emailFieldBazPostOnUpdate','secondaryEmailFieldHidden','secondaryEmailFieldDisabled','secondaryEmailFieldRequired','secondaryEmailFieldBazPostOnCreate','secondaryEmailFieldBazPostOnUpdate','ccEmailsToSecondaryEmailFieldHidden','ccEmailsToSecondaryEmailFieldDisabled','ccEmailsToSecondaryEmailFieldRequired','ccEmailsToSecondaryEmailFieldBazPostOnCreate','ccEmailsToSecondaryEmailFieldBazPostOnUpdate','contactPhoneFieldHidden','contactPhoneFieldDisabled','contactPhoneFieldRequired','contactPhoneFieldBazPostOnCreate','contactPhoneFieldBazPostOnUpdate','contactPhoneExtFieldHidden','contactPhoneExtFieldDisabled','contactPhoneExtFieldRequired','contactPhoneExtFieldBazPostOnCreate','contactPhoneExtFieldBazPostOnUpdate','contactMobileFieldHidden','contactMobileFieldDisabled','contactMobileFieldRequired','contactMobileFieldBazPostOnCreate','contactMobileFieldBazPostOnUpdate','contactFaxFieldHidden','contactFaxFieldDisabled','contactFaxFieldRequired','contactFaxFieldBazPostOnCreate','contactFaxFieldBazPostOnUpdate','contactOtherFieldHidden','contactOtherFieldDisabled','contactOtherFieldRequired','contactOtherFieldBazPostOnCreate','contactOtherFieldBazPostOnUpdate','contactNotesFieldHidden','contactNotesFieldDisabled','contactNotesFieldRequired','contactNotesFieldBazPostOnCreate','contactNotesFieldBazPostOnUpdate'];
+
+        foreach ($fieldsArr as $field) {
+            $this->contactsParams[$field] =
+                isset($this->params[$field]) &&
+                    $this->params[$field] === true ?
+                true :
+                false;
+        }
+
+        //Note: for profile updating contact fields require OnCreate Permissions as there is no profile ID sent via POST.
+    }
+
     protected function buildSingleContactLayout()
     {
-        $this->content .=
-            '<div class="row">' . $this->inclEmailMobile() . '</div>' .
-            '<div class="row">' . $this->inclName() . '</div>' .
-            '<div class="row">' . $this->inclPhone() . '</div>';
+        $vdivide = '';
+        if (isset($this->contactsParams['includePortrait']) && $this->contactsParams['includePortrait'] === true) {
+            $vdivide = ' vdivide';
+        }
 
-        $this->content .=
-            $this->inclBaseJs() .
-                $this->inclEmailMobileJs() .
-                $this->inclNameJs() .
-                $this->inclPhoneJs();
+        $this->content .= '<div class="row' . $vdivide . '">';
+
+        if (isset($this->contactsParams['includePortrait']) && $this->contactsParams['includePortrait'] === true) {
+            $this->content .= '<div class="col-md-3 col-sm-12">';
+            $this->content .= $this->inclPortrait();
+            $this->content .= '</div>';
+        }
+
+        $this->content .= '<div class="col">';
+        if (isset($this->contactsParams['includeName']) && $this->contactsParams['includeName'] === true) {
+            $this->content .= $this->inclName();
+        }
+
+        if (isset($this->contactsParams['includeEmail']) && $this->contactsParams['includeEmail'] === true) {
+            $this->content .= $this->inclEmail();
+        }
+
+        $this->content .= $this->inclPhone();
+
+        if (isset($this->contactsParams['includeOther']) && $this->contactsParams['includeOther'] === true) {
+            $this->content .= $this->inclOther();
+        }
+
+        if (isset($this->contactsParams['includeNotes']) && $this->contactsParams['includeNotes'] === true) {
+            $this->content .= $this->inclNotes();
+        }
+
+        $this->content .= '</div></div>';
+
+        $this->content .= $this->inclBaseJs();
+
+        if (isset($this->contactsParams['includeName']) && $this->contactsParams['includeName'] === true) {
+            $this->content .= $this->inclNameJs();
+        }
+
+        if (isset($this->contactsParams['includeEmail']) && $this->contactsParams['includeEmail'] === true) {
+            $this->content .= $this->inclEmailJs();
+        }
+
+        $this->content .= $this->inclPhoneJs();
+
+        if (isset($this->contactsParams['includeOther']) && $this->contactsParams['includeOther'] === true) {
+            $this->content .= $this->inclOtherJs();
+        }
+
+        if (isset($this->contactsParams['includeNotes']) && $this->contactsParams['includeNotes'] === true) {
+            $this->content .= $this->inclNotesJs();
+        }
 
         $this->content .=
             '});</script>';
     }
 
-    protected function inclEmailMobile()
+    protected function inclPortrait()
     {
-        return
-            '<div class="col">' .
-                $this->adminLTETags->useTag('fields',
-                    [
-                        'component'                             => $this->params['component'],
-                        'componentName'                         => $this->params['componentName'],
-                        'componentId'                           => $this->params['componentId'],
-                        'sectionId'                             => $this->params['sectionId'],
-                        'fieldId'                               => 'account_email',
-                        'fieldLabel'                            => 'Email',
-                        'fieldType'                             => 'input',
-                        'fieldPlaceholder'                      => 'Email',
-                        'fieldHelp'                             => true,
-                        'fieldHelpTooltipContent'               => 'Contact Email address. If field is disabled, it means contact has an account on this system. Only Systems Administrators can change the email address.',
-                        'fieldBazScan'                          => true,
-                        'fieldBazJstreeSearch'                  => true,
-                        'fieldBazPostOnCreate'                  => false,
-                        'fieldBazPostOnUpdate'                  => false,
-                        'fieldRequired'                         => true,
-                        'fieldDataInputMinLength'               => 1,
-                        'fieldDataInputMaxLength'               => 100,
-                        'fieldValue'                            => ''
-                    ]
-                ) .
-            '</div>
-            <div class="col">' .
-                $this->adminLTETags->useTag('fields',
-                    [
-                        'component'                             => $this->params['component'],
-                        'componentName'                         => $this->params['componentName'],
-                        'componentId'                           => $this->params['componentId'],
-                        'sectionId'                             => $this->params['sectionId'],
-                        'fieldId'                               => 'contact_mobile',
-                        'fieldLabel'                            => 'Mobile',
-                        'fieldType'                             => 'input',
-                        'fieldHelp'                             => true,
-                        'fieldHelpTooltipContent'               => 'Mobile phone number of the contact',
-                        'fieldRequired'                         => true,
-                        'fieldBazScan'                          => true,
-                        'fieldBazJstreeSearch'                  => true,
-                        'fieldBazPostOnCreate'                  => false,
-                        'fieldBazPostOnUpdate'                  => false,
-                        'fieldDataInputMinLength'               => 1,
-                        'fieldDataInputMaxLength'               => 15,
-                        'fieldValue'                            => ''
-                    ]
-                ) .
-            '</div>';
+        $portrait = '';
+
+        if (isset($this->contactsParams['portrait']) && $this->contactsParams['portrait'] !== '') {
+            $portraitLink = $this->links->url('system/storages/q/uuid/' . $this->contactsParams['portrait'] . '/w/200');
+        } else {
+            $portraitLink = '';
+        }
+        if (isset($this->contactsParams['initials_avatar']['large']) && $this->contactsParams['initials_avatar']['large'] !== '') {
+            $initialsAvatar = $this->contactsParams['initials_avatar'];
+        } else {
+            $initialsAvatar = '';
+        }
+
+        $portrait .=
+            $this->adminLTETags->useTag('fields',
+                [
+                    'component'                      => $this->params['component'],
+                    'componentName'                  => $this->params['componentName'],
+                    'componentId'                    => $this->params['componentId'],
+                    'sectionId'                      => $this->params['sectionId'],
+                    'fieldId'                        => 'portrait',
+                    'fieldLabel'                     => false,
+                    'fieldType'                      => 'files/croppie',
+                    'fieldValue'                     => $this->contactsParams['portrait'],
+                    'imageType'                      => 'portrait',
+                    'initialsAvatar'                 => $initialsAvatar,
+                    'storageType'                    => 'private',
+                    'upload'                         => true,
+                    'avatar'                         => true,
+                    'remove'                         => true,
+                    'recover'                        => true,
+                    'portraitLink'                   => $portraitLink
+                ]
+            );
+
+        return $portrait;
     }
 
     protected function inclName()
     {
-        return
+        $name =
+            '<div class="row">';
+
+        if ($this->contactsParams['includeNamePrefix']) {
+            $name .=
+                '<div class="col-md-1">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                      => $this->params['component'],
+                            'componentName'                  => $this->params['componentName'],
+                            'componentId'                    => $this->params['componentId'],
+                            'sectionId'                      => $this->params['sectionId'],
+                            'fieldId'                        => 'prefix',
+                            'fieldLabel'                     => 'Prefix',
+                            'fieldType'                      => 'input',
+                            'fieldHelp'                      => true,
+                            'fieldHelpTooltipContent'        => 'Prefix',
+                            'fieldBazScan'                   => true,
+                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazPostOnCreate'           => $this->contactsParams['firstNameFieldBazPostOnCreate'],
+                            'fieldBazPostOnUpdate'           => $this->contactsParams['firstNameFieldBazPostOnUpdate'],
+                            'fieldDataInputMinLength'        => 1,
+                            'fieldDataInputMaxLength'        => 100,
+                            'fieldValue'                     => $this->contactsParams['prefix']
+                        ]
+                    ) .
+                '</div>';
+        }
+
+        $name .=
             '<div class="col">' .
                 $this->adminLTETags->useTag('fields',
                     [
@@ -134,14 +242,16 @@ class Single
                         'fieldType'                      => 'input',
                         'fieldHelp'                      => true,
                         'fieldHelpTooltipContent'        => 'First Name',
-                        'fieldRequired'                  => true,
+                        'fieldHidden'                    => $this->contactsParams['firstNameFieldHidden'],
+                        'fieldDisabled'                  => $this->contactsParams['firstNameFieldDisabled'],
+                        'fieldRequired'                  => $this->contactsParams['firstNameFieldRequired'],
                         'fieldBazScan'                   => true,
                         'fieldBazJstreeSearch'           => true,
-                        'fieldBazPostOnCreate'           => false,
-                        'fieldBazPostOnUpdate'           => false,
+                        'fieldBazPostOnCreate'           => $this->contactsParams['firstNameFieldBazPostOnCreate'],
+                        'fieldBazPostOnUpdate'           => $this->contactsParams['firstNameFieldBazPostOnUpdate'],
                         'fieldDataInputMinLength'        => 1,
                         'fieldDataInputMaxLength'        => 100,
-                        'fieldValue'                     => ''
+                        'fieldValue'                     => $this->contactsParams['first_name']
                     ]
                 ) .
             '</div>
@@ -157,68 +267,317 @@ class Single
                         'fieldType'                      => 'input',
                         'fieldHelp'                      => true,
                         'fieldHelpTooltipContent'        => 'Last Name',
-                        'fieldRequired'                  => true,
+                        'fieldHidden'                    => $this->contactsParams['lastNameFieldHidden'],
+                        'fieldDisabled'                  => $this->contactsParams['lastNameFieldDisabled'],
+                        'fieldRequired'                  => $this->contactsParams['lastNameFieldRequired'],
                         'fieldBazScan'                   => true,
                         'fieldBazJstreeSearch'           => true,
-                        'fieldBazPostOnCreate'           => false,
-                        'fieldBazPostOnUpdate'           => false,
+                        'fieldBazPostOnCreate'           => $this->contactsParams['lastNameFieldBazPostOnCreate'],
+                        'fieldBazPostOnUpdate'           => $this->contactsParams['lastNameFieldBazPostOnUpdate'],
                         'fieldDataInputMinLength'        => 1,
                         'fieldDataInputMaxLength'        => 100,
-                        'fieldValue'                     => ''
+                        'fieldValue'                     => $this->contactsParams['last_name']
                     ]
                 ) .
             '</div>';
+
+        if ($this->contactsParams['includeNameSuffix']) {
+            $name .=
+                '<div class="col-md-1">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                      => $this->params['component'],
+                            'componentName'                  => $this->params['componentName'],
+                            'componentId'                    => $this->params['componentId'],
+                            'sectionId'                      => $this->params['sectionId'],
+                            'fieldId'                        => 'suffix',
+                            'fieldLabel'                     => 'Suffix',
+                            'fieldType'                      => 'input',
+                            'fieldHelp'                      => true,
+                            'fieldHelpTooltipContent'        => 'Suffix',
+                            'fieldBazScan'                   => true,
+                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazPostOnCreate'           => $this->contactsParams['firstNameFieldBazPostOnCreate'],
+                            'fieldBazPostOnUpdate'           => $this->contactsParams['firstNameFieldBazPostOnUpdate'],
+                            'fieldDataInputMinLength'        => 1,
+                            'fieldDataInputMaxLength'        => 100,
+                            'fieldValue'                     => $this->contactsParams['suffix']
+                        ]
+                    ) .
+                '</div>';
+        }
+
+        $name .=
+            '</div>';
+
+        return $name;
+    }
+
+    protected function inclEmail()
+    {
+        $ccEmailsChecked = false;
+        if (isset($this->params['contacts']['cc_emails_to_secondary_email'])) {
+            if ($this->params['contacts']['cc_emails_to_secondary_email'] == 1) {
+                $ccEmailsChecked = true;
+            }
+        }
+
+        return
+            '<div class="row">
+                <div class="col">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                      => $this->params['component'],
+                            'componentName'                  => $this->params['componentName'],
+                            'componentId'                    => $this->params['componentId'],
+                            'sectionId'                      => $this->params['sectionId'],
+                            'fieldId'                        => 'email',
+                            'fieldLabel'                     => 'Email',
+                            'fieldType'                      => 'input',
+                            'fieldHelp'                      => true,
+                            'fieldHelpTooltipContent'        => 'Email',
+                            'fieldHidden'                    => $this->contactsParams['emailFieldHidden'],
+                            'fieldDisabled'                  => $this->contactsParams['emailFieldDisabled'],
+                            'fieldRequired'                  => $this->contactsParams['emailFieldRequired'],
+                            'fieldBazScan'                   => true,
+                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazPostOnCreate'           => $this->contactsParams['emailFieldBazPostOnCreate'],
+                            'fieldBazPostOnUpdate'           => $this->contactsParams['emailFieldBazPostOnUpdate'],
+                            'fieldDataInputMinLength'        => 1,
+                            'fieldDataInputMaxLength'        => 100,
+                            'fieldValue'                     => $this->contactsParams['email']
+                        ]
+                    ) .
+                '</div>
+                <div class="col">
+                    <div class="row">
+                        <div class="col-md-10">' .
+                            $this->adminLTETags->useTag('fields',
+                                [
+                                    'component'                      => $this->params['component'],
+                                    'componentName'                  => $this->params['componentName'],
+                                    'componentId'                    => $this->params['componentId'],
+                                    'sectionId'                      => $this->params['sectionId'],
+                                    'fieldId'                        => 'secondary_email',
+                                    'fieldLabel'                     => $this->contactsParams['secondaryEmailFieldLabel'],
+                                    'fieldType'                      => 'input',
+                                    'fieldHelp'                      => true,
+                                    'fieldHelpTooltipContent'        => $this->contactsParams['secondaryEmailFieldLabel'],
+                                    'fieldHidden'                    => $this->contactsParams['secondaryEmailFieldHidden'],
+                                    'fieldDisabled'                  => $this->contactsParams['secondaryEmailFieldDisabled'],
+                                    'fieldRequired'                  => $this->contactsParams['secondaryEmailFieldRequired'],
+                                    'fieldBazScan'                   => true,
+                                    'fieldBazJstreeSearch'           => true,
+                                    'fieldBazPostOnCreate'           => $this->contactsParams['secondaryEmailFieldBazPostOnCreate'],
+                                    'fieldBazPostOnUpdate'           => $this->contactsParams['secondaryEmailFieldBazPostOnUpdate'],
+                                    'fieldDataInputMinLength'        => 1,
+                                    'fieldDataInputMaxLength'        => 100,
+                                    'fieldValue'                     => $this->contactsParams['secondary_email']
+                                ]
+                            ) .
+                        '</div>
+                        <div class="col-md-2">' .
+                            $this->adminLTETags->useTag('fields',
+                                [
+                                    'component'                      => $this->params['component'],
+                                    'componentName'                  => $this->params['componentName'],
+                                    'componentId'                    => $this->params['componentId'],
+                                    'sectionId'                      => $this->params['sectionId'],
+                                    'fieldId'                        => 'cc_emails_to_secondary_email',
+                                    'fieldLabel'                     => 'CC Emails?',
+                                    'fieldHelp'                      => true,
+                                    'fieldHelpTooltipContent'        => 'CC Emails to secondary email address?',
+                                    'fieldHidden'                    => $this->contactsParams['ccEmailsToSecondaryEmailFieldHidden'],
+                                    'fieldDisabled'                  => $this->contactsParams['ccEmailsToSecondaryEmailFieldDisabled'],
+                                    'fieldRequired'                  => $this->contactsParams['ccEmailsToSecondaryEmailFieldRequired'],
+                                    'fieldType'                      => 'checkbox',
+                                    'fieldCheckboxType'              => 'info',
+                                    'fieldCheckboxChecked'           => $ccEmailsChecked,
+                                    'fieldBazScan'                   => true,
+                                    'fieldBazJstreeSearch'           => true,
+                                    'fieldBazPostOnCreate'           => $this->contactsParams['ccEmailsToSecondaryEmailFieldBazPostOnCreate'],
+                                    'fieldBazPostOnUpdate'           => $this->contactsParams['ccEmailsToSecondaryEmailFieldBazPostOnUpdate'],
+                                ]
+                            ) .
+                        '</div>
+                    </div>
+                </div>
+            </div>';
     }
 
     protected function inclPhone()
     {
         return
-            '<div class="col">' .
-                $this->adminLTETags->useTag('fields',
-                    [
-                        'component'                      => $this->params['component'],
-                        'componentName'                  => $this->params['componentName'],
-                        'componentId'                    => $this->params['componentId'],
-                        'sectionId'                      => $this->params['sectionId'],
-                        'fieldId'                        => 'contact_phone',
-                        'fieldLabel'                     => 'Phone',
-                        'fieldType'                      => 'input',
-                        'fieldHelp'                      => true,
-                        'fieldHelpTooltipContent'        => 'Phone number of the contact',
-                        'fieldRequired'                  => true,
-                        'fieldBazScan'                   => true,
-                        'fieldBazJstreeSearch'           => true,
-                        'fieldBazPostOnCreate'           => false,
-                        'fieldBazPostOnUpdate'           => false,
-                        'fieldDataInputMinLength'        => 1,
-                        'fieldDataInputMaxLength'        => 15,
-                        'fieldValue'                     => ''
-                    ]
-                ) .
-            '</div>
-            <div class="col">' .
-                $this->adminLTETags->useTag('fields',
-                    [
-                        'component'                      => $this->params['component'],
-                        'componentName'                  => $this->params['componentName'],
-                        'componentId'                    => $this->params['componentId'],
-                        'sectionId'                      => $this->params['sectionId'],
-                        'fieldId'                        => 'contact_phone_ext',
-                        'fieldLabel'                     => 'Extension',
-                        'fieldType'                      => 'input',
-                        'fieldHelp'                      => true,
-                        'fieldHelpTooltipContent'        => 'Phone number extension of the contact',
-                        'fieldRequired'                  => false,
-                        'fieldBazScan'                   => true,
-                        'fieldBazJstreeSearch'           => true,
-                        'fieldBazPostOnCreate'           => false,
-                        'fieldBazPostOnUpdate'           => false,
-                        'fieldDataInputMinLength'        => 1,
-                        'fieldDataInputMaxLength'        => 15,
-                        'fieldValue'                     => ''
-                    ]
-                ) .
-            '</div>';
+            '<div class="row">
+                <div class="col">
+                    <div class="row">
+                        <div class="col-md-8">' .
+                            $this->adminLTETags->useTag('fields',
+                                [
+                                    'component'                      => $this->params['component'],
+                                    'componentName'                  => $this->params['componentName'],
+                                    'componentId'                    => $this->params['componentId'],
+                                    'sectionId'                      => $this->params['sectionId'],
+                                    'fieldId'                        => 'contact_phone',
+                                    'fieldLabel'                     => 'Phone',
+                                    'fieldType'                      => 'input',
+                                    'fieldHelp'                      => true,
+                                    'fieldHelpTooltipContent'        => 'Phone',
+                                    'fieldHidden'                    => $this->contactsParams['contactPhoneFieldHidden'],
+                                    'fieldDisabled'                  => $this->contactsParams['contactPhoneFieldDisabled'],
+                                    'fieldRequired'                  => $this->contactsParams['contactPhoneFieldRequired'],
+                                    'fieldBazScan'                   => true,
+                                    'fieldBazJstreeSearch'           => true,
+                                    'fieldBazPostOnCreate'           => $this->contactsParams['contactPhoneFieldBazPostOnCreate'],
+                                    'fieldBazPostOnUpdate'           => $this->contactsParams['contactPhoneFieldBazPostOnUpdate'],
+                                    'fieldDataInputMinLength'        => 1,
+                                    'fieldDataInputMaxLength'        => 100,
+                                    'fieldValue'                     => $this->contactsParams['contact_phone']
+                                ]
+                            ) .
+                        '</div>
+                        <div class="col-md-4">' .
+                            $this->adminLTETags->useTag('fields',
+                                [
+                                    'component'                      => $this->params['component'],
+                                    'componentName'                  => $this->params['componentName'],
+                                    'componentId'                    => $this->params['componentId'],
+                                    'sectionId'                      => $this->params['sectionId'],
+                                    'fieldId'                        => 'contact_phone_ext',
+                                    'fieldLabel'                     => 'Extension',
+                                    'fieldType'                      => 'input',
+                                    'fieldHelp'                      => true,
+                                    'fieldHidden'                    => $this->contactsParams['contactPhoneExtFieldHidden'],
+                                    'fieldDisabled'                  => $this->contactsParams['contactPhoneExtFieldDisabled'],
+                                    'fieldRequired'                  => $this->contactsParams['contactPhoneExtFieldRequired'],
+                                    'fieldBazScan'                   => true,
+                                    'fieldBazJstreeSearch'           => true,
+                                    'fieldBazPostOnCreate'           => $this->contactsParams['contactPhoneExtFieldBazPostOnCreate'],
+                                    'fieldBazPostOnUpdate'           => $this->contactsParams['contactPhoneExtFieldBazPostOnUpdate'],
+                                    'fieldDataInputMinLength'        => 1,
+                                    'fieldDataInputMaxLength'        => 20,
+                                    'fieldValue'                     => $this->contactsParams['contact_phone_ext']
+                                ]
+                            ) .
+                        '</div>
+                    </div>
+                </div>
+                <div class="col">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                      => $this->params['component'],
+                            'componentName'                  => $this->params['componentName'],
+                            'componentId'                    => $this->params['componentId'],
+                            'sectionId'                      => $this->params['sectionId'],
+                            'fieldId'                        => 'contact_mobile',
+                            'fieldLabel'                     => 'Mobile',
+                            'fieldType'                      => 'input',
+                            'fieldHelp'                      => true,
+                            'fieldHelpTooltipContent'        => 'Mobile',
+                            'fieldHidden'                    => $this->contactsParams['contactMobileFieldHidden'],
+                            'fieldDisabled'                  => $this->contactsParams['contactMobileFieldDisabled'],
+                            'fieldRequired'                  => $this->contactsParams['contactMobileFieldRequired'],
+                            'fieldBazScan'                   => true,
+                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazPostOnCreate'           => $this->contactsParams['contactMobileFieldBazPostOnCreate'],
+                            'fieldBazPostOnUpdate'           => $this->contactsParams['contactMobileFieldBazPostOnUpdate'],
+                            'fieldDataInputMinLength'        => 1,
+                            'fieldDataInputMaxLength'        => 15,
+                            'fieldValue'                     => $this->contactsParams['contact_mobile']
+                        ]
+                    ) .
+                '</div>
+            </div>';
+    }
+
+    protected function inclOther()
+    {
+        return
+            '<div class="row">
+                <div class="col">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                      => $this->params['component'],
+                            'componentName'                  => $this->params['componentName'],
+                            'componentId'                    => $this->params['componentId'],
+                            'sectionId'                      => $this->params['sectionId'],
+                            'fieldId'                        => 'contact_fax',
+                            'fieldLabel'                     => $this->contactsParams['contactFaxFieldLabel'],
+                            'fieldType'                      => 'input',
+                            'fieldHelp'                      => true,
+                            'fieldHelpTooltipContent'        => $this->contactsParams['contactFaxFieldLabel'],
+                            'fieldHidden'                    => $this->contactsParams['contactFaxFieldHidden'],
+                            'fieldDisabled'                  => $this->contactsParams['contactFaxFieldDisabled'],
+                            'fieldRequired'                  => $this->contactsParams['contactFaxFieldRequired'],
+                            'fieldBazScan'                   => true,
+                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazPostOnCreate'           => $this->contactsParams['contactFaxFieldBazPostOnCreate'],
+                            'fieldBazPostOnUpdate'           => $this->contactsParams['contactFaxFieldBazPostOnUpdate'],
+                            'fieldDataInputMinLength'        => 1,
+                            'fieldDataInputMaxLength'        => 15,
+                            'fieldValue'                     => $this->contactsParams['contact_fax']
+                        ]
+                    ) .
+                '</div>
+                <div class="col">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                      => $this->params['component'],
+                            'componentName'                  => $this->params['componentName'],
+                            'componentId'                    => $this->params['componentId'],
+                            'sectionId'                      => $this->params['sectionId'],
+                            'fieldId'                        => 'contact_other',
+                            'fieldLabel'                     => $this->contactsParams['contactOtherFieldLabel'],
+                            'fieldType'                      => 'input',
+                            'fieldHelp'                      => true,
+                            'fieldHelpTooltipContent'        => $this->contactsParams['contactOtherFieldLabel'],
+                            'fieldHidden'                    => $this->contactsParams['contactOtherFieldHidden'],
+                            'fieldDisabled'                  => $this->contactsParams['contactOtherFieldDisabled'],
+                            'fieldRequired'                  => $this->contactsParams['contactOtherFieldRequired'],
+                            'fieldBazScan'                   => true,
+                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazPostOnCreate'           => $this->contactsParams['contactOtherFieldBazPostOnCreate'],
+                            'fieldBazPostOnUpdate'           => $this->contactsParams['contactOtherFieldBazPostOnUpdate'],
+                            'fieldDataInputMinLength'        => 1,
+                            'fieldDataInputMaxLength'        => 15,
+                            'fieldValue'                     => $this->contactsParams['contact_other']
+                        ]
+                    ) .
+                '</div>
+            </div>';
+    }
+
+    protected function inclNotes()
+    {
+        return
+            '<div class="row">
+                <div class="col">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                      => $this->params['component'],
+                            'componentName'                  => $this->params['componentName'],
+                            'componentId'                    => $this->params['componentId'],
+                            'sectionId'                      => $this->params['sectionId'],
+                            'fieldId'                        => 'contact_notes',
+                            'fieldLabel'                     => $this->contactsParams['contactNotesFieldLabel'],
+                            'fieldType'                      => 'textarea',
+                            'fieldHelp'                      => true,
+                            'fieldHelpTooltipContent'        => $this->contactsParams['contactNotesFieldLabel'],
+                            'fieldHidden'                    => $this->contactsParams['contactNotesFieldHidden'],
+                            'fieldDisabled'                  => $this->contactsParams['contactNotesFieldDisabled'],
+                            'fieldRequired'                  => $this->contactsParams['contactNotesFieldRequired'],
+                            'fieldBazScan'                   => true,
+                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazPostOnCreate'           => $this->contactsParams['contactNotesFieldBazPostOnCreate'],
+                            'fieldBazPostOnUpdate'           => $this->contactsParams['contactNotesFieldBazPostOnUpdate'],
+                            'fieldDataInputMinLength'        => 1,
+                            'fieldDataInputMaxLength'        => 2048,
+                            'fieldTextareaRows'              => 2,
+                            'fieldValue'                     => $this->contactsParams['contact_notes']
+                        ]
+                    ) .
+                '</div>
+            </div>';
     }
 
     protected function inclBaseJs()
@@ -256,24 +615,41 @@ class Single
         return $baseJs;
     }
 
-    protected function inclEmailMobileJs()
-    {
-        return
-            '"' . $this->compSecId . '-account_email"        : { },
-            "' . $this->compSecId . '-contact_mobile"        : { },';
-    }
-
     protected function inclNameJs()
     {
         return
-            '"' . $this->compSecId . '-first_name"           : { },
-            "' . $this->compSecId . '-last_name"             : { },';
+            '"' . $this->compSecId . '-prefix"                      : { },
+            "' . $this->compSecId . '-first_name"                   : { },
+            "' . $this->compSecId . '-last_name"                    : { },
+            "' . $this->compSecId . '-suffix"                       : { },';
+    }
+
+    protected function inclEmailJs()
+    {
+        return
+            '"' . $this->compSecId . '-email"                       : { },
+            "' . $this->compSecId . '-secondary_email"              : { },
+            "' . $this->compSecId . '-cc_emails_to_secondary_email" : { },';
     }
 
     protected function inclPhoneJs()
     {
         return
-            '"' . $this->compSecId . '-contact_phone"        : { },
-            "' . $this->compSecId . '-contact_phone_ext"     : { }';
+            '"' . $this->compSecId . '-contact_phone"               : { },
+            "' . $this->compSecId . '-contact_phone_ext"            : { },
+            "' . $this->compSecId . '-contact_mobile"               : { },';
+    }
+
+    protected function inclOtherJs()
+    {
+        return
+            '"' . $this->compSecId . '-contact_other"               : { },
+            "' . $this->compSecId . '-contact_fax"                  : { },';
+    }
+
+    protected function inclNotesJs()
+    {
+        return
+            '"' . $this->compSecId . '-contact_notes"               : { }';
     }
 }

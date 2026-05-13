@@ -1,8 +1,3 @@
-{% set firstNameDisabled = false %}
-{% set lastNameDisabled = false %}
-{% set canUpload = true %}
-{% set canAvatar = true %}
-{% set canRemove = true %}
 <div class="row vdivide">
     <div class="col-md-3 col-sm-12">
         {% if profile['contact']['portrait'] is defined and profile['contact']['portrait'] !== '' %}
@@ -28,9 +23,9 @@
                 'imageType'                      : 'portrait',
                 'initialsAvatar'                 : initialsAvatar,
                 'storageType'                    : 'private',
-                'upload'                         : canUpload,
-                'avatar'                         : canAvatar,
-                'remove'                         : canRemove,
+                'upload'                         : true,
+                'avatar'                         : true,
+                'remove'                         : true,
                 'recover'                        : true,
                 'portraitLink'                   : portraitLink
             ]
@@ -79,6 +74,8 @@
                     ]
                 )}}
             </div>
+        </div>
+        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -109,48 +106,25 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'first_name',
-                        'fieldLabel'                     : 'First Name',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'First Name',
-                        'fieldRequired'                  : true,
-                        'fieldDisabled'                  : firstNameDisabled,
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 50,
-                        'fieldValue'                     : profile['contact']['first_name']
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'last_name',
-                        'fieldLabel'                     : 'Last Name',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Last Name',
-                        'fieldRequired'                  : true,
-                        'fieldDisabled'                  : lastNameDisabled,
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 50,
-                        'fieldValue'                     : profile['contact']['last_name']
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_username',
+                        'fieldLabel'                            : 'Account Username',
+                        'fieldType'                             : 'input',
+                        'fieldPlaceholder'                      : 'Account Username',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Account Username',
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldRequired'                         : false,
+                        'fieldDisabled'                         : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 50,
+                        'fieldValue'                            : account['username']
                     ]
                 )}}
             </div>

@@ -193,6 +193,7 @@ class Profiles extends BasePackage
         }
 
         unset($data['id']);
+        unset($data['email']);//Remove email as it can only be updated via users/account
 
         $profile['contact'] = array_merge($profile['contact'], $data);
 
