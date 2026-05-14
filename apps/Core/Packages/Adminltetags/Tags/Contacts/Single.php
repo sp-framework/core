@@ -85,7 +85,7 @@ class Single
         $fieldsArr = null;
         $field = null;
 
-        $fieldsArr = ['includePortrait','includeNamePrefix','includeName','includeNameSuffix','includeEmail','includeOther','includeNotes','firstNameFieldHidden','firstNameFieldDisabled','firstNameFieldRequired','firstNameFieldBazPostOnCreate','firstNameFieldBazPostOnUpdate','lastNameFieldHidden','lastNameFieldDisabled','lastNameFieldRequired','lastNameFieldBazPostOnCreate','lastNameFieldBazPostOnUpdate','emailFieldHidden','emailFieldDisabled','emailFieldRequired','emailFieldBazPostOnCreate','emailFieldBazPostOnUpdate','secondaryEmailFieldHidden','secondaryEmailFieldDisabled','secondaryEmailFieldRequired','secondaryEmailFieldBazPostOnCreate','secondaryEmailFieldBazPostOnUpdate','ccEmailsToSecondaryEmailFieldHidden','ccEmailsToSecondaryEmailFieldDisabled','ccEmailsToSecondaryEmailFieldRequired','ccEmailsToSecondaryEmailFieldBazPostOnCreate','ccEmailsToSecondaryEmailFieldBazPostOnUpdate','contactPhoneFieldHidden','contactPhoneFieldDisabled','contactPhoneFieldRequired','contactPhoneFieldBazPostOnCreate','contactPhoneFieldBazPostOnUpdate','contactPhoneExtFieldHidden','contactPhoneExtFieldDisabled','contactPhoneExtFieldRequired','contactPhoneExtFieldBazPostOnCreate','contactPhoneExtFieldBazPostOnUpdate','contactMobileFieldHidden','contactMobileFieldDisabled','contactMobileFieldRequired','contactMobileFieldBazPostOnCreate','contactMobileFieldBazPostOnUpdate','contactFaxFieldHidden','contactFaxFieldDisabled','contactFaxFieldRequired','contactFaxFieldBazPostOnCreate','contactFaxFieldBazPostOnUpdate','contactOtherFieldHidden','contactOtherFieldDisabled','contactOtherFieldRequired','contactOtherFieldBazPostOnCreate','contactOtherFieldBazPostOnUpdate','contactNotesFieldHidden','contactNotesFieldDisabled','contactNotesFieldRequired','contactNotesFieldBazPostOnCreate','contactNotesFieldBazPostOnUpdate'];
+        $fieldsArr = ['multiple','includePortrait','includeNamePrefix','includeName','includeNameSuffix','includeEmail','includeOther','includeNotes','firstNameFieldHidden','firstNameFieldDisabled','firstNameFieldRequired','firstNameFieldBazPostOnCreate','firstNameFieldBazPostOnUpdate','lastNameFieldHidden','lastNameFieldDisabled','lastNameFieldRequired','lastNameFieldBazPostOnCreate','lastNameFieldBazPostOnUpdate','emailFieldHidden','emailFieldDisabled','emailFieldRequired','emailFieldBazPostOnCreate','emailFieldBazPostOnUpdate','secondaryEmailFieldHidden','secondaryEmailFieldDisabled','secondaryEmailFieldRequired','secondaryEmailFieldBazPostOnCreate','secondaryEmailFieldBazPostOnUpdate','ccEmailsToSecondaryEmailFieldHidden','ccEmailsToSecondaryEmailFieldDisabled','ccEmailsToSecondaryEmailFieldRequired','ccEmailsToSecondaryEmailFieldBazPostOnCreate','ccEmailsToSecondaryEmailFieldBazPostOnUpdate','contactPhoneFieldHidden','contactPhoneFieldDisabled','contactPhoneFieldRequired','contactPhoneFieldBazPostOnCreate','contactPhoneFieldBazPostOnUpdate','contactPhoneExtFieldHidden','contactPhoneExtFieldDisabled','contactPhoneExtFieldRequired','contactPhoneExtFieldBazPostOnCreate','contactPhoneExtFieldBazPostOnUpdate','contactMobileFieldHidden','contactMobileFieldDisabled','contactMobileFieldRequired','contactMobileFieldBazPostOnCreate','contactMobileFieldBazPostOnUpdate','contactFaxFieldHidden','contactFaxFieldDisabled','contactFaxFieldRequired','contactFaxFieldBazPostOnCreate','contactFaxFieldBazPostOnUpdate','contactOtherFieldHidden','contactOtherFieldDisabled','contactOtherFieldRequired','contactOtherFieldBazPostOnCreate','contactOtherFieldBazPostOnUpdate','contactNotesFieldHidden','contactNotesFieldDisabled','contactNotesFieldRequired','contactNotesFieldBazPostOnCreate','contactNotesFieldBazPostOnUpdate'];
 
         foreach ($fieldsArr as $field) {
             $this->contactsParams[$field] =
@@ -102,15 +102,20 @@ class Single
     {
         $vdivide = '';
         if (isset($this->contactsParams['includePortrait']) && $this->contactsParams['includePortrait'] === true) {
-            $vdivide = ' vdivide';
-        }
-
-        $this->content .= '<div class="row' . $vdivide . '">';
-
-        if (isset($this->contactsParams['includePortrait']) && $this->contactsParams['includePortrait'] === true) {
-            $this->content .= '<div class="col-md-3 col-sm-12">';
-            $this->content .= $this->inclPortrait();
-            $this->content .= '</div>';
+            if ($this->contactsParams['multiple']) {
+                $this->content .= '<div class="col">';
+                $this->content .= '<div class="row">';
+                $this->content .= '<div class="col">';
+                $this->content .= $this->inclPortrait();
+                $this->content .= '</div>';
+                $this->content .= '</div>';
+                $this->content .= '<hr>';
+            } else {
+                $this->content .= '<div class="row vdivide">';
+                $this->content .= '<div class="col-md-3 col-sm-12">';
+                $this->content .= $this->inclPortrait();
+                $this->content .= '</div>';
+            }
         }
 
         $this->content .= '<div class="col">';
@@ -132,7 +137,11 @@ class Single
             $this->content .= $this->inclNotes();
         }
 
-        $this->content .= '</div></div>';
+        if ($this->contactsParams['multiple']) {
+            $this->content .= '</div></div>';
+        } else {
+            $this->content .= '</div>';
+        }
 
         $this->content .= $this->inclBaseJs();
 
@@ -384,7 +393,7 @@ class Single
                                     'componentId'                    => $this->params['componentId'],
                                     'sectionId'                      => $this->params['sectionId'],
                                     'fieldId'                        => 'cc_emails_to_secondary_email',
-                                    'fieldLabel'                     => 'CC Emails?',
+                                    'fieldLabel'                     => 'CC?',
                                     'fieldHelp'                      => true,
                                     'fieldHelpTooltipContent'        => 'CC Emails to secondary email address?',
                                     'fieldHidden'                    => $this->contactsParams['ccEmailsToSecondaryEmailFieldHidden'],
@@ -431,7 +440,7 @@ class Single
                                     'fieldBazPostOnCreate'           => $this->contactsParams['contactPhoneFieldBazPostOnCreate'],
                                     'fieldBazPostOnUpdate'           => $this->contactsParams['contactPhoneFieldBazPostOnUpdate'],
                                     'fieldDataInputMinLength'        => 1,
-                                    'fieldDataInputMaxLength'        => 100,
+                                    'fieldDataInputMaxLength'        => 15,
                                     'fieldValue'                     => $this->contactsParams['contact_phone']
                                 ]
                             ) .
@@ -455,7 +464,7 @@ class Single
                                     'fieldBazPostOnCreate'           => $this->contactsParams['contactPhoneExtFieldBazPostOnCreate'],
                                     'fieldBazPostOnUpdate'           => $this->contactsParams['contactPhoneExtFieldBazPostOnUpdate'],
                                     'fieldDataInputMinLength'        => 1,
-                                    'fieldDataInputMaxLength'        => 20,
+                                    'fieldDataInputMaxLength'        => 10,
                                     'fieldValue'                     => $this->contactsParams['contact_phone_ext']
                                 ]
                             ) .

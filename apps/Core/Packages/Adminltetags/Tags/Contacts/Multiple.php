@@ -104,6 +104,7 @@ class Multiple
             'componentId'                                 => $this->params['componentId'],
             'sectionId'                                   => $this->params['sectionId'],
             'contactFieldType'                            => 'single',
+            'multiple'                                    => true
         ];
 
         $singleContactArr = array_merge($singleContactArr, $this->contactsParams);
