@@ -59,7 +59,7 @@ class Single
             $this->params['searchType'] :
             'city';
 
-        $fieldsArr = ['addressReference','attentionTo','streetAddress','streetAddress2','streetAddress3','streetAddress4','cityId','cityName','postCode','stateId','stateName','countryId','countryName'];
+        $fieldsArr = ['addressReference','attentionTo','streetAddress','streetAddress2','streetAddress3','streetAddress4','cityId','cityName','postCodeId','postCode','stateId','stateName','countryId','countryName'];
         foreach ($fieldsArr as $field) {
             $this->addressesParams[$field] =
                 isset($this->params[$field]) ?
@@ -781,9 +781,6 @@ class Single
                             highlight: true,
                             resultItem: {
                                 content: (data, source) => {
-                                    //eslint-disable-next-line
-                                    console.log(data);
-
                                     source.innerHTML = data.match + " <span>(Locality: " + data.value.name + ", State: " + data.value.state_name + ", Country: " + data.value.country_name + ")</span>";
                                 },
                                 element: "div"
@@ -804,6 +801,8 @@ class Single
                                 }
                             },
                             onSelection: feedback => {
+                                $("#' . $this->compSecId . '-post_code_id").val(feedback.selection.value.id);
+                                $("#' . $this->compSecId . '-post_code_id").attr("value", feedback.selection.value.id);
                                 $("#' . $this->compSecId . '-post_code").val(feedback.selection.value.code);
                                 $("#' . $this->compSecId . '-post_code").attr("value", feedback.selection.value.code);
                                 $("#' . $this->compSecId . '-state_id").val(feedback.selection.value.state_id);

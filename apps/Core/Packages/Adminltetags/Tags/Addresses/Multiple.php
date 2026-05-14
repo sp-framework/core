@@ -338,7 +338,7 @@ class Multiple
                                                                 '<dt class="text-uppercase mb-0 col-sm-4">City</dt>
                                                                 <dd class="mb-0 col-sm-8 cla-city" data-id="' . $address['city_id'] . '">' . $address['city_name'] . '</dd>
                                                                 <dt class="text-uppercase mb-0 col-sm-4">Post Code</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-postcode" data-id="' . $address['post_code_id'] . '">' . $address['post_code'] . '</dd>
+                                                                <dd class="mb-0 col-sm-8 cla-post_code" data-id="' . $address['post_code_id'] . '">' . $address['post_code'] . '</dd>
                                                                 <dt class="text-uppercase mb-0 col-sm-4">State</dt>
                                                                 <dd class="mb-0 col-sm-8 cla-state" data-id="' . $address['state_id'] . '">' . $address['state_name'] . '</dd>
                                                                 <dt class="text-uppercase mb-0 col-sm-4">Country</dt>
@@ -622,8 +622,8 @@ class Multiple
                                 if ($("#' . $this->compSecId . '-post_code").length > 0) {
                                     data["post_code"] = $("#' . $this->compSecId . '-post_code").val().trim();
                                     html +=
-                                        \'<dt class="text-uppercase mb-0 col-sm-4">City</dt>\' +
-                                        \'<dd class="mb-0 col-sm-8 cla-city" data-id="\' + data["post_code_id"] + \'">\' + data["post_code"] + \'</dd>\';
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">Post Code</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-post_code" data-id="\' + data["post_code_id"] + \'">\' + data["post_code"] + \'</dd>\';
                                 }
                                 data["state_id"] = $("#' . $this->compSecId . '-state_id").val();
                                 if ($("#' . $this->compSecId . '-state_name").length > 0) {
@@ -733,7 +733,7 @@ class Multiple
                                             } else if ($(dd).is(".cla-city")) {
                                                 data["city_id"] = $(dd).data("id");
                                                 data["city_name"] = $(dd).html();
-                                            } else if ($(dd).is(".cla-postcode")) {
+                                            } else if ($(dd).is(".cla-post_code")) {
                                                 data["post_code_id"] = $(dd).data("id");
                                                 data["post_code"] = $(dd).html();
                                             } else if ($(dd).is(".cla-state")) {
@@ -773,7 +773,7 @@ class Multiple
                                             } else if ($(dd).is(".cla-city")) {
                                                 $("#' . $this->compSecId . '-city_id").val($(dd).data("id"));
                                                 $("#' . $this->compSecId . '-city_name").val($(dd).html());
-                                            } else if ($(dd).is(".cla-postcode")) {
+                                            } else if ($(dd).is(".cla-post_code")) {
                                                 $("#' . $this->compSecId . '-post_code_id").val($(dd).data("id"));
                                                 $("#' . $this->compSecId . '-post_code").val($(dd).html());
                                             } else if ($(dd).is(".cla-state")) {
@@ -810,7 +810,7 @@ class Multiple
                                             } else if ($(dd).is(".cla-city")) {
                                                 $("#' . $this->compSecId . '-city_id").val($(dd).data("id"));
                                                 $("#' . $this->compSecId . '-city_name").val($(dd).html());
-                                            } else if ($(dd).is(".cla-postcode")) {
+                                            } else if ($(dd).is(".cla-post_code")) {
                                                 $("#' . $this->compSecId . '-post_code_id").val($(dd).data("id"));
                                                 $("#' . $this->compSecId . '-post_code").val($(dd).html());
                                             } else if ($(dd).is(".cla-state")) {
