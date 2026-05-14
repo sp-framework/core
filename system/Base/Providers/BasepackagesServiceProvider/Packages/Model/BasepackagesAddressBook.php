@@ -28,6 +28,8 @@ class BasepackagesAddressBook extends BaseModel
 
     public $city_name;
 
+    public $post_code_id;
+
     public $post_code;
 
     public $state_id;

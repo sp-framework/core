@@ -69,23 +69,40 @@ class DevtoolsGeoExtractData extends BasePackage
         }
     }
 
-    protected function downloadGeoData()
+    protected function downloadGeoCountriesData()
     {
-        $this->method = 'downloadGeoData';
+        $this->method = 'downloadGeoCountriesData';
 
         return $this->downloadData(
-            'https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/json/countries%2Bstates%2Bcities.json',
-            base_path('apps/Core/Packages/Devtools/GeoExtractData/Data/countries+states+cities.json')
+            'https://github.com/dr5hn/countries-states-cities-database/releases/latest/download/json-countries+states+cities.json.gz',
+            base_path('apps/Core/Packages/Devtools/GeoExtractData/Data/json-countries+states+cities.json.gz')
         );
     }
 
-    protected function processGeoData()
+    protected function downloadGeoPostcodeData()
     {
+        $this->method = 'downloadGeoPostcodeData';
+
+        return $this->downloadData(
+            'https://github.com/dr5hn/countries-states-cities-database/releases/latest/download/json-postcodes.json.gz',
+            base_path('apps/Core/Packages/Devtools/GeoExtractData/Data/json-postcodes.json.gz')
+        );
+    }
+
+    protected function processGeoCountriesData()
+    {
+        $this->ungzData('json-countries+states+cities.json.gz');
+        $this->ungzData('json-postcodes.json.gz');
+
         $countries = [];
 
         try {
-            if ($this->localContent->fileExists($this->sourceDir . 'countries+states+cities.json')) {
-                $this->sourceFile = $this->helper->decode($this->localContent->read($this->sourceDir . 'countries+states+cities.json'), true);
+            if ($this->localContent->fileExists($this->sourceDir . 'json-countries+states+cities.json')) {
+                $this->sourceFile = $this->helper->decode($this->localContent->read($this->sourceDir . 'json-countries+states+cities.json'), true);
+            }
+
+            if ($this->localContent->fileExists($this->sourceDir . 'json-postcodes.json')) {
+                $postcodesArr = $this->helper->decode($this->localContent->read($this->sourceDir . 'json-postcodes.json'), true);
             }
         } catch (FilesystemException | UnableToReadFile | \throwable $e) {
             $this->addResponse($e->getMessage(), 1);
@@ -105,31 +122,83 @@ class DevtoolsGeoExtractData extends BasePackage
 
                 if ($states && is_array($states) && count($states) > 0) {
                     foreach ($states as $state) {
-                        $stateName = str_replace(' ', '' , strtolower($state['name']));
-
                         $cities = $state['cities'];
 
                         unset($state['cities']);
 
-                        $countries[$countryKey]['states'][$stateName] = $state;
+                        $countries[$countryKey]['states'][$country['id'] . '-' . $state['id']] = $state;
 
                         foreach ($cities as $city) {
                             $cityName = str_replace(' ', '' , strtolower($city['name']));
 
-                            $countries[$countryKey]['states'][$stateName]['cities'][$cityName] = $city;
+                            $countries[$countryKey]['states'][$country['id'] . '-' . $state['id']]['cities'][$cityName] = $city;
                         }
                     }
+
+                    $countries[$countryKey]['states'][$country['id'] . '-' . $state['id']]['postcodes'] = [];
                 }
             }
         }
 
+        $postCodes = [];
+
+        if ($postcodesArr && is_array($postcodesArr)) {
+            foreach ($postcodesArr as $postcode) {
+                if (!isset($postCodes[$postcode['country_id'] . '-' . $postcode['state_id']])) {
+                    $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']] = [];
+                }
+
+                $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']][$postcode['id']]['id'] = $postcode['id'];
+                $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']][$postcode['id']]['code'] = $postcode['code'];
+                $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']][$postcode['id']]['name'] = $postcode['locality_name'];
+                $postCodes[$postcode['country_id'] . '-' . $postcode['state_id']][$postcode['id']]['city_id'] = $postcode['city_id'];
+            }
+        }
+
         foreach ($countries as $countryKey => &$country) {
+            if (isset($country['states'])) {
+                foreach ($country['states'] as &$state) {
+                    if (isset($postCodes[$country['id'] . '-' . $state['id']])) {
+                        $countries[$countryKey]['states'][$country['id'] . '-' . $state['id']]['postcodes'] = $postCodes[$country['id'] . '-' . $state['id']];
+                    }
+                }
+            }
+
             $this->localContent->write($this->sourceDir . $countryKey . '.json', $this->helper->encode($country));
 
             unset($country['states']);
         }
 
         $this->localContent->write($this->sourceDir . 'AllCountries.json', $this->helper->encode($countries));
+
+        return true;
+    }
+
+    protected function ungzData($fileName)
+    {
+        try {
+            // Name of the output file (remove .gz)
+            $outFileName = str_replace('.gz', '', $fileName);
+
+            // Open the gzipped file in read-binary mode
+            $gzFile = gzopen(base_path($this->sourceDir . $fileName), 'rb');
+            // Open/Create the output file in write-binary mode
+            $outFile = fopen(base_path($this->sourceDir . $outFileName), 'wb');
+
+            // Read and write until the end of the compressed file
+            while (!gzeof($gzFile)) {
+                // Read 4KB at a time
+                fwrite($outFile, gzread($gzFile, 4096));
+            }
+
+            // Close the file pointers
+            fclose($outFile);
+            gzclose($gzFile);
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
 
         return true;
     }

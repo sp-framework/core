@@ -16,6 +16,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Filters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoHolidays;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoPostcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoRegions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
@@ -72,6 +73,8 @@ class Basepackages
 	protected $geoStates;
 
 	protected $geoCities;
+
+	protected $geoPostcodes;
 
 	protected $storages;
 
@@ -232,6 +235,13 @@ class Basepackages
 		$this->geoCities = (new GeoCities())->init();
 
 		return $this->geoCities;
+	}
+
+	protected function initGeoPostcodes()
+	{
+		$this->geoPostcodes = (new GeoPostcodes())->init();
+
+		return $this->geoPostcodes;
 	}
 
 	protected function initStorages()

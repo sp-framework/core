@@ -5,7 +5,7 @@ namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo;
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;
 
-class Cities
+class Postcodes
 {
     public function columns()
     {
@@ -22,6 +22,14 @@ class Cities
                     ]
                 ),
                 new Column(
+                    'code',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
                     'name',
                     [
                         'type'          => Column::TYPE_VARCHAR,
@@ -30,20 +38,9 @@ class Cities
                     ]
                 ),
                 new Column(
-                    'longitude',
+                    'city_id',
                     [
-                        'type'          => Column::TYPE_DECIMAL,
-                        'size'          => 11,
-                        'scale'         => 8,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'latitude',
-                    [
-                        'type'          => Column::TYPE_DECIMAL,
-                        'size'          => 10,
-                        'scale'         => 8,
+                        'type'          => Column::TYPE_INTEGER,
                         'notNull'       => false,
                     ]
                 ),
@@ -51,14 +48,14 @@ class Cities
                     'state_id',
                     [
                         'type'          => Column::TYPE_INTEGER,
-                        'notNull'       => true,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'country_id',
                     [
                         'type'          => Column::TYPE_INTEGER,
-                        'notNull'       => true,
+                        'notNull'       => false,
                     ]
                 )
             ]
@@ -72,6 +69,7 @@ class Cities
             new Index(
                 'column_INDEX',
                 [
+                    'code',
                     'name',
                     'state_id',
                     'country_id'

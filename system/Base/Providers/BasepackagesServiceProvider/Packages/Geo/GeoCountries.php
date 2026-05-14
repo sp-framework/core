@@ -86,6 +86,19 @@ class GeoCountries extends BasePackage
 
     public function installCountry(array $data)
     {
+        // /etc/apache2.conf - Change the timeout to 3600 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
+        // Timeout 3600
+
+        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
+        if ((int) ini_get('max_execution_time') < 3600) {
+            set_time_limit(3600);
+        }
+
+        //Increase memory_limit to 2G as the process takes a bit of memory to process the array.
+        if ((int) ini_get('memory_limit') < 2048) {
+            ini_set('memory_limit', '2048M');
+        }
+
         if (!isset($data['country_iso2'])) {
             $this->addResponse('Please provide country in iso2 format', 1);
 
@@ -122,6 +135,19 @@ class GeoCountries extends BasePackage
 
     public function uninstallCountry($data)
     {
+        // /etc/apache2.conf - Change the timeout to 3600 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
+        // Timeout 3600
+
+        //Increase Exectimeout to 20 mins as this process takes time to extract and merge data.
+        if ((int) ini_get('max_execution_time') < 3600) {
+            set_time_limit(3600);
+        }
+
+        //Increase memory_limit to 2G as the process takes a bit of memory to process the array.
+        if ((int) ini_get('memory_limit') < 2048) {
+            ini_set('memory_limit', '2048M');
+        }
+
         if (!isset($data['country_id'])) {
             $this->addResponse('Please provide country id', 1);
 
@@ -138,12 +164,22 @@ class GeoCountries extends BasePackage
                 $this->basepackages->geoStates->remove($state['id']);
             }
         }
+
         //Remove Cities
         $statesCities = $this->basepackages->geoCities->searchCitiesByCountryId($country['id']);
 
         if ($statesCities) {
             foreach ($statesCities as $city) {
                 $this->basepackages->geoCities->remove($city['id']);
+            }
+        }
+
+        //Remove Postcodes
+        $statesPostcodes = $this->basepackages->geoPostcodes->searchPostcodesByCountryId($country['id']);
+
+        if ($statesPostcodes) {
+            foreach ($statesPostcodes as $postcode) {
+                $this->basepackages->geoPostcodes->remove($postcode['id']);
             }
         }
 
@@ -226,6 +262,11 @@ class GeoCountries extends BasePackage
                 unset($state['cities']);
             }
 
+            if (isset($state['postcodes'])) {
+                $postcodes = $state['postcodes'];
+                unset($state['postcodes']);
+            }
+
             if (isset($state['id'])) {
                 $this->basepackages->geoStates->setFFAddUsingUpdateOrInsert(true);
 
@@ -235,7 +276,13 @@ class GeoCountries extends BasePackage
             if (isset($cities)) {
                 $this->registerCities($cities, $country_id, $state['id']);
             }
+
+            if (isset($postcodes)) {
+                $this->registerPostcodes($postcodes, $country_id, $state['id']);
+            }
         }
+
+        $this->basepackages->geoStates->ffStore->count(true);
     }
 
     protected function registerCities($citiesData, $country_id, $state_id)
@@ -250,6 +297,24 @@ class GeoCountries extends BasePackage
                 $this->basepackages->geoCities->add($city);
             }
         }
+
+        $this->basepackages->geoCities->ffStore->count(true);
+    }
+
+    protected function registerPostcodes($postcodesData, $country_id, $state_id)
+    {
+        foreach ($postcodesData as $key => $postcode) {
+            $postcode['state_id'] = $state_id;
+            $postcode['country_id'] = $country_id;
+
+            if (isset($postcode['id'])) {
+                $this->basepackages->geoPostcodes->setFFAddUsingUpdateOrInsert(true);
+
+                $this->basepackages->geoPostcodes->add($postcode);
+            }
+        }
+
+        $this->basepackages->geoPostcodes->ffStore->count(true);
     }
 
     public function isEnabled($countryId = null, $returnData = false)

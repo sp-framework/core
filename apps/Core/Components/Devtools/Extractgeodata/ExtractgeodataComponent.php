@@ -41,8 +41,9 @@ class ExtractgeodataComponent extends BaseComponent
             $success = false;
 
             if (isset($this->postData()['geo']) && $this->postData()['geo'] == 'true') {
-                $success = $this->geoExtractDataPackage->downloadGeoData();
-                $success = $this->geoExtractDataPackage->processGeoData();
+                $success = $this->geoExtractDataPackage->downloadGeoCountriesData();
+                $success = $this->geoExtractDataPackage->downloadGeoPostcodeData();
+                $success = $this->geoExtractDataPackage->processGeoCountriesData();
             }
 
             if (isset($this->postData()['timezone']) && $this->postData()['timezone'] == 'true') {
@@ -85,13 +86,18 @@ class ExtractgeodataComponent extends BaseComponent
             $methods = array_merge($methods,
                 [
                     [
-                        'method'    => 'downloadGeoData',
-                        'text'      => 'Download Geo Location Data...',
+                        'method'    => 'downloadGeoCountriesData',
+                        'text'      => 'Download Geo Location Countries Data...',
                         'remoteWeb' => true
                     ],
                     [
-                        'method'    => 'processGeoData',
-                        'text'      => 'Process Geo Location Data...'
+                        'method'    => 'downloadGeoPostcodeData',
+                        'text'      => 'Download Geo Location Postcode Data...',
+                        'remoteWeb' => true
+                    ],
+                    [
+                        'method'    => 'processGeoCountriesData',
+                        'text'      => 'Process Geo Location Countries Data...'
                     ]
                 ]
             );

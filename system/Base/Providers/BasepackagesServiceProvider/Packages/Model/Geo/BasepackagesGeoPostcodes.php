@@ -4,15 +4,15 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo;
 
 use System\Base\BaseModel;
 
-class BasepackagesGeoCities extends BaseModel
+class BasepackagesGeoPostcodes extends BaseModel
 {
     public $id;
 
+    public $code;
+
     public $name;
 
-    public $latitude;
-
-    public $longitude;
+    public $city_id;
 
     public $state_id;
 

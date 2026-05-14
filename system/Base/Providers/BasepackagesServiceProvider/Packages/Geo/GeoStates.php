@@ -126,4 +126,34 @@ class GeoStates extends BasePackage
 
         return $searchStates;
     }
+
+    public function addState(array $data)
+    {
+        if ($this->add($data)) {
+            $this->addResponse('State added');
+
+            return true;
+        }
+
+        $this->addResponse('Error Adding State', 1);
+    }
+
+    public function updateState(array $data)
+    {
+        $state = $this->getById($data['id']);
+
+        if (!$state) {
+            $this->addResponse('State with ID does not exists', 1);
+
+            return;
+        }
+
+        if ($this->update($data)) {
+            $this->addResponse('State updated');
+
+            return true;
+        }
+
+        $this->addResponse('Error Updating State', 1);
+    }
 }

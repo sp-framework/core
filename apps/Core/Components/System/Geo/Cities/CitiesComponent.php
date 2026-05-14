@@ -152,27 +152,4 @@ class CitiesComponent extends BaseComponent
             $this->addResponse('Search Query Missing', 1);
         }
     }
-
-    public function searchPostCodeAction()
-    {
-        $this->requestIsPost();
-
-        if ($this->postData()['search']) {
-            $searchQuery = $this->postData()['search'];
-
-            if (strlen($searchQuery) < 3) {
-                return;
-            }
-
-            $this->basepackages->geoCities->searchPostCodes($searchQuery);
-
-            $this->addResponse(
-                $this->basepackages->geoCities->packagesData->responseMessage,
-                $this->basepackages->geoCities->packagesData->responseCode,
-                $this->basepackages->geoCities->packagesData->responseData ?? []
-            );
-        } else {
-            $this->addResponse('Search Query Missing', 1);
-        }
-    }
 }

@@ -18,6 +18,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2Locati
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV6;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Holidays;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Postcodes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Regions;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
@@ -104,6 +105,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\Basepac
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCitiesIp2locationv6;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoHolidays;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoPostcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoRegions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoTimezones;
@@ -285,6 +287,10 @@ class Schema
                 'basepackages_geo_cities'                   => [
                         'schema'    => new Cities,
                         'model'     => new BasepackagesGeoCities,
+                    ],
+                'basepackages_geo_postcodes'                => [
+                        'schema'    => new Postcodes,
+                        'model'     => new BasepackagesGeoPostcodes,
                     ],
                 'basepackages_geo_cities_ip2locationv4'     => [
                         'schema'    => new CitiesIp2LocationV4,

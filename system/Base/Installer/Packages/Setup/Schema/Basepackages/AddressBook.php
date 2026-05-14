@@ -100,10 +100,17 @@ class AddressBook
                     ]
                 ),
                 new Column(
-                    'post_code',
+                    'post_code_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
-                        'size'    => 20,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'post_code',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
                         'notNull' => false,
                     ]
                 ),
@@ -143,6 +150,7 @@ class AddressBook
                     'column_UNIQUE',
                     [
                         'package_row_id',
+                        'package_name',
                         'address_reference'
                     ],
                     'UNIQUE'
@@ -158,7 +166,9 @@ class AddressBook
             new Index(
                 'column_INDEX',
                 [
-                    'package_row_id'
+                    'package_row_id',
+                    'package_name',
+                    'address_reference'
                 ],
                 'INDEX'
             )
