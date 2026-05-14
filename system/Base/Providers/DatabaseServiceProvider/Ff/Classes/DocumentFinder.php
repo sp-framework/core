@@ -287,6 +287,10 @@ class DocumentFinder
                 self::skip($found, $skip);
                 self::limit($found, $limit);
             }
+
+            if ($indexSearched && count($orderBy) > 0) {
+                self::sort($found, $orderBy);
+            }
         }
 
         return $found;
