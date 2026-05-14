@@ -114,9 +114,9 @@ class DevtoolsModules extends BasePackage
         }
 
         try {
-            if ($this->generateNewFiles($data) &&
-                $this->updateModuleJson($data, false, $viewPublic) &&
-                $this->modules->{$data['module_type']}->add($data)
+            if ($this->modules->{$data['module_type']}->add($data) &&
+                $this->generateNewFiles($data) &&
+                $this->updateModuleJson($data, false, $viewPublic)
             ) {
                 if (strtolower($data['app_type']) !== 'core') {
                     $this->reCalculateFilesHash($this->modules->{$data['module_type']}->packagesData->last);
