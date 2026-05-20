@@ -276,7 +276,7 @@ class Multiple
                                     'fieldBazPostOnUpdate'      => false
                                 ]
                             ) .
-                            '<ul class="list-group list-group-sortable" id="' . $this->compSecId . '-sortable-addresses-list">';
+                            '<ul class="list-group list-group-sortable" id="' . $this->compSecId . '-sortable-addresses-list" style="max-height: 450px;overflow: scroll;border-radius: 0 !important;">';
                                 if (isset($this->params['addresses']) && is_array($this->params['addresses']) && count($this->params['addresses']) > 0) {
                                     $this->content .=
                                         '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-addresses-list-nodata" hidden>
@@ -291,9 +291,6 @@ class Multiple
                                         $this->content .=
                                             '<li class="list-group-item list-group-item-secondary" area-disabled="false" style="cursor: pointer" data-new="0" data-address-id="' . $address['id'] . '">
                                                 <div class="row">
-                                                    <div class="col">
-                                                        <i class="fa fa-sort fa-fw handle"></i>
-                                                    </div>
                                                     <div class="col">
                                                         <button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 addressDeleteButton">
                                                             <i class="fa fas fa-fw text-xs fa-trash"></i>
