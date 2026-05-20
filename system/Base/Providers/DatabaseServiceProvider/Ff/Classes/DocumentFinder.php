@@ -118,8 +118,15 @@ class DocumentFinder
                                 $conditionArrKey = null;
 
                                 foreach ($conditionArr as $conditionArrKey => $conditionArrConditions) {
-                                    //OR Condition
-                                    if (isset($conditionArrConditions[1]) && is_string($conditionArrConditions[1]) && strtolower($conditionArrConditions[1]) === 'or') {
+                                    if (is_string($conditionArrConditions) &&
+                                               (strtolower($conditionArrConditions) === 'and' ||
+                                               strtolower($conditionArrConditions) === 'or')
+                                    ) {
+                                        continue;
+                                    } else if (isset($conditionArrConditions[1]) &&
+                                               is_string($conditionArrConditions[1]) &&
+                                               strtolower($conditionArrConditions[1]) === 'or'
+                                    ) {//OR Condition
                                         foreach ($found as $foundKey => $foundValue) {
                                             if (isset($foundValue[$conditionArrConditions[0][0]]) &&
                                                 isset($foundValue[$conditionArrConditions[2][0]])
@@ -138,45 +145,43 @@ class DocumentFinder
                                         }
                                     } else {//AndCondition
                                         foreach ($found as $foundKey => $foundValue) {
-                                            if (isset($foundValue[$conditionArrConditions[0][0]])) {
-                                                if (isset($conditionsCount[$conditionArrConditions[0][0]]) &&
-                                                    count($conditionsCount[$conditionArrConditions[0][0]]) > 1
-                                                ) {//OR conditions (multiple AND conditions)
-                                                    $match = false;
+                                            if (isset($conditionsCount[$conditionArrConditions[0][0]]) &&
+                                                count($conditionsCount[$conditionArrConditions[0][0]]) > 1
+                                            ) {//OR conditions (multiple AND conditions)
+                                                $match = false;
 
-                                                    foreach ($conditionsCount[$conditionArrConditions[0][0]] as $conditionsCountIndex => $conditionsCountKey) {
-                                                        if (ConditionsHandler::verifyCondition($conditionArr[$conditionsCountKey][1], $foundValue[$conditionArrConditions[0][0]], $conditionArr[$conditionsCountKey][2])
-                                                        ) {
-                                                            if (strtolower($conditionArr[1]) === 'or') {
+                                                foreach ($conditionsCount[$conditionArrConditions[0][0]] as $conditionsCountIndex => $conditionsCountKey) {
+                                                    if (ConditionsHandler::verifyCondition($conditionArr[$conditionsCountKey][1], $foundValue[$conditionArrConditions[0][0]], $conditionArr[$conditionsCountKey][2])
+                                                    ) {
+                                                        if (strtolower($conditionArr[1]) === 'or') {
+                                                            $match = true;
+
+                                                            break;
+                                                        } else if (strtolower($conditionArr[1]) === 'and') {
+                                                            if ($conditionsCountIndex === count($conditionsCount[$conditionArrConditions[0][0]]) - 1) {
                                                                 $match = true;
 
                                                                 break;
-                                                            } else if (strtolower($conditionArr[1]) === 'and') {
-                                                                if ($conditionsCountIndex === count($conditionsCount[$conditionArrConditions[0][0]]) - 1) {
-                                                                    $match = true;
-
-                                                                    break;
-                                                                }
-
-                                                                continue;
                                                             }
-                                                        }
 
-                                                        if (strtolower($conditionArr[1]) === 'and') {//If the first condition is not met.
-                                                            break;
+                                                            continue;
                                                         }
                                                     }
 
-                                                    if (!$match) {
-                                                        unset($found[$foundKey]);
+                                                    if (strtolower($conditionArr[1]) === 'and') {//If the first condition is not met.
+                                                        break;
                                                     }
-                                                } else {
-                                                    if (ConditionsHandler::verifyCondition($conditionArrConditions[0][1], $foundValue[$conditionArrConditions[0][0]], $conditionArrConditions[0][2])) {
-                                                        continue;
-                                                    }
+                                                }
 
+                                                if (!$match) {
                                                     unset($found[$foundKey]);
                                                 }
+                                            } else {
+                                                if (ConditionsHandler::verifyCondition($conditionArrConditions[1], $foundValue[$conditionArrConditions[0]], $conditionArrConditions[2])) {
+                                                    continue;
+                                                }
+
+                                                unset($found[$foundKey]);
                                             }
                                         }
                                     }
