@@ -1,0 +1,140 @@
+{% if module['id'] is defined and module['filters'] is defined %}
+    {% set filters = module['filters'] %}
+    {% set moduleFilters = module['filters'] %}
+{% else %}
+    {% set filters = moduleFilters %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'filter_name',
+                'fieldLabel'                     : 'Filter Name',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Filter Name Example: Users with Role Administrators',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 100,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'filter_default',
+                'fieldLabel'                     : 'Filter is default?',
+                'fieldType'                      : 'radio',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Is filter default filter for the component?',
+                'fieldRequired'                  : false,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldBazScan'                   : true,
+                'fieldRadioPlacementType'        : 'horizontal',
+                'fieldRadioButtons'              :
+                    [
+                        'filter-no' :
+                            [
+                                'title'                           : 'No',
+                                'dataValue'                       : 'filter-no'
+                            ],
+                        'filter-yes' :
+                            [
+                                'title'                           : 'YES',
+                                'dataValue'                       : 'filter-yes'
+                            ]
+                    ],
+                'fieldRadioChecked'              : 'filter-no'
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'filter_conditions',
+                'fieldLabel'                     : 'Filter Conditions',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Filter Conditions Example: -|status|equals|1&OR|status|equals|2&',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 100,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                    : 'button',
+                'buttons'                       :
+                    [
+                        'filter-remove'    : [
+                            'title'                   : 'Remove',
+                            'size'                    : 'xs',
+                            'type'                    : 'danger',
+                            'icon'                    : 'trash'
+                        ],
+                        'filter-add'    : [
+                            'title'                   : 'Add',
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'position'                : 'right'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'filters',
+                'fieldLabel'                     : 'Module Filters',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Filters of the module. JSON Format',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldTextareaRows'              : 15,
+                'fieldValue'                     : filters
+            ]
+        )}}
+    </div>
+</div>

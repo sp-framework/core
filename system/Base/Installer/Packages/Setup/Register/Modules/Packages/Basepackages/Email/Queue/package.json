@@ -1,0 +1,30 @@
+{
+	"name" : "EmailQueue",
+	"display_name" : "Email Queue",
+	"description" : "<p>Basepackage Email Queue</p>",
+	"module_type" : "packages",
+	"app_type" : "core",
+	"category" : "basepackages",
+	"version" : "0.0.0",
+	"repo" : "https://.../",
+	"class" : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Email\\EmailQueue",
+	"dependencies" : 
+	{
+		"core" : 
+		{
+			"name" : "Core",
+			"version" : "0.0.0",
+			"repo" : "https://.../"
+		},
+		"components" : [],
+		"packages" : [],
+		"middlewares" : [],
+		"views" : [],
+		"external" : [],
+		"externals" : []
+	},
+	"settings" : 
+	{
+		"componentRoute" : "system/email/queue"
+	}
+}

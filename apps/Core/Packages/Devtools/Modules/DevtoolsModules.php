@@ -265,6 +265,7 @@ class DevtoolsModules extends BasePackage
                     if ($data['module_type'] === 'components' && strtolower($data['app_type']) === 'core') {
                         $this->addUpdateComponentMenu($module);
                         $this->addUpdateComponentWidgets($module);
+                        $this->addUpdateComponentFilters($module);
                     }
 
                     if ($data['module_type'] === 'views') {
@@ -1314,6 +1315,13 @@ class DevtoolsModules extends BasePackage
         return $this->helper->encode($defaultSettings);
     }
 
+    public function getDefaultFilters()
+    {
+        $defaultFilters = [];
+
+        return $this->helper->encode($defaultFilters);
+    }
+
     public function getDefaultDependencies($type, $isSubView = false)
     {
         // For all - core, apptype
@@ -1421,6 +1429,7 @@ class DevtoolsModules extends BasePackage
             if ($data['module_type'] === 'components') {
                 $jsonContent["menu"] = $data["menu"];
                 $jsonContent["widgets"] = $data["widgets"];
+                $jsonContent["filters"] = $data["filters"];
             }
 
             if ($data['module_type'] === 'views') {
@@ -2281,22 +2290,122 @@ $file .= '
                     }
                 }
             }
-        }
 
-        //Remove widgets that dont exists
-        $componentWidgets = $this->basepackages->widgets->getWidgetsByComponentId((int) $data['id']);
+            //Remove widgets that dont exists
+            $componentWidgets = $this->basepackages->widgets->getWidgetsByComponentId((int) $data['id']);
 
-        if ($componentWidgets && count($componentWidgets) > 0) {
-            $componentWidgetsKeys = array_keys($componentWidgets);
+            if ($componentWidgets && count($componentWidgets) > 0) {
+                $componentWidgetsKeys = array_keys($componentWidgets);
 
-            if (isset($data['widgets']) &&
-                count($data['widgets']) > 0
-            ) {
+                $widget = null;
+
                 foreach ($data['widgets'] as $widget) {
                     if (isset($widget['id'])) {
                         if (!in_array($widget['id'], $componentWidgetsKeys)) {
                             $this->basepackages->widgets->remove((int) $widget['id']);
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    protected function addUpdateComponentFilters($data)
+    {
+        if (strtolower($data['app_type']) !== 'core') {
+            return true;
+        }
+
+        if (isset($data['filters'])) {
+            if (!is_array($data['filters']) && $data['filters'] !== '') {
+                $data['filters'] = $this->helper->decode($data['filters'], true);
+            }
+        }
+
+        if (isset($data['filters']) &&
+            count($data['filters']) > 0
+        ) {
+            $defaultFilter = null;
+
+            foreach ($data['filters'] as $filterArr) {
+                if (!isset($filterArr['name']) || !isset($filterArr['conditions'])) {
+                    continue;
+                }
+
+                $filter = $this->basepackages->filters->getFiltersByComponentIdAndCondition($data['id'], $filterArr['conditions']);
+
+                if ($filter) {
+                    $this->basepackages->filters->updateFilter(
+                        [
+                            'id'                => $filter['id'],
+                            'name'              => $filterArr['name'],
+                            'app_type'          => $data['app_type'],
+                            'conditions'        => $filterArr['conditions'],
+                            'component_id'      => $data['id'],
+                            'filter_type'       => 0,//System
+                            'is_default'        => $filterArr['is_default'] == 'true' ? 1 : 0,
+                            'auto_generated'    => 1,
+                            'account_id'        => 0
+                        ]
+                    );
+                } else {
+                    $this->basepackages->filters->addFilter(
+                        [
+                            'name'              => $filterArr['name'],
+                            'app_type'          => $data['app_type'],
+                            'conditions'        => $filterArr['conditions'],
+                            'component_id'      => $data['id'],
+                            'filter_type'       => 0,//System
+                            'is_default'        => $filterArr['is_default'] == 'true' ? 1 : 0,
+                            'auto_generated'    => 1,
+                            'account_id'        => 0
+                        ]
+                    );
+
+                    $filter = $this->basepackages->filters->packagesData->last;
+                }
+
+                if ($filter['is_default'] === 1) {
+                    $defaultFilter = $filter;
+                }
+            }
+
+            //Remove filters that dont exists
+            $componentFilters = $this->basepackages->filters->getFiltersForComponent((int) $data['id'], null, $data['app_type']);
+
+            if ($componentFilters && count($componentFilters) > 0) {
+                $componentFiltersConditions = [];
+
+                foreach ($data['filters'] as $filter) {
+                    if (!in_array($filter['conditions'], $componentFiltersConditions)) {
+                        array_push($componentFiltersConditions, $filter['conditions']);
+                    }
+                }
+                //Default All Filter
+                array_push($componentFiltersConditions, '');
+
+                foreach ($componentFilters as $componentFilter) {
+                    if (!in_array($componentFilter['conditions'], $componentFiltersConditions)) {
+                        $this->basepackages->filters->removeFilter($componentFilter['id']);
+
+                        continue;
+                    }
+
+                    //make sure we only make 1 default.
+                    if ($defaultFilter) {
+                        if ($defaultFilter['id'] === $componentFilter['id']) {
+                            $componentFilter['is_default'] = 1;
+                        } else {
+                            $componentFilter['is_default'] = 0;
+                        }
+
+                        $this->basepackages->filters->updateFilter($componentFilter);
+                    } else {
+                        if ($componentFilter['conditions'] === '') {
+                            $componentFilter['is_default'] = 1;
+                        }
+
+                        $this->basepackages->filters->updateFilter($componentFilter);
                     }
                 }
             }

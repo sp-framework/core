@@ -1387,7 +1387,7 @@ dataCollectionSection =
                     ]
                 ]
             %}
-            {% if module is defined and module['module_type'] === 'components' or type === 'components' %}
+            {% if module is defined and module['module_type'] == 'components' or type == 'components' %}
                 {% set tabsData = array_merge(tabsData,
                     [
                         'menu'   :
@@ -1401,6 +1401,13 @@ dataCollectionSection =
                         [
                             'tabTitle'          : 'Widgets',
                             'tabInclude'        : 'modules/module/widgets'
+                        ]
+                    ],
+                    [
+                        'filters'   :
+                        [
+                            'tabTitle'          : 'Filters',
+                            'tabInclude'        : 'modules/module/filters'
                         ]
                     ])
                 %}
@@ -1477,6 +1484,7 @@ dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
 dataCollectionSectionForm['vars']['moduleDependencies'] = JSON.parse('{{moduleDependencies}}');
 dataCollectionSectionForm['vars']['moduleId'] = '{{moduleId}}';
 dataCollectionSectionForm['vars']['moduleWidgets'] = JSON.parse('{{moduleWidgets}}');
+dataCollectionSectionForm['vars']['moduleFilters'] = JSON.parse('{{moduleFilters}}');
 
 if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
     dataCollectionSectionForm['vars']['moduleSettings'] = { };
@@ -1952,6 +1960,83 @@ dataCollectionSection =
                 prettyfyJson();
             }
         },
+        '{{componentId}}-{{sectionId}}-filter_name'                             : { },
+        '{{componentId}}-{{sectionId}}-filter_default'                          : { },
+        '{{componentId}}-{{sectionId}}-filter_conditions'                       : { },
+        '{{componentId}}-{{sectionId}}-filters'                                 : {
+            'afterInit'     : function() {
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-filters')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleFilters'], null, 4));
+                }
+                prettyfyJson();
+
+                function reset() {
+                    $('#{{componentId}}-{{sectionId}}-filter_name').val('');
+                    $('#{{componentId}}-{{sectionId}}-filter_conditions').val('');
+                    $("#filter-no").prop('checked', true);
+                    $('#{{componentId}}-{{sectionId}}-filters').val('');
+                }
+
+                $('#{{componentId}}-{{sectionId}}-filter-add, ' +
+                  '#{{componentId}}-{{sectionId}}-filter-remove').click(function(e) {
+                    e.preventDefault();
+
+                    if ($('#{{componentId}}-{{sectionId}}-filter_name').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-filter_name').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-filter_name').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-filter_conditions').val() === '') {
+                        $('#{{componentId}}-{{sectionId}}-filter_conditions').addClass('is-invalid');
+                        $('#{{componentId}}-{{sectionId}}-filter_conditions').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else {
+                        if (dataCollectionSectionForm['vars']['moduleFilters'].length > 0) {
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-filter-remove') {
+                                $(dataCollectionSectionForm['vars']['moduleFilters']).each(function(index, filter) {
+                                    if (filter['name'] === $('#{{componentId}}-{{sectionId}}-filter_name').val() &&
+                                        filter['conditions'] === $('#{{componentId}}-{{sectionId}}-filter_conditions').val()
+                                    ) {
+                                        dataCollectionSectionForm['vars']['moduleFilters'].splice(index, 1);
+
+                                        return;
+                                    }
+                                });
+                            } else {
+                                addFilter();
+                            }
+                        } else {
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-filter-remove') {
+                                return false;
+                            } else {
+                                addFilter();
+                            }
+                        }
+                    }
+
+                    reset();
+                    prettyfyJson();
+                });
+
+                function addFilter() {
+                    var filterDefault = false;
+
+                    if ($('#{{componentId}}-{{sectionId}}-filter_default').find('input[type=radio]:checked').data('value') == 'filter-yes') {
+                        filterDefault = true;
+                    }
+
+                    dataCollectionSectionForm['vars']['moduleFilters'].push(
+                        {
+                            'name'          : $('#{{componentId}}-{{sectionId}}-filter_name').val(),
+                            'conditions'    : $('#{{componentId}}-{{sectionId}}-filter_conditions').val(),
+                            'is_default'    : filterDefault
+                        }
+                    );
+                }
+            }
+        },
         '{{componentId}}-{{sectionId}}-menu'                                    : { },
         '{{componentId}}-{{sectionId}}-menu_id'                                 : { },
         '{{componentId}}-{{sectionId}}-apps'                                    : { },
@@ -2021,20 +2106,22 @@ dataCollectionSection =
                         });
                     } else {
                         if (dataCollectionSectionForm['vars']['moduleWidgets'].length > 0) {
-                            $(dataCollectionSectionForm['vars']['moduleWidgets']).each(function(index, widget) {
-                                if (widget['method'] === $('#{{componentId}}-{{sectionId}}-widget-method').val()) {
-                                    dataCollectionSectionForm['vars']['moduleWidgets'].splice(index, 1);
-                                }
-                            });
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-widget-remove') {
+                                $(dataCollectionSectionForm['vars']['moduleWidgets']).each(function(index, widget) {
+                                    if (widget['method'] === $('#{{componentId}}-{{sectionId}}-widget-method').val()) {
+                                        dataCollectionSectionForm['vars']['moduleWidgets'].splice(index, 1);
 
-                            if ($(this)[0].id !== '{{componentId}}-{{sectionId}}-widget-remove') {
+                                        return;
+                                    }
+                                });
+                            } else {
                                 addWidget();
                             }
                         } else {
-                            if ($(this)[0].id !== '{{componentId}}-{{sectionId}}-widget-remove') {
-                                addWidget();
-                            } else {
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-widget-remove') {
                                 return false;
+                            } else {
+                                addWidget();
                             }
                         }
                     }

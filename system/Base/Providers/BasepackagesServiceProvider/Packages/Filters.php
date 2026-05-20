@@ -15,9 +15,7 @@ class Filters extends BasePackage
 
     public function getFiltersForComponent(int $componentId)
     {
-        $checkShowAllFilters = $this->checkShowAllFilters($componentId);
-
-        if ($checkShowAllFilters) {
+        if ($this->checkShowAllFilters($componentId)) {
             return $this->getFilters($componentId);
         } else {
             $this->addShowAllFilter($componentId);
@@ -46,11 +44,10 @@ class Filters extends BasePackage
             return
                 $this->getByParams(
                     [
-                        'conditions'    => 'component_id = :cid: AND auto_generated = :ag: AND app_type = :at:',
+                        'conditions'    => 'component_id = :cid: AND auto_generated = :ag:',
                         'bind'          => [
                             'cid'       => $componentId,
-                            'ag'        => 1,
-                            'at'        => $this->app['app_type']
+                            'ag'        => 1
                         ]
                     ], true
                 );
@@ -59,8 +56,7 @@ class Filters extends BasePackage
                 ['conditions' =>
                     [
                         ['component_id', '=', $componentId],
-                        ['auto_generated', '=', 1],
-                        ['app_type', '=', $this->app['app_type']]
+                        ['auto_generated', '=', 1]
                     ]
                 ]
             );
@@ -76,10 +72,9 @@ class Filters extends BasePackage
                 $filtersArr =
                     $this->getByParams(
                         [
-                            'conditions'    => 'component_id = :cid: AND app_type = :at: AND (account_id = :aid: OR account_id = :aid0:)',
+                            'conditions'    => 'component_id = :cid: AND (account_id = :aid: OR account_id = :aid0:)',
                             'bind'          => [
                                 'cid'       => $componentId,
-                                'at'        => $this->app['app_type'],
                                 'aid'       => $account['id'],
                                 'aid0'      => 0
                             ]
@@ -91,8 +86,7 @@ class Filters extends BasePackage
                         [
                             'conditions'    =>
                                 [
-                                    ['component_id', '=', $componentId],
-                                    ['app_type', '=', $this->app['app_type']]
+                                    ['component_id', '=', $componentId]
                                 ],
                                 [
                                     ['account_id', '=', $account['id']],
@@ -104,6 +98,7 @@ class Filters extends BasePackage
             }
 
             $myFilters = [];
+            $filters = [];
 
             //Make System Filters above all
             if ($filtersArr) {
@@ -120,7 +115,6 @@ class Filters extends BasePackage
                         array_push($myFilters, $filter['id']);
 
                         if ($filter['shared_ids']) {//Im Sharing
-
                             $filter['shared_ids'] = $this->helper->decode($filter['shared_ids'], true);
 
                             //Role Ids
@@ -129,6 +123,7 @@ class Filters extends BasePackage
                             ) {
                                 foreach ($filter['shared_ids']['rids'] as $sharingRidKey => $sharingRid) {
                                     $role = $this->roles->getById($sharingRid);
+
                                     if ($role) {
                                         $filter['shared_ids']['rids'][$sharingRidKey] =
                                         [
@@ -159,6 +154,7 @@ class Filters extends BasePackage
                             $filter['shared_ids'] = $this->escaper->escapeHtml($this->helper->encode($filter['shared_ids']));
                         }
                     }
+
                     $filters[$filter['id']] = $filter;
                 }
             }
@@ -167,10 +163,9 @@ class Filters extends BasePackage
                 $sharedFiltersArr =
                     $this->getByParams(
                         [
-                            'conditions'    => 'component_id = :cid: AND app_type = :at: AND shared_ids IS NOT NULL',
+                            'conditions'    => 'component_id = :cid: AND shared_ids IS NOT NULL',
                             'bind'          => [
-                                'cid'       => $componentId,
-                                'at'        => $this->app['app_type']
+                                'cid'       => $componentId
                             ]
                         ]
                     );
@@ -180,7 +175,6 @@ class Filters extends BasePackage
                         [
                             'conditions'    => [
                                 ['component_id', '=', $componentId],
-                                ['app_type', '=', $this->app['app_type']],
                                 ['shared_ids', '!=', null]
                             ]
                         ]
@@ -192,7 +186,6 @@ class Filters extends BasePackage
                     $filter['url'] = $this->links->url($component['route']) . '/q/filter/' . $filter['id'];
 
                     if (!in_array($filter['id'], $myFilters)) {
-
                         $filter['shared_ids'] = $this->helper->decode($filter['shared_ids'], true);
 
                         if (isset($filter['shared_ids']['rids']) &&
@@ -248,10 +241,9 @@ class Filters extends BasePackage
             $filtersArr =
                 $this->getByParams(
                     [
-                        'conditions'    => 'component_id = :cid: AND app_type = :at:',
+                        'conditions'    => 'component_id = :cid:',
                         'bind'          => [
-                            'cid'       => $componentId,
-                            'at'        => $this->app['app_type']
+                            'cid'       => $componentId
                         ]
                     ]
                 );
@@ -260,8 +252,7 @@ class Filters extends BasePackage
                 $this->getByParams(
                     [
                         'conditions'    => [
-                            ['component_id', '=', $componentId],
-                            ['app_type', '=', $this->app['app_type']]
+                            ['component_id', '=', $componentId]
                         ]
                     ]
                 );
@@ -272,14 +263,18 @@ class Filters extends BasePackage
         //Make Autogenrated filter above all
         foreach ($filtersArr as $filterKey => $filter) {
             if ($filter['auto_generated'] == 1) {
-                array_push($sortedFilters, $filter);
+                if (!isset($sortedFilters[$filter['id']])) {
+                    $sortedFilters[$filter['id']] = $filter;
+                }
             }
         }
 
         //Make System Filters after Autogenerated
         foreach ($filtersArr as $filterKey => $filter) {
             if ($filter['filter_type'] == 0) {
-                array_push($sortedFilters, $filter);
+                if (!isset($sortedFilters[$filter['id']])) {
+                    $sortedFilters[$filter['id']] = $filter;
+                }
             }
         }
 
@@ -306,10 +301,14 @@ class Filters extends BasePackage
             $this->addFilterForEmailQueue($component);
         }
 
+        if ($component && $component['route'] === 'system/workers/jobs') {
+            $this->addFilterForWorkersJobs($component);
+        }
+
         $this->addFilter(
             [
                 'name'              => 'Show All ' . $component['name'],
-                'app_type'          => $this->app['app_type'],
+                'app_type'          => $component['app_type'],
                 'conditions'        => '',
                 'component_id'      => $componentId,
                 'filter_type'       => 0,//System
@@ -318,10 +317,6 @@ class Filters extends BasePackage
                 'account_id'        => 0
             ]
         );
-
-        if ($component && $component['route'] === 'system/workers/jobs') {
-            $this->addFilterForWorkersJobs($component);
-        }
     }
 
     protected function addFilterForNotifications($component)
@@ -497,6 +492,31 @@ class Filters extends BasePackage
         }
     }
 
+    public function getFiltersByComponentIdAndCondition($componentId, $conditions)
+    {
+        if ($this->config->databasetype === 'db') {
+            $filterCondition =
+                [
+                    'conditions'    => 'component_id = :componentId: AND conditions = :conditions:',
+                    'bind'          =>
+                        [
+                            'component_id'  => (int) $componentId,
+                            'conditions'    => $conditions
+                        ]
+                ];
+        } else {
+            $filterCondition = ['conditions' => [['component_id', '=', (int) $componentId], ['conditions', '=', $conditions]]];
+        }
+
+        $filters = $this->getByParams($filterCondition);
+
+        if ($filters && count($filters) > 0) {
+            return $filters[0];
+        }
+
+        return false;
+    }
+
     public function addFilter(array $data)
     {
         if (!isset($data['filter_type'])) {
@@ -597,7 +617,7 @@ class Filters extends BasePackage
     {
         $filter = $this->getById($data['id']);
 
-        if ($filter['auto_generated'] == 1) {
+        if (!isset($data['force']) && $filter['auto_generated'] == 1) {
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = 'Cannot remove auto generated filter.';
@@ -605,10 +625,9 @@ class Filters extends BasePackage
             return false;
         }
 
-        $remove = $this->remove($data['id']);
+        $remove = $this->remove($filter['id']);
 
         if ($remove) {
-
             if (isset($data['component_id'])) {
                 $account = $this->access->auth->account();
 
@@ -618,6 +637,7 @@ class Filters extends BasePackage
                     $this->packagesData->filters = $this->getFiltersForComponent($data['component_id']);
                 }
             }
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Filter Removed';
@@ -674,13 +694,12 @@ class Filters extends BasePackage
             if ($this->config->databasetype === 'db') {
                 $params =
                     [
-                        'conditions'    => 'component_id = :cid: AND is_default = :isd: AND account_id = :aid: AND app_type = :at:',
+                        'conditions'    => 'component_id = :cid: AND is_default = :isd: AND account_id = :aid:',
                         'bind'          =>
                             [
                                 'cid'   => $componentId,
                                 'isd'   => '1',
-                                'aid'   => $account['id'],
-                                'at'    => $this->app['app_type']
+                                'aid'   => $account['id']
                             ]
                     ];
             } else {
@@ -688,8 +707,7 @@ class Filters extends BasePackage
                     [
                         ['component_id', '=', $componentId],
                         ['is_default', '=', 1],
-                        ['account_id', '=', $account['id']],
-                        ['app_type', '=', $this->app['app_type']],
+                        ['account_id', '=', $account['id']]
                     ]
                 ];
             }
@@ -697,16 +715,15 @@ class Filters extends BasePackage
             if ($this->config->databasetype === 'db') {
                 $params =
                     [
-                        'conditions'    => 'component_id = :cid: AND is_default = :isd: AND app_type = :at:',
+                        'conditions'    => 'component_id = :cid: AND is_default = :isd:',
                         'bind'          =>
                             [
                                 'cid'   => $componentId,
-                                'isd'   => '1',
-                                'at'    => $this->app['app_type']
+                                'isd'   => '1'
                             ]
                     ];
             } else {
-                $params = ['conditions' => [['component_id', '=', $componentId], ['is_default', '=', 1], ['app_type', '=', $this->app['app_type']]]];
+                $params = ['conditions' => ['component_id', '=', $componentId], ['is_default', '=', 1]];
             }
         }
 

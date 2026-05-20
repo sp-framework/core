@@ -280,6 +280,7 @@ class ModulesComponent extends BaseComponent
 			$this->view->apis = $apis;
 			$this->view->moduleTypes = $this->modulesPackage->getModuleTypes();
 			$this->view->moduleSettings = $this->modulesPackage->getDefaultSettings();
+			$this->view->moduleFilters = $this->modulesPackage->getDefaultFilters();
 			if (isset($this->view->subview)) {
 				$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies($type, true);
 			} else {
@@ -406,6 +407,9 @@ class ModulesComponent extends BaseComponent
 					}
 					if (isset($module['settings']) && is_array($module['settings'])) {
 						$this->view->moduleSettings = $module['settings'] = $this->helper->encode($module['settings']);
+					}
+					if (isset($module['filters']) && is_array($module['filters'])) {
+						$this->view->moduleFilters = $module['filters'] = $this->helper->encode($module['filters']);
 					}
 					if (isset($module['dependencies']) && is_array($module['dependencies'])) {
 						$this->view->moduleDependencies = $module['dependencies'] = $this->helper->encode($module['dependencies']);
