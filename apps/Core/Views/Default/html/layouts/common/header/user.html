@@ -8,7 +8,7 @@
             <a href="{{links.url('system/users/profile')}}" id="profile" class="dropdown-item contentAjaxLink">
                 <i class="fa fa-fw fa-id-card mr-2"></i> Profile
             </a>
-            {% if access.auth.account() %}
+            {% if access.auth.check() %}
                 <div class="dropdown-divider"></div>
                 <a href="{{links.url('auth/logout')}}" id="logout" class="dropdown-item text-danger">
                     <i class="fa fa-fw fa-sign-out-alt mr-2"></i> Logout

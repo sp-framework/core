@@ -10,7 +10,7 @@
             ]
         )}}
     </ul>
-    {% if access.auth.account() %}
+    {% if access.auth.check() %}
         <ul class="navbar-nav ml-auto">
             {% if modules.components.getComponentByNameForAppId('Messenger', apps.getAppInfo()['id']) %}
                 {% include modules.views.getPhalconViewPath() ~ 'layouts/common/header/messenger' %}

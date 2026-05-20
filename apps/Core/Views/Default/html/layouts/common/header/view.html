@@ -1,4 +1,4 @@
-<!-- htmlmin:ignore -->
+
 <input id="security-token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
 {% if activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
     {% if activeLayout === 'topnav' %}
@@ -40,7 +40,7 @@
                     </li>
                 </ul>
             {% endif %}
-            {% if access.auth.account() %}
+            {% if access.auth.check() %}
                 <ul class="navbar-nav ml-auto">
                     {% if modules.components.getComponentByNameForAppId('Messenger', apps.getAppInfo()['id']) %}
                         {% include modules.views.getPhalconViewPath() ~ 'layouts/common/header/messenger' %}
@@ -66,7 +66,7 @@
 </nav>
 {% endif %}
 {% if activeLayout === 'default' or activeLayout === 'topnavsidebar' %}
-    {% if access.auth.account() %}
+    {% if access.auth.check() %}
         <script>
 /* globals BazCore */
 window.dataCollection.env.profile = { };
@@ -96,4 +96,3 @@ $('#logout').click(function(e) {
     {% endif %}
 {% endif %}
 {% include modules.views.getPhalconViewPath() ~ 'layouts/common/header/breadcrumb' %}
-<!-- htmlmin:ignore -->
