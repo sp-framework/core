@@ -4281,12 +4281,6 @@ $file .= '
 
     public function toggleVisibilityRepo($data)
     {
-        if (!isset($data['id']) || (isset($data['id']) && $data['id'] === '')) {
-            $this->addResponse('Remote Repository not available', 1);
-
-            return false;
-        }
-
         if (!isset($data['repo'])) {
             $this->addResponse('Repo not set', 1);
 
@@ -4297,12 +4291,32 @@ $file .= '
             return false;
         }
 
-        $moduleSync = $this->modules->manager->getModuleInfo(
-            [
-                'module_type'       => $data['module_type'],
-                'module_id'         => (int) $data['id']
-            ]
-        );
+        if (!isset($data['id']) || (isset($data['id']) && $data['id'] === '')) {
+            if (strtolower($this->apiClientConfig['provider']) === 'gitea') {
+                $collection = 'RepositoryApi';
+                $method = 'repoGet';
+            } else if (strtolower($this->apiClientConfig['provider']) === 'github') {
+                $collection = 'ReposApi';
+                $method = 'reposGet';
+            }
+
+            $args = [$this->apiClientConfig['org_user'], $data['repo']];
+
+            $responseArr = $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
+
+            if ($responseArr) {
+                $moduleSync['repo_details']['details'] = $responseArr;
+            }
+        } else {
+            $moduleSync = $this->modules->manager->getModuleInfo(
+                [
+                    'module_type'       => $data['module_type'],
+                    'module_id'         => (int) $data['id'],
+                    'sync'              => true,
+                    'getLatestRelease'  => true
+                ]
+            );
+        }
 
         $visibility = ['private' => true];
         if ($moduleSync['repo_details']['details']['private'] === true) {
@@ -4324,14 +4338,18 @@ $file .= '
         try {
             $this->apiClient->useMethod($collection, $method, $args)->getResponse(true);
 
-            $this->modules->manager->getModuleInfo(
-                [
-                    'module_type'       => $data['module_type'],
-                    'module_id'         => $data['id'],
-                    'sync'              => true,
-                    'getLatestRelease'  => true
-                ]
-            );
+            if (!isset($data['id']) || (isset($data['id']) && $data['id'] === '')) {
+                //Local Module does not exists, we do not do anything!
+            } else {
+                $this->modules->manager->getModuleInfo(
+                    [
+                        'module_type'       => $data['module_type'],
+                        'module_id'         => $data['id'],
+                        'sync'              => true,
+                        'getLatestRelease'  => true
+                    ]
+                );
+            }
 
             if ($visibility['private'] === true) {
                 $this->addResponse('Repo ' . $data['repo'] . ' marked as private');
@@ -4355,12 +4373,6 @@ $file .= '
 
     public function removeRepo($data)
     {
-        if (!isset($data['id']) || (isset($data['id']) && $data['id'] === '')) {
-            $this->addResponse('Remote Repository not available', 1);
-
-            return false;
-        }
-
         if (!isset($data['repo'])) {
             $this->addResponse('Repo not set', 1);
 

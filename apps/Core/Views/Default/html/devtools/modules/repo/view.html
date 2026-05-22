@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set repoHtml = '' %}
 {% if remoteModules|length > 0 %}
     {% for remoteModule in remoteModules %}
@@ -15,23 +15,23 @@
                 '   <i class="fas fa-fw fa-xs fa-edit"></i>' ~
                 '</button>'
             %}
-            {% set modulePermissionIcon = 'eye' %}
-            {% set modulePermissionColor = 'primary' %}
-            {% set moduleVisibility = 'public' %}
-            {% if remoteModule['private'] %}
-                {% set modulePermissionIcon = 'eye-slash' %}
-                {% set modulePermissionColor = 'secondary' %}
-                {% set moduleVisibility = 'private' %}
-            {% endif %}
-            {% set moduleOptions =
-                '<button href="#" type="button" data-repo="' ~ remoteModule['name'] ~ '" data-id="' ~ remoteModule['synced'] ~ '" data-visibility="' ~ moduleVisibility ~ '" data-type="' ~ remoteModule['module_type'] ~ '" class="ml-1 mr-1 text-white btn btn-' ~ modulePermissionColor ~ ' btn-xs toggleVisibility">' ~
-                '   <i class="fas fa-fw fa-xs fa-' ~ modulePermissionIcon ~ '"></i>' ~
-                '</button>' ~
-                '<button href="#" type="button" data-repo="' ~ remoteModule['name'] ~ '" class="ml-1 mr-1 text-white btn btn-danger btn-xs removeModule">' ~
-                '    <i class="fas fa-fw fa-xs fa-trash"></i>' ~
-                '</button>'
-            %}
         {% endif %}
+        {% set modulePermissionIcon = 'eye' %}
+        {% set modulePermissionColor = 'primary' %}
+        {% set moduleVisibility = 'public' %}
+        {% if remoteModule['private'] %}
+            {% set modulePermissionIcon = 'eye-slash' %}
+            {% set modulePermissionColor = 'secondary' %}
+            {% set moduleVisibility = 'private' %}
+        {% endif %}
+        {% set moduleOptions =
+            '<button href="#" type="button" data-repo="' ~ remoteModule['name'] ~ '" data-id="' ~ remoteModule['synced'] ~ '" data-visibility="' ~ moduleVisibility ~ '" data-type="' ~ remoteModule['module_type'] ~ '" class="ml-1 mr-1 text-white btn btn-' ~ modulePermissionColor ~ ' btn-xs toggleVisibility">' ~
+            '   <i class="fas fa-fw fa-xs fa-' ~ modulePermissionIcon ~ '"></i>' ~
+            '</button>' ~
+            '<button href="#" type="button" data-repo="' ~ remoteModule['name'] ~ '" class="ml-1 mr-1 text-white btn btn-danger btn-xs removeModule">' ~
+            '    <i class="fas fa-fw fa-xs fa-trash"></i>' ~
+            '</button>'
+        %}
         {% set repoHtml = repoHtml ~ '<tr>' ~
         '           <td>' ~  remoteModule['name'] ~ '</td>' ~
         '           <td>' ~  remoteModule['module_type'] ~ '</td>' ~
@@ -233,9 +233,13 @@ dataCollectionSectionForm['funcs']['init'] = function() {
                         paginatedPNotify('success', {'text': response.responseMessage});
 
                         if ($(thisButton).data('visibility') === 'public') {
+                            $(thisButton).data('visibility', 'private');
+                            $(thisButton).attr('data-visibility', 'private');
                             $(thisButton).children('i').addClass('fa-eye-slash');
                             $(thisButton).removeClass('btn-primary').addClass('btn-secondary');
                         } else if ($(thisButton).data('visibility') === 'private') {
+                            $(thisButton).data('visibility', 'public');
+                            $(thisButton).attr('data-visibility', 'public');
                             $(thisButton).children('i').addClass('fa-eye');
                             $(thisButton).removeClass('btn-secondary').addClass('btn-primary');
                         }
@@ -290,3 +294,4 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
+<!-- htmlmin:ignore -->
