@@ -1445,8 +1445,10 @@ dataCollectionSection =
             </form>
             {% if module['id'] is defined %}
                 {% set moduleId = module['id'] %}
+                {% set moduleAppType = module['app_type'] %}
             {% else %}
                 {% set moduleId = '0' %}
+                {% set moduleAppType = '' %}
             {% endif %}
             {% set subView = false %}
             {% if subview is defined and subview === true %}
@@ -1479,7 +1481,9 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 }
 
 dataCollectionSectionForm['vars'] = { };
+dataCollectionSectionForm['func'] = { };
 dataCollectionSectionForm['vars']['module_type'] = '{{type}}';
+dataCollectionSectionForm['vars']['module_app_type'] = '{{moduleAppType}}';
 dataCollectionSectionForm['vars']['modules'] = JSON.parse('{{modulesJson}}');
 dataCollectionSectionForm['vars']['moduleDependencies'] = JSON.parse('{{moduleDependencies}}');
 dataCollectionSectionForm['vars']['moduleId'] = '{{moduleId}}';
@@ -1541,6 +1545,22 @@ if (dataCollectionSectionForm['vars']['module_type'] !== 'views' &&
     !dataCollectionSectionForm['vars']['moduleDependencies']['externals']
 ) {
     dataCollectionSectionForm['vars']['moduleDependencies']['externals'] = { };
+}
+
+dataCollectionSectionForm['func']['toggleDependenciesModules'] = function() {
+    if (dataCollectionSectionForm['vars']['moduleId'] != '0' &&
+        dataCollectionSectionForm['vars']['module_app_type'] !== ''
+    ) {
+        $('#{{componentId}}-{{sectionId}}-dependencies-modules option').each(function(index, option) {
+            if ($(option).data('app_type') &&
+                $(option).data('app_type') !== dataCollectionSectionForm['vars']['module_app_type']
+            ) {
+                $(option).attr('disabled', true);
+            } else {
+                $(option).attr('disabled', false);
+            }
+        });
+    }
 }
 
 dataCollectionSection =
@@ -3112,7 +3132,10 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-export'                                  : { },
         '{{componentId}}-{{sectionId}}-dependencies-modules'                    : {
             'placeholder'   : 'SELECT MODULE',
-            'allowClear'    : true
+            'allowClear'    : true,
+            afterInit       : function() {
+                dataCollectionSectionForm['func']['toggleDependenciesModules']();
+            }
         },
         '{{componentId}}-{{sectionId}}-dependencies-modulename'                 : { },
         '{{componentId}}-{{sectionId}}-dependencies-moduleversion'              : { },

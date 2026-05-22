@@ -107,8 +107,10 @@ class ModulesComponent extends BaseComponent
 				$modulesArr['modules'] = msort($this->modules->{$modulesType}->{$modulesType}, 'name');
 			} else if ($modulesType === 'apptypes') {
 				$modulesArr['modules'] = msort($this->apps->types->types, 'name');
-				if (!isset($this->getData()['includecoremodules'])) {
-					foreach ($modulesArr['modules'] as $typesModuleKey => $typesModule) {
+				foreach ($modulesArr['modules'] as $typesModuleKey => $typesModule) {
+					$modulesArr['modules'][$typesModuleKey]['data']['app_type'] = $typesModule['app_type'];
+
+					if (!isset($this->getData()['includecoremodules'])) {
 						if ($typesModule['app_type'] === 'core') {
 							unset($modulesArr['modules'][$typesModuleKey]);
 						}
@@ -632,6 +634,8 @@ class ModulesComponent extends BaseComponent
 		$modulesArr['categoryArr'] = [];
 
 		foreach ($modulesArr['modules'] as $key => &$module) {
+			$modulesArr['modules'][$key]['data']['app_type'] = $module['app_type'];
+
 			if (!isset($modulesArr['categoryArr'][$module['category']])) {
 				$modulesArr['categoryArr'][$module['category']]['id'] = $module['category'];
 				$modulesArr['categoryArr'][$module['category']]['name'] = ucfirst($module['category']);
