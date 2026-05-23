@@ -813,30 +813,10 @@ class Accounts extends BasePackage
                 }
             } else {
                 if ($update) {
+                    $envStore->setValidateData(false);
+
                     $envStore->update($accountEnv);
                 }
-            }
-
-            if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
-                $this->opCache->removeCache('account_' . $id, 'core');
-            }
-
-            if ($getAppParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
-                return $accountEnv['params'][$this->apps->getAppInfo()['id']];
-            } else {
-                return false;
-            }
-
-            if ($getRouteParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
-                return $accountEnv['params'][$this->apps->getAppInfo()['id']][$route];
-            } else {
-                return false;
-            }
-
-            if ($this->config->databasetype === 'db') {
-                return $accountEnv->getLast()->toArray();
-            } else {
-                return $envStore->getLast();
             }
         } else {
             $accountEnv['account_id'] = $id;
@@ -854,28 +834,32 @@ class Accounts extends BasePackage
             } else {
                 $envStore->insert($accountEnv);
             }
+        }
 
-            if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
-                $this->opCache->removeCache('account_' . $id, 'core');
-            }
+        if ($this->opCache && $this->opCache->checkCache('account_' . $id, 'core')) {
+            $this->opCache->removeCache('account_' . $id, 'core');
+        }
 
-            if ($getAppParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
+        if ($getAppParams) {
+            if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
                 return $accountEnv['params'][$this->apps->getAppInfo()['id']];
             } else {
                 return false;
             }
+        }
 
-            if ($getRouteParams && isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
+        if ($getRouteParams) {
+            if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
                 return $accountEnv['params'][$this->apps->getAppInfo()['id']][$route];
             } else {
                 return false;
             }
+        }
 
-            if ($this->config->databasetype === 'db') {
-                return $accountEnv->getLast()->toArray();
-            } else {
-                return $envStore->getLast();
-            }
+        if ($this->config->databasetype === 'db') {
+            return $accountEnv->getLast()->toArray();
+        } else {
+            return $envStore->getLast();
         }
     }
 

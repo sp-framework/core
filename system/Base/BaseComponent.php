@@ -605,18 +605,32 @@ abstract class BaseComponent extends Controller
 		}
 
 		if ($this->request->isPost() && $this->isJson()) {
-			if (isset($this->access->auth->account()['id'])) {
-				$accountEnv = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], true);
+			if ($this->access->auth->check()) {
+				if (!isset($this->access->auth->account()['env'])) {
+					$routeEnv = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], false, true);
+				} else {
+					$routeArr = explode('/q/', $this->request->getURI());
+					if ($this->domains->domain['exclusive_to_default_app']) {
+						$route = str_replace('/' . $this->apps->getAppInfo()['route'], '', $routeArr[0]);
+					} else {
+						$route = $routeArr[0];
+					}
 
-				if ($accountEnv) {
-					$this->view->accountEnv = $accountEnv;
+					if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
+						$routeEnv = $this->access->auth->account()['env']['params'][$this->apps->getAppInfo()['id']][$route];
+					} else {
+						$routeEnv = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], false, true);
+					}
 				}
-
-				$routeEnv = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], false, true);
 
 				if ($routeEnv) {
 					$this->view->routeEnv = $routeEnv;
 				}
+				// $accountEnv = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], true);
+
+				// if ($accountEnv) {
+				// 	$this->view->accountEnv = $accountEnv;
+				// }
 			}
 
 			return $this->sendJson();
