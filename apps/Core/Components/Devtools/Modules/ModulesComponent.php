@@ -579,6 +579,19 @@ class ModulesComponent extends BaseComponent
 		);
 	}
 
+	public function bulkAction()
+	{
+		$this->requestIsPost();
+
+		$this->modulesPackage->bulkModule($this->postData());
+
+		$this->addResponse(
+			$this->modulesPackage->packagesData->responseMessage,
+			$this->modulesPackage->packagesData->responseCode,
+			$this->modulesPackage->packagesData->responseData ?? []
+		);
+	}
+
 	public function removeAction()
 	{
 		$this->requestIsPost();

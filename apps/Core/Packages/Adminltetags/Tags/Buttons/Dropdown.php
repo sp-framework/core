@@ -67,7 +67,7 @@ class Dropdown
         $this->content .=
             '<div class="dropdown-menu ' . $this->buttonParams['dropdownAlign'] . ' ">';
             foreach ($this->params['dropdowns'] as $index => $links) {
-                if ($index === 'divider') {
+                if ($links === 'divider') {
                     $this->content .= '<div class="dropdown-divider"></div>';
                 } else {
                     if (isset($links['icon']) && isset($links['title'])) {

@@ -141,6 +141,45 @@
 <hr>
 <div class="row">
     <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'componentId'                       : componentId,
+                'sectionId'                         : sectionId,
+                'buttonType'                        : 'DropdownSplitButtons',
+                'buttonLabel'                       : false,
+                'dropdownButtonId'                  : 'bulk',
+                'dropdownButtonTitle'               : '(0) Bulk Actions',
+                'dropdownButtonIcon'                : 'wand-magic-sparkles',
+                'dropdownButtonDisabled'            : true,
+                'dropdownButtonAdditionalClass'     : 'text-uppercase',
+                'dropdownAlign'                     : 'right',
+                'buttonPosition'                    : 'right',
+                'dropdowns'                         :
+                    {
+                        'install' : {
+                            'title'                   : 'Install'
+                        },
+                        'uninstall' : {
+                            'title'                   : 'Uninstall'
+                        },
+                        'divider1' : 'divider',
+                        'truncate' : {
+                            'title'                   : 'Truncate DB'
+                        },
+                        'run_script' : {
+                            'title'                   : 'Run Install/Uninstall Script'
+                        },
+                        'divider2' : 'divider',
+                        'cancel' : {
+                            'title'                   : 'Cancel'
+                        }
+                    }
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
         {% set modulesTable = '' %}
         {% for moduletype, modulesArr in modules %}
             {% if modulesArr['childs'] is defined and modulesArr['childs']|length > 0 %}

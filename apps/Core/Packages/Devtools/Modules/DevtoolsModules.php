@@ -378,6 +378,86 @@ class DevtoolsModules extends BasePackage
         $this->addResponse('Error updating Module', 1);
     }
 
+    public function bulkModule($data)
+    {
+        if (!isset($data['bulk_actions']) ||
+            (isset($data['bulk_actions']) && is_array($data['bulk_actions']) && count($data['bulk_actions']) === 0)
+        ) {
+            $this->addResponse('Provide a list of modules to perform action on.', 1);
+
+            return false;
+        }
+
+        if (!isset($data['task'])) {
+            $this->addResponse('Bulk action task not provided.', 1);
+
+            return false;
+        }
+
+        foreach ($data['bulk_actions'] as $module_type => $moduleList) {
+            if ($module_type === 'bundles') {
+                continue;
+            }
+            if ($data['task'] === 'truncate' && $module_type !== 'packages') {
+                continue;
+            }
+            if ($data['task'] === 'run_script' && $module_type === 'views') {
+                continue;
+            }
+
+            if (count($moduleList) > 0) {
+                foreach ($moduleList as $moduleId) {
+                    $moduleToUpdate = null;
+
+                    if ($module_type === 'apptypes') {
+                        $moduleToUpdate = $this->apps->types->getAppTypeById((int) $moduleId);
+                    } else {
+                        $moduleToUpdate = $this->modules->{$module_type}->getById((int) $moduleId);
+                    }
+
+                    if (isset($moduleToUpdate)) {
+                        if ($moduleToUpdate['name'] === 'Core' &&
+                            $data['task'] !== 'run_script'
+                        ) {
+                            continue;
+                        }
+
+                        try {
+                            $update = false;
+                            if ($data['task'] === 'install') {
+                                $moduleToUpdate['installed'] = 1;
+                                $update = true;
+                            } else if ($data['task'] === 'uninstall') {
+                                $moduleToUpdate['installed'] = 0;
+                                $update = true;
+                            } else if ($data['task'] === 'truncate') {
+                                $this->runInstallUninstallTruncateTable($moduleToUpdate, false, true);
+                            } else if ($data['task'] === 'run_script') {
+                                $this->runInstallUninstallTruncateTable($moduleToUpdate, true, false);
+                            }
+
+                            if ($update) {
+                                if ($module_type === 'apptypes') {
+                                    $this->apps->types->update($moduleToUpdate);
+                                } else {
+                                    $this->modules->{$module_type}->update($moduleToUpdate);
+                                }
+                            }
+                        } catch (\throwable $e) {
+                            $this->addResponse($e->getMessage(), 1);
+
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->addResponse('Bulk action performed successfully!');
+
+        return true;
+    }
+
     protected function precheck($data)
     {
         if ($data['api_id'] != '0' &&

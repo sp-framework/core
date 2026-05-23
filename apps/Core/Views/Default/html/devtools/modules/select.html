@@ -49,6 +49,7 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSectionForm['funcs'] = { };
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+dataCollectionSectionForm['vars']['bulkActions'] = { };
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -70,7 +71,6 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-modules'                             : {
-            'placeholder'   : 'SELECT MODULE TO EDIT',
             'afterInit'     : function() {
                 if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-modules-table')) {
                     dataCollectionSectionForm['vars']['modulesTable'] = $('#{{componentId}}-{{sectionId}}-modules-table').DataTable({
@@ -88,6 +88,7 @@ dataCollectionSection =
                             [100, -1],
                             [100, 'All']
                         ],
+                        select: 'multiple'
                     });
 
                     dataCollectionSectionForm['vars']['modulesTable'].on('page', function() {
@@ -96,6 +97,41 @@ dataCollectionSection =
                     dataCollectionSectionForm['vars']['modulesTable'].on('search.dt', function() {
                         resetButtons();
                     });
+                    dataCollectionSectionForm['vars']['modulesTable'].on('select.dt', function(e, dt, type, indexes) {
+                        var moduleType = dataCollectionSectionForm['vars']['modulesTable'].rows(indexes).data()[0][4];
+                        if (moduleType === 'views (sub)') {
+                            moduleType = 'views';
+                        }
+                        var id = dataCollectionSectionForm['vars']['modulesTable'].rows(indexes).data()[0][0];
+
+                        if (!dataCollectionSectionForm['vars']['bulkActions'][moduleType]) {
+                            dataCollectionSectionForm['vars']['bulkActions'][moduleType] = [];
+                        }
+
+                        if (!dataCollectionSectionForm['vars']['bulkActions'][moduleType].includes(id)) {
+                            dataCollectionSectionForm['vars']['bulkActions'][moduleType].push(id);
+                        }
+                        dataCollectionSectionForm['funcs']['editBulkButton']();
+                    });
+                    dataCollectionSectionForm['vars']['modulesTable'].on('deselect.dt', function(e, dt, type, indexes) {
+                        var moduleType = dataCollectionSectionForm['vars']['modulesTable'].rows(indexes).data()[0][4];
+                        if (moduleType === 'views (sub)') {
+                            moduleType = 'views';
+                        }
+                        var id = dataCollectionSectionForm['vars']['modulesTable'].rows(indexes).data()[0][0];
+
+                        if (!dataCollectionSectionForm['vars']['bulkActions'][moduleType]) {
+                            return;
+                        }
+
+                        if (dataCollectionSectionForm['vars']['bulkActions'][moduleType].includes(id)) {
+                            var index = dataCollectionSectionForm['vars']['bulkActions'][moduleType].indexOf(id);
+
+                            dataCollectionSectionForm['vars']['bulkActions'][moduleType].splice(index, 1);
+                        }
+                        dataCollectionSectionForm['funcs']['editBulkButton']();
+                    });
+                    dataCollectionSectionForm['funcs']['enableBulkButtonsLinks']();
                 }
 
                 function resetButtons() {
@@ -300,4 +336,96 @@ dataCollectionSectionForm['funcs']['loadAjax'] =
                                             }
         });
     }
+
+dataCollectionSectionForm['funcs']['editBulkButton'] = function() {
+    var total = 0;
+
+    if (Object.keys(dataCollectionSectionForm['vars']['bulkActions']).length > 0) {
+        for (var moduleType in dataCollectionSectionForm['vars']['bulkActions']) {
+            if (dataCollectionSectionForm['vars']['bulkActions'][moduleType].length > 0) {
+                total = total + dataCollectionSectionForm['vars']['bulkActions'][moduleType].length;
+            }
+        }
+    }
+
+    if (total > 0) {
+        $('#{{componentId}}-{{sectionId}}-bulk').html('<i class="fas fa-fw fa-wand-magic-sparkles"></i>  (' + total + ') BULK ACTIONS');
+        $('#{{componentId}}-{{sectionId}}-bulk').attr('disabled', false);
+    } else {
+        $('#{{componentId}}-{{sectionId}}-bulk').html('<i class="fas fa-fw fa-wand-magic-sparkles"></i>  (0) BULK ACTIONS');
+        $('#{{componentId}}-{{sectionId}}-bulk').attr('disabled', true);
+    }
+}
+
+dataCollectionSectionForm['funcs']['enableBulkButtonsLinks'] = function() {
+    $('#{{componentId}}-{{sectionId}}-install,#{{componentId}}-{{sectionId}}-uninstall,#{{componentId}}-{{sectionId}}-truncate,' +
+      '#{{componentId}}-{{sectionId}}-run_script,#{{componentId}}-{{sectionId}}-cancel').off();
+    $('#{{componentId}}-{{sectionId}}-install,#{{componentId}}-{{sectionId}}-uninstall,#{{componentId}}-{{sectionId}}-truncate,' +
+      '#{{componentId}}-{{sectionId}}-run_script,#{{componentId}}-{{sectionId}}-cancel').click(function(e) {
+
+        e.preventDefault();
+
+        var buttonID = $(this)[0].id;
+
+        if (buttonID === '{{componentId}}-{{sectionId}}-cancel') {
+            dataCollectionSectionForm['vars']['modulesTable'].rows().deselect();
+            dataCollectionSectionForm['vars']['bulkActions'] = { };
+            dataCollectionSectionForm['funcs']['editBulkButton']();
+        } else {
+            Swal.fire({
+                title                       : '<span class="text-warning"> Perform Bulk Action against selected modules?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Yes',
+                cancelButtonText            : 'No',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-warning btn-sm text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary btn-sm text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : true,
+                allowEscapeKey              : true,
+                didOpen                     : function() {
+                    dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    dataCollectionSectionForm['funcs']['performBulkAction'](buttonID);
+                }
+            });
+        }
+    });
+}
+
+dataCollectionSectionForm['funcs']['performBulkAction'] = function(buttonID) {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['bulk_actions'] = dataCollectionSectionForm['vars']['bulkActions'];
+
+    var buttonIDArr = buttonID.split('-');
+    postData['task'] = buttonIDArr[buttonIDArr.length - 1];
+
+    $.post('{{links.url("devtools/modules/bulk")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            paginatedPNotify('success', {'text': response.responseMessage});
+
+            if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+            } else {
+                dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+            }
+        } else {
+            paginatedPNotify('error', {'text': response.responseMessage});
+        }
+    }, 'json');
+
+}
 </script>
