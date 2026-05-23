@@ -2,6 +2,10 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckExistence;
+use League\Flysystem\UnableToDeleteDirectory;
+use League\Flysystem\UnableToDeleteFile;
 use System\Base\BasePackage;
 
 class DbInstaller extends BasePackage
@@ -122,6 +126,24 @@ class DbInstaller extends BasePackage
                 }
                 $config = $this->ff->generateConfig($tableName, $tableClass['schema'], $tableClass['model'], $tableConfigParams);
                 $schema = $this->ff->generateSchema($tableName, $tableClass['schema'], $tableClass['model']);
+
+                //Delete config and schema file
+                try {
+                    if ($this->localContent->fileExists(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/config.json')) {
+                        $this->localContent->delete(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/config.json');
+                    }
+                    if ($this->localContent->fileExists(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/schema.json')) {
+                        $this->localContent->delete(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/schema.json');
+                    }
+                    if ($this->localContent->directoryExists(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/cache')) {
+                        $this->localContent->deleteDirectory(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/cache');
+                    }
+                    if ($this->localContent->directoryExists(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/indexes')) {
+                        $this->localContent->deleteDirectory(str_replace(base_path(), '', $this->ff->getDatabaseDir()) . $tableName . '/indexes');
+                    }
+                } catch (FilesystemException | UnableToCheckExistence | UnableToDeleteFile | UnableToDeleteDirectory | \throwable $e) {
+                    throw $e;
+                }
 
                 $this->ff->store($tableName, $config, $schema);
 
