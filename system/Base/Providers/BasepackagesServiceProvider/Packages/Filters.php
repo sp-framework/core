@@ -63,7 +63,7 @@ class Filters extends BasePackage
         }
     }
 
-    protected function getFilters(int $componentId, array $account = null)
+    public function getFilters(int $componentId, array $account = null)
     {
         $component = $this->modules->components->getComponentById($componentId);
 
