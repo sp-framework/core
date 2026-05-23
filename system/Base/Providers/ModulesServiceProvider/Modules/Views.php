@@ -544,6 +544,8 @@ class Views extends BasePackage
 
         $this->view['view_modules_version'] = $viewsModulesVersion = implode('.', $viewsModulesVersion);
 
+        $this->setFFValidation(false);
+
         $this->update($this->view);
 
         return $viewsModulesVersion;

@@ -1697,13 +1697,11 @@ class Store
                     if (array_key_exists('format', $property)) {
                         if ($property['format'] === 'json') {
                             if (is_string($data[$propertyKey])) {
-                                $utils = new Utils();
-
-                                if (!$utils->validateJson(['json' => $data[$propertyKey]])) {
-                                    throw new \Exception($utils->packagesData->responseMessage);
+                                try {
+                                    $data[$propertyKey] = json_decode($data[$propertyKey], true);
+                                } catch (\throwable $e) {
+                                    throw $e;
                                 }
-
-                                $data[$propertyKey] = json_decode($data[$propertyKey], true);
                             }
                         }
                     }
