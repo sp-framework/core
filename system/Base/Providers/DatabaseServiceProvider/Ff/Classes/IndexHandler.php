@@ -144,7 +144,7 @@ class IndexHandler
                                 continue;
                             }
 
-                            if (!checkCtype($content[$index], 'alnum')) {//Ignore Special chars
+                            if (!checkCtype($content[$index], 'alnum', [' ', '&amp;', '&', '.', ',', ':', ';', '&#64;', '@', '-', '_'])) {//Ignore Special chars
                                 continue;
                             }
 
@@ -207,7 +207,7 @@ class IndexHandler
                         }
 
 
-                        if (!checkCtype($content[$index], 'alnum')) {//Ignore Special chars
+                        if (!checkCtype($content[$index], 'alnum', [' ', '&amp;', '&', '.', ',', ':', ';', '&#64;', '@', '-', '_'])) {//Ignore Special chars
                             continue;
                         }
 
