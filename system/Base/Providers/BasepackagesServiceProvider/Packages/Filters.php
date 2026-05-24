@@ -30,7 +30,6 @@ class Filters extends BasePackage
 
         if ($checkShowAllFilters) {
             return $this->getFilters($componentId, $account);
-
         } else {
             $this->addShowAllFilter($componentId);
 
@@ -86,12 +85,12 @@ class Filters extends BasePackage
                         [
                             'conditions'    =>
                                 [
-                                    ['component_id', '=', $componentId]
-                                ],
-                                [
-                                    ['account_id', '=', $account['id']],
-                                    'OR',
-                                    ['account_id', '=', 0],
+                                    ['component_id', '=', $componentId],
+                                    [
+                                        ['account_id', '=', $account['id']],
+                                        'OR',
+                                        ['account_id', '=', 0]
+                                    ],
                                 ]
                         ]
                     );
