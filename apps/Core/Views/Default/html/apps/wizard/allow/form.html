@@ -218,42 +218,25 @@ dataCollectionSection =
 $(document).ready(function() {
     dataCollectionSection['steps']['2']['onNext'] =
         function(resolve, reject) {
-            var postData = { };
-            postData[$('#security-token').attr('name')] = $('#security-token').val();
-            postData['app_type'] = window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"]['1']['responseData']['app_type'];
+            var registerFormId;
 
-            $('#{{componentId}}-{{sectionId}}-view').on('select2:select', function() {
-                window.dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['formValidator'].valid();
-            });
+            if ($('#{{componentId}}-{{sectionId}}-id').val() != '') {
+                registerFormId = $('#{{componentId}}-{{sectionId}}-id').val();
+            } else {
+                registerFormId = window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"]['1']['responseData']['id'];
+            }
 
-            $.post('{{links.url("apps/getViewsForAppType")}}', postData, function(response) {
-                if (response.tokenKey && response.token) {
-                    $("#security-token").attr("name", response.tokenKey);
-                    $("#security-token").val(response.token);
-                }
+            if (registerFormId) {
+                $('#{{wizardComponentId}}-main-edit-new-app').attr(
+                    'href',
+                    "{{links.url('apps/q/id/')}}" + registerFormId
+                );
 
-                if (response.responseCode == 0) {
-                    if (response.responseData && response.responseData.views) {
-                        for (var view in response.responseData.views) {
-                            var newOption = new Option(
-                                response.responseData.views[view]['display_name'],
-                                response.responseData.views[view]['id'],
-                                false,
-                                false
-                            );
+                window['dataCollection']['env']['wizard'] = false;
 
-                            $('#{{componentId}}-{{sectionId}}-view').append(newOption).trigger('change');
-                            $('#{{componentId}}-{{sectionId}}-id').val(
-                                window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"]['1']['responseData']['id']
-                            );
-                        }
-                    }
-
-                    return resolve(true);
-                }
-
-                return resolve(false);
-            }, 'json');
+                return resolve(true);
+            }
+            return resolve(false);
         }
 });
 </script>

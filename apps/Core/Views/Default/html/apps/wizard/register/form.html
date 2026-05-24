@@ -304,35 +304,40 @@ $(document).ready(function() {
                 registerFormId = window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"]['1']['responseData']['id'];
             }
 
-            $('#' + window['dataCollection']['env']['appRoute'] + '-{{componentName}}-allow-main-id').val(registerFormId);//Assign ID to allow
+            var postData = { };
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+            postData['app_type'] = window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"]['1']['responseData']['app_type'];
 
-            var step = window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]['currentStep'] + 1;
+            $('#{{componentId}}-{{sectionId}}-view').on('select2:select', function() {
+                window.dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['formValidator'].valid();
+            });
 
-            var div = '{{wizardComponentId}}-wizard-' + step + '-data';
+            $.post('{{links.url("apps/getViewsForAppType")}}', postData, function(response) {
+                if (response.tokenKey && response.token) {
+                    $("#security-token").attr("name", response.tokenKey);
+                    $("#security-token").val(response.token);
+                }
 
-            $.get('{{links.url("apps")}}/q/modules/true/id/' + registerFormId, function(response, status, xhr) {
-                if (response) {
-                    if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
-                        $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
-                        $('#security-token').val(xhr.getResponseHeader('token'));
+                if (response.responseCode == 0) {
+                    if (response.responseData && response.responseData.views) {
+                        for (var view in response.responseData.views) {
+                            var newOption = new Option(
+                                response.responseData.views[view]['display_name'],
+                                response.responseData.views[view]['id'],
+                                false,
+                                false
+                            );
+
+                            $('#{{wizardComponentId}}-allow-main-view').append(newOption).trigger('change');
+                            $('#{{wizardComponentId}}-allow-main-id').val(registerFormId);
+                        }
                     }
-                    $('#' + div + ' .card-body').empty().html(response);
+
                     return resolve(true);
                 }
 
-                 return resolve(false);
-            }).done(function(response) {
-                if (response) {
-                    window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"][step]['type'] = 'form';
-                    window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"][step]['validate'] = true;
-
-                    window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"][step]['componentId'] = $('#' + div).find('.component')[0].id;
-                    window['dataCollection']["{{wizardComponentId}}"]["{{wizardSectionId}}"]["steps"][step]['sectionId'] = $('#' + div).find('.sectionWithForm')[0].id;
-
-                    $('#' + $('#' + div).find('.sectionWithForm')[0].id + '-id').val(registerFormId);
-                    $('#{{wizardComponentId}}-modules-main').BazContentSectionWithForm();
-                }
-            });
+                return resolve(false);
+            }, 'json');
         }
 });
 </script>

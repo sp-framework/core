@@ -400,7 +400,9 @@ class AppsComponent extends BaseComponent
             $this->apps->packagesData->responseData
         );
 
-        $this->addToNotification('add', 'Added new app ' . $this->postData()['name'], null, $this->apps->packagesData->last);
+        if ($this->apps->packagesData->responseCode === 0) {
+            $this->addToNotification('add', 'Added new app ' . $this->postData()['name'], null, $this->apps->packagesData->last);
+        }
     }
 
     /**
@@ -419,7 +421,9 @@ class AppsComponent extends BaseComponent
             $this->apps->packagesData->responseCode
         );
 
-        $this->addToNotification('update', 'Updated app', null, $this->apps->packagesData->last ?? []);
+        if ($this->apps->packagesData->responseCode === 0) {
+            $this->addToNotification('update', 'Updated app', null, $this->apps->packagesData->last ?? []);
+        }
     }
 
     /**
@@ -438,7 +442,9 @@ class AppsComponent extends BaseComponent
             $this->apps->packagesData->responseCode
         );
 
-        $this->addToNotification('remove', 'Removed app with ID ' . $this->postData()['id']);
+        if ($this->apps->packagesData->responseCode === 0) {
+            $this->addToNotification('remove', 'Removed app with ID ' . $this->postData()['id']);
+        }
     }
 
     public function getFiltersAction()

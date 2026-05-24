@@ -5,18 +5,18 @@
     {% set defaultGuestsPage = 0 %}
     {% set defaultUsersPageHidden = 'hidden' %}
     {% set defaultUsersPage = 0 %}
+    {% if dashboards is not defined %}
+        {% set dashboards = [] %}
+    {% endif %}
+    {% if pages is not defined %}
+        {% set pages = [] %}
+    {% endif %}
     {% if app['default_component_guests'] is defined and app['default_component_guests'] != 0 %}
         {% set appDefaultComponentGuests = app['default_component_guests'] %}
     {% else %}
         {% set appDefaultComponentGuests = 0 %}
     {% endif %}
-    {% if appDefaultComponentGuests == dashboardComponentId and dashboards|length > 0 %}
-        {% set defaultGuestsDashboardHidden = '' %}
-        {% if app['settings']['defaultGuestDashboard'] is defined %}
-            {% set defaultGuestsDashboard = app['settings']['defaultGuestDashboard'] %}
-        {% endif %}
-    {% endif %}
-    {% if appDefaultComponentGuests == pageComponentId %}
+    {% if appDefaultComponentGuests == pageComponentId and pages|length > 0 %}
         {% set defaultGuestsPageHidden = '' %}
         {% if app['settings']['defaultGuestPage'] is defined %}
             {% set defaultGuestsPage = app['settings']['defaultGuestPage'] %}
@@ -33,7 +33,7 @@
             {% set defaultDashboard = app['settings']['defaultDashboard'] %}
         {% endif %}
     {% endif %}
-    {% if appDefaultComponentUsers == pageComponentId %}
+    {% if appDefaultComponentUsers == pageComponentId and pages|length > 0 %}
         {% set defaultUsersPageHidden = '' %}
         {% if app['settings']['defaultUserPage'] is defined %}
             {% set defaultUsersPage = app['settings']['defaultUserPage'] %}
