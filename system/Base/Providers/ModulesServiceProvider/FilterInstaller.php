@@ -106,7 +106,7 @@ class FilterInstaller extends BasePackage
 
                             foreach ($componentFilters as $componentFilter) {
                                 if (!in_array($componentFilter['conditions'], $componentFiltersConditions)) {
-                                    $this->basepackages->filters->removeFilter($componentFilter['id']);
+                                    $this->basepackages->filters->removeFilter($componentFilter);
 
                                     continue;
                                 }
