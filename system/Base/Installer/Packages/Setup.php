@@ -653,9 +653,9 @@ class Setup
 		return (new RegisterRole())->registerCoreRole($this->db, $this->ff, $this->helper);
 	}
 
-	protected function registerRegisteredUserAndGuestRoles()
+	protected function registerAdditionalRoles()
 	{
-		return (new RegisterRole())->registerRegisteredUserAndGuestRoles($this->db, $this->ff, $this->helper);
+		return (new RegisterRole())->registerAdditionalRoles($this->db, $this->ff, $this->helper);
 	}
 
 	protected function registerCoreAccount($workFactor = 12)
@@ -773,6 +773,15 @@ class Setup
 		}
 
 		return true;
+	}
+
+	protected function writeBaseConfigs($coreJson = null)
+	{
+		if (!$this->configs) {
+			$this->configs = new Configs($this->container, $this->postData, $coreJson);
+		}
+
+		return $this->configs->write(false);
 	}
 
 	protected function writeConfigs($coreJson = null, $writeBaseFile = false, $onlyUpdateDb = false)

@@ -8,54 +8,56 @@ class Role
 
     public function registerCoreRole($db, $ff, $helper)
     {
-        $role =
+        $this->addRoles($db, $ff, $helper,
             [
-                'name'              => 'System Administrators',
-                'description'       => 'System Administrators Role',
-                'type'              => 0,
-                'permissions'       => $helper->encode([])
-            ];
-
-        if ($db) {
-            $db->insertAsDict('basepackages_users_roles', $role);
-        }
-
-        if ($ff) {
-            $roleStore = $ff->store('basepackages_users_roles');
-
-            $roleStore->updateOrInsert($role);
-        }
+                [
+                    'name'              => 'System Administrators',
+                    'description'       => 'System Administrators Role',
+                    'type'              => 0,
+                    'permissions'       => $helper->encode([])
+                ]
+            ]
+        );
     }
 
-    public function registerRegisteredUserAndGuestRoles($db, $ff, $helper)
+    public function registerAdditionalRoles($db, $ff, $helper)
     {
-        $registered =
+        $this->addRoles($db, $ff, $helper,
             [
-                'name'              => 'Registered Users',
-                'description'       => 'Registered Users Role',
-                'type'              => 1,
-                'permissions'       => $helper->encode([])
-            ];
+                [
+                    'name'              => 'Super Users',
+                    'description'       => 'Super Users Role',
+                    'type'              => 1,
+                    'permissions'       => $helper->encode([])
+                ],
+                [
+                    'name'              => 'Registered Users',
+                    'description'       => 'Registered Users Role',
+                    'type'              => 1,
+                    'permissions'       => $helper->encode([])
+                ],
+                [
+                    'name'              => 'Guests',
+                    'description'       => 'Guests Role',
+                    'type'              => 1,
+                    'permissions'       => $helper->encode([])
+                ]
+            ]
+        );
+    }
 
-        $guest =
-            [
-                'name'              => 'Guests',
-                'description'       => 'Guests Role',
-                'type'              => 1,
-                'permissions'       => $helper->encode([])
-            ];
+    protected function addRoles($db, $ff, $helper, $roles)
+    {
+        foreach ($roles as $role) {
+            if ($db) {
+                $db->insertAsDict('basepackages_users_roles', $role);
+            }
 
+            if ($ff) {
+                $roleStore = $ff->store('basepackages_users_roles');
 
-        if ($db) {
-            $db->insertAsDict('basepackages_users_roles', $registered);
-            $db->insertAsDict('basepackages_users_roles', $guest);
-        }
-
-        if ($ff) {
-            $roleStore = $ff->store('basepackages_users_roles');
-
-            $roleStore->updateOrInsert($registered);
-            $roleStore->updateOrInsert($guest);
+                $roleStore->updateOrInsert($role);
+            }
         }
     }
 }

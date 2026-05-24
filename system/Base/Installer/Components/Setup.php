@@ -399,7 +399,7 @@ Class Setup
 
 				$this->setupPackage->registerDomain();
 
-				$baseConfig = $this->setupPackage->writeConfigs($this->coreJson);
+				$baseConfig = $this->setupPackage->writeBaseConfigs($this->coreJson);
 
 				$this->setupPackage->registerCore($baseConfig);
 
@@ -421,7 +421,7 @@ Class Setup
 
 				$this->setupPackage->registerCoreRole();
 
-				$this->setupPackage->registerRegisteredUserAndGuestRoles();
+				$this->setupPackage->registerAdditionalRoles();
 
 				$this->setupPackage->registerCoreAccount($baseConfig['settings']['security']['passwordWorkFactor']);
 
@@ -556,7 +556,7 @@ Class Setup
 					'text'		=> 'Registering domain...'
 				],
 				[
-					'method'	=> 'writeConfigs',
+					'method'	=> 'writeBaseConfigs',
 					'text'		=> 'Writing base configurations...'
 				],
 				[
@@ -608,7 +608,7 @@ Class Setup
 					'text'		=> 'Registering core profile...'
 				],
 				[
-					'method'	=> 'registerRegisteredUserAndGuestRoles',
+					'method'	=> 'registerAdditionalRoles',
 					'text'		=> 'Registering additional roles...'
 				],
 				[
@@ -666,6 +666,10 @@ Class Setup
 				[
 					'method'	=> 'cleanOldCookies',
 					'text'		=> 'Cleaning old cookies...'
+				],
+				[
+					'method'	=> 'writeConfigs',
+					'text'		=> 'Writing configurations...'
 				]
 			]
 		);
