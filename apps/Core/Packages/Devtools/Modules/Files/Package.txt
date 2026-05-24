@@ -12,6 +12,16 @@ class "PACKAGENAME" extends BasePackage
 
     public $"PACKAGENAMELC";
 
+    public function init()
+    {
+        //Note: If you want to use init function, you need to run parent::init as well.
+        //It is used by the use app database feature of the app.
+        //if you remove the init() function from this class, it is also fine.
+        parent::init();
+
+        return $this;
+    }
+
     public function get"PACKAGENAME"ById($id)
     {
         $"PACKAGENAMELC" = $this->getById($id);

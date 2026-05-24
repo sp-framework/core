@@ -22,6 +22,11 @@
         {% set registrationApproveAccountsManuallyDisabled = true %}
         {% set registrationRoleDisabled = true %}
     {% endif %}
+    {% if app['use_app_db'] is defined and app['use_app_db'] == true %}
+        {% set useAppDb = true %}
+    {% else %}
+        {% set useAppDb = false %}
+    {% endif %}
     {% set recoverPassword = false %}
     {% if app['recover_password'] == true %}
         {% set recoverPassword = true %}

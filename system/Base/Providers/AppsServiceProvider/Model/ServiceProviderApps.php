@@ -49,6 +49,8 @@ class ServiceProviderApps extends BaseModel
 
     public $menu_structure;
 
+    public $use_app_db;
+
     public $settings;
 
     public function initialize()

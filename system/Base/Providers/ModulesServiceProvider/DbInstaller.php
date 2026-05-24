@@ -14,8 +14,16 @@ class DbInstaller extends BasePackage
     {
         if (isset($this->config['databasetype']) && $this->config['databasetype'] !== 'ff') {
             foreach ($databases as $tableName => $tableClass) {
-                if ($tableClass['model'] && $tableClass['model']->getSource()) {
+                if (!isset($tableClass['schema']) || !isset($tableClass['model'])) {
+                    continue;
+                }
+
+                if (isset($tableClass['tableName'])) {
+                    $tableName = $tableClass['tableName'];
+                } else if ($tableClass['model']->getSource()) {
                     $tableName = $tableClass['model']->getSource();
+                } else {
+                    continue;
                 }
 
                 if (method_exists($tableClass['schema'], 'columns')) {
@@ -116,8 +124,16 @@ class DbInstaller extends BasePackage
             $storesToIndex = [];
 
             foreach ($databases as $tableName => $tableClass) {
-                if ($tableClass['model'] && $tableClass['model']->getSource()) {
+                if (!isset($tableClass['schema']) || !isset($tableClass['model'])) {
+                    continue;
+                }
+
+                if (isset($tableClass['tableName'])) {
+                    $tableName = $tableClass['tableName'];
+                } else if ($tableClass['model']->getSource()) {
                     $tableName = $tableClass['model']->getSource();
+                } else {
+                    continue;
                 }
 
                 $tableConfigParams = [];

@@ -637,6 +637,10 @@ var BazContentFields = function() {
             urlProtocol: true,
             tagsToRemove: ['script', 'link'],
             btnsDef: {
+                image: {
+                    dropdown: ['insertImage', 'base64', 'upload'],
+                    ico: 'insertImage'
+                },
                 justifyFull: {
                     dropdown: ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
                     ico: 'justifyFull'

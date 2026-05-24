@@ -162,6 +162,13 @@ class Apps
 					]
 				),
 				new Column(
+					'use_app_db',
+					[
+						'type'    => Column::TYPE_BOOLEAN,
+						'notNull' => false,
+					]
+				),
+				new Column(
 					'settings',
 					[
 						'type'    => Column::TYPE_JSON,

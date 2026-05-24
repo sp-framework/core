@@ -421,6 +421,39 @@ class Components extends BasePackage
 
 						$package['apps'] = $this->helper->encode($package['apps']);
 
+						//We install new databases for each package if it does not exist
+						//Removal is manual or we can add process to system/core for removal of db tables.
+						if ($package['app_type'] !== 'core' &&
+							isset($data['use_app_db']) && $data['use_app_db'] == '1'
+						) {
+							$classArr = explode('\\', $package['class']);
+							$classArr = array_slice($classArr, 0, -1);
+							$class = implode('\\', $classArr) . '\\Install\\Install';
+							$path = lcfirst(str_replace('\\', '/', $class) . '.php');
+
+							try {
+								if ($this->localContent->fileExists($path)) {
+									$packageInstall = (new $class())->init();
+									$reflection = new \ReflectionClass($packageInstall);
+									$databases = $reflection->getProperty('databases');
+									$databases->setAccessible(true);
+
+									$databases = $databases->getValue($packageInstall);
+
+									if ($databases && count($databases) > 0) {
+										foreach ($databases as $databaseName => &$database) {
+											$database['tableName'] = str_replace($data['app_type'], $data['route'], $database['model']->getSource());
+										}
+
+										$dbInstaller = new \System\Base\Providers\ModulesServiceProvider\DbInstaller;
+										$dbInstaller->installDb($databases);
+									}
+								}
+							} catch (FilesystemException | UnableToCheckExistence | \throwable $e) {
+								$this->logger->log->debug('Error while installing package : ' . $package['name'] . ' for app database. ' . $e->getMessage());
+							}
+						}
+
 						$this->modules->packages->update($package);
 					}
 				}

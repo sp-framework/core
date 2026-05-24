@@ -1190,8 +1190,6 @@ class DevtoolsModules extends BasePackage
                         }
                     }
                 } else {
-                    $module = new $class();
-
                     if ($truncate && method_exists($module, 'truncate')) {
                         $module->init()->truncate();
                     }

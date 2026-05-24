@@ -8,9 +8,9 @@ abstract class BaseModel extends Model
 {
 	protected $app;
 
-	protected $apps;
-
 	protected $modules;
+
+	protected $helper;
 
 	protected $db;
 
@@ -19,7 +19,6 @@ abstract class BaseModel extends Model
 	public function onConstruct()
 	{
 		$this->useDynamicUpdate(true);
-		$this->setTableSource();
 	}
 
 	public function initialize()
@@ -27,26 +26,46 @@ abstract class BaseModel extends Model
 		//
 	}
 
-	protected function setTableSource()
+	protected function setTableSource($source = null)
 	{
-		$reflection = new \ReflectionClass($this);
+		if (!$source) {
+			$reflection = new \ReflectionClass($this);
 
-		$tableNameArr = preg_split('/(?=[A-Z])/', $reflection->getShortName(), -1, PREG_SPLIT_NO_EMPTY);
+			$tableNameArr = preg_split('/(?=[A-Z])/', $reflection->getShortName(), -1, PREG_SPLIT_NO_EMPTY);
+		} else {
+			$tableNameArr = preg_split('/(?=[A-Z])/', $source, -1, PREG_SPLIT_NO_EMPTY);
+		}
 
 		$this->setSource(strtolower(join('_', $tableNameArr)));
 	}
 
-	public function init()
+	public function init($app = null)
 	{
-		$this->apps = $this->getDi()->getShared('apps');
+		$source = null;
 
-		$this->app = $this->apps->getAppInfo();
+		if ($app) {
+			$this->app = $app;
 
-		$this->modules = $this->getDi()->getShared('modules');
+			$this->modules = $this->getDi()->getShared('modules');
 
-		if (!isset($this->db)) {
-			$this->db = $this->getDi()->getShared('db');
+			$this->helper = $this->getDi()->getShared('helper');
+
+			if (!isset($this->db)) {
+				$this->db = $this->getDi()->getShared('db');
+			}
+
+			if (isset($this->app['use_app_db']) && $this->app['use_app_db'] === true) {
+				if (str_starts_with(get_class($this), 'Apps\\' . ucfirst($this->app['app_type']))) {
+					$modelArr = explode('\\', get_class($this));
+
+					if (str_starts_with($this->helper->last($modelArr), 'Apps' . ucfirst($this->app['app_type']))) {
+						$source = str_replace(ucfirst($this->app['app_type']), ucfirst($this->app['route']), $this->helper->last($modelArr));
+					}
+				}
+			}
 		}
+
+		$this->setTableSource($source);
 
 		return $this;
 	}

@@ -116,6 +116,18 @@ abstract class BasePackage extends Controller
 	{
 		$this->app = $this->apps->getAppInfo();
 
+		if (isset($this->app['use_app_db']) && $this->app['use_app_db'] === true) {
+			if (str_starts_with(get_called_class(), 'Apps\\' . ucfirst($this->app['app_type']))) {
+				if (isset($this->modelToUse)) {
+					$modelArr = explode('\\', $this->modelToUse);
+
+					if (str_starts_with($this->helper->last($modelArr), 'Apps' . ucfirst($this->app['app_type']))) {
+						$this->setFfStoreToUse();
+					}
+				}
+			}
+		}
+
 		return $this;
 	}
 
@@ -1661,7 +1673,7 @@ abstract class BasePackage extends Controller
 	protected function useModel($model = null)
 	{
 		if (!$model) {
-			return new $this->modelToUse;
+			return (new $this->modelToUse)->init($this->app);
 		}
 
 		return new $model;
