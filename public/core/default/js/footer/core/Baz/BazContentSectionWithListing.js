@@ -284,6 +284,15 @@
                         $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
                         $('#' + sectionId + '-delete').addClass('disabled');
                     }
+
+                    //Reset Quick Filters
+                    if ($('#listing-filters-quick').length === 1) {
+                        $('#' + sectionId + '-filter-quick').attr('disabled', true);
+                        $('#' + sectionId + '-filter-quick').val('');
+                        $('#' + sectionId + '-filter-search').attr('disabled', true);
+                        $('#' + sectionId + '-filter-clear').attr('disabled', true);
+                        $('#' + sectionId + '-filter-quick-prepend-dropdown-button span').text('SELECT FIELD');
+                    }
                 }
 
                 //Add / Open Modal
@@ -535,7 +544,6 @@
 
                 //Enable/Disable Operators as per field type (numeric/alphanumeric)
                 $('#' + sectionId + '-field').on('select2:select', function(e) {
-
                     var options = $('#' + sectionId + '-filter-operator').children();
 
                     if ($(e.params.data.element).data()['number'] == true) {
@@ -624,7 +632,6 @@
                 });
 
                 $('#' + sectionId + '-default').click(function() {
-
                     var postData = { };
                     postData['component_id'] = $('#' + sectionId + '-filter-filters option:selected').data()['component_id'];
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -1217,10 +1224,6 @@
                         $('#listing-filters').attr('hidden', false);
                         $.extend(thisOptions.listOptions.datatable, JSON.parse(response.rows));
 
-                        if (response.accountEnv) {
-                            dataCollection.env.accountEnv = response.accountEnv;
-                        }
-
                         if (response.routeEnv && response.routeEnv.pageParams) {
                             if (response.routeEnv.pageParams.limit) {
                                 thisOptions.listOptions.datatable.iDisplayLength = response.routeEnv.pageParams.limit;
@@ -1242,6 +1245,13 @@
                                     });
 
                                     dataCollection.env['customConditions'] = customConditions;
+
+                                    $('#' + sectionId + '-filter-quick').attr('disabled', false);
+                                    $('#' + sectionId + '-filter-search').attr('disabled', false);
+                                    $('#' + sectionId + '-filter-clear').attr('disabled', false);
+                                    $('#' + sectionId + '-filter-quick-prepend-dropdown-button span')
+                                        .text($('#' + sectionId + '-filter-quick-' + dataCollection.env['customConditions'][0][1]).text().toUpperCase());
+                                    $('#' + sectionId + '-filter-quick').val(dataCollection.env['customConditions'][0][3].replace(/%/g, ''));
                                 }
 
                                 filter = true;
