@@ -44,6 +44,7 @@ class MenusComponent extends BaseComponent
                 'actionsToEnable'       =>
                 [
                     'view'              => 'system/menus',
+                    'remove'            => 'system/menus/remove',
                 ]
             ];
 
@@ -57,7 +58,7 @@ class MenusComponent extends BaseComponent
             $controlActions,
             null,
             null,
-            'id'
+            'route'
         );
 
         $this->view->pick('menus/list');
@@ -84,6 +85,13 @@ class MenusComponent extends BaseComponent
      */
     public function removeAction()
     {
-        //
+        $this->requestIsPost();
+
+        $removeMenu = $this->menus->removeMenu($this->postData());
+
+        $this->addResponse(
+            $this->menus->packagesData->responseMessage,
+            $this->menus->packagesData->responseCode
+        );
     }
 }

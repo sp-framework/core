@@ -221,6 +221,23 @@ class Menus extends BasePackage
         return true;
     }
 
+    public function removeMenu(array $data)
+    {
+        $menu = $this->getById($data['id']);
+
+        $remove = $this->remove($menu['id']);
+
+        if ($remove) {
+            $this->addResponse('Menu Removed');
+
+            return true;
+        }
+
+        $this->addResponse('Error removing menu', 1);
+
+        return false;
+    }
+
     protected function addSequence($menu, $sequence)
     {
         foreach ($menu as $key => &$value) {
