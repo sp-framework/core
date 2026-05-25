@@ -556,9 +556,8 @@ class Filters extends BasePackage
                 } else {
                     $this->packagesData->filters = $this->getFilters($data['component_id']);
                 }
-                $this->packagesData->responseCode = 0;
 
-                $this->packagesData->responseMessage = 'Filter Added';
+                $this->addResponse('Filter Added');
 
                 return true;
             }
@@ -597,17 +596,13 @@ class Filters extends BasePackage
                     $this->packagesData->filters = $this->getFiltersForComponent($data['component_id']);
                 }
 
-                $this->packagesData->responseCode = 0;
-
-                $this->packagesData->responseMessage = 'Filter Updated';
+                $this->addResponse('Filter Updated');
 
                 return true;
             }
         }
 
-        $this->packagesData->responseCode = 1;
-
-        $this->packagesData->responseMessage = 'Cannot update filter.';
+        $this->addResponse('Cannot update filter.', 1);
 
         return false;
     }
@@ -637,16 +632,12 @@ class Filters extends BasePackage
                 }
             }
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Filter Removed';
+            $this->addResponse('Filter Removed');
 
             return true;
         }
 
-        $this->packagesData->responseCode = 1;
-
-        $this->packagesData->responseMessage = 'Cannot remove filter.';
+        $this->addResponse('Cannot remove filter.', 1);
 
         return false;
     }
@@ -675,9 +666,7 @@ class Filters extends BasePackage
                 $this->packagesData->filters = $this->getFiltersForComponent($data['component_id']);
             }
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Filter cloned successfully';
+            $this->addResponse('Filter cloned successfully');
 
             return true;
         }
@@ -756,9 +745,7 @@ class Filters extends BasePackage
                     $this->defaultFilter[0]['is_default'] = 0;
 
                     if (!$this->update($this->defaultFilter[0])) {
-                        $this->packagesData->responseCode = 1;
-
-                        $this->packagesData->responseMessage = 'Error removing default filter';
+                        $this->addResponse('Error removing default filter', 1);
 
                         return false;
                     }
@@ -767,9 +754,7 @@ class Filters extends BasePackage
                 $this->defaultFilter[0]['is_default'] = 0;
 
                 if (!$this->update($this->defaultFilter[0])) {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Error removing default filter';
+                    $this->addResponse('Error removing default filter', 1);
 
                     return false;
                 }
