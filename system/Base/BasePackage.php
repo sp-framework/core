@@ -607,7 +607,9 @@ abstract class BasePackage extends Controller
 
 		//Retrieve from Users Env
 		if ($this->access->auth->check()) {
-			if (count($this->postData()) === 0 || !isset($this->postData()['conditions'])) {
+			if (count($this->postData()) === 0 ||
+				(!isset($this->postData()['page']) && !isset($this->postData()['limit']) && !isset($this->postData()['conditions']))
+			) {
 				$envParams = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], false, true);
 
 				if ($envParams) {
