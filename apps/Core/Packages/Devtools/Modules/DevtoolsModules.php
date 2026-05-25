@@ -1168,6 +1168,10 @@ class DevtoolsModules extends BasePackage
                 if ($data['app_type'] === 'core') {
                     $coreInstall = new CoreInstall;
 
+                    if (!isset($data['type'])) {
+                        $data['type'] =$moduleToReinstall['module_type'];
+                    }
+
                     if ($data['type'] === 'core' ||
                         ($data['type'] === 'packages' && $data['name'] === 'Core')
                     ) {
