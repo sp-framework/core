@@ -412,14 +412,14 @@ class Local extends BasePackage
                 return $this->response->setFileToSend(base_path($dataFile));
             }
 
+            $response = $this->response->setFileToSend(base_path($dataFile));
+
             $this->response->setContentType($file[0]['type']);
 
-            $this->response
-                ->setHeader("Content-Length", filesize(base_path($dataFile)))
-                ->setHeader("Content-Disposition", "attachment; filename=" . $file[0]['org_file_name']);
+            $this->response->setHeader("Content-Disposition", "attachment; filename=" . $file[0]['org_file_name']);
+            $this->response->setContentLength(filesize(base_path($dataFile)));
 
-            return $this->response->setFileToSend(base_path($dataFile));
-
+            return $response;
         } else {
             $this->response->setStatusCode(404, 'Not Found');
 
