@@ -238,7 +238,8 @@ class Single
                             'fieldDisabled'                         => $this->addressesParams['attentionToFieldDisabled'],
                             'fieldRequired'                         => $this->addressesParams['attentionToFieldRequired'],
                             'fieldBazScan'                          => true,
-                            'fieldBazJstreeSearch'                  => true,
+                            'fieldBazJstreeSearch'                  =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'                  => $this->addressesParams['attentionToFieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'                  => $this->addressesParams['attentionToFieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'               => 1,
@@ -270,7 +271,8 @@ class Single
                             'fieldDisabled'                         => $this->addressesParams['streetAddressFieldDisabled'],
                             'fieldRequired'                         => $this->addressesParams['streetAddressFieldRequired'],
                             'fieldBazScan'                          => true,
-                            'fieldBazJstreeSearch'                  => true,
+                            'fieldBazJstreeSearch'                  =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'                  => $this->addressesParams['streetAddressFieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'                  => $this->addressesParams['streetAddressFieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'               => 1,
@@ -295,7 +297,8 @@ class Single
                             'fieldDisabled'                         => $this->addressesParams['streetAddress2FieldDisabled'],
                             'fieldRequired'                         => $this->addressesParams['streetAddress2FieldRequired'],
                             'fieldBazScan'                          => true,
-                            'fieldBazJstreeSearch'                  => true,
+                            'fieldBazJstreeSearch'                  =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'                  => $this->addressesParams['streetAddress2FieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'                  => $this->addressesParams['streetAddress2FieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'               => 1,
@@ -327,7 +330,8 @@ class Single
                             'fieldDisabled'                         => $this->addressesParams['streetAddress3FieldDisabled'],
                             'fieldRequired'                         => $this->addressesParams['streetAddress3FieldRequired'],
                             'fieldBazScan'                          => true,
-                            'fieldBazJstreeSearch'                  => true,
+                            'fieldBazJstreeSearch'                  =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'                  => $this->addressesParams['streetAddress3FieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'                  => $this->addressesParams['streetAddress3FieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'               => 1,
@@ -352,7 +356,8 @@ class Single
                             'fieldDisabled'                         => $this->addressesParams['streetAddress4FieldDisabled'],
                             'fieldRequired'                         => $this->addressesParams['streetAddress4FieldRequired'],
                             'fieldBazScan'                          => true,
-                            'fieldBazJstreeSearch'                  => true,
+                            'fieldBazJstreeSearch'                  =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'                  => $this->addressesParams['streetAddress4FieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'                  => $this->addressesParams['streetAddress4FieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'               => 1,
@@ -397,7 +402,8 @@ class Single
                         'fieldHelp'                             => true,
                         'fieldHelpTooltipContent'               => 'Search ' . $this->addressesParams['cityFieldLabel'] . '. If there are no search results, try fixing the spelling or use full form for the name, ex=> use Saint instead of St.',
                         'fieldBazScan'                          => true,
-                        'fieldBazJstreeSearch'                  => true,
+                        'fieldBazJstreeSearch'                  =>
+                            (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['cityFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['cityFieldBazPostOnUpdate'],
                         'fieldHidden'                           => $this->addressesParams['cityFieldHidden'],
@@ -446,7 +452,8 @@ class Single
                         'fieldDisabled'                         => $this->addressesParams['postCodeFieldDisabled'],
                         'fieldRequired'                         => $this->addressesParams['postCodeFieldRequired'],
                         'fieldBazScan'                          => true,
-                        'fieldBazJstreeSearch'                  => true,
+                        'fieldBazJstreeSearch'                  =>
+                            (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['postCodeFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['postCodeFieldBazPostOnUpdate'],
                         'fieldDataInputMinLength'               => 1,
@@ -490,7 +497,8 @@ class Single
                         'fieldHelp'                             => true,
                         'fieldHelpTooltipContent'               => 'Enter ' . $this->addressesParams['stateFieldLabel'],
                         'fieldBazScan'                          => true,
-                        'fieldBazJstreeSearch'                  => true,
+                        'fieldBazJstreeSearch'                  =>
+                            (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['stateFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['stateFieldBazPostOnUpdate'],
                         'fieldHidden'                           => $this->addressesParams['stateFieldHidden'],
@@ -537,7 +545,8 @@ class Single
                         'fieldHelp'                             => true,
                         'fieldHelpTooltipContent'               => 'Enter ' . $this->addressesParams['countryFieldLabel'],
                         'fieldBazScan'                          => true,
-                        'fieldBazJstreeSearch'                  => true,
+                        'fieldBazJstreeSearch'                  =>
+                            (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                         'fieldBazPostOnCreate'                  => $this->addressesParams['countryFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'                  => $this->addressesParams['countryFieldBazPostOnUpdate'],
                         'fieldHidden'                           => $this->addressesParams['countryFieldHidden'],

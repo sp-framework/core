@@ -128,6 +128,8 @@ class Multiple
 
     protected function buildMultipleAddressesLayout()
     {
+        $this->addressesParams['multiple'] = true;
+
         $singleAddressArr = [
             'component'                                   => $this->params['component'],
             'componentName'                               => $this->params['componentName'],

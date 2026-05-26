@@ -98,6 +98,8 @@ class Multiple
 
     protected function buildMultipleContactsLayout()
     {
+        $this->contactsParams['multiple'] = true;
+
         $singleContactArr = [
             'component'                                   => $this->params['component'],
             'componentName'                               => $this->params['componentName'],

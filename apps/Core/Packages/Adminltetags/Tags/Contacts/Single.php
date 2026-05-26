@@ -227,7 +227,8 @@ class Single
                             'fieldHelp'                      => true,
                             'fieldHelpTooltipContent'        => 'Prefix',
                             'fieldBazScan'                   => true,
-                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazJstreeSearch'           =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'           => $this->contactsParams['firstNameFieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'           => $this->contactsParams['firstNameFieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'        => 1,
@@ -255,7 +256,8 @@ class Single
                         'fieldDisabled'                  => $this->contactsParams['firstNameFieldDisabled'],
                         'fieldRequired'                  => $this->contactsParams['firstNameFieldRequired'],
                         'fieldBazScan'                   => true,
-                        'fieldBazJstreeSearch'           => true,
+                        'fieldBazJstreeSearch'           =>
+                            (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                         'fieldBazPostOnCreate'           => $this->contactsParams['firstNameFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'           => $this->contactsParams['firstNameFieldBazPostOnUpdate'],
                         'fieldDataInputMinLength'        => 1,
@@ -280,7 +282,8 @@ class Single
                         'fieldDisabled'                  => $this->contactsParams['lastNameFieldDisabled'],
                         'fieldRequired'                  => $this->contactsParams['lastNameFieldRequired'],
                         'fieldBazScan'                   => true,
-                        'fieldBazJstreeSearch'           => true,
+                        'fieldBazJstreeSearch'           =>
+                            (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                         'fieldBazPostOnCreate'           => $this->contactsParams['lastNameFieldBazPostOnCreate'],
                         'fieldBazPostOnUpdate'           => $this->contactsParams['lastNameFieldBazPostOnUpdate'],
                         'fieldDataInputMinLength'        => 1,
@@ -305,7 +308,8 @@ class Single
                             'fieldHelp'                      => true,
                             'fieldHelpTooltipContent'        => 'Suffix',
                             'fieldBazScan'                   => true,
-                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazJstreeSearch'           =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'           => $this->contactsParams['firstNameFieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'           => $this->contactsParams['firstNameFieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'        => 1,
@@ -349,7 +353,8 @@ class Single
                             'fieldDisabled'                  => $this->contactsParams['emailFieldDisabled'],
                             'fieldRequired'                  => $this->contactsParams['emailFieldRequired'],
                             'fieldBazScan'                   => true,
-                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazJstreeSearch'           =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'           => $this->contactsParams['emailFieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'           => $this->contactsParams['emailFieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'        => 1,
@@ -376,7 +381,8 @@ class Single
                                     'fieldDisabled'                  => $this->contactsParams['secondaryEmailFieldDisabled'],
                                     'fieldRequired'                  => $this->contactsParams['secondaryEmailFieldRequired'],
                                     'fieldBazScan'                   => true,
-                                    'fieldBazJstreeSearch'           => true,
+                                    'fieldBazJstreeSearch'           =>
+                                        (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                                     'fieldBazPostOnCreate'           => $this->contactsParams['secondaryEmailFieldBazPostOnCreate'],
                                     'fieldBazPostOnUpdate'           => $this->contactsParams['secondaryEmailFieldBazPostOnUpdate'],
                                     'fieldDataInputMinLength'        => 1,
@@ -403,7 +409,8 @@ class Single
                                     'fieldCheckboxType'              => 'info',
                                     'fieldCheckboxChecked'           => $ccEmailsChecked,
                                     'fieldBazScan'                   => true,
-                                    'fieldBazJstreeSearch'           => true,
+                                    'fieldBazJstreeSearch'           =>
+                                        (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                                     'fieldBazPostOnCreate'           => $this->contactsParams['ccEmailsToSecondaryEmailFieldBazPostOnCreate'],
                                     'fieldBazPostOnUpdate'           => $this->contactsParams['ccEmailsToSecondaryEmailFieldBazPostOnUpdate'],
                                 ]
@@ -436,7 +443,8 @@ class Single
                                     'fieldDisabled'                  => $this->contactsParams['contactPhoneFieldDisabled'],
                                     'fieldRequired'                  => $this->contactsParams['contactPhoneFieldRequired'],
                                     'fieldBazScan'                   => true,
-                                    'fieldBazJstreeSearch'           => true,
+                                    'fieldBazJstreeSearch'           =>
+                                        (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                                     'fieldBazPostOnCreate'           => $this->contactsParams['contactPhoneFieldBazPostOnCreate'],
                                     'fieldBazPostOnUpdate'           => $this->contactsParams['contactPhoneFieldBazPostOnUpdate'],
                                     'fieldDataInputMinLength'        => 1,
@@ -460,7 +468,8 @@ class Single
                                     'fieldDisabled'                  => $this->contactsParams['contactPhoneExtFieldDisabled'],
                                     'fieldRequired'                  => $this->contactsParams['contactPhoneExtFieldRequired'],
                                     'fieldBazScan'                   => true,
-                                    'fieldBazJstreeSearch'           => true,
+                                    'fieldBazJstreeSearch'           =>
+                                        (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                                     'fieldBazPostOnCreate'           => $this->contactsParams['contactPhoneExtFieldBazPostOnCreate'],
                                     'fieldBazPostOnUpdate'           => $this->contactsParams['contactPhoneExtFieldBazPostOnUpdate'],
                                     'fieldDataInputMinLength'        => 1,
@@ -487,7 +496,8 @@ class Single
                             'fieldDisabled'                  => $this->contactsParams['contactMobileFieldDisabled'],
                             'fieldRequired'                  => $this->contactsParams['contactMobileFieldRequired'],
                             'fieldBazScan'                   => true,
-                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazJstreeSearch'           =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'           => $this->contactsParams['contactMobileFieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'           => $this->contactsParams['contactMobileFieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'        => 1,
@@ -519,7 +529,8 @@ class Single
                             'fieldDisabled'                  => $this->contactsParams['contactFaxFieldDisabled'],
                             'fieldRequired'                  => $this->contactsParams['contactFaxFieldRequired'],
                             'fieldBazScan'                   => true,
-                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazJstreeSearch'           =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'           => $this->contactsParams['contactFaxFieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'           => $this->contactsParams['contactFaxFieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'        => 1,
@@ -544,7 +555,8 @@ class Single
                             'fieldDisabled'                  => $this->contactsParams['contactOtherFieldDisabled'],
                             'fieldRequired'                  => $this->contactsParams['contactOtherFieldRequired'],
                             'fieldBazScan'                   => true,
-                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazJstreeSearch'           =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'           => $this->contactsParams['contactOtherFieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'           => $this->contactsParams['contactOtherFieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'        => 1,
@@ -576,7 +588,8 @@ class Single
                             'fieldDisabled'                  => $this->contactsParams['contactNotesFieldDisabled'],
                             'fieldRequired'                  => $this->contactsParams['contactNotesFieldRequired'],
                             'fieldBazScan'                   => true,
-                            'fieldBazJstreeSearch'           => true,
+                            'fieldBazJstreeSearch'           =>
+                                (isset($this->params['multiple']) && $this->params['multiple'] === true) ? false : true,
                             'fieldBazPostOnCreate'           => $this->contactsParams['contactNotesFieldBazPostOnCreate'],
                             'fieldBazPostOnUpdate'           => $this->contactsParams['contactNotesFieldBazPostOnUpdate'],
                             'fieldDataInputMinLength'        => 1,
