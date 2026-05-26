@@ -30,14 +30,6 @@ class States
                     ]
                 ),
                 new Column(
-                    'state_code',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 10,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
                     'longitude',
                     [
                         'type'          => Column::TYPE_DECIMAL,

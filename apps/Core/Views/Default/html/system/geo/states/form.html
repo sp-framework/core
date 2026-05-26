@@ -1,12 +1,10 @@
 {% if state['id'] is defined %}
     {% set stateId = state['id'] %}
     {% set stateName = state['name'] %}
-    {% set stateCode = state['state_code'] %}
     {% set stateCountry = state['country_id'] %}
 {% else %}
     {% set stateId = '' %}
     {% set stateName = '' %}
-    {% set stateCode = '' %}
     {% set stateCountry = '' %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
@@ -60,28 +58,6 @@
             </div>
         </div>
         <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'state_code',
-                        'fieldLabel'                     : 'State Code',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'State Code Example: VIC for Victoria',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 100,
-                        'fieldValue'                     : stateCode
-                    ]
-                )}}
-            </div>
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -139,19 +115,16 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                       : { },
         '{{componentId}}-{{sectionId}}-name'                     : { },
-        '{{componentId}}-{{sectionId}}-state_code'               : { },
         '{{componentId}}-{{sectionId}}-country_id'               : {
             placeholder : 'SELECT COUNTRY'
         },
         '{{componentId}}-{{sectionId}}-form'                     : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                : 'required',
-                '{{componentId}}-{{sectionId}}-state_code'          : 'required',
                 '{{componentId}}-{{sectionId}}-country_id'          : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                : 'Please enter state name',
-                '{{componentId}}-{{sectionId}}-state_code'          : 'Please enter state code',
                 '{{componentId}}-{{sectionId}}-country_id'          : 'Please select country'
             }
         }
