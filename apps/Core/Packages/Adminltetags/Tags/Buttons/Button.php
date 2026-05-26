@@ -249,6 +249,15 @@ class Button
                 $button['tooltipTitle'] :
                 '';
 
+            if (isset($button['data'])) {
+                $this->buttonParams['dataAttr'] = '';
+                foreach ($button['data'] as $dataKey => $dataValue) {
+                    $this->buttonParams['dataAttr'] .= 'data-' . $dataKey . '="' . $dataValue . '" ';
+                }
+            } else {
+                $this->buttonParams['dataAttr'] = '';
+            }
+
             $this->buildButton();
         }
     }
@@ -282,8 +291,8 @@ class Button
                 $this->buttonParams['updateSuccessRedirectUrl'] . ' ' .
                 $this->buttonParams['actionTarget'] . ' ' .
                 $this->buttonParams['successNotify'] . ' ' .
-            ' id="' . $this->buttonParams['id'] . '" ' .
-            'data-toggle="tooltip" data-html="true" data-placement="' .
+            ' id="' . $this->buttonParams['id'] . '" ' . $this->buttonParams['dataAttr'] .
+            ' data-toggle="tooltip" data-html="true" data-placement="' .
                 $this->buttonParams['tooltipPosition']. '" title="' .
                 $this->buttonParams['tooltipTitle'] . '" ' .
             $this->buttonParams['disabled'] . ' ' .
