@@ -5621,7 +5621,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
             that,
             thisOptions,
             datatableOptions,
-            swalSound;
+            swalSound,
+            selectedId;
         var listColumns = { };
         var filter, query;
 
@@ -6456,8 +6457,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     clearStoredData();
                 });
 
+                //Quick Filters
                 if ($('#listing-filters-quick').length === 1) {
-                    var dataType, selectedId;
+                    var dataType;
 
                     $('#listing-filters-quick a').click(function(e) {
                         e.preventDefault();
@@ -6836,6 +6838,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                     $('#' + sectionId + '-filter-clear').attr('disabled', false);
                                     $('#' + sectionId + '-filter-quick-prepend-dropdown-button span')
                                         .text($('#' + sectionId + '-filter-quick-' + dataCollection.env['customConditions'][0][1]).text().toUpperCase());
+                                    selectedId = dataCollection.env['customConditions'][0][1];
                                     $('#' + sectionId + '-filter-quick').val(dataCollection.env['customConditions'][0][3].replace(/%/g, ''));
                                 }
 
