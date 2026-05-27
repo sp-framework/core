@@ -1,3 +1,15 @@
+{% set formButtons =
+    [
+        'closeActionUrl'            : 'devtools/modules'
+    ]
+%}
+{% if selectedAppType is defined and selectedAppType != '0' %}
+    {% set formButtons =
+        [
+            'closeActionUrl'            : 'devtools/modules/q/apptype/' ~ selectedAppType
+        ]
+    %}
+{% endif %}
 {{adminltetags.useTag('content',
     [
         'component'                     : component,
@@ -14,9 +26,6 @@
         'cardAdditionalClass'           : 'rounded-0',
         'cardShowTools'                 : [],
         'cardBodyInclude'               : 'modules/changes/view',
-        'formButtons'                   :
-        [
-            'closeActionUrl'                : 'devtools/modules'
-        ]
+        'formButtons'                   : formButtons
     ]
 )}}

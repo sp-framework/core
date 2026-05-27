@@ -338,7 +338,16 @@ dataCollectionSection =
 
                 $('#{{componentId}}-{{sectionId}}-check-for-changes').off();
                 $('#{{componentId}}-{{sectionId}}-check-for-changes').click(function() {
-                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, true);
+                    var apptype = false;
+                    if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                        apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                    }
+
+                    if (apptype) {
+                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, true, apptype);
+                    } else {
+                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, true);
+                    }
                 });
             }
         },
@@ -398,6 +407,9 @@ dataCollectionSectionForm['funcs']['loadAjax'] =
 
         if (isChanges) {
             dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/changes/true")}}';
+            if (isAppType) {
+                dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/apptype/' + isAppType;
+            }
         }
 
         if (dataCollectionSectionForm['vars']['url'].charAt(0) !== 'h' &&
