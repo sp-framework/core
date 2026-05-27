@@ -115,11 +115,35 @@ class Apps extends BasePackage
 
 			if ((isset($apiUri) && count($apiUri) === 1) ||
 				count($uri) === 1
-			) {//Check for Murl
+			) {
 				if (isset($apiUri)) {
-					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, trim($apiUri[0], '/'), $domain['id']);
+					$murlApiUri = trim($apiUri[0], '/');
+				}
+				$murlUri = trim($uri[0], '/');
+
+				//Check for Murl
+				//If we access component-ID directly
+				//Example: https://domain.com/jobs-3830, it should look for murl entry jobs-{id}
+				$uriId = 0;
+				if (str_contains(trim($uri[0], '/'), '-')) {
+					$uriArr = explode('-', trim($uri[0], '/'));
+
+					if (count($uriArr) > 1) {
+						$uriId = (int) $this->helper->last($uriArr);
+
+						if ($uriId > 0) {
+							if (isset($apiUri)) {
+								$murlApiUri = $this->helper->first($uriArr);
+							}
+							$murlUri = $this->helper->first($uriArr);
+						}
+					}
+				}
+
+				if (isset($apiUri)) {
+					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, $murlApiUri, $domain['id'], $uriId);
 				} else {
-					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, trim($uri[0], '/'), $domain['id']);
+					$this->isMurl = $this->basepackages->murls->getMurlByDomainId($this, $murlUri, $domain['id'], $uriId);
 				}
 
 				if ($this->isMurl) {
