@@ -175,7 +175,7 @@ class Storages extends BasePackage
                         $fileType = $fileInfo[0]['type'];
                     }
 
-                    if (in_array($fileType, $this->storage->storage['allowed_image_mime_types'])) {
+                    if (isset($fileType) && in_array($fileType, $this->storage->storage['allowed_image_mime_types'])) {
                         if (isset($this->request->getPost()['getpubliclinks'])) {
                             $widths = explode(',', $this->request->getPost()['getpubliclinks']);
 
@@ -190,7 +190,7 @@ class Storages extends BasePackage
 
                         $this->packagesData->responseMessage = 'Files Uploaded!';
 
-                    } else if (in_array($fileType, $this->storage->storage['allowed_file_mime_types'])) {
+                    } else if (isset($fileType) && in_array($fileType, $this->storage->storage['allowed_file_mime_types'])) {
                         if (isset($this->request->getPost()['getpubliclinks'])) {
                             $storageData['publicLinks'] = [];
 
