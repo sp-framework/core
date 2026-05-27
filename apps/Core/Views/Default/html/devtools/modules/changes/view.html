@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set changesHtml = '' %}
 {% if modules|length > 0 %}
     {% for moduleType, modulesArr in modules %}
@@ -10,6 +10,10 @@
                 {% endif %}
                 {% set editUrl = links.url('devtools/modules/q/module/true/type/' ~ moduleArr['module_type'] ~ '/id/' ~ moduleArr['id'] ~ isSubView) %}
                 {% set releaseUrl = links.url('devtools/modules/q/module/true/type/' ~ moduleArr['module_type'] ~ '/id/' ~ moduleArr['id'] ~ '/newrelease/true') %}
+                {% if selectedAppType is defined and selectedAppType != '0' %}
+                    {% set editUrl = editUrl ~ '/apptype/' ~ selectedAppType %}
+                    {% set releaseUrl = releaseUrl ~ '/apptype/' ~ selectedAppType %}
+                {% endif %}
                 {% set moduleButtons =
                     '<div class="btn-group">
                         <a href="' ~ editUrl ~ '" type="button" data-id="' ~ moduleArr['id'] ~ '" data-type="' ~ moduleArr['module_type'] ~ '" class="pl-2 pr-2 text-white btn btn-primary btn-xs editModule">
@@ -171,6 +175,7 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['modifiedModules'] = JSON.parse('{{modifiedModules}}');
+dataCollectionSectionForm['vars']['selectedAppType'] = '{{selectedAppType}}';
 dataCollectionSectionForm['funcs'] = { };
 dataCollectionSectionForm['funcs']['init'] = function() {
     if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-changes-table')) {
@@ -347,7 +352,11 @@ dataCollectionSectionForm['funcs']['init'] = function() {
             if (response.responseCode == 0) {
                 paginatedPNotify('success', {'text': response.responseMessage});
 
-                dataCollectionSectionForm['funcs']['browse']('{{links.url("devtools/modules/q/changes/true")}}');
+                if (dataCollectionSectionForm['vars']['selectedAppType'] != '0') {
+                    dataCollectionSectionForm['funcs']['browse']('{{links.url("devtools/modules/q/changes/true/apptype/' + dataCollectionSectionForm['vars']['selectedAppType'] + '")}}');
+                } else {
+                    dataCollectionSectionForm['funcs']['browse']('{{links.url("devtools/modules/q/changes/true")}}');
+                }
             } else {
                 paginatedPNotify('error', {'text': response.responseMessage});
             }
@@ -408,3 +417,4 @@ $(document).ready(function() {
     dataCollectionSectionForm['funcs']['init']();
 });
 </script>
+<!-- htmlmin:ignore -->

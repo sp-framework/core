@@ -30,6 +30,10 @@
     %}
 {% endif %}
 {% if newrelease is defined and newrelease === true %}
+    {% set moduleChangesUrl = links.url('devtools/modules/q/changes/true') %}
+    {% if selectedAppType is defined and selectedAppType != '0' %}
+        {% set moduleChangesUrl = moduleChangesUrl ~ '/apptype/' ~ selectedAppType %}
+    {% endif %}
     {{adminltetags.useTag('content',
         [
             'component'                     : component,
@@ -49,13 +53,20 @@
             'formSecondaryButtons'          :
             [
                 'buttonType'                : 'button',
-                'buttons'                   : {
-                    'generate' : {
+                'buttons'                   : [
+                    'generate' : [
                         'title'                   : 'Generate',
                         'type'                    : 'success',
                         'icon'                    : 'wand-sparkles'
-                    }
-                }
+                    ],
+                    'check-for-changes' : [
+                        'title'                   : 'Check for module changes',
+                        'type'                    : 'info',
+                        'icon'                    : 'code',
+                        'buttonAdditionalClass'   : 'contentAjaxLink',
+                        'url'                     : moduleChangesUrl
+                    ]
+                ]
             ]
         ]
     )}}
@@ -116,7 +127,7 @@
     {% set generateReleaseUrl = links.url('devtools/modules/q/module/true/type/' ~ type ~ '/id/' ~ moduleId ~ '/newrelease/true') %}
     {% if selectedAppType is defined and selectedAppType != '0' %}
         {% if clone is defined and clone == false %}
-            {% set generateReleaseUrl = links.url('devtools/modules/q/module/true/type/' ~ type ~ '/id/' ~ moduleId ~ '/newrelease/true/apptype/' ~ selectedAppType) %}
+            {% set generateReleaseUrl = generateReleaseUrl ~ '/apptype/' ~ selectedAppType %}
         {% endif %}
     {% endif %}
     {% set formSecondaryButtons = [] %}

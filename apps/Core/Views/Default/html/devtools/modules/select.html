@@ -58,7 +58,11 @@ dataCollectionSection =
             placeholder: 'SHOW MODULES FOR SELECTED APP TYPE',
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function(e) {
-                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, false, e.params.data.id);
+                    if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
+                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, true, false, false, false, false, false, false, e.params.data.id);
+                    } else {
+                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, false, e.params.data.id);
+                    }
                 });
             }
         },
@@ -387,13 +391,21 @@ dataCollectionSectionForm['funcs']['loadAjax'] =
                 }
             }
         } else if (includecoremodules) {
+            if (isAppType) {
+                dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/q/apptype/' + isAppType;
+            }
+
             if (dataCollectionSectionForm['vars']['url'].includes('/q/')) {
-                dataCollectionSectionForm['vars']['url'] = '{{links.url("/includecoremodules/true")}}';
+                dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/includecoremodules/true';
             } else {
-                dataCollectionSectionForm['vars']['url'] = '{{links.url("/devtools/modules/q/includecoremodules/true")}}';
+                dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/q/includecoremodules/true';
             }
         } else {
-            dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+            if (isAppType) {
+                dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/apptype/' + isAppType + '")}}';
+            } else {
+                dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+            }
         }
 
         if (id && isRemote) {
@@ -401,8 +413,6 @@ dataCollectionSectionForm['funcs']['loadAjax'] =
         }
         if (id && isAppType) {
             dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/apptype/' + isAppType;
-        } else if (isAppType) {
-            dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/apptype/' + isAppType + '")}}';
         }
 
         if (isChanges) {

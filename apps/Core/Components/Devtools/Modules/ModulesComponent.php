@@ -124,7 +124,17 @@ class ModulesComponent extends BaseComponent
 				foreach ($modulesArr['modules'] as $typesModuleKey => $typesModule) {
 					if (isset($this->getData()['apptype'])) {
 						if ($typesModule['app_type'] !== $this->getData()['apptype']) {
-							unset($modulesArr['modules'][$typesModuleKey]);
+							if (isset($this->getData()['includecoremodules'])) {
+								if ($typesModule['app_type'] !== 'core' &&
+									$typesModule['app_type'] !== $this->getData()['apptype']
+								) {
+									unset($modulesArr['modules'][$typesModuleKey]);
+								}
+							} else {
+								if ($typesModule['app_type'] !== $this->getData()['apptype'])  {
+									unset($modulesArr['modules'][$typesModuleKey]);
+								}
+							}
 						}
 					}
 				}
@@ -142,7 +152,17 @@ class ModulesComponent extends BaseComponent
 
 					if (isset($this->getData()['apptype'])) {
 						if ($typesModule['app_type'] !== $this->getData()['apptype']) {
-							unset($modulesArr['modules'][$typesModuleKey]);
+							if (isset($this->getData()['includecoremodules'])) {
+								if ($typesModule['app_type'] !== 'core' &&
+									$typesModule['app_type'] !== $this->getData()['apptype']
+								) {
+									unset($modulesArr['modules'][$typesModuleKey]);
+								}
+							} else {
+								if ($typesModule['app_type'] !== $this->getData()['apptype'])  {
+									unset($modulesArr['modules'][$typesModuleKey]);
+								}
+							}
 						}
 					}
 				}
@@ -152,8 +172,16 @@ class ModulesComponent extends BaseComponent
 
 				foreach ($modulesArr['modules'] as $typesModuleKey => $typesModule) {
 					if (isset($this->getData()['apptype'])) {
-						if ($typesModule['app_type'] !== $this->getData()['apptype']) {
-							unset($modulesArr['modules'][$typesModuleKey]);
+						if (isset($this->getData()['includecoremodules'])) {
+							if ($typesModule['app_type'] !== 'core' &&
+								$typesModule['app_type'] !== $this->getData()['apptype']
+							) {
+								unset($modulesArr['modules'][$typesModuleKey]);
+							}
+						} else {
+							if ($typesModule['app_type'] !== $this->getData()['apptype']) {
+								unset($modulesArr['modules'][$typesModuleKey]);
+							}
 						}
 					}
 				}

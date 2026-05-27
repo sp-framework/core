@@ -2659,7 +2659,7 @@ $file .= '
                 return $issues;
             }
 
-            $this->addResponse('No issues found with selected milestone/label', 1);
+            $this->addResponse('No closed issues found with selected milestone/label', 1);
         } catch (\Exception $e) {
             $this->addResponse($e->getMessage(), 1);
 
