@@ -12,6 +12,12 @@
     {% set middlewaresURL = middlewaresURL ~ '/includecoremodules/true' %}
     {% set viewsURL = viewsURL ~ '/includecoremodules/true' %}
 {% endif %}
+{% if selectedAppType is defined and selectedAppType != 0 %}
+    {% set componentsURL = componentsURL ~ '/apptype/' ~ selectedAppType %}
+    {% set packagesURL = packagesURL ~ '/apptype/' ~ selectedAppType %}
+    {% set middlewaresURL = middlewaresURL ~ '/apptype/' ~ selectedAppType %}
+    {% set viewsURL = viewsURL ~ '/apptype/' ~ selectedAppType %}
+{% endif %}
 <div class="row">
     <div class="col">
         {% set includeCoreModulesChecked = false %}
@@ -139,7 +145,31 @@
     </div>
 </div>
 <hr>
-<div class="row">
+<div class="row mb-1">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'app_type',
+                'fieldLabel'                           : false,
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select app type to see only that app type modules.',
+                'fieldRequired'                        : false,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : false,
+                'fieldBazPostOnUpdate'                 : false,
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2Options'              : appTypes,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsSelected'      : selectedAppType
+            ]
+        )}}
+    </div>
     <div class="col">
         {{adminltetags.useTag('buttons',
             [

@@ -55,26 +55,41 @@ class ModulesComponent extends BaseComponent
 			}
 		}
 
+		$this->view->includecoremodules = false;
 		if (isset($this->getData()['includecoremodules'])) {
 			$this->view->includecoremodules = true;
 		}
 
+		$this->view->clone = false;
 		if (isset($this->getData()['clone'])) {
 			$this->view->clone = true;
 		}
 
+		$this->view->newrelease = false;
 		if (isset($this->getData()['newrelease'])) {
 			$this->view->newrelease = true;
 		}
 
+		$this->view->subview = false;
 		if (isset($this->getData()['subview'])) {
 			$this->view->subview = true;
+		}
+
+		$this->view->selectedAppType = 0;
+		if (isset($this->getData()['apptype'])) {
+			$this->view->selectedAppType = $this->getData()['apptype'];
 		}
 
 		$appTypesArr = $this->apps->types->types;
 		$appTypes = [];
 
 		foreach ($appTypesArr as $key => $value) {
+			if (isset($this->getData()['id']) && $this->view->selectedAppType !== 0) {
+				if ($value['app_type'] !== $this->view->selectedAppType) {
+					continue;
+				}
+			}
+
 			$appTypes[$value['app_type']]['id'] = $value['app_type'];
 			$appTypes[$value['app_type']]['name'] = $value['name'];
 		}
@@ -105,8 +120,17 @@ class ModulesComponent extends BaseComponent
 		foreach ($modulesTypeArr as $modulesType) {
 			if ($modulesType === 'bundles') {
 				$modulesArr['modules'] = msort($this->modules->{$modulesType}->{$modulesType}, 'name');
+
+				foreach ($modulesArr['modules'] as $typesModuleKey => $typesModule) {
+					if (isset($this->getData()['apptype'])) {
+						if ($typesModule['app_type'] !== $this->getData()['apptype']) {
+							unset($modulesArr['modules'][$typesModuleKey]);
+						}
+					}
+				}
 			} else if ($modulesType === 'apptypes') {
 				$modulesArr['modules'] = msort($this->apps->types->types, 'name');
+
 				foreach ($modulesArr['modules'] as $typesModuleKey => $typesModule) {
 					$modulesArr['modules'][$typesModuleKey]['data']['app_type'] = $typesModule['app_type'];
 
@@ -115,10 +139,24 @@ class ModulesComponent extends BaseComponent
 							unset($modulesArr['modules'][$typesModuleKey]);
 						}
 					}
+
+					if (isset($this->getData()['apptype'])) {
+						if ($typesModule['app_type'] !== $this->getData()['apptype']) {
+							unset($modulesArr['modules'][$typesModuleKey]);
+						}
+					}
 				}
 			} else {
 				$modulesArr = $this->processModulesArr(msort($this->modules->{$modulesType}->{$modulesType}, 'name'));
 				${$modulesType . 'CategoryArr'} = $modulesArr['categoryArr'];
+
+				foreach ($modulesArr['modules'] as $typesModuleKey => $typesModule) {
+					if (isset($this->getData()['apptype'])) {
+						if ($typesModule['app_type'] !== $this->getData()['apptype']) {
+							unset($modulesArr['modules'][$typesModuleKey]);
+						}
+					}
+				}
 			}
 
 			if ($modulesArr['modules'] && count($modulesArr['modules']) > 0) {
@@ -219,39 +257,43 @@ class ModulesComponent extends BaseComponent
 
 		$this->view->modules = $modules;
 
-		$modulesJson = [];
+		$apis = $this->modulesPackage->getAvailableApis(false, true);
 
-		foreach ($modules as $moduleKey => $moduleJson) {
-			if ($moduleKey === 'bundles' &&
-				!$this->view->bundles
-			) {
-				continue;
-			}
+		$this->view->modulesJson = '';
 
-			foreach ($moduleJson['childs'] as $childKey => $child) {
-				$modulesJson[$moduleKey][$child['id']] =
-					[
-						'id' 		=> $child['id'],
-						'name' 		=> $child['name'],
-						'version' 	=> $child['version'] ?? null,
-						'repo' 		=> $child['repo'] ?? null,
-					];
+		if (isset($this->getData()['id'])) {
+			$modulesJson = [];
 
-				if ($moduleKey === 'views') {
+			foreach ($modules as $moduleKey => $moduleJson) {
+				if ($moduleKey === 'bundles' &&
+					!$this->view->bundles
+				) {
+					continue;
+				}
+
+				foreach ($moduleJson['childs'] as $childKey => $child) {
 					$modulesJson[$moduleKey][$child['id']] =
-						array_merge($modulesJson[$moduleKey][$child['id']],
-							[
-								'base_view_module_id' 	=> $child['base_view_module_id'],
-								'is_subview' 			=> $child['is_subview'] ?? false
-							]
-						);
+						[
+							'id' 		=> $child['id'],
+							'name' 		=> $child['name'],
+							'version' 	=> $child['version'] ?? null,
+							'repo' 		=> $child['repo'] ?? null,
+						];
+
+					if ($moduleKey === 'views') {
+						$modulesJson[$moduleKey][$child['id']] =
+							array_merge($modulesJson[$moduleKey][$child['id']],
+								[
+									'base_view_module_id' 	=> $child['base_view_module_id'],
+									'is_subview' 			=> $child['is_subview'] ?? false
+								]
+							);
+					}
 				}
 			}
+
+			$this->view->modulesJson = $this->helper->encode($modulesJson);
 		}
-
-		$this->view->modulesJson = $this->helper->encode($modulesJson);
-
-		$apis = $this->modulesPackage->getAvailableApis(false, true);
 
 		if (isset($this->getData()['id']) &&
 			isset($this->getData()['module']) &&

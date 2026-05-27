@@ -54,6 +54,14 @@ dataCollectionSectionForm['vars']['bulkActions'] = { };
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-include_core_modules'                : { },
+        '{{componentId}}-{{sectionId}}-app_type'                            : {
+            placeholder: 'SHOW MODULES FOR SELECTED APP TYPE',
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-app_type').on('select2:select', function(e) {
+                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, false, e.params.data.id);
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-api_id'                              : {
             placeholder: "SELECT REPO",
             afterInit: function() {
@@ -141,14 +149,27 @@ dataCollectionSection =
                     $('.editModule').click(function(e) {
                         e.preventDefault();
 
+                        var apptype = false;
+                        if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                            apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                        }
+
                         if ($(this).data()['type'] === 'views' && $(this).data()['subview'] === true) {
                             isSubView = true;
                         }
 
                         if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, false, false, isSubView);
+                            if (apptype) {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, false, false, isSubView, false, false, apptype);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, false, false, isSubView);
+                            }
                         } else {
-                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, false, isSubView);
+                            if (apptype) {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, false, isSubView, false, false, apptype);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, false, isSubView);
+                            }
                         }
                     });
 
@@ -156,14 +177,27 @@ dataCollectionSection =
                     $('.cloneModule').click(function(e) {
                         e.preventDefault();
 
+                        var apptype = false;
+                        if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                            apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                        }
+
                         if ($(this).data()['type'] === 'views' && $(this).data()['subview'] === true) {
                             isSubView = true;
                         }
 
                         if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, true, false, isSubView);
+                            if (apptype) {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, true, false, isSubView, false, false, apptype);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, false, true, false, isSubView);
+                            }
                         } else {
-                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, true, false, isSubView);
+                            if (apptype) {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, true, false, isSubView, false, false, apptype);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, true, false, isSubView);
+                            }
                         }
                     });
 
@@ -209,10 +243,23 @@ dataCollectionSection =
                     $('.generateRelease').click(function(e) {
                         e.preventDefault();
 
+                        var apptype = false;
+                        if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                            apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                        }
+
                         if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, true);
+                            if (apptype) {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, true, false, false, false, false, false, apptype);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], true, true);
+                            }
                         } else {
-                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, true);
+                            if (apptype) {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, true, false, false, false, false, false, apptype);
+                            } else {
+                                dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, true);
+                            }
                         }
                     });
 
@@ -220,17 +267,39 @@ dataCollectionSection =
                     $('.commitModuleJson').click(function(e) {
                         e.preventDefault();
 
-                        dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, true);
+                        var apptype = false;
+                        if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                            apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                        }
+
+                        if (apptype) {
+                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, true, false, false, false, apptype);
+                        } else {
+                            dataCollectionSectionForm['funcs']['loadAjax']($(this).data()['id'], $(this).data()['type'], false, false, false, true);
+                        }
                     });
                 }
 
                 resetButtons();
 
                 $('#{{componentId}}-{{sectionId}}-include_core_modules').click(function() {
+                    var apptype = false;
+                    if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                        apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                    }
+
                     if ($(this)[0].checked === true) {
-                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+                        if (apptype) {
+                            dataCollectionSectionForm['funcs']['loadAjax'](null, null, true, false, false, false, false, false, false, apptype);
+                        } else {
+                            dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+                        }
                     } else {
-                        dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                        if (apptype) {
+                            dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, false, apptype);
+                        } else {
+                            dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                        }
                     }
                 });
 
@@ -243,10 +312,23 @@ dataCollectionSection =
 
                         if (response.responseCode == 0) {
                             paginatedPNotify('success', {'text': response.responseMessage});
+                            var apptype = false;
+                            if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                                apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+                            }
+
                             if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                                dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+                                if (apptype) {
+                                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, true, false, false, false, false, false, false, apptype);
+                                } else {
+                                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+                                }
                             } else {
-                                dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                                if (apptype) {
+                                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, false, apptype);
+                                } else {
+                                    dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                                }
                             }
                         } else {
                             paginatedPNotify('error', {'text': response.responseMessage});
@@ -269,7 +351,7 @@ dataCollectionSection =
     });
 
 dataCollectionSectionForm['funcs']['loadAjax'] =
-    function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false, bundlesjson = false, isSubView = false, isRemote = false, isChanges = false) {
+    function(id = null, label = null, includecoremodules = false, newrelease = false, clone = false, bundlesjson = false, isSubView = false, isRemote = false, isChanges = false, isAppType = null) {
         if (id && label) {
             if (label === 'bundles' && !newrelease) {
                 dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/bundles/true/id/' + id + '")}}';
@@ -308,6 +390,12 @@ dataCollectionSectionForm['funcs']['loadAjax'] =
         if (id && isRemote) {
             dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/repo/true/id/' + id + '")}}';
         }
+        if (id && isAppType) {
+            dataCollectionSectionForm['vars']['url'] = dataCollectionSectionForm['vars']['url'] + '/apptype/' + isAppType;
+        } else if (isAppType) {
+            dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/apptype/' + isAppType + '")}}';
+        }
+
         if (isChanges) {
             dataCollectionSectionForm['vars']['url'] = '{{links.url("devtools/modules/q/changes/true")}}';
         }
@@ -426,6 +514,5 @@ dataCollectionSectionForm['funcs']['performBulkAction'] = function(buttonID) {
             paginatedPNotify('error', {'text': response.responseMessage});
         }
     }, 'json');
-
 }
 </script>
