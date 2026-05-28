@@ -505,7 +505,6 @@ class ModulesComponent extends BaseComponent
 						$module['module_type'] = 'apptypes';
 
 						$module['id'] = $module['module_details']['id'];
-
 					} catch (\throwable $e) {
 						throw new \Exception($e->getMessage());
 					}

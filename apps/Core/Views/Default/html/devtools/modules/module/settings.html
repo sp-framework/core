@@ -1,6 +1,10 @@
+{% set moduleDevSettings = '{}' %}
 {% if module['id'] is defined %}
     {% set settings = module['settings'] %}
     {% set moduleSettings = module['settings'] %}
+    {% if module['module_details']['settings'] is defined %}
+        {% set moduleDevSettings = json_encode(module['module_details']['settings'], 16) %}
+    {% endif %}
 {% else %}
     {% set settings = moduleSettings %}
 {% endif %}
@@ -416,6 +420,32 @@
                 'fieldDataInputMaxLength'        : 4096,
                 'fieldTextareaRows'              : 15,
                 'fieldValue'                     : settings
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'settings_dev',
+                'fieldLabel'                     : 'Module Settings (Developer test)',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 4096,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Settings of the module. JSON Format. If developer is modifying the settings, it will show here. These settings should be only modified by the component settings form.',
+                'fieldRequired'                  : false,
+                'fieldDisabled'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldTextareaRows'              : 15,
+                'fieldValue'                     : moduleDevSettings
             ]
         )}}
     </div>

@@ -1477,9 +1477,14 @@ dataCollectionSection =
             {% if module['id'] is defined %}
                 {% set moduleId = module['id'] %}
                 {% set moduleAppType = module['app_type'] %}
+                {% set moduleDevSettings = '{}' %}
+                {% if module['module_details']['settings'] is defined %}
+                    {% set moduleDevSettings = json_encode(module['module_details']['settings'], 16) %}
+                {% endif %}
             {% else %}
                 {% set moduleId = '0' %}
                 {% set moduleAppType = '' %}
+                {% set moduleDevSettings = '{}' %}
             {% endif %}
             {% set subView = false %}
             {% if subview is defined and subview === true %}
@@ -1523,6 +1528,7 @@ dataCollectionSectionForm['vars']['moduleFilters'] = JSON.parse('{{moduleFilters
 
 if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
     dataCollectionSectionForm['vars']['moduleSettings'] = { };
+    dataCollectionSectionForm['vars']['moduleDevSettings'] = { };
     if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
         dataCollectionSectionForm['vars']['subview'] = '{{subView}}';
 
@@ -1567,6 +1573,7 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
     }
 } else {
     dataCollectionSectionForm['vars']['moduleSettings'] = JSON.parse('{{moduleSettings}}');
+    dataCollectionSectionForm['vars']['moduleDevSettings'] = JSON.parse('{{moduleDevSettings}}');
     if (dataCollectionSectionForm['vars']['module_type'] === 'views') {
         dataCollectionSectionForm['vars']['subview'] = '{{subView}}';
     }
@@ -2008,6 +2015,19 @@ dataCollectionSection =
                         }
                     }
                 });
+                prettyfyJson();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-settings_dev'                            : {
+            'afterInit'     : function() {
+                if (dataCollectionSectionForm['vars']['moduleDevSettings'].length === 0) {
+                    dataCollectionSectionForm['vars']['moduleDevSettings'] = { };
+                }
+                function prettyfyJson() {
+                    $('#{{componentId}}-{{sectionId}}-settings_dev')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['moduleDevSettings'], null, 4));
+                }
+
                 prettyfyJson();
             }
         },
