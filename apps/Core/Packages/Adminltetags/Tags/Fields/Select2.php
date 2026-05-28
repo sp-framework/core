@@ -72,6 +72,11 @@ class Select2
             $this->params['fieldSelect2Type'] :
             'primary';
 
+        $this->fieldParams['fieldSelect2AdditionalClass'] =
+            isset($this->params['fieldSelect2AdditionalClass']) ?
+            $this->params['fieldSelect2AdditionalClass'] :
+            '';
+
         $this->fieldParams['fieldDataSelect2Multiple'] =
             isset($this->params['fieldDataSelect2Multiple']) && $this->params['fieldDataSelect2Multiple'] === true ?
             'multiple="multiple"' :
@@ -294,7 +299,7 @@ class Select2
     protected function select2()
     {
         $this->content .=
-            '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control select2 select2-' . $this->fieldParams['fieldSelect2Type'] . '" data-dropdown-css-class="select2-' . $this->fieldParams['fieldSelect2Type'] . '" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" style="width:' . $this->width . ';" ' . $this->fieldParams['fieldDataSelect2Multiple'] . ' ' . $this->fieldParams['fieldDataSelect2Create'] . ' ' . $this->fieldParams['fieldDataSelect2MultipleObject'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldDataAttributes'] . '>
+            '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control select2 select2-' . $this->fieldParams['fieldSelect2Type'] . ' ' . $this->fieldParams['fieldSelect2AdditionalClass'] . '" data-dropdown-css-class="select2-' . $this->fieldParams['fieldSelect2Type'] . '" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" style="width:' . $this->width . ';" ' . $this->fieldParams['fieldDataSelect2Multiple'] . ' ' . $this->fieldParams['fieldDataSelect2Create'] . ' ' . $this->fieldParams['fieldDataSelect2MultipleObject'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldDataAttributes'] . '>
                 <option></option>';
 
         if ($this->fieldParams['fieldDataSelect2TreeData']) {
