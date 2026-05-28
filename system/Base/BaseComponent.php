@@ -1228,9 +1228,9 @@ abstract class BaseComponent extends Controller
 		return preg_replace('/[^0-9]/', '', $string);
 	}
 
-	public function setModuleSettings(bool $setting)
+	public function setModuleSettings(bool $showModuleSettings = true)
 	{
-		$this->showModuleSettings = $setting;
+		$this->showModuleSettings = $showModuleSettings;
 	}
 
 	public function setModuleSettingsData(array $data = [])
@@ -1238,7 +1238,7 @@ abstract class BaseComponent extends Controller
 		if (isset($this->getData()['settings']) &&
 			$this->getData()['settings'] == 'true'
 		) {
-			$this->showModuleSettingsData = $data;
+			$this->showModuleSettingsData = array_merge($this->showModuleSettingsData, $data);
 		}
 	}
 

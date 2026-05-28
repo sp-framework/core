@@ -434,6 +434,10 @@ class Packages extends BasePackage
 			throw $e;
 		}
 
+		if ($this->opCache && $this->opCache->checkCache('packages', 'core')) {
+			$this->opCache->removeCache('packages', 'core');
+		}
+
 		return true;
 	}
 }

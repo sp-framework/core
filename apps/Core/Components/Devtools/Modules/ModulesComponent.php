@@ -18,7 +18,7 @@ class ModulesComponent extends BaseComponent
 	{
 		$this->modulesPackage = $this->usePackage(DevtoolsModules::class);
 
-		$this->setModuleSettings(true);
+		$this->setModuleSettings();
 
 		$this->setModuleSettingsData([
 				'apis' => $this->modulesPackage->getAvailableApis(true, false),
