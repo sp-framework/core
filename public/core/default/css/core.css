@@ -42575,3 +42575,17 @@ a.disabled {
   max-width: none !important;
   min-width: 32em;
 }
+
+.accordion-title:before {
+  float: right !important;
+  font-family: FontAwesome;
+  content: "\f068";
+  padding-right: 5px;
+  padding-top: 5px;
+}
+
+.accordion-title.collapsed:before {
+  float: right !important;
+  content: "\f067";
+  padding-top: 5px;
+}
