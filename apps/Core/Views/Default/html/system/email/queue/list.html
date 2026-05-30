@@ -82,7 +82,17 @@ window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFu
 $('.process-queue').click(function(e) {
     e.preventDefault();
 
-    processQueue($(this).parent().siblings());
+    var priority;
+
+    if ($(this).hasClass('high')) {
+        priority = 1;
+    } else if ($(this).hasClass('medium')) {
+        priority = 2;
+    } else if ($(this).hasClass('low')) {
+        priority = 3;
+    }
+
+    processQueue($(this).parent().siblings(), $(this).attr('href'), priority);
 });
 
 function initFuncs() {
@@ -91,7 +101,7 @@ function initFuncs() {
         $(row).click(function(e) {
             e.preventDefault();
 
-            processQueue(this);
+            processQueue(this, $(this).attr('href'));
         });
     });
 
@@ -100,28 +110,21 @@ function initFuncs() {
         $(row).click(function(e) {
             e.preventDefault();
 
-            processQueue(this);
+            processQueue(this, $(this).attr('href'));
         });
     });
 }
 
-function processQueue(thisButton) {
+function processQueue(thisButton, url, priority = null) {
     $(thisButton).children('i').removeClass('fa-paper-plane').addClass('fa-spin fa-cog');
     $(thisButton).attr('disabled', true);
-
-    var url = $(thisButton).attr('href');
-    $(thisButton).children('i').removeClass('fa-paper-plane').addClass('fa-spin fa-cog');
-    $(thisButton).attr('disabled', true);
+    $(thisButton).addClass('disabled');
 
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    if ($(thisButton).hasClass('high')) {
-        postData['priority'] = 1;
-    } else if ($(thisButton).hasClass('medium')) {
-        postData['priority'] = 2;
-    } else if ($(thisButton).hasClass('low')) {
-        postData['priority'] = 3;
+    if (priority) {
+        postData['priority'] = priority;
     }
 
     if ($(thisButton).parents('tr').length > 0) {
@@ -137,13 +140,14 @@ function processQueue(thisButton) {
         if (response.responseCode === 0) {
             window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
         } else {
-            $(thisButton).children('i').removeClass('fa-spin fa-cog').addClass('fa-paper-plane');
-            $(thisButton).removeClass('disabled');
-
             paginatedPNotify('error', {
                 text : response.responseMessage
             });
         }
+
+        $(thisButton).children('i').removeClass('fa-spin fa-cog').addClass('fa-paper-plane');
+        $(thisButton).attr('disabled', false);
+        $(thisButton).removeClass('disabled');
     }, 'json');
 }
 </script>
