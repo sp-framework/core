@@ -25,7 +25,7 @@ class Activitylogs extends Adminltetags
 
     protected function generateContent()
     {
-        if (!isset($this->params['activityLogs'])) {
+        if (!isset($this->params['activityLogs']['data'])) {
             throw new \Exception('Error: activityLogs (array) missing');
         }
 
@@ -46,12 +46,8 @@ class Activitylogs extends Adminltetags
             }
 
             $this->content .=
-                '<div class="row ml-4 mr-4">
-                    <div class="col">
-                        Showing <span class="activityLogs-shown">' . $start . ' to ' . $to . '</span> out of <span class="active-logs-total">' . $this->params['activityLogs']['paginationCounters']['filtered_items'] . '</span>
-                    </div>
-                    <div class="col">';
-
+                '<div class="row pt-2 pl-4 pr-4">
+                    <div class="col">' .
             $leftDisabled = '';
             $rightDisabled = '';
 
@@ -59,17 +55,17 @@ class Activitylogs extends Adminltetags
                 $this->params['activityLogs']['paginationCounters']['current'] === 1 &&
                 $this->params['activityLogs']['paginationCounters']['last'] === 1
             ) {
-                $leftDisabled = 'disabled';
-                $rightDisabled = 'disabled';
+                $leftDisabled = 'disabled text-muted';
+                $rightDisabled = 'disabled text-muted';
             } else if ($this->params['activityLogs']['paginationCounters']['first'] === 1 &&
                        $this->params['activityLogs']['paginationCounters']['current'] === 1 &&
                        $this->params['activityLogs']['paginationCounters']['last'] > 1
             ) {
-                $leftDisabled = 'disabled';
+                $leftDisabled = 'disabled text-muted';
                 $rightDisabled = '';
             } else if ($this->params['activityLogs']['paginationCounters']['current'] === $this->params['activityLogs']['paginationCounters']['last']) {
                 $leftDisabled = '';
-                $rightDisabled = 'disabled';
+                $rightDisabled = 'disabled text-muted';
             }
 
             $this->content .=
@@ -80,7 +76,10 @@ class Activitylogs extends Adminltetags
                     <li class="page-item">
                         <a class="page-link activity-logs-next ' . $rightDisabled . '" href="#"><i class="fas fa-chevron-right"></i></a>
                     </li>
-                </ul>';
+                </ul>
+                <span class="text-uppercase float-right mr-3" style="position: relative;top: 3px;font-size: 17px;">
+                Showing <span class="activityLogs-shown">' . $start . ' to ' . $to . '</span> out of <span class="active-logs-total">' . $this->params['activityLogs']['paginationCounters']['filtered_items'] . '</span>
+                </span>';
 
             $this->content .=
                     '</div>
@@ -88,19 +87,19 @@ class Activitylogs extends Adminltetags
         }
 
         $this->content .=
-            '<div class="row">
+            '<div id="timeline-div" class="row">
                 <div class="col">
                     <div class="timeline">';
 
-        foreach ($this->params['activityLogs'] as $logsKey => $logs) {
+        foreach ($this->params['activityLogs']['data'] as $logsKey => $logs) {
             if ($logsKey === 'paginationCounters') {
                 continue;
             }
 
-            if ($logs['activity_type'] === '1') {
+            if ($logs['activity_type'] == '1') {
                 $icon = 'plus';
                 $bg = 'primary';
-            } else if ($logs['activity_type'] === '2') {
+            } else if ($logs['activity_type'] == '2') {
                 $icon = 'edit';
                 $bg = 'warning';
             }
@@ -167,9 +166,9 @@ class Activitylogs extends Adminltetags
 
             $this->content .=
                 '<div>
-                    <i class="fas fa-fw fa-' . $icon . ' bg-' . $bg . '"></i>
+                    <i class="fas fa-fw fa-' . $icon . ' bg-' . $bg . '" style="border-radius: 0.25rem"></i>
                     <div class="timeline-item">
-                        <span class="time"><i class="fas fa-clock"></i> ' . $logs['created_at'] .'</span>
+                        <span class="time"><i class="fa fa-fw fa-clock"></i> ' . $logs['created_at'] .'</span>
                         <h6 class="timeline-header text-secondary">' .  $title . '</h6>
                         <div class="timeline-body">' . $logContent . '</div>
                         <div class="timeline-footer"></div>
@@ -179,7 +178,7 @@ class Activitylogs extends Adminltetags
 
         $this->content .=
                         '<div>
-                            <i class="fas fa-fw fa-clock bg-secondary"></i>
+                            <i class="fas fa-fw fa-clock bg-secondary" style="border-radius: 0.25rem"></i>
                         </div>
                     </div>
                 </div>
@@ -196,11 +195,13 @@ class Activitylogs extends Adminltetags
                 $(".activity-logs-previous, .activity-logs-next").click(function(e) {
                     e.preventDefault();
 
-                    var url = "' . $this->links->url('crypto/trades/getActivityLogs') . '";
+                    var url = "' . $this->links->url($this->params['activityLogs']['postLink']) . '";
 
                     var postData = { };
                     postData[$("#security-token").attr("name")] = $("#security-token").val();
-                    postData["id"] = $("#' . $this->params['componentId'] . '-main-id").val();
+                    postData["id"] = ' . $this->params['activityLogs']['id'] . ';
+                    postData["packageName"] = "' . $this->params['activityLogs']['packageName'] . '";
+                    postData["postLink"] = "' . $this->params['activityLogs']['postLink'] . '";
 
                     if ($(this).is(".activity-logs-previous")) {
                         postData["page"] = paginationCounters["previous"];
@@ -208,13 +209,7 @@ class Activitylogs extends Adminltetags
                         postData["page"] = paginationCounters["next"];
                     }
 
-                    $.post(url, postData, function(response) {
-                        if (response.responseCode == 0) {
-                            if (response.responseData) {
-                                $("#activity-logs").empty().html(response.responseData.logs);
-                            }
-                        }
-                    }, "json");
+                    $("#baz-content").load(url, postData);
                 });
             </script>';
     }

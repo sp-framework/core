@@ -40,6 +40,8 @@ abstract class BaseComponent extends Controller
 
 	protected $usedModules = [];
 
+	protected $alPackage;
+
 	public $widgets;
 
 	protected function onConstruct()
@@ -374,6 +376,7 @@ abstract class BaseComponent extends Controller
 	}
 
 	/**
+	 * Module Settings
 	 * @acl(name=msview)
 	 */
 	public function msviewAction()
@@ -384,6 +387,7 @@ abstract class BaseComponent extends Controller
 	}
 
 	/**
+	 * Module Settings
 	 * @acl(name=msupdate)
 	 */
 	public function msupdateAction()
@@ -408,6 +412,81 @@ abstract class BaseComponent extends Controller
 				$this->modules->packages->packagesData->responseMessage,
 				$this->modules->packages->packagesData->responseCode
 			);
+		}
+	}
+
+	public function setModuleSettings(bool $showModuleSettings = true)
+	{
+		$this->showModuleSettings = $showModuleSettings;
+	}
+
+	public function setModuleSettingsData(array $data = [])
+	{
+		if (isset($this->getData()['settings']) &&
+			$this->getData()['settings'] == 'true'
+		) {
+			$this->showModuleSettingsData = array_merge($this->showModuleSettingsData, $data);
+		}
+	}
+
+	public function setActivityLogsPackage($alPackage, $postLink)
+	{
+		if (gettype($alPackage) === 'string') {
+			$this->alPackage = $this->usePackage($alPackage);
+		} else {
+			$this->alPackage = $alPackage;
+		}
+
+		if (isset($this->getData()['activitylogs']) &&
+			$this->getData()['activitylogs'] == 'true'
+		) {
+			$this->dispatcher->forward(
+				[
+					'action' => 'activitylogs',
+					'params' => [$postLink]
+				]
+			);
+		}
+	}
+
+	/**
+	 * Activity Logs
+	 * @acl(name=activitylogs)
+	 */
+	public function activitylogsAction($postLink = null)
+	{
+		if (isset($this->getData()['activitylogs']) && $this->getData()['activitylogs'] == 'true') {
+			if (isset($this->getData()['id']) && isset($this->alPackage)) {
+				$this->view->activityLogs = $this->alPackage->getActivityLogs((int) $this->getData()['id'], $postLink);
+			}
+
+			$this->view->pick($this->helper->last(explode('/', $this->component['route'])) . '/activitylogs');
+
+			return;
+		} else if ($this->request->isPost()) {
+			$package = $this->modules->packages->getPackageByName($this->postData()['packageName']);
+
+			if ($package) {
+				$this->alPackage = $this->usePackage($package['class']);
+
+				$this->view->activityLogs =
+					$this->alPackage->getActivityLogs(
+						$this->postData()['id'],
+						$this->postData()['postLink'],
+						true,
+						(int) $this->postData()['page']
+					);
+
+				$viewDirArr = explode('/', trim($this->view->getViewsDir(), '/'));
+				$popped = array_pop($viewDirArr);
+				$this->view->setViewsDir('/' . implode('/', $viewDirArr) . '/');
+
+				$this->setDefaultViewData();
+
+				$this->view->logs = $this->view->partial($popped . '/activitylogs');
+
+				return false;
+			}
 		}
 	}
 
@@ -1226,20 +1305,6 @@ abstract class BaseComponent extends Controller
 	protected function extractNumbers($string)
 	{
 		return preg_replace('/[^0-9]/', '', $string);
-	}
-
-	public function setModuleSettings(bool $showModuleSettings = true)
-	{
-		$this->showModuleSettings = $showModuleSettings;
-	}
-
-	public function setModuleSettingsData(array $data = [])
-	{
-		if (isset($this->getData()['settings']) &&
-			$this->getData()['settings'] == 'true'
-		) {
-			$this->showModuleSettingsData = array_merge($this->showModuleSettingsData, $data);
-		}
 	}
 
 	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $last = null)

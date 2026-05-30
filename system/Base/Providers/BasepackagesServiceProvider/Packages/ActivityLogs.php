@@ -39,10 +39,24 @@ class ActivityLogs extends BasePackage
             if (isset($oldData['package_name'])) {
                 unset($oldData['package_name']);
             }
-            $data = $this->getDifference($this->jsonData($data), $this->jsonData($oldData));
 
-            $log['activity_type'] = self::ACTIVITY_TYPE_UPDATE;
+            $activityData = $this->getDifference($this->jsonData($data), $this->jsonData($oldData));
+
+            if (count($activityData) === 0) {
+                return true;//Nothing changed, so we do not add activity log.
+            }
+
+            //Check if there are any logs from before, if not, we change from type UPDATE to type ADD
+            $this->getLogs(packageName: $packageName, packageRowId: $dataId, getCount: true);
+
+            if (isset($this->packagesData->paginationCounters['total_items']) && $this->packagesData->paginationCounters['total_items'] > 0) {
+                $log['activity_type'] = self::ACTIVITY_TYPE_UPDATE;
+            } else {
+                $log['activity_type'] = self::ACTIVITY_TYPE_ADD;
+            }
         } else {
+            $activityData = $data;
+
             $log['activity_type'] = self::ACTIVITY_TYPE_ADD;
         }
 
@@ -66,20 +80,16 @@ class ActivityLogs extends BasePackage
             $log['created_at'] = $data['created_at'];
         }
 
-        $log['log'] = $this->helper->encode($data);
+        $log['log'] = $activityData;
 
         if ($this->add($log, false)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Activity Log Added';
+            $this->addResponse('Activity Log Added');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error Adding Activity Log';
+            $this->addResponse('Error Adding Activity Log', 1);
         }
     }
 
-    public function getLogs($packageName, int $packageRowId, bool $newFirst, $page = 1)
+    public function getLogs($packageName, int $packageRowId, $postLink = null, bool $newFirst = true, $page = 1, $getCount = false)
     {
         $logsArr = [];
 
@@ -93,27 +103,35 @@ class ActivityLogs extends BasePackage
             [
                 'conditions'    => '-|package_name|equals|' . $packageName . '&and|package_row_id|equals|' . $packageRowId . '&',
                 'order'         => $order,
-                'limit'         => 10,
+                'limit'         => 5,
                 'page'          => $page
             ]
         );
 
         if ($pagedLogs) {
-            $logsArr = $pagedLogs->getItems();
+            if ($getCount) {//$this->packagesData->paginationCounters
+                return true;
+            }
+
+            $logsArr['data'] = $pagedLogs->getItems();
         }
 
-        if (count($logsArr) > 0) {
-            foreach ($logsArr as $key => &$log) {
+        if (count($logsArr['data']) > 0) {
+            foreach ($logsArr['data'] as $key => &$log) {
                 unset($log['id']);
                 unset($log['package_name']);
                 unset($log['package_row_id']);
 
                 if ($log['account_id'] != 0) {
-                    $account = $this->basepackages->accounts->getById($log['account_id']);
-                    $log['account_email'] = $account['email'];
+                    $account = $this->basepackages->accounts->getAccountById($log['account_id']);
 
-                    $profile = $this->basepackages->profiles->getProfile($log['account_id']);
-                    $log['account_full_name'] = $profile['full_name'];
+                    if ($account) {
+                        $log['account_email'] = $account['email'];
+                        $log['account_full_name'] = $account['contact']['full_name'];
+                    } else {
+                        $log['account_email'] = 'N/A';
+                        $log['account_full_name'] = 'System';
+                    }
 
                     unset($log['account_id']);
                 } else {
@@ -121,7 +139,7 @@ class ActivityLogs extends BasePackage
                     $log['account_full_name'] = 'System';
                 }
 
-                if ($log['log'] !== '') {
+                if (is_string($log['log']) && $log['log'] !== '') {
                     $log['log'] = $this->helper->decode($log['log'], true);
                 }
             }
@@ -129,6 +147,11 @@ class ActivityLogs extends BasePackage
             if ($this->packagesData->paginationCounters) {
                 $logsArr = array_replace($logsArr, ['paginationCounters' => $this->packagesData->paginationCounters]);
             }
+
+            $logsArr['postLink'] = $postLink;
+            $logsArr['id'] = $packageRowId;
+            $logsArr['packageName'] = $packageName;
+            $logsArr['postLink'] = $postLink;
 
             return $logsArr;
         }
@@ -139,16 +162,5 @@ class ActivityLogs extends BasePackage
     protected function getDifference(array $data, array $oldData)
     {
         return array_diff_assoc($data, $oldData);
-    }
-
-    protected function removeSessionToken($data)
-    {
-        $token = array_keys($data, $this->security->getRequestToken());
-
-        if ($token) {
-            unset($data[$token[0]]);
-        }
-
-        return $data;
     }
 }

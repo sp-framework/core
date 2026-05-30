@@ -29,6 +29,8 @@ class ServicesComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
+                $this->setActivityLogsPackage($this->emailservices, 'system/email/services/activitylogs');
+
                 $this->view->emailservice = $emailservice;
             }
 

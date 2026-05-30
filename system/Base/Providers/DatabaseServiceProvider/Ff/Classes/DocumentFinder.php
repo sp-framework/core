@@ -90,7 +90,7 @@ class DocumentFinder
                         if (count($conditionArr) > 1) {
                             $conditionsCount = [];
 
-                            $this->processIndexes($conditionArr[0], $found);
+                            $this->processIndexes($conditionArr[0], $found, $skip, $limit);
 
                             //Once our first condition is met, we do not process index anymore. We just process the data of first condition
                             //This is like filtering. ex: we first search for data meeting one condition and once we have the data, we filter it
@@ -106,7 +106,7 @@ class DocumentFinder
                                 }
 
                                 if (isset($conditionsCount[$conditionArrCondition[0]])) {
-                                    $this->processIndexes($conditionArrCondition, $found);
+                                    $this->processIndexes($conditionArrCondition, $found, $skip, $limit);
 
                                     array_push($conditionsCount[$conditionArrCondition[0]], $conditionArrKey);
                                 } else {

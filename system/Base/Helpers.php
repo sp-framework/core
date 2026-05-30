@@ -665,3 +665,41 @@ if (!function_exists('numberFormatPrecision')) {
         return (float) $response;
     }
 }
+
+if (!function_exists('findKeysByValue')) {
+    function findKeysByValue(array $array, $search, array $keys = []) {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $subPath = findKeysByValue($value, $search, array_merge($keys, [$key]));
+                if (!empty($subPath)) {
+                    return $subPath;
+                }
+            } elseif ($value === $search) {
+                return array_merge($keys, [$key]);
+            }
+        }
+
+        return [];
+    }
+}
+
+if (!function_exists('findKeyLocation')) {
+    function findKeyLocation(array $array, $searchKey, array $path = []) {
+        foreach ($array as $key => $value) {
+            $currentPath = array_merge($path, [$key]);
+
+            if ($key === $searchKey) {
+                return $currentPath;
+            }
+
+            if (is_array($value)) {
+                $result = findKeyLocation($value, $searchKey, $currentPath);
+                if ($result !== null) {
+                    return $result;
+                }
+            }
+        }
+
+        return null;
+    }
+}

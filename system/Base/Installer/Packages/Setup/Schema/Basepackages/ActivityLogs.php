@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class ActivityLogs
 {
@@ -66,5 +67,22 @@ class ActivityLogs
                     ),
                 ]
             ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'package_row_id',
+                    'package_name',
+                    'activity_type',
+                    'account_id'
+                ],
+                'INDEX'
+            )
+        ];
     }
 }

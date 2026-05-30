@@ -534,7 +534,7 @@ abstract class BasePackage extends Controller
 		}
 
 		if (isset($this->postData()['page'])) {
-			$pageParams['currentPage'] = $this->postData()['page'];
+			$pageParams['currentPage'] = (int) $this->postData()['page'];
 		} else if (isset($params['page'])) {
 			$pageParams['currentPage'] = $params['page'];
 		} else {
@@ -550,7 +550,7 @@ abstract class BasePackage extends Controller
 		}
 
 		if (isset($this->postData()['limit'])) {
-			$pageParams['limit'] = $this->postData()['limit'];
+			$pageParams['limit'] = (int) $this->postData()['limit'];
 		} else if (isset($params['limit'])) {
 			$pageParams['limit'] = $params['limit'];
 		} else {
@@ -607,8 +607,10 @@ abstract class BasePackage extends Controller
 
 		//Retrieve from Users Env
 		if ($this->access->auth->check()) {
-			if (count($this->postData()) === 0 ||
-				(!isset($this->postData()['page']) && !isset($this->postData()['limit']) && !isset($this->postData()['conditions']))
+
+			if ($this->request->isPost() &&
+				(count($this->postData()) === 0 ||
+				(!isset($this->postData()['page']) && !isset($this->postData()['limit']) && !isset($this->postData()['conditions'])))
 			) {
 				$envParams = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], false, true);
 
@@ -1279,135 +1281,119 @@ abstract class BasePackage extends Controller
 
 	public function add(array $data, $resetCache = true)
 	{
-		if ($data) {
-			$data = $this->jsonData($data);
+		$data = $this->jsonData($data);
 
-			if ($this->config->databasetype === 'db') {
-				${$this->packageNameModel} = $this->useModel();
+		if ($this->config->databasetype === 'db') {
+			${$this->packageNameModel} = $this->useModel();
 
-				${$this->packageNameModel}->assign($data);
+			${$this->packageNameModel}->assign($data);
 
-				$create = ${$this->packageNameModel}->create();
-			} else {
-				if (!$this->ffStore) {
-					$this->ffStore = $this->ff->store($this->ffStoreToUse);
-				}
-
-				if ($this->ffAddUsingUpdateOrInsert) {
-					if (isset($data['id']) && (int) $data['id'] !== 0) {
-						$create = $this->ffData = $this->ffStore->updateOrInsert($data, false);
-					} else {
-						$create = $this->ffData = $this->ffStore->updateOrInsert($data);
-					}
-				} else {
-					$create = $this->ffData = $this->ffStore->insert($data);
-				}
-
-				$this->setFfStoreToUse();
-			}
-
-			if ($create) {
-				$this->packagesData->responseCode = 0;
-
-				$this->packagesData->responseMessage = "Added " . ucfirst($this->packageNameS) . "!";
-
-				if ($this->config->databasetype === 'db') {
-					$this->packagesData->last = ${$this->packageNameModel}->toArray();
-				} else {
-					$this->packagesData->last = $create;
-				}
-
-				if ($resetCache) {
-					$this->resetCache();
-				}
-
-				return true;
-			} else {
-				$this->transactionErrors = [];
-
-				foreach (${$this->packageNameModel}->getMessages() as $value) {
-					array_push($this->transactionErrors, $value->getMessage());
-				}
-
-				array_push($this->transactionErrors, $data);
-
-				throw new \Exception(
-					"Could not add " . ucfirst($this->packageNameS) . "Reasons: <br>" .
-					join(',', $this->jsonData($this->transactionErrors))
-				);
-			}
+			$create = ${$this->packageNameModel}->create();
 		} else {
-			throw new \Exception('Data array missing. Cannot add!');
+			if (!$this->ffStore) {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			}
+
+			if ($this->ffAddUsingUpdateOrInsert) {
+				if (isset($data['id']) && (int) $data['id'] !== 0) {
+					$create = $this->ffData = $this->ffStore->updateOrInsert($data, false);
+				} else {
+					$create = $this->ffData = $this->ffStore->updateOrInsert($data);
+				}
+			} else {
+				$create = $this->ffData = $this->ffStore->insert($data);
+			}
+
+			$this->setFfStoreToUse();
+		}
+
+		if ($create) {
+			if ($this->config->databasetype === 'db') {
+				$this->packagesData->last = ${$this->packageNameModel}->toArray();
+			} else {
+				$this->packagesData->last = $create;
+			}
+
+			if ($resetCache) {
+				$this->resetCache();
+			}
+
+			return true;
+		} else {
+			$this->transactionErrors = [];
+
+			foreach (${$this->packageNameModel}->getMessages() as $value) {
+				array_push($this->transactionErrors, $value->getMessage());
+			}
+
+			array_push($this->transactionErrors, $data);
+
+			throw new \Exception(
+				"Could not add " . $this->packageName . " Reasons: <br>" .
+				join(',', $this->jsonData($this->transactionErrors))
+			);
 		}
 	}
 
 	public function update(array $data, $resetCache = true)
 	{
-		if ($data) {
-			$data = $this->jsonData($data);
+		$data = $this->jsonData($data);
 
-			if (isset($data['updated_on'])) {
-				unset($data['updated_on']);
+		if (isset($data['updated_on'])) {
+			unset($data['updated_on']);
+		}
+
+		if ($this->config->databasetype === 'db') {
+			${$this->packageNameModel} = $this->getFirst('id', $data['id'], false, false);
+
+			if (!${$this->packageNameModel}) {
+				$this->packagesData->responseCode = 1;
+
+				$this->packagesData->responseMessage = 'ID: ' . $data['id'] . " not found for package {$this->packageName}";
+
+				return;
 			}
 
-			if ($this->config->databasetype === 'db') {
-				${$this->packageNameModel} = $this->getFirst('id', $data['id'], false, false);
+			${$this->packageNameModel}->assign($data);
 
-				if (!${$this->packageNameModel}) {
-					$this->packagesData->responseCode = 1;
-
-					$this->packagesData->responseMessage = 'ID: ' . $data['id'] . " not found for package {$this->packageName}";
-
-					return;
-				}
-
-				${$this->packageNameModel}->assign($data);
-
-				$update = ${$this->packageNameModel}->update();
-			} else {
-				if (!$this->ffStore) {
-					$this->ffStore = $this->ff->store($this->ffStoreToUse);
-				}
-
-				$update = $this->ffData = $this->ffStore->update($data);
-
-				$this->setFfStoreToUse();
-			}
-
-			if ($update) {
-				$this->packagesData->responseCode = 0;
-
-				$this->packagesData->responseMessage = ucfirst($this->packageNameS) . " Updated!";
-
-				if ($this->config->databasetype === 'db') {
-					$this->packagesData->last = ${$this->packageNameModel}->toArray();
-
-					if ($resetCache && count(${$this->packageNameModel}->getUpdatedFields()) !== 0) {//Make sure we only update when we change any fields
-						$this->resetCache($this->packagesData->last['id']);
-					}
-				} else {
-					$this->packagesData->last = $update;
-
-					if ($resetCache) {
-						$this->resetCache($this->packagesData->last['id']);
-					}
-				}
-
-				return true;
-			} else {
-				$this->transactionErrors = [];
-
-				foreach (${$this->packageNameModel}->getMessages() as $value) {
-					array_push($this->transactionErrors, $value->getMessage());
-				}
-
-				throw new \Exception(
-					"Could not update " . ucfirst($this->packageNameS) . "Reasons: <br>" .
-					join(',', $this->transactionErrors)
-				);
-			}
+			$update = ${$this->packageNameModel}->update();
 		} else {
-			throw new \Exception('Data array missing. Cannot update!');
+			if (!$this->ffStore) {
+				$this->ffStore = $this->ff->store($this->ffStoreToUse);
+			}
+
+			$update = $this->ffData = $this->ffStore->update($data);
+
+			$this->setFfStoreToUse();
+		}
+
+		if ($update) {
+			if ($this->config->databasetype === 'db') {
+				$this->packagesData->last = ${$this->packageNameModel}->toArray();
+
+				if ($resetCache && count(${$this->packageNameModel}->getUpdatedFields()) !== 0) {//Make sure we only update when we change any fields
+					$this->resetCache($this->packagesData->last['id']);
+				}
+			} else {
+				$this->packagesData->last = $update;
+
+				if ($resetCache) {
+					$this->resetCache($this->packagesData->last['id']);
+				}
+			}
+
+			return true;
+		} else {
+			$this->transactionErrors = [];
+
+			foreach (${$this->packageNameModel}->getMessages() as $value) {
+				array_push($this->transactionErrors, $value->getMessage());
+			}
+
+			throw new \Exception(
+				"Could not update " . $this->packageName . " Reasons: <br>" .
+				join(',', $this->transactionErrors)
+			);
 		}
 	}
 
@@ -2185,16 +2171,16 @@ abstract class BasePackage extends Controller
 		return $this->basepackages->activityLogs->addLog($this->packageName, $data, $oldData);
 	}
 
-	public function getActivityLogs(int $id, $newFirst = true, $page = 1, $packageName = null)
+	public function getActivityLogs(int $id, $postLink, $newFirst = true, $page = 1, $packageName = null)
 	{
 		if ($packageName) {
-			return $this->basepackages->activityLogs->getLogs($packageName, $id, $newFirst, $page);
+			return $this->basepackages->activityLogs->getLogs($packageName, $id, $postLink, $newFirst, $page);
 		}
 
-		return $this->basepackages->activityLogs->getLogs($this->packageName, $id, $newFirst, $page);
+		return $this->basepackages->activityLogs->getLogs($this->packageName, $id, $postLink, $newFirst, $page);
 	}
 
-	public function getNoteLogs(int $id, $newFirst = true, $page = 1, $packageName = null)
+	public function getNotes(int $id, $newFirst = true, $page = 1, $packageName = null)
 	{
 		if ($packageName) {
 			return $this->basepackages->notes->getNotes($packageName, $id, $newFirst, $page);
@@ -2492,5 +2478,16 @@ abstract class BasePackage extends Controller
 	protected function extractNumbers($string)
 	{
 		return preg_replace('/[^0-9]/', '', $string);
+	}
+
+	protected function removeSessionToken($data)
+	{
+		$token = array_keys($data, $this->security->getRequestToken());
+
+		if ($token) {
+			unset($data[$token[0]]);
+		}
+
+		return $data;
 	}
 }
