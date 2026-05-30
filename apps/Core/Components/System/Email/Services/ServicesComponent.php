@@ -31,6 +31,7 @@ class ServicesComponent extends BaseComponent
 
                 $this->view->emailservice = $emailservice;
             }
+
             $this->view->pick('services/view');
 
             return;

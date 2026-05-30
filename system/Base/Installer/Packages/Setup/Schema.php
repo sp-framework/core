@@ -10,8 +10,8 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\A
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ContactBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Dashboards\Widgets as DashboardsWidgets;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailServices;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Email\Queue as EmailQueue;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Email\Services as EmailServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Filters;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\CitiesIp2LocationV4;

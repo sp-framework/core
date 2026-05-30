@@ -5,6 +5,7 @@
     {% set emailserviceUsername = emailservice['username'] %}
     {% set emailservicePassword = emailservice['password'] %}
     {% set emailserviceFromAddress = emailservice['from_address'] %}
+    {% set emailserviceFromName = emailservice['from_name'] %}
     {% set emailserviceEncryption = emailservice['encryption'] %}
     {% set emailserviceAllowHtmlBody = emailservice['allow_html_body'] %}
 {% else %}
@@ -14,6 +15,7 @@
     {% set emailserviceUsername = '' %}
     {% set emailservicePassword = '' %}
     {% set emailserviceFromAddress = '' %}
+    {% set emailserviceFromName = '' %}
     {% set emailserviceEncryption = 0 %}
     {% set emailserviceAllowHtmlBody = 0 %}
 {% endif %}
@@ -225,9 +227,33 @@
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
-                'fieldDataInputMaxLength'        : 50,
+                'fieldDataInputMaxLength'        : 100,
                 'fieldBazJstreeSearch'           : true,
                 'fieldValue'                     : emailserviceFromAddress
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'from_name',
+                'fieldLabel'                     : 'From Name',
+                'fieldType'                      : 'input',
+                'fieldInputType'                 : 'text',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Email From Name.',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 100,
+                'fieldBazJstreeSearch'           : true,
+                'fieldValue'                     : emailserviceFromName
             ]
         )}}
     </div>

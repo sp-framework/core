@@ -126,9 +126,9 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-username'                : { },
         '{{componentId}}-{{sectionId}}-password'                : { },
         '{{componentId}}-{{sectionId}}-from_address'            : { },
+        '{{componentId}}-{{sectionId}}-from_name'               : { },
         '{{componentId}}-{{sectionId}}-test'                    : {
             afterInit: function() {
-
                 $('#{{componentId}}-{{sectionId}}-test').click(function() {
                     if ($(this)[0].checked === true) {
                         $('#{{componentId}}-{{sectionId}}-test_email_address-test').attr('disabled', false);

@@ -20,6 +20,10 @@ class BasepackagesEmailQueue extends BaseModel
 
     public $confidential;
 
+    public $from_address;
+
+    public $from_name;
+
     public $to_addresses;
 
     public $cc_addresses;

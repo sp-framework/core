@@ -38,6 +38,15 @@ class EmailQueue extends BasePackage
             $data = $this->encryptBody($data);
         }
 
+        $queueEmailSettings = $this->basepackages->email->getEmailSettings();
+
+        if (!isset($data['from_address'])) {
+            $data['from_address'] = $queueEmailSettings['from_address'];
+            $data['from_name'] = $queueEmailSettings['from_address'];
+        } else if (!isset($data['from_name'])) {
+            $data['from_name'] = $queueEmailSettings['from_address'];
+        }
+
         if ($this->add($data)){
             $this->addResponse('Added email to queue with ID ' . $this->packagesData->last['id'], 0, null, true);
 
@@ -138,22 +147,63 @@ class EmailQueue extends BasePackage
                 } else {
                     $queueEmailSettings = $this->basepackages->email->getEmailSettings();
 
-                    $this->basepackages->email->setSender($queueEmailSettings['from_address'], $queueEmailSettings['from_address']);
+                    //Set Sender
+                    if (isset($queueEmail['from_address']) && isset($queueEmail['from_name']) &&
+                        $queueEmail['from_address'] !== '' && $queueEmail['from_name'] !== ''
+                    ) {
+                        $fromAddress = $queueEmail['from_address'];
+                        $fromName = $queueEmail['from_name'];
+                    } else {
+                        $fromAddress = $queueEmailSettings['from_address'];
 
+                        if (!isset($queueEmailSettings['from_name']) || (isset($queueEmailSettings['from_name']) && $queueEmailSettings['from_name'] === '')) {
+                            $fromName = $queueEmailSettings['from_name'] = $queueEmailSettings['from_address'];
+                        } else {
+                            $fromName = $queueEmailSettings['from_name'];
+                        }
+                    }
+                    $this->basepackages->email->setSender($fromAddress, $fromName);
+
+                    //Set To
                     if (is_string($queueEmail['to_addresses'])) {
                         $queueEmail['to_addresses'] = $this->helper->decode($queueEmail['to_addresses'], true);
                     }
-                    if (count($queueEmail['to_addresses']) > 1) {
-                        foreach ($queueEmail['to_addresses'] as $key => $toAddress) {
+                    foreach ($queueEmail['to_addresses'] as $toAddress) {
+                        if (is_array($toAddress) && (isset($toAddress['email']) && isset($toAddress['name']))) {
+                            $this->basepackages->email->setRecipientTo($toAddress['email'], $toAddress['name']);
+                        } else {
                             $this->basepackages->email->setRecipientTo($toAddress, $toAddress);
                         }
-                    } else {
-                        $this->basepackages->email->setRecipientTo($this->helper->first($queueEmail['to_addresses']), $this->helper->first($queueEmail['to_addresses']));
                     }
-                    $queueEmail['to_addresses'] = $this->helper->encode($queueEmail['to_addresses']);
 
+                    //Set CC
+                    if (is_string($queueEmail['cc_addresses'])) {
+                        $queueEmail['cc_addresses'] = $this->helper->decode($queueEmail['cc_addresses'], true);
+                    }
+                    foreach ($queueEmail['cc_addresses'] as $ccAddress) {
+                        if (is_array($ccAddress) && (isset($ccAddress['email']) && isset($ccAddress['name']))) {
+                            $this->basepackages->email->setRecipientCc($ccAddress['email'], $ccAddress['name']);
+                        } else {
+                            $this->basepackages->email->setRecipientCc($ccAddress, $ccAddress);
+                        }
+                    }
+
+                    //Set BCC
+                    if (is_string($queueEmail['bcc_addresses'])) {
+                        $queueEmail['bcc_addresses'] = $this->helper->decode($queueEmail['bcc_addresses'], true);
+                    }
+                    foreach ($queueEmail['bcc_addresses'] as $bccAddress) {
+                        if (is_array($bccAddress) && (isset($bccAddress['email']) && isset($bccAddress['name']))) {
+                            $this->basepackages->email->setRecipientBcc($bccAddress['email'], $bccAddress['name']);
+                        } else {
+                            $this->basepackages->email->setRecipientBcc($bccAddress, $bccAddress);
+                        }
+                    }
+
+                    //Set Subject
                     $this->basepackages->email->setSubject($queueEmail['subject']);
 
+                    //Set encryption
                     if (isset($queueEmail['confidential']) && $queueEmail['confidential'] == 1) {
                         $queueEmail = $this->decryptBody($queueEmail);
                         $this->basepackages->email->setBody($queueEmail['body']);
@@ -162,11 +212,27 @@ class EmailQueue extends BasePackage
                         $this->basepackages->email->setBody($queueEmail['body']);
                     }
 
+                    //Set Attachments
+                    if (isset($queueEmail['attachments']) && is_array($queueEmail['attachments']) && count($queueEmail['attachments']) > 0) {
+                        foreach ($queueEmail['attachments'] as $attachment) {
+                            $file = $this->basepackages->storages->getFileInfo($attachment);
+
+                            if ($file) {
+                                $path = $this->basepackages->storages->getAbsolutePath($file);
+
+                                if ($path) {
+                                    $this->basepackages->email->addAttachments($path, $file['org_file_name']);
+                                }
+                            }
+                        }
+                    }
+
+                    //Set Logs
                     $logs = $this->basepackages->email->sendNewEmail();
 
                     if ($logs === true) {
                         $queueEmail['status'] = self::STATUS_SENT;
-                        $queueEmail['logs'] = 'Sent';
+                        $queueEmail['logs'] = 'Sent successfully!';
                         $queueEmail['sent_on'] = date("F j, Y, g:i a");
 
                         array_push($queueProcessedIds, $queueEmail['id']);

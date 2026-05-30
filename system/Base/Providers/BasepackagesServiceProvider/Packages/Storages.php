@@ -14,6 +14,8 @@ class Storages extends BasePackage
 
     public $storage;
 
+    public $storageInfo;
+
     public function init(bool $resetCache = false)
     {
         if ($this->opCache) {
@@ -145,6 +147,25 @@ class Storages extends BasePackage
         return $this->initStorage($public)->getById($id);
     }
 
+    public function getAbsolutePath($fileOrUUID)
+    {
+        if (is_array($fileOrUUID)) {
+            $file = $fileOrUUID;
+        } else {
+            $file = $this->getFileInfo($uuid);
+        }
+
+        if ($file) {
+            if ($this->storageInfo['type'] !== 'local') {
+                throw new \Exception('File is not on a local storage!');
+            }
+
+            return base_path($this->storageInfo['permission'] . '/' . $this->storageInfo['id'] . '/data/' . $file['uuid_location'] . $file['uuid']);
+        }
+
+        return false;
+    }
+
     public function getFileInfo($uuid, $orgFileName = null, $like = false)
     {
         $fileInfo = $this->initStorage(false)->getFileInfo($uuid, $orgFileName, $like);
@@ -260,6 +281,12 @@ class Storages extends BasePackage
         } else {
             return false;
         }
+
+        if (!$storage) {
+            throw new \Exception('Storage not configured!');
+        }
+
+        $this->storageInfo = $storage;
 
         if ($storage['type'] === 'local') {
             $this->storage = (new Local())->initLocal($storage);

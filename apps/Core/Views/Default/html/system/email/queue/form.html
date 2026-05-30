@@ -4,11 +4,14 @@
     {% set emailPriority = email['priority'] %}
     {% set emailSentOn = email['sent_on'] %}
     {% set emailConfidential = email['confidential'] %}
+    {% set emailFromAddress = email['from_address'] %}
+    {% set emailFromName = email['from_name'] %}
     {% set emailToAddresses = email['to_addresses'] %}
     {% set emailCCAddresses = email['cc_addresses'] %}
     {% set emailBCCAddresses = email['bcc_addresses'] %}
     {% set emailSubject = email['subject'] %}
     {% set emailBody = email['body'] %}
+    {% set emailAttachments = email['attachments'] %}
     {% set emailLogs = email['logs'] %}
     <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
         <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -97,6 +100,48 @@
                 </div>
             </div>
             <hr>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'from_address',
+                            'fieldLabel'                     : 'From Address',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'From Address',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldValue'                     : emailFromAddress
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'from_name',
+                            'fieldLabel'                     : 'From Name',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'From Name',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldValue'                     : emailFromAddress
+                        ]
+                    )}}
+                </div>
+            </div>
             <div class="row">
                 <div class="col">
                     {{adminltetags.useTag('fields',
@@ -223,6 +268,30 @@
                             'componentName'                  : componentName,
                             'componentId'                    : componentId,
                             'sectionId'                      : sectionId,
+                            'fieldId'                        : 'attachments',
+                            'fieldLabel'                     : 'Attachments',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 2048,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Attachments',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldTextareaRows'              : 5,
+                            'fieldValue'                     : emailAttachments
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
                             'fieldId'                        : 'logs',
                             'fieldLabel'                     : 'Logs',
                             'fieldType'                      : 'textarea',
@@ -274,11 +343,14 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-priority'                : { },
         '{{componentId}}-{{sectionId}}-sent_on'                 : { },
         '{{componentId}}-{{sectionId}}-confidential'            : { },
+        '{{componentId}}-{{sectionId}}-from_address'            : { },
+        '{{componentId}}-{{sectionId}}-from_name'               : { },
         '{{componentId}}-{{sectionId}}-to_addresses'            : { },
         '{{componentId}}-{{sectionId}}-cc_addresses'            : { },
         '{{componentId}}-{{sectionId}}-bcc_addresses'           : { },
         '{{componentId}}-{{sectionId}}-subject'                 : { },
         '{{componentId}}-{{sectionId}}-body'                    : { },
+        '{{componentId}}-{{sectionId}}-attachments'             : { },
         '{{componentId}}-{{sectionId}}-logs'                    : {
             rules: {
             },

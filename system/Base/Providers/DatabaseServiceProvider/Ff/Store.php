@@ -340,7 +340,7 @@ class Store
         try {
             $content = IoHelper::getFileContent($this->getDataPath() . "$id.json");
         } catch (Exception $exception) {
-            return false;
+            throw new IOException("Document with ID: $id not found!");
         }
 
         $data = @json_decode($content, true);
@@ -481,7 +481,7 @@ class Store
 
             $current = $this->findById((int) $data[$this->primaryKey]);
 
-            if ($autoGenerateIdOnInsert && $current === null) {
+            if ($autoGenerateIdOnInsert && !$current) {
                 $data[$this->primaryKey] = $this->increaseCounterAndGetNextId();
 
                 $insert = true;
@@ -563,7 +563,7 @@ class Store
 
                 $current = $this->findById((int) $document[$this->primaryKey]);
 
-                if ($autoGenerateIdOnInsert && $current === null) {
+                if ($autoGenerateIdOnInsert && !$current) {
                     $document[$this->primaryKey] = $this->increaseCounterAndGetNextId();
 
                     $insert = true;

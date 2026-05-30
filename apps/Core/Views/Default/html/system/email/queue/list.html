@@ -137,33 +137,32 @@ function initFuncs() {
             $(thisButton).children('i').removeClass('fa-paper-plane').addClass('fa-spin fa-cog');
             $(thisButton).addClass('disabled');
 
-            var dataToSend = { };
-            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
-            dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+            var postData = { };
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+            postData.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
 
-            $.ajax({
-                url         : url,
-                method      : 'post',
-                dataType    : 'json',
-                data        : dataToSend,
-                success     : function(response) {
-                    if (response.responseCode === 0) {
-                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
-                    } else {
-                        paginatedPNotify('error', {
-                            title           : response.responseMessage,
-                        });
-                    }
+            $.post(url, postData, function(response) {
+                if (response.tokenKey && response.token) {
+                    $("#security-token").attr("name", response.tokenKey);
+                    $("#security-token").val(response.token);
+                }
 
-                    $(thisButton).children('i').removeClass('fa-paper-plane').addClass('fa-spin fa-cog');
+                if (response.responseCode === 0) {
+                    window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                } else {
+                    $(thisButton).children('i').removeClass('fa-spin fa-cog').addClass('fa-paper-plane');
                     $(thisButton).removeClass('disabled');
 
-                    if (response.tokenKey && response.token) {
-                        $('#security-token').attr('name', response.tokenKey);
-                        $('#security-token').val(response.token);
-                    }
+                    paginatedPNotify('error', {
+                        text : response.responseMessage
+                    });
                 }
-            });
+
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
+                }
+            }, 'json');
         });
     });
 

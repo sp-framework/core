@@ -139,7 +139,16 @@ class QueueComponent extends BaseComponent
             $data['to_addresses'] = $this->helper->decode($data['to_addresses'], true);
         }
 
-        $data['to_addresses'] = implode(',', $data['to_addresses']);
+        $toAddresses = [];
+        foreach ($data['to_addresses'] as $toAddress) {
+            if (isset($toAddress['email']) && isset($toAddress['name'])) {
+                array_push($toAddresses, $toAddress['email'] . '|' . $toAddress['name']);
+            } else {
+                array_push($toAddresses, $toAddress);
+            }
+        }
+
+        $data['to_addresses'] = implode(',', $toAddresses);
 
         return $data;
     }
