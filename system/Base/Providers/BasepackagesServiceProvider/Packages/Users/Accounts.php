@@ -1209,7 +1209,7 @@ class Accounts extends BasePackage
         $emailData['subject'] = 'OTP for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $password;
 
-        return $this->basepackages->emailqueue->addToQueue($emailData);
+        return $this->basepackages->emailqueue->addQueue($emailData);
     }
 
     public function removeAccountAgents(array $data)

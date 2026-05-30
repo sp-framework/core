@@ -697,6 +697,6 @@ class ImportExport extends BasePackage
             $emailData['body'] = ucfirst($task['type']) . ' request ID:' . $task['id'] . ' execution complete.';
         }
 
-        $this->basepackages->emailqueue->addToQueue($emailData);
+        $this->basepackages->emailqueue->addQueue($emailData);
     }
 }

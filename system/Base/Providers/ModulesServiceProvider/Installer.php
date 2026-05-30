@@ -2514,6 +2514,6 @@ class Installer extends BasePackage
         //Move this to template in future.
         $emailData['body'] = printArrayList($this->queue);
 
-        return $this->basepackages->emailqueue->addToQueue($emailData);
+        return $this->basepackages->emailqueue->addQueue($emailData);
     }
 }

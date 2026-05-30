@@ -177,7 +177,7 @@ class Notifications extends BasePackage
         }
         $email['body'] = $body;
 
-        $this->basepackages->emailqueue->addToQueue($email);
+        $this->basepackages->emailqueue->addQueue($email);
     }
 
     public function fetchNewNotificationsCount($type = 0)

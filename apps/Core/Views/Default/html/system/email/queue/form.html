@@ -4,8 +4,7 @@
     {% set emailPriority = email['priority'] %}
     {% set emailSentOn = email['sent_on'] %}
     {% set emailConfidential = email['confidential'] %}
-    {% set emailFromAddress = email['from_address'] %}
-    {% set emailFromName = email['from_name'] %}
+    {% set emailFrom = email['from'] %}
     {% set emailToAddresses = email['to_addresses'] %}
     {% set emailCCAddresses = email['cc_addresses'] %}
     {% set emailBCCAddresses = email['bcc_addresses'] %}
@@ -108,36 +107,17 @@
                             'componentName'                  : componentName,
                             'componentId'                    : componentId,
                             'sectionId'                      : sectionId,
-                            'fieldId'                        : 'from_address',
-                            'fieldLabel'                     : 'From Address',
+                            'fieldId'                        : 'from',
+                            'fieldLabel'                     : 'From',
                             'fieldType'                      : 'input',
                             'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'From Address',
+                            'fieldHelpTooltipContent'        : 'From',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : true,
                             'fieldBazScan'                   : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
-                            'fieldValue'                     : emailFromAddress
-                        ]
-                    )}}
-                </div>
-                <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'from_name',
-                            'fieldLabel'                     : 'From Name',
-                            'fieldType'                      : 'input',
-                            'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'From Name',
-                            'fieldRequired'                  : false,
-                            'fieldBazScan'                   : true,
-                            'fieldBazPostOnCreate'           : false,
-                            'fieldBazPostOnUpdate'           : false,
-                            'fieldValue'                     : emailFromAddress
+                            'fieldValue'                     : emailFrom
                         ]
                     )}}
                 </div>
@@ -155,8 +135,9 @@
                             'fieldType'                      : 'textarea',
                             'fieldDataMaxLength'             : 1024,
                             'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'To Addresses',
+                            'fieldHelpTooltipContent'        : 'To Addresses JSON format',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : true,
                             'fieldBazScan'                   : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
@@ -178,8 +159,9 @@
                             'fieldType'                      : 'textarea',
                             'fieldDataMaxLength'             : 1024,
                             'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'CC Addresses',
+                            'fieldHelpTooltipContent'        : 'CC Addresses JSON Format',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : true,
                             'fieldBazScan'                   : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
@@ -201,8 +183,9 @@
                             'fieldType'                      : 'textarea',
                             'fieldDataMaxLength'             : 1024,
                             'fieldHelp'                      : true,
-                            'fieldHelpTooltipContent'        : 'BCC Addresses',
+                            'fieldHelpTooltipContent'        : 'BCC Addresses JSON Format',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : true,
                             'fieldBazScan'                   : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
@@ -227,6 +210,8 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Subject',
                             'fieldBazScan'                   : true,
+                            'fieldRequired'                  : false,
+                            'fieldDisabled'                  : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
                             'fieldDataInputMinLength'        : 1,
@@ -251,6 +236,7 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Body',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : true,
                             'fieldBazScan'                   : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
@@ -274,11 +260,11 @@
                             'fieldDataMaxLength'             : 2048,
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Attachments',
-                            'fieldRequired'                  : false,
+                            'fieldDisabled'                  : true,
                             'fieldBazScan'                   : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
-                            'fieldTextareaRows'              : 5,
+                            'fieldTextareaRows'              : 2,
                             'fieldValue'                     : emailAttachments
                         ]
                     )}}
@@ -299,6 +285,7 @@
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Logs',
                             'fieldRequired'                  : false,
+                            'fieldDisabled'                  : true,
                             'fieldBazScan'                   : true,
                             'fieldBazPostOnCreate'           : false,
                             'fieldBazPostOnUpdate'           : false,
@@ -343,8 +330,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-priority'                : { },
         '{{componentId}}-{{sectionId}}-sent_on'                 : { },
         '{{componentId}}-{{sectionId}}-confidential'            : { },
-        '{{componentId}}-{{sectionId}}-from_address'            : { },
-        '{{componentId}}-{{sectionId}}-from_name'               : { },
+        '{{componentId}}-{{sectionId}}-from'                    : { },
         '{{componentId}}-{{sectionId}}-to_addresses'            : { },
         '{{componentId}}-{{sectionId}}-cc_addresses'            : { },
         '{{componentId}}-{{sectionId}}-bcc_addresses'           : { },
@@ -353,8 +339,16 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-attachments'             : { },
         '{{componentId}}-{{sectionId}}-logs'                    : {
             rules: {
+                '{{componentId}}-{{sectionId}}-from'            : 'required',
+                '{{componentId}}-{{sectionId}}-to_addresses'    : 'required',
+                '{{componentId}}-{{sectionId}}-subject'         : 'required',
+                '{{componentId}}-{{sectionId}}-body'            : 'required'
             },
             messages: {
+                '{{componentId}}-{{sectionId}}-from'            : 'Please enter from',
+                '{{componentId}}-{{sectionId}}-to_addresses'    : 'Please enter to',
+                '{{componentId}}-{{sectionId}}-subject'         : 'Please enter subject',
+                '{{componentId}}-{{sectionId}}-body'            : 'Please enter body'
             }
         }
     });

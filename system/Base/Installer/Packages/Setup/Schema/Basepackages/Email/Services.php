@@ -80,7 +80,7 @@ class Services
                         [
                             'type'    => Column::TYPE_VARCHAR,
                             'size'    => 100,
-                            'notNull' => false,
+                            'notNull' => true,
                         ]
                     ),
                     new Column(

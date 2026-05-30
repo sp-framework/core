@@ -65,7 +65,7 @@
         'dtStateSave'               : false,
         'dtBordered'                : false,
         'dtHideIdColumn'            : true,
-        'dtNoOfColumnsToShow'       : 6,
+        'dtNoOfColumnsToShow'       : 9,
         'dtTableCompact'            : true,
         'dtZeroRecords'             : 'No email in queue.'
     ]
@@ -82,48 +82,7 @@ window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFu
 $('.process-queue').click(function(e) {
     e.preventDefault();
 
-    var thisButton = $(this).parent().siblings();
-    var url = $(this).attr('href');
-    $(thisButton).children('i').removeClass('fa-paper-plane').addClass('fa-spin fa-cog');
-    $(thisButton).attr('disabled', true);
-
-    var priority;
-
-    if ($(this).hasClass('high')) {
-        priority = 1;
-    } else if ($(this).hasClass('medium')) {
-        priority = 2;
-    } else if ($(this).hasClass('low')) {
-        priority = 3;
-    }
-
-    var dataToSend = { };
-    dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
-    dataToSend['priority'] = priority;
-
-    $.ajax({
-        url         : url,
-        method      : 'post',
-        dataType    : 'json',
-        data        : dataToSend,
-        success     : function(response) {
-            if (response.responseCode === 0) {
-                window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
-            } else {
-                paginatedPNotify('error', {
-                    title           : response.responseMessage,
-                });
-            }
-
-            $(thisButton).children('i').removeClass('fa-spin fa-cog').addClass('fa-paper-plane');
-            $(thisButton).attr('disabled', false);
-
-            if (response.tokenKey && response.token) {
-                $('#security-token').attr('name', response.tokenKey);
-                $('#security-token').val(response.token);
-            }
-        }
-    });
+    processQueue($(this).parent().siblings());
 });
 
 function initFuncs() {
@@ -132,37 +91,7 @@ function initFuncs() {
         $(row).click(function(e) {
             e.preventDefault();
 
-            var thisButton = this;
-            var url = $(this).attr('href');
-            $(thisButton).children('i').removeClass('fa-paper-plane').addClass('fa-spin fa-cog');
-            $(thisButton).addClass('disabled');
-
-            var postData = { };
-            postData[$('#security-token').attr('name')] = $('#security-token').val();
-            postData.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
-
-            $.post(url, postData, function(response) {
-                if (response.tokenKey && response.token) {
-                    $("#security-token").attr("name", response.tokenKey);
-                    $("#security-token").val(response.token);
-                }
-
-                if (response.responseCode === 0) {
-                    window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
-                } else {
-                    $(thisButton).children('i').removeClass('fa-spin fa-cog').addClass('fa-paper-plane');
-                    $(thisButton).removeClass('disabled');
-
-                    paginatedPNotify('error', {
-                        text : response.responseMessage
-                    });
-                }
-
-                if (response.tokenKey && response.token) {
-                    $('#security-token').attr('name', response.tokenKey);
-                    $('#security-token').val(response.token);
-                }
-            }, 'json');
+            processQueue(this);
         });
     });
 
@@ -171,33 +100,50 @@ function initFuncs() {
         $(row).click(function(e) {
             e.preventDefault();
 
-            var thisButton = this;
-            var url = $(this).attr('href');
-
-            var dataToSend = { };
-            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
-            dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
-
-            $.ajax({
-                url         : url,
-                method      : 'post',
-                dataType    : 'json',
-                data        : dataToSend,
-                success     : function(response) {
-                    if (response.responseCode === 0) {
-                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
-                    } else {
-                        paginatedPNotify('error', {
-                            title           : response.responseMessage,
-                        });
-                    }
-                    if (response.tokenKey && response.token) {
-                        $('#security-token').attr('name', response.tokenKey);
-                        $('#security-token').val(response.token);
-                    }
-                }
-            });
+            processQueue(this);
         });
     });
+}
+
+function processQueue(thisButton) {
+    $(thisButton).children('i').removeClass('fa-paper-plane').addClass('fa-spin fa-cog');
+    $(thisButton).attr('disabled', true);
+
+    var url = $(thisButton).attr('href');
+    $(thisButton).children('i').removeClass('fa-paper-plane').addClass('fa-spin fa-cog');
+    $(thisButton).attr('disabled', true);
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    if ($(thisButton).hasClass('high')) {
+        postData['priority'] = 1;
+    } else if ($(thisButton).hasClass('medium')) {
+        postData['priority'] = 2;
+    } else if ($(thisButton).hasClass('low')) {
+        postData['priority'] = 3;
+    }
+
+    if ($(thisButton).parents('tr').length > 0) {
+        postData['id'] = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+    }
+
+    $.post(url, postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $("#security-token").attr("name", response.tokenKey);
+            $("#security-token").val(response.token);
+        }
+
+        if (response.responseCode === 0) {
+            window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+        } else {
+            $(thisButton).children('i').removeClass('fa-spin fa-cog').addClass('fa-paper-plane');
+            $(thisButton).removeClass('disabled');
+
+            paginatedPNotify('error', {
+                text : response.responseMessage
+            });
+        }
+    }, 'json');
 }
 </script>

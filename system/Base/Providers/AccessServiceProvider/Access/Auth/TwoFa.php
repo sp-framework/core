@@ -165,7 +165,7 @@ class TwoFa extends BasePackage
         $emailData['subject'] = '2FA code for ' . $this->domains->getDomain()['name'];
         $emailData['body'] = $twofaCode;
 
-        return $this->basepackages->emailqueue->addToQueue($emailData);
+        return $this->basepackages->emailqueue->addQueue($emailData);
     }
 
     public function canUse2fa()

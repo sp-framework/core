@@ -65,25 +65,17 @@ class Queue
                         ]
                     ),
                     new Column(
+                        'from',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 100,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
                         'to_addresses',
                         [
                             'type'    => Column::TYPE_JSON,
-                            'notNull' => true,
-                        ]
-                    ),
-                    new Column(
-                        'from_address',
-                        [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 100,
-                            'notNull' => true,
-                        ]
-                    ),
-                    new Column(
-                        'from_name',
-                        [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 100,
                             'notNull' => true,
                         ]
                     ),
@@ -143,7 +135,7 @@ class Queue
                 [
                     'status',
                     'priority',
-                    'from_address'
+                    'from'
                 ],
                 'INDEX'
             )
