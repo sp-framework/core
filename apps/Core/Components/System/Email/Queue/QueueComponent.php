@@ -31,12 +31,13 @@ class QueueComponent extends BaseComponent
 
                 $email = $this->formatStatus(0, $email);
                 $email = $this->formatPriority(0, $email);
-                $email = $this->formatSentOn(0, $email);
+                $email = $this->formatSentOn(0, $email, true);
                 $email = $this->formatToAddresses(0, $email);
                 $email = $this->formatConfidential(0, $email);
 
                 $this->view->email = $email;
             }
+
             return;
         }
 
@@ -120,14 +121,18 @@ class QueueComponent extends BaseComponent
         return $data;
     }
 
-    protected function formatSentOn($rowId, $data)
+    protected function formatSentOn($rowId, $data, $id = null)
     {
         if (!$data['sent_on']) {
-            $data['sent_on'] =
-                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-send-' . $rowId . '" href="' . $this->links->url('system/email/queue/processqueue') . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-info btn-xs rowSendNow text-uppercase">
-                    <i class="mr-1 fas fa-fw fa-xs fa-paper-plane"></i>
-                    <span class="text-xs"> Send Now</span>
-                </a>';
+            if ($id) {
+                $data['sent_on'] = 'Not Sent!';
+            } else {
+                $data['sent_on'] =
+                    '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-send-' . $rowId . '" href="' . $this->links->url('system/email/queue/processqueue') . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-info btn-xs rowSendNow text-uppercase">
+                        <i class="mr-1 fas fa-fw fa-xs fa-paper-plane"></i>
+                        <span class="text-xs"> Send Now</span>
+                    </a>';
+            }
         }
 
         return $data;
