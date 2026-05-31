@@ -219,39 +219,43 @@ class EmailQueue extends BasePackage
                     }
 
                     //Set CC
-                    if (is_string($queueEmail['cc_addresses'])) {
-                        $queueEmail['cc_addresses'] = $this->helper->decode($queueEmail['cc_addresses'], true);
-                    }
-                    foreach ($queueEmail['cc_addresses'] as $ccAddress) {
-                        $ccAddress = str_replace(' ', '', $ccAddress);//Trim
-                        $ccAddressArr = explode('|', $ccAddress);
+                    if (isset($queueEmail['cc_addresses'])) {
+                        if (is_string($queueEmail['cc_addresses'])) {
+                            $queueEmail['cc_addresses'] = $this->helper->decode($queueEmail['cc_addresses'], true);
+                        }
+                        foreach ($queueEmail['cc_addresses'] as $ccAddress) {
+                            $ccAddress = str_replace(' ', '', $ccAddress);//Trim
+                            $ccAddressArr = explode('|', $ccAddress);
 
-                        if (count($ccAddressArr) === 2) {
-                            if ($ccAddressArr[0] !== '' && $ccAddressArr[1] !== '') {
-                                $this->basepackages->email->setRecipientCc($ccAddressArr[0], $ccAddressArr[1]);
-                            }
-                        } else if (count($ccAddressArr) === 1) {
-                            if ($ccAddressArr[0] !== '') {
-                                $this->basepackages->email->setRecipientCc($ccAddressArr[0], $ccAddressArr[0]);
+                            if (count($ccAddressArr) === 2) {
+                                if ($ccAddressArr[0] !== '' && $ccAddressArr[1] !== '') {
+                                    $this->basepackages->email->setRecipientCc($ccAddressArr[0], $ccAddressArr[1]);
+                                }
+                            } else if (count($ccAddressArr) === 1) {
+                                if ($ccAddressArr[0] !== '') {
+                                    $this->basepackages->email->setRecipientCc($ccAddressArr[0], $ccAddressArr[0]);
+                                }
                             }
                         }
                     }
 
                     //Set BCC
-                    if (is_string($queueEmail['bcc_addresses'])) {
-                        $queueEmail['bcc_addresses'] = $this->helper->decode($queueEmail['bcc_addresses'], true);
-                    }
-                    foreach ($queueEmail['bcc_addresses'] as $bccAddress) {
-                        $bccAddress = str_replace(' ', '', $bccAddress);//Trim
-                        $bccAddressArr = explode('|', $bccAddress);
+                    if (isset($queueEmail['bcc_addresses'])) {
+                        if (is_string($queueEmail['bcc_addresses'])) {
+                            $queueEmail['bcc_addresses'] = $this->helper->decode($queueEmail['bcc_addresses'], true);
+                        }
+                        foreach ($queueEmail['bcc_addresses'] as $bccAddress) {
+                            $bccAddress = str_replace(' ', '', $bccAddress);//Trim
+                            $bccAddressArr = explode('|', $bccAddress);
 
-                        if (count($bccAddressArr) === 2) {
-                            if ($bccAddressArr[0] !== '' && $bccAddressArr[1] !== '') {
-                                $this->basepackages->email->setRecipientBcc($bccAddressArr[0], $bccAddressArr[1]);
-                            }
-                        } else if (count($bccAddressArr) === 1) {
-                            if ($bccAddressArr[0] !== '') {
-                                $this->basepackages->email->setRecipientBcc($bccAddressArr[0], $bccAddressArr[0]);
+                            if (count($bccAddressArr) === 2) {
+                                if ($bccAddressArr[0] !== '' && $bccAddressArr[1] !== '') {
+                                    $this->basepackages->email->setRecipientBcc($bccAddressArr[0], $bccAddressArr[1]);
+                                }
+                            } else if (count($bccAddressArr) === 1) {
+                                if ($bccAddressArr[0] !== '') {
+                                    $this->basepackages->email->setRecipientBcc($bccAddressArr[0], $bccAddressArr[0]);
+                                }
                             }
                         }
                     }
