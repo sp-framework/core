@@ -1046,12 +1046,6 @@ class Store
         }
 
         foreach ($schema['relations'] as $relationKey => $relation) {
-            if (count($relationsStores) > 0) {
-                if (!in_array($relation['table'], $relationsStores)) {
-                    continue;
-                }
-            }
-
             if ($relation['type'] === 'belongsTo') {//We dont want to get relations if it belongs to. This will cause infinite loop!
                 continue;
             }
@@ -1070,6 +1064,14 @@ class Store
             }
 
             if ($relation['type'] === 'hasOne' || $relation['type'] === 'hasMany') {
+                if (count($relationsStores) > 0) {
+                    if (isset($relation['table']) &&
+                        !in_array($relation['table'], $relationsStores)
+                    ) {
+                        continue;
+                    }
+                }
+
                 if (isset($relation['fields']) &&
                     count($relation['fields']) > 0 &&
                     count($relation['fields']) % 2 == 0
@@ -1114,6 +1116,15 @@ class Store
                     }
                 }
             } else if ($relation['type'] === 'hasOneThrough' || $relation['type'] === 'hasManyThrough') {
+                if (count($relationsStores) > 0) {
+                    if (isset($relation[0]['table']) && isset($relation[1]['table']) &&
+                        !in_array($relation[0]['table'], $relationsStores) &&
+                        !in_array($relation[1]['table'], $relationsStores)
+                    ) {
+                        continue;
+                    }
+                }
+
                 if (isset($relation[0]['fields']) &&
                     count($relation[0]['fields']) > 0 &&
                     count($relation[0]['fields']) % 2 == 0
