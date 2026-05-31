@@ -60,6 +60,14 @@ class ActivityLogs extends BasePackage
             $log['activity_type'] = self::ACTIVITY_TYPE_ADD;
         }
 
+        if ($log['activity_type'] === self::ACTIVITY_TYPE_ADD) {
+            foreach ($activityData as $activityDataKey => $activityDataValue) {
+                if (is_null($activityDataValue) || $activityDataValue === '') {
+                    unset($activityData[$activityDataKey]);
+                }
+            }
+        }
+
         if (PHP_SAPI === 'cli') {
             $log['account_id'] = 0;//System
         } else {
@@ -107,6 +115,8 @@ class ActivityLogs extends BasePackage
                 'page'          => $page
             ]
         );
+
+        $logsArr['data'] = [];
 
         if ($pagedLogs) {
             if ($getCount) {//$this->packagesData->paginationCounters
@@ -159,11 +169,9 @@ class ActivityLogs extends BasePackage
             $logsArr['id'] = $packageRowId;
             $logsArr['packageName'] = $packageName;
             $logsArr['postLink'] = $postLink;
-
-            return $logsArr;
         }
 
-        return [];
+        return $logsArr;
     }
 
     protected function getDifference(array $data, array $oldData)

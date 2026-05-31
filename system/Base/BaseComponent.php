@@ -1027,29 +1027,29 @@ abstract class BaseComponent extends Controller
 			}
 
 			foreach ($arr as $value) {
-				if (isset($value[1])) {
-					if ($value[1] === '{id}') {
-						$uriId = 0;
-						if (str_contains(trim($this->request->getURI(), '/'), '-')) {
-							$uriArr = explode('-', trim($this->request->getURI(), '/'));
+				if (isset($value[0]) && isset($value[1])) {
+					if (is_string($value[0]) && is_string($value[1])) {
+						if ($value[1] === '{id}') {
+							$uriId = 0;
+							if (str_contains(trim($this->request->getURI(), '/'), '-')) {
+								$uriArr = explode('-', trim($this->request->getURI(), '/'));
 
-							if (count($uriArr) > 1) {
-								if (isset($apiUri)) {
-									$murlApiUri = $this->helper->first($uriArr);
+								if (count($uriArr) > 1) {
+									if (isset($apiUri)) {
+										$murlApiUri = $this->helper->first($uriArr);
+									}
+									$murlUri = $this->helper->first($uriArr);
+									$uriId = (int) $this->helper->last($uriArr);
 								}
-								$murlUri = $this->helper->first($uriArr);
-								$uriId = (int) $this->helper->last($uriArr);
 							}
-						}
 
-						if ($uriId > 0) {
-							$this->getQueryArr[$value[0]] = $uriId;
+							if ($uriId > 0) {
+								$this->getQueryArr[$value[0]] = $uriId;
+							}
+						} else {
+							$this->getQueryArr[$value[0]] = $value[1];
 						}
-					} else {
-						$this->getQueryArr[$value[0]] = $value[1];
 					}
-				} else {
-					$this->getQueryArr[$value[0]] = 0; //Value not set, so default to 0
 				}
 			}
 

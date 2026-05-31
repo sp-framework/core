@@ -29,6 +29,12 @@ class Activitylogs extends Adminltetags
             throw new \Exception('Error: activityLogs (array) missing');
         }
 
+        if (count($this->params['activityLogs']['data']) === 0) {
+             $this->content .= 'No activity logs available for this ID.';
+
+            return true;
+        }
+
         if (isset($this->params['activityLogs']['paginationCounters'])) {
             if ($this->params['activityLogs']['paginationCounters']['first'] === $this->params['activityLogs']['paginationCounters']['current']) {
                 $start = 1;

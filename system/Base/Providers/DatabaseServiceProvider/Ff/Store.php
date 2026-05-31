@@ -340,7 +340,7 @@ class Store
         try {
             $content = IoHelper::getFileContent($this->getDataPath() . "$id.json");
         } catch (Exception $exception) {
-            throw new IOException("Document with ID: $id not found!");
+            return false;
         }
 
         $data = @json_decode($content, true);
