@@ -128,12 +128,19 @@ class ActivityLogs extends BasePackage
                     if ($account) {
                         $log['account_email'] = $account['email'];
                         $log['account_full_name'] = $account['contact']['full_name'];
+
+                        if (isset($account['contact']['portrait'])) {
+                            $log['account_portrait'] = '<img src="' . $this->links->url('system/storages/q/uuid/' . $account['contact']['portrait'] . '/w/30') . '" class="rounded-sm" style="position:relative;width:20px;" alt="User Image">';
+                        } else if (isset($account['contact']['initials_avatar']['small'])) {
+                            $log['account_portrait'] = '<img src="data:image/png;base64,' . $account['contact']['initials_avatar']['small'] . '" class="rounded-sm" style="position:relative;width:20px;" alt="User Avatar">';
+                        } else {
+                            $log['account_portrait'] = '<img src="' . $this->links->images('general/user.png') . '" class="rounded-sm" style="position:relative;width:20px;" alt="User Image">';;
+                        }
                     } else {
                         $log['account_email'] = 'N/A';
                         $log['account_full_name'] = 'System';
+                        $log['account_portrait'] = '';
                     }
-
-                    unset($log['account_id']);
                 } else {
                     $log['account_email'] = 'N/A';
                     $log['account_full_name'] = 'System';

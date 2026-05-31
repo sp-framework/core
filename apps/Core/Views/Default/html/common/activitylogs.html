@@ -7,19 +7,36 @@
 {% if disableKeys is not defined %}
     {% set disableKeys = [] %}
 {% endif %}
-<div class="row" id="activity-logs">
-    <div class="col">
-        {{adminltetags.useTag('activitylogs',
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'activitylogs',
+        'contentType'                   : 'section',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'list',
+        'cardTitle'                     : 'Activity Logs',
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardShowTools'                 : ['form'],
+        'cardBodyContent'               : adminltetags.useTag('activitylogs',
             [
                 'component'                     : component,
                 'componentName'                 : componentName,
                 'componentId'                   : componentId,
-                'sectionId'                     : 'main',
+                'sectionId'                     : 'activitylogs',
                 'activityLogs'                  : activityLogs,
                 'replaceKeys'                   : replaceKeys,
                 'replaceValues'                 : replaceValues,
                 'disableKeys'                   : disableKeys
             ]
-        )}}
-    </div>
-</div>
+        ),
+        'sectionButtons'                   :
+        [
+            'closeActionUrl'                : closeActionUrl
+        ]
+    ]
+)}}

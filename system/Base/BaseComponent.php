@@ -429,7 +429,7 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	public function setActivityLogsPackage($alPackage, $postLink)
+	public function setActivityLogsPackage($alPackage, $postLink, $replaceKeys = [], $replaceValues = [], $disableKeys = [])
 	{
 		if (gettype($alPackage) === 'string') {
 			$this->alPackage = $this->usePackage($alPackage);
@@ -443,7 +443,7 @@ abstract class BaseComponent extends Controller
 			$this->dispatcher->forward(
 				[
 					'action' => 'activitylogs',
-					'params' => [$postLink]
+					'params' => [$postLink, $replaceKeys, $replaceValues, $disableKeys]
 				]
 			);
 		}
@@ -453,12 +453,16 @@ abstract class BaseComponent extends Controller
 	 * Activity Logs
 	 * @acl(name=activitylogs)
 	 */
-	public function activitylogsAction($postLink = null)
+	public function activitylogsAction($postLink = null, $replaceKeys = [], $replaceValues = [], $disableKeys = [])
 	{
 		if (isset($this->getData()['activitylogs']) && $this->getData()['activitylogs'] == 'true') {
 			if (isset($this->getData()['id']) && isset($this->alPackage)) {
 				$this->view->activityLogs = $this->alPackage->getActivityLogs((int) $this->getData()['id'], $postLink);
 			}
+
+			$this->view->replaceKeys = $replaceKeys;
+			$this->view->replaceValues = $replaceValues;
+			$this->view->disableKeys = $disableKeys;
 
 			$this->view->pick($this->helper->last(explode('/', $this->component['route'])) . '/activitylogs');
 
@@ -482,6 +486,10 @@ abstract class BaseComponent extends Controller
 				$this->view->setViewsDir('/' . implode('/', $viewDirArr) . '/');
 
 				$this->setDefaultViewData();
+
+				$this->view->replaceKeys = $replaceKeys;
+				$this->view->replaceValues = $replaceValues;
+				$this->view->disableKeys = $disableKeys;
 
 				$this->view->logs = $this->view->partial($popped . '/activitylogs');
 
@@ -647,6 +655,12 @@ abstract class BaseComponent extends Controller
 		}
 
 		$this->view->version = $this->core->getVersion();
+
+		if (isset($this->getData()['id'])) {//Set data Id to view, can be used for anything like activity logs.
+			$this->view->dataId = (int) $this->getData()['id'];
+		} else if (isset($this->postData()['id'])) {
+			$this->view->dataId = (int) $this->postData()['id'];
+		}
 	}
 
 	protected function sendJson()

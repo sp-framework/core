@@ -203,6 +203,70 @@ class Card extends Adminltetags
                                 <i class="fas fa-fw fa-database"></i>
                             </button>';
                     }
+                } else if ($tool === "form") {//For redirecting to form entry of the set dataId
+                    if (isset($this->view->getParamsToView()['dataId'])) {//Only show this when dataId is present
+                        $url = $this->links->url($this->params['component']['route'] . '/q/id/' . $this->view->getParamsToView()['dataId']);
+                        $tools .=
+                            '<a href="' . $url . '" class="btn btn-tool btn-tool-form-link disabled" role="button" hidden="">Form Link</a>' .
+                            '<script>
+                                $(document).ready(function() {
+                                    $(".btn-tool-form").click(function() {
+                                        BazContentLoader.loadAjax($(".btn-tool-form-link"), {
+                                            ajaxBefore                      : function () {
+                                                                                Pace.restart();
+                                                                                $("#baz-content").empty();
+                                                                                $("#loader").attr("hidden", false);
+                                                                            },
+                                            ajaxFinished                    : function () {
+                                                                                BazCore.updateBreadcrumb();
+                                                                                $("#loader").attr("hidden", true);
+                                                                                $(".tooltip").remove();
+                                                                            },
+                                            ajaxError                       : function () {
+                                                                                $("#loader").attr("hidden", true);
+                                                                                BazCore.updateBreadcrumb();
+                                                                            }
+                                        });
+                                        BazContentLoader.init();
+                                    });
+                                });
+                            </script>
+                            <button type="button" class="btn btn-tool btn-tool-form" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Form" data-card-widget="form">
+                                <i class="fas fa-fw fa-file-pen"></i>
+                            </button>';
+                    }
+                } else if ($tool === "activityLogs") {
+                    if (isset($this->view->getParamsToView()['dataId'])) {//Only show this when dataId is present
+                        $url = $this->links->url($this->params['component']['route'] . '/q/id/' . $this->view->getParamsToView()['dataId'] . '/activitylogs/true');
+                        $tools .=
+                            '<a href="' . $url . '" class="btn btn-tool btn-tool-activitylogs-link disabled" role="button" hidden="">Activity Logs Link</a>' .
+                            '<script>
+                                $(document).ready(function() {
+                                    $(".btn-tool-activitylogs").click(function() {
+                                        BazContentLoader.loadAjax($(".btn-tool-activitylogs-link"), {
+                                            ajaxBefore                      : function () {
+                                                                                Pace.restart();
+                                                                                $("#baz-content").empty();
+                                                                                $("#loader").attr("hidden", false);
+                                                                            },
+                                            ajaxFinished                    : function () {
+                                                                                BazCore.updateBreadcrumb();
+                                                                                $("#loader").attr("hidden", true);
+                                                                                $(".tooltip").remove();
+                                                                            },
+                                            ajaxError                       : function () {
+                                                                                $("#loader").attr("hidden", true);
+                                                                                BazCore.updateBreadcrumb();
+                                                                            }
+                                        });
+                                        BazContentLoader.init();
+                                    });
+                                });
+                            </script>
+                            <button type="button" class="btn btn-tool btn-tool-activitylogs" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Activity Logs" data-card-widget="activitylogs">
+                                <i class="fas fa-fw fa-list"></i>
+                            </button>';
+                    }
                 }
             }
         } else {

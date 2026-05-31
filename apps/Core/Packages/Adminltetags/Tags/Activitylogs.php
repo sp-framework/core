@@ -107,7 +107,11 @@ class Activitylogs extends Adminltetags
             if (isset($logs['account_id']) && $logs['account_id'] == 0) {
                 $title = '<span><i class="fas fa-fw fa-robot"></i> ' . $logs['account_full_name'] . ' </span>';
             } else {
-                $title = '<span><i class="fas fa-fw fa-user"></i> ' . $logs['account_full_name'] . ' (' . $logs['account_email'] . ') </span>';
+                if ($logs['account_portrait'] !== '') {
+                    $title = $logs['account_portrait'] . '<span class="ml-2">' . $logs['account_full_name'] . ' (' . $logs['account_email'] . ') </span>';
+                } else {
+                    $title = '<span><i class="fas fa-fw fa-user"></i> ' . $logs['account_full_name'] . ' (' . $logs['account_email'] . ') </span>';
+                }
             }
 
             $logContent = '<dl class="row">';
@@ -115,7 +119,7 @@ class Activitylogs extends Adminltetags
             foreach ($logs['log'] as $logKey => $log) {
                 if (!in_array($logKey, $this->params['disableKeys'])) {
                     if (array_key_exists($logKey, $this->params['replaceValues'])) {
-                        $log = $this->params['replaceValues'][$logKey][$log];
+                        $log = $this->params['replaceValues'][$logKey];
                     }
                     if (array_key_exists($logKey, $this->params['replaceKeys'])) {
                         $logKey = $this->params['replaceKeys'][$logKey];
@@ -168,10 +172,9 @@ class Activitylogs extends Adminltetags
                 '<div>
                     <i class="fas fa-fw fa-' . $icon . ' bg-' . $bg . '" style="border-radius: 0.25rem"></i>
                     <div class="timeline-item">
-                        <span class="time"><i class="fa fa-fw fa-clock"></i> ' . $logs['created_at'] .'</span>
-                        <h6 class="timeline-header text-secondary">' .  $title . '</h6>
+                        <span class="time p-2"><i class="fa fa-fw fa-clock"></i> ' . $logs['created_at'] .'</span>
+                        <h6 class="timeline-header p-2">' .  $title . '</h6>
                         <div class="timeline-body">' . $logContent . '</div>
-                        <div class="timeline-footer"></div>
                     </div>
                 </div>';
         }
@@ -195,6 +198,9 @@ class Activitylogs extends Adminltetags
                 $(".activity-logs-previous, .activity-logs-next").click(function(e) {
                     e.preventDefault();
 
+                    $("#baz-content").empty();
+                    $("#loader").attr("hidden", false);
+
                     var url = "' . $this->links->url($this->params['activityLogs']['postLink']) . '";
 
                     var postData = { };
@@ -209,7 +215,9 @@ class Activitylogs extends Adminltetags
                         postData["page"] = paginationCounters["next"];
                     }
 
-                    $("#baz-content").load(url, postData);
+                    $("#baz-content").load(url, postData, function() {
+                        $("#loader").attr("hidden", true);
+                    });
                 });
             </script>';
     }
