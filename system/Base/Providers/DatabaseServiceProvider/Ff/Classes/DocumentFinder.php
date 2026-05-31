@@ -88,29 +88,42 @@ class DocumentFinder
                 foreach ($conditions as $conditionKey => $conditionArr) {
                     if (is_array($conditionArr[0])) {
                         if (count($conditionArr) > 1) {
-                            $conditionsCount = [];
-
                             $this->processIndexes($conditionArr[0], $found, $skip, $limit);
 
-                            //Once our first condition is met, we do not process index anymore. We just process the data of first condition
+                            //Once our first condition is met, we do not process index any more. We just process the data of first condition
                             //This is like filtering. ex: we first search for data meeting one condition and once we have the data, we filter it
                             //using following conditions.
-                            // Else if it is AND search, we add more data to found and then strip it down.
-                            foreach ($conditionArr as $conditionArrKey => $conditionArrCondition) {
-                                if (is_array($conditionArrCondition[0])) {//For Or Condition
-                                    continue;
-                                }
+                            // Else if it is OR search, we add more data to found and then strip it down.
+                            $conditionsCount = [];
+                            if (count($found) === 0) {
+                                foreach ($conditionArr as $conditionArrKey => $conditionArrCondition) {
+                                    if ($conditionArrCondition === 'AND' || $conditionArrCondition === 'OR') {
+                                        continue;
+                                    }
 
-                                if ($conditionArrCondition === 'AND' || $conditionArrCondition === 'OR') {
-                                    continue;
-                                }
+                                    if (!is_array($conditionArrCondition[0])) {
+                                        if (isset($conditionsCount[$conditionArrCondition[0]])) {
+                                            array_push($conditionsCount[$conditionArrCondition[0]], $conditionArrKey);
+                                        } else {
+                                            $conditionsCount[$conditionArrCondition[0]] = [$conditionArrKey];
+                                        }
 
-                                if (isset($conditionsCount[$conditionArrCondition[0]])) {
-                                    $this->processIndexes($conditionArrCondition, $found, $skip, $limit);
+                                        $this->processIndexes($conditionArrCondition, $found, $skip, $limit);
+                                    } else {
+                                        foreach ($conditionArrCondition as $conditionArrConditionKey => $conditionArrConditionValue) {
+                                            if ($conditionArrConditionValue === 'AND' || $conditionArrConditionValue === 'OR') {
+                                                continue;
+                                            }
 
-                                    array_push($conditionsCount[$conditionArrCondition[0]], $conditionArrKey);
-                                } else {
-                                    $conditionsCount[$conditionArrCondition[0]] = [$conditionArrKey];
+                                            if (isset($conditionsCount[$conditionArrConditionValue[0]])) {
+                                                array_push($conditionsCount[$conditionArrConditionValue[0]], $conditionArrConditionKey);
+                                            } else {
+                                                $conditionsCount[$conditionArrConditionValue[0]] = [$conditionArrConditionKey];
+                                            }
+
+                                            $this->processIndexes($conditionArrConditionValue, $found, $skip, $limit);
+                                        }
+                                    }
                                 }
                             }
 
@@ -195,7 +208,6 @@ class DocumentFinder
                     }
                 }
             }
-
             if (count($found) > 0) {
                 if (!$this->store->criteriaCount) {
                     $this->store->criteriaCount = count($found);
@@ -303,6 +315,10 @@ class DocumentFinder
 
     protected function processIndexes($conditionArr, &$found, $skip = 0, $limit = 0)
     {
+        if (is_array($conditionArr[0])) {
+            return [];
+        }
+
         //Search for ID
         if (!in_array('id', $this->storeConfiguration['indexes'])) {
             array_push($this->storeConfiguration['indexes'], 'id');
