@@ -66,14 +66,40 @@ class Content extends Adminltetags
 
     protected function getContentTypeSection()
     {
-        return
+        $section = '';
+
+        if (isset($this->params['sectionSecondaryButtons']) && is_array($this->params['sectionSecondaryButtons'])) {
+            $sectionSecondaryButtons = $this->params['sectionSecondaryButtons'];
+        } else {
+            $sectionSecondaryButtons = [];
+        }
+
+        if (isset($this->params['sectionButtons']) && is_array($this->params['sectionButtons'])) {
+            $sectionButtons =
+                [
+                    'componentId'               => $this->params['componentId'],
+                    'sectionId'                 => $this->params['sectionId'],
+                    'buttonLabel'               => false,
+                    'buttonType'                => 'sectionWithButtons',
+                    'sectionButtons'            => $this->params['sectionButtons'],
+                    'sectionSecondaryButtons'   => $sectionSecondaryButtons
+                ];
+
+            $this->params['cardFooterContent'] = $this->useTag('buttons', $sectionButtons);
+        }
+
+        $section .=
             '<section id="' . $this->compSecId . '" class="section">' .
                 $this->useTag('card', $this->params) .
-            '</section>
-            <script>
+            '</section>';
+
+        $section .=
+            '<script>
                 window["dataCollection"]["env"]["currentComponentId"] = "' . $this->params['componentId'] . '";
                 window["dataCollection"]["env"]["parentComponentId"] = "' . $this->params['parentComponentId'] . '";
             </script>';
+
+        return $section;
     }
 
     protected function checkDataDependency()

@@ -266,7 +266,7 @@ class Button
     {
         if ($this->buttonParams['url'] !== '') {
             $this->content .=
-                '<a href="' . $this->buttonParams['url'] . '" ';
+                '<a target="_blank" href="' . $this->buttonParams['url'] . '" ';
         } else {
             $this->content .=
                 '<button ';
