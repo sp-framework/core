@@ -6910,7 +6910,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                 if (!reDraw) {
                     // Pagination
-                    if (datatableOptions.pagination && datatableOptions.paginationCounters.filtered_items > 20) {
+                    if (datatableOptions.pagination) {
                         $.extend(thisOptions.listOptions.datatable, {
                             paging : true,
                             pagingType : 'simple',
@@ -6939,6 +6939,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     }
 
                     thisOptions['datatable'] = $('#' + thisOptions.listOptions.tableName).DataTable(datatableOptions);
+                    thisOptions['datatableContainer'] = $('#' + thisOptions.listOptions.tableName).DataTable().table().container();
 
                     if (thisOptions.customFunctions.afterTableInit) {
                         if (datatableOptions.headerClass) {
@@ -7005,7 +7006,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     });
 
                 } else { //redraw used on pagination prev and next
-
                     if (thisOptions.customFunctions.beforeRedraw) {
                         thisOptions.customFunctions.beforeRedraw();
                     }
@@ -7385,6 +7385,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
             }
 
             _proto._drawCallback = function() {
+                if (datatableOptions.pagination && datatableOptions.paginationCounters.filtered_items > 20) {
+                    $('.dataTables_paginate', thisOptions['datatableContainer']).show();
+                    $('.dataTables_length', thisOptions['datatableContainer']).show();
+                } else {
+                    $('.dataTables_paginate', thisOptions['datatableContainer']).hide();
+                    $('.dataTables_length', thisOptions['datatableContainer']).hide();
+                }
+
                 if (datatableOptions.pagination &&
                     datatableOptions.paginationCounters.filtered_items > 20 &&
                     (datatableOptions.paginationCounters.filtered_items !== datatableOptions.paginationCounters.limit)
@@ -7465,7 +7473,6 @@ exports.BazContentSectionWithListing = BazContentSectionWithListing;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
-
 /* exported BazContentSectionWithStorage */
 /* globals  */
 /*
