@@ -56,6 +56,9 @@
     {% set moduleDescription = '' %}
     {% set moduleModule_type = type %}
     {% set moduleApp_type = '' %}
+    {% if selectedAppType is defined %}
+        {% set moduleApp_type = selectedAppType %}
+    {% endif %}
     {% set moduleCategory = '' %}
     {% set moduleApiId = '0' %}
     {% set moduleVersion = '0.0.0' %}

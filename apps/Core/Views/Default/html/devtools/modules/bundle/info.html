@@ -12,6 +12,10 @@
     {% set bundleName = '' %}
     {% set bundleDescription = '' %}
     {% set bundleApp_type = '' %}
+    {% set bundleApp_type = '' %}
+    {% if selectedAppType is defined %}
+        {% set bundleApp_type = selectedAppType %}
+    {% endif %}
     {% set bundleModule_type = 'bundles' %}
     {% set bundleApiId = '' %}
     {% set bundleVersion = '0.0.0' %}

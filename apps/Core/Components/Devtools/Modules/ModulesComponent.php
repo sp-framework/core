@@ -189,8 +189,8 @@ class ModulesComponent extends BaseComponent
 
 			if ($modulesArr['modules'] && count($modulesArr['modules']) > 0) {
 				if ($modulesType === 'views') {
-					if (isset($this->view->subview)) {
-						foreach ($modulesArr['modules'] as $moduleArrKey => $moduleArr) {
+					foreach ($modulesArr['modules'] as $moduleArrKey => $moduleArr) {
+						if ($this->view->subview) {
 							if (array_key_exists('is_subview', $moduleArr) &&
 								$moduleArr['is_subview'] == true
 							) {
@@ -198,10 +198,10 @@ class ModulesComponent extends BaseComponent
 							}
 							$modules[$modulesType]['value'] = ucfirst($modulesType);
 							$modules[$modulesType]['childs'][$moduleArrKey] = $moduleArr;
+						} else {
+							$modules[$modulesType]['value'] = ucfirst($modulesType);
+							$modules[$modulesType]['childs'] = $modulesArr['modules'];
 						}
-					} else if (!isset($this->view->subview)) {
-						$modules[$modulesType]['value'] = ucfirst($modulesType);
-						$modules[$modulesType]['childs'] = $modulesArr['modules'];
 					}
 				} else {
 					$modules[$modulesType]['value'] = ucfirst($modulesType);
@@ -244,7 +244,7 @@ class ModulesComponent extends BaseComponent
 				unset($modules['components']);
 				unset($modules['middlewares']);
 				unset($modules['bundles']);
-				if (!isset($this->view->subview)) {
+				if (!$this->view->subview) {
 					unset($modules['views']);
 				}
 			}
@@ -288,7 +288,6 @@ class ModulesComponent extends BaseComponent
 		$apis = $this->modulesPackage->getAvailableApis(false, true);
 
 		$this->view->modulesJson = '';
-
 		if (isset($this->getData()['id'])) {
 			$modulesJson = [];
 
@@ -353,7 +352,7 @@ class ModulesComponent extends BaseComponent
 			$this->view->moduleTypes = $this->modulesPackage->getModuleTypes();
 			$this->view->moduleSettings = $this->modulesPackage->getDefaultSettings();
 			$this->view->moduleFilters = $this->modulesPackage->getDefaultFilters();
-			if (isset($this->view->subview)) {
+			if ($this->view->subview) {
 				$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies($type, true);
 			} else {
 				$this->view->moduleDependencies = $this->modulesPackage->getDefaultDependencies($type);

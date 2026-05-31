@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+<!-- htmlhint tag-pair:false -->
 {% set apptypesURL = links.url('devtools/modules/q/module/true/type/apptypes/id/0') %}
 {% set componentsURL = links.url('devtools/modules/q/module/true/type/components/id/0') %}
 {% set packagesURL = links.url('devtools/modules/q/module/true/type/packages/id/0') %}
@@ -17,6 +17,8 @@
     {% set packagesURL = packagesURL ~ '/apptype/' ~ selectedAppType %}
     {% set middlewaresURL = middlewaresURL ~ '/apptype/' ~ selectedAppType %}
     {% set viewsURL = viewsURL ~ '/apptype/' ~ selectedAppType %}
+    {% set subViewsURL = subViewsURL ~ '/apptype/' ~ selectedAppType %}
+    {% set bundlesURL = bundlesURL ~ '/apptype/' ~ selectedAppType %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -331,4 +333,3 @@
         )}}
     </div>
 </div>
-<!-- htmlmin:ignore -->
