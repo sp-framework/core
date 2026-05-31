@@ -48,6 +48,8 @@ abstract class BasePackage extends Controller
 
 	protected $ffRelations = false;
 
+	protected $ffRelationsStores = [];
+
 	protected $ffRelationsConditions = false;
 
 	protected $ffAddUsingUpdateOrInsert = false;
@@ -80,6 +82,8 @@ abstract class BasePackage extends Controller
 		$this->ffStoreToUse = $model->getSource();
 
 		$this->ffRelations = false;
+
+		$this->ffRelationsStores = [];
 
 		$this->ffRelationsConditions = false;
 	}
@@ -215,7 +219,7 @@ abstract class BasePackage extends Controller
 					$this->ffStore = $this->ff->store($this->ffStoreToUse);
 				}
 
-				$this->ffData = $this->ffStore->findById($id, $this->ffRelations, $this->ffRelationsConditions);
+				$this->ffData = $this->ffStore->findById($id, $this->ffRelations, $this->ffRelationsConditions, $this->ffRelationsStores);
 
 				$this->setFfStoreToUse();
 
@@ -275,9 +279,9 @@ abstract class BasePackage extends Controller
 			}
 
 			if ($by === 'id') {
-				$this->ffData = $this->jsonData($this->ffStore->findById((int) $value, $this->ffRelations, $this->ffRelationsConditions), true);
+				$this->ffData = $this->jsonData($this->ffStore->findById((int) $value, $this->ffRelations, $this->ffRelationsConditions, $this->ffRelationsStores), true);
 			} else {
-				$this->ffData = $this->jsonData($this->ffStore->findOneBy([$by, '=', $value], $this->ffRelations, $this->ffRelationsConditions), true);
+				$this->ffData = $this->jsonData($this->ffStore->findOneBy([$by, '=', $value], $this->ffRelations, $this->ffRelationsConditions, $this->ffRelationsStores), true);
 			}
 
 			$this->setFfStoreToUse();
@@ -306,7 +310,7 @@ abstract class BasePackage extends Controller
 					$this->ffStore = $this->ff->store($this->ffStoreToUse);
 				}
 
-				$allPackages = $this->ffStore->findAll(null, null, null, $this->ffRelations, $this->ffRelationsConditions);
+				$allPackages = $this->ffStore->findAll(null, null, null, $this->ffRelations, $this->ffRelationsConditions, $this->ffRelationsStores);
 
 				$this->setFfStoreToUse();
 			}
@@ -413,6 +417,10 @@ abstract class BasePackage extends Controller
 			}
 
 			if (count($relationColumns) > 0) {
+				foreach ($relationColumns as $relationColumn) {
+					array_push($this->ffRelationsStores, $relationColumn['relationStore']);
+				}
+
 				$this->ffRelations = true;
 			}
 
@@ -443,14 +451,14 @@ abstract class BasePackage extends Controller
 			if (isset($params['conditions']) && is_array($params['conditions']) && count($params['conditions']) > 0) {
 				$this->ffData =
 					$this->ffStore->findBy(
-						$params['conditions'], $order, $limit, $offset, $this->ffRelations, $this->ffRelationsConditions
+						$params['conditions'], $order, $limit, $offset, $this->ffRelations, $this->ffRelationsConditions, $this->ffRelationsStores
 					);
 			} else if (isset($params['conditions']) &&
 					   ((is_array($params['conditions']) && count($params['conditions']) === 0) ||
 						 $params['conditions'] === ''
 					   )
 			) {
-				$this->ffData = $this->ffStore->findAll($order, $limit, $offset, $this->ffRelations, $this->ffRelationsConditions);
+				$this->ffData = $this->ffStore->findAll($order, $limit, $offset, $this->ffRelations, $this->ffRelationsConditions, $this->ffRelationsStores);
 			} else {
 				throw new \Exception('getByParams needs parameter conditions (array) to be set.');
 			}

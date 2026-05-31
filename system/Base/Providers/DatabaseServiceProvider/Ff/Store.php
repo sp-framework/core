@@ -299,7 +299,7 @@ class Store
         return $this->storeName;
     }
 
-    public function findAll(array $orderBy = null, int $limit = null, int $offset = null, $getRelations = false, $relationsConditions = false): array
+    public function findAll(array $orderBy = null, int $limit = null, int $offset = null, $getRelations = false, $relationsConditions = false, $relationsStores = []): array
     {
         try {
             $qb = $this->createQueryBuilder();
@@ -320,7 +320,7 @@ class Store
             if ($dataArr && count($dataArr) > 0) {
                 if ($getRelations) {
                     foreach ($dataArr as &$data) {
-                        $data = $this->getRelations($data, $relationsConditions);
+                        $data = $this->getRelations($data, $relationsConditions, $relationsStores);
                     }
                 }
             }
@@ -333,7 +333,7 @@ class Store
         return $this->data;
     }
 
-    public function findById($id, $getRelations = false, $relationsConditions = false)
+    public function findById($id, $getRelations = false, $relationsConditions = false, $relationsStores = [])
     {
         $id = $this->checkAndStripId($id);
 
@@ -346,7 +346,7 @@ class Store
         $data = @json_decode($content, true);
 
         if ($getRelations) {
-            $data = $this->getRelations($data, $relationsConditions);
+            $data = $this->getRelations($data, $relationsConditions, $relationsStores);
         }
 
         $this->data = $data;
@@ -354,7 +354,7 @@ class Store
         return $data;
     }
 
-    public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null, $getRelations = false, $relationsConditions = false): array
+    public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null, $getRelations = false, $relationsConditions = false, $relationsStores = []): array
     {
         if (count($criteria) === 1 &&
             $criteria[0][0] === 'id' &&
@@ -385,7 +385,7 @@ class Store
             if ($dataArr && count($dataArr) > 0) {
                 if ($getRelations) {
                     foreach ($dataArr as &$data) {
-                        $data = $this->getRelations($data, $relationsConditions);
+                        $data = $this->getRelations($data, $relationsConditions, $relationsStores);
                     }
                 }
             }
@@ -398,7 +398,7 @@ class Store
         return $this->data;
     }
 
-    public function findOneBy(array $criteria, $getRelations = false, $relationsConditions = false)
+    public function findOneBy(array $criteria, $getRelations = false, $relationsConditions = false, $relationsStores = [])
     {
         if (count($criteria) === 1 &&
             $criteria[0][0] === 'id'
@@ -413,7 +413,7 @@ class Store
         $result = $qb->getQuery()->first();
 
         if ($getRelations) {
-            $result = $this->getRelations($result, $relationsConditions);
+            $result = $this->getRelations($result, $relationsConditions, $relationsStores);
         }
 
         $this->data = (!empty($result)) ? $result : null;
@@ -1029,7 +1029,7 @@ class Store
         return $this->data;
     }
 
-    public function getRelations($data, $relationsConditions = false)
+    public function getRelations($data, $relationsConditions = false, $relationsStores = [])
     {
         if (count($data) === 0) {
             return $data;
@@ -1046,6 +1046,12 @@ class Store
         }
 
         foreach ($schema['relations'] as $relationKey => $relation) {
+            if (count($relationsStores) > 0) {
+                if (!in_array($relation['table'], $relationsStores)) {
+                    continue;
+                }
+            }
+
             if ($relation['type'] === 'belongsTo') {//We dont want to get relations if it belongs to. This will cause infinite loop!
                 continue;
             }
