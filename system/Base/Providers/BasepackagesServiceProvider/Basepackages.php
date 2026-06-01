@@ -25,6 +25,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Maintenance;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Messenger;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Murls;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Mutex;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Pages;
@@ -115,6 +116,8 @@ class Basepackages
 	protected $utils;
 
 	protected $murls;
+
+	protected $mutex;
 
 	protected $maintenance;
 
@@ -382,6 +385,13 @@ class Basepackages
 		$this->murls = (new Murls())->init();
 
 		return $this->murls;
+	}
+
+	protected function initMutex()
+	{
+		$this->mutex = (new Mutex())->init();
+
+		return $this->mutex;
 	}
 
 	protected function initMaintenance()

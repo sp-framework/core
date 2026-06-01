@@ -415,6 +415,13 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
+	public function releaseMutexAction()
+	{
+		if (isset($this->postData()['mutexLock']) && isset($this->postData()['mutexLock']['id'])) {
+			$this->basepackages->mutex->releaseMutex($this->postData()['mutexLock']);
+		}
+	}
+
 	public function setModuleSettings(bool $showModuleSettings = true)
 	{
 		$this->showModuleSettings = $showModuleSettings;

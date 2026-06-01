@@ -26,6 +26,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\ImportExport;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Messenger;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Murls;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Mutex;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Pages;
@@ -90,6 +91,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Basepackage
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesImportExport;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMenus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMurls;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMutex;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesPages;
@@ -263,6 +265,10 @@ class Schema
                 'basepackages_murls'                        => [
                         'schema'    => new Murls,
                         'model'     => new BasepackagesMurls,
+                    ],
+                'basepackages_mutex'                        => [
+                        'schema'    => new Mutex,
+                        'model'     => new BasepackagesMutex,
                     ],
                 'basepackages_filters'                      => [
                         'schema'    => new Filters,

@@ -54,6 +54,8 @@ abstract class BasePackage extends Controller
 
 	protected $ffAddUsingUpdateOrInsert = false;
 
+	protected $mutex = false;
+
 	public function onConstruct()
 	{
 		$this->packagesData = new PackagesData;
@@ -191,6 +193,28 @@ abstract class BasePackage extends Controller
 		return $this->request->getPut();
 	}
 
+	public function useMutex($mutex)
+	{
+		$this->mutex = $mutex;
+	}
+
+	protected function setMutex($data)
+	{
+		if (!$this->mutex || !isset($data['id'])) {
+			return;
+		}
+
+		if (!isset($this->view->mutexLock)) {
+			$this->view->mutexLock = [];
+		}
+
+		if ($mutexLock = $this->basepackages->mutex->getMutex($this->packageName, $data['id'])) {
+			if ($mutexLock['parent_lock_id'] === 0) {
+				$this->view->mutexLock = $mutexLock;
+			}
+		}
+	}
+
 	public function getById(int $id, bool $resetCache = false, bool $enableCache = true)
 	{
 		$this->buildGetQueryParamsArr();
@@ -224,7 +248,9 @@ abstract class BasePackage extends Controller
 				$this->setFfStoreToUse();
 
 				if (is_array($this->ffData) && count($this->ffData) > 0) {
-					return $this->jsonData($this->ffData, true);
+					$this->setMutex($this->ffData);
+
+					return $this->ffData = $this->jsonData($this->ffData, true);
 				}
 
 				return false;
@@ -256,20 +282,20 @@ abstract class BasePackage extends Controller
 			try {
 				$this->model = $this->modelToUse::findFirst($parameters);
 
-				$this->cacheTools->updateIndex(
-					$this->cacheName,
-					$parameters,
-					$this->model,
-					null,
-					true
-				);
+				$this->cacheTools->updateIndex($this->cacheName, $parameters, $this->model, null, true);
 
-				if (!$returnArray) {
-					return $this->model;
-				} else {
-					return $this->model->toArray();
+				if ($returnArray) {
+					$returnArray = [];
+					$returnArray = $this->model->toArray();
+
+					$this->setMutex($returnArray);
+
+					$this->view->data = $returnArray;
+
+					return $returnArray;
 				}
 
+				return $this->model;
 			} catch (\Exception $e) {
 				throw $e;
 			}
@@ -287,8 +313,10 @@ abstract class BasePackage extends Controller
 			$this->setFfStoreToUse();
 
 			if (is_array($this->ffData) && count($this->ffData) > 0) {
+				$this->setMutex($this->ffData);
+
 				if ($returnArray) {
-					return $this->ffData;
+					return $this->ffData = $this->jsonData($this->ffData, true);
 				}
 
 				return $this->ffStore;
@@ -1248,41 +1276,29 @@ abstract class BasePackage extends Controller
 	protected function getDbData($parameters, bool $enableCache = true, string $type = 'id', bool $returnArray = true)
 	{
 		if ($type === 'id') {
-			$this->packagesData->responseCode = 0;
-
-			$this->packagesData->responseMessage = 'Found';
-
-			if ($enableCache && $this->cacheName) {
-				$this->cacheTools->updateIndex(
-					$this->cacheName,
-					$parameters,
-					$this->model,
-					null,
-					true
-				);
-			}
-
-			return $this->model->toArray();
-
+			$list = null;
+			$id = true;
 		} else if ($type === 'params') {
-			if ($enableCache && $this->cacheName) {
-				$this->cacheTools->updateIndex(
-					$this->cacheName,
-					$parameters,
-					$this->model,
-					true,
-					null
-				);
-			}
-
-			if (!$returnArray) {
-				return $this->model;
-			} else {
-				return $this->model->toArray();
-			}
+			$list = true;
+			$id = null;
 		}
 
-		$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
+		if ($enableCache && $this->cacheName) {
+			$this->cacheTools->updateIndex($this->cacheName, $parameters, $this->model, $list, $id);
+		}
+
+		if ($returnArray) {
+			$returnArray = [];
+			$returnArray = $this->model->toArray();
+
+			$this->setMutex($returnArray);
+
+			$this->view->data = $returnArray;
+
+			return $returnArray;
+		} else {
+			return $this->model;
+		}
 
 		return false;
 	}
