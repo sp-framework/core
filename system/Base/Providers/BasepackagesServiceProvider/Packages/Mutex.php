@@ -42,6 +42,28 @@ class Mutex extends BasePackage
                 $mutex['parent_lock_id'] = 0;
             } else if (!static::$parentLock) {
                 static::$parentLock = $mutex['id'];
+            } else if ($mutex['parent_lock_id'] === 0 && static::$parentLock) {
+                //This situation will be when you open a child first and then open a parent.
+                //So the child has no parent as it is the parent.
+                //The parent in that case should be locked as the child is being modified.
+                $parent = $this->getById((int) static::$parentLock);
+
+                $parent['parent_lock_by_id'] = $mutex['id'];
+                $parent['parent_lock_by_package'] = $mutex['package_name'];
+
+                if ($parent['account_id'] === $mutex['account_id']) {
+                    $parent['self'] = true;
+                    $parent['account_name'] = $mutex['account_name'];
+                } else {
+                    $account = $this->basepackages->accounts->getAccountById($mutex['account_id']);
+
+                    if ($account && isset($account['contact']['full_name'])) {
+                        $parent['self'] = false;
+                        $parent['account_name'] = $account['contact']['full_name'];
+                    }
+                }
+                // trace([$mutex, $parent]);
+                return $parent;
             }
 
             return $mutex;
