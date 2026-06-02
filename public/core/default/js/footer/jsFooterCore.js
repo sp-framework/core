@@ -4094,6 +4094,10 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                                             }
                                             if ($(thisButtonId).is('.updateData')) {
                                                 $('body').trigger('sectionWithFormDataUpdated');
+                                                //Delete mutex entry from env
+                                                if (window['dataCollection']['env']['mutexLock'] && window['dataCollection']['env']['mutexLock']['self']) {
+                                                    delete(window['dataCollection']['env']['mutexLock']);
+                                                }
                                             }
                                             if (dataCollection[componentId] && dataCollection[componentId][sectionId][sectionId + '-form']['onSuccessResponse']) {
                                                 dataCollection[componentId] && dataCollection[componentId][sectionId][sectionId + '-form']['onSuccessResponse'](response);

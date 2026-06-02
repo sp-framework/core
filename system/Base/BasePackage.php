@@ -221,7 +221,7 @@ abstract class BasePackage extends Controller
 
 	protected function releaseMutex($data)
 	{
-		if (!isset($data['id'])) {
+		if (!$this->mutex || !isset($data['id'])) {
 			return;
 		}
 
@@ -1380,6 +1380,23 @@ abstract class BasePackage extends Controller
 	{
 		$data = $this->jsonData($data);
 
+		if (!isset($data['id'])) {
+			$this->addResponse("ID not set!", 1);
+
+			return false;
+		}
+
+		if ($this->mutex && $mutex = $this->basepackages->mutex->checkMutex($this->packageName, $data['id'])) {
+			if ($mutex['self'] === false) {
+				//Log here
+				$this->logger->log->error('Entry is locked by: ' . $mutex['account_name'] . '. It cannot be modified!');
+
+				$this->addResponse('Entry is locked by: ' . $mutex['account_name'] . '. It cannot be modified!', 1);
+
+				return false;
+			}
+		}
+
 		if (isset($data['updated_on'])) {
 			unset($data['updated_on']);
 		}
@@ -1388,11 +1405,9 @@ abstract class BasePackage extends Controller
 			${$this->packageNameModel} = $this->getFirst('id', $data['id'], false, false);
 
 			if (!${$this->packageNameModel}) {
-				$this->packagesData->responseCode = 1;
+				$this->addResponse("ID: {$data['id']} not found for package {$this->packageName}", 1);
 
-				$this->packagesData->responseMessage = 'ID: ' . $data['id'] . " not found for package {$this->packageName}";
-
-				return;
+				return false;
 			}
 
 			${$this->packageNameModel}->assign($data);
@@ -1459,6 +1474,10 @@ abstract class BasePackage extends Controller
 		} else {
 			//This might cause data to be encoded multiple times when being stored in the DB. check!
 			foreach ($data as $dataKey => $dataValue) {
+				if ($dataKey === 'id') {
+					$data[$dataKey] = (int) $dataValue;
+				}
+
 				if (is_array($dataValue)) {
 					$data[$dataKey] = $this->helper->encode($dataValue);
 				}
