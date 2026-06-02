@@ -193,9 +193,13 @@ abstract class BasePackage extends Controller
 		return $this->request->getPut();
 	}
 
-	public function useMutex($mutex)
+	public function useMutex($mutex, $timeout = null)
 	{
 		$this->mutex = $mutex;
+
+		if ($timeout) {
+			$this->basepackages->mutex->setTimeout($timeout);
+		}
 	}
 
 	protected function setMutex($data)

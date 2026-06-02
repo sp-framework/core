@@ -16,11 +16,23 @@ class Mutex extends BasePackage
 
     public $mutex;
 
+    protected $timeout = 300;//5 Min
+
     protected static $parentLock = null;
 
     public function init()
     {
         return $this;
+    }
+
+    public function setTimeout(int $timeout)
+    {
+        $this->timeout = $timeout;
+    }
+
+    public function getTimeout()
+    {
+        return $this->timeout;
     }
 
     public function getMutex($packageName, $packageRowId)
@@ -157,23 +169,40 @@ class Mutex extends BasePackage
 
         $mutex = $this->getByParams($params);
 
-        if ($mutex && count($mutex) > 0 && isset($mutex[0]['id']) && isset($mutex[0]['account_id'])) {
-            $account = $this->basepackages->accounts->getAccountById($mutex[0]['account_id']);
+        if ($mutex && count($mutex) > 0 && isset($mutex[0]['id'])) {
+            //Remove Mutex that has timed out.
+            foreach ($mutex as $mutexKey => $mutexValue) {
+                if (isset($mutexValue['locked_at']) && $mutexValue['locked_at'] > 0) {
+                    $currentTime = time();
 
-            if ($account && isset($account['contact']['full_name'])) {
-                $mutex[0]['account_name'] = $account['contact']['full_name'];
-                $mutex[0]['self'] = false;
+                    $lockedAtTime = $mutexValue['locked_at'] + $this->getTimeout();
 
-                if ($mutex[0]['account_id'] === $this->access->auth->account()['id']) {
-                    $mutex[0]['self'] = true;
+                    if ($currentTime > $lockedAtTime) {
+                        if ($this->remove($mutexValue['id'])) {
+                            unset($mutex[$mutexKey]);
+                        }
+                    }
                 }
-            } else {//User not found, we remove lock
-                $this->releaseMutex($mutex[0]['id']);
-
-                return false;
             }
 
-            return $mutex[0];
+            if (isset($mutex[0]['account_id'])) {
+                $account = $this->basepackages->accounts->getAccountById($mutex[0]['account_id']);
+
+                if ($account && isset($account['contact']['full_name'])) {
+                    $mutex[0]['account_name'] = $account['contact']['full_name'];
+                    $mutex[0]['self'] = false;
+
+                    if ($mutex[0]['account_id'] === $this->access->auth->account()['id']) {
+                        $mutex[0]['self'] = true;
+                    }
+                } else {//User not found, we remove lock
+                    $this->releaseMutex($mutex[0]['id']);
+
+                    return false;
+                }
+
+                return $mutex[0];
+            }
         }
 
         return false;
