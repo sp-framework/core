@@ -94,8 +94,9 @@
                         'componentId'   : componentId,
                         'sectionId'     : sectionId
                     });
-                    this._initSectionButtonsAndActions();
                 }
+
+                this._initSectionButtonsAndActions();
 
                 if ($('.btn-tool-reset-cache').length === 1) {
                     if (dataCollection.env.currentId == '0') {
@@ -410,7 +411,6 @@
             }
 
             _proto._sectionToObj = function _sectionToObj() {
-
                 if (!dataCollection[componentId][sectionId]['data']) {
                     dataCollection[componentId][sectionId]['data'] = { };
                 }
@@ -613,16 +613,13 @@
                 dataCollection[componentId][sectionId]['BazContentSectionWithForm'] = $(this).data(DATA_KEY);
                 options = $.extend({}, Default, options);
 
-                if (!dataCollection[componentId][sectionId]['BazContentSectionWithForm']) {
-                    dataCollection[componentId][sectionId]['BazContentSectionWithForm'] = new BazContentSectionWithForm($(this), options);
-                    $(this).data(DATA_KEY, typeof options === 'string' ? 'options need to be an object and not string' : options);
-                    dataCollection[componentId][sectionId]['BazContentSectionWithForm']._init(options);
-                } else {
+                if (dataCollection[componentId][sectionId]['BazContentSectionWithForm']) {
                     delete dataCollection[componentId][sectionId]['BazContentSectionWithForm'];
-                    dataCollection[componentId][sectionId]['BazContentSectionWithForm'] = new BazContentSectionWithForm($(this), options);
-                    $(this).data(DATA_KEY, typeof options === 'string' ? 'options need to be an object and not string' : options);
-                    dataCollection[componentId][sectionId]['BazContentSectionWithForm']._init(options);
                 }
+
+                dataCollection[componentId][sectionId]['BazContentSectionWithForm'] = new BazContentSectionWithForm($(this), options);
+                $(this).data(DATA_KEY, typeof options === 'string' ? 'options need to be an object and not string' : options);
+                dataCollection[componentId][sectionId]['BazContentSectionWithForm']._init(options);
             };
 
         return BazContentSectionWithForm;

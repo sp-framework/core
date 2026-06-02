@@ -87,9 +87,9 @@ var BazCore = function() {
                         async: true,
                         cache: true
                     }).done(function() {
-                        $('body').trigger('libsLoadComplete');
                         bazFooterFunctions(options);
                         dataCollection.env.libsLoaded = true;
+                        $('body').trigger('libsLoadComplete');
                     });
                 });
             }
