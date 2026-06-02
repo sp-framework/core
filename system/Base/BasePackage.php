@@ -219,6 +219,19 @@ abstract class BasePackage extends Controller
 		}
 	}
 
+	protected function releaseMutex($data)
+	{
+		if (!isset($data['id'])) {
+			return;
+		}
+
+		if ($mutexLock = $this->basepackages->mutex->checkMutex($this->packageName, $data['id'])) {
+			if ($mutexLock['parent_lock_id'] === 0) {
+				$this->basepackages->mutex->releaseMutex($mutexLock);
+			}
+		}
+	}
+
 	public function getById(int $id, bool $resetCache = false, bool $enableCache = true)
 	{
 		$this->buildGetQueryParamsArr();
@@ -1409,6 +1422,8 @@ abstract class BasePackage extends Controller
 					$this->resetCache($this->packagesData->last['id']);
 				}
 			}
+
+			$this->releaseMutex($this->packagesData->last);
 
 			return true;
 		} else {
