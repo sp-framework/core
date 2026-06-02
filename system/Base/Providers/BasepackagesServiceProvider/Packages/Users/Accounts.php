@@ -1399,7 +1399,7 @@ class Accounts extends BasePackage
 
                     if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                         $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
-                        $components[strtolower($app['id'])]['childs'][$key]['title'] = $component['name'];
+                        $components[strtolower($app['id'])]['childs'][$key]['title'] = strtoupper($component['name']);
                     }
                 }
             }
@@ -1432,8 +1432,9 @@ class Accounts extends BasePackage
                 }
 
                 if ($account['security']['permissions'] && $account['security']['permissions'] !== '') {
-                    if (is_string($account['security']['permissions'])) {
-                        $permissionsArr = $this->helper->decode($account['security']['permissions'], true);
+                    $permissionsArr = $account['security']['permissions'];
+                    if (is_string($permissionsArr)) {
+                        $permissionsArr = $this->helper->decode($permissionsArr, true);
                     }
                 } else {
                     $permissionsArr = [];

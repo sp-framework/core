@@ -88,10 +88,10 @@
                                     'tabInclude'        : 'profile/form/locale',
                                     'tabIncludeParams'  : ['profile' : profile, 'account' : account]
                                 ],
-                                'address'   :
+                                'addresses'   :
                                 [
-                                    'tabTitle'          : 'Address',
-                                    'tabInclude'        : 'profile/form/address',
+                                    'tabTitle'          : 'Addresses',
+                                    'tabInclude'        : 'profile/form/addresses',
                                     'tabIncludeParams'  : ['profile' : profile, 'account' : account]
                                 ],
                                 'security'   :
@@ -381,13 +381,13 @@ dataCollectionSection =
                 }
 
                 $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
-                    if (e.target.hash === '#core-profile-main-tabs-notifications') {
+                    if (e.target.hash === '#{{componentId}}-{{sectionId}}-tabs-notifications') {
                         fixGrid();
                     }
                 });
 
                 $('#{{componentId}}-{{sectionId}}-form-fields').on('select_node.jstree', function(e, data) {
-                    if (data.node.li_attr["data-tabid"] === 'core-profile-main-tabs-notifications') {
+                    if (data.node.li_attr["data-tabid"] === '{{componentId}}-{{sectionId}}-tabs-notifications') {
                         fixGrid();
                     }
                 });
@@ -557,7 +557,7 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-subscriptions-' + subscriptions[subscriptionAll] + '-unsubscribeall').click(function(e) {
                             e.preventDefault();
 
-                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-subscriptions-view-unsubscribeall') {
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-subscriptions-' + subscriptions[subscriptionAll] + '-unsubscribeall') {
                                 denyPermitAll(null, null, false, true);
                             } else {
                                 denyPermitAll(this, false, null, null);
@@ -565,7 +565,7 @@ dataCollectionSection =
                         });
                         $('#{{componentId}}-{{sectionId}}-subscriptions-' + subscriptions[subscriptionAll] + '-subscribeall').click(function(e) {
                             e.preventDefault();
-                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-subscriptions-view-subscribeall') {
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-subscriptions-' + subscriptions[subscriptionAll] + '-subscribeall') {
                                 denyPermitAll(this, true, null, true);
                             } else {
                                 denyPermitAll(this, true, null, null);

@@ -30,7 +30,7 @@ class AccountsComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $account = $this->accounts->generateViewData($this->getData()['id']);
+                $account = $this->accounts->generateViewData((int) $this->getData()['id']);
 
                 if (!$account) {
                     return $this->throwIdNotFound();
@@ -42,7 +42,7 @@ class AccountsComponent extends BaseComponent
             if ($account) {
                 $app = $this->apps->getAppInfo();
 
-                $middlewares = $this->modules->middlewares->getMiddlewaresForAppType($app['app_type'],null);
+                $middlewares = $this->modules->middlewares->middlewares;
 
                 $middlewareEnabledForApps = [];
 
@@ -66,6 +66,7 @@ class AccountsComponent extends BaseComponent
 
                 if (count($middlewareEnabledForApps) > 0) {
                     $this->view->aclMiddlewareEnabled = true;
+
                     foreach ($components as $key => $component) {
                         if (!in_array($component['id'], $middlewareEnabledForApps)) {
                             unset($components[$key]);

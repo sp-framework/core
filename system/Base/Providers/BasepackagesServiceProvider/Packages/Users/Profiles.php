@@ -483,90 +483,89 @@ class Profiles extends BasePackage
             'remove' => 'remove'
         ];
 
-        $appsArr = $this->apps->apps;
+        if (isset($account['can_login'][$this->app['id']]) && $account['can_login'][$this->app['id']] !== 0) {
+            $notifications_modules[$this->app['id']] =
+                [
+                    'title' => strtoupper($this->app['name']),
+                    'id' => strtoupper($this->app['id'])
+                ];
 
-        foreach ($appsArr as $appKey => $app) {
-            if (isset($account['can_login'][$app['id']])) {
-                $notifications_modules[$app['id']] =
-                    [
-                        'title' => strtoupper($app['name']),
-                        'id' => strtoupper($app['id'])
-                    ];
+            $allModules = array_merge(
+                msort($this->modules->components->getComponentsForAppId($this->app['id']), 'name'),
+                msort($this->modules->packages->getPackagesForAppId($this->app['id']), 'display_name')
+            );
 
-                $allModules['components'] = msort($this->modules->components->getComponentsForAppId($app['id']), 'name');
-                $allModules['packages'] = msort($this->modules->packages->getPackagesForAppId($app['id']), 'display_name');
+            $appHasNotifications = false;
+            if (count($allModules) > 0) {
+                foreach ($allModules as $module) {
+                    if (!isset($notifications_modules[$this->app['id']]['childs'][$module['module_type']])) {
+                        $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['title'] = strtoupper($module['module_type']);
+                    }
 
-                foreach ($allModules as $moduleType => $modules) {
-                    if ($modules && count($modules) > 0) {
-                        foreach ($modules as $moduleKey => $module) {
-                            if (!isset($notifications_modules[$app['id']]['childs'][$moduleType])) {
-                                $notifications_modules[$app['id']]['childs'][$moduleType]['title'] = strtoupper($moduleType);
-                            }
+                    if ($module['notification_subscriptions'] &&
+                        !is_array($module['notification_subscriptions']) &&
+                        $module['notification_subscriptions'] !== ''
+                    ) {
+                        $module['notification_subscriptions'] = $this->helper->decode($module['notification_subscriptions'], true);
+                    }
 
-                            if ($module['notification_subscriptions'] &&
-                                !is_array($module['notification_subscriptions']) &&
-                                $module['notification_subscriptions'] !== ''
-                            ) {
-                                $module['notification_subscriptions'] = $this->helper->decode($module['notification_subscriptions'], true);
-                            }
+                    $reflector = $this->annotations->get($module['class']);
+                    $methods = $reflector->getMethodsAnnotations();
 
-                            $reflector = $this->annotations->get($module['class']);
-                            $methods = $reflector->getMethodsAnnotations();
+                    if ($methods && count($methods) > 0) {
+                        foreach ($methods as $annotation) {
+                            if ($annotation->getAll('notification')) {
+                                $appHasNotifications = true;
 
-                            if ($methods && count($methods) > 0) {
-                                foreach ($methods as $annotation) {
-                                    if ($annotation->getAll('notification')) {
-                                        $notifications_modules[$app['id']]['childs'][$moduleType]['childs'][$moduleKey]['id'] = $module['id'];
-                                        if ($moduleType === 'packages') {
-                                            $notifications_modules[$app['id']]['childs'][$moduleType]['childs'][$moduleKey]['title'] = strtoupper($module['display_name']);
-                                        } else {
-                                            $notifications_modules[$app['id']]['childs'][$moduleType]['childs'][$moduleKey]['title'] = strtoupper($module['name']);
-                                        }
+                                $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['module_type']]['id'] = $module['id'];
+                                if ($module['module_type'] === 'packages') {
+                                    $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['module_type']]['title'] = strtoupper($module['display_name']);
+                                } else {
+                                    $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['module_type']]['title'] = strtoupper($module['name']);
+                                }
 
-                                        $thisSubscriptions = [];
-                                        $notification_action = $annotation->getAll('notification')[0]->getArguments();
-                                        $notification_allowed_methods = $annotation->getAll('notification_allowed_methods');
+                                $thisSubscriptions = [];
+                                $notification_action = $annotation->getAll('notification')[0]->getArguments();
+                                $notification_allowed_methods = $annotation->getAll('notification_allowed_methods');
 
-                                        if (count($notification_allowed_methods) > 0) {
-                                            $notification_allowed_methods = $annotation->getAll('notification_allowed_methods')[0]->getArguments();
-                                        }
+                                if (count($notification_allowed_methods) > 0) {
+                                    $notification_allowed_methods = $annotation->getAll('notification_allowed_methods')[0]->getArguments();
+                                }
 
-                                        $subscriptions[$notification_action['name']] = $notification_action['name'];
-                                        $thisSubscriptions[$notification_action['name']] = $notification_action['name'];
+                                $subscriptions[$notification_action['name']] = $notification_action['name'];
+                                $thisSubscriptions[$notification_action['name']] = $notification_action['name'];
 
-                                        if (count($notification_allowed_methods) > 0) {
-                                            foreach ($notification_allowed_methods as $allowedMethodKey => $allowedMethod) {
-                                                $subscriptions[$allowedMethod] = $allowedMethod;
-                                                $thisSubscriptions[$allowedMethod] = $allowedMethod;
-                                            }
-                                        }
+                                if (count($notification_allowed_methods) > 0) {
+                                    foreach ($notification_allowed_methods as $allowedMethodKey => $allowedMethod) {
+                                        $subscriptions[$allowedMethod] = $allowedMethod;
+                                        $thisSubscriptions[$allowedMethod] = $allowedMethod;
+                                    }
+                                }
 
-                                        if (isset($module['notification_subscriptions'][$app['id']])) {
-                                            foreach ($thisSubscriptions as $subscriptionKey => $subscriptionValue) {
-                                                if (isset($module['notification_subscriptions'][$app['id']][$subscriptionValue])) {
+                                if (isset($module['notification_subscriptions'][$this->app['id']])) {
+                                    foreach ($thisSubscriptions as $subscriptionKey => $subscriptionValue) {
+                                        if (isset($module['notification_subscriptions'][$this->app['id']][$subscriptionValue])) {
 
-                                                    if ($subscriptionValue === 'email') {
-                                                        if (isset($module['notification_subscriptions'][$app['id']][$subscriptionValue][$account['id']])) {
-                                                            $notifications[$app['id']][$moduleType][$module['id']][$subscriptionValue] = 1;
-                                                        } else {
-                                                            $notifications[$app['id']][$moduleType][$module['id']][$subscriptionValue] = 0;
-                                                        }
-                                                    } else {
-                                                        if (in_array($account['id'], $module['notification_subscriptions'][$app['id']][$subscriptionValue])) {
-                                                            $notifications[$app['id']][$moduleType][$module['id']][$subscriptionValue] = 1;
-                                                        } else {
-                                                            $notifications[$app['id']][$moduleType][$module['id']][$subscriptionValue] = 0;
-                                                        }
-                                                    }
+                                            if ($subscriptionValue === 'email') {
+                                                if (isset($module['notification_subscriptions'][$this->app['id']][$subscriptionValue][$account['id']])) {
+                                                    $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 1;
                                                 } else {
-                                                    $notifications[$app['id']][$moduleType][$module['id']][$subscriptionValue] = 0;
+                                                    $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                                }
+                                            } else {
+                                                if (in_array($account['id'], $module['notification_subscriptions'][$this->app['id']][$subscriptionValue])) {
+                                                    $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 1;
+                                                } else {
+                                                    $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
                                                 }
                                             }
                                         } else {
-                                            foreach ($thisSubscriptions as $subscriptionKey => $subscriptionValue) {
-                                                $notifications[$app['id']][$moduleType][$module['id']][$subscriptionValue] = 0;
-                                            }
+                                            $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
                                         }
+                                    }
+                                } else {
+                                    foreach ($thisSubscriptions as $subscriptionKey => $subscriptionValue) {
+                                        $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
                                     }
                                 }
                             }
@@ -574,9 +573,12 @@ class Profiles extends BasePackage
                     }
                 }
 
-                if (!isset($notifications_modules[$app['id']]['childs'])) {
-                    unset($notifications_modules[$app['id']]);
+                if (!isset($notifications_modules[$this->app['id']]['childs'])) {
+                    unset($notifications_modules[$this->app['id']]);
                 }
+            }
+            if (!$appHasNotifications) {
+                unset($notifications_modules[$this->app['id']]);
             }
         }
 

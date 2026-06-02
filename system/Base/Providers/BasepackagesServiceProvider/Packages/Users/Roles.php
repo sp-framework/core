@@ -164,7 +164,7 @@ class Roles extends BasePackage
 
                     if ($methods && count($methods) > 2 && isset($methods['viewAction'])) {
                         $components[strtolower($app['id'])]['childs'][$key]['id'] = $component['id'];
-                        $components[strtolower($app['id'])]['childs'][$key]['title'] = $component['name'];
+                        $components[strtolower($app['id'])]['childs'][$key]['title'] = strtoupper($component['name']);
                     }
                 }
             }
@@ -215,6 +215,9 @@ class Roles extends BasePackage
                                         }
                                         $acls[$action['name']] = $action['name'];
                                         if (isset($permissionsArr[$app['id']][$component['id']])) {
+                                            if (!isset($permissionsArr[$app['id']][$component['id']][$action['name']])) {
+                                                $permissionsArr[$app['id']][$component['id']][$action['name']] = 0;
+                                            }
                                             $permissions[$app['id']][$component['id']] = $permissionsArr[$app['id']][$component['id']];
                                         } else {
                                             $permissions[$app['id']][$component['id']][$action['name']] = 0;

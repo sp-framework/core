@@ -223,7 +223,10 @@ gridColumns.push(
     }
 );
 
+var aclsForApp = [];
 for (var acl in acls) {
+    aclsForApp.push(acl);
+
     gridColumns.push(
         {
             header          :   '<p class="text-center mb-0">' +
@@ -248,6 +251,7 @@ for (var acl in acls) {
         }
     );
 }
+
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -296,11 +300,11 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-override_role'   : {
             'afterInit' : function () {
-
                 function fixGrid() {
                     var gridCount = $('.jstree-grid-column').length - 1;
                     var gridWidth = $('.jstree-grid-wrapper').width();
                     var colWidth = (gridWidth - 300) / gridCount;
+
                     $('.jstree-grid-column').each(function(index,grid) {
                         if (index !== 0) {
                             $(grid).css({
@@ -353,13 +357,13 @@ dataCollectionSection =
                 }
 
                 $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
-                    if (e.target.hash === '#admin-accounts-main-tabs-permissions') {
+                    if (e.target.hash === '#{{componentId}}-{{sectionId}}-tabs-permissions') {
                         fixGrid();
                     }
                 });
 
                 $('#{{componentId}}-{{sectionId}}-form-fields').on('select_node.jstree', function(e, data) {
-                    if (data.node.li_attr["data-tabid"] === 'admin-accounts-main-tabs-permissions') {
+                    if (data.node.li_attr["data-tabid"] === '{{componentId}}-{{sectionId}}-tabs-permissions') {
                         fixGrid();
                     }
                 });
@@ -397,7 +401,38 @@ dataCollectionSection =
                     }
                 }
 
+                var parentJstreeIds = [];
+                var parentIds = [];
+
                 $.each(allIds, function(index, obj) {
+                    if (obj.parent === '#') {
+                        parentJstreeIds.push(obj.id);
+                        parentIds.push(obj.data.id);
+
+                        $('.jstree-grid-wrapper')
+                            .find('[data-jstreegrid="' + obj.id + '"]')
+                            .each(function(index, column) {
+                                $(column).html('<p class="text-center mb-0">' +
+                                    '<span class="cursor-pointer">' +
+                                        '<i id="{{componentId}}-{{sectionId}}-app-' + obj.data.id + '-denyall" ' +
+                                            'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                            'data-original-title="Deny all ' + obj.data.id + '" class="fas fa-fw fa-times-circle ' +
+                                            'mr-1 text-danger helper app-' + obj.data.id + '" data-app-id="' + obj.data.id + '" data-type="' +
+                                            aclsForApp[index] + '" data-permission="deny">' +
+                                        '</i>' +
+                                    '</span> | ' +
+                                    ' <span class="cursor-pointer">' +
+                                        '<i id="{{componentId}}-{{sectionId}}-app-' + obj.data.id + '-permitall" ' +
+                                            'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                            'data-original-title="Permit all ' + obj.data.id + '" class="fas fa-fw fa-check-circle ' +
+                                            'ml-1 text-success helper app-' + obj.data.id + '" data-app-id="' + obj.data.id + '" data-type="' +
+                                            aclsForApp[index] + '" data-permission="permit">' +
+                                        '</i>' +
+                                    '</span>' +
+                                '</p>');
+                            });
+                    }
+
                     if (gridData[obj.id]) {
                         var jstreeIdStructure =
                             $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['jstree'])
@@ -422,6 +457,7 @@ dataCollectionSection =
                             .find('[data-jstreegrid="' + jstreeGridId + '"]')
                             .each(function(index, column) {
                                 var permission, spanClass, spanData;
+
                                 var spanClasses = $(this).children('span').attr("class").split(/\s+/);
                                 $(spanClasses).each(function(index, sclass) {
                                     if (sclass.search(/ACL-.*/) === 0) {
@@ -442,10 +478,13 @@ dataCollectionSection =
                                     spanClass = 'na';
                                     spanData = '<p class="text-secondary">-</p>';
                                 }
+                                $(this).children('span').data('app-id', gridData[jstreeGridId]['app_id']);
+                                $(this).children('span').attr('data-app-id', gridData[jstreeGridId]['app_id']);
                                 $(this).children('span').addClass(spanClass).html(spanData);
                             }
                         );
                     }
+
                     extractData();
                 }
                 buildPermissionsGrid(gridData);
@@ -477,6 +516,10 @@ dataCollectionSection =
                 //Click Toggle
                 $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['jstree'])
                     .on('select_cell.jstree-grid', function(e, data) {
+                        if (parentJstreeIds.includes($(data.node)[0].id)) {
+                            return;
+                        }
+
                         toggleGridCell($(data.grid)[0].id, $(data.node)[0].id, false, null);
                     }
                 );
@@ -580,8 +623,8 @@ dataCollectionSection =
                                 }
                             }
                         }
-
                     }
+
                     extractData();
                 }
 
@@ -600,21 +643,45 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-permissions-' + acls[aclAll] + '-denyall').click(function(e) {
                             e.preventDefault();
 
-                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-permissions-view-denyall') {
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-permissions-' + acls[aclAll] + '-denyall') {
                                 denyPermitAll(null, null, false, true);
                             } else {
                                 denyPermitAll(this, false, null, null);
                             }
                         });
+
                         $('#{{componentId}}-{{sectionId}}-permissions-' + acls[aclAll] + '-permitall').click(function(e) {
                             e.preventDefault();
-                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-permissions-view-permitall') {
+
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-permissions-' + acls[aclAll] + '-permitall') {
                                 denyPermitAll(this, true, null, true);
                             } else {
                                 denyPermitAll(this, true, null, null);
                             }
                         });
                     }
+
+                    $(parentIds).each(function(index, id) {
+                        $('#{{componentId}}-{{sectionId}}-app-' + id + '-denyall, #{{componentId}}-{{sectionId}}-app-' + id + '-permitall').click(function(e) {
+                            e.preventDefault();
+
+                            var thisButon = $(this);
+
+                            $('span.' + $(this).data('type') + '[data-app-id="' + $(this).data('app-id') + '"]').each(function(index, span) {
+                                if ($(thisButon).data('permission') === 'permit') {
+                                    $(span).removeClass('text-danger').addClass('text-success');
+                                    $(span).html('<i class="fas fa-fw fa-check-circle"></i>');
+                                    gridData[$(this).parent().data('jstreegrid')]['permissions'][$(thisButon).data('type')] = 1;
+                                } else if ($(thisButon).data('permission') === 'deny') {
+                                    $(span).removeClass('text-success').addClass('text-danger');
+                                    $(span).html('<i class="fas fa-fw fa-times-circle"></i>');
+                                    gridData[$(this).parent().data('jstreegrid')]['permissions'][$(thisButon).data('type')] = 0;
+                                }
+                            });
+
+                            extractData();
+                        });
+                    });
                 })();
 
                 // Function to make bulk changes
@@ -627,10 +694,12 @@ dataCollectionSection =
                     // Deny All in that Column
                     $.each(allIds, function(index, child) {
                         if (denyPermitPermissionIconId) {
-                            toggleGridCell(
-                                $('.jstree-grid-wrapper')
-                                .find('[data-jstreegrid="' + child.id + '"]')[colNum].id, child.id, true, permit
-                            );
+                            if (child.parent !== '#') {
+                                toggleGridCell(
+                                    $('.jstree-grid-wrapper')
+                                    .find('[data-jstreegrid="' + child.id + '"]')[colNum].id, child.id, true, permit
+                                );
+                            }
                         } else {
                             $('.jstree-grid-wrapper').find('[data-jstreegrid="' + child.id + '"]')
                                 .children('span')
@@ -670,6 +739,7 @@ dataCollectionSection =
                     if (!dataCollectionSection['data']['permissions']) {
                         dataCollectionSection['data']['permissions'] = { };
                     }
+
                     var data = dataCollectionSection['data']['permissions'];
 
                     for (var app in permissions) {
@@ -682,6 +752,7 @@ dataCollectionSection =
                     }
                 }
             }
-        }),
+        })
 });
+
 </script>
