@@ -48,7 +48,9 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 }
 dataCollectionSectionForm['funcs'] = { };
 dataCollectionSectionForm['vars'] = { };
-dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+$(document).ready(function() {
+    dataCollectionSectionForm['vars']['url'] = window['dataCollection']['env']['currentRoute'];
+});
 dataCollectionSectionForm['vars']['bulkActions'] = { };
 
 dataCollectionSection =
@@ -518,6 +520,9 @@ dataCollectionSectionForm['funcs']['performBulkAction'] = function(buttonID) {
     var buttonIDArr = buttonID.split('-');
     postData['task'] = buttonIDArr[buttonIDArr.length - 1];
 
+    $('#' + buttonID).parent().siblings().attr('disabled', true)
+    $('#' + buttonID).parent().siblings().children().removeClass('fa-wand-magic-sparkles').addClass('fa-cog fa-spin');
+
     $.post('{{links.url("devtools/modules/bulk")}}', postData, function(response) {
         if (response.tokenKey && response.token) {
             $('#security-token').attr('name', response.tokenKey);
@@ -534,6 +539,9 @@ dataCollectionSectionForm['funcs']['performBulkAction'] = function(buttonID) {
             }
         } else {
             paginatedPNotify('error', {'text': response.responseMessage});
+
+            $('#' + buttonID).parent().siblings().attr('disabled', true)
+            $('#' + buttonID).parent().siblings().children().removeClass('fa-cog fa-spin').addClass('fa-wand-magic-sparkles');
         }
     }, 'json');
 }
