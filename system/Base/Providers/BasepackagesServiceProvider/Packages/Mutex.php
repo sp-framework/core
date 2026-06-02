@@ -119,27 +119,42 @@ class Mutex extends BasePackage
             return false;
         }
 
-        if ($mutex = $this->getById((int) $data['id'])) {
-            if ($mutex['account_id'] === $this->access->auth->account()['id']) {
-                if ($mutex['parent_lock_id'] === 0) {
-                    $childs = $this->getChilds($data['id']);
+        if (!isset($data['mutexLock']['id']) && isset($data['id'])) {
+            $data['mutexLock'] = $data;
+        }
 
-                    if ($childs && count($childs) > 0) {
-                        foreach ($childs as $child) {
-                            $this->remove($child['id']);
-                        }
-                    }
-
-                    if ($this->remove($data['id'])) {
-                        return true;
-                    }
-                }
+        if ($mutex = $this->getById((int) $data['mutexLock']['id'])) {
+            if ($this->access->auth->account()['id'] === 1 ||
+                ($mutex['account_id'] === $this->access->auth->account()['id'])
+            ) {
+                return $this->removeParentAndChilds($data, $mutex);
             } else {
+                if (isset($data['forceRelease']) && $data['forceRelease'] == 'true') {
+                    return $this->removeParentAndChilds($data, $mutex);
+                }
+
                 return true;
             }
         }
 
         return false;
+    }
+
+    protected function removeParentAndChilds($data, $mutex)
+    {
+        if ($mutex['parent_lock_id'] === 0) {
+            $childs = $this->getChilds($data['mutexLock']['id']);
+
+            if ($childs && count($childs) > 0) {
+                foreach ($childs as $child) {
+                    $this->remove($child['id']);
+                }
+            }
+
+            if ($this->remove($data['mutexLock']['id'])) {
+                return true;
+            }
+        }
     }
 
     public function checkMutex($packageName, $packageRowId)
@@ -178,6 +193,14 @@ class Mutex extends BasePackage
                     $lockedAtTime = $mutexValue['locked_at'] + $this->getTimeout();
 
                     if ($currentTime > $lockedAtTime) {
+                        $childs = $this->getChilds($mutexValue['id']);
+
+                        if ($childs && count($childs) > 0) {
+                            foreach ($childs as $child) {
+                                $this->remove($child['id']);
+                            }
+                        }
+
                         if ($this->remove($mutexValue['id'])) {
                             unset($mutex[$mutexKey]);
                         }
@@ -194,6 +217,20 @@ class Mutex extends BasePackage
 
                     if ($mutex[0]['account_id'] === $this->access->auth->account()['id']) {
                         $mutex[0]['self'] = true;
+                    } else {
+                        $mutex[0]['can_remove_lock'] = false;
+
+                        $mutexComponent = $this->modules->components->getComponentByRoute('system/mutex');
+
+                        if ($mutexComponent) {
+                            if ($this->access->auth->account()['role']['id'] == '1' ||
+                                (isset($this->access->auth->account()['role']['permissions']['1'][$mutexComponent['id']]['remove']) &&
+                                $this->access->auth->account()['role']['permissions']['1'][$mutexComponent['id']]['remove'] == '1')
+
+                            ) {
+                                $mutex[0]['can_remove_lock'] = true;
+                            }
+                        }
                     }
                 } else {//User not found, we remove lock
                     $this->releaseMutex($mutex[0]['id']);
@@ -228,5 +265,12 @@ class Mutex extends BasePackage
         }
 
         return $this->getByParams($params);
+    }
+
+    protected function dbLock()
+    {
+        //We can extend this package to actually lock the Ids at DB level using
+        //https://github.com/php-lock/lock
+        //composer require malkusch/lock
     }
 }
