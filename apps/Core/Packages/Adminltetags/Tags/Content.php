@@ -190,13 +190,26 @@ class Content extends Adminltetags
                 (isset($this->view->getParamsToView()['mutexLock']['self']) &&
                  $this->view->getParamsToView()['mutexLock']['self'] === false)
             ) {
-                $paramsFormButtons = $this->params['formButtons'];
+                if (isset($this->view->getParamsToView()['mutexLock']['can_remove_lock']) &&
+                    $this->view->getParamsToView()['mutexLock']['can_remove_lock'] == 'true'
+                ) {
+                    $paramsFormButtons = $this->params['formButtons'];
+                    unset($this->params['formButtons']);
 
-                unset($this->params['formButtons']);
+                    $this->params['formButtons']['updateButtonId'] = $paramsFormButtons['updateButtonId'];
+                    $this->params['formButtons']['updateActionUrl'] = $paramsFormButtons['updateActionUrl'];
+                    $this->params['formButtons']['updateSuccessRedirectUrl'] = $paramsFormButtons['updateSuccessRedirectUrl'];
+                    $this->params['formButtons']['cancelActionUrl'] = $paramsFormButtons['cancelActionUrl'];
+                    $this->params['mutexLock'] = $this->view->getParamsToView()['mutexLock'];
+                } else {
+                    $paramsFormButtons = $this->params['formButtons'];
 
-                $this->params['formButtons']['updateButtonId'] = $paramsFormButtons['updateButtonId'];
-                $this->params['formButtons']['closeActionUrl'] = $paramsFormButtons['closeActionUrl'];
-                $this->params['mutexLock'] = $this->view->getParamsToView()['mutexLock'];
+                    unset($this->params['formButtons']);
+
+                    $this->params['formButtons']['updateButtonId'] = $paramsFormButtons['updateButtonId'];
+                    $this->params['formButtons']['closeActionUrl'] = $paramsFormButtons['closeActionUrl'];
+                    $this->params['mutexLock'] = $this->view->getParamsToView()['mutexLock'];
+                }
             }
 
             $formButtons =

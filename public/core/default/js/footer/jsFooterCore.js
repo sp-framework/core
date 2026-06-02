@@ -3823,6 +3823,61 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                         BazCore.bazContent();
                     }
                 }
+
+                if ($('.btn-tool-unlock').length === 1) {
+                    $('.btn-tool-unlock').off();
+                    $('.btn-tool-unlock').click(function(e) {
+                        e.preventDefault();
+
+                        var thisButton = this;
+                        var swalSound = window.dataCollection.env.sounds.swalSound;
+
+                        Swal.fire({
+                            title                       : '<span class="text-warning"> Force remove lock?</span>',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Yes',
+                            cancelButtonText            : 'No',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-warning text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                //Release and delete mutex entry from env
+                                var postData = { };
+                                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                postData['mutexLock'] = window['dataCollection']['env']['mutexLock'];
+                                postData['forceRelease'] = true;
+
+                                var url = window['dataCollection']['env']['rootPath'] + window['dataCollection']['env']['currentRoute'] + '/releaseMutex';
+
+                                $.post(url, postData, function(response) {
+                                    if (response.tokenKey && response.token) {
+                                        $("#security-token").attr("name", response.tokenKey);
+                                        $("#security-token").val(response.token);
+                                    }
+
+                                    if (response.responseCode == '0') {
+                                        $(thisButton).parents('.card-header').removeClass('bg-warning').addClass('bg-primary');
+                                        $(thisButton).siblings().children().removeClass('text-primary').addClass('text-white');
+                                        $(thisButton).remove();
+                                        delete(window['dataCollection']['env']['mutexLock']);
+                                    }
+                                }, 'json');
+                            }
+                        });
+                    });
+                }
             };
 
             _proto._validateForm = function _validateForm() {
