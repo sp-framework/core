@@ -94,6 +94,23 @@ class Card extends Adminltetags
         $cardTitle = strtoupper($this->params['cardTitle']) :
         $cardTitle = 'MISSING TITLE';
 
+        if (isset($this->params['mutexLock'])) {
+            if (isset($this->view->getParamsToView()['mutexLock']['parent_lock_by_id']) ||
+                (isset($this->view->getParamsToView()['mutexLock']['self']) &&
+                 $this->view->getParamsToView()['mutexLock']['self'] === false)
+            ) {
+                if (isset($this->params['mutexLock']['account_name'])) {
+                    $cardType = "bg-warning";
+                    $cardTitle = $cardTitle . ' (';
+                    $cardTitle = $cardTitle . 'LOCKED BY : ' . strtoupper($this->view->getParamsToView()['mutexLock']['account_name']);
+                    if (isset($this->view->getParamsToView()['mutexLock']['parent_lock_by_id'])) {
+                        $cardTitle = $cardTitle . ' VIA : ' . strtoupper($this->view->getParamsToView()['mutexLock']['parent_lock_by_package']);
+                    }
+                    $cardTitle = $cardTitle . ')';
+                }
+            }
+        }
+
         isset($this->params['cardSpanType']) && isset($this->params['cardSpanText']) ?
         $cardSpan =
             '<span class="badge bg-' . $this->params['cardSpanType'] . '">' .
@@ -279,13 +296,10 @@ class Card extends Adminltetags
             '';
 
         if (isset($this->params['cardBodyContent'])) {
-
             $cardBody = $this->params['cardBodyContent'];
-
         } else if (isset($this->params['cardBodyInclude']) &&
                    isset($this->params['cardBodyIncludeParams'])
         ) {
-
             $cardBody =
                 $this->view->getPartial(
                     $this->params['cardBodyInclude'],
@@ -314,14 +328,12 @@ class Card extends Adminltetags
             } else if (isset($this->params['cardFooterInclude']) &&
                        isset($this->params['cardFooterIncludeParams'])
             ) {
-
                 $cardFooter =
                     $this->view->getPartial(
                         $this->params['cardFooterInclude'],
                         $this->params['cardFooterIncludeParams']
                     );
             } else if (isset($this->params['cardFooterInclude'])) {
-
                 $cardFooter =
                     $this->view->getPartial(
                         $this->params['cardFooterInclude'],

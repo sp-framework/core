@@ -173,7 +173,32 @@ class Content extends Adminltetags
             $formSecondaryButtons = [];
         }
 
+        if (isset($this->view->getParamsToView()['canAdd'])) {
+            $this->params['formButtons']['canAdd'] = $this->view->getParamsToView()['canAdd'];
+        }
+        if (isset($this->view->getParamsToView()['canUpdate'])) {
+            $this->params['formButtons']['canUpdate'] = $this->view->getParamsToView()['canUpdate'];
+        }
+
+        $this->params['mutexLock'] = null;
         if (isset($this->params['formButtons']) && is_array($this->params['formButtons'])) {
+            if (isset($this->view->getParamsToView()['mutexLock'])) {
+                $this->params['mutexLock'] = $this->view->getParamsToView()['mutexLock'];
+            }
+
+            if (isset($this->view->getParamsToView()['mutexLock']['parent_lock_by_id']) ||
+                (isset($this->view->getParamsToView()['mutexLock']['self']) &&
+                 $this->view->getParamsToView()['mutexLock']['self'] === false)
+            ) {
+                $paramsFormButtons = $this->params['formButtons'];
+
+                unset($this->params['formButtons']);
+
+                $this->params['formButtons']['updateButtonId'] = $paramsFormButtons['updateButtonId'];
+                $this->params['formButtons']['closeActionUrl'] = $paramsFormButtons['closeActionUrl'];
+                $this->params['mutexLock'] = $this->view->getParamsToView()['mutexLock'];
+            }
+
             $formButtons =
                 [
                     'componentId'            => $this->params['componentId'],
@@ -195,8 +220,15 @@ class Content extends Adminltetags
         $sectionForm .=
             '<script>
                 window["dataCollection"]["env"]["currentComponentId"] = "' . $this->params['componentId'] . '";
-                window["dataCollection"]["env"]["parentComponentId"] = "' . $this->params['parentComponentId'] . '";
-            </script>';
+                window["dataCollection"]["env"]["parentComponentId"] = "' . $this->params['parentComponentId'] . '";';
+
+        if ($this->params['mutexLock'] && count($this->params['mutexLock']) > 0) {
+            $sectionForm .=
+                'window["dataCollection"]["env"]["mutexLock"] = JSON.parse("' . $this->escaper->js($this->helper->encode($this->params['mutexLock'])) . '");';
+        }
+
+        $sectionForm .=
+            '</script>';
 
         return $sectionForm;
     }
