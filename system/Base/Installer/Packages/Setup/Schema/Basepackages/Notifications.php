@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Notifications
 {
@@ -105,5 +106,24 @@ class Notifications
                     )
                 ]
             ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'package_name',
+                    'package_row_id',
+                    'notification_type',
+                    'account_id',
+                    'read',
+                    'archive'
+                ],
+                'INDEX'
+            )
+        ];
     }
 }

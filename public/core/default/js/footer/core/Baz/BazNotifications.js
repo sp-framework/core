@@ -209,7 +209,9 @@ var BazNotifications = function() {
         console.log(type, response);
         if (response.responseCode == 0) {
             if (response.responseData && response.responseData.count && response.responseData.mute !== 'undefined') {
-                getNotificationsCount(response.responseData);
+                if (response.responseData.app && response.responseData.app === window.dataCollection.env.appRoute) {
+                    getNotificationsCount(response.responseData);
+                }
             } else {
                 getNotificationsCount();
             }

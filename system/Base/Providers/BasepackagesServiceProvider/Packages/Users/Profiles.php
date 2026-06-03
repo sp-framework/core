@@ -261,6 +261,13 @@ class Profiles extends BasePackage
             $profile['settings'] = $this->helper->encode($profile['settings']);
         }
 
+        if ($this->opCache && $this->opCache->checkCache('components', 'core')) {
+            $this->opCache->removeCache('components', 'core');
+        }
+        if ($this->opCache && $this->opCache->checkCache('packages', 'core')) {
+            $this->opCache->removeCache('packages', 'core');
+        }
+
         if ($this->update($profile)) {
             $this->basepackages->storages->changeOrphanStatus($data['portrait'], $portrait);
 
