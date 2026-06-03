@@ -86,7 +86,9 @@ return
 		],
 		"timeout"			=>
 		[
-			"cookies"						=> 86400
+			"cookies"						=> 86400,
+			"session_idle" 					=> 86400,
+			"session_absolute" 				=> 2592000
 		]
 	];';
 			$this->writeBaseFile();
@@ -248,7 +250,9 @@ if ($this->coreJson['settings']['databasetype'] === 'hybrid') {
 		],
 		"timeout"			=>
 		[
-			"cookies"						=> ' . $this->coreJson['settings']['timeout']['cookies'] . '
+			"cookies"						=> ' . $this->coreJson['settings']['timeout']['cookies'] . ',
+			"session_idle"					=> ' . $this->coreJson['settings']['timeout']['session_idle'] . ',
+			"session_absolute"				=> ' . $this->coreJson['settings']['timeout']['session_absolute'] . '
 		]
 	];';
 

@@ -1080,23 +1080,23 @@ class Core extends BasePackage
 			$this->core['settings']['security']['twofaSettings']['twofaUsing'] = $data['twofa_using'];
 		}
 
-		if (isset($data['twofa_email_code_timeout']) && $data['twofa_email_code_timeout'] < 60) {
+		if (isset($data['twofa_email_code_timeout']) && (int) $data['twofa_email_code_timeout'] < 60) {
 			$data['twofa_email_code_timeout'] = 60;
 		}
-		if (isset($data['twofa_email_code_timeout']) && $data['twofa_email_code_timeout'] > 3600) {
+		if (isset($data['twofa_email_code_timeout']) && (int) $data['twofa_email_code_timeout'] > 3600) {
 			$data['twofa_email_code_timeout'] = 3600;
 		}
 		if (isset($data['twofa_email_code_timeout'])) {
-			$this->core['settings']['security']['twofaSettings']['twofaEmailCodeTimeout'] = $data['twofa_email_code_timeout'];
+			$this->core['settings']['security']['twofaSettings']['twofaEmailCodeTimeout'] = (int) $data['twofa_email_code_timeout'];
 		}
-		if (isset($data['twofa_email_code_length']) && $data['twofa_email_code_length'] < 4) {
+		if (isset($data['twofa_email_code_length']) && (int) $data['twofa_email_code_length'] < 4) {
 			$data['twofa_email_code_length'] = 4;
 		}
-		if (isset($data['twofa_email_code_length']) && $data['twofa_email_code_length'] > 12) {
+		if (isset($data['twofa_email_code_length']) && (int) $data['twofa_email_code_length'] > 12) {
 			$data['twofa_email_code_length'] = 12;
 		}
 		if (isset($data['twofa_email_code_length'])) {
-			$this->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'] = $data['twofa_email_code_length'];
+			$this->core['settings']['security']['twofaSettings']['twofaEmailCodeLength'] = (int) $data['twofa_email_code_length'];
 		}
 
 		if (isset($data['twofa_otp'])) {
@@ -1105,39 +1105,39 @@ class Core extends BasePackage
 		if (isset($data['twofa_otp_logo'])) {
 			$this->core['settings']['security']['twofaSettings']['twofaOtpLogo'] = $data['twofa_otp_logo'];
 		}
-		if (isset($data['twofa_otp_secret_size']) && $data['twofa_otp_secret_size'] < 8) {
+		if (isset($data['twofa_otp_secret_size']) && (int) $data['twofa_otp_secret_size'] < 8) {
 			$data['twofa_otp_secret_size'] = 8;
 		}
-		if (isset($data['twofa_otp_secret_size']) && $data['twofa_otp_secret_size'] > 64) {
+		if (isset($data['twofa_otp_secret_size']) && (int) $data['twofa_otp_secret_size'] > 64) {
 			$data['twofa_otp_secret_size'] = 64;
 		}
 		if (isset($data['twofa_otp_secret_size'])) {
-			$this->core['settings']['security']['twofaSettings']['twofaOtpSecretSize'] = $data['twofa_otp_secret_size'];
+			$this->core['settings']['security']['twofaSettings']['twofaOtpSecretSize'] = (int) $data['twofa_otp_secret_size'];
 		}
-		if (isset($data['twofa_otp_totp_timeout']) && $data['twofa_otp_totp_timeout'] < 30) {
+		if (isset($data['twofa_otp_totp_timeout']) && (int) $data['twofa_otp_totp_timeout'] < 30) {
 			$data['twofa_otp_totp_timeout'] = 30;
 		}
-		if (isset($data['twofa_otp_totp_timeout']) && $data['twofa_otp_totp_timeout'] > 300) {
+		if (isset($data['twofa_otp_totp_timeout']) && (int) $data['twofa_otp_totp_timeout'] > 300) {
 			$data['twofa_otp_totp_timeout'] = 300;
 		}
 		if (isset($data['twofa_otp_totp_timeout'])) {
-			$this->core['settings']['security']['twofaSettings']['twofaOtpTotpTimeout'] = $data['twofa_otp_totp_timeout'];
+			$this->core['settings']['security']['twofaSettings']['twofaOtpTotpTimeout'] = (int) $data['twofa_otp_totp_timeout'];
 
 			if (isset($data['twofa_otp_totp_window']) && $data['twofa_otp_totp_window'] > $data['twofa_otp_totp_timeout']) {
-				$data['twofa_otp_totp_window'] = $data['twofa_otp_totp_timeout'] - 1;
+				$data['twofa_otp_totp_window'] = (int) $data['twofa_otp_totp_timeout'] - 1;
 			}
 		}
 		if (isset($data['twofa_otp_totp_window'])) {
 			$this->core['settings']['security']['twofaSettings']['twofaOtpTotpWindow'] = $data['twofa_otp_totp_window'];
 		}
-		if (isset($data['twofa_otp_hotp_counter']) && $data['twofa_otp_hotp_counter'] < 0) {
+		if (isset($data['twofa_otp_hotp_counter']) && (int) $data['twofa_otp_hotp_counter'] < 0) {
 			$data['twofa_otp_hotp_counter'] = 0;
 		}
 		if (isset($data['twofa_otp_hotp_counter'])) {
-			$this->core['settings']['security']['twofaSettings']['twofaOtpHotpCounter'] = $data['twofa_otp_hotp_counter'];
+			$this->core['settings']['security']['twofaSettings']['twofaOtpHotpCounter'] = (int) $data['twofa_otp_hotp_counter'];
 		}
 		if (isset($data['twofa_otp_hotp_window'])) {
-			$this->core['settings']['security']['twofaSettings']['twofaOtpHotpWindow'] = $data['twofa_otp_hotp_window'];
+			$this->core['settings']['security']['twofaSettings']['twofaOtpHotpWindow'] = (int) $data['twofa_otp_hotp_window'];
 		}
 		if (isset($data['twofa_otp_label'])) {
 			$this->core['settings']['security']['twofaSettings']['twofaOtpLabel'] = $data['twofa_otp_label'];
@@ -1154,26 +1154,26 @@ class Core extends BasePackage
 			$this->core['settings']['security']['twofaSettings']['twofaOtpAlgorithm'] = $data['twofa_otp_algorithm'];
 		}
 		if (isset($data['twofa_otp_digits_length'])) {
-			$this->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'] = $data['twofa_otp_digits_length'];
+			$this->core['settings']['security']['twofaSettings']['twofaOtpDigitsLength'] = (int) $data['twofa_otp_digits_length'];
 		}
 
-		if (isset($data['agent_email_code_timeout']) && $data['agent_email_code_timeout'] < 60) {
+		if (isset($data['agent_email_code_timeout']) && (int) $data['agent_email_code_timeout'] < 60) {
 			$data['agent_email_code_timeout'] = 60;
 		}
-		if (isset($data['agent_email_code_timeout']) && $data['agent_email_code_timeout'] > 3600) {
+		if (isset($data['agent_email_code_timeout']) && (int) $data['agent_email_code_timeout'] > 3600) {
 			$data['agent_email_code_timeout'] = 3600;
 		}
 		if (isset($data['agent_email_code_timeout'])) {
-			$this->core['settings']['security']['agentEmailCodeTimeout'] = $data['agent_email_code_timeout'];
+			$this->core['settings']['security']['agentEmailCodeTimeout'] = (int) $data['agent_email_code_timeout'];
 		}
-		if (isset($data['agent_email_code_length']) && $data['agent_email_code_length'] < 4) {
+		if (isset($data['agent_email_code_length']) && (int) $data['agent_email_code_length'] < 4) {
 			$data['agent_email_code_length'] = 4;
 		}
-		if (isset($data['agent_email_code_length']) && $data['agent_email_code_length'] > 12) {
+		if (isset($data['agent_email_code_length']) && (int) $data['agent_email_code_length'] > 12) {
 			$data['agent_email_code_length'] = 12;
 		}
 		if (isset($data['agent_email_code_length'])) {
-			$this->core['settings']['security']['agentEmailCodeLength'] = $data['agent_email_code_length'];
+			$this->core['settings']['security']['agentEmailCodeLength'] = (int) $data['agent_email_code_length'];
 		}
 
 		if (isset($data['logs'])) {
@@ -1227,10 +1227,41 @@ class Core extends BasePackage
 			$this->core['settings']['websocket']['host'] = $data['websocket_host'];
 		}
 		if (isset($data['websocket_port'])) {
-			$this->core['settings']['websocket']['port'] = $data['websocket_port'];
+			$this->core['settings']['websocket']['port'] = (int) $data['websocket_port'];
 		}
 		if (isset($data['timeout_cookies'])) {
-			$this->core['settings']['timeout']['cookies'] = $data['timeout_cookies'];
+			if ((int) $data['timeout_cookies'] < 60) {
+				$data['timeout_cookies'] = 60;
+			}
+
+			if ((int) $data['timeout_cookies'] > 31536000) {
+				$data['timeout_cookies'] = 31536000;
+			}
+		}
+		if (isset($data['timeout_cookies'])) {
+			$this->core['settings']['timeout']['cookies'] = (int) $data['timeout_cookies'];
+		}
+		if (isset($data['timeout_session_idle'])) {
+			if ((int) $data['timeout_session_idle'] < 60) {
+				$data['timeout_session_idle'] = 60;
+			}
+			if ((int) $data['timeout_session_idle'] > 86400) {
+				$data['timeout_session_idle'] = 86400;
+			}
+		}
+		if (isset($data['timeout_session_idle'])) {
+			$this->core['settings']['timeout']['session_idle'] = (int) $data['timeout_session_idle'];
+		}
+		if (isset($data['timeout_session_absolute'])) {
+			if ((int) $data['timeout_session_absolute'] < 60) {
+				$data['timeout_session_absolute'] = 60;
+			}
+			if ((int) $data['timeout_session_absolute'] > 31536000) {
+				$data['timeout_session_absolute'] = 31536000;
+			}
+		}
+		if (isset($data['timeout_session_absolute'])) {
+			$this->core['settings']['timeout']['session_absolute'] = (int) $data['timeout_session_absolute'];
 		}
 
 		$this->update($this->core);
@@ -1413,7 +1444,9 @@ if ($this->core['settings']['databasetype'] === 'hybrid') {
 		],
 		"timeout"			=>
 		[
-			"cookies"						=> ' . $this->core['settings']['timeout']['cookies'] . '
+			"cookies"						=> ' . $this->core['settings']['timeout']['cookies'] . ',
+			"session_idle"					=> ' . $this->core['settings']['timeout']['session_idle'] . ',
+			"session_absolute"				=> ' . $this->core['settings']['timeout']['session_absolute'] . '
 		]
 	];';
 
@@ -1455,7 +1488,9 @@ return
 		],
 		"timeout"			=>
 		[
-			"cookies"						=> 86400
+			"cookies"						=> 86400,
+			"session_idle"					=> 86400,
+			"session_absolute"				=> 2592000
 		]
 	];';
 

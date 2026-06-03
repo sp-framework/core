@@ -43,6 +43,20 @@ class Sessions
                             'size'          => 50,
                             'notNull'       => true,
                         ]
+                    ),
+                    new Column(
+                        'session_idle_timeout',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => true,
+                        ]
+                    ),
+                    new Column(
+                        'session_absolute_timeout',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => true,
+                        ]
                     )
                 ],
                 'indexes' => [

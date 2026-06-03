@@ -34,15 +34,11 @@ class Auth extends BasePackage
 
     protected $otp;
 
-    protected $cookieTimeout = 0;
-
     public function init()
     {
         $this->app = $this->apps->getAppInfo();
 
         $this->cookieKey = 'remember_' . $this->getKey();
-
-        $this->cookieTimeout = time() + $this->config->timeout->cookies;
 
         $this->twoFa = new TwoFa();
 
@@ -184,7 +180,7 @@ class Auth extends BasePackage
         return true;
     }
 
-    public function logout()
+    public function logout($forced = false)
     {
         if (!$this->account) {
             try {
@@ -216,11 +212,13 @@ class Auth extends BasePackage
             $this->session->remove($this->key);
         }
 
-        $this->session->redirectUrl = '/';
+        if (!$forced) {
+            $this->session->redirectUrl = '/';
 
-        $this->packagesData->redirectUrl = $this->links->url('/');
+            $this->packagesData->redirectUrl = $this->links->url('/');
 
-        $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->apps->getAppInfo()['name']);
+            $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->apps->getAppInfo()['name']);
+        }
 
         return true;
     }
@@ -252,34 +250,7 @@ class Auth extends BasePackage
             }
         }
 
-        //Set cookies to 1 second so browser removes them.
-        $this->cookies->set(
-            $this->cookieKey,
-            '0',
-            1,
-            '/',
-            $this->config->dev === true ? false : true,
-            $this->domains->getDomain()['name'],
-            true
-        );
-
-        $this->cookies->get($this->cookieKey)->setOptions(['samesite'=>'strict']);
-
-        $this->cookies->set(
-            'id',
-            '0',
-            1,
-            '/',
-            $this->config->dev === true ? false : true,
-            $this->domains->getDomain()['name'],
-            true
-        );
-
-        $this->cookies->send();
-
-        if ($this->cookies->has($this->cookieKey)) {
-            $this->cookies->delete($this->cookieKey);
-        }
+        $this->clearRecallerCookies();
     }
 
     protected function clearAccountSessionId()
@@ -288,13 +259,13 @@ class Auth extends BasePackage
         $sessionStore = $this->ff->store($sessionModel->getSource());
 
         if ($this->config->databasetype === 'db') {
-            $session = $sessionModel::findFirst(
+            $session = $sessionModel::find(
                 [
-                'session_id = :sessionId: AND app = :app:',
+                'account_id = :accountId: AND app = :app:',
                 'bind'      =>
                     [
-                        'sessionId' => $this->session->getId(),
-                        'app'       => $this->getKey()
+                        'accountId'     => $this->account['id'],
+                        'app'           => $this->getKey()
                     ]
                 ]
             );
@@ -305,10 +276,12 @@ class Auth extends BasePackage
                 }
             }
         } else {
-            $sessionStore->findOneBy([['session_id', '=', $this->session->getId()], "AND", ['app', '=', $this->getKey()]]);
+            $sessions = $sessionStore->findBy([['account_id', '=', $this->account['id']], ['app', '=', $this->getKey()]]);
 
-            if ($sessionStore->toArray()) {
-                $sessionStore->deleteById($sessionStore->toArray()['id'], true, false, ['agents']);
+            if ($sessions && count($sessions) > 0) {
+                foreach ($sessions as $session) {
+                    $sessionStore->deleteById($session['id'], true, false, ['agents']);
+                }
             }
         }
 
@@ -464,6 +437,9 @@ class Auth extends BasePackage
             $newSession['account_id'] = $this->account['id'];
             $newSession['app'] = $this->getKey();
             $newSession['session_id'] = $this->session->getId();
+            //Set Session Timeouts
+            $newSession['session_idle_timeout'] = time() + (int) $this->config->timeout->session_idle;
+            $newSession['session_absolute_timeout'] = time() + (int) $this->config->timeout->session_absolute;
 
             if ($this->config->databasetype === 'db') {
                 $sessionModel = new BasepackagesUsersAccountsSessions;
@@ -475,7 +451,7 @@ class Auth extends BasePackage
                 } catch (\Exception $e) {
                     $this->logger->log->debug('Duplicate session Id Found. This happens when session was deleted from server and browser used an old session ID.');
 
-                    $this->logout();
+                    $this->logout(true);
 
                     throw $e;
                 }
@@ -489,9 +465,9 @@ class Auth extends BasePackage
 
                     //Delete the duplicate entry and try again.
                     try {
-
+                        //
                     } catch (\Exception $e) {
-                        $this->logout();
+                        $this->logout(true);
 
                         throw $e;
                     }
@@ -504,6 +480,41 @@ class Auth extends BasePackage
         }
     }
 
+    protected function updateSessionIdleTimer(array $session)
+    {
+        $session['session_idle_timeout'] = time() + (int) $this->config->timeout->session_idle;
+
+        if ($this->config->databasetype === 'db') {
+            $sessionModel = new BasepackagesUsersAccountsSessions;
+
+            $sessionModel->assign($session);
+
+            try {
+                $sessionModel->update();
+            } catch (\Exception $e) {
+                $this->logger->log->debug('Not able to update session idle timeout for session id: ' . $session['session_id']);
+
+                $this->logout(true);
+
+                return false;
+            }
+        } else {
+            $sessionStore = $this->ff->store('basepackages_users_accounts_sessions');
+
+            try {
+                $sessionStore->update($session);
+            } catch (\Exception $e) {
+                $this->logger->log->debug('Not able to update session idle timeout for session id: ' . $session['session_id']);
+
+                $this->logout(true);
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     protected function setUserIdCooikie()
     {
         $this->cookies->useEncryption(false);
@@ -511,7 +522,7 @@ class Auth extends BasePackage
         $this->cookies->set(
             'id',
             $this->account['id'],
-            $this->cookieTimeout,
+            time() + $this->config->timeout->cookies,
             '/',
             $this->config->dev === true ? false : true,
             $this->domains->getDomain()['name'],
@@ -521,6 +532,53 @@ class Auth extends BasePackage
         $this->cookies->send();
 
         $this->cookies->useEncryption(true);
+    }
+
+    protected function clearRecallerCookies()
+    {
+        //Set cookies to 1 second so browser removes them.
+        $this->cookies->set(
+            $this->cookieKey,
+            '0',
+            1,
+            '/',
+            $this->config->dev === true ? false : true,
+            $this->domains->getDomain()['name'],
+            true
+        );
+
+        $this->cookies->get($this->cookieKey)->setOptions(['samesite'=>'strict']);
+
+        $this->cookies->set(
+            'id',
+            '0',
+            1,
+            '/',
+            $this->config->dev === true ? false : true,
+            $this->domains->getDomain()['name'],
+            true
+        );
+
+        $this->cookies->send();
+
+        if ($this->cookies->has($this->cookieKey)) {
+            $this->cookies->delete($this->cookieKey);
+        }
+    }
+
+    protected function setRecallerCooikie($identifier, $token)
+    {
+        $this->cookies->set(
+            $this->cookieKey,
+            $identifier . $this->separator . $token,
+            time() + $this->config->timeout->cookies,
+            '/',
+            $this->config->dev === true ? false : true,
+            $this->domains->getDomain()['name'],
+            true
+        );
+
+        $this->cookies->get($this->cookieKey)->setOptions(['samesite'=>'strict']);
     }
 
     public function setUserFromRecaller()
@@ -599,24 +657,22 @@ class Auth extends BasePackage
             if ($session) {
                 $session['session_id'] = $this->session->getId();
 
-                if ($this->config->databasetype === 'db') {
-                    $sessionModel->assign($session);
+                $this->updateSessionIdleTimer($session);
+            } else {
+                $this->logger->log->debug('Old session ID for the identifier does not match the new session ID, forcing logout');
 
-                    $sessionModel->update();
-                } else {
-                    $sessionStore->update($session);
-                }
+                throw new \Exception('Error: Contact System Administrator');
             }
         }
     }
 
     public function hasRecaller()
     {
-        if (!$this->cookies->has($this->cookieKey) && $this->hasUserInSession()) {
-            if (!$this->cookies->has('id')) {
-                $this->setUserIdCooikie();
-            }
+        if (!$this->cookies->has('id')) {
+            $this->setUserIdCooikie();
+        }
 
+        if (!$this->cookies->has($this->cookieKey) && $this->hasUserInSession()) {
             if ($this->config->databasetype === 'db') {
                 $identifierModel = new BasepackagesUsersAccountsIdentifiers;
 
@@ -662,20 +718,6 @@ class Auth extends BasePackage
     {
         list($identifier, $token) = $this->generateRecaller();
 
-        $this->cookies->set(
-            $this->cookieKey,
-            $identifier . $this->separator . $token,
-            $this->cookieTimeout,
-            '/',
-            $this->config->dev === true ? false : true,
-            $this->domains->getDomain()['name'],
-            true
-        );
-
-        $this->cookies->get($this->cookieKey)->setOptions(['samesite'=>'strict']);
-
-        $this->cookies->send();
-
         $newIdentifier['account_id'] = $this->account['id'];
         $newIdentifier['app'] = $this->getKey();
         $newIdentifier['session_id'] = $this->session->getId();
@@ -693,6 +735,8 @@ class Auth extends BasePackage
 
             $identifierStore->insert($newIdentifier);
         }
+
+        $this->setRecallerCooikie($identifier, $token);
     }
 
     protected function generateRecaller()
@@ -758,10 +802,34 @@ class Auth extends BasePackage
 
             if ($account['sessions'] && is_array($account['sessions']) && count($account['sessions']) > 0) {
                 foreach ($account['sessions'] as $session) {
-                    if (isset($session['session_id']) &&
-                        $session['session_id'] === $this->session->getId() &&
+                    if ($session['session_id'] === $this->session->getId() &&
                         $session['app'] === $this->getKey()
                     ) {
+                        //Check Timeout
+                        if (isset($session['session_absolute_timeout']) && $session['session_absolute_timeout'] > 0) {
+                            if (time() > $session['session_absolute_timeout']) {
+                                $this->account = $account;
+
+                                $this->logger->log->debug($account['email'] . ' absolute session timeout reached, forcing logout');
+
+                                throw new \Exception('Error: Absolute session timeout!');
+                            }
+                        }
+
+                        if (isset($session['session_idle_timeout']) && $session['session_idle_timeout'] > 0) {
+                            if (time() > $session['session_idle_timeout']) {
+                                $this->account = $account;
+
+                                $this->logger->log->debug($account['email'] . ' idle session timeout reached, forcing logout');
+
+                                throw new \Exception('Error: Idle session timeout!');
+                            } else {
+                                if (!$this->updateSessionIdleTimer($session)) {
+                                    throw new \Exception('Error: Contact System Administrator');
+                                }
+                            }
+                        }
+
                         $this->account = $account;
 
                         return true;
@@ -769,12 +837,14 @@ class Auth extends BasePackage
                 }
             }
 
+            if ($this->cookies->has($this->cookieKey)) {
+                return false;
+            }
+
             $this->logger->log->debug(
                 $account['email'] . ' session id ' . $this->session->getId() .
                 ' not present in DB. Possibly session deleted by administrator via force logout'
             );
-
-            $this->sessionTools->clearSession($this->session->getId());
 
             throw new \Exception('Error: Contact System Administrator');
         } else {

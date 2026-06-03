@@ -10,16 +10,64 @@
                 'fieldLabel'                            : 'Cookies',
                 'fieldType'                             : 'input',
                 'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Cookies timeout in seconds.',
+                'fieldHelpTooltipContent'               : 'Cookies timeout in seconds. 1 minute min & 365 days max.',
                 'fieldInputTypeTextFilter'              : 'positiveInt',
                 'fieldRequired'                         : true,
                 'fieldBazScan'                          : true,
                 'fieldBazJstreeSearch'                  : true,
                 'fieldBazPostOnUpdate'                  : true,
-                'fieldDataInputMinNumber'               : 1,
+                'fieldDataInputMinNumber'               : 60,
                 'fieldDataInputMaxNumber'               : 31536000,
                 'fieldDataInputMaxLength'               : 8,
                 'fieldValue'                            : core['settings']['timeout']['cookies']
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'timeout_session_idle',
+                'fieldLabel'                            : 'Session (Idle)',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Session idle timeout in seconds. 1 minute min & max24 hours max.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 60,
+                'fieldDataInputMaxNumber'               : 86400,
+                'fieldDataInputMaxLength'               : 5,
+                'fieldValue'                            : core['settings']['timeout']['session_idle']
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'timeout_session_absolute',
+                'fieldLabel'                            : 'Session (Absolute)',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Session absolute timeout in seconds. 1 minute min & 365 days max.',
+                'fieldInputTypeTextFilter'              : 'positiveInt',
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldDataInputMinNumber'               : 60,
+                'fieldDataInputMaxNumber'               : 31536000,
+                'fieldDataInputMaxLength'               : 8,
+                'fieldValue'                            : core['settings']['timeout']['session_absolute']
             ]
         )}}
     </div>

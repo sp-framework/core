@@ -19,6 +19,10 @@ class BasepackagesUsersAccountsSessions extends BaseModel
 
     public $session_id;
 
+    public $session_idle_timeout;
+
+    public $session_absolute_timeout;
+
     public function initialize()
     {
         $this->modelRelations['accounts']['relationObj'] = $this->belongsTo(
