@@ -524,11 +524,12 @@ class Profiles extends BasePackage
                             if ($annotation->getAll('notification')) {
                                 $appHasNotifications = true;
 
-                                $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['module_type']]['id'] = $module['id'];
                                 if ($module['module_type'] === 'packages') {
-                                    $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['module_type']]['title'] = strtoupper($module['display_name']);
+                                    $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['id'] = $module['id'];
+                                    $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['title'] = strtoupper($module['display_name']);
                                 } else {
-                                    $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['module_type']]['title'] = strtoupper($module['name']);
+                                    $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['id'] = $module['id'];
+                                    $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['title'] = strtoupper($module['name']);
                                 }
 
                                 $thisSubscriptions = [];
@@ -584,6 +585,7 @@ class Profiles extends BasePackage
                     unset($notifications_modules[$this->app['id']]);
                 }
             }
+
             if (!$appHasNotifications) {
                 unset($notifications_modules[$this->app['id']]);
             }
