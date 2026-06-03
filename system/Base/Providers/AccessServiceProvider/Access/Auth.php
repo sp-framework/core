@@ -51,7 +51,7 @@ class Auth extends BasePackage
         return $this;
     }
 
-    public function attempt($data)
+    public function login(array $data)
     {
         $validate = $this->validateData($data, 'auth');
 

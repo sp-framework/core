@@ -105,7 +105,7 @@ class Enable extends Commands
     protected function performLogin()
     {
         try {
-            $login = $this->terminal->access->auth->attempt(['user' => $this->username, 'pass' => $this->password]);
+            $login = $this->terminal->access->auth->login(['user' => $this->username, 'pass' => $this->password]);
             if ($login) {
                 $this->terminal->setWhereAt('enable');
                 $this->terminal->setPrompt('# ');
