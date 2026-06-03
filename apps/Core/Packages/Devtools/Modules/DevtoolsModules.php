@@ -310,7 +310,7 @@ class DevtoolsModules extends BasePackage
 
                             return;
                         } else {
-                            if (!$this->checkRepo($data)) {
+                            if (!$checkedRepo = $this->checkRepo($data)) {
                                 if (strtolower($data['app_type']) !== 'core') {
                                     $newRepo = $this->createRepo($data);
                                 }
@@ -324,8 +324,17 @@ class DevtoolsModules extends BasePackage
                                                    ]
                                                 );
 
-                                return;
+                                return true;
                             }
+
+                            $this->addResponse('Module updated & repo already exists. Run git commands locally to initialize the repo locally.',
+                                               0,
+                                               [
+                                                'newRepo'   => $checkedRepo
+                                               ]
+                                            );
+
+                            return true;
                         }
                     }
 

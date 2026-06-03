@@ -3650,6 +3650,10 @@ dataCollectionSection =
             },
             onSubmitResponse: function(response) {
                 if (response.responseData && response.responseData.newRepo && $('#repo-details').length > 0) {
+                    if (response.responseMessage) {
+                        paginatedPNotify('info', {'text': response.responseMessage});
+                    }
+
                     if (response.responseData.newRepo == false) {
                         return true;
                     }
