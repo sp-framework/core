@@ -668,7 +668,7 @@ class Auth extends BasePackage
 
     public function hasRecaller()
     {
-        if (!$this->cookies->has('id')) {
+        if (!$this->cookies->has('id') && $this->hasUserInSession()) {
             $this->setUserIdCooikie();
         }
 
