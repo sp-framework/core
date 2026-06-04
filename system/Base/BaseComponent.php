@@ -1353,6 +1353,12 @@ abstract class BaseComponent extends Controller
 					count($subscriptions[$subscriptionType]) > 0
 				) {
 					foreach ($subscriptions[$subscriptionType] as $key => $aId) {
+						if ($this->access->auth->check() &&
+							$this->access->auth->account()['id'] === $aId
+						) {
+							continue;
+						}
+
 						$this->basepackages->notifications->addNotification(
 							$messageTitle,
 							$messageDetails,
