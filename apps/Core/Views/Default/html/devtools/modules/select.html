@@ -532,10 +532,15 @@ dataCollectionSectionForm['funcs']['performBulkAction'] = function(buttonID) {
         if (response.responseCode == 0) {
             paginatedPNotify('success', {'text': response.responseMessage});
 
+            var apptype = false;
+            if ($('#{{componentId}}-{{sectionId}}-app_type').val() != '0') {
+                apptype = $('#{{componentId}}-{{sectionId}}-app_type').val();
+            }
+
             if ($('#{{componentId}}-{{sectionId}}-include_core_modules')[0].checked === true) {
-                dataCollectionSectionForm['funcs']['loadAjax'](null, null, true);
+                dataCollectionSectionForm['funcs']['loadAjax'](null, null, true, false, false, false, false, false, false, apptype);
             } else {
-                dataCollectionSectionForm['funcs']['loadAjax'](null, null, false);
+                dataCollectionSectionForm['funcs']['loadAjax'](null, null, false, false, false, false, false, false, false, apptype);
             }
         } else {
             paginatedPNotify('error', {'text': response.responseMessage});
