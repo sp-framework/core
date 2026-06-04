@@ -41,8 +41,12 @@ class Pusher extends WebsocketBase implements WampServerInterface
     public function onOpen(ConnectionInterface $conn)
     {
         var_dump('Open: '. $conn->resourceId);
-        if ($this->checkAccount($conn) !== true) {
-            $conn->close();
+        try {
+            if ($this->checkAccount($conn) !== true) {
+                $conn->close();
+            }
+        } catch (\throwable $e) {
+            trace([$e]);
         }
     }
 
@@ -337,7 +341,7 @@ class Pusher extends WebsocketBase implements WampServerInterface
                 }
             }
         } else {
-            if ($this->account && count($this->account['sessions']) > 0) {
+            if (isset($this->account['sessions']) && count($this->account['sessions']) > 0) {
                 foreach ($this->account['sessions'] as $key => $session) {
                     if ($session['session_id'] === $cookies['SP']) {
                         return true;
