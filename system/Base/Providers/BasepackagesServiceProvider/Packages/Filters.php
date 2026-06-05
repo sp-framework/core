@@ -41,6 +41,10 @@ class Filters extends BasePackage
     {
         $component = $this->modules->components->getById($componentId);
 
+        if ($component && $component['route'] !== 'system/notifications') {
+            $accountId = null;
+        }
+
         if ($this->config->databasetype === 'db') {
             $conditions = [];
             $conditions['conditions'] = 'name = :name: AND component_id = :cid: AND auto_generated = :ag:';
