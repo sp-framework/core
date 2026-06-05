@@ -197,7 +197,7 @@ abstract class BaseComponent extends Controller
 
 	public function beforeExecuteRoute()
 	{
-		$this->checkSettingsRoute();
+		$this->checkForwarders();
 
 		if ($this->app) {
 			$appType = $this->apps->types->getAppTypeByType($this->app['app_type']);
@@ -362,7 +362,7 @@ abstract class BaseComponent extends Controller
 		$this->view->canMsu = $canMsu;
 	}
 
-	protected function checkSettingsRoute()
+	protected function checkForwarders()
 	{
 		if ($this->dispatcher->wasForwarded()) {
 			return;
@@ -372,6 +372,19 @@ abstract class BaseComponent extends Controller
 			$this->getData()['settings'] == 'true'
 		) {
 			$this->dispatcher->forward(['action' => 'msview']);
+		}
+
+		if (isset($this->getData()['activitylogs']) &&
+			$this->getData()['activitylogs'] == 'true'
+		) {
+			//public function initialize($onlyActivityLogs = false)
+			//set $onlyActivityLogs to true so you can control when initialize can return
+			//Example: If you have 10 packages to initialize, Only instantiate package that is needed by the activitylogs and then return.
+			//See Email/ServicesComponent.
+			//Setting setActivityLogsPackage is needed at the initialize level as we need to set replaceKeys, replaceValues, disableKeys for POST as well
+			$this->initialize(true);
+
+			$this->dispatcher->forward(['action' => 'activitylogs']);
 		}
 	}
 
@@ -436,23 +449,18 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	public function setActivityLogsPackage($alPackage, $postLink, $replaceKeys = [], $replaceValues = [], $disableKeys = [])
+	protected function setActivityLogsPackage(&$alPackage, $postLink, $replaceKeys = [], $replaceValues = [], $disableKeys = [])
 	{
-		if (gettype($alPackage) === 'string') {
-			$this->alPackage = $this->usePackage($alPackage);
-		} else {
-			$this->alPackage = $alPackage;
-		}
-
-		if (isset($this->getData()['activitylogs']) &&
-			$this->getData()['activitylogs'] == 'true'
+		if ((isset($this->getData()['id']) && $this->getData()['id'] != 0) ||
+			($this->request->isPost() && (isset($this->postData()['id']) && $this->postData()['id'] != 0))
 		) {
-			$this->dispatcher->forward(
-				[
-					'action' => 'activitylogs',
-					'params' => [$postLink, $replaceKeys, $replaceValues, $disableKeys]
-				]
-			);
+			$this->alPackage = [];
+
+			$this->alPackage['package'] = $alPackage;
+			$this->alPackage['postLink'] = $postLink;
+			$this->alPackage['replaceKeys'] = $replaceKeys;
+			$this->alPackage['replaceValues'] = $replaceValues;
+			$this->alPackage['disableKeys'] = $disableKeys;
 		}
 	}
 
@@ -460,45 +468,56 @@ abstract class BaseComponent extends Controller
 	 * Activity Logs
 	 * @acl(name=activitylogs)
 	 */
-	public function activitylogsAction($postLink = null, $replaceKeys = [], $replaceValues = [], $disableKeys = [])
+	public function activitylogsAction()
 	{
 		if (isset($this->getData()['activitylogs']) && $this->getData()['activitylogs'] == 'true') {
-			if (isset($this->getData()['id']) && isset($this->alPackage)) {
-				$this->view->activityLogs = $this->alPackage->getActivityLogs((int) $this->getData()['id'], $postLink);
+			if (isset($this->getData()['id']) && $this->getData()['id'] != 0 && isset($this->alPackage['package'])) {
+				$this->view->activityLogs = $this->alPackage['package']->getActivityLogs((int) $this->getData()['id'], $this->alPackage['postLink']);
 			}
 
-			$this->view->replaceKeys = $replaceKeys;
-			$this->view->replaceValues = $replaceValues;
-			$this->view->disableKeys = $disableKeys;
+			$this->view->replaceKeys = $this->alPackage['replaceKeys'];
+			$this->view->replaceValues = $this->alPackage['replaceValues'];
+			$this->view->disableKeys = $this->alPackage['disableKeys'];
 
 			$this->view->pick($this->helper->last(explode('/', $this->component['route'])) . '/activitylogs');
 
 			return;
 		} else if ($this->request->isPost()) {
+			if (!isset($this->postData()['id']) ||
+				(isset($this->postData()['id']) && $this->postData()['id'] == 0)
+			) {
+				$this->addResponse('Id not set!', 1);
+
+				return false;
+			}
+
 			$package = $this->modules->packages->getPackageByName($this->postData()['packageName']);
 
 			if ($package) {
-				$this->alPackage = $this->usePackage($package['class']);
+				$this->alPackage['package'] = $this->usePackage($package['class']);
+				$this->alPackage['id'] = $this->postData()['id'];
+				$this->alPackage['postLink'] = $this->postData()['postLink'];
+				$this->alPackage['page'] = (int) $this->postData()['page'];
 
 				$this->view->activityLogs =
-					$this->alPackage->getActivityLogs(
-						$this->postData()['id'],
-						$this->postData()['postLink'],
+					$this->alPackage['package']->getActivityLogs(
+						$this->alPackage['id'],
+						$this->alPackage['postLink'],
 						true,
-						(int) $this->postData()['page']
+						(int) $this->alPackage['page']
 					);
 
 				$viewDirArr = explode('/', trim($this->view->getViewsDir(), '/'));
-				$popped = array_pop($viewDirArr);
+				$componentRoute = array_pop($viewDirArr);
 				$this->view->setViewsDir('/' . implode('/', $viewDirArr) . '/');
 
 				$this->setDefaultViewData();
 
-				$this->view->replaceKeys = $replaceKeys;
-				$this->view->replaceValues = $replaceValues;
-				$this->view->disableKeys = $disableKeys;
+				$this->view->replaceKeys = $this->alPackage['replaceKeys'];
+				$this->view->replaceValues = $this->alPackage['replaceValues'];
+				$this->view->disableKeys = $this->alPackage['disableKeys'];
 
-				$this->view->logs = $this->view->partial($popped . '/activitylogs');
+				$this->view->logs = $this->view->partial($componentRoute . '/activitylogs');
 
 				return false;
 			}

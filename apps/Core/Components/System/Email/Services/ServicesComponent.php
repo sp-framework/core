@@ -11,9 +11,15 @@ class ServicesComponent extends BaseComponent
 
     protected $emailservices;
 
-    public function initialize()
+    public function initialize($onlyActivityLogs = false)
     {
         $this->emailservices = $this->basepackages->emailservices;
+
+        $this->setActivityLogsPackage($this->emailservices, 'system/email/services/activitylogs', [], ['password' => '*****']);
+
+        if ($onlyActivityLogs) {
+            return;
+        }
     }
 
     /**
@@ -28,8 +34,6 @@ class ServicesComponent extends BaseComponent
                 if (!$emailservice) {
                     return $this->throwIdNotFound();
                 }
-
-                $this->setActivityLogsPackage($this->emailservices, 'system/email/services/activitylogs', [], ['password' => '*****']);
 
                 $this->view->emailservice = $emailservice;
             }
