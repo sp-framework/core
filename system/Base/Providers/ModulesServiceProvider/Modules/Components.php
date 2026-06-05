@@ -500,13 +500,23 @@ class Components extends BasePackage
 		}
 
 		foreach ($this->apps->apps as $appId => $app) {
-			if (!isset($subscriptions[$appId]) ||
-				!isset($subscriptions[$appId]['components'])
-			) {
-				continue;
+			if ($app['app_type'] === 'core') {
+				if (!isset($subscriptions[$appId]) ||
+					!isset($subscriptions[$appId]['components'])
+				) {
+					continue;
+				}
+
+				$subscriptionsArr = $subscriptions[$appId]['components'];
+			} else {
+				if (!isset($subscriptions[$appId])) {
+					continue;
+				}
+
+				$subscriptionsArr = $subscriptions[$appId];
 			}
 
-			foreach ($subscriptions[$appId]['components'] as $componentId => $componentSubscriptions) {
+			foreach ($subscriptionsArr as $componentId => $componentSubscriptions) {
 				if (!isset($this->components[$componentId])) {
 					continue;
 				}
@@ -520,7 +530,7 @@ class Components extends BasePackage
 						foreach ($componentSubscriptions as $subscriptionKey => $subscriptionValue) {
 							if (isset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey])) {
 								if ($subscriptionValue == 1) {
-									if ($subscriptionKey == 'email') {
+									if ($subscriptionKey === 'email') {
 										if (!isset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']])) {
 											$this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']] = $account['email'];
 										}
@@ -530,7 +540,7 @@ class Components extends BasePackage
 										}
 									}
 								} else if ($subscriptionValue == 0) {
-									if ($subscriptionKey == 'email') {
+									if ($subscriptionKey === 'email') {
 										if (isset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']])) {
 											unset($this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']]);
 										}
@@ -564,7 +574,7 @@ class Components extends BasePackage
 
 									if (in_array($subscriptionKey, $notification_allowed_methods)) {
 										if ($subscriptionValue == 1) {
-											if ($subscriptionKey == 'email') {
+											if ($subscriptionKey === 'email') {
 												$this->components[$componentId]['notification_subscriptions'][$appId][$subscriptionKey][$account['id']] = [$account['email']];
 											}
 										} else {
@@ -574,12 +584,18 @@ class Components extends BasePackage
 								}
 							}
 						}
+
+						if (!isset($componentSubscriptions['email'])) {
+							if (isset($this->components[$componentId]['notification_subscriptions'][$appId]['email'][$account['id']])) {
+								unset($this->components[$componentId]['notification_subscriptions'][$appId]['email'][$account['id']]);
+							}
+						}
 					} else {
 						$this->components[$componentId]['notification_subscriptions'][$appId] = [];
 
 						foreach ($componentSubscriptions as $notificationKey => $notification) {
 							if ($notification == 1) {
-								if ($notificationKey == 'email') {
+								if ($notificationKey === 'email') {
 									$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id'] => $account['email']];
 								} else {
 									$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id']];
@@ -594,7 +610,7 @@ class Components extends BasePackage
 
 					foreach ($componentSubscriptions as $notificationKey => $notification) {
 						if ($notification == 1) {
-							if ($notificationKey == 'email') {
+							if ($notificationKey === 'email') {
 								$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id'] => $account['email']];
 							} else {
 								$this->components[$componentId]['notification_subscriptions'][$appId][$notificationKey] = [$account['id']];

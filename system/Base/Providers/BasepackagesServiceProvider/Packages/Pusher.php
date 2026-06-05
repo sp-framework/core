@@ -95,15 +95,20 @@ class Pusher extends WebsocketBase implements WampServerInterface
         if (!isset($newPush['broadcast']) ||
             (isset($newPush['broadcast']) && !$newPush['broadcast'])
         ) {
-            $excludeUsers = [];
             $eligibleUsers = [];
 
-            if ($this->config->setup && $this->config->setup === false) {
+            if (isset($this->config->setup) && $this->config->setup === false) {
                 foreach ($topic->getIterator() as $key => $connection) {
-                    if ($connection->resourceId != $newPush['to']) {
-                        array_push($excludeUsers, $connection->WAMP->sessionId);
-                    } else if ($connection->resourceId == $newPush['to']) {
-                        array_push($eligibleUsers, $connection->WAMP->sessionId);
+                    if (is_array($newPush['to'])) {
+                        foreach ($newPush['to'] as $pushTo) {
+                            if ($connection->resourceId == $pushTo) {
+                                array_push($eligibleUsers, $connection->WAMP->sessionId);
+                            }
+                        }
+                    } else {
+                        if ($connection->resourceId == $newPush['to']) {
+                            array_push($eligibleUsers, $connection->WAMP->sessionId);
+                        }
                     }
                 }
             } else {
@@ -118,15 +123,12 @@ class Pusher extends WebsocketBase implements WampServerInterface
                 }
             }
 
-            $topic->broadcast($newPush['response'], $excludeUsers, $eligibleUsers);
+            $topic->broadcast($newPush['response'], [], $eligibleUsers);
         } else if (isset($newPush['broadcast']) && isset($newPush['from'])) {//If from set, it will not broadcast to from
             $excludeUsers = [];
-            $eligibleUsers = [];
 
             foreach ($topic->getIterator() as $key => $connection) {
-                if ($connection->resourceId != $newPush['from']) {
-                    array_push($eligibleUsers, $connection->WAMP->sessionId);
-                } else if ($connection->resourceId == $newPush['from']) {
+                if ($connection->resourceId == $newPush['from']) {
                     array_push($excludeUsers, $connection->WAMP->sessionId);
                 }
             }

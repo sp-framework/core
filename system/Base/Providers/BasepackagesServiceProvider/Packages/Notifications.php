@@ -356,6 +356,7 @@ class Notifications extends BasePackage
                     $this->removeNotification($removeData);
                 }
             }
+            $this->addResponse('Removed');
         } else {
             $this->addResponse('Task Missing', 1);
         }
@@ -445,10 +446,10 @@ class Notifications extends BasePackage
             $params = ['conditions' => [['id', '=', (int) $data['id']], ['account_id', '=', $this->access->auth->account()['id']]]];
         }
 
-        $notification = $this->getByParams($params);
+        $notifications = $this->getByParams($params);
 
-        if (count($notification) === 1) {
-            $this->remove($notification[0]['id']);
+        if ($notifications && count($notifications) === 1) {
+            $this->remove($notifications[0]['id']);
 
             $this->addResponse('Ok');
 

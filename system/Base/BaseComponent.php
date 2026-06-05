@@ -42,6 +42,8 @@ abstract class BaseComponent extends Controller
 
 	protected $alPackage;
 
+	protected $notifyPackage;
+
 	public $widgets;
 
 	protected function onConstruct()
@@ -750,6 +752,9 @@ abstract class BaseComponent extends Controller
 				// if ($accountEnv) {
 				// 	$this->view->accountEnv = $accountEnv;
 				// }
+				if (isset($this->notifyPackage)) {
+					$this->addToNotification(null, null);
+				}
 			}
 
 			return $this->sendJson();
@@ -1140,6 +1145,7 @@ abstract class BaseComponent extends Controller
 			}
 		} else {
 			$package = (new $packageClass())->init();
+
 			$packageName = $this->helper->last(explode('\\', $packageClass));
 
 			if (!$this->checkPackage($packageClass)) {
@@ -1347,8 +1353,25 @@ abstract class BaseComponent extends Controller
 		return preg_replace('/[^0-9]/', '', $string);
 	}
 
+	protected function setNotificationPackage(&$notifyPackage = null)
+	{
+		if ($this->request->isPost() && (isset($this->postData()['id']) && $this->postData()['id'] != 0)) {
+			$this->notifyPackage = $notifyPackage;
+		}
+	}
+
 	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $last = null)
 	{
+		if ($this->notifyPackage) {
+			$this->notifyPackage->addToNotification($this->dispatcher->getActionName(), null, null, null, null, $this->component);
+
+			return;
+		}
+
+		if (is_null($subscriptionType)) {
+			throw new \Exceptions('Notification subscription not set');
+		}
+
 		if ($this->component['notification_subscriptions']) {
 			if (!is_array($this->component['notification_subscriptions'])) {
 				$this->component['notification_subscriptions'] = $this->helper->decode($this->component['notification_subscriptions'], true);

@@ -2329,35 +2329,57 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $package = null, $packageRowId = null)
+	public function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $package = null, $packageRowId = null, $component = null)
 	{
+		if (is_null($subscriptionType)) {
+			throw new \Exceptions('Notification subscription not set');
+		}
+
 		if (!$this->app) {
 			$this->app = $this->apps->getAppInfo();
 		}
 
-		if (!$package) {
-			$package = $this->checkPackage($this->packageName);
-		} else if ($package && is_string($package)) {
-			$package = $this->checkPackage($package);
+		if (isset($package) && isset($component)) {
+			throw new \Exception('Notification method can only have either package or component');
 		}
 
-		if ($package) {
+		if ($component) {
+			$module = $component;
+		} else {
+			if (!$package) {
+				$module = $this->checkPackage($this->packageName);
+			} else if ($package && is_string($package)) {
+				$module = $this->checkPackage($package);
+			}
+		}
+
+		if ($module) {
 			if (!$packageRowId && isset($this->packagesData->last)) {
 				$packageRowId = $this->packagesData->last['id'];
+
+				if (!isset($messageTitle)) {
+					$messageTitle = strtoupper($subscriptionType) . ': ' . strtoupper(($module['display_name'] ?? $module['name']));
+
+					if (isset($this->packagesData->last['name'])) {
+						$messageTitle = $messageTitle . ': ' . strtoupper($this->packagesData->last['name']);
+					} else {
+						$messageTitle = $messageTitle . ': ' . $this->packagesData->last['id'];
+					}
+				}
 			} else if (!$packageRowId) {
 				$packageRowId = null;
 			}
 
-			if ($package['notification_subscriptions']) {
-				if (!is_array($package['notification_subscriptions'])) {
-					$package['notification_subscriptions'] = $this->helper->decode($package['notification_subscriptions'], true);
+			if ($module['notification_subscriptions']) {
+				if (!is_array($module['notification_subscriptions'])) {
+					$module['notification_subscriptions'] = $this->helper->decode($module['notification_subscriptions'], true);
 				}
 
-				if (count($package['notification_subscriptions']) === 0) {
+				if (count($module['notification_subscriptions']) === 0) {
 					return;
 				}
 
-				foreach ($package['notification_subscriptions'] as $appId => $subscriptions) {
+				foreach ($module['notification_subscriptions'] as $appId => $subscriptions) {
 					if ($subscriptionType === 'add' || $subscriptionType === 'update' || $subscriptionType === 'remove') {
 						$notificationType = 0;
 					} else if ($subscriptionType === 'warning') {
@@ -2383,14 +2405,14 @@ abstract class BasePackage extends Controller
 								$appId,
 								$aId,
 								null,
-								$package['display_name'] ?? $package['name'],
+								$module['display_name'] ?? $module['name'],
 								$packageRowId,
 								$notificationType
 							);
 						}
 					}
 
-					if ($package['name'] !== 'EmailServices' &&
+					if ($module['name'] !== 'EmailServices' &&
 						isset($subscriptions['email']) &&
 						count($subscriptions['email']) > 0
 					) {
@@ -2413,7 +2435,7 @@ abstract class BasePackage extends Controller
 							$domainId,
 							$appId,
 							null,
-							$package['display_name'] ?? $package['name'],
+							$module['display_name'] ?? $module['name'],
 							$packageRowId,
 							$notificationType
 						);

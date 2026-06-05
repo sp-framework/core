@@ -35,6 +35,10 @@ class EmailServices extends BasePackage
         return $this;
     }
 
+    /**
+     * @notification(name=add)
+     * @notification_allowed_methods(email)
+     */
     public function addEmailService(array $data)
     {
         $data = $this->encryptPass($data);
@@ -58,6 +62,10 @@ class EmailServices extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=update)
+     * @notification_allowed_methods(email)
+     */
     public function updateEmailService(array $data)
     {
         $emailService = $this->getById($data['id']);
@@ -93,18 +101,26 @@ class EmailServices extends BasePackage
 
             $this->addActivityLog($data, $emailService);
 
+            $this->addToNotification('update', 'Updated: Email Service.', null, null, $emailService['id']);
+
             $this->addResponse('Updated email service ' . $data['name']);
         } else {
             $this->addResponse('Error updating email service.', 1);
         }
     }
 
+    /**
+     * @notification(name=remove)
+     * @notification_allowed_methods(email)
+     */
     public function removeEmailService(array $data)
     {
         $emailService = $this->getById($data['id']);
 
         //Check relations before removing.
         if ($this->remove($emailService['id'])) {
+            $this->addToNotification('remove', 'Removed: Email Service - ' . $emailService['name'], null, null);
+
             $this->addResponse('Removed email service ' . $emailService['name']);
         } else {
             $this->addResponse('Error removing email service.', 1);

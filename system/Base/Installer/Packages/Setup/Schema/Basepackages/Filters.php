@@ -98,6 +98,7 @@ class Filters
                     [
                         'name',
                         'app_type',
+                        'account_id',
                         'component_id'
                     ],
                     'UNIQUE'
@@ -114,6 +115,7 @@ class Filters
                 'column_INDEX',
                 [
                     'app_type',
+                    'account_id',
                     'component_id'
                 ],
                 'INDEX'

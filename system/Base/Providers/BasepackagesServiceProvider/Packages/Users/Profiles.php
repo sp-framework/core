@@ -497,16 +497,19 @@ class Profiles extends BasePackage
                     'id' => strtoupper($this->app['id'])
                 ];
 
-            $allModules = array_merge(
-                msort($this->modules->components->getComponentsForAppId($this->app['id']), 'name'),
-                msort($this->modules->packages->getPackagesForAppId($this->app['id']), 'display_name')
-            );
+            $allModules = msort($this->modules->components->getComponentsForAppId($this->app['id']), 'name');
+
+            if ($this->app['app_type'] === 'core') {
+                $allModules = array_merge($allModules, msort($this->modules->packages->getPackagesForAppId($this->app['id']), 'display_name'));
+            }
 
             $appHasNotifications = false;
             if (count($allModules) > 0) {
                 foreach ($allModules as $module) {
-                    if (!isset($notifications_modules[$this->app['id']]['childs'][$module['module_type']])) {
-                        $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['title'] = strtoupper($module['module_type']);
+                    if ($this->app['app_type'] === 'core') {
+                        if (!isset($notifications_modules[$this->app['id']]['childs'][$module['module_type']])) {
+                            $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['title'] = strtoupper($module['module_type']);
+                        }
                     }
 
                     if ($module['notification_subscriptions'] &&
@@ -524,12 +527,17 @@ class Profiles extends BasePackage
                             if ($annotation->getAll('notification')) {
                                 $appHasNotifications = true;
 
-                                if ($module['module_type'] === 'packages') {
-                                    $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['id'] = $module['id'];
-                                    $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['title'] = strtoupper($module['display_name']);
+                                if ($this->app['app_type'] === 'core') {
+                                    if ($module['module_type'] === 'packages') {
+                                        $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['id'] = $module['id'];
+                                        $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['title'] = strtoupper($module['display_name']);
+                                    } else {
+                                        $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['id'] = $module['id'];
+                                        $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['title'] = strtoupper($module['name']);
+                                    }
                                 } else {
-                                    $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['id'] = $module['id'];
-                                    $notifications_modules[$this->app['id']]['childs'][$module['module_type']]['childs'][$module['name']]['title'] = strtoupper($module['name']);
+                                    $notifications_modules[$this->app['id']]['childs'][$module['name']]['id'] = $module['id'];
+                                    $notifications_modules[$this->app['id']]['childs'][$module['name']]['title'] = strtoupper($module['name']);
                                 }
 
                                 $thisSubscriptions = [];
@@ -556,24 +564,48 @@ class Profiles extends BasePackage
 
                                             if ($subscriptionValue === 'email') {
                                                 if (isset($module['notification_subscriptions'][$this->app['id']][$subscriptionValue][$account['id']])) {
-                                                    $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 1;
+                                                    if ($this->app['app_type'] === 'core') {
+                                                        $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 1;
+                                                    } else {
+                                                        $notifications[$this->app['id']][$module['id']][$subscriptionValue] = 1;
+                                                    }
                                                 } else {
-                                                    $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                                    if ($this->app['app_type'] === 'core') {
+                                                        $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                                    } else {
+                                                        $notifications[$this->app['id']][$module['id']][$subscriptionValue] = 0;
+                                                    }
                                                 }
                                             } else {
                                                 if (in_array($account['id'], $module['notification_subscriptions'][$this->app['id']][$subscriptionValue])) {
-                                                    $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 1;
+                                                    if ($this->app['app_type'] === 'core') {
+                                                        $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 1;
+                                                    } else {
+                                                        $notifications[$this->app['id']][$module['id']][$subscriptionValue] = 1;
+                                                    }
                                                 } else {
-                                                    $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                                    if ($this->app['app_type'] === 'core') {
+                                                        $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                                    } else {
+                                                        $notifications[$this->app['id']][$module['id']][$subscriptionValue] = 0;
+                                                    }
                                                 }
                                             }
                                         } else {
-                                            $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                            if ($this->app['app_type'] === 'core') {
+                                                $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                            } else {
+                                                $notifications[$this->app['id']][$module['id']][$subscriptionValue] = 0;
+                                            }
                                         }
                                     }
                                 } else {
                                     foreach ($thisSubscriptions as $subscriptionKey => $subscriptionValue) {
-                                        $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                        if ($this->app['app_type'] === 'core') {
+                                            $notifications[$this->app['id']][$module['module_type']][$module['id']][$subscriptionValue] = 0;
+                                        } else {
+                                            $notifications[$this->app['id']][$module['id']][$subscriptionValue] = 0;
+                                        }
                                     }
                                 }
                             }
