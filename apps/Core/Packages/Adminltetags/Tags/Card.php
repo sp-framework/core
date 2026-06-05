@@ -280,6 +280,10 @@ class Card extends Adminltetags
                             '<script>
                                 $(document).ready(function() {
                                     $(".btn-tool-activitylogs").click(function() {
+                                        if (window.dataCollection.env.mutexLock) {
+                                            delete(window.dataCollection.env.mutexLock);
+                                        }
+
                                         BazContentLoader.loadAjax($(".btn-tool-activitylogs-link"), {
                                             ajaxBefore                      : function () {
                                                                                 Pace.restart();

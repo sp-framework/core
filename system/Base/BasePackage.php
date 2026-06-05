@@ -208,6 +208,14 @@ abstract class BasePackage extends Controller
 			return;
 		}
 
+		if ($this->access->auth->check()) {//If user cannot update, we do not lock it.
+			if (isset($this->view->getParamsToView()['canUpdate']) &&
+				$this->view->getParamsToView()['canUpdate'] === false
+			) {//This is set before the route is executed in BaseComponent
+				return;
+			}
+		}
+
 		if (!isset($this->view->mutexLock)) {
 			$this->view->mutexLock = [];
 		}
