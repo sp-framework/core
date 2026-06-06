@@ -175,7 +175,7 @@ class Ff
                     $schema['properties'][$column->getName()]['format'] = 'time';
                 } else if ($column->getType() === 4 || $column->getType() === 17) {//if format is date-time and is required add timestamp
                     $schema['properties'][$column->getName()]['format'] = 'date-time';
-                    if ($column->getDefault() &&
+                    if (!is_null($column->getDefault()) &&
                         $column->getDefault() === 'CURRENT_TIMESTAMP'
                     ) {
                         if (!in_array($column->getName(), $schema['required'])) {
@@ -184,13 +184,26 @@ class Ff
                     }
                 } else if ($column->getType() === 15 || $column->getType() === 16) {//json format
                     $schema['properties'][$column->getName()]['format'] = 'json';
+                } else {
+                    if (!is_null($column->getDefault())) {
+                        $schema['properties'][$column->getName()]['default'] = (string) $column->getDefault();
+                    }
                 }
             } else if (in_array($column->getType(), $contants['number'])) {
                 $type = 'number';
+                if (!is_null($column->getDefault())) {
+                    $schema['properties'][$column->getName()]['default'] = (float) $column->getDefault();
+                }
             } else if (in_array($column->getType(), $contants['integer'])) {
                 $type = 'integer';
+                if (!is_null($column->getDefault())) {
+                    $schema['properties'][$column->getName()]['default'] = (int) $column->getDefault();
+                }
             } else if ($column->getType() === 8) {//Boolean
                 $type = 'boolean';
+                if (!is_null($column->getDefault())) {
+                    $schema['properties'][$column->getName()]['default'] = (bool) $column->getDefault();
+                }
             }
 
             if (isset($schema['properties'][$column->getName()]['type']) &&
