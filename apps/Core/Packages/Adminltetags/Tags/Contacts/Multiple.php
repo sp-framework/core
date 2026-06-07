@@ -737,8 +737,6 @@ class Multiple
                                             .find(".list-group-item-data").empty().append(html);
 
                                         if ($("#' . $this->compSecId . '-portrait-croppie").length > 0 && contactPortraitLink) {
-                                            //eslint-disable-next-line
-                                            console.log(contactId, $("#' . $this->compSecId . '-portrait-croppie-image-" + contactId));
                                             $("#' . $this->compSecId . '-portrait-croppie-image-" + contactId).attr("src", contactPortraitLink);
 
                                             $("#body").trigger("saveCroppie");
@@ -893,8 +891,6 @@ class Multiple
                                 var portrait = "";
 
                                 $($(button).parents("li").children(".row")[1]).find("dd").each(function(index,dd) {
-                                    //eslint-disable-next-line
-                                    console.log(dd);
                                     if ($(dd).is(".cla-contactReference")) {
                                         $("#' . $this->compSecId . '-contact_reference").val($(dd).html());
                                     } else if ($(dd).is(".cla-portrait")) {
