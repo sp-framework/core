@@ -12,6 +12,8 @@ class BasepackagesContactBook extends BaseModel
 
     public $package_row_id;
 
+    public $seq;
+
     public $portrait;
 
     public $initials_avatar;

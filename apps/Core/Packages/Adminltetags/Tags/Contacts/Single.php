@@ -100,7 +100,34 @@ class Single
 
     protected function buildSingleContactLayout()
     {
-        $vdivide = '';
+        $this->content .=
+            '<div class="row">
+                <div class="col">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                             => $this->params['component'],
+                            'componentName'                         => $this->params['componentName'],
+                            'componentId'                           => $this->params['componentId'],
+                            'sectionId'                             => $this->params['sectionId'],
+                            'fieldId'                               => 'contact_reference',
+                            'fieldLabel'                            => 'Contact Reference',
+                            'fieldType'                             => 'input',
+                            'fieldHelp'                             => true,
+                            'fieldHelpTooltipContent'               => 'Placeholder for js.',
+                            'fieldHidden'                           => true,
+                            'fieldDisabled'                         => true,
+                            'fieldRequired'                         => false,
+                            'fieldBazScan'                          => true,
+                            'fieldBazPostOnCreate'                  => false,
+                            'fieldBazPostOnUpdate'                  => false,
+                            'fieldDataInputMinLength'               => 1,
+                            'fieldDataInputMaxLength'               => 100,
+                            'fieldValue'                            => ''
+                        ]
+                    ) .
+                '</div>
+            </div>';
+
         if (isset($this->contactsParams['includePortrait']) && $this->contactsParams['includePortrait'] === true) {
             if ($this->contactsParams['multiple']) {
                 $this->content .= '<div class="col">';
@@ -115,6 +142,10 @@ class Single
                 $this->content .= '<div class="col-md-3 col-sm-12">';
                 $this->content .= $this->inclPortrait();
                 $this->content .= '</div>';
+            }
+        } else {
+            if ($this->contactsParams['multiple']) {
+                $this->content .= '<div class="col">';
             }
         }
 
@@ -171,8 +202,20 @@ class Single
     {
         $portrait = '';
 
+        if (!isset($this->params['maxHeight']) ||
+            isset($this->params['maxHeight']) && $this->params['maxHeight'] == 0
+        ) {
+            $this->contactsParams['maxHeight'] = 200;
+        }
+
+        if (!isset($this->params['maxWidth']) ||
+            isset($this->params['maxWidth']) && $this->params['maxWidth'] == 0
+        ) {
+            $this->contactsParams['maxWidth'] = 200;
+        }
+
         if (isset($this->contactsParams['portrait']) && $this->contactsParams['portrait'] !== '') {
-            $portraitLink = $this->links->url('system/storages/q/uuid/' . $this->contactsParams['portrait'] . '/w/200');
+            $portraitLink = $this->links->url('system/storages/q/uuid/' . $this->contactsParams['portrait'] . '/w/' . $this->contactsParams['maxWidth']);
         } else {
             $portraitLink = '';
         }
@@ -200,7 +243,9 @@ class Single
                     'avatar'                         => true,
                     'remove'                         => true,
                     'recover'                        => true,
-                    'portraitLink'                   => $portraitLink
+                    'portraitLink'                   => $portraitLink,
+                    'maxHeight'                      => $this->contactsParams['maxHeight'],
+                    'maxWidth'                       => $this->contactsParams['maxWidth']
                 ]
             );
 
@@ -214,7 +259,7 @@ class Single
 
         if ($this->contactsParams['includeNamePrefix']) {
             $name .=
-                '<div class="col-md-1">' .
+                '<div class="col-md-2">' .
                     $this->adminLTETags->useTag('fields',
                         [
                             'component'                      => $this->params['component'],
@@ -295,7 +340,7 @@ class Single
 
         if ($this->contactsParams['includeNameSuffix']) {
             $name .=
-                '<div class="col-md-1">' .
+                '<div class="col-md-2">' .
                     $this->adminLTETags->useTag('fields',
                         [
                             'component'                      => $this->params['component'],
@@ -640,7 +685,8 @@ class Single
     protected function inclNameJs()
     {
         return
-            '"' . $this->compSecId . '-prefix"                      : { },
+            '"' . $this->compSecId . '-contact_reference"           : { },
+            "' . $this->compSecId . '-prefix"                       : { },
             "' . $this->compSecId . '-first_name"                   : { },
             "' . $this->compSecId . '-last_name"                    : { },
             "' . $this->compSecId . '-suffix"                       : { },';

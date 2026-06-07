@@ -36,6 +36,14 @@ class ContactBook
                         'notNull' => true
                     ]
                 ),
+                new Column(//sequence
+                    'seq',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => true,
+                        'default' => 0
+                    ]
+                ),
                 new Column(
                     'portrait',
                     [
@@ -142,7 +150,7 @@ class ContactBook
                 new Column(
                     'cc_emails_to_secondary_email',
                     [
-                        'type'          => Column::TYPE_TINYINTEGER,
+                        'type'          => Column::TYPE_BOOLEAN,
                         'notNull'       => false,
                     ]
                 ),
@@ -167,7 +175,9 @@ class ContactBook
                 new Index(
                     'column_UNIQUE',
                     [
-                        'package_row_id'
+                        'package_row_id',
+                        'package_name',
+                        'full_name'
                     ],
                     'UNIQUE'
                 )
@@ -182,7 +192,12 @@ class ContactBook
             new Index(
                 'column_INDEX',
                 [
-                    'package_row_id'
+                    'package_row_id',
+                    'package_name',
+                    'first_name',
+                    'last_name',
+                    'email',
+                    'contact_phone'
                 ],
                 'INDEX'
             )

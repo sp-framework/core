@@ -506,6 +506,96 @@ abstract class BaseComponent extends Controller
 			$this->addResponse('Updated addresses', 0, ['addresses' => $addresses]);
 		}
 	}
+
+	//Modify Basepackages Contacts from any component
+	public function contactsAction()
+	{
+		if (!isset($this->postData()['package_name']) && !isset($this->postData()['package_row_id'])) {
+			$this->addResponse('Contact package information missing', 1);
+
+			return;
+		}
+
+		if (isset($this->postData()['package_name']) && $this->postData()['package_name'] === '') {
+			$this->addResponse('Contact package information missing', 1);
+
+			return;
+		}
+		if (isset($this->postData()['package_row_id']) && (int) $this->postData()['package_row_id'] == '0') {
+			$this->addResponse('Contact package information missing', 1);
+
+			return;
+		}
+
+		if (isset($this->postData()['contact_ids'])) {
+			if (is_string($this->postData()['contact_ids'])) {
+				$this->postData()['contact_ids'] = $this->helper->decode($this->postData()['contact_ids'], true);
+			}
+
+			if (count($this->postData()['contact_ids']) > 0) {
+				foreach ($this->postData()['contact_ids'] as $contactId => $contact) {
+					if (isset($contact['new']) && $contact['new'] == 1) {
+						$contact['package_name'] = $this->postData()['package_name'];
+						$contact['package_row_id'] = (int) $this->postData()['package_row_id'];
+
+						if (isset($contact['first_name']) && isset($contact['last_name'])) {
+							$contact['full_name'] = $contact['first_name'] . ' ' . $contact['last_name'];
+						} else {
+							$contact['full_name'] = $contact['first_name'];
+						}
+
+						$this->basepackages->contactbook->addContact($contact);
+					} else {
+						$dbContact = $this->basepackages->contactbook->getById($contactId);
+
+						if ($dbContact) {
+							$dbContact = array_merge($dbContact, $this->postData()['contact_ids'][$contactId]);
+
+							if (isset($dbContact['first_name']) && isset($dbContact['last_name'])) {
+								$dbContact['full_name'] = $dbContact['first_name'] . ' ' . $dbContact['last_name'];
+							} else {
+								$dbContact['full_name'] = $dbContact['first_name'];
+							}
+
+							$this->basepackages->contactbook->updateContact($dbContact);
+						}
+					}
+				}
+			}
+		}
+
+		if (isset($this->postData()['delete_contact_ids'])) {
+			if (is_string($this->postData()['delete_contact_ids'])) {
+				$this->postData()['delete_contact_ids'] = $this->helper->decode($this->postData()['delete_contact_ids'], true);
+			}
+
+			if (count($this->postData()['delete_contact_ids']) > 0) {
+				foreach ($this->postData()['delete_contact_ids'] as $contactId) {
+					$dbContact = $this->basepackages->contactbook->getById($contactId);
+
+					if ($dbContact) {
+						$this->basepackages->contactbook->removeContact($dbContact);
+					}
+				}
+			}
+		}
+
+		$contacts = [];
+
+		$contactsArr =
+			$this->basepackages->contactbook->getContactsByPackageNameAndPackageRowId(
+				$this->postData()['package_name'], $this->postData()['package_row_id']
+			);
+
+		if ($contactsArr && count($contactsArr) > 0) {
+			foreach ($contactsArr as $contact) {
+				$contacts[$contact['id']] = $contact;
+			}
+		}
+
+		$this->addResponse('Updated contacts', 0, ['contacts' => $contacts]);
+	}
+
 	public function releaseMutexAction()
 	{
 		if (isset($this->postData()['mutexLock']) && isset($this->postData()['mutexLock']['id'])) {

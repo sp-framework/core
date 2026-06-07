@@ -56,4 +56,29 @@ class ContactBook extends BasePackage
             $this->addResponse('Error removing contact.', 1);
         }
     }
+
+    public function getContactsByPackageNameAndPackageRowId($packageName, $packageRowId)
+    {
+        if ($this->config->databasetype === 'db') {
+            $conditions =
+                [
+                    'conditions'    => 'package_name = :packageName: AND package_row_id = :packageRowId:',
+                    'bind'          =>
+                        [
+                            'packageName'       => $packageName,
+                            'packageRowId'      => $packageRowId
+                        ]
+                ];
+        } else {
+            $conditions =
+                [
+                    'conditions'    => [
+                        ['package_name', '=', $packageName],
+                        ['package_row_id', '=', (int) $packageRowId]
+                    ]
+                ];
+        }
+
+        return $this->getByParams($conditions);
+    }
 }

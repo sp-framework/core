@@ -199,6 +199,8 @@ class Profiles extends BasePackage
 
         if (isset($data['first_name']) && isset($data['last_name'])) {
             $profile['contact']['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
+        } else {
+            $profile['contact']['full_name'] = $data['first_name'];
         }
 
         if ($profile['contact']['contact_phone'] === '') {
@@ -215,6 +217,22 @@ class Profiles extends BasePackage
         $contact['package_row_id'] = $profile['id'];
 
         $this->basepackages->contactbook->updateContact($contact);
+
+        if (isset($data['delete_address_ids'])) {
+            if (is_string($data['delete_address_ids'])) {
+                $data['delete_address_ids'] = $this->helper->decode($data['delete_address_ids'], true);
+            }
+
+            if (count($data['delete_address_ids']) > 0) {
+                foreach ($data['delete_address_ids'] as $addressId) {
+                    $dbAddress = $this->basepackages->addressbook->getById($addressId);
+
+                    if ($dbAddress) {
+                        $this->basepackages->addressbook->removeAddress($dbAddress);
+                    }
+                }
+            }
+        }
 
         if (isset($data['address_ids'])) {
             if (is_string($data['address_ids'])) {
@@ -233,25 +251,9 @@ class Profiles extends BasePackage
 
                         if ($dbAddress) {
                             $dbAddress = array_merge($dbAddress, $data['address_ids'][$addressId]);
+
+                            $this->basepackages->addressbook->updateAddress($dbAddress);
                         }
-
-                        $this->basepackages->addressbook->updateAddress($dbAddress);
-                    }
-                }
-            }
-        }
-
-        if (isset($data['delete_address_ids'])) {
-            if (is_string($data['delete_address_ids'])) {
-                $data['delete_address_ids'] = $this->helper->decode($data['delete_address_ids'], true);
-            }
-
-            if (count($data['delete_address_ids']) > 0) {
-                foreach ($data['delete_address_ids'] as $addressId) {
-                    $dbAddress = $this->basepackages->addressbook->getById($addressId);
-
-                    if ($dbAddress) {
-                        $this->basepackages->addressbook->removeAddress($dbAddress);
                     }
                 }
             }

@@ -82,6 +82,31 @@ class Multiple
             $this->params['contactNotesFieldLabel'] :
             'Contact Notes';
 
+        $this->contactsParams['contactPostLink'] =
+            isset($this->params['contactPostLink']) ?
+            $this->params['contactPostLink'] :
+            '';
+
+        if ($this->contactsParams['contactPostLink'] !== '') {
+            if (!isset($this->params['contactPackageName'])) {
+                throw new \Exception('contactPostLink requires contactPackageName');
+            }
+            if (!isset($this->params['contactPackageRowId'])) {
+                throw new \Exception('contactPostLink requires contactPackageRowId');
+            }
+
+            $this->contactsParams['contactPackageName'] = $this->params['contactPackageName'];
+            $this->contactsParams['contactPackageRowId'] = $this->params['contactPackageRowId'];
+        } else {
+            $this->contactsParams['contactPackageName'] = '';
+            $this->contactsParams['contactPackageRowId'] = '';
+        }
+
+        $this->contactsParams['contactSortable'] =
+            isset($this->params['contactSortable']) ?
+            $this->params['contactSortable'] :
+            true;
+
         $fieldsArr = null;
         $field = null;
 
@@ -113,7 +138,7 @@ class Multiple
 
         $this->content .=
             '<div class="row vdivide" id="' . $this->compSecId . '-contacts">
-                <div class="col">
+                <div class="col-md-7">
                     <div class="row">
                         <div class="col">' .
                             $this->adminLTETags->useTag('fields',
@@ -249,25 +274,33 @@ class Multiple
                                     'fieldBazPostOnUpdate'      => false
                                 ]
                             ) .
-                            '<ul class="list-group list-group-sortable" id="' . $this->compSecId . '-sortable-contacts-list">';
+                            '<ul class="list-group list-group-sortable" id="' . $this->compSecId . '-sortable-contacts-list" style="max-height: ' . ($this->contactsParams['includePortrait'] === true ? '700' : '450') . 'px;overflow: scroll;border-radius: 0 !important;">';
                                 if (isset($this->params['contacts']) && is_array($this->params['contacts']) && count($this->params['contacts']) > 0) {
+                                    $this->params['contacts'] = msort($this->params['contacts'], 'seq');
+
                                     $this->content .=
                                         '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-contacts-list-nodata" hidden>
                                             <div class="row">
                                                 <div class="col text-uppercase">
                                                     <i class="fa fa-fw fa-exclamation"></i> Add New Contact
                                                 </div>
-                                            </div>
+                                            </div>`
                                         </div>';
 
                                     foreach ($this->params['contacts'] as $key => $contact) {
                                         $this->content .=
-                                            '<li class="list-group-item list-group-item-secondary" area-disabled="false" style="cursor: pointer" data-new="0" data-contact-id="' . $contact['id'] . '">
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <i class="fa fa-sort fa-fw handle"></i>
-                                                    </div>
-                                                    <div class="col">
+                                            '<li class="list-group-item list-group-item-secondary" area-disabled="false" style="border: 1px solid rgba(0, 0, 0, 0.125); cursor: pointer" data-new="0" data-contact-id="' . $contact['id'] . '" data-contact-seq="' . $contact['seq'] . '">
+                                                <div class="row">';
+
+                                                if ($this->contactsParams['contactSortable']) {
+                                                    $this->content .=
+                                                        '<div class="col">
+                                                            <i class="fa fa-sort fa-fw handle"></i>
+                                                        </div>';
+                                                }
+
+                                                $this->content .=
+                                                    '<div class="col">
                                                         <button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 contactDeleteButton">
                                                             <i class="fa fas fa-fw text-xs fa-trash"></i>
                                                         </button>
@@ -279,47 +312,102 @@ class Multiple
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <div class="row">
-                                                    <div class="col list-group-item-data">
-                                                        <dl class="row mb-0">
-                                                            <dt class="text-uppercase mb-0 col-sm-4">Contact Reference</dt>
-                                                            <dd class="mb-0 col-sm-8 cla-contactReference">' . $contact['contact_reference'] . '</dd>';
-                                                            if (isset($contact['attention_to']) && $contact['attention_to'] !== '') {
-                                                                $this->content .=
-                                                                    '<dt class="text-uppercase mb-0 col-sm-4">Attention To</dt>
-                                                                    <dd class="mb-0 col-sm-8 cla-attentionTo">' . $contact['attention_to'] . '</dd>';
-                                                            }
+                                                <div class="text-center image-content ' . $this->compSecId . '-portrait-image-content">';
+                                                    if ($contact['portrait'] !== '') {
+                                                        $contactPortraitLink = $this->links->url('system/storages/q/uuid/' . $contact["portrait"] . '/w/80');
+
+                                                        $this->content .=
+                                                            '<img id="' . $this->compSecId . '-portrait-croppie-image-' . $contact['id'] . '" alt="portrait" data-type="portrait" data-orgimage="' . $this->links->images('general/portrait.png') . '" src="' . $contactPortraitLink . '" class="user-image img-fluid img-thumbnail" style="max-width:80px;max-height:80px;">
+                                                            <div class="image-text-portrait d-none">' . $contact['portrait'] . '</div>';
+                                                    } else {
+                                                        $this->content .=
+                                                            '<img id="' . $this->compSecId . '-portrait-croppie-image-' . $contact['id'] . '" alt="portrait" data-type="portrait" data-orgimage="' . $this->links->images('general/portrait.png') . '" src="' . $this->links->images('general/portrait.png') . '" class="user-image img-fluid img-thumbnail" style="max-width:80px;max-height:80px;">
+                                                            <div class="image-text-portrait d-none">' . $this->links->images('general/portrait.png') . '</div>';
+                                                    }
+                                                $this->content .=
+                                                '</div>';
+                                                $this->content .=
+                                                    '<div class="row">
+                                                        <div class="col list-group-item-data">
+                                                            <dl class="row mb-0">
+                                                                <dt class="text-uppercase mb-0 col-sm-4 d-none">Contact Reference</dt>
+                                                                <dd class="mb-0 col-sm-8 cla-contactReference d-none">' . $contact['full_name'] . '</dd>';
+
                                                             $this->content .=
-                                                                '<dt class="text-uppercase mb-0 col-sm-4">Street Contact</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-street">' . $contact['street_contact'] . '</dd>';
-                                                            if (isset($contact['street_contact_2']) && $contact['street_contact_2'] !== '') {
+                                                                '<dt class="text-uppercase mb-0 col-sm-4 d-none">Portrait</dt>
+                                                                <dd class="mb-0 col-sm-8 cla-portrait d-none">' . $contact["portrait"] . '</dd>';
+
+                                                                if (isset($contact['prefix']) && $contact['prefix'] !== '') {
+                                                                    $this->content .=
+                                                                        '<dt class="text-uppercase mb-0 col-sm-4">Prefix</dt>
+                                                                        <dd class="mb-0 col-sm-8 cla-prefix">' . $contact['prefix'] . '</dd>';
+                                                                }
                                                                 $this->content .=
-                                                                    '<dt class="text-uppercase mb-0 col-sm-4">Street Contact 2</dt>
-                                                                    <dd class="mb-0 col-sm-8 cla-street2">' . $contact['street_contact_2'] . '</dd>';
-                                                            }
-                                                            if (isset($contact['street_contact_3']) && $contact['street_contact_3'] !== '') {
+                                                                    '<dt class="text-uppercase mb-0 col-sm-4">First Name</dt>
+                                                                    <dd class="mb-0 col-sm-8 cla-firstName">' . $contact['first_name'] . '</dd>
+                                                                    <dt class="text-uppercase mb-0 col-sm-4">Last Name</dt>
+                                                                    <dd class="mb-0 col-sm-8 cla-lastName">' . $contact['last_name'] . '</dd>';
+                                                                if (isset($contact['suffix']) && $contact['suffix'] !== '') {
+                                                                    $this->content .=
+                                                                        '<dt class="text-uppercase mb-0 col-sm-4">Suffix</dt>
+                                                                        <dd class="mb-0 col-sm-8 cla-suffix">' . $contact['suffix'] . '</dd>';
+                                                                }
+                                                                if (isset($contact['email']) && $contact['email'] !== '') {
+                                                                    $this->content .=
+                                                                        '<dt class="text-uppercase mb-0 col-sm-4">Email</dt>
+                                                                        <dd class="mb-0 col-sm-8 cla-email">' . $contact['email'] . '</dd>';
+                                                                }
+                                                                if (isset($contact['secondary_email']) && $contact['secondary_email'] !== '') {
+                                                                    $this->content .=
+                                                                        '<dt class="text-uppercase mb-0 col-sm-4">Secondary Email</dt>
+                                                                        <dd class="mb-0 col-sm-8 cla-secondaryEmail">' . $contact['secondary_email'] . '</dd>';
+                                                                }
+                                                                if (isset($contact['cc_emails_to_secondary_email']) && $contact['cc_emails_to_secondary_email'] !== '') {
+                                                                    if ($contact['cc_emails_to_secondary_email'] == '0') {
+                                                                        $contact['cc_emails_to_secondary_email'] = 'N';
+                                                                    } else if ($contact['cc_emails_to_secondary_email'] == '1') {
+                                                                        $contact['cc_emails_to_secondary_email'] = 'Y';
+                                                                    }
+                                                                    $this->content .=
+                                                                        '<dt class="text-uppercase mb-0 col-sm-4">CC Secondary Email</dt>
+                                                                        <dd class="mb-0 col-sm-8 cla-ccSecondaryEmail">' . $contact['cc_emails_to_secondary_email'] . '</dd>';
+                                                                }
+                                                                if (isset($contact['contact_phone']) && $contact['contact_phone'] !== '') {
+                                                                    $this->content .=
+                                                                        '<dt class="text-uppercase mb-0 col-sm-4">Phone</dt>
+                                                                        <dd class="mb-0 col-sm-8 cla-phone">' . $contact['contact_phone'] . '</dd>';
+                                                                }
+                                                                if (isset($contact['contact_phone_ext']) && $contact['contact_phone_ext'] !== '') {
+                                                                    $this->content .=
+                                                                        '<dt class="text-uppercase mb-0 col-sm-4">Extension</dt>
+                                                                        <dd class="mb-0 col-sm-8 cla-extension">' . $contact['contact_phone_ext'] . '</dd>';
+                                                                }
+                                                                if (isset($contact['contact_mobile']) && $contact['contact_mobile'] !== '') {
+                                                                    $this->content .=
+                                                                        '<dt class="text-uppercase mb-0 col-sm-4">Mobile</dt>
+                                                                        <dd class="mb-0 col-sm-8 cla-mobile">' . $contact['contact_mobile'] . '</dd>';
+                                                                }
+                                                                if (isset($contact['contact_fax']) && $contact['contact_fax'] !== '') {
+                                                                    $this->content .=
+                                                                        '<dt class="text-uppercase mb-0 col-sm-4">Fax</dt>
+                                                                        <dd class="mb-0 col-sm-8 cla-fax">' . $contact['contact_fax'] . '</dd>';
+                                                                }
+                                                                if (isset($contact['contact_other']) && $contact['contact_other'] !== '') {
+                                                                    $this->content .=
+                                                                        '<dt class="text-uppercase mb-0 col-sm-4">Other Contact #</dt>
+                                                                        <dd class="mb-0 col-sm-8 cla-other">' . $contact['contact_other'] . '</dd>';
+                                                                }
+                                                                if (isset($contact['contact_notes']) && $contact['contact_notes'] !== '') {
+                                                                    $this->content .=
+                                                                        '<dt class="text-uppercase mb-0 col-sm-4">Contact Notes</dt>
+                                                                        <dd class="mb-0 col-sm-8 cla-notes">' . $contact['contact_notes'] . '</dd>';
+                                                                }
+
                                                                 $this->content .=
-                                                                    '<dt class="text-uppercase mb-0 col-sm-4">Street Contact 3</dt>
-                                                                    <dd class="mb-0 col-sm-8 cla-street3">' . $contact['street_contact_3'] . '</dd>';
-                                                            }
-                                                            if (isset($contact['street_contact_4']) && $contact['street_contact_4'] !== '') {
-                                                                $this->content .=
-                                                                    '<dt class="text-uppercase mb-0 col-sm-4">Street Contact 4</dt>
-                                                                    <dd class="mb-0 col-sm-8 cla-street4">' . $contact['street_contact_4'] . '</dd>';
-                                                            }
-                                                            $this->content .=
-                                                                '<dt class="text-uppercase mb-0 col-sm-4">City</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-city" data-id="' . $contact['city_id'] . '">' . $contact['city_name'] . '</dd>
-                                                                <dt class="text-uppercase mb-0 col-sm-4">Post Code</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-postcode">' . $contact['post_code'] . '</dd>
-                                                                <dt class="text-uppercase mb-0 col-sm-4">State</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-state" data-id="' . $contact['state_id'] . '">' . $contact['state_name'] . '</dd>
-                                                                <dt class="text-uppercase mb-0 col-sm-4">Country</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-country" data-id="' . $contact['country_id'] . '">' . $contact['country_name'] . '</dd>
-                                                        </dl>
+                                                            '</dl>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </li>';
+                                                </li>';
                                     }
                                 } else {
                                     $this->content .=
@@ -373,6 +461,9 @@ class Multiple
                 $.extend(dataCollectionSection, {
                     "' . $this->compSecId . '-contact_reference"                   : {
                         afterInit : function () {
+                            var contactPostLink = "' . $this->contactsParams['contactPostLink'] . '";
+                            var contactSortable = "' . $this->contactsParams['contactSortable'] . '";
+
                             dataCollectionSection["data"]["contact_ids"] = { }
                             dataCollectionSection["data"]["delete_contact_ids"] = [];
 
@@ -380,42 +471,45 @@ class Multiple
                                 $("#' . $this->compSecId . '-cancel-contact").off();
                                 $("#' . $this->compSecId . '-cancel-contact").click(function(e) {
                                     e.preventDefault();
-                                    $(".contactEditButton, .contactDeleteButton").attr("disabled", false);
+                                    $(".contactEditButton, .contactDeleteButton, .contactCopyButton").attr("disabled", false);
+
                                     toggleContactFields(true);
-                                    $("#' . $this->compSecId . '-contacts").trigger("contactCancel");
+
+                                    if ($("#' . $this->compSecId . '-portrait-croppie").length > 0) {
+                                        $("#body").trigger("resetCroppie");
+                                    }
+
+                                    $("#' . $this->compSecId . '-contactes").trigger("contactCancel");
                                 });
                                 $("#' . $this->compSecId . '-add-contact, #' . $this->compSecId . '-update-contact").off();
                                 $("#' . $this->compSecId . '-add-contact, #' . $this->compSecId . '-update-contact").attr("disabled", false);
                                 $("#' . $this->compSecId . '-add-contact, #' . $this->compSecId . '-update-contact").click(function(e) {
                                     e.preventDefault();
-                                    $(".contactEditButton, .contactDeleteButton").attr("disabled", false);
+                                    $(".contactEditButton, .contactDeleteButton, .contactCopyButton").attr("disabled", false);
 
                                     if ($(this)[0].id === "' . $this->compSecId . '-update-contact") {
-                                        extractData(true);
-                                        $("#' . $this->compSecId . '-contacts").trigger("contactUpdate");
+                                        extractData(true, true);
+                                        $("#' . $this->compSecId . '-contactes").trigger("contactUpdate");
                                     } else {
-                                        extractData();
-                                        $("#' . $this->compSecId . '-contacts").trigger("contactAdd");
+                                        extractData(false, true);
+                                        $("#' . $this->compSecId . '-contactes").trigger("contactAdd");
                                     }
                                 });
                             }
 
                             function toggleContactFields(status, update = false) {
+                                var fields = ["contact_id","contact_reference","portrait","prefix","first_name","last_name","suffix","email","secondary_email","cc_emails_to_secondary_email","contact_phone","contact_phone_ext","contact_mobile","contact_other","contact_fax","contact_notes"];
+
                                 if (status === true) {
-                                    $("#' . $this->compSecId . '-contact_reference").val("");
-                                    $("#' . $this->compSecId . '-contact_id").val("");
-                                    $("#' . $this->compSecId . '-attention_to").val("");
-                                    $("#' . $this->compSecId . '-street_contact").val("");
-                                    $("#' . $this->compSecId . '-street_contact_2").val("");
-                                    $("#' . $this->compSecId . '-street_contact_3").val("");
-                                    $("#' . $this->compSecId . '-street_contact_4").val("");
-                                    $("#' . $this->compSecId . '-city_id").val("");
-                                    $("#' . $this->compSecId . '-city_name").val("");
-                                    $("#' . $this->compSecId . '-post_code").val("");
-                                    $("#' . $this->compSecId . '-state_id").val("");
-                                    $("#' . $this->compSecId . '-state_name").val("");
-                                    $("#' . $this->compSecId . '-country_id").val("");
-                                    $("#' . $this->compSecId . '-country_name").val("");
+                                    $(fields).each(function(index, field) {
+                                        if ($("#' . $this->compSecId . '-" + field).length > 0) {
+                                            if (field === "cc_emails_to_secondary_email") {
+                                                $("#' . $this->compSecId . '-" + field)[0]["checked"] = false;
+                                            } else {
+                                                $("#' . $this->compSecId . '-" + field).val("");
+                                            }
+                                        }
+                                    });
                                 }
 
                                 if (update === true) {
@@ -428,116 +522,30 @@ class Multiple
                                     $("#' . $this->compSecId . '-add-contact").attr("disabled", false);
                                 }
 
-                                $("#' . $this->compSecId . '-contact_reference").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-attention_to").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-street_contact").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-street_contact_2").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-street_contact_3").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-street_contact_4").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-city_name").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-post_code").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-state_name").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-country_name").removeClass("is-invalid");
+                                $(fields).each(function(index, field) {
+                                    if ($("#' . $this->compSecId . '-" + field).length > 0) {
+                                        $("#' . $this->compSecId . '-" + field).removeClass("is-invalid");
+                                    }
+                                });
                             }
 
-                            function extractData(update = false) {
-                                if ($("#' . $this->compSecId . '-contact_reference").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-contact_reference").val() === "") {
-                                    $("#' . $this->compSecId . '-contact_reference").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-contact_reference").focus(function() {
-                                        $("#' . $this->compSecId . '-contact_reference").removeClass("is-invalid");
-                                    });
+                            function extractData(update = false, onclick = false) {
+                                var fields = ["prefix","first_name","last_name","suffix","email","secondary_email","cc_emails_to_secondary_email","contact_phone","contact_phone_ext","contact_mobile","contact_other","contact_fax","contact_notes"];
 
-                                    return;
-                                }
+                                var fieldError = false;
+                                $(fields).each(function(index, field) {
+                                    if ($("#' . $this->compSecId . '-" + field).siblings().find("[data-original-title=\'Required\']").length > 0 &&
+                                        $("#' . $this->compSecId . '-" + field).val() === "") {
+                                        $("#' . $this->compSecId . '-" + field).addClass("is-invalid");
+                                        $("#' . $this->compSecId . '-" + field).focus(function() {
+                                            $("#' . $this->compSecId . '-" + field).removeClass("is-invalid");
+                                        });
 
-                                if ($("#' . $this->compSecId . '-attention_to").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-attention_to").val() === "") {
-                                    $("#' . $this->compSecId . '-attention_to").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-attention_to").focus(function() {
-                                        $("#' . $this->compSecId . '-attention_to").removeClass("is-invalid");
-                                    });
+                                        fieldError = true;
+                                    }
+                                });
 
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-street_contact").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-street_contact").val() === "") {
-                                    $("#' . $this->compSecId . '-street_contact").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-street_contact").focus(function() {
-                                        $("#' . $this->compSecId . '-street_contact").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-street_contact_2").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-street_contact_2").val() === "") {
-                                    $("#' . $this->compSecId . '-street_contact_2").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-street_contact_2").focus(function() {
-                                        $("#' . $this->compSecId . '-street_contact_2").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-street_contact_3").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-street_contact_3").val() === "") {
-                                    $("#' . $this->compSecId . '-street_contact_3").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-street_contact_3").focus(function() {
-                                        $("#' . $this->compSecId . '-street_contact_3").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-street_contact_4").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-street_contact_4").val() === "") {
-                                    $("#' . $this->compSecId . '-street_contact_4").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-street_contact_4").focus(function() {
-                                        $("#' . $this->compSecId . '-street_contact_4").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-city_name").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-city_name").val() === "") {
-                                    $("#' . $this->compSecId . '-city_name").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-city_name").focus(function() {
-                                        $("#' . $this->compSecId . '-city_name").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-post_code").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-post_code").val() === "") {
-                                    $("#' . $this->compSecId . '-post_code").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-post_code").focus(function() {
-                                        $("#' . $this->compSecId . '-post_code").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-state_name").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-state_name").val() === "") {
-                                    $("#' . $this->compSecId . '-state_name").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-state_name").focus(function() {
-                                        $("#' . $this->compSecId . '-state_name").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-country_name").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-country_name").val() === "") {
-                                    $("#' . $this->compSecId . '-country_name").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-country_name").focus(function() {
-                                        $("#' . $this->compSecId . '-country_name").removeClass("is-invalid");
-                                    });
-
+                                if (fieldError) {
                                     return;
                                 }
 
@@ -548,67 +556,98 @@ class Multiple
                                 var html =
                                     \'<dl class="row mb-0">\';
                                 if ($("#' . $this->compSecId . '-contact_reference").length > 0) {
-                                    data["contact_reference"] = $("#' . $this->compSecId . '-contact_reference").val().trim();
+                                    data["contact_reference"] = $("#' . $this->compSecId . '-first_name").val().trim() + " " + $("#' . $this->compSecId . '-last_name").val().trim();
                                     html +=
-                                        \'<dt class="text-uppercase mb-0 col-sm-4">Contact Reference</dt>\' +
-                                        \'<dd class="mb-0 col-sm-8 cla-contactReference">\' + data["contact_reference"] + \'</dd>\';
+                                        \'<dt class="text-uppercase mb-0 col-sm-4 d-none">Contact Reference</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-contactReference d-none">\' + data["contact_reference"] + \'</dd>\';
                                 }
-                                if ($("#' . $this->compSecId . '-attention_to").length > 0) {
-                                    data["attention_to"] = $("#' . $this->compSecId . '-attention_to").val().trim();
+                                if ($("#' . $this->compSecId . '-portrait").length > 0) {
+                                    data["portrait"] = $("#' . $this->compSecId . '-portrait").val().trim();
                                     html +=
-                                        \'<dt class="text-uppercase mb-0 col-sm-4">Attention To</dt>\' +
-                                        \'<dd class="mb-0 col-sm-8 cla-attentionTo">\' + data["attention_to"] + \'</dd>\';
+                                        \'<dt class="text-uppercase mb-0 col-sm-4 d-none">Portrait</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-portrait d-none">\' + data["portrait"] + \'</dd>\';
                                 }
-                                if ($("#' . $this->compSecId . '-street_contact").length > 0) {
-                                    data["street_contact"] = $("#' . $this->compSecId . '-street_contact").val().trim();
+                                if ($("#' . $this->compSecId . '-prefix").length > 0) {
+                                    data["prefix"] = $("#' . $this->compSecId . '-prefix").val().trim();
                                     html +=
-                                        \'<dt class="text-uppercase mb-0 col-sm-4">Street Contact</dt>\' +
-                                        \'<dd class="mb-0 col-sm-8 cla-street">\' + data["street_contact"] + \'</dd>\';
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">Prefix</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-prefix">\' + data["prefix"] + \'</dd>\';
                                 }
-                                if ($("#' . $this->compSecId . '-street_contact_2").length > 0) {
-                                    data["street_contact_2"] = $("#' . $this->compSecId . '-street_contact_2").val().trim();
+                                if ($("#' . $this->compSecId . '-first_name").length > 0) {
+                                    data["first_name"] = $("#' . $this->compSecId . '-first_name").val().trim();
                                     html +=
-                                        \'<dt class="text-uppercase mb-0 col-sm-4">Street Contact 2</dt>\' +
-                                        \'<dd class="mb-0 col-sm-8 cla-street2">\' + data["street_contact_2"] + \'</dd>\';
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">First Name</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-firstName">\' + data["first_name"] + \'</dd>\';
                                 }
-                                if ($("#' . $this->compSecId . '-street_contact_3").length > 0) {
-                                    data["street_contact_3"] = $("#' . $this->compSecId . '-street_contact_3").val().trim();
+                                if ($("#' . $this->compSecId . '-last_name").length > 0) {
+                                    data["last_name"] = $("#' . $this->compSecId . '-last_name").val().trim();
                                     html +=
-                                        \'<dt class="text-uppercase mb-0 col-sm-4">Street Contact 3</dt>\' +
-                                        \'<dd class="mb-0 col-sm-8 cla-street3">\' + data["street_contact_3"] + \'</dd>\';
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">Last Name</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-lastName">\' + data["last_name"] + \'</dd>\';
                                 }
-                                if ($("#' . $this->compSecId . '-street_contact_4").length > 0) {
-                                    data["street_contact_4"] = $("#' . $this->compSecId . '-street_contact_4").val().trim();
+                                if ($("#' . $this->compSecId . '-suffix").length > 0) {
+                                    data["suffix"] = $("#' . $this->compSecId . '-suffix").val().trim();
                                     html +=
-                                        \'<dt class="text-uppercase mb-0 col-sm-4">Street Contact 4</dt>\' +
-                                        \'<dd class="mb-0 col-sm-8 cla-street4">\' + data["street_contact_4"] + \'</dd>\';
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">Suffix</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-suffix">\' + data["suffix"] + \'</dd>\';
                                 }
-                                data["city_id"] = $("#' . $this->compSecId . '-city_id").val();
-                                if ($("#' . $this->compSecId . '-city_name").length > 0) {
-                                    data["city_name"] = $("#' . $this->compSecId . '-city_name").val().trim();
+                                if ($("#' . $this->compSecId . '-email").length > 0) {
+                                    data["email"] = $("#' . $this->compSecId . '-email").val().trim();
                                     html +=
-                                        \'<dt class="text-uppercase mb-0 col-sm-4">City</dt>\' +
-                                        \'<dd class="mb-0 col-sm-8 cla-city" data-id="\' + data["city_id"] + \'">\' + data["city_name"] + \'</dd>\';
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">Email</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-email">\' + data["email"] + \'</dd>\';
                                 }
-                                if ($("#' . $this->compSecId . '-post_code").length > 0) {
-                                    data["post_code"] = $("#' . $this->compSecId . '-post_code").val().trim();
+                                if ($("#' . $this->compSecId . '-secondary_email").length > 0) {
+                                    data["secondary_email"] = $("#' . $this->compSecId . '-secondary_email").val().trim();
                                     html +=
-                                        \'<dt class="text-uppercase mb-0 col-sm-4">Post Code</dt>\' +
-                                        \'<dd class="mb-0 col-sm-8 cla-postcode">\' + data["post_code"] + \'</dd>\';
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">Secondary Email</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-secondaryEmail">\' + data["secondary_email"] + \'</dd>\';
                                 }
-                                data["state_id"] = $("#' . $this->compSecId . '-state_id").val();
-                                if ($("#' . $this->compSecId . '-state_name").length > 0) {
-                                    data["state_name"] = $("#' . $this->compSecId . '-state_name").val().trim();
+                                if ($("#' . $this->compSecId . '-cc_emails_to_secondary_email").length > 0) {
+                                    data["cc_emails_to_secondary_email"] = $("#' . $this->compSecId . '-cc_emails_to_secondary_email")[0].checked;
+                                    var ccEmailsToSecondaryEmail = "N";
+                                    if (data["cc_emails_to_secondary_email"]) {
+                                        ccEmailsToSecondaryEmail = "Y";
+                                    }
                                     html +=
-                                        \'<dt class="text-uppercase mb-0 col-sm-4">State</dt>\' +
-                                        \'<dd class="mb-0 col-sm-8 cla-state" data-id="\' + data["state_id"] + \'">\' + data["state_name"] + \'</dd>\';
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">CC Secondary Email</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-ccSecondaryEmail">\' + ccEmailsToSecondaryEmail + \'</dd>\';
                                 }
-                                data["country_id"] = $("#' . $this->compSecId . '-country_id").val();
-                                if ($("#' . $this->compSecId . '-country_name").length > 0) {
-                                    data["country_name"] = $("#' . $this->compSecId . '-country_name").val().trim();
+                                if ($("#' . $this->compSecId . '-contact_phone").length > 0) {
+                                    data["contact_phone"] = $("#' . $this->compSecId . '-contact_phone").val().trim();
                                     html +=
-                                        \'<dt class="text-uppercase mb-0 col-sm-4">Country</dt>\' +
-                                        \'<dd class="mb-0 col-sm-8 cla-country" data-id="\' + data["country_id"] + \'">\' + data["country_name"] + \'</dd>\';
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">Phone</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-phone">\' + data["contact_phone"] + \'</dd>\';
+                                }
+                                if ($("#' . $this->compSecId . '-contact_phone_ext").length > 0) {
+                                    data["contact_phone_ext"] = $("#' . $this->compSecId . '-contact_phone_ext").val().trim();
+                                    html +=
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">Extension</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-extension">\' + data["contact_phone_ext"] + \'</dd>\';
+                                }
+                                if ($("#' . $this->compSecId . '-contact_mobile").length > 0) {
+                                    data["contact_mobile"] = $("#' . $this->compSecId . '-contact_mobile").val().trim();
+                                    html +=
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">Mobile</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-mobile">\' + data["contact_mobile"] + \'</dd>\';
+                                }
+                                if ($("#' . $this->compSecId . '-contact_fax").length > 0) {
+                                    data["contact_fax"] = $("#' . $this->compSecId . '-contact_fax").val().trim();
+                                    html +=
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">Fax</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-fax">\' + data["contact_fax"] + \'</dd>\';
+                                }
+                                if ($("#' . $this->compSecId . '-contact_other").length > 0) {
+                                    data["contact_other"] = $("#' . $this->compSecId . '-contact_other").val().trim();
+                                    html +=
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">Other Contact #</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-other">\' + data["contact_other"] + \'</dd>\';
+                                }
+                                if ($("#' . $this->compSecId . '-contact_notes").length > 0) {
+                                    data["contact_notes"] = $("#' . $this->compSecId . '-contact_notes").val().trim();
+                                    html +=
+                                        \'<dt class="text-uppercase mb-0 col-sm-4">Contact Notes</dt>\' +
+                                        \'<dd class="mb-0 col-sm-8 cla-notes">\' + data["contact_notes"] + \'</dd>\';
                                 }
 
                                 html +=
@@ -628,8 +667,11 @@ class Multiple
                                     var list =
                                         \'<li class="list-group-item list-group-item-secondary\' +
                                             \'" area-disabled="false" style="cursor: pointer" \' +
-                                            \'" data-new="\' + contactNew + \'" data-contact-id="\' + contactId + \'">\' +
+                                            \'" data-new="\' + contactNew + \'" data-contact-id="\' + contactId + \'" data-contact-seq="\' + contactId + \'">\' +
                                             \'<div class="row">\' +
+                                                \'<div class="col">\' +
+                                                    \'<i class="fa fa-sort fa-fw handle"></i>\' +
+                                                \'</div>\' +
                                                 \'<div class="col">\' +
                                                     \'<button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 contactDeleteButton">\' +
                                                         \'<i class="fa fas fa-fw text-xs fa-trash"></i>\' +
@@ -641,7 +683,30 @@ class Multiple
                                                         \'<i class="fa fas fa-fw text-xs fa-copy"></i>\' +
                                                     \'</button>\' +
                                                 \'</div>\' +
-                                            \'</div>\' +
+                                            \'</div>\';
+
+                                            if ($("#' . $this->compSecId . '-portrait").length > 0) {
+                                                var contactPortraitLink;
+
+                                                data["portrait"] = $("#' . $this->compSecId . '-portrait").val().trim();
+                                                list +=
+                                                    \'<div class="text-center image-content ' . $this->compSecId . '-portrait-image-content">\';
+
+                                                if (data["portrait"] === "") {
+                                                    list +=
+                                                    \'<img id="' . $this->compSecId . '-portrait-croppie-image-\' + contactId + \'" alt="portrait" data-type="portrait" data-orgimage="' . $this->links->images('general/portrait.png') . '" src="' . $this->links->images('general/portrait.png') . '" class="user-image img-fluid img-thumbnail" style="max-width:80px;max-height:80px;">\' +
+                                                    \'<div class="image-text-portrait d-none">' . $this->links->images('general/portrait.png') . '</div>\';
+                                                } else {
+                                                    contactPortraitLink = \'' . $this->links->url('system/storages/q/uuid/\' + data["portrait"] + \'/w/80\'') . ';
+                                                    list +=
+                                                    \'<img id="' . $this->compSecId . '-portrait-croppie-image-\' + contactId + \'" alt="portrait" data-type="portrait" data-orgimage="' . $this->links->images('general/portrait.png') . '" src="\' + contactPortraitLink + \'" class="user-image img-fluid img-thumbnail" style="max-width:80px;max-height:80px;">\' +
+                                                    \'<div class="image-text-portrait d-none">\' + data["portrait"] + \'</div>\';
+                                                }
+                                                list +=
+                                                    \'</div>\';
+                                            }
+
+                                        list +=
                                             \'<div class="row">\' +
                                                 \'<div class="col list-group-item-data">\' +
                                                     html +
@@ -653,8 +718,10 @@ class Multiple
                                         var exists = false;
 
                                         $(contactsLi).each(function(index, li) {
-                                            if ($(li).find(".cla-contactReference").text() === data["contact_reference"]) {
-                                                PNotify.error({"title" : "Contact with same reference already added!"});
+                                            if ($(li).find(".cla-firstName").text() === data["first_name"] &&
+                                                $(li).find(".cla-lastName").text() === data["last_name"]
+                                            ) {
+                                                PNotify.error({"title" : "Contact with same name already added!"});
                                                 exists = true;
                                                 return;
                                             }
@@ -668,55 +735,91 @@ class Multiple
                                     } else if (update === true) {
                                         $("#' . $this->compSecId . '-sortable-contacts-list [data-contact-id=" + contactId + "]")
                                             .find(".list-group-item-data").empty().append(html);
+
+                                        if ($("#' . $this->compSecId . '-portrait-croppie").length > 0 && contactPortraitLink) {
+                                            //eslint-disable-next-line
+                                            console.log(contactId, $("#' . $this->compSecId . '-portrait-croppie-image-" + contactId));
+                                            $("#' . $this->compSecId . '-portrait-croppie-image-" + contactId).attr("src", contactPortraitLink);
+
+                                            $("#body").trigger("saveCroppie");
+                                        }
                                     } else {
                                         $("#' . $this->compSecId . '-sortable-contacts-list").append(list);
                                         $("#' . $this->compSecId . '-contacts-list-nodata").attr("hidden", true);
                                     }
                                 }
 
-                                collectData();
+                                collectData(onclick);
                                 registerContactButtons();
                                 toggleContactFields(true);
                             }
 
-                            function collectData() {
-                                if ($("#' . $this->compSecId . '-sortable-contacts-list li").length > 0) {
-                                    $("#' . $this->compSecId . '-sortable-contacts-list li").each(function(index, id) {
-                                        var data = { };
-                                        var contactId;
-
-                                        contactId = $(this).data("contact-id");
-                                        data["new"] = $(this).data("new");
-
-                                        $(id).find("dd").each(function(index,dd) {
-                                            if ($(dd).is(".cla-attentionTo")) {
-                                                data["attention_to"] = $(dd).html();
-                                            } else if ($(dd).is(".cla-contactReference")) {
-                                                data["contact_reference"] = $(dd).html();
-                                            } else if ($(dd).is(".cla-street")) {
-                                                data["street_contact"] = $(dd).html();
-                                            } else if ($(dd).is(".cla-street2")) {
-                                                data["street_contact_2"] = $(dd).html();
-                                            } else if ($(dd).is(".cla-street3")) {
-                                                data["street_contact_3"] = $(dd).html();
-                                            } else if ($(dd).is(".cla-street4")) {
-                                                data["street_contact_4"] = $(dd).html();
-                                            } else if ($(dd).is(".cla-city")) {
-                                                data["city_id"] = $(dd).data("id");
-                                                data["city_name"] = $(dd).html();
-                                            } else if ($(dd).is(".cla-postcode")) {
-                                                data["post_code"] = $(dd).html();
-                                            } else if ($(dd).is(".cla-state")) {
-                                                data["state_id"] = $(dd).data("id");
-                                                data["state_name"] = $(dd).html();
-                                            } else if ($(dd).is(".cla-country")) {
-                                                data["country_id"] = $(dd).data("id");
-                                                data["country_name"] = $(dd).html();
-                                            }
-                                        });
-
-                                        dataCollectionSection["data"]["contact_ids"][contactId] = data;
+                            if (contactSortable) {
+                                function initSortable(element) {
+                                    var el = document.getElementById(element);
+                                    dataCollectionSection["' . $this->compSecId . '-form"]["sortable"] = { };
+                                    dataCollectionSection["' . $this->compSecId . '-form"]["sortable"] = Sortable.create(el, {
+                                        dataIdAttr : "data-contact-seq",
+                                        onEnd: function(e) {
+                                            collectData(true);
+                                        }
                                     });
+                                }
+                            }
+
+                            function collectData(onclick = false) {
+                                $("#' . $this->compSecId . '-sortable-contacts-list li").each(function(index, id) {
+                                    var data = { };
+                                    var contactId;
+
+                                    contactId = $(this).data("contact-id");
+                                    data["new"] = $(this).data("new");
+                                    data["seq"] = index;
+
+                                    $(id).find("dd").each(function(index,dd) {
+                                        if ($(dd).is(".cla-portrait")) {
+                                            data["portrait"] = $(dd).html();
+                                        } else if ($(dd).is(".cla-prefix")) {
+                                            data["prefix"] = $(dd).html();
+                                        } else if ($(dd).is(".cla-firstName")) {
+                                            data["first_name"] = $(dd).html();
+                                        } else if ($(dd).is(".cla-lastName")) {
+                                            data["last_name"] = $(dd).html();
+                                        } else if ($(dd).is(".cla-suffix")) {
+                                            data["suffix"] = $(dd).html();
+                                        } else if ($(dd).is(".cla-email")) {
+                                            data["email"] = $(dd).html();
+                                        } else if ($(dd).is(".cla-secondaryEmail")) {
+                                            data["secondary_email"] = $(dd).html();
+                                        } else if ($(dd).is(".cla-ccSecondaryEmail")) {
+                                            data["cc_emails_to_secondary_email"] = false;
+                                            if ($(dd).html().toLowerCase() === "y") {
+                                                data["cc_emails_to_secondary_email"] = true;
+                                            }
+                                        } else if ($(dd).is(".cla-phone")) {
+                                            data["contact_phone"] = $(dd).html();
+                                        } else if ($(dd).is(".cla-extension")) {
+                                            data["contact_phone_ext"] = $(dd).html();
+                                        } else if ($(dd).is(".cla-mobile")) {
+                                            data["contact_mobile"] = $(dd).html();
+                                        } else if ($(dd).is(".cla-fax")) {
+                                            data["contact_fax"] = $(dd).html();
+                                        } else if ($(dd).is(".cla-other")) {
+                                            data["contact_other"] = $(dd).html();
+                                        } else if ($(dd).is(".cla-notes")) {
+                                            data["contact_notes"] = $(dd).html();
+                                        }
+                                    });
+
+                                    dataCollectionSection["data"]["contact_ids"][contactId] = data;
+                                });
+
+                                if (onclick && contactPostLink !== "") {
+                                    postData();
+                                }
+
+                                if ($("#' . $this->compSecId . '-portrait-croppie").length > 0) {
+                                    $("#body").trigger("resetCroppie");
                                 }
                             }
 
@@ -724,101 +827,186 @@ class Multiple
                                 $(".contactEditButton").each(function(index, button) {
                                     $(button).off();
                                     $(button).click(function() {
-                                        $(this).attr("disabled", true);
-                                        $(this).siblings(".contactDeleteButton").attr("disabled", true);
-
-                                        $($(this).parents("li").children(".row")[1]).find("dd").each(function(index,dd) {
-                                            if ($(dd).is(".cla-contactReference")) {
-                                                $("#' . $this->compSecId . '-contact_reference").val($(dd).html());
-                                            } else if ($(dd).is(".cla-attentionTo")) {
-                                                $("#' . $this->compSecId . '-attention_to").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street")) {
-                                                $("#' . $this->compSecId . '-street_contact").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street2")) {
-                                                $("#' . $this->compSecId . '-street_contact_2").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street3")) {
-                                                $("#' . $this->compSecId . '-street_contact_3").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street4")) {
-                                                $("#' . $this->compSecId . '-street_contact_4").val($(dd).html());
-                                            } else if ($(dd).is(".cla-city")) {
-                                                $("#' . $this->compSecId . '-city_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-city_name").val($(dd).html());
-                                            } else if ($(dd).is(".cla-postcode")) {
-                                                $("#' . $this->compSecId . '-post_code").val($(dd).html());
-                                            } else if ($(dd).is(".cla-state")) {
-                                                $("#' . $this->compSecId . '-state_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-state_name").val($(dd).html());
-                                            } else if ($(dd).is(".cla-country")) {
-                                                $("#' . $this->compSecId . '-country_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-country_name").val($(dd).html());
-                                            }
-
-                                            $("#' . $this->compSecId . '-contact_id").val($(dd).parents("li").data("contact-id"));
-                                        });
-                                        toggleContactFields(false, true);
+                                        editCopy("edit", this);
                                     });
                                 });
 
                                 $(".contactCopyButton").each(function(index, button) {
                                     $(button).off();
                                     $(button).click(function() {
-                                        $("#' . $this->compSecId . '-contact_types").val(0).trigger("change");
-                                        $($(this).parents("li").children(".row")[1]).find("dd").each(function(index,dd) {
-                                            if ($(dd).is(".cla-contactReference")) {
-                                                $("#' . $this->compSecId . '-contact_reference").val($(dd).html());
-                                            } else if ($(dd).is(".cla-attentionTo")) {
-                                                $("#' . $this->compSecId . '-attention_to").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street")) {
-                                                $("#' . $this->compSecId . '-street_contact").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street2")) {
-                                                $("#' . $this->compSecId . '-street_contact_2").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street3")) {
-                                                $("#' . $this->compSecId . '-street_contact_3").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street4")) {
-                                                $("#' . $this->compSecId . '-street_contact_4").val($(dd).html());
-                                            } else if ($(dd).is(".cla-city")) {
-                                                $("#' . $this->compSecId . '-city_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-city_name").val($(dd).html());
-                                            } else if ($(dd).is(".cla-postcode")) {
-                                                $("#' . $this->compSecId . '-post_code").val($(dd).html());
-                                            } else if ($(dd).is(".cla-state")) {
-                                                $("#' . $this->compSecId . '-state_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-state_name").val($(dd).html());
-                                            } else if ($(dd).is(".cla-country")) {
-                                                $("#' . $this->compSecId . '-country_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-country_name").val($(dd).html());
-                                            }
-                                        });
-                                        toggleContactFields(false, false);
+                                        editCopy("copy", this);
                                     });
                                 });
 
                                 $(".contactDeleteButton").each(function(index, button) {
                                     $(button).off();
                                     $(button).click(function() {
-                                        var contactsCount = $(this).parents("ul").children("li").length;
+                                        Swal.fire({
+                                            title                       : \'<span class="text-danger"> Delete contact?</span>\',
+                                            icon                        : "question",
+                                            background                  : "rgba(0,0,0,.8)",
+                                            backdrop                    : "rgba(0,0,0,.6)",
+                                            buttonsStyling              : false,
+                                            confirmButtonText           : "Delete",
+                                            customClass                 : {
+                                                "confirmButton"             : "btn btn-danger btn-sm text-uppercase",
+                                                "cancelButton"              : "ml-2 btn btn-secondary btn-sm text-uppercase",
+                                            },
+                                            showCancelButton            : true,
+                                            keydownListenerCapture      : true,
+                                            allowOutsideClick           : true,
+                                            allowEscapeKey              : true,
+                                            didOpen                     : function() {
+                                                dataCollection.env.sounds.swalSound.play();
+                                            }
+                                        }).then((result) => {
+                                            if (result.value) {
+                                                var contactsCount = $(this).parents("ul").children("li").length;
 
-                                        dataCollectionSection["data"]["delete_contact_ids"].push($(this).parents("li").data("contact-id"));
+                                                dataCollectionSection["data"]["delete_contact_ids"].push($(this).parents("li").data("contact-id"));
 
-                                        if (dataCollectionSection["data"]["contact_ids"][$(this).parents("li").data("contact-id")]) {
-                                            delete(dataCollectionSection["data"]["contact_ids"][$(this).parents("li").data("contact-id")]);
-                                        }
+                                                if (dataCollectionSection["data"]["contact_ids"][$(this).parents("li").data("contact-id")]) {
+                                                    delete(dataCollectionSection["data"]["contact_ids"][$(this).parents("li").data("contact-id")]);
+                                                }
 
-                                        $(this).parents("li").remove();
+                                                $(this).parents("li").remove();
 
-                                        contactsCount = contactsCount - 1;
+                                                contactsCount = contactsCount - 1;
 
-                                        if (contactsCount === 0) {
-                                            $("#' . $this->compSecId . '-contacts-list-nodata").attr("hidden", false);
-                                        }
-                                        collectData();
+                                                if (contactsCount === 0) {
+                                                    $("#' . $this->compSecId . '-contacts-list-nodata").attr("hidden", false);
+                                                }
+
+                                                collectData(true);
+                                            } else {
+                                                return;
+                                            }
+                                        });
                                     });
                                 });
                             }
 
+                            function editCopy(task, button) {
+                                $(button).attr("disabled", true);
+                                $(button).siblings(".contactDeleteButton").attr("disabled", true);
+
+                                var portrait = "";
+
+                                $($(button).parents("li").children(".row")[1]).find("dd").each(function(index,dd) {
+                                    //eslint-disable-next-line
+                                    console.log(dd);
+                                    if ($(dd).is(".cla-contactReference")) {
+                                        $("#' . $this->compSecId . '-contact_reference").val($(dd).html());
+                                    } else if ($(dd).is(".cla-portrait")) {
+                                        $("#' . $this->compSecId . '-portrait").val($(dd).html());
+                                        portrait = $(dd).html();
+                                    } else if ($(dd).is(".cla-prefix")) {
+                                        $("#' . $this->compSecId . '-prefix").val($(dd).html());
+                                    } else if ($(dd).is(".cla-firstName")) {
+                                        $("#' . $this->compSecId . '-first_name").val($(dd).html());
+                                    } else if ($(dd).is(".cla-lastName")) {
+                                        $("#' . $this->compSecId . '-last_name").val($(dd).html());
+                                    } else if ($(dd).is(".cla-suffix")) {
+                                        $("#' . $this->compSecId . '-suffix").val($(dd).html());
+                                    } else if ($(dd).is(".cla-email")) {
+                                        $("#' . $this->compSecId . '-email").val($(dd).html());
+                                    } else if ($(dd).is(".cla-secondaryEmail")) {
+                                        $("#' . $this->compSecId . '-secondary_email").val($(dd).html());
+                                    } else if ($(dd).is(".cla-ccSecondaryEmail")) {
+                                        var ccEmailsToSecondaryEmail = false;
+                                        if ($(dd).html().toLowerCase() === "y") {
+                                            ccEmailsToSecondaryEmail = true;
+                                        }
+                                        $("#' . $this->compSecId . '-cc_emails_to_secondary_email")[0].checked = ccEmailsToSecondaryEmail;
+                                    } else if ($(dd).is(".cla-phone")) {
+                                        $("#' . $this->compSecId . '-contact_phone").val($(dd).html());
+                                    } else if ($(dd).is(".cla-extension")) {
+                                        $("#' . $this->compSecId . '-contact_phone_ext").val($(dd).html());
+                                    } else if ($(dd).is(".cla-mobile")) {
+                                        $("#' . $this->compSecId . '-contact_mobile").val($(dd).html());
+                                    } else if ($(dd).is(".cla-fax")) {
+                                        $("#' . $this->compSecId . '-contact_fax").val($(dd).html());
+                                    } else if ($(dd).is(".cla-other")) {
+                                        $("#' . $this->compSecId . '-contact_other").val($(dd).html());
+                                    } else if ($(dd).is(".cla-notes")) {
+                                        $("#' . $this->compSecId . '-contact_notes").val($(dd).html());
+                                    }
+
+                                    if (task === "edit") {
+                                        $("#' . $this->compSecId . '-contact_id").val($(dd).parents("li").data("contact-id"));
+                                    } else if (task === "copy") {
+                                        $("#' . $this->compSecId . '-contact_id").val("");
+                                    }
+                                });
+
+                                if (task === "edit") {
+                                    toggleContactFields(false, true);
+                                    $(button).siblings(".contactCopyButton").attr("disabled", true);
+                                } else if (task === "copy") {
+                                    toggleContactFields(false, false);
+                                    $(button).siblings(".contactEditButton").attr("disabled", true);
+                                }
+
+                                if ($("#' . $this->compSecId . '-portrait-croppie").length > 0 && portrait !== "") {
+                                    portrait = \'' . $this->links->url('system/storages/q/uuid/\' + portrait + \'/w/200\'') . ';
+                                    $("#' . $this->compSecId . '-portrait-croppie-image").attr("src", portrait);
+                                    $("#' . $this->compSecId . '-portrait-croppie-image").attr("hidden", false);
+                                    $("#' . $this->compSecId . '-portrait-croppie").attr("hidden", true);
+
+                                    $("#body").trigger("saveCroppie");
+                                }
+                            }
+
+                            if (contactSortable) {
+                                initSortable($("#' . $this->compSecId . '-sortable-contacts-list")[0].id);
+                            }
                             initMainButtons();
-                            collectData();
+                            if (contactPostLink === "") {
+                                collectData();
+                            }
                             registerContactButtons();
+
+                            function postData() {
+                                var postData = { };
+                                postData[$("#security-token").attr("name")] = $("#security-token").val();
+                                postData["package_name"] = "' . $this->contactsParams['contactPackageName'] . '";
+                                postData["package_row_id"] = "' . $this->contactsParams['contactPackageRowId'] . '";
+                                postData["contact_ids"] = dataCollectionSection["data"]["contact_ids"];
+                                postData["delete_contact_ids"] = dataCollectionSection["data"]["delete_contact_ids"];
+
+                                $.post(contactPostLink, postData, function(response) {
+                                    if (response.responseCode == 1) {
+                                        paginatedPNotify("error", {title: response.responseMessage});
+                                        return;
+                                    }
+
+                                    if (response.responseCode == 0) {
+                                        dataCollectionSection["data"]["contact_ids"] = response.responseData.contacts;
+                                        dataCollectionSection["data"]["delete_contact_ids"] = [];
+
+                                        $(dataCollectionSection["data"]["contact_ids"]).each(function(index, contactArr) {
+                                            for (var contactId in contactArr) {
+                                                var contactLi = Array.from($(\'.cla-contactReference\')).find(item => item.textContent.trim() === contactArr[contactId]["full_name"]);
+
+                                                $(contactLi).parents("li").data("new", 0);
+                                                $(contactLi).parents("li").data("contact-id", contactId);
+                                                $(contactLi).parents("li").data("contact-seq", contactArr[contactId]["seq"]);
+                                                $(contactLi).parents("li").attr("data-new", 0);
+                                                $(contactLi).parents("li").attr("data-contact-id", contactId);
+                                                $(contactLi).parents("li").attr("data-contact-seq", contactArr[contactId]["seq"]);
+                                            }
+                                        });
+
+                                        paginatedPNotify("success", {title: response.responseMessage});
+                                        return;
+                                    }
+
+                                    if (response.tokenKey && response.token) {
+                                        $("#security-token").attr("name", response.tokenKey);
+                                        $("#security-token").val(response.token);
+                                    }
+                                }, "json");
+                            }
                         }
                     }
                 });

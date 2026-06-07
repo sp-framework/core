@@ -217,6 +217,16 @@ class Croppie
                             'hidden'                    => true,
                             'size'                      => 'xs',
                             'buttonAdditionalClass'     => 'mr-1 ml-1'
+                        ],
+                        $this->params['fieldId'] . '-croppie-cancel-2' =>
+                        [
+                            'title'                     => false,
+                            'type'                      => 'secondary',
+                            'position'                  => 'left',
+                            'icon'                      => 'times',
+                            'hidden'                    => true,
+                            'size'                      => 'xs',
+                            'buttonAdditionalClass'     => 'mr-1 ml-1'
                         ]
                     ]
                 );
@@ -233,6 +243,7 @@ class Croppie
                             'position'                  => 'left',
                             'icon'                      => 'history',
                             'hidden'                    => false,
+                            'type'                      => 'info',
                             'size'                      => 'xs',
                             'buttonAdditionalClass'     => 'mr-1 ml-1'
                         ]
@@ -289,6 +300,7 @@ class Croppie
                             'sectionId'                     => $this->params['sectionId'],
                             'fieldId'                       => $this->params['fieldId'],
                             'fieldLabel'                    => false,
+                            'fieldPlaceholder'              => 'UUID',
                             'fieldType'                     => 'input',
                             'fieldHelp'                     => true,
                             'fieldHelpTooltipContent'       => false,
@@ -538,7 +550,6 @@ class Croppie
                             }
 
                             $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload-image").change(function () {
-                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload").attr("disabled", true);
                                 readFile(this);
                             });
 
@@ -592,11 +603,10 @@ class Croppie
                                     circle  : ' . $this->fieldParams['fieldCroppieViewportCircle'] . '
                                 }).then(function (croppedImage) {
                                     imageBlob = croppedImage;
-                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie").attr("hidden", true);
-                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-save").attr("hidden", true);
-                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-cancel").attr("hidden", true);
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image").attr("src", croppedImage);
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image").attr("hidden", false);
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie").attr("hidden", true);
+                                    croppieSaved();
                                 });
 
                                 //To Blob for upload
@@ -613,7 +623,8 @@ class Croppie
                                 });
                             });
 
-                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-cancel").click(function () {
+                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-cancel, " +
+                              "#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-cancel-2").click(function () {
                                 croppieReset();
                             });
 
@@ -623,6 +634,7 @@ class Croppie
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload-image").attr("disabled", false);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-save").attr("hidden", true);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-cancel").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-cancel-2").attr("hidden", true);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-save-warning").attr("hidden", true);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image").attr("hidden", false);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie").attr("hidden", true);
@@ -656,6 +668,8 @@ class Croppie
                                     var reader = new FileReader();
 
                                     reader.onload = function (e) {
+                                        $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload").attr("disabled", true);
+                                        $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload").attr("hidden", true);
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image").attr("hidden", true);
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie").attr("hidden", false);
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-save").attr("hidden", false);
@@ -663,8 +677,9 @@ class Croppie
                                         window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '"]["' . $this->compSecId . '-' . $this->params['fieldId'] . '"].croppie("bind", {
                                             url: e.target.result
                                         }).then(function(){
-                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-female").attr("disabled", true);
-                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-male").attr("disabled", true);
+                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-female").attr("hidden", true);
+                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-male").attr("hidden", true);
+                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-recover").attr("hidden", true);
                                         });
                                     }
 
@@ -672,7 +687,7 @@ class Croppie
                                     reader.readAsDataURL(input.files[0]);
                                 }
                                 else {
-                                    PNotify.error("Sorry - you\'re browser doesn\'t support the FileReader API");
+                                    paginatedPNotify("error", {"title" :"Sorry - you\'re browser doesn\'t support the FileReader API"});
                                 }
                             }
 
@@ -681,17 +696,21 @@ class Croppie
                             ) {
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-male").click(function() {
                                     $(this).attr("disabled", true);
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload").attr("hidden", true);
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload").attr("disabled", true);
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload-image").attr("disabled", true);
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-female").attr("disabled", false);
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-recover").attr("hidden", true);
                                     generateAvatar("M");
                                 });
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-female").click(function() {
                                     $(this).attr("disabled", true);
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload").attr("hidden", true);
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload").attr("disabled", true);
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload-image").attr("disabled", true);
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-female").attr("disabled", true);
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-male").attr("disabled", false);
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-recover").attr("hidden", true);
                                     generateAvatar("F");
                                 });
                             }
@@ -707,13 +726,13 @@ class Croppie
 
                                 $.post("' . $this->links->url("system/users/profile/generateavatar") . '", postData, function(response) {
                                     if (response.responseCode == 1) {
-                                        PNotify.error(response.responseMessage);
+                                        paginatedPNotify("error", {"title" :response.responseMessage});
                                         return;
                                     }
 
                                     $(".' . $this->compSecId . '-' . $this->params['fieldId'] . '-image-content .image-text").html(response.avatarName);
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-image").attr("src", "data:image/png;base64," + response.avatar);
-                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-remove").attr("hidden", false);
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-cancel-2").attr("hidden", false);
 
                                     if (response.tokenKey && response.token) {
                                         $("#security-token").attr("name", response.tokenKey);
@@ -728,6 +747,7 @@ class Croppie
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-save").attr("hidden", false);
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-save").off();
                                     $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-save").click(function() {
+                                        $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-cancel-2").attr("hidden", true);
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload").attr("hidden", true);
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-male").attr("hidden", true);
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-female").attr("hidden", true);
@@ -752,7 +772,6 @@ class Croppie
                                 formData.append("setOrphan", "' . $this->params['setOrphan'] . '");
                                 formData.append("fileName", avatarName);
                                 formData.append("storagetype", "' . $this->params['storageType'] . '");
-                                formData.append($("#security-token").attr("name"), $("#security-token").val());
 
                                 performUpload(formData);
                             }
@@ -852,14 +871,9 @@ class Croppie
                                             } else {
                                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").val(response.responseData.uuid);
                                             }
-                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-remove").attr("hidden", false);
-                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-male").attr("hidden", true);
-                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-female").attr("hidden", true);
-                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-recover").attr("hidden", true);
-                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-recover").attr("disabled", false);
-                                            $($("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-filename").parents(".form-group")[0]).addClass("d-none");
-                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-filename").attr("disabled", true);
-                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload").attr("hidden", true);
+
+                                            croppieSaved();
+
                                             $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '")
                                             .trigger(
                                                 {
@@ -868,13 +882,28 @@ class Croppie
                                                 }
                                             );
                                         } else {
-                                            PNotify.error(response.responseMessage);
+                                            paginatedPNotify("error", {"title" :response.responseMessage});
                                             croppieReset();
                                         }
                                     } else {
-                                        PNotify.error("Image Upload Failed!");
+                                        paginatedPNotify("error", {"title" :"Image Upload Failed!"});
                                     }
                                 });
+                            }
+
+                            function croppieSaved() {
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-remove").attr("hidden", false);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-male").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-female").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-refresh").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-save").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-cancel").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-cancel-2").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-recover").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-recover").attr("disabled", false);
+                                $($("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-filename").parents(".form-group")[0]).addClass("d-none");
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-filename").attr("disabled", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload").attr("hidden", true);
                             }
 
                             function updateProfileThumbnail(remove = false) {
@@ -893,7 +922,7 @@ class Croppie
                                     } else {
                                         $("#profile-portrait").children("i").attr("hidden", true);
                                         $("#profile-portrait").children("img").attr("src", window.dataCollection.env.rootPath + window.dataCollection.env.appRoute +
-                                            "/system/storages/q/uuid/" + uploadUUIDs[uploadUUIDs.length - 1] + "/w/30");
+                                            "/system/storages/q/uuid/" + uploadUUIDs[0] + "/w/30");
                                         $("#profile-portrait").children("img").attr("hidden", false);
                                         window.dataCollection.env.profile.portrait =
                                             window.dataCollection.env.rootPath + window.dataCollection.env.appRoute + "/system/storages/q/uuid/" + uploadUUIDs[0] + "/w/80";
@@ -904,16 +933,18 @@ class Croppie
 
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").off();
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").on("croppieSaved", function(e) {
-                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-refresh").attr("hidden", true);
-                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-save").attr("hidden", true);
-                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-female").attr("hidden", true);
-                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-male").attr("hidden", true);
-                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-upload").attr("hidden", true);
-
+                                    croppieSaved();
                                 });
                             }
 
                             initCroppie();
+
+                            $("#body").on("resetCroppie", function() {
+                                croppieReset();
+                            });
+                            $("#body").on("saveCroppie", function() {
+                                croppieSaved();
+                            })
                         }
                     },
                     "' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-filename"                             : {
