@@ -430,6 +430,82 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
+	//Modify Basepackages Addresses from any component
+	public function addressesAction()
+	{
+		if (!isset($this->postData()['package_name']) && !isset($this->postData()['package_row_id'])) {
+			$this->addResponse('Address package information missing', 1);
+
+			return;
+		}
+
+		if (isset($this->postData()['package_name']) && $this->postData()['package_name'] === '') {
+			$this->addResponse('Address package information missing', 1);
+
+			return;
+		}
+		if (isset($this->postData()['package_row_id']) && (int) $this->postData()['package_row_id'] == '0') {
+			$this->addResponse('Address package information missing', 1);
+
+			return;
+		}
+
+		if (isset($this->postData()['delete_address_ids'])) {
+			if (is_string($this->postData()['delete_address_ids'])) {
+				$this->postData()['delete_address_ids'] = $this->helper->decode($this->postData()['delete_address_ids'], true);
+			}
+
+			if (count($this->postData()['delete_address_ids']) > 0) {
+				foreach ($this->postData()['delete_address_ids'] as $addressId) {
+					$dbAddress = $this->basepackages->addressbook->getById($addressId);
+
+					if ($dbAddress) {
+						$this->basepackages->addressbook->removeAddress($dbAddress);
+					}
+				}
+			}
+		}
+
+		if (isset($this->postData()['address_ids'])) {
+			if (is_string($this->postData()['address_ids'])) {
+				$this->postData()['address_ids'] = $this->helper->decode($this->postData()['address_ids'], true);
+			}
+
+			if (count($this->postData()['address_ids']) > 0) {
+				foreach ($this->postData()['address_ids'] as $addressId => $address) {
+					if (isset($address['new']) && $address['new'] == 1) {
+						$address['package_name'] = $this->postData()['package_name'];
+						$address['package_row_id'] = (int) $this->postData()['package_row_id'];
+
+						$this->basepackages->addressbook->addAddress($address);
+					} else {
+						$dbAddress = $this->basepackages->addressbook->getById($addressId);
+
+						if ($dbAddress) {
+							$dbAddress = array_merge($dbAddress, $this->postData()['address_ids'][$addressId]);
+
+							$this->basepackages->addressbook->updateAddress($dbAddress);
+						}
+					}
+				}
+			}
+		}
+
+		$addresses = [];
+
+		$addressesArr =
+			$this->basepackages->addressbook->getAddressesByPackageNameAndPackageRowId(
+				$this->postData()['package_name'], $this->postData()['package_row_id']
+			);
+
+		if ($addressesArr && count($addressesArr) > 0) {
+			foreach ($addressesArr as $address) {
+				$addresses[$address['id']] = $address;
+			}
+
+			$this->addResponse('Updated addresses', 0, ['addresses' => $addresses]);
+		}
+	}
 	public function releaseMutexAction()
 	{
 		if (isset($this->postData()['mutexLock']) && isset($this->postData()['mutexLock']['id'])) {

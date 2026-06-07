@@ -9,7 +9,10 @@
                 'addressFieldType'                            : 'multiple',
                 'includeStreet'                               : true,
                 'searchType'                                  : 'city',
-                'addresses'                                   : profile['addresses']
+                'addresses'                                   : profile['addresses'],
+                'addressPostLink'                             : links.url('system/users/profile/addresses'),
+                'addressPackageName'                          : 'UsersProfiles',
+                'addressPackageRowId'                         : profile['id']
             ]
         )}}
     </div>

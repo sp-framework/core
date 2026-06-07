@@ -112,6 +112,31 @@ class Multiple
             $this->params['countryFieldLabel'] :
             'Country';
 
+        $this->addressesParams['addressPostLink'] =
+            isset($this->params['addressPostLink']) ?
+            $this->params['addressPostLink'] :
+            '';
+
+        if ($this->addressesParams['addressPostLink'] !== '') {
+            if (!isset($this->params['addressPackageName'])) {
+                throw new \Exception('addressPostLink requires addressPackageName');
+            }
+            if (!isset($this->params['addressPackageRowId'])) {
+                throw new \Exception('addressPostLink requires addressPackageRowId');
+            }
+
+            $this->addressesParams['addressPackageName'] = $this->params['addressPackageName'];
+            $this->addressesParams['addressPackageRowId'] = $this->params['addressPackageRowId'];
+        } else {
+            $this->addressesParams['addressPackageName'] = '';
+            $this->addressesParams['addressPackageRowId'] = '';
+        }
+
+        $this->addressesParams['addressSortable'] =
+            isset($this->params['addressSortable']) ?
+            $this->params['addressSortable'] :
+            true;
+
         $fieldsArr = null;
         $field = null;
 
@@ -280,6 +305,8 @@ class Multiple
                             ) .
                             '<ul class="list-group list-group-sortable" id="' . $this->compSecId . '-sortable-addresses-list" style="max-height: 450px;overflow: scroll;border-radius: 0 !important;">';
                                 if (isset($this->params['addresses']) && is_array($this->params['addresses']) && count($this->params['addresses']) > 0) {
+                                    $this->params['addresses'] = msort($this->params['addresses'], 'seq');
+
                                     $this->content .=
                                         '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-addresses-list-nodata" hidden>
                                             <div class="row">
@@ -291,9 +318,18 @@ class Multiple
 
                                     foreach ($this->params['addresses'] as $key => $address) {
                                         $this->content .=
-                                            '<li class="list-group-item list-group-item-secondary" area-disabled="false" style="cursor: pointer" data-new="0" data-address-id="' . $address['id'] . '">
-                                                <div class="row">
-                                                    <div class="col">
+                                            '<li class="list-group-item list-group-item-secondary" area-disabled="false" style="border: 1px solid rgba(0, 0, 0, 0.125); cursor: pointer" data-new="0" data-address-id="' . $address['id'] . '" data-address-seq="' . $address['seq'] . '">
+                                                <div class="row">';
+
+                                                if ($this->addressesParams['addressSortable']) {
+                                                    $this->content .=
+                                                        '<div class="col">
+                                                            <i class="fa fa-sort fa-fw handle"></i>
+                                                        </div>';
+                                                }
+
+                                                $this->content .=
+                                                    '<div class="col">
                                                         <button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 addressDeleteButton">
                                                             <i class="fa fas fa-fw text-xs fa-trash"></i>
                                                         </button>
@@ -399,6 +435,9 @@ class Multiple
                 $.extend(dataCollectionSection, {
                     "' . $this->compSecId . '-address_reference"                   : {
                         afterInit : function () {
+                            var addressPostLink = "' . $this->addressesParams['addressPostLink'] . '";
+                            var addressSortable = "' . $this->addressesParams['addressSortable'] . '";
+
                             dataCollectionSection["data"]["address_ids"] = { }
                             dataCollectionSection["data"]["delete_address_ids"] = [];
 
@@ -406,43 +445,37 @@ class Multiple
                                 $("#' . $this->compSecId . '-cancel-address").off();
                                 $("#' . $this->compSecId . '-cancel-address").click(function(e) {
                                     e.preventDefault();
-                                    $(".addressEditButton, .addressDeleteButton").attr("disabled", false);
+                                    $(".addressEditButton, .addressDeleteButton, .addressCopyButton").attr("disabled", false);
+
                                     toggleAddressFields(true);
+
                                     $("#' . $this->compSecId . '-addresses").trigger("addressCancel");
                                 });
                                 $("#' . $this->compSecId . '-add-address, #' . $this->compSecId . '-update-address").off();
                                 $("#' . $this->compSecId . '-add-address, #' . $this->compSecId . '-update-address").attr("disabled", false);
                                 $("#' . $this->compSecId . '-add-address, #' . $this->compSecId . '-update-address").click(function(e) {
                                     e.preventDefault();
-                                    $(".addressEditButton, .addressDeleteButton").attr("disabled", false);
+                                    $(".addressEditButton, .addressDeleteButton, .addressCopyButton").attr("disabled", false);
 
                                     if ($(this)[0].id === "' . $this->compSecId . '-update-address") {
-                                        extractData(true);
+                                        extractData(true, true);
                                         $("#' . $this->compSecId . '-addresses").trigger("addressUpdate");
                                     } else {
-                                        extractData();
+                                        extractData(false, true);
                                         $("#' . $this->compSecId . '-addresses").trigger("addressAdd");
                                     }
                                 });
                             }
 
                             function toggleAddressFields(status, update = false) {
+                                var fields = ["address_id","address_reference","attention_to","street_address","street_address_2","street_address_3","street_address_4","city_name","post_code","state_name","country_name","city_id","post_code_id","state_id","country_id"];
+
                                 if (status === true) {
-                                    $("#' . $this->compSecId . '-address_reference").val("");
-                                    $("#' . $this->compSecId . '-address_id").val("");
-                                    $("#' . $this->compSecId . '-attention_to").val("");
-                                    $("#' . $this->compSecId . '-street_address").val("");
-                                    $("#' . $this->compSecId . '-street_address_2").val("");
-                                    $("#' . $this->compSecId . '-street_address_3").val("");
-                                    $("#' . $this->compSecId . '-street_address_4").val("");
-                                    $("#' . $this->compSecId . '-city_id").val("");
-                                    $("#' . $this->compSecId . '-city_name").val("");
-                                    $("#' . $this->compSecId . '-post_code_id").val("");
-                                    $("#' . $this->compSecId . '-post_code").val("");
-                                    $("#' . $this->compSecId . '-state_id").val("");
-                                    $("#' . $this->compSecId . '-state_name").val("");
-                                    $("#' . $this->compSecId . '-country_id").val("");
-                                    $("#' . $this->compSecId . '-country_name").val("");
+                                    $(fields).each(function(index, field) {
+                                        if ($("#' . $this->compSecId . '-" + field).length > 0) {
+                                            $("#' . $this->compSecId . '-" + field).val("");
+                                        }
+                                    });
                                 }
 
                                 if (update === true) {
@@ -455,116 +488,30 @@ class Multiple
                                     $("#' . $this->compSecId . '-add-address").attr("disabled", false);
                                 }
 
-                                $("#' . $this->compSecId . '-address_reference").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-attention_to").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-street_address").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-street_address_2").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-street_address_3").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-street_address_4").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-city_name").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-post_code").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-state_name").removeClass("is-invalid");
-                                $("#' . $this->compSecId . '-country_name").removeClass("is-invalid");
+                                $(fields).each(function(index, field) {
+                                    if ($("#' . $this->compSecId . '-" + field).length > 0) {
+                                        $("#' . $this->compSecId . '-" + field).removeClass("is-invalid");
+                                    }
+                                });
                             }
 
-                            function extractData(update = false) {
-                                if ($("#' . $this->compSecId . '-address_reference").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-address_reference").val() === "") {
-                                    $("#' . $this->compSecId . '-address_reference").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-address_reference").focus(function() {
-                                        $("#' . $this->compSecId . '-address_reference").removeClass("is-invalid");
-                                    });
+                            function extractData(update = false, onclick = false) {
+                                var fields = ["address_reference","attention_to","street_address","street_address_2","street_address_3","street_address_4","city_name","post_code","state_name","country_name"];
 
-                                    return;
-                                }
+                                var fieldError = false;
+                                $(fields).each(function(index, field) {
+                                    if ($("#' . $this->compSecId . '-" + field).siblings().find("[data-original-title=\'Required\']").length > 0 &&
+                                        $("#' . $this->compSecId . '-" + field).val() === "") {
+                                        $("#' . $this->compSecId . '-" + field).addClass("is-invalid");
+                                        $("#' . $this->compSecId . '-" + field).focus(function() {
+                                            $("#' . $this->compSecId . '-" + field).removeClass("is-invalid");
+                                        });
 
-                                if ($("#' . $this->compSecId . '-attention_to").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-attention_to").val() === "") {
-                                    $("#' . $this->compSecId . '-attention_to").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-attention_to").focus(function() {
-                                        $("#' . $this->compSecId . '-attention_to").removeClass("is-invalid");
-                                    });
+                                        fieldError = true;
+                                    }
+                                });
 
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-street_address").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-street_address").val() === "") {
-                                    $("#' . $this->compSecId . '-street_address").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-street_address").focus(function() {
-                                        $("#' . $this->compSecId . '-street_address").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-street_address_2").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-street_address_2").val() === "") {
-                                    $("#' . $this->compSecId . '-street_address_2").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-street_address_2").focus(function() {
-                                        $("#' . $this->compSecId . '-street_address_2").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-street_address_3").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-street_address_3").val() === "") {
-                                    $("#' . $this->compSecId . '-street_address_3").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-street_address_3").focus(function() {
-                                        $("#' . $this->compSecId . '-street_address_3").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-street_address_4").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-street_address_4").val() === "") {
-                                    $("#' . $this->compSecId . '-street_address_4").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-street_address_4").focus(function() {
-                                        $("#' . $this->compSecId . '-street_address_4").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-city_name").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-city_name").val() === "") {
-                                    $("#' . $this->compSecId . '-city_name").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-city_name").focus(function() {
-                                        $("#' . $this->compSecId . '-city_name").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-post_code").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-post_code").val() === "") {
-                                    $("#' . $this->compSecId . '-post_code").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-post_code").focus(function() {
-                                        $("#' . $this->compSecId . '-post_code").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-state_name").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-state_name").val() === "") {
-                                    $("#' . $this->compSecId . '-state_name").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-state_name").focus(function() {
-                                        $("#' . $this->compSecId . '-state_name").removeClass("is-invalid");
-                                    });
-
-                                    return;
-                                }
-
-                                if ($("#' . $this->compSecId . '-country_name").siblings().find("[data-original-title=\'Required\']").length > 0 &&
-                                    $("#' . $this->compSecId . '-country_name").val() === "") {
-                                    $("#' . $this->compSecId . '-country_name").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-country_name").focus(function() {
-                                        $("#' . $this->compSecId . '-country_name").removeClass("is-invalid");
-                                    });
-
+                                if (fieldError) {
                                     return;
                                 }
 
@@ -656,8 +603,11 @@ class Multiple
                                     var list =
                                         \'<li class="list-group-item list-group-item-secondary\' +
                                             \'" area-disabled="false" style="cursor: pointer" \' +
-                                            \'" data-new="\' + addressNew + \'" data-address-id="\' + addressId + \'">\' +
+                                            \'" data-new="\' + addressNew + \'" data-address-id="\' + addressId + \'" data-address-seq="\' + addressId + \'">\' +
                                             \'<div class="row">\' +
+                                                \'<div class="col">\' +
+                                                    \'<i class="fa fa-sort fa-fw handle"></i>\' +
+                                                \'</div>\' +
                                                 \'<div class="col">\' +
                                                     \'<button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 addressDeleteButton">\' +
                                                         \'<i class="fa fas fa-fw text-xs fa-trash"></i>\' +
@@ -682,7 +632,7 @@ class Multiple
 
                                         $(addressesLi).each(function(index, li) {
                                             if ($(li).find(".cla-addressReference").text() === data["address_reference"]) {
-                                                PNotify.error({"title" : "Address with same reference already added!"});
+                                                paginatedPNotify("error", {"title" : "Address with same reference already added!"});
                                                 exists = true;
                                                 return;
                                             }
@@ -702,12 +652,25 @@ class Multiple
                                     }
                                 }
 
-                                collectData();
+                                collectData(onclick);
                                 registerAddressButtons();
                                 toggleAddressFields(true);
                             }
 
-                            function collectData() {
+                            if (addressSortable) {
+                                function initSortable(element) {
+                                    var el = document.getElementById(element);
+                                    dataCollectionSection["' . $this->compSecId . '-form"]["sortable"] = { };
+                                    dataCollectionSection["' . $this->compSecId . '-form"]["sortable"] = Sortable.create(el, {
+                                        dataIdAttr : "data-address-seq",
+                                        onEnd: function(e) {
+                                            collectData(true);
+                                        }
+                                    });
+                                }
+                            }
+
+                            function collectData(onclick = false) {
                                 if ($("#' . $this->compSecId . '-sortable-addresses-list li").length > 0) {
                                     $("#' . $this->compSecId . '-sortable-addresses-list li").each(function(index, id) {
                                         var data = { };
@@ -715,6 +678,7 @@ class Multiple
 
                                         addressId = $(this).data("address-id");
                                         data["new"] = $(this).data("new");
+                                        data["seq"] = index;
 
                                         $(id).find("dd").each(function(index,dd) {
                                             if ($(dd).is(".cla-attentionTo")) {
@@ -746,6 +710,10 @@ class Multiple
 
                                         dataCollectionSection["data"]["address_ids"][addressId] = data;
                                     });
+
+                                    if (onclick && addressPostLink !== "") {
+                                        postData();
+                                    }
                                 }
                             }
 
@@ -753,103 +721,162 @@ class Multiple
                                 $(".addressEditButton").each(function(index, button) {
                                     $(button).off();
                                     $(button).click(function() {
-                                        $(this).attr("disabled", true);
-                                        $(this).siblings(".addressDeleteButton").attr("disabled", true);
-
-                                        $($(this).parents("li").children(".row")[1]).find("dd").each(function(index,dd) {
-                                            if ($(dd).is(".cla-addressReference")) {
-                                                $("#' . $this->compSecId . '-address_reference").val($(dd).html());
-                                            } else if ($(dd).is(".cla-attentionTo")) {
-                                                $("#' . $this->compSecId . '-attention_to").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street")) {
-                                                $("#' . $this->compSecId . '-street_address").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street2")) {
-                                                $("#' . $this->compSecId . '-street_address_2").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street3")) {
-                                                $("#' . $this->compSecId . '-street_address_3").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street4")) {
-                                                $("#' . $this->compSecId . '-street_address_4").val($(dd).html());
-                                            } else if ($(dd).is(".cla-city")) {
-                                                $("#' . $this->compSecId . '-city_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-city_name").val($(dd).html());
-                                            } else if ($(dd).is(".cla-post_code")) {
-                                                $("#' . $this->compSecId . '-post_code_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-post_code").val($(dd).html());
-                                            } else if ($(dd).is(".cla-state")) {
-                                                $("#' . $this->compSecId . '-state_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-state_name").val($(dd).html());
-                                            } else if ($(dd).is(".cla-country")) {
-                                                $("#' . $this->compSecId . '-country_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-country_name").val($(dd).html());
-                                            }
-
-                                            $("#' . $this->compSecId . '-address_id").val($(dd).parents("li").data("address-id"));
-                                        });
-                                        toggleAddressFields(false, true);
+                                        editCopy("edit", this);
                                     });
                                 });
 
                                 $(".addressCopyButton").each(function(index, button) {
                                     $(button).off();
                                     $(button).click(function() {
-                                        $("#' . $this->compSecId . '-address_types").val(0).trigger("change");
-                                        $($(this).parents("li").children(".row")[1]).find("dd").each(function(index,dd) {
-                                            if ($(dd).is(".cla-addressReference")) {
-                                                $("#' . $this->compSecId . '-address_reference").val($(dd).html());
-                                            } else if ($(dd).is(".cla-attentionTo")) {
-                                                $("#' . $this->compSecId . '-attention_to").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street")) {
-                                                $("#' . $this->compSecId . '-street_address").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street2")) {
-                                                $("#' . $this->compSecId . '-street_address_2").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street3")) {
-                                                $("#' . $this->compSecId . '-street_address_3").val($(dd).html());
-                                            } else if ($(dd).is(".cla-street4")) {
-                                                $("#' . $this->compSecId . '-street_address_4").val($(dd).html());
-                                            } else if ($(dd).is(".cla-city")) {
-                                                $("#' . $this->compSecId . '-city_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-city_name").val($(dd).html());
-                                            } else if ($(dd).is(".cla-post_code")) {
-                                                $("#' . $this->compSecId . '-post_code_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-post_code").val($(dd).html());
-                                            } else if ($(dd).is(".cla-state")) {
-                                                $("#' . $this->compSecId . '-state_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-state_name").val($(dd).html());
-                                            } else if ($(dd).is(".cla-country")) {
-                                                $("#' . $this->compSecId . '-country_id").val($(dd).data("id"));
-                                                $("#' . $this->compSecId . '-country_name").val($(dd).html());
-                                            }
-                                        });
-                                        toggleAddressFields(false, false);
+                                        editCopy("copy", this);
                                     });
                                 });
 
                                 $(".addressDeleteButton").each(function(index, button) {
                                     $(button).off();
                                     $(button).click(function() {
-                                        var addressesCount = $(this).parents("ul").children("li").length;
+                                        Swal.fire({
+                                            title                       : \'<span class="text-danger"> Delete address?</span>\',
+                                            icon                        : "question",
+                                            background                  : "rgba(0,0,0,.8)",
+                                            backdrop                    : "rgba(0,0,0,.6)",
+                                            buttonsStyling              : false,
+                                            confirmButtonText           : "Delete",
+                                            customClass                 : {
+                                                "confirmButton"             : "btn btn-danger btn-sm text-uppercase",
+                                                "cancelButton"              : "ml-2 btn btn-secondary btn-sm text-uppercase",
+                                            },
+                                            showCancelButton            : true,
+                                            keydownListenerCapture      : true,
+                                            allowOutsideClick           : true,
+                                            allowEscapeKey              : true,
+                                            didOpen                     : function() {
+                                                dataCollection.env.sounds.swalSound.play();
+                                            }
+                                        }).then((result) => {
+                                            if (result.value) {
+                                                collectData(true);
 
-                                        dataCollectionSection["data"]["delete_address_ids"].push($(this).parents("li").data("address-id"));
+                                                var addressesCount = $(this).parents("ul").children("li").length;
 
-                                        if (dataCollectionSection["data"]["address_ids"][$(this).parents("li").data("address-id")]) {
-                                            delete(dataCollectionSection["data"]["address_ids"][$(this).parents("li").data("address-id")]);
-                                        }
+                                                dataCollectionSection["data"]["delete_address_ids"].push($(this).parents("li").data("address-id"));
 
-                                        $(this).parents("li").remove();
+                                                if (dataCollectionSection["data"]["address_ids"][$(this).parents("li").data("address-id")]) {
+                                                    delete(dataCollectionSection["data"]["address_ids"][$(this).parents("li").data("address-id")]);
+                                                }
 
-                                        addressesCount = addressesCount - 1;
+                                                $(this).parents("li").remove();
 
-                                        if (addressesCount === 0) {
-                                            $("#' . $this->compSecId . '-addresses-list-nodata").attr("hidden", false);
-                                        }
-                                        collectData();
+                                                addressesCount = addressesCount - 1;
+
+                                                if (addressesCount === 0) {
+                                                    $("#' . $this->compSecId . '-addresses-list-nodata").attr("hidden", false);
+                                                }
+                                            } else {
+                                                return;
+                                            }
+                                        });
                                     });
                                 });
                             }
 
+                            function editCopy(task, button) {
+                                $(button).attr("disabled", true);
+                                $(button).siblings(".addressDeleteButton").attr("disabled", true);
+
+                                $($(button).parents("li").children(".row")[1]).find("dd").each(function(index,dd) {
+                                    if ($(dd).is(".cla-addressReference")) {
+                                        $("#' . $this->compSecId . '-address_reference").val($(dd).html());
+                                    } else if ($(dd).is(".cla-attentionTo")) {
+                                        $("#' . $this->compSecId . '-attention_to").val($(dd).html());
+                                    } else if ($(dd).is(".cla-street")) {
+                                        $("#' . $this->compSecId . '-street_address").val($(dd).html());
+                                    } else if ($(dd).is(".cla-street2")) {
+                                        $("#' . $this->compSecId . '-street_address_2").val($(dd).html());
+                                    } else if ($(dd).is(".cla-street3")) {
+                                        $("#' . $this->compSecId . '-street_address_3").val($(dd).html());
+                                    } else if ($(dd).is(".cla-street4")) {
+                                        $("#' . $this->compSecId . '-street_address_4").val($(dd).html());
+                                    } else if ($(dd).is(".cla-city")) {
+                                        $("#' . $this->compSecId . '-city_id").val($(dd).data("id"));
+                                        $("#' . $this->compSecId . '-city_name").val($(dd).html());
+                                    } else if ($(dd).is(".cla-post_code")) {
+                                        $("#' . $this->compSecId . '-post_code_id").val($(dd).data("id"));
+                                        $("#' . $this->compSecId . '-post_code").val($(dd).html());
+                                    } else if ($(dd).is(".cla-state")) {
+                                        $("#' . $this->compSecId . '-state_id").val($(dd).data("id"));
+                                        $("#' . $this->compSecId . '-state_name").val($(dd).html());
+                                    } else if ($(dd).is(".cla-country")) {
+                                        $("#' . $this->compSecId . '-country_id").val($(dd).data("id"));
+                                        $("#' . $this->compSecId . '-country_name").val($(dd).html());
+                                    }
+
+                                    if (task === "edit") {
+                                        $("#' . $this->compSecId . '-address_id").val($(dd).parents("li").data("address-id"));
+                                    } else if (task === "copy") {
+                                        $("#' . $this->compSecId . '-address_id").val("");
+                                    }
+                                });
+
+                                if (task === "edit") {
+                                    toggleAddressFields(false, true);
+                                    $(button).siblings(".addressCopyButton").attr("disabled", true);
+                                } else if (task === "copy") {
+                                    toggleAddressFields(false, false);
+                                    $(button).siblings(".addressEditButton").attr("disabled", true);
+                                }
+                            }
+
+                            if (addressSortable) {
+                                initSortable($("#' . $this->compSecId . '-sortable-addresses-list")[0].id);
+                            }
                             initMainButtons();
-                            collectData();
+                            if (addressPostLink === "") {
+                                collectData();
+                            }
                             registerAddressButtons();
+
+                            function postData() {
+                                var postData = { };
+                                postData[$("#security-token").attr("name")] = $("#security-token").val();
+                                postData["package_name"] = "' . $this->addressesParams['addressPackageName'] . '";
+                                postData["package_row_id"] = "' . $this->addressesParams['addressPackageRowId'] . '";
+                                postData["address_ids"] = dataCollectionSection["data"]["address_ids"];
+                                postData["delete_address_ids"] = dataCollectionSection["data"]["delete_address_ids"];
+
+                                $.post(addressPostLink, postData, function(response) {
+                                    if (response.responseCode == 1) {
+                                        paginatedPNotify("error", {title: response.responseMessage});
+                                        return;
+                                    }
+
+                                    if (response.responseCode == 0) {
+                                        dataCollectionSection["data"]["address_ids"] = response.responseData.addresses;
+                                        dataCollectionSection["data"]["delete_address_ids"] = [];
+
+                                        $(dataCollectionSection["data"]["address_ids"]).each(function(index, addressArr) {
+                                            for (var addressId in addressArr) {
+                                                var addressLi = Array.from($(\'.cla-addressReference\')).find(item => item.textContent.trim() === addressArr[addressId]["address_reference"]);
+
+                                                $(addressLi).parents("li").data("new", 0);
+                                                $(addressLi).parents("li").data("address-id", addressId);
+                                                $(addressLi).parents("li").data("address-seq", addressArr[addressId]["seq"]);
+                                                $(addressLi).parents("li").attr("data-new", 0);
+                                                $(addressLi).parents("li").attr("data-address-id", addressId);
+                                                $(addressLi).parents("li").attr("data-address-seq", addressArr[addressId]["seq"]);
+                                            }
+                                        });
+
+                                        paginatedPNotify("success", {title: response.responseMessage});
+                                        return;
+                                    }
+
+                                    if (response.tokenKey && response.token) {
+                                        $("#security-token").attr("name", response.tokenKey);
+                                        $("#security-token").val(response.token);
+                                    }
+                                }, "json");
+                            }
                         }
                     }
                 });

@@ -36,6 +36,14 @@ class AddressBook
                         'notNull' => true
                     ]
                 ),
+                new Column(//sequence
+                    'seq',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => true,
+                        'default' => 0
+                    ]
+                ),
                 new Column(
                     'address_reference',
                     [

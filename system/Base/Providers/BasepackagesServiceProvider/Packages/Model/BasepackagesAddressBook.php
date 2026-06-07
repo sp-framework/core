@@ -12,6 +12,8 @@ class BasepackagesAddressBook extends BaseModel
 
     public $package_row_id;
 
+    public $seq;
+
     public $address_reference;
 
     public $attention_to;
