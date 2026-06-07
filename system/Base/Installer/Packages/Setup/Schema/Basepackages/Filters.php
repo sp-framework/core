@@ -91,6 +91,13 @@ class Filters
                         'notNull' => false,
                     ]
                 ),
+                new Column(
+                    'archived',
+                    [
+                        'type'    => Column::TYPE_BOOLEAN,
+                        'notNull' => true,
+                    ]
+                ),
             ],
            'indexes' => [
                 new Index(
@@ -116,7 +123,8 @@ class Filters
                 [
                     'app_type',
                     'account_id',
-                    'component_id'
+                    'component_id',
+                    'archived'
                 ],
                 'INDEX'
             )

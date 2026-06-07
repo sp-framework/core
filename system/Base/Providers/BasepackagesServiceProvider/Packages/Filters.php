@@ -88,7 +88,7 @@ class Filters extends BasePackage
         }
     }
 
-    public function getFilters(int $componentId, array $account = null)
+    public function getFilters(int $componentId, array $account = null, $archived = false)
     {
         $component = $this->modules->components->getComponentById($componentId);
 
@@ -97,11 +97,12 @@ class Filters extends BasePackage
                 $filtersArr =
                     $this->getByParams(
                         [
-                            'conditions'    => 'component_id = :cid: AND (account_id = :aid: OR account_id = :aid0:)',
+                            'conditions'    => 'component_id = :cid: AND (account_id = :aid: OR account_id = :aid0:) AND archived = :archived:',
                             'bind'          => [
                                 'cid'       => $componentId,
                                 'aid'       => $account['id'],
-                                'aid0'      => 0
+                                'aid0'      => 0,
+                                'archived'  => $archived
                             ]
                         ], true
                     );
@@ -117,6 +118,7 @@ class Filters extends BasePackage
                                         'OR',
                                         ['account_id', '=', 0]
                                     ],
+                                    ['archived', '=', $archived]
                                 ]
                         ]
                     );
@@ -190,7 +192,8 @@ class Filters extends BasePackage
                         [
                             'conditions'    => 'component_id = :cid: AND shared_ids IS NOT NULL',
                             'bind'          => [
-                                'cid'       => $componentId
+                                'cid'       => $componentId,
+                                'archived'  => $archived
                             ]
                         ]
                     );
@@ -200,7 +203,8 @@ class Filters extends BasePackage
                         [
                             'conditions'    => [
                                 ['component_id', '=', $componentId],
-                                ['shared_ids', '!=', null]
+                                ['shared_ids', '!=', null],
+                                ['archived', '=', $archived],
                             ]
                         ]
                     );
@@ -266,9 +270,10 @@ class Filters extends BasePackage
             $filtersArr =
                 $this->getByParams(
                     [
-                        'conditions'    => 'component_id = :cid:',
+                        'conditions'    => 'component_id = :cid: AND archived = :archived:',
                         'bind'          => [
-                            'cid'       => $componentId
+                            'cid'       => $componentId,
+                            'archived'  => $archived
                         ]
                     ]
                 );
@@ -277,7 +282,8 @@ class Filters extends BasePackage
                 $this->getByParams(
                     [
                         'conditions'    => [
-                            ['component_id', '=', $componentId]
+                            ['component_id', '=', $componentId],
+                            ['archived', '=', $archived]
                         ]
                     ]
                 );
@@ -339,7 +345,8 @@ class Filters extends BasePackage
                 'filter_type'       => 0,//System
                 'is_default'        => 1,
                 'auto_generated'    => 1,
-                'account_id'        => 0
+                'account_id'        => 0,
+                'archived'          => 0
             ]
         );
     }
@@ -390,7 +397,8 @@ class Filters extends BasePackage
                         'filter_type'       => 0,//System
                         'is_default'        => $default,
                         'auto_generated'    => 1,
-                        'account_id'        => $this->access->auth->account()['id']
+                        'account_id'        => $this->access->auth->account()['id'],
+                        'archived'          => 0
                     ]
                 );
             }
@@ -450,7 +458,8 @@ class Filters extends BasePackage
                         'filter_type'       => 0,//System
                         'is_default'        => $default,
                         'auto_generated'    => 1,
-                        'account_id'        => 0
+                        'account_id'        => 0,
+                        'archived'          => 0
                     ]
                 );
             }
@@ -510,7 +519,8 @@ class Filters extends BasePackage
                         'filter_type'       => 0,//System
                         'is_default'        => $default,
                         'auto_generated'    => 1,
-                        'account_id'        => 0
+                        'account_id'        => 0,
+                        'archived'          => 0
                     ]
                 );
             }
