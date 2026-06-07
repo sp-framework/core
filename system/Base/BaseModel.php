@@ -12,6 +12,8 @@ abstract class BaseModel extends Model
 
 	protected $helper;
 
+	protected $config;
+
 	protected $db;
 
 	protected $modelRelations;
@@ -50,7 +52,9 @@ abstract class BaseModel extends Model
 
 			$this->helper = $this->getDi()->getShared('helper');
 
-			if (!isset($this->db)) {
+			$this->config = $this->getDi()->getShared('config');
+
+			if (!isset($this->db) && $this->config->databasetype !== 'ff') {
 				$this->db = $this->getDi()->getShared('db');
 			}
 
