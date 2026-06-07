@@ -891,6 +891,47 @@ abstract class BaseComponent extends Controller
 			$this->response->setHeader('token', $this->token);
 		}
 
+		if ($this->app && $this->view->componentName !== 'auth') {
+			if (!$this->app['menu_structure']) {
+				$menus =
+					$this->basepackages->menus->buildMenusForApp($this->app);
+			} else {
+				if (is_string($this->app['menu_structure'])) {
+					$menus =
+						$this->helper->decode($this->app['menu_structure'], true);
+				} else {
+					$menus = $this->app['menu_structure'];
+				}
+			}
+
+			//Check Permission for the user
+			if ($this->access->auth->check()) {
+				//Overridden permissions first
+				if (isset($this->access->auth->account()['security']['permissions']) &&
+					count($this->access->auth->account()['security']['permissions']) > 0
+				) {
+					$menus =
+						$this->basepackages->menus->buildMenusForAppWithPermissions(
+							$this->app,
+							$this->access->auth->account()['security']['permissions'][$this->app['id']]
+						);
+				}
+
+				//Role Permissions
+				if (isset($this->access->auth->account()['role']['permissions']) &&
+					count($this->access->auth->account()['role']['permissions']) > 0
+				) {
+					$menus =
+						$this->basepackages->menus->buildMenusForAppWithPermissions(
+							$this->app,
+							$this->access->auth->account()['role']['permissions'][$this->app['id']]
+						);
+				}
+			}
+
+			$this->view->menus = $menus;
+		}
+
 		if ($this->request->isPost() && $this->isJson()) {
 			if ($this->access->auth->check()) {
 				if (!isset($this->access->auth->account()['env'])) {
@@ -924,20 +965,6 @@ abstract class BaseComponent extends Controller
 			}
 
 			return $this->sendJson();
-		}
-
-		if ($this->app && $this->view->componentName !== 'auth') {
-			if (!$this->app['menu_structure']) {
-				$this->view->menus =
-					$this->basepackages->menus->buildMenusForApp($this->app['id']);
-			} else {
-				if (is_string($this->app['menu_structure'])) {
-					$this->view->menus =
-						$this->helper->decode($this->app['menu_structure'], true);
-				} else {
-					$this->view->menus = $this->app['menu_structure'];
-				}
-			}
 		}
 
 		//Murl - update Hits

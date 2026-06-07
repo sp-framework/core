@@ -5,12 +5,15 @@ namespace System\Base\Providers\CoreServiceProvider\Install;
 use System\Base\BasePackage;
 use System\Base\Installer\Packages\Setup\Schema;
 use System\Base\Providers\ModulesServiceProvider\DbInstaller;
+use System\Base\Providers\ModulesServiceProvider\MenuInstaller;
 
 class Install extends BasePackage
 {
     protected $databases;
 
     protected $dbInstaller;
+
+    protected $menuInstaller;
 
     public function init($schemaNames = [])
     {
@@ -32,12 +35,16 @@ class Install extends BasePackage
 
         $this->dbInstaller = new DbInstaller;
 
+        $this->menuInstaller = new MenuInstaller;
+
         return $this;
     }
 
     public function install()
     {
         $this->preInstall();
+
+        $this->installMenu();
 
         $this->installDb();
 
@@ -73,5 +80,21 @@ class Install extends BasePackage
     public function truncate()
     {
         $this->dbInstaller->truncate($this->databases);
+    }
+
+    protected function installMenu()
+    {
+        $this->menuInstaller->installMenu($this);
+
+        return true;
+    }
+
+    public function uninstall($remove = false)
+    {
+        if ($remove) {
+            $this->menuInstaller->uninstallMenu($this);
+        }
+
+        return true;
     }
 }

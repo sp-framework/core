@@ -14,6 +14,8 @@ class BasepackagesMenus extends BaseModel
 
     public $app_type;
 
+    public $component_id;
+
     public $route;
 
     public $sequence;

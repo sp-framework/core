@@ -68,6 +68,8 @@ class Setup
 
 	protected $helper;
 
+	protected $opCache;
+
 	protected $remoteWebContent;
 
 	protected $onlyUpdateDb = false;
@@ -91,6 +93,8 @@ class Setup
 		$this->cookies = $this->container->getShared('cookies');
 
 		$this->helper = $this->container->getShared('helper');
+
+		$this->opCache = $this->container->getShared('opCache');
 
 		if (($this->request->isPost() &&
 			 !$precheckFail &&
@@ -204,6 +208,10 @@ class Setup
 			} catch (FilesystemException | UnableToDeleteFile $exception) {
 				throw $exception;
 			}
+		}
+
+		if ($this->opCache) {
+			$this->opCache->removeCache(null, 'core');
 		}
 
 		return true;
@@ -467,14 +475,17 @@ class Setup
 					) {
 						continue;
 					}
-
-					if ($jsonFile['menu'] && $jsonFile['menu'] !== 'false') {
-						$menuId = $this->registerCoreMenu($jsonFile);
-					} else {
-						$menuId = null;
-					}
+					$menuId = null;
 
 					$registeredComponentId = $this->registerCoreComponent($jsonFile, $menuId);
+
+					if ($jsonFile['menu'] && $jsonFile['menu'] !== 'false') {
+						$menuId = $this->registerCoreMenu($jsonFile, $registeredComponentId);
+					}
+
+					if ($menuId) {
+						$this->registerCoreComponent($jsonFile, $menuId, true);
+					}
 
 					if ($jsonFile['route'] === 'dashboards') {
 						$this->registerCoreDashboard($jsonFile);
@@ -584,8 +595,12 @@ class Setup
 		return true;
 	}
 
-	protected function registerCoreComponent(array $componentFile, $menuId)
+	protected function registerCoreComponent(array $componentFile, $menuId = null, $update = false)
 	{
+		if ($update) {
+			return (new RegisterComponent())->update($this->db, $this->ff, $componentFile, $menuId);
+		}
+
 		return (new RegisterComponent())->register($this->db, $this->ff, $componentFile, $menuId, $this->helper);
 	}
 
@@ -604,9 +619,9 @@ class Setup
 		return (new RegisterCoreApp())->update($this->db, $this->ff);
 	}
 
-	protected function registerCoreMenu($componentJsonFile)
+	protected function registerCoreMenu($componentJsonFile, $registeredComponentId)
 	{
-		return (new RegisterMenu())->register($this->db, $this->ff, $componentJsonFile, $this->helper);
+		return (new RegisterMenu())->register($this->db, $this->ff, $componentJsonFile, $this->helper, $registeredComponentId);
 	}
 
 	protected function registerCorePackage(array $packageFile)

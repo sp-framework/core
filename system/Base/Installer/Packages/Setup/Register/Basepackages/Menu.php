@@ -4,7 +4,7 @@ namespace System\Base\Installer\Packages\Setup\Register\Basepackages;
 
 class Menu
 {
-    public function register($db, $ff, $componentJsonFile, $helper)
+    public function register($db, $ff, $componentJsonFile, $helper, $registeredComponentId)
     {
         $menu = $componentJsonFile['menu'];
 
@@ -22,6 +22,7 @@ class Menu
                 'menu'                  => $helper->encode($menu),
                 'apps'                  => $helper->encode(['1' => ['enabled'  => true]]),
                 'app_type'              => $componentJsonFile['app_type'],
+                'component_id'          => $registeredComponentId,
                 'route'                 => $componentJsonFile['route'],
                 'sequence'              => $sequence
             ];
@@ -34,6 +35,7 @@ class Menu
 
         if ($ff) {
             $menuStore = $ff->store('basepackages_menus');
+            $menuStore->setValidateData(false);
 
             $menuStore->updateOrInsert($menuToRegister);
 

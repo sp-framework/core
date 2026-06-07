@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Menus
 {
@@ -45,6 +46,13 @@ class Menus
                         ]
                     ),
                     new Column(
+                        'component_id',
+                        [
+                            'type'    => Column::TYPE_INTEGER,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
                         'route',
                         [
                             'type'    => Column::TYPE_VARCHAR,
@@ -60,7 +68,32 @@ class Menus
                             'notNull' => true,
                         ]
                     )
+                ],
+                'indexes' => [
+                    new Index(
+                        'column_UNIQUE',
+                        [
+                            'app_type',
+                            'component_id'
+                        ],
+                        'UNIQUE'
+                    )
                 ]
             ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'app_type',
+                    'component_id'
+                ],
+                'INDEX'
+            )
+        ];
     }
 }

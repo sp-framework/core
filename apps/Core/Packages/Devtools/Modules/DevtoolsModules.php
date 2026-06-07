@@ -2262,6 +2262,8 @@ $file .= '
             return true;
         }
 
+        $module = $this->modules->{$data['module_type']}->packagesData->last;
+
         if ($data['menu_id'] != '' && $data['menu_id'] != '0') {
             if (!isset($data['is_clone']) ||
                 (isset($data['is_clone']) && $data['is_clone'] == false)
@@ -2271,8 +2273,6 @@ $file .= '
                 if ($menu) {
                     if ($data['menu'] == 'false') {
                         $this->basepackages->menus->remove($data['menu_id']);
-
-                        $module = $this->modules->{$data['module_type']}->getById($data['id']);
 
                         $module['menu_id'] = null;
                         $module['menu'] = null;
@@ -2289,9 +2289,7 @@ $file .= '
             $data['menu'] = $this->helper->decode($data['menu'], true);
 
             if (isset($menu) && $menu) {
-                $this->basepackages->menus->updateMenu($data['menu_id'], $data);
-
-                $module = $this->modules->{$data['module_type']}->packagesData->last;
+                $this->basepackages->menus->updateMenu($data['menu_id'], $data, $module);
 
                 $module['menu_id'] = $menu['id'];
 
@@ -2299,7 +2297,7 @@ $file .= '
 
                 return;
             } else {
-                $menu = $this->basepackages->menus->addMenu($data);
+                $menu = $this->basepackages->menus->addMenu($data, $module);
 
                 if ($menu) {
                     $module = $this->modules->{$data['module_type']}->packagesData->last;
