@@ -545,7 +545,7 @@ dataCollectionSectionForm['funcs']['performBulkAction'] = function(buttonID) {
         } else {
             paginatedPNotify('error', {'text': response.responseMessage});
 
-            $('#' + buttonID).parent().siblings().attr('disabled', true)
+            $('#' + buttonID).parent().siblings().attr('disabled', false);
             $('#' + buttonID).parent().siblings().children().removeClass('fa-cog fa-spin').addClass('fa-wand-magic-sparkles');
         }
     }, 'json');
