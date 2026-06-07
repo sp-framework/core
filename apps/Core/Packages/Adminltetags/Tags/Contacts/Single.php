@@ -85,7 +85,7 @@ class Single
         $fieldsArr = null;
         $field = null;
 
-        $fieldsArr = ['multiple','includePortrait','includeNamePrefix','includeName','includeNameSuffix','includeEmail','includeOther','includeNotes','firstNameFieldHidden','firstNameFieldDisabled','firstNameFieldRequired','firstNameFieldBazPostOnCreate','firstNameFieldBazPostOnUpdate','lastNameFieldHidden','lastNameFieldDisabled','lastNameFieldRequired','lastNameFieldBazPostOnCreate','lastNameFieldBazPostOnUpdate','emailFieldHidden','emailFieldDisabled','emailFieldRequired','emailFieldBazPostOnCreate','emailFieldBazPostOnUpdate','secondaryEmailFieldHidden','secondaryEmailFieldDisabled','secondaryEmailFieldRequired','secondaryEmailFieldBazPostOnCreate','secondaryEmailFieldBazPostOnUpdate','ccEmailsToSecondaryEmailFieldHidden','ccEmailsToSecondaryEmailFieldDisabled','ccEmailsToSecondaryEmailFieldRequired','ccEmailsToSecondaryEmailFieldBazPostOnCreate','ccEmailsToSecondaryEmailFieldBazPostOnUpdate','contactPhoneFieldHidden','contactPhoneFieldDisabled','contactPhoneFieldRequired','contactPhoneFieldBazPostOnCreate','contactPhoneFieldBazPostOnUpdate','contactPhoneExtFieldHidden','contactPhoneExtFieldDisabled','contactPhoneExtFieldRequired','contactPhoneExtFieldBazPostOnCreate','contactPhoneExtFieldBazPostOnUpdate','contactMobileFieldHidden','contactMobileFieldDisabled','contactMobileFieldRequired','contactMobileFieldBazPostOnCreate','contactMobileFieldBazPostOnUpdate','contactFaxFieldHidden','contactFaxFieldDisabled','contactFaxFieldRequired','contactFaxFieldBazPostOnCreate','contactFaxFieldBazPostOnUpdate','contactOtherFieldHidden','contactOtherFieldDisabled','contactOtherFieldRequired','contactOtherFieldBazPostOnCreate','contactOtherFieldBazPostOnUpdate','contactNotesFieldHidden','contactNotesFieldDisabled','contactNotesFieldRequired','contactNotesFieldBazPostOnCreate','contactNotesFieldBazPostOnUpdate'];
+        $fieldsArr = ['multiple','includePortrait','includeNamePrefix','includeName','includeNameSuffix','includeEmail','includeSecondaryEmail','includeOther','includeNotes','firstNameFieldHidden','firstNameFieldDisabled','firstNameFieldRequired','firstNameFieldBazPostOnCreate','firstNameFieldBazPostOnUpdate','lastNameFieldHidden','lastNameFieldDisabled','lastNameFieldRequired','lastNameFieldBazPostOnCreate','lastNameFieldBazPostOnUpdate','emailFieldHidden','emailFieldDisabled','emailFieldRequired','emailFieldBazPostOnCreate','emailFieldBazPostOnUpdate','secondaryEmailFieldHidden','secondaryEmailFieldDisabled','secondaryEmailFieldRequired','secondaryEmailFieldBazPostOnCreate','secondaryEmailFieldBazPostOnUpdate','ccEmailsToSecondaryEmailFieldHidden','ccEmailsToSecondaryEmailFieldDisabled','ccEmailsToSecondaryEmailFieldRequired','ccEmailsToSecondaryEmailFieldBazPostOnCreate','ccEmailsToSecondaryEmailFieldBazPostOnUpdate','contactPhoneFieldHidden','contactPhoneFieldDisabled','contactPhoneFieldRequired','contactPhoneFieldBazPostOnCreate','contactPhoneFieldBazPostOnUpdate','contactPhoneExtFieldHidden','contactPhoneExtFieldDisabled','contactPhoneExtFieldRequired','contactPhoneExtFieldBazPostOnCreate','contactPhoneExtFieldBazPostOnUpdate','contactMobileFieldHidden','contactMobileFieldDisabled','contactMobileFieldRequired','contactMobileFieldBazPostOnCreate','contactMobileFieldBazPostOnUpdate','contactFaxFieldHidden','contactFaxFieldDisabled','contactFaxFieldRequired','contactFaxFieldBazPostOnCreate','contactFaxFieldBazPostOnUpdate','contactOtherFieldHidden','contactOtherFieldDisabled','contactOtherFieldRequired','contactOtherFieldBazPostOnCreate','contactOtherFieldBazPostOnUpdate','contactNotesFieldHidden','contactNotesFieldDisabled','contactNotesFieldRequired','contactNotesFieldBazPostOnCreate','contactNotesFieldBazPostOnUpdate'];
 
         foreach ($fieldsArr as $field) {
             $this->contactsParams[$field] =
@@ -380,7 +380,7 @@ class Single
             }
         }
 
-        return
+        $email =
             '<div class="row">
                 <div class="col">' .
                     $this->adminLTETags->useTag('fields',
@@ -407,8 +407,10 @@ class Single
                             'fieldValue'                     => $this->contactsParams['email']
                         ]
                     ) .
-                '</div>
-                <div class="col">
+                '</div>';
+        if (isset($this->contactsParams['includeSecondaEmail']) && $this->contactsParams['includeSecondaEmail'] === true) {
+            $email .=
+                '<div class="col">
                     <div class="row">
                         <div class="col-md-10">' .
                             $this->adminLTETags->useTag('fields',
@@ -464,6 +466,12 @@ class Single
                     </div>
                 </div>
             </div>';
+
+        } else {
+            $email .= '</div>';
+        }
+
+        return $email;
     }
 
     protected function inclPhone()
@@ -694,10 +702,15 @@ class Single
 
     protected function inclEmailJs()
     {
-        return
-            '"' . $this->compSecId . '-email"                       : { },
-            "' . $this->compSecId . '-secondary_email"              : { },
-            "' . $this->compSecId . '-cc_emails_to_secondary_email" : { },';
+        if (isset($this->contactsParams['includeSecondaEmail']) && $this->contactsParams['includeSecondaEmail'] === true) {
+            return
+                '"' . $this->compSecId . '-email"                       : { },
+                "' . $this->compSecId . '-secondary_email"              : { },
+                "' . $this->compSecId . '-cc_emails_to_secondary_email" : { },';
+        } else {
+            return
+                '"' . $this->compSecId . '-email"                       : { },';
+        }
     }
 
     protected function inclPhoneJs()
