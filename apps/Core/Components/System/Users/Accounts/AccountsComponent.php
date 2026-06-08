@@ -154,6 +154,13 @@ class AccountsComponent extends BaseComponent
             } else {
                 $data['status'] = '<span class="badge badge-success text-uppercase">ENABLED</span>';
             }
+
+            if (!isset($data['first_name'])) {
+                $data['first_name'] = '-';
+            }
+            if (!isset($data['last_name'])) {
+                $data['last_name'] = '-';
+            }
         }
 
         return $dataArr;
@@ -180,13 +187,24 @@ class AccountsComponent extends BaseComponent
         if ($data['profile_package_name'] === 'UsersProfiles') {
             $profile = $this->basepackages->profiles->getById($data['profile_package_row_id']);
         } else if ($profilePackage) {
-            //Get profile information from packages class.
+            try {
+                $profilePackageClass = new $profilePackage['class'];
+
+                $profile = $profilePackageClass->getById($data['profile_package_row_id']);
+            } catch (\throwable $e) {
+                //Do nothing.
+            }
         }
 
-        if ($profilePackage) {
-            if (is_string($profilePackage['settings'])) {
+        if ($data['profile_package_name'] === 'UsersProfiles' &&
+            $profilePackage
+        ) {
+            if (isset($profilePackage['settings']) &&
+                is_string($profilePackage['settings'])
+            ) {
                 $profilePackage['settings'] = $this->helper->decode($profilePackage['settings'], true);
             }
+
             if (isset($profilePackage['settings']['componentRoute'])) {
                 $componentRoute = $profilePackage['settings']['componentRoute'];
             }
@@ -201,7 +219,6 @@ class AccountsComponent extends BaseComponent
             }
         } else {
             $data['profile_package_row_id'] = '-';
-            $data['profile_package_name'] = '-';
         }
 
         return $data;

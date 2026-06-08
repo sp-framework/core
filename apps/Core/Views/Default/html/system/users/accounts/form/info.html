@@ -3,8 +3,8 @@
     {% set accountStatus = account['status'] %}
     {% set accountEmail = account['email'] %}
     {% set accountUsername = account['username'] %}
-    {% set accountFirstName = account['contact']['first_name'] %}
-    {% set accountLastName = account['contact']['last_name'] %}
+    {% set accountFirstName = (account['contact']['first_name'] is defined ? account['contact']['first_name'] : '-') %}
+    {% set accountLastName = (account['contact']['last_name'] is defined ? account['contact']['last_name'] : '-') %}
 {% else %}
     {% set accountId = '' %}
     {% set accountStatus = '' %}
@@ -23,6 +23,14 @@
     {% set accountStatusDisabled = true %}
 {% else %}
     {% set accountStatusDisabled = false %}
+{% endif %}
+{% set accountFirstNameDisabled = false %}
+{% if accountFirstName == '-' %}
+    {% set accountFirstNameDisabled = true %}
+{% endif %}
+{% set accountLastNameDisabled = false %}
+{% if accountLastName == '-' %}
+    {% set accountLastNameDisabled = true %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -135,6 +143,7 @@
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'First Name',
                 'fieldRequired'                  : true,
+                'fieldDisabled'                  : accountFirstNameDisabled,
                 'fieldBazScan'                   : true,
                 'fieldBazJstreeSearch'           : true,
                 'fieldBazPostOnCreate'           : true,
@@ -158,6 +167,7 @@
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Last Name',
                 'fieldRequired'                  : true,
+                'fieldDisabled'                  : accountLastNameDisabled,
                 'fieldBazScan'                   : true,
                 'fieldBazJstreeSearch'           : true,
                 'fieldBazPostOnCreate'           : true,

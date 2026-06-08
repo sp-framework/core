@@ -89,6 +89,7 @@ class Accounts
                 'column_INDEX',
                 [
                     'email',
+                    'domain',
                     'username'
                 ],
                 'INDEX'
