@@ -1758,7 +1758,13 @@ class Store
 
                         if ($type === 'integer') {
                             if (is_string($data[$propertyKey])) {
-                                $data[$propertyKey] = (int) $data[$propertyKey];
+                                if ($data[$propertyKey] !== '') {
+                                    $data[$propertyKey] = (int) $data[$propertyKey];
+                                } else {
+                                    if (!in_array($propertyKey, $schema['required'])) {
+                                        $data[$propertyKey] = null;
+                                    }
+                                }
                             }
                         }
 
