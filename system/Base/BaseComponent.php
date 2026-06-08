@@ -44,6 +44,8 @@ abstract class BaseComponent extends Controller
 
 	protected $notifyPackage;
 
+	protected $notifyNameField;
+
 	public $widgets;
 
 	protected function onConstruct()
@@ -1546,17 +1548,18 @@ abstract class BaseComponent extends Controller
 		return preg_replace('/[^0-9]/', '', $string);
 	}
 
-	protected function setNotificationPackage(&$notifyPackage = null)
+	protected function setNotificationPackage(&$notifyPackage = null, $notifyNameField = null)
 	{
 		if ($this->request->isPost() && (isset($this->postData()['id']) && $this->postData()['id'] != 0)) {
 			$this->notifyPackage = $notifyPackage;
+			$this->notifyNameField = $notifyNameField;
 		}
 	}
 
 	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $last = null)
 	{
 		if ($this->notifyPackage) {
-			$this->notifyPackage->addToNotification($this->dispatcher->getActionName(), null, null, null, null, $this->component);
+			$this->notifyPackage->addToNotification($this->dispatcher->getActionName(), null, null, null, null, $this->component, $this->notifyNameField);
 
 			return;
 		}

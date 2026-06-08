@@ -231,8 +231,9 @@ class Notifications extends BasePackage
                         'warning'   => $warning,
                         'error'     => $error
                     ],
-                'mute'  => $isMute,
-                'app'   => $this->apps->getAppInfo()['route']
+                'mute'      => $isMute,
+                'app'       => $this->apps->getAppInfo()['route'],
+                'for_user'  => $notificationAccount['email']
             ];
 
         $this->addResponse('Ok', 0, $count);

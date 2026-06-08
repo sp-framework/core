@@ -2329,7 +2329,7 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	public function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $package = null, $packageRowId = null, $component = null)
+	public function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $package = null, $packageRowId = null, $component = null, $notifyNameField = null)
 	{
 		if (is_null($subscriptionType)) {
 			throw new \Exceptions('Notification subscription not set');
@@ -2357,11 +2357,15 @@ abstract class BasePackage extends Controller
 			if (!$packageRowId && isset($this->packagesData->last)) {
 				$packageRowId = $this->packagesData->last['id'];
 
+				if (!$notifyNameField) {
+					$notifyNameField = 'name';
+				}
+
 				if (!isset($messageTitle)) {
 					$messageTitle = strtoupper($subscriptionType) . ': ' . strtoupper(($module['display_name'] ?? $module['name']));
 
-					if (isset($this->packagesData->last['name'])) {
-						$messageTitle = $messageTitle . ': ' . strtoupper($this->packagesData->last['name']);
+					if (isset($this->packagesData->last[$notifyNameField])) {
+						$messageTitle = $messageTitle . ': ' . strtoupper($this->packagesData->last[$notifyNameField]);
 					} else {
 						$messageTitle = $messageTitle . ': ' . $this->packagesData->last['id'];
 					}

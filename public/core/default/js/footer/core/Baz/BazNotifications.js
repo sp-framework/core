@@ -205,6 +205,11 @@ var BazNotifications = function() {
     }
 
     function onMessage(type, response) {
+        if (response.responseData.for_user) {
+            if (response.responseData.for_user !== window.dataCollection.env.profile.email) {
+                return;
+            }
+        }
         //eslint-disable-next-line
         console.log(type, response);
         if (response.responseCode == 0) {
