@@ -103,7 +103,45 @@ dataCollectionSection =
                             [100, 'All']
                         ],
                         select: 'multiple',
-                        buttons : ['selectAll','selectNone'],
+                        buttons : [
+                            {
+                                extend: 'selectAll',
+                                action: function(e) {
+                                    e.preventDefault();
+
+                                    dataCollectionSectionForm['vars']['modulesTable'].rows({ search: 'applied'}).select();
+                                    var selectedRows = dataCollectionSectionForm['vars']['modulesTable'].rows({ selected: true }).data().toArray();
+
+                                    if (selectedRows.length > 0) {
+                                        $(selectedRows).each(function(index, row) {
+                                            var moduleType = row[4];
+                                            if (moduleType === 'views (sub)') {
+                                                moduleType = 'views';
+                                            }
+                                            var id = row[0];
+
+                                            if (!dataCollectionSectionForm['vars']['bulkActions'][moduleType]) {
+                                                dataCollectionSectionForm['vars']['bulkActions'][moduleType] = [];
+                                            }
+
+                                            if (!dataCollectionSectionForm['vars']['bulkActions'][moduleType].includes(id)) {
+                                                dataCollectionSectionForm['vars']['bulkActions'][moduleType].push(id);
+                                            }
+                                        });
+                                    }
+
+                                    dataCollectionSectionForm['funcs']['editBulkButton']();
+                                }
+                            },
+                            {
+                                extend: 'selectNone',
+                                action: function(e) {
+                                    dataCollectionSectionForm['vars']['modulesTable'].rows().deselect();
+                                    dataCollectionSectionForm['vars']['bulkActions'] = { };
+                                    dataCollectionSectionForm['funcs']['editBulkButton']();
+                                }
+                            }
+                        ],
                         dom : '<"row mb-1"<"col-md-3 col-xs-12"B><"col-md-3 col-xs-12"l><"col-md-3 col-xs-12"f><"col-md-3 col-xs-12"p>>' +
                               '<"row mb-1"<"col"tr>>' +
                               '<"row"<"col-md-6 col-xs-12"i><"col-md-6 col-xs-12"p>>',
