@@ -294,7 +294,11 @@ class Menus extends BasePackage
 
     protected function addSequence($menu, $sequence)
     {
-        foreach ($menu as $menu['component_id'] => &$value) {
+        foreach ($menu as &$value) {
+            if (!is_array($value)) {
+                continue;
+            }
+
             if (!isset($value['seq'])) {
                 $value['seq'] = $sequence;
             }

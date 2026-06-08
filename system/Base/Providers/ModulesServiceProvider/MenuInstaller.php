@@ -84,11 +84,11 @@ class MenuInstaller extends BasePackage
                                 $component['menu'] = false;
                                 $component['menu_id'] = null;
                             } else {
-                                $this->basepackages->menus->updateMenu($menu['id'], $installComponentJsonFile, $component, ['id' => 1]);
+                                $this->basepackages->menus->updateMenu($menu['id'], $installComponentJsonFile, $component);
                             }
                         } else {
                             if ($installComponentJsonFile['menu'] && $installComponentJsonFile['menu'] != 'false') {
-                                $menu = $this->basepackages->menus->addMenu($installComponentJsonFile, $component, ['id' => 1]);
+                                $menu = $this->basepackages->menus->addMenu($installComponentJsonFile, $component);
 
                                 $component['menu'] = $installComponentJsonFile['menu'];
                                 $component['menu_id'] = $menu['id'];
