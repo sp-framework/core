@@ -102,7 +102,20 @@ dataCollectionSection =
                             [100, -1],
                             [100, 'All']
                         ],
-                        select: 'multiple'
+                        select: 'multiple',
+                        buttons : ['selectAll','selectNone'],
+                        dom : '<"row mb-1"<"col-md-3 col-xs-12"B><"col-md-3 col-xs-12"l><"col-md-3 col-xs-12"f><"col-md-3 col-xs-12"p>>' +
+                              '<"row mb-1"<"col"tr>>' +
+                              '<"row"<"col-md-6 col-xs-12"i><"col-md-6 col-xs-12"p>>',
+                        language : {
+                            buttons         : {
+                                selectAll   : '<i class="fas fa-fw fa-check-double"></i>',
+                                selectNone  : '<span class="fa-stack">' +
+                                              '<i class="fas fa-fw fa-check-double fa-stack-1x"></i>' +
+                                              '<i class="fas fa-fw fa-ban fa-stack-2x text-danger"></i>' +
+                                              '</span>'
+                            }
+                        }
                     });
 
                     dataCollectionSectionForm['vars']['modulesTable'].on('page', function() {
