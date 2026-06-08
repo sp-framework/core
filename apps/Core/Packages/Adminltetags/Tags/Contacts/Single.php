@@ -685,7 +685,7 @@ class Single
 
             dataCollectionSection =
                 $.extend(dataCollectionSection, {
-                    ';
+                    "' . $this->compSecId . '-contact_reference"           : { },';
 
         return $baseJs;
     }
@@ -693,8 +693,7 @@ class Single
     protected function inclNameJs()
     {
         return
-            '"' . $this->compSecId . '-contact_reference"           : { },
-            "' . $this->compSecId . '-prefix"                       : { },
+            '"' . $this->compSecId . '-prefix"                      : { },
             "' . $this->compSecId . '-first_name"                   : { },
             "' . $this->compSecId . '-last_name"                    : { },
             "' . $this->compSecId . '-suffix"                       : { },';
