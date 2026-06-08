@@ -49,9 +49,11 @@ class Mutex extends BasePackage
 
                 $parent = $this->getById((int) $mutex['parent_lock_id']);
 
-                $mutex['parent_lock_by_id'] = $parent['parent_lock_id'];
-                $mutex['parent_lock_by_package'] = $parent['package_name'];
-                $mutex['parent_lock_id'] = 0;
+                if ($parent) {
+                    $mutex['parent_lock_by_id'] = $parent['parent_lock_id'];
+                    $mutex['parent_lock_by_package'] = $parent['package_name'];
+                    $mutex['parent_lock_id'] = 0;
+                }
             } else if (!static::$parentLock) {
                 static::$parentLock = $mutex['id'];
             } else if ($mutex['parent_lock_id'] === 0 && static::$parentLock) {
