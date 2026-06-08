@@ -645,12 +645,16 @@ class Filters extends BasePackage
 
     public function removeFilter(array $data)
     {
-        $filter = $this->getById($data['id']);
+        $filter = $this->getById((int) $data['id']);
+
+        if (!$filter) {
+            $this->addResponse('Filter with ID not found.', 1);
+
+            return false;
+        }
 
         if (!isset($data['force']) && $filter['auto_generated'] == 1) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Cannot remove auto generated filter.';
+            $this->addResponse('Cannot remove auto generated filter.', 1);
 
             return false;
         }
