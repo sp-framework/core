@@ -7,6 +7,9 @@
 {% if disableKeys is not defined %}
     {% set disableKeys = [] %}
 {% endif %}
+{% if isJson is not defined %}
+    {% set isJson = [] %}
+{% endif %}
 {{adminltetags.useTag('content',
     [
         'component'                     : component,
@@ -31,7 +34,8 @@
                 'activityLogs'                  : activityLogs,
                 'replaceKeys'                   : replaceKeys,
                 'replaceValues'                 : replaceValues,
-                'disableKeys'                   : disableKeys
+                'disableKeys'                   : disableKeys,
+                'isJson'                        : isJson
             ]
         ),
         'sectionButtons'                   :

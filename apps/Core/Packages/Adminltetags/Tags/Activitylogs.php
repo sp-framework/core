@@ -131,13 +131,13 @@ class Activitylogs extends Adminltetags
                         $logKey = $this->params['replaceKeys'][$logKey];
                     }
 
-                    $logKey = str_replace('_', ' ', $logKey);
+                    if (in_array($logKey, $this->params['isJson'])) {
+                        if (is_array($log)) {
+                            $log = $this->helper->encode($log);
+                        }
 
-                    if (is_array($log)) {
-                        $log = $this->helper->encode($log);
-
-                        if ($log === '[]') {
-                            $log = '';
+                        if ($log === '[]' || $log === '{}') {
+                            continue;
                         }
 
                         $jsonLog = $log;
@@ -166,8 +166,10 @@ class Activitylogs extends Adminltetags
                                 </script>';
                     }
 
+                    $logTitle = str_replace('_', ' ', $logKey);
+
                     $logContent .=
-                        '<dt class="col-md-4 text-uppercase">' . $logKey . '</dt>
+                        '<dt class="col-md-4 text-uppercase">' . $logTitle . '</dt>
                         <dd id="' . $logKey . '-' . $logsKey . '" class="col-md-8">: ' . $log . '</dd>';
                 }
             }
