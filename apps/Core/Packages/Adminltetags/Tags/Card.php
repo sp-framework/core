@@ -99,22 +99,26 @@ class Card extends Adminltetags
                 (isset($this->view->getParamsToView()['mutexLock']['self']) &&
                  $this->view->getParamsToView()['mutexLock']['self'] === false)
             ) {
-                if (isset($this->params['mutexLock']['account_name'])) {
-                    $cardType = "bg-warning";
-                    $cardTitle = $cardTitle . ' (';
-                    $cardTitle = $cardTitle . 'LOCKED BY : ' . strtoupper($this->view->getParamsToView()['mutexLock']['account_name']);
-                    if (isset($this->view->getParamsToView()['mutexLock']['parent_lock_by_id'])) {
-                        $cardTitle = $cardTitle . ' VIA : ' . strtoupper($this->view->getParamsToView()['mutexLock']['parent_lock_by_package']);
-                    }
-                    $cardTitle = $cardTitle . ')';
+                if (isset($this->view->getParamsToView()['mutexLock']['self']) &&
+                    $this->view->getParamsToView()['mutexLock']['self'] === false
+                ) {
+                    if (isset($this->params['mutexLock']['account_name'])) {
+                        $cardType = "bg-warning";
+                        $cardTitle = $cardTitle . ' (';
+                        $cardTitle = $cardTitle . 'LOCKED BY : ' . strtoupper($this->view->getParamsToView()['mutexLock']['account_name']);
+                        if (isset($this->view->getParamsToView()['mutexLock']['parent_lock_by_id'])) {
+                            $cardTitle = $cardTitle . ' VIA : ' . strtoupper($this->view->getParamsToView()['mutexLock']['parent_lock_by_package']);
+                        }
+                        $cardTitle = $cardTitle . ')';
 
-                    if (isset($this->view->getParamsToView()['mutexLock']['can_remove_lock']) &&
-                        $this->view->getParamsToView()['mutexLock']['can_remove_lock'] == 'true'
-                    ) {
-                        if (isset($this->params['cardShowTools']) && count($this->params['cardShowTools']) > 0) {
-                            array_push($this->params['cardShowTools'], 'unlock');
-                        } else {
-                            $this->params['cardShowTools'] = ['unlock'];
+                        if (isset($this->view->getParamsToView()['mutexLock']['can_remove_lock']) &&
+                            $this->view->getParamsToView()['mutexLock']['can_remove_lock'] == 'true'
+                        ) {
+                            if (isset($this->params['cardShowTools']) && count($this->params['cardShowTools']) > 0) {
+                                array_push($this->params['cardShowTools'], 'unlock');
+                            } else {
+                                $this->params['cardShowTools'] = ['unlock'];
+                            }
                         }
                     }
                 }

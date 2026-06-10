@@ -190,8 +190,10 @@ class Content extends Adminltetags
                 (isset($this->view->getParamsToView()['mutexLock']['self']) &&
                  $this->view->getParamsToView()['mutexLock']['self'] === false)
             ) {
-                if (isset($this->view->getParamsToView()['mutexLock']['can_remove_lock']) &&
-                    $this->view->getParamsToView()['mutexLock']['can_remove_lock'] == 'true'
+                if ((isset($this->view->getParamsToView()['mutexLock']['can_remove_lock']) &&
+                    $this->view->getParamsToView()['mutexLock']['can_remove_lock'] == 'true') ||
+                    (isset($this->view->getParamsToView()['mutexLock']['self']) &&
+                     $this->view->getParamsToView()['mutexLock']['self'] === true)
                 ) {
                     $paramsFormButtons = $this->params['formButtons'];
                     unset($this->params['formButtons']);
