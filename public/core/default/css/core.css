@@ -41869,6 +41869,16 @@ a.text-muted:hover {
   min-height: calc(1.8rem + 3px) !important;
 }
 
+.select2-container--default.select2-container--disabled .select2-selection--single {
+  background-color: #e9ecef !important;
+  opacity: 1;
+}
+
+.select2-container--default.select2-container--disabled .select2-selection--multiple {
+  background-color: #e9ecef !important;
+  opacity: 1;
+}
+
 .select2-container--default .select2-selection--single .select2-selection__rendered,
 .select2-container--default .select2-selection--multiple .select2-selection__rendered {
   margin-top: -5px !important;
@@ -42588,4 +42598,50 @@ a.disabled {
   float: right !important;
   content: "\f067";
   padding-top: 5px;
+}
+
+.print {
+  background: white;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 0.5cm;
+}
+
+.print[size="A4"] {
+  width: 21cm;
+  height: 29.7cm;
+}
+
+.print[size="A4"][layout="landscape"] {
+  width: 29.7cm;
+  height: 21cm;
+}
+
+.print[size="A3"] {
+  width: 29.7cm;
+  height: 42cm;
+}
+
+.print[size="A3"][layout="landscape"] {
+  width: 42cm;
+  height: 29.7cm;
+}
+
+.print[size="A5"] {
+  width: 14.8cm;
+  height: 21cm;
+}
+
+.print[size="A5"][layout="landscape"] {
+  width: 21cm;
+  height: 14.8cm;
+}
+
+@media print {
+  .print {
+    margin: 0 auto;
+    padding: 0 !important;
+    box-shadow: 0;
+    width: 100%;
+  }
 }
