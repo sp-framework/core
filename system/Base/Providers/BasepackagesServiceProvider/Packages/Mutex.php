@@ -129,9 +129,13 @@ class Mutex extends BasePackage
             if ($this->access->auth->account()['id'] === 1 ||
                 ($mutex['account_id'] === $this->access->auth->account()['id'])
             ) {
+                static::$parentLock = null;
+
                 return $this->removeParentAndChilds($data, $mutex);
             } else {
                 if (isset($data['forceRelease']) && $data['forceRelease'] == 'true') {
+                    static::$parentLock = null;
+
                     return $this->removeParentAndChilds($data, $mutex);
                 }
 
