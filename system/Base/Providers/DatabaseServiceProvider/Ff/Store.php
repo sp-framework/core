@@ -1104,7 +1104,7 @@ class Store
 
                         if ($directRelationStoreData && count($directRelationStoreData) > 0) {
                             if ($relation['type'] === 'hasOne') {
-                                $data[$relation['alias']] = $directRelationStoreData[0];
+                                $data[$relation['alias']] = $directRelationStoreData[array_key_first($directRelationStoreData)];
                             } else if ($relation['type'] === 'hasMany') {
                                 $data[$relation['alias']] = $directRelationStoreData;
                             }
@@ -1194,7 +1194,7 @@ class Store
 
                                     if ($finalRelationStoreData && count($finalRelationStoreData) > 0) {
                                         if ($relation['type'] === 'hasOneThrough') {
-                                            $data[$relation['alias']] = $finalRelationStoreData[0];
+                                            $data[$relation['alias']] = $finalRelationStoreData[array_key_first($finalRelationStoreData)];
                                         } else if ($relation['type'] === 'hasManyThrough') {
                                             $data[$relation['alias']] = $finalRelationStoreData;
                                         }
