@@ -118,6 +118,12 @@ class Profiles extends BasePackage
     {
         $profile = $this->getProfile((int) $data['id']);
 
+        if (!$profile) {
+            $this->addResponse('Profile not found.', 1);
+
+            return false;
+        }
+
         if (isset($data['first_name']) && isset($data['last_name'])) {
             if (($data['first_name'] !== $profile['contact']['first_name'] ||
                 $data['last_name'] !== $profile['contact']['last_name']) ||
