@@ -1107,7 +1107,7 @@ class Installer extends BasePackage
                 $destDir = '';
             } else {
                 if ($module['module_type'] === 'apptype') {
-                    $destDir = 'apps/' . ucfirst($module['name']) . '/';
+                    $destDir = 'apps/' . ucfirst($module['app_type']) . '/';
                 } else if ($module['module_type'] === 'components') {
                     $destDir = 'apps/' . ucfirst($module['app_type']) . '/Components/';
 
