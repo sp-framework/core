@@ -243,7 +243,7 @@ if (!function_exists('xmlToArray')) {
 }
 
 if (!function_exists('checkCtype')) {
-    function checkCtype($str, $ctype = 'alnum', $ignoreChars = null) {
+    function checkCtype($str, $ctype = 'alnum', $ignoreChars = null, $replaceChars = true) {
         if (!$ignoreChars) {
             $ignoreChars = [' ', '&amp;', '&', '.', ',', ':', ';', '&#64;', '@'];
         }
@@ -252,15 +252,15 @@ if (!function_exists('checkCtype')) {
 
         if ($ctype === 'alnum') {
             if (ctype_alnum($string)) {
-                return $string;
+                return ($replaceChars === true ? $string : $str);
             }
         } else if ($ctype === 'alpha') {
             if (ctype_alpha($string)) {
-                return $string;
+                return ($replaceChars === true ? $string : $str);
             }
         } else if ($ctype === 'digits') {
             if (ctype_digit($string)) {
-                return $string;
+                return ($replaceChars === true ? $string : $str);
             }
         }
 
