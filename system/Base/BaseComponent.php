@@ -1558,6 +1558,10 @@ abstract class BaseComponent extends Controller
 
 	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $last = null)
 	{
+		if (isset($this->view->responseCode) && $this->view->responseCode !== 0) {
+			return;
+		}
+
 		if ($this->notifyPackage) {
 			$this->notifyPackage->addToNotification($this->dispatcher->getActionName(), null, null, null, null, $this->component, $this->notifyNameField);
 
