@@ -69,6 +69,8 @@ dataCollectionSectionForm['funcs']['syncBranches'] = function(quick = false) {
                 }
                 if (quick) {
                     $('#{{componentId}}-{{sectionId}}-branch').val('main').trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-branch').valid();
+                    $('#{{componentId}}-{{sectionId}}-release-type').valid();
                 }
             }
             paginatedPNotify('success', {'text': 'Synced ' + response.responseData.branches.length + ' branches.'});
