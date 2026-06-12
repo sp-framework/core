@@ -180,7 +180,25 @@ class MiddlewaresServiceProvider extends Injectable
 
     protected function componentsNeedsAuth()
     {
-        $componentsArr = $this->modules->components->getComponentsForAppType($this->data['app']['app_type'], true);
+        //Get Guest Component information
+        if ($this->data['givenRoute'] === $this->data['appRoute'] . '/home' &&
+            isset($this->data['app']['default_component_guests']) &&
+            (int) $this->data['app']['default_component_guests'] > 0
+        ) {
+            $componentsArr = [$this->modules->components->getById((int) $this->data['app']['default_component_guests'])];
+
+            if (isset($componentsArr[0]['route'])) {
+                $this->data['givenRoute'] = $this->data['appRoute'] . '/' . $componentsArr[0]['route'];
+            }
+        }
+
+        if (!isset($componentsArr)) {
+            $componentsArr = $this->modules->components->getComponentsForAppType($this->data['app']['app_type'], true);
+        }
+
+        if (isset($componentsArr) && is_array($componentsArr) && count($componentsArr) === 0) {
+            return false;
+        }
 
         foreach ($componentsArr as $key => $componentValue) {
             $match = false;
@@ -208,7 +226,9 @@ class MiddlewaresServiceProvider extends Injectable
                 $match === true
             ) {
                 if ($componentValue['apps']) {
-                    $componentValue['apps'] = $this->helper->decode($componentValue['apps'], true);
+                    if (is_string($componentValue['apps'])) {
+                        $componentValue['apps'] = $this->helper->decode($componentValue['apps'], true);
+                    }
 
                     if (!isset($componentValue['apps'][$this->data['app']['id']]['needAuth'])) {
                         return false;
