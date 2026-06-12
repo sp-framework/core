@@ -398,6 +398,12 @@ abstract class BaseComponent extends Controller
 	 */
 	public function msviewAction()
 	{
+		if (!$this->showModuleSettings) {
+			$this->setErrorDispatcher('routeNotFound', ['error' => true]);
+
+			return;
+		}
+
 		if (isset($this->getData()['settings']) && $this->getData()['settings'] == 'true') {
 			$this->view->pick($this->helper->last(explode('/', $this->component['route'])) . '/msview');
 		}
@@ -409,6 +415,12 @@ abstract class BaseComponent extends Controller
 	 */
 	public function msupdateAction()
 	{
+		if (!$this->showModuleSettings) {
+			$this->setErrorDispatcher('routeNotFound', ['error' => true]);
+
+			return;
+		}
+
 		$this->requestIsPost();
 
 		if (isset($this->postData()['id']) &&
