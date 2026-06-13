@@ -897,6 +897,7 @@ class Croppie
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-female").attr("hidden", true);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-refresh").attr("hidden", true);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-save").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-save").attr("hidden", true);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-cancel").attr("hidden", true);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-cancel-2").attr("hidden", true);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-croppie-avatar-recover").attr("hidden", true);
