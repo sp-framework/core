@@ -61,6 +61,16 @@ class Dropzone
             $this->params['fieldDropzoneLabel'] :
             false;
 
+        $this->fieldParams['fieldDropzonePreviewLabel'] =
+            isset($this->params['fieldDropzonePreviewLabel']) ?
+            $this->params['fieldDropzonePreviewLabel'] :
+            false;
+
+        $this->fieldParams['fieldDropzonePreviewHelpTooltipContent'] =
+            isset($this->params['fieldDropzonePreviewHelpTooltipContent']) ?
+            $this->params['fieldDropzonePreviewHelpTooltipContent'] :
+            '';
+
         $this->fieldParams['fieldHelpTooltipContent'] =
             isset($this->params['fieldHelpTooltipContent']) ?
             $this->params['fieldHelpTooltipContent'] :
@@ -85,6 +95,11 @@ class Dropzone
             isset($this->params['fieldBazPostOnUpdate']) && $this->params['fieldBazPostOnUpdate'] === true ?
             true :
             false;
+
+        $this->fieldParams['arrange'] =
+            isset($this->params['arrange']) ?
+            $this->params['arrange'] :
+            'horizontal';//Side by Side OR Vertical Uploader on top and preview on bottom
 
         $this->fieldParams['sortable'] =
             isset($this->params['sortable']) ?
@@ -198,86 +213,98 @@ class Dropzone
                 );
         }
 
-        $this->content .=
-            '<div style="max-height: ' . $this->fieldParams['tableMaxHeight'] . 'px;overflow-y: scroll;overflow-x: hidden">
-                <div class="row">
-                    <div class="col mb-2">' .
-                        $this->adminLTETags->useTag('fields',
-                            [
-                                'component'                     => $this->params['component'],
-                                'componentName'                 => $this->params['componentName'],
-                                'componentId'                   => $this->params['componentId'],
-                                'sectionId'                     => $this->params['sectionId'],
-                                'fieldId'                       => $this->params['fieldId'],
-                                'fieldLabel'                    => $this->fieldParams['fieldDropzoneLabel'],
-                                'fieldType'                     => 'html',
-                                'fieldHelp'                     => true,
-                                'fieldHelpTooltipContent'       => $this->fieldParams['fieldHelpTooltipContent'],
-                                'fieldAdditionalClass'          => 'mb-0',
-                                'fieldRequired'                 => $this->fieldParams['fieldRequired'],
-                                'fieldBazScan'                  => true,
-                                'fieldBazJstreeSearch'          => $this->fieldParams['fieldBazJstreeSearch'],
-                                'fieldBazPostOnCreate'          => $this->fieldParams['fieldBazPostOnCreate'],
-                                'fieldBazPostOnUpdate'          => $this->fieldParams['fieldBazPostOnUpdate']
-                            ]
-                        ) .
-                        $this->adminLTETags->useTag('buttons',
-                            [
-                                'componentId'                   => $this->params['componentId'],
-                                'sectionId'                     => $this->params['sectionId'],
-                                'buttonLabel'                   => false,
-                                'buttonType'                    => 'button',
-                                'buttons'                       => $dropzoneButtons
-                            ]
-                        ) .
-                        '<span id="' . $this->compSecId . '-dropzone-save-warning" class="dropzone-save-warning text-danger" hidden>Save/Cancel Image</span>
-                    </div>
+        $uploader =
+            '<div class="row">
+                <div class="col mb-2">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                     => $this->params['component'],
+                            'componentName'                 => $this->params['componentName'],
+                            'componentId'                   => $this->params['componentId'],
+                            'sectionId'                     => $this->params['sectionId'],
+                            'fieldId'                       => $this->params['fieldId'],
+                            'fieldLabel'                    => $this->fieldParams['fieldDropzoneLabel'],
+                            'fieldType'                     => 'html',
+                            'fieldHelp'                     => true,
+                            'fieldHelpTooltipContent'       => $this->fieldParams['fieldHelpTooltipContent'],
+                            'fieldAdditionalClass'          => 'mb-0',
+                            'fieldRequired'                 => $this->fieldParams['fieldRequired'],
+                            'fieldBazScan'                  => true,
+                            'fieldBazJstreeSearch'          => $this->fieldParams['fieldBazJstreeSearch'],
+                            'fieldBazPostOnCreate'          => $this->fieldParams['fieldBazPostOnCreate'],
+                            'fieldBazPostOnUpdate'          => $this->fieldParams['fieldBazPostOnUpdate']
+                        ]
+                    ) .
+                    $this->adminLTETags->useTag('buttons',
+                        [
+                            'componentId'                   => $this->params['componentId'],
+                            'sectionId'                     => $this->params['sectionId'],
+                            'buttonLabel'                   => false,
+                            'buttonType'                    => 'button',
+                            'buttons'                       => $dropzoneButtons
+                        ]
+                    ) .
+                    '<span id="' . $this->compSecId . '-dropzone-save-warning" class="dropzone-save-warning text-danger" hidden>Save/Cancel Image</span>
                 </div>
-                <div class="row pb-2">
-                    <div class="col">
-                        <ul class="list-group" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-upload-previews">
-                            <li class="list-group-item list-group-item-secondary rounded-0 ' . $this->compSecId . '-' . $this->params['fieldId'] . '-upload-template" area-disabled="false">
-                                <div class="row">
-                                    <div class="col">
-                                        <span class="filename"></span>
+            </div>
+            <div class="row pb-2">
+                <div class="col">
+                    <ul class="list-group" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-upload-previews">
+                        <li class="list-group-item list-group-item-secondary rounded-0 ' . $this->compSecId . '-' . $this->params['fieldId'] . '-upload-template" area-disabled="false">
+                            <div class="row">
+                                <div class="col">
+                                    <span class="filename"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-2 p-1 text-center">
+                                    <span class="preview">
+                                        <img alt="" data-dz-thumbnail />
+                                    </span>
+                                </div>
+                                <div class="col-sm-8 p-1">
+                                    <div class="progress" style="position: relative;top: 8px;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                        <div class="progress progress-bar progress-bar-striped bg-success" style="width:0%;" data-dz-uploadprogress></div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-sm-2 p-1 text-center">
-                                        <span class="preview">
-                                            <img alt="" data-dz-thumbnail />
-                                        </span>
-                                    </div>
-                                    <div class="col-sm-8 p-1">
-                                        <div class="progress" style="position: relative;top: 8px;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                                            <div class="progress progress-bar progress-bar-striped bg-success" style="width:0%;" data-dz-uploadprogress></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-2 p-1 text-center">
-                                        <button data-dz-remove class="btn btn-danger delete p-1">
-                                            <i class="fa fa-fw fa-trash"></i>
-                                        </button>
-                                    </div>
+                                <div class="col-sm-2 p-1 text-center">
+                                    <button data-dz-remove class="btn btn-danger delete p-1">
+                                        <i class="fa fa-fw fa-trash"></i>
+                                    </button>
                                 </div>
-                            </li>
-                        </ul>
-                    </div>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
-                <div class="row border-top pt-2" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-attachments" ' . $this->params['noPreview'] . '>
-                    <div class="col">
-                        <ul class="list-group" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments">';
+            </div>';
 
-                            if ($this->params['attachments'] && count($this->params['attachments']) > 0) {
-                                $this->content .=
-                                    '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata" hidden>
-                                        <div class="row">
-                                            <div class="col text-uppercase">
-                                                <i class="fa fa-fw fa-exclamation"></i> Add ' . $this->params['allowedUploads'] . '
-                                            </div>
-                                        </div>
-                                    </div>';
+        $preview =
+            '<div class="row pt-2" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-attachments" ' . $this->params['noPreview'] . '>
+                <div class="col">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                     => $this->params['component'],
+                            'componentName'                 => $this->params['componentName'],
+                            'componentId'                   => $this->params['componentId'],
+                            'sectionId'                     => $this->params['sectionId'],
+                            'fieldId'                       => $this->params['fieldId'],
+                            'fieldLabel'                    => $this->fieldParams['fieldDropzonePreviewLabel'],
+                            'fieldType'                     => 'html',
+                            'fieldHelp'                     => true,
+                            'fieldHelpTooltipContent'       => $this->fieldParams['fieldDropzonePreviewHelpTooltipContent'],
+                            'fieldAdditionalClass'          => 'mb-0',
+                            'fieldBazScan'                  => true
+                        ]
+                    ) .
+                    '<ul class="list-group" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments">';
+                        if ($this->params['attachments'] && count($this->params['attachments']) > 0) {
+                            $counter = 0;
+                            foreach ($this->params['attachments'] as $attachmentKey => $attachment) {
+                                if (!isset($attachment['uuid'])) {
+                                    continue;
+                                }
 
-                                foreach ($this->params['attachments'] as $attachmentKey => $attachment) {
+                                if (isset($attachment['type'])) {
                                     if ($attachment['type'] === 'application/pdf') {
                                         $src = $this->links->images('/general/pdf.png');
                                         $alt = 'pdf';
@@ -309,81 +336,88 @@ class Dropzone
                                         $src = $this->links->images('/general/file-unknown.png');
                                         $alt = 'Unknwon File Type';
                                     }
+                                } else {
+                                    $src = $this->links->images('/general/file-unknown.png');
+                                    $alt = 'Unknwon File Type';
+                                }
 
-                                    $this->content .=
-                                        '<li class="list-group-item list-group-item-secondary rounded-0" area-disabled="false" style="cursor: pointer; border: 1px solid rgba(0, 0, 0, 0.125);" data-uuid="' . $attachment['uuid'] . '">';
+                                $preview .=
+                                    '<li class="list-group-item list-group-item-secondary rounded-0" area-disabled="false" style="cursor: pointer; border: 1px solid rgba(0, 0, 0, 0.125);" data-uuid="' . $attachment['uuid'] . '">';
 
-                                            if (isset($this->params['sortable']) &&
-                                                $this->params['sortable'] === true
-                                            ) {
-                                                $this->content .=
-                                                    '<i class="fa fa-sort fa-fw handle"></i>';
-                                            }
+                                        if (isset($this->params['sortable']) &&
+                                            $this->params['sortable'] === true
+                                        ) {
+                                            $preview .=
+                                                '<i class="fa fa-sort fa-fw handle"></i>';
+                                        }
 
-                                            $this->content .=
-                                                $attachment['org_file_name'] .
-                                                '<div class="row mt-2">
-                                                    <div class="col chocolat-parent">';
+                                        $preview .=
+                                            $attachment['org_file_name'] .
+                                            '<div class="row mt-2">
+                                                <div class="col chocolat-parent">';
 
-                                                        if (in_array($attachment['type'], $this->params['storage']['allowed_file_mime_types'])) {
-                                                            $this->content .=
-                                                                '<img alt="' . $alt . '" src="' . $src . '" class="img-fluid img-thumbnail">';
-                                                            $download = true;
-                                                        } else if (in_array($attachment['type'], $this->params['storage']['allowed_image_mime_types'])) {
-                                                            $download = false;
+                                                    if (in_array($attachment['type'], $this->params['storage']['allowed_file_mime_types'])) {
+                                                        $preview .=
+                                                            '<img alt="' . $alt . '" src="' . $src . '" class="img-fluid img-thumbnail">';
+                                                        $download = true;
+                                                    } else if (in_array($attachment['type'], $this->params['storage']['allowed_image_mime_types'])) {
+                                                        $download = false;
 
-                                                            if ($this->params['storage']['permission'] === 'public') {
-                                                                if (!isset($attachment['links'][$this->fieldParams['lightboxSize']])) {
-                                                                    $this->fieldParams['lightboxSize'] = $this->adminLTETags->helper->lastKey($attachment['links']);
-                                                                }
-                                                                $this->content .=
-                                                                '<a class="chocolat-image" title="' . $attachment['org_file_name'] . '" href="' . $attachment['links'][$this->fieldParams['lightboxSize']] . '">
-                                                                    <img alt="' . $attachment['org_file_name'] . '" src="' . $attachment['links'][$this->fieldParams['thumbnailSize']] . '" class="img-fluid img-thumbnail">
-                                                                </a>';
-
-                                                            } else {
-                                                                $this->content .=
-                                                                    '<a class="chocolat-image" href="' . $this->links->url('system/storages/q/uuid/' . $attachment['uuid'] . '/w/' . $this->fieldParams['lightboxSize']) . '">
-                                                                        <img alt="' . $attachment['org_file_name'] . '" src="' . $this->links->url('system/storages/q/uuid/' . $attachment['uuid'] . '/storagetype/private/w/' . $this->fieldParams['thumbnailSize']) . '" class="img-fluid img-thumbnail">
-                                                                    </a>';
+                                                        if ($this->params['storage']['permission'] === 'public') {
+                                                            if (!isset($attachment['links'][$this->fieldParams['lightboxSize']])) {
+                                                                $this->fieldParams['lightboxSize'] = $this->adminLTETags->helper->lastKey($attachment['links']);
                                                             }
-
-                                                        } else {
-                                                            $download = true;
-                                                            $this->content .=
-                                                                '<img alt="' . $alt . '" src="' . $src . '" class="img-fluid img-thumbnail">';
-                                                        }
-
-                                                    $this->content .=
-                                                        '</div>
-                                                        <div class="col">
-                                                            <a data-uuid="' . $attachment['uuid'] . '" class="uploads-delete btn btn-danger btn-xs float-right" href="#">
-                                                                <i class="fa fa-fw fa-trash"></i>
+                                                            $preview .=
+                                                            '<a class="chocolat-image" title="' . $attachment['org_file_name'] . '" href="' . $attachment['links'][$this->fieldParams['lightboxSize']] . '">
+                                                                <img alt="' . $attachment['org_file_name'] . '" src="' . $attachment['links'][$this->fieldParams['thumbnailSize']] . '" class="img-fluid img-thumbnail">
                                                             </a>';
 
-                                                            if (isset($download) && $download === true) {
-                                                                if ($this->params['storage']['permission'] === 'public') {
+                                                        } else {
+                                                            $preview .=
+                                                                '<a class="chocolat-image" href="' . $this->links->url('system/storages/q/uuid/' . $attachment['uuid'] . '/w/' . $this->fieldParams['lightboxSize']) . '">
+                                                                    <img alt="' . $attachment['org_file_name'] . '" src="' . $this->links->url('system/storages/q/uuid/' . $attachment['uuid'] . '/storagetype/private/w/' . $this->fieldParams['thumbnailSize']) . '" class="img-fluid img-thumbnail">
+                                                                </a>';
+                                                        }
 
-                                                                    $this->content .=
-                                                                        '<a data-uuid="' . $attachment['uuid'] . '" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="' . $attachment['links']['data'] . '" target="_blank">
-                                                                            <i class="fa fa-fw fa-download"></i>
-                                                                        </a>';
+                                                    } else {
+                                                        $download = true;
+                                                        $preview .=
+                                                            '<img alt="' . $alt . '" src="' . $src . '" class="img-fluid img-thumbnail">';
+                                                    }
 
-                                                                } else {
-                                                                    $this->content .=
-                                                                        '<a data-uuid="' . $attachment['uuid'] . '" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="' . $this->links->url('system/storages/q/storagetype/private/uuid/' . $attachment["uuid"]) .'" target="_blank">
-                                                                            <i class="fa fa-fw fa-download"></i>
-                                                                        </a>';
-                                                                }
+                                                $preview .=
+                                                    '</div>
+                                                    <div class="col">
+                                                        <a data-uuid="' . $attachment['uuid'] . '" class="uploads-delete btn btn-danger btn-xs float-right" href="#">
+                                                            <i class="fa fa-fw fa-trash"></i>
+                                                        </a>';
+
+                                                        if (isset($download) && $download === true) {
+                                                            if ($this->params['storage']['permission'] === 'public') {
+
+                                                                $preview .=
+                                                                    '<a data-uuid="' . $attachment['uuid'] . '" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="' . $attachment['links']['data'] . '" target="_blank">
+                                                                        <i class="fa fa-fw fa-download"></i>
+                                                                    </a>';
+
+                                                            } else {
+                                                                $preview .=
+                                                                    '<a data-uuid="' . $attachment['uuid'] . '" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="' . $this->links->url('system/storages/q/storagetype/private/uuid/' . $attachment["uuid"]) .'" target="_blank">
+                                                                        <i class="fa fa-fw fa-download"></i>
+                                                                    </a>';
                                                             }
+                                                        }
 
-                                                    $this->content .=
-                                                        '</div>
-                                                    </div>
-                                                </li>';
-                                }
-                            } else {
-                                $this->content .=
+                                                $preview .=
+                                                    '</div>
+                                                </div>
+                                            </li>';
+
+                                $counter++;
+                            }
+
+                            if ($counter === 0) {
+                                $preview .=
                                     '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata">
                                         <div class="row">
                                             <div class="col text-uppercase">
@@ -392,14 +426,37 @@ class Dropzone
                                         </div>
                                     </div>';
                             }
+                        } else {
+                            $preview .=
+                                '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata">
+                                    <div class="row">
+                                        <div class="col text-uppercase">
+                                            <i class="fa fa-fw fa-exclamation"></i> Add ' . $this->params['allowedUploads'] . '
+                                        </div>
+                                    </div>
+                                </div>';
+                        }
 
-                        $this->content .= '
-                        </ul>
-                    </div>
+                    $preview .= '
+                    </ul>
                 </div>
-            </div>' .
+            </div>';
 
-        $this->inclJs();
+        if ($this->fieldParams['arrange'] === 'horizontal') {
+            $this->content .=
+                '<div class="row vdivide" style="max-height: ' . $this->fieldParams['tableMaxHeight'] . 'px;overflow-y: scroll;overflow-x: hidden">
+                    <div class="col">' . $uploader . '</div>
+                    <div class="col">' . $preview . '</div>
+                </div>';
+        } else {
+            $this->content .=
+                '<div style="max-height: ' . $this->fieldParams['tableMaxHeight'] . 'px;overflow-y: scroll;overflow-x: hidden">'
+                    . $uploader
+                    . $preview .
+                '</div>';
+        }
+
+        $this->content .= $this->inclJs();
     }
 
     protected function inclJs()
@@ -475,7 +532,7 @@ class Dropzone
                                 fieldId["dropzone"].on("addedfile", function(file) {
                                     if (file.size > maxFileSize) {
                                         fieldId["dropzone"].removeFile(file);
-                                        PNotify.error({
+                                        paginatedPNotify("error", {
                                             title: file.name,
                                             text: "File size exceeds allowed size! File not added."
                                         });
@@ -528,7 +585,7 @@ class Dropzone
 
                                     } else if (indexOfFile === -1 && indexOfImage === -1) {
                                         fieldId["dropzone"].removeFile(file);
-                                        PNotify.error({
+                                        paginatedPNotify("error", {
                                             title: file.name,
                                             text: "Extension not allowed! File not added."
                                         });
@@ -585,7 +642,7 @@ class Dropzone
                                     if (file.accepted && file.status === "success") {
                                         if (response.responseCode != 0) {
                                             problemWithUpload = true;
-                                            PNotify.error({
+                                            paginatedPNotify("error", {
                                                 title: file.name,
                                                 text: response.responseMessage
                                             });
@@ -651,8 +708,8 @@ class Dropzone
                                                 newList +=';
                                                 if ($this->params['storage']['permission'] === 'public') {
                                                     $inclJs .=
-                                                        '\'<a class="chocolat-image" title="\' + file.name + \'" href="\' + response.responseData.publicLinks[1][Object.keys(response.responseData.publicLinks[1])[0]] + \'">\' +
-                                                            \'<img alt="\' + file.name + \'" src="\' + response.responseData.publicLinks[0][Object.keys(response.responseData.publicLinks[0])[0]] + \'" class="img-fluid img-thumbnail">\' +
+                                                        '\'<a class="chocolat-image" title="\' + file.name + \'" href="\' + response.responseData.publicLinks[1] + \'">\' +
+                                                            \'<img alt="\' + file.name + \'" src="\' + response.responseData.publicLinks[0] + \'" class="img-fluid img-thumbnail">\' +
                                                         \'</a>\';';
                                                 } else {
                                                     $inclJs .=
@@ -721,7 +778,7 @@ class Dropzone
 
                                     if (file.accepted === false) {
                                         fieldId["dropzone"].removeFile(file);
-                                        PNotify.error({
+                                        paginatedPNotify("error", {
                                             title: "Limit Reached!",
                                             text: response + " Did not add file " + file.name + " to the queue."
                                         });
@@ -730,7 +787,7 @@ class Dropzone
 
                                     //Fatal Error
                                     if (file.status === "error") {
-                                        PNotify.error({
+                                        paginatedPNotify("error", {
                                             title: "ERROR",
                                             text: "Contact Administrator!"
                                         });
@@ -852,8 +909,13 @@ class Dropzone
                                         deleteFile(uuid);
                                     });
                                 }
+
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", true);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-upload").attr("disabled", false);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").children("i").removeClass("fa-cog fa-spin").addClass("fa-save");
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("disabled", false);
+
                                 deleteUUIDs = [];
                                 filesLimit = filesLimit + deleteUUIDsLength;
                                 initDropzone();
@@ -872,7 +934,7 @@ class Dropzone
                                     }
 
                                     if (response.responseCode != 0) {
-                                        PNotify.error({
+                                        paginatedPNotify("error", {
                                             title: "Error:",
                                             text: response.responseMessage
                                         });

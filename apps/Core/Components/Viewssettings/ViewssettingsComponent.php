@@ -20,6 +20,8 @@ class ViewssettingsComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['id'])) {
+            $this->useStorage('public');
+
             if ($this->getData()['id'] != 0) {
                 $viewssettings = $this->modules->viewsSettings->getViewsSettingsById($this->getData()['id']);
 

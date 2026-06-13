@@ -68,6 +68,20 @@ class StoragesLocal
                         ]
                     ),
                     new Column(
+                        'height',
+                        [
+                            'type'      => Column::TYPE_INTEGER,
+                            'notNull'   => false
+                        ]
+                    ),
+                    new Column(
+                        'width',
+                        [
+                            'type'      => Column::TYPE_INTEGER,
+                            'notNull'   => false
+                        ]
+                    ),
+                    new Column(
                         'type',
                         [
                             'type'    => Column::TYPE_VARCHAR,

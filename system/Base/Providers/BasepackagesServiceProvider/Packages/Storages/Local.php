@@ -35,6 +35,10 @@ class Local extends BasePackage
 
     protected $fileSize;
 
+    protected $fileHeight;
+
+    protected $fileWidth;
+
     protected $directory;
 
     protected $sizes;
@@ -50,6 +54,10 @@ class Local extends BasePackage
     protected $getData;
 
     protected $width;
+
+    protected $allowedImageSizes;
+
+    protected $maxImageSize;
 
     public function initLocal(array $storage)
     {
@@ -90,7 +98,7 @@ class Local extends BasePackage
         $this->imageMimeTypes = $this->storage['allowed_image_mime_types'];
 
         if (!isset($this->storage['allowed_image_sizes'])) {
-            $this->storage['allowed_image_sizes'] = [30, 80, 200, 800, 1200, 2000];
+            $this->storage['allowed_image_sizes'] = [];
         }
 
         $this->allowedImageSizes = $this->storage['allowed_image_sizes'];
@@ -98,6 +106,12 @@ class Local extends BasePackage
         if (!isset($this->storage['allowed_file_mime_types'])) {
             $this->storage['allowed_file_mime_types'] = [];
         }
+
+        if (!isset($this->storage['max_image_size'])) {
+            $this->storage['max_image_size'] = 2000;
+        }
+
+        $this->maxImageSize = $this->storage['max_image_size'];
 
         $this->fileMimeTypes = $this->storage['allowed_file_mime_types'];
 
@@ -283,6 +297,21 @@ class Local extends BasePackage
             $this->moveImageToLocationAsUUID();
         }
 
+        try {
+            $image = new Imagick($this->imagesPath . $this->uuidLocation);
+
+            $this->fileHeight = $image->getHeight();
+            $this->fileWidth = $image->getWidth();
+        } catch (\throwable $e) {
+            if ($this->config->logs->exceptions) {
+                $this->logger->logExceptions->critical(json_trace($e));
+            }
+
+            $this->response->setStatusCode(500, 'Error loading image! Check exception logs.');
+
+            return false;
+        }
+
         $this->addFileInfoToDb();
     }
 
@@ -353,6 +382,8 @@ class Local extends BasePackage
                 'uuid_location'         => $this->directory . '/',
                 'org_file_name'         => $this->fileName,
                 'size'                  => $this->fileSize,
+                'height'                => $this->fileHeight,
+                'width'                 => $this->fileWidth,
                 'type'                  => $this->mimeType,
                 'orphan'                => 1,
                 'is_pointer'            => $this->isPointer,
@@ -373,20 +404,24 @@ class Local extends BasePackage
         }
 
         if (in_array($file[0]['type'], $this->imageMimeTypes)) {
-            if (isset($this->getData['w']) && in_array($this->getData['w'], $this->allowedImageSizes)) {
-                $sizedImage = $this->getSizedImage($file[0], $this->getData['w']);
+            if (isset($this->getData['w'])) {
+                if (count($this->allowedImageSizes) > 0 &&
+                    in_array($this->getData['w'], $this->allowedImageSizes)
+                ) {
+                    $sizedImage = $this->getSizedImage($file[0], $this->getData['w']);
+                } else if ((int) $this->getData['w'] <= $this->maxImageSize) {
+                    $sizedImage = $this->getSizedImage($file[0], $this->getData['w']);
+                }
 
                 if ($sizedImage) {
                     $this->response->setContentType($file[0]['type']);
 
                     $this->response->setContent($this->localContent->read($sizedImage));
+                } else {
+                    $this->response->setStatusCode(404, 'Not Found');
                 }
-
-                return $this->response->send();
             } else {
                 $this->response->setStatusCode(404, 'Not Found');
-
-                return $this->response->send();
             }
         } else if (in_array($file[0]['type'], $this->fileMimeTypes)) {
             if ($file[0]['is_pointer'] == 1) {
@@ -399,7 +434,7 @@ class Local extends BasePackage
             if ($this->storage['permission'] === 'public') {
                 $this->updateFileLink(
                     $file[0],
-                    '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid'],
+                    '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid'],
                     null
                 );
             }
@@ -422,9 +457,9 @@ class Local extends BasePackage
             return $response;
         } else {
             $this->response->setStatusCode(404, 'Not Found');
-
-            return $this->response->send();
         }
+
+        return $this->response->send();
     }
 
     public function getFiles($params)
@@ -528,12 +563,12 @@ class Local extends BasePackage
             if ($this->storage['permission'] === 'public') {
                 $this->updateFileLink(
                     $file,
-                    '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width . $imageFormat,
+                    '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width . $imageFormat,
                     $this->width
                 );
             }
 
-            return $sizedImage;
+            return str_replace('/' . $this->storage['permission'], '', $sizedImage);
         }
     }
 
@@ -545,10 +580,12 @@ class Local extends BasePackage
             return '#';
         }
 
-        if (isset($file[0]['links']) &&
-            ($file[0]['links'] !== null && $file[0]['links'] !== '')
-        ) {
-            $file[0]['links'] = $file[0]['links'];
+        if (isset($file[0]['links'])) {
+            if (is_string($file[0]['links'])) {
+                $file[0]['links'] = $this->helper->decode($file[0]['links'], true);
+            }
+        } else {
+            $file[0]['links'] = [];
         }
 
         if ($width) {
@@ -560,26 +597,19 @@ class Local extends BasePackage
                 }
             }
 
-            if ($this->width) {
-                if (in_array($this->width, $this->allowedImageSizes)) {
-                    $this->getSizedImage($file[0], $this->width);
-                } else {
-                    $this->addResponse('Requested Width not registered with system.', 1);
-
-                    return false;
-                }
-            } else {
+            if (count($this->allowedImageSizes) > 0) {
                 if (in_array($width, $this->allowedImageSizes)) {
-                    $this->getSizedImage($file[0], $width);
+                    return $this->getSizedImage($file[0], $width);
                 } else {
                     $this->addResponse('Requested Width not registered with system.', 1);
-
-                    return false;
                 }
+            } else if ((int) $width <= $this->maxImageSize) {
+                return $this->getSizedImage($file[0], $width);
+            } else {
+                $this->addResponse('Requested Width not registered with system.', 1);
             }
 
-            return $this->getPublicLink($uuid, $this->width);
-
+            return false;
         } else {
             if (isset($file[0]['links']['data'])) {
                 return $file[0]['links']['data'];

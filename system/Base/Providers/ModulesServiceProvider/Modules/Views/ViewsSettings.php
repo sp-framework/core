@@ -81,6 +81,12 @@ class ViewsSettings extends BasePackage
             return false;
         }
 
+        if (!isset($data['domain_id'])) {
+            $this->addResponse('Please provide domain id', 1);
+
+            return false;
+        }
+
         $view = $this->modules->views->getById($data['view_id']);
 
         if (!$view) {
@@ -146,14 +152,46 @@ class ViewsSettings extends BasePackage
             unset($data['view_layout']);
         }
 
-        foreach ($view['settings']['branding'] as $brandingKey => $branding) {
-            if (isset($data[$brandingKey])) {
-                if ($data[$brandingKey] !== $view['settings']['branding'][$brandingKey]['brand']) {
-                    $data[$brandingKey] = str_replace('public/' . $this->apps->getAppInfo()['app_type'] . '/' . strtolower($this->modules->views->getViewInfo()['name']) . '/images/', '', $data[$brandingKey]);
+        if (isset($data['branding'])) {
+            if (is_string($data['branding'])) {
+                $data['branding'] = $this->helper->decode($data['branding'], true);
+            }
 
-                    $view['settings']['branding'][$brandingKey]['brand'] = $data[$brandingKey];
+            if (count($data['branding']) === 0) {
+                // $data['branding'] = $data['settings']['branding'];
+            }
+        } else if (isset($data['settings']['branding'])) {//Coming from Devtools or if no branding is set.
+            $data['branding'] = $data['settings']['branding'];
+        }
+
+        if (isset($data['branding']) && count($data['branding']) > 0) {
+            $domain = $this->domains->getDomainById($data['domain_id']);
+
+            if ($domain && isset($domain['apps'][$data['app_id']]['publicStorage'])) {
+                $view['settings']['branding'] = [];
+
+                foreach ($data['branding'] as $brandingKey => $brandingUUID) {
+                    if (is_string($brandingUUID)) {
+                        $branding = $this->basepackages->storages->getFileInfo($brandingUUID);
+
+                        if ($branding) {
+                            $view['settings']['branding'][$brandingKey]['type'] = $branding['type'];
+                            $view['settings']['branding'][$brandingKey]['uuid'] = $branding['uuid'];
+                            $view['settings']['branding'][$brandingKey]['org_file_name'] = $branding['org_file_name'];
+                            $view['settings']['branding'][$brandingKey]['brand'] =
+                                'public/' . $domain['apps'][$data['app_id']]['publicStorage'] . '/images/assets/' . $data['id'] . '/' . $brandingUUID;
+
+                            $view['settings']['branding'][$brandingKey]['maxWidth'] = $branding['width'];
+                            $view['settings']['branding'][$brandingKey]['maxHeight'] = $branding['height'];
+                            $view['settings']['branding'][$brandingKey]['links'] = $branding['links'];
+                        }
+                    }
+
                 }
-                unset($data[$brandingKey]);
+            }
+
+            if (count($view['settings']['branding']) === 0) {
+                $view['settings']['branding'] = $data['branding'];
             }
         }
 

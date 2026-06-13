@@ -276,6 +276,9 @@ class DevtoolsModules extends BasePackage
                                 if (is_string($data['settings'])) {
                                     $data['settings'] = $this->helper->decode($data['settings'], true);
                                 }
+                                if (isset($setting['settings']['branding']) && count($setting['settings']['branding']) > 0) {
+                                    unset($data['settings']['branding']);
+                                }
 
                                 $setting['settings'] = array_replace($setting['settings'], $data['settings']);
 

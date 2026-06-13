@@ -209,8 +209,11 @@ class Storages extends BasePackage
                             }
                         }
 
-                        $this->packagesData->responseMessage = 'Files Uploaded!';
-
+                        if ($this->storage->packagesData->responseCode === 0) {
+                            $this->packagesData->responseMessage = 'Files Uploaded!';
+                        } else {
+                            $this->packagesData->responseMessage = $this->storage->packagesData->responseMessage;
+                        }
                     } else if (isset($fileType) && in_array($fileType, $this->storage->storage['allowed_file_mime_types'])) {
                         if (isset($this->request->getPost()['getpubliclinks'])) {
                             $storageData['publicLinks'] = [];
@@ -218,7 +221,11 @@ class Storages extends BasePackage
                             array_push($storageData['publicLinks'], $this->getPublicLink($storageData['uuid'], null));
                         }
 
-                        $this->packagesData->responseMessage = 'Files Uploaded!';
+                        if ($this->storage->packagesData->responseCode === 0) {
+                            $this->packagesData->responseMessage = 'Files Uploaded!';
+                        } else {
+                            $this->packagesData->responseMessage = $this->storage->packagesData->responseMessage;
+                        }
                     }
                 }
 

@@ -68,7 +68,7 @@
                             'fieldDataMaxLength'             : 4096,
                             'fieldHelp'                      : true,
                             'fieldHelpTooltipContent'        : 'Allowed Image Sizes. Format: JSON',
-                            'fieldRequired'                  : true,
+                            'fieldRequired'                  : false,
                             'fieldBazScan'                   : true,
                             'fieldBazJstreeSearch'           : true,
                             'fieldBazPostOnUpdate'           : true,
@@ -111,8 +111,7 @@ dataCollectionSection =
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules: {
                 '{{componentId}}-{{sectionId}}-allowedFileMimeTypes'            : {'required' : true, 'json' : true},
-                '{{componentId}}-{{sectionId}}-allowedImageMimeTypes'           : {'required' : true, 'json' : true},
-                '{{componentId}}-{{sectionId}}-allowedImageSizes'               : {'required' : true, 'json' : true}
+                '{{componentId}}-{{sectionId}}-allowedImageMimeTypes'           : {'required' : true, 'json' : true}
             },
             messages: {
             }
