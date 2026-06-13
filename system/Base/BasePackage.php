@@ -1758,6 +1758,10 @@ abstract class BasePackage extends Controller
 
 	protected function resetCache(int $id = null, $removeId = false, $cacheName = null)
 	{
+		if (PHP_SAPI === 'cli') {
+			return;
+		}
+
 		if (!$cacheName) {
 			$cacheName = $this->cacheName;
 		}
