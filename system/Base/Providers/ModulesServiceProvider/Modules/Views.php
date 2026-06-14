@@ -731,14 +731,15 @@ class Views extends BasePackage
         if (is_array($this->viewSettings['branding']) && count($this->viewSettings['branding']) > 0) {
             foreach ($this->viewSettings['branding'] as $key => $brand) {
                 if (isset($brand['brand'])) {
-                    $this->assetsCollections['branding']->addInline(new Inline($key . '-brand', $brand['brand']));
-
-                    if (!isset($brand['maxWidth']) && !isset($brand['maxHeight'])) {
+                    if (!isset($brand['maxWidth'])) {
                         $brand['maxWidth'] = 200;
+                    }
+
+                    if (!isset($brand['maxHeight'])) {
                         $brand['maxHeight'] = 50;
                     }
-                    $this->assetsCollections['branding']->addInline(new Inline($key . '-brand-maxWidth', $brand['maxWidth']));
-                    $this->assetsCollections['branding']->addInline(new Inline($key . '-brand-maxHeight', $brand['maxHeight']));
+
+                    $this->assetsCollections['branding']->addInline(new Inline($key . '-brand', $brand['brand'], true, $brand));
                 }
             }
         }

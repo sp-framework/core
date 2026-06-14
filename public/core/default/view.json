@@ -53,15 +53,15 @@
 		"branding" : 
 		[
 			{
-				"brand" : "baz/logo/justlogo33x30.png",
+				"brand" : "general/logo.png",
 				"maxWidth" : 35,
-				"maxHeight" : 30
+				"maxHeight" : 35
 			},
 			
 			{
-				"brand" : "baz/logo/fulllogo168x30.png",
+				"brand" : "general/logo.png",
 				"maxWidth" : 200,
-				"maxHeight" : 30
+				"maxHeight" : 200
 			}
 		],
 		"head" : 
