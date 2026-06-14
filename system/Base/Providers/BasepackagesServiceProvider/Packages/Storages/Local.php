@@ -566,9 +566,11 @@ class Local extends BasePackage
                     '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width . $imageFormat,
                     $this->width
                 );
+
+                return str_replace('/' . $this->storage['permission'], '', $sizedImage);
             }
 
-            return str_replace('/' . $this->storage['permission'], '', $sizedImage);
+            return $sizedImage;
         }
     }
 

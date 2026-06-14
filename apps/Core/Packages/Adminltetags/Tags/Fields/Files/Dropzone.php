@@ -573,16 +573,20 @@ class Dropzone
                                     } else if (file.type === "text/csv") {
                                         src = "' . $this->links->images('/general/csv.png') . '";
                                         alt = "csv";
+                                    } else if (file.type.startsWith("image")) {
+                                        src = null;
+                                        alt = null;
                                     } else {
                                         src = "' . $this->links->images('/general/file-unknown.png') . '";
                                         alt = "Unknwon File Type";
                                     }
 
                                     if (indexOfFile !== -1 || indexOfImage !== -1) {
-                                        $(file.previewElement).children().find(".filename").html(file.name);
-                                        $(file.previewElement).children().find("[data-dz-thumbnail]").attr("src", src);
-                                        $(file.previewElement).children().find("[data-dz-thumbnail]").attr("alt", alt);
-
+                                        if (src && alt) {
+                                            $(file.previewElement).children().find(".filename").html(file.name);
+                                            $(file.previewElement).children().find("[data-dz-thumbnail]").attr("src", src);
+                                            $(file.previewElement).children().find("[data-dz-thumbnail]").attr("alt", alt);
+                                        }
                                     } else if (indexOfFile === -1 && indexOfImage === -1) {
                                         fieldId["dropzone"].removeFile(file);
                                         paginatedPNotify("error", {
