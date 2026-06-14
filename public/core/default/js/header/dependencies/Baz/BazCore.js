@@ -130,7 +130,7 @@ var BazCore = function() {
 
     //10 mins get update of site status. Note this is not PING, but webserver responsive time to reply with favicon.
     function initPings() {
-        BazHelpers.ping(dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost, {}, function(err, data) {
+        BazHelpers.ping(dataCollection.env.httpScheme + '://' + dataCollection.env.httpHost, {"favicon" : "/ping.ico"}, function(err, data) {
             timerId = BazHelpers.getTimerId('ping');
 
             if (!err && data) {
