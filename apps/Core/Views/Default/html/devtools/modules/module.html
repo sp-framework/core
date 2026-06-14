@@ -1542,8 +1542,6 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
             dataCollectionSectionForm['vars']['moduleSettings']['layouts'] = { };
             dataCollectionSectionForm['vars']['moduleSettings']['tags'] = '';
             dataCollectionSectionForm['vars']['moduleSettings']['branding'] = { };
-            dataCollectionSectionForm['vars']['moduleSettings']['branding']['small'] = '';
-            dataCollectionSectionForm['vars']['moduleSettings']['branding']['large'] = '';
             dataCollectionSectionForm['vars']['moduleSettings']['head']['title'] = '';
             dataCollectionSectionForm['vars']['moduleSettings']['head']['meta'] = { };
             dataCollectionSectionForm['vars']['moduleSettings']['head']['meta']['author'] = '';
@@ -1562,6 +1560,7 @@ if (dataCollectionSectionForm['vars']['moduleId'] == '0') {
         dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['dev'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod'] = { };
+        dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['favicons'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src'] = { };
         dataCollectionSectionForm['vars']['moduleSettings']['head']['script']['src']['assets'] = { };
@@ -2248,6 +2247,12 @@ dataCollectionSection =
                             }
                         },
                         {
+                            'head-link-href-favicons' : {
+                                'id'    : 'head-link-href-favicons',
+                                'text'  : 'Head Favicons'
+                            }
+                        },
+                        {
                             'head-script-src-assets-dev' : {
                                 'id'    : 'head-script-src-assets-dev',
                                 'text'  : 'Head Java Scripts Source (Dev)'
@@ -2674,6 +2679,22 @@ dataCollectionSection =
                                 }
 
                                 break;
+                            case 'head-link-href-favicons' :
+                                if (dataCollectionSectionForm['vars']['subview'] == true) {
+                                    paginatedPNotify('error', {text: 'Setting not valid for non base view module.'});
+
+                                    $(this).val(0).trigger('change');
+                                    return false;
+                                }
+
+                                type = 'array';
+                                settings = '';
+
+                                if (dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['favicons']) {
+                                    settings = dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['favicons'];
+                                }
+
+                                break;
                             case 'head-script-src-assets-dev' :
                                 type = 'array';
                                 settings = '';
@@ -3027,6 +3048,11 @@ dataCollectionSection =
                                 break;
                             case 'head-link-href-assets-prod' :
                                 dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['assets']['prod']
+                                     = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
+
+                                break;
+                            case 'head-link-href-favicons' :
+                                dataCollectionSectionForm['vars']['moduleSettings']['head']['link']['href']['favicons']
                                      = JSON.parse($('#{{componentId}}-{{sectionId}}-settings-' + fieldType).val());
 
                                 break;

@@ -225,7 +225,7 @@
                             'fieldBazPostOnCreate'           : true,
                             'fieldBazPostOnUpdate'           : true,
                             'fieldDataInputMaxLength'        : 4096,
-                            'fieldTextareaRows'              : 5,
+                            'fieldTextareaRows'              : 4,
                             'fieldValue'                     : viewssettings['settings']['head']['meta']['keywords']
                         ]
                     )}}
@@ -248,8 +248,33 @@
                             'fieldBazPostOnCreate'           : true,
                             'fieldBazPostOnUpdate'           : true,
                             'fieldDataInputMaxLength'        : 4096,
-                            'fieldTextareaRows'              : 5,
+                            'fieldTextareaRows'              : 4,
                             'fieldValue'                     : viewssettings['settings']['head']['meta']['description']
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'head_link_href_favicons',
+                            'fieldLabel'                     : 'Site Favicons',
+                            'fieldType'                      : 'textarea',
+                            'fieldDataMaxLength'             : 4096,
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Enter site favicons. JSON Format.',
+                            'fieldRequired'                  : true,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMaxLength'        : 4096,
+                            'fieldTextareaRows'              : 8,
+                            'fieldValue'                     : viewssettings['settings']['head']['link']['href']['favicons']
                         ]
                     )}}
                 </div>
@@ -472,7 +497,6 @@
 </form>
 {% set apps = json_encode(apps) %}
 {% set viewssettings = escaper.js(json_encode(viewssettings, 16)) %}
-{% set storage = escaper.js(json_encode(storage, 16)) %}
 <script>
 /* globals paginatedPNotify BazContentLoader Pace BazCore */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -502,7 +526,6 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSectionForm['vars'] = { };
 dataCollectionSectionForm['vars']['apps'] = JSON.parse('{{apps}}');
 dataCollectionSectionForm['vars']['viewssettings'] = JSON.parse('{{viewssettings}}');
-dataCollectionSectionForm['vars']['storage'] = JSON.parse('{{storage}}');
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -593,6 +616,12 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-head_title'                              : { },
         '{{componentId}}-{{sectionId}}-head_meta_keywords'                      : { },
         '{{componentId}}-{{sectionId}}-head_meta_description'                   : { },
+        '{{componentId}}-{{sectionId}}-head_link_href_favicons'                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-head_link_href_favicons')
+                        .val(JSON.stringify(dataCollectionSectionForm['vars']['viewssettings']['settings']['head']['link']['href']['favicons'], null, 4));
+            }
+        },
         '{{componentId}}-{{sectionId}}-copyright_name'                          : { },
         '{{componentId}}-{{sectionId}}-copyright_site'                          : { },
         '{{componentId}}-{{sectionId}}-copyright_fromYear'                      : { },

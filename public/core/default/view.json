@@ -94,6 +94,16 @@
 								"asset" : "core/default/css/core.css"
 							}
 						]
+					},
+					"favicons" : 
+					{
+						"16" : "favicons/favicon-16x16.png",
+						"32" : "favicons/favicon-32x32.png",
+						"180" : "favicons/favicon-180x180.png",
+						"192" : "favicons/favicon-192x192.png",
+						"512" : "favicons/favicon-512x512.png",
+						"ico" : "favicons/favicon.ico",
+						"webmanifest" : "favicons/site.webmanifest"
 					}
 				}
 			},

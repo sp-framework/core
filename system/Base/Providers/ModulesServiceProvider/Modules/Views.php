@@ -581,6 +581,7 @@ class Views extends BasePackage
         $this->buildAssetsHeadCss();
         $this->buildAssetsHeadJs();
         $this->buildAssetsBranding();
+        $this->buildAssetsFavicons();
         $this->buildAssetsFooter();
         $this->buildAssetsFooterJs();
     }
@@ -728,7 +729,7 @@ class Views extends BasePackage
     {
         $this->assetsCollections['branding'] = $this->assets->collection('branding');
 
-        if (is_array($this->viewSettings['branding']) && count($this->viewSettings['branding']) > 0) {
+        if (isset($this->viewSettings['branding']) && is_array($this->viewSettings['branding']) && count($this->viewSettings['branding']) > 0) {
             foreach ($this->viewSettings['branding'] as $key => $brand) {
                 if (isset($brand['brand'])) {
                     if (!isset($brand['maxWidth'])) {
@@ -741,6 +742,20 @@ class Views extends BasePackage
 
                     $this->assetsCollections['branding']->addInline(new Inline($key . '-brand', $brand['brand'], true, $brand));
                 }
+            }
+        }
+    }
+
+    protected function buildAssetsFavicons()
+    {
+        $this->assetsCollections['favicons'] = $this->assets->collection('favicons');
+
+        if (isset($this->viewSettings['head']['link']['href']['favicons']) &&
+            is_array($this->viewSettings['head']['link']['href']['favicons']) &&
+            count($this->viewSettings['head']['link']['href']['favicons']) > 0
+        ) {
+            foreach ($this->viewSettings['head']['link']['href']['favicons'] as $key => $icon) {
+                $this->assetsCollections['favicons']->addInline(new Inline($key, $icon));
             }
         }
     }
