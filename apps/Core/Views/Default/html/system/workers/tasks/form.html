@@ -9,6 +9,7 @@
     {% set taskDescription = task['description'] %}
     {% set taskPriority = task['priority'] %}
     {% set taskSchedule = task['schedule_id'] %}
+    {% set taskJobLogsMode = task['job_log_mode'] %}
     {% set taskScheduleDisabled = false %}
     {% if task['enabled'] == 1 %}
         {% set taskEnableChecked = true %}
@@ -31,6 +32,7 @@
     {% set taskDescription = '' %}
     {% set taskPriority = '' %}
     {% set taskSchedule = '' %}
+    {% set taskJobLogsMode = '' %}
     {% set taskEnableChecked = false %}
     {% set taskEnableDisabled = false %}
     {% set taskScheduleDisabled = false %}
@@ -178,6 +180,30 @@
                         'fieldDataSelect2OptionsValue'          : 'name',
                         'fieldDataSelect2OptionsArray'          : true,
                         'fieldDataSelect2OptionsSelected'       : taskSchedule
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'job_log_mode',
+                        'fieldLabel'                            : 'JOb Log Mode',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : "Select how job is logged. Per run - logs every time task is executed. Per hour, logs all task run happened in the hour in one job. Per day, logs all task run happened in the day in one job.",
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : jobLogsModes,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : taskJobLogsMode
                     ]
                 )}}
             </div>
@@ -383,6 +409,9 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-priority'                : { },
         '{{componentId}}-{{sectionId}}-schedule_id'             : {
             placeholder : "SELECT SCHEDULE"
+        },
+        '{{componentId}}-{{sectionId}}-job_log_mode'            : {
+            placeholder : "SELECT JOB LOG MODE"
         },
         '{{componentId}}-{{sectionId}}-cid'                     : {
             placeholder : "SELECT FUNCTION TO CALL",

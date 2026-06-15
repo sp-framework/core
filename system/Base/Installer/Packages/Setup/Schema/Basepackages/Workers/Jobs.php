@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Jobs
 {
@@ -34,6 +35,13 @@ class Jobs
                             'notNull'       => true,
                         ]
                     ),
+                    new Column(//Call ID
+                        'cid',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => true,
+                        ]
+                    ),
                     new Column(
                         'run_on',
                         [
@@ -48,7 +56,7 @@ class Jobs
                             'notNull'       => true,
                         ]
                     ),
-                    new Column(
+                    new Column(//0 - system 1 - user
                         'type',
                         [
                             'type'          => Column::TYPE_TINYINTEGER,
@@ -56,10 +64,32 @@ class Jobs
                         ]
                     ),
                     new Column(
-                        'execution_time',
+                        'execution_times',
+                        [
+                            'type'          => Column::TYPE_JSON,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'total_execution_time',
                         [
                             'type'          => Column::TYPE_FLOAT,
                             'notNull'       => false,
+                        ]
+                    ),
+                    new Column(//1 - per job run, 2 per hour, 3 per day
+                        'job_log_mode',
+                        [
+                            'type'          => Column::TYPE_TINYINTEGER,
+                            'notNull'       => true,
+                            'default'       => 1
+                        ]
+                    ),
+                    new Column(
+                        'job_log_time',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => false
                         ]
                     ),
                     new Column(
@@ -85,5 +115,21 @@ class Jobs
                     )
                 ]
             ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_INDEX',
+                [
+                    'task_id',
+                    'job_log_mode',
+                    'job_log_time'
+                ],
+                'INDEX'
+            )
+        ];
     }
 }

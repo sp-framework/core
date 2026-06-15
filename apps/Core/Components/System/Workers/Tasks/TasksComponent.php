@@ -29,6 +29,8 @@ class TasksComponent extends BaseComponent
     {
         $this->schedules = $this->basepackages->workers->schedules->schedules;
 
+        $this->view->jobLogsModes = $this->tasks->getJobLogsModes();
+
         if (isset($this->getData()['id'])) {
             $calls = [];
 

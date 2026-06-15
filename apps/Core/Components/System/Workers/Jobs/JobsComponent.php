@@ -64,9 +64,9 @@ class JobsComponent extends BaseComponent
             $this->jobs,
             'system/workers/jobs/view',
             $conditions,
-            ['task_id', 'worker_id', 'run_on', 'status', 'execution_time'],
+            ['task_id', 'worker_id', 'run_on', 'status', 'total_execution_time'],
             true,
-            ['task_id', 'worker_id', 'run_on', 'status', 'execution_time'],
+            ['task_id', 'worker_id', 'run_on', 'status', 'total_execution_time'],
             $controlActions,
             ['task_id'=>'task', 'worker_id'=>'worker'],
             $replaceColumns,
@@ -143,9 +143,7 @@ class JobsComponent extends BaseComponent
             $data['run_on'] = $this->helper->decode($data['run_on']);
         }
 
-        if (is_array($data['run_on']) && isset($data['run_on'][0])) {
-            $data['run_on'] = $data['run_on'][0];
-        }
+        $data['run_on'] = $this->helper->last($data['run_on']);
 
         return $data;
     }

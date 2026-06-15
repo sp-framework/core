@@ -69,6 +69,7 @@ class Tasks
                 'priority'          => 10,
                 'enabled'           => 1,
                 'type'              => 0,
+                'job_log_mode'      => 3,
                 'status'            => 1
             ];
         array_push($taskArr, $taskEntry);
@@ -86,6 +87,7 @@ class Tasks
                 'priority'          => 10,
                 'enabled'           => 0,
                 'type'              => 0,
+                'job_log_mode'      => 3,
                 'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
@@ -103,6 +105,7 @@ class Tasks
                 'priority'          => 10,
                 'enabled'           => 0,
                 'type'              => 0,
+                'job_log_mode'      => 3,
                 'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
@@ -120,6 +123,7 @@ class Tasks
                 'priority'          => 10,
                 'enabled'           => 0,
                 'type'              => 0,
+                'job_log_mode'      => 3,
                 'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
@@ -154,6 +158,7 @@ class Tasks
                 'priority'          => 10,
                 'enabled'           => 0,
                 'type'              => 0,
+                'job_log_mode'      => 3,
                 'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
@@ -171,6 +176,7 @@ class Tasks
                 'priority'          => 5,
                 'enabled'           => 0,
                 'type'              => 0,
+                'job_log_mode'      => 3,
                 'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
@@ -206,6 +212,7 @@ class Tasks
                 'priority'          => 10,
                 'enabled'           => 0,
                 'type'              => 0,
+                'job_log_mode'      => 3,
                 'status'            => 0
             ];
         array_push($taskArr, $taskEntry);

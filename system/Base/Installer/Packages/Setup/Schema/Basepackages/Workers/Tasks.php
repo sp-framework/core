@@ -130,6 +130,14 @@ class Tasks
                             'notNull'       => false,
                         ]
                     ),
+                    new Column(//1 - per job run, 2 per hour, 3 per day
+                        'job_log_mode',
+                        [
+                            'type'          => Column::TYPE_TINYINTEGER,
+                            'notNull'       => true,
+                            'default'       => 1
+                        ]
+                    ),
                     new Column(
                         'email',
                         [

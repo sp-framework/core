@@ -220,4 +220,26 @@ class Tasks extends BasePackage
 
         return false;
     }
+
+    public function getJobLogsModes()
+    {
+        return
+            [
+                '1' =>
+                    [
+                        'id' => '1',
+                        'name'  => 'Per Job'
+                    ],
+                '2' =>
+                    [
+                        'id' => '2',
+                        'name'  => 'Per Hour'
+                    ],
+                '3' =>
+                    [
+                        'id' => '3',
+                        'name'  => 'Per Day'
+                    ]
+            ];
+    }
 }

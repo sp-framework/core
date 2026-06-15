@@ -1081,17 +1081,53 @@ class Workers extends BasePackage
             return false;
         }
 
-        $addJob = $this->jobs->addJob(
-            [
-                'task_id'       => $task['id'],
-                'worker_id'     => $this->worker['id'],
-                'type'          => 0,
-                'status'        => 1//Scheduled
-            ]
-        );
+        if ($task['job_log_mode'] != '1') {
+            $job = $this->jobs->getJobByMode($task);
 
-        if ($addJob) {
-            $this->scheduledJobs[$task['id'] . '-' . $schedule['type']] = $this->jobs->packagesData->responseData;
+            if (!$job) {
+                $time = \Carbon\Carbon::now();
+
+                if ($task['job_log_mode'] == '2') {
+                    $time = $time->startOfHour()->timestamp;
+                } else if ($task['job_log_mode'] == '3') {
+                    $time = $time->startOfDay()->timestamp;
+                }
+
+                $addJob = $this->jobs->addJob(
+                    [
+                        'task_id'       => $task['id'],
+                        'worker_id'     => $this->worker['id'],
+                        'type'          => 0,
+                        'job_log_mode'  => $task['job_log_mode'],
+                        'job_log_time'  => $time,
+                        'cid'           => $task['cid'],
+                        'status'        => 1//Scheduled
+                    ]
+                );
+
+                if ($addJob) {
+                    $job = $this->jobs->packagesData->responseData;
+                }
+            }
+        } else {
+            $addJob = $this->jobs->addJob(
+                [
+                    'task_id'       => $task['id'],
+                    'worker_id'     => $this->worker['id'],
+                    'type'          => 0,
+                    'job_log_mode'  => 1,
+                    'job_log_time'  => null,
+                    'status'        => 1//Scheduled
+                ]
+            );
+
+            if ($addJob) {
+                $job = $this->jobs->packagesData->responseData;
+            }
+        }
+
+        if (isset($job) && is_array($job)) {
+            $this->scheduledJobs[$task['id'] . '-' . $schedule['type']] = $job;
 
             $task = $this->basepackages->workers->tasks->getById($task['id'], false, false);
 
@@ -1105,7 +1141,7 @@ class Workers extends BasePackage
 
             $this->workers->updateWorker($updateWorker);
 
-            return $this->jobs->packagesData->responseData;
+            return $job;
         }
 
         $this->logger->log->alert('Unable to add job for task ' . $task['id'] . ' at ' . date('Y-m-d H:i:s'));
