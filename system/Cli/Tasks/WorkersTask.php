@@ -26,6 +26,10 @@ class WorkersTask extends Task
 
     public function execAction($taskId, $jobId)
     {
-        $this->basepackages->workers->exec($taskId, $jobId);
+        try {
+            $this->basepackages->workers->exec($taskId, $jobId);
+        } catch (\throwable $e) {
+            trace([$e]);
+        }
     }
 }

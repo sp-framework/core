@@ -18,7 +18,9 @@ class ProcessPsef extends Calls
     {
         $this->updateJobTask(2, $args);
 
-        $this->addJobResult($this->addResponse('Ok', 0), $args);
+        $this->addResponse('Ok', 0, []);
+
+        $this->addJobResult($this->packagesData, $args);
 
         $this->updateJobTask(3, $args);
     }

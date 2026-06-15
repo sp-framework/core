@@ -238,7 +238,28 @@ class Workers extends BasePackage
             return false;
         }
 
-        $class = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Workers\\Calls\\' . ucfirst($task['call']);
+        $class = null;
+
+        if (isset($this->availableCalls[$task['cid']])) {
+            if (str_starts_with($this->availableCalls[$task['cid']]['package_class'], 'System')) {
+                $class = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Workers\\Calls\\' . ucfirst($this->availableCalls[$task['cid']]['name']);
+            } else if (str_starts_with($this->availableCalls[$task['cid']]['package_class'], 'Apps')) {
+                $packageClassArr = explode('\\', $this->availableCalls[$task['cid']]['package_class']);
+                unset($packageClassArr[$this->helper->lastKey($packageClassArr)]);
+                $this->availableCalls[$task['cid']]['package_class'] = implode('\\', $packageClassArr);
+
+                $class = $this->availableCalls[$task['cid']]['package_class'] . '\\TaskCalls\\' . ucfirst($this->availableCalls[$task['cid']]['name']);
+            }
+        } else {
+            $task['enabled'] = 0;
+            $task['status'] = 3;//Error
+            $task['result'] = 'Task call not found!';
+
+            $this->tasks->update($task);
+
+            return false;
+        }
+
         $call = new $class;
 
         $args = ['task' => $task, 'job' => $job, 'schedule' => $schedule];
@@ -255,10 +276,10 @@ class Workers extends BasePackage
     protected function execRun($call, $args)
     {
         try {
-            $call->run($args)();
+            $call->run($args);
         } catch (\throwable $e) {
-            $data['responseCode'] = ["1"];
-            $data['responseMessage'] = [$e->getMessage()];
+            $data['responseCode'] = 1;
+            $data['responseMessage'] = 'Exception: ' . $e->getMessage();
             $data['responseData'] = [];
 
             $call->addJobResult((object) $data, $args);
@@ -295,8 +316,8 @@ class Workers extends BasePackage
                 }
             }
         } catch (\throwable $e) {
-            $data['responseCode'] = ["1"];
-            $data['responseMessage'] = [$e->getMessage()];
+            $data['responseCode'] = 1;
+            $data['responseMessage'] = 'Exception: ' . $e->getMessage();
             $data['responseData'] = [];
 
             $call->addJobResult((object) $data, $args);
@@ -712,7 +733,7 @@ class Workers extends BasePackage
             })->
             then(function () use ($args) {
                 $this->processThen($args);
-            }, true)->
+            })->
             everyminute();
         } else if ($schedule['type'] === 'everyxminutes') {
             $this->scheduler->php(
@@ -728,7 +749,7 @@ class Workers extends BasePackage
             })->
             then(function () use ($args) {
                 $this->processThen($args);
-            }, true)->
+            })->
             everyminute(
                 (int) $schedule['params']['minutes']
             );
@@ -746,7 +767,7 @@ class Workers extends BasePackage
             })->
             then(function () use ($args) {
                 $this->processThen($args);
-            }, true)->
+            })->
             everyminute(
                 (int) $schedule['params']['minutes']
             );
@@ -764,7 +785,7 @@ class Workers extends BasePackage
             })->
             then(function () use ($args) {
                 $this->processThen($args);
-            }, true)->
+            })->
             hourly(
                 (int) $schedule['params']['hourly_minutes']
             );
@@ -782,7 +803,7 @@ class Workers extends BasePackage
             })->
             then(function () use ($args) {
                 $this->processThen($args);
-            }, true)->
+            })->
             daily(
                 (int) $schedule['params']['daily_hours'],
                 (int) $schedule['params']['daily_minutes']
@@ -801,7 +822,7 @@ class Workers extends BasePackage
             })->
             then(function () use ($args) {
                 $this->processThen($args);
-            }, true)->
+            })->
             weekly(
                 $this->dayOfWeek,
                 (int) $schedule['params']['weekly_hours'],
@@ -821,7 +842,7 @@ class Workers extends BasePackage
             })->
             then(function () use ($args) {
                 $this->processThen($args);
-            }, true)->
+            })->
             monthly(
                 (int) $this->month,
                 (int) $this->dateOfMonth,
