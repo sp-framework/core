@@ -52,8 +52,6 @@ class TasksComponent extends BaseComponent
 
             $this->tasks->setFFRelations(true);
 
-            // $calls = $this->tasks->getAllCalls();
-
             $this->view->calls = $calls;
 
             $this->view->schedules = $this->schedules;
@@ -176,7 +174,7 @@ class TasksComponent extends BaseComponent
 
     protected function formatStatus($rowId, $data)
     {
-        if ($data['enabled'] == '0' && $data['status'] != '2') {
+        if ($data['enabled'] == '0' && $data['is_on_demand'] == '0') {
             $data['status'] = '-';
 
             return $data;

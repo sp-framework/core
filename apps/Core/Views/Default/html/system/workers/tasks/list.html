@@ -23,7 +23,7 @@
                 'buttonType'            : 'button',
                 'buttons'               :
                     {
-                        'add-business' : {
+                        'add-task' : {
                             'title'                   : 'Add New Task',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
@@ -31,6 +31,31 @@
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'position'                : 'right',
                             'url'                     : links.url('system/workers/tasks/q/id/0')
+                        }
+                    }
+            },
+        'dtPrimaryButtons'      :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'jobs' : {
+                            'title'                   : 'Jobs',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/workers/jobs')
+                        },
+                        'schedules' : {
+                            'title'                   : 'Schedules',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/workers/schedules')
                         }
                     }
             },

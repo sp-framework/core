@@ -95,6 +95,19 @@ class Calls extends BasePackage
         }
     }
 
+    // Task Statuses
+    // 1 - Scheduled
+    // 2 - Running
+    // 3 - Success
+    // 4 - Error
+    // 5 - Rescheduled (Due to No Workers)
+
+    // Job Statuses
+    // 1 - Scheduled
+    // 2 - Running
+    // 3 - Success
+    // 4 - Error
+    // 5 - Warning
     public function updateJobTask($status, $args)
     {
         $this->updateJob($status, $args);
@@ -257,7 +270,7 @@ class Calls extends BasePackage
 
                 $this->addJobResult($thisCall->packagesData, $args);
 
-                $thisCall->updateJobTask(3, $args);
+                $thisCall->updateJobTask(4, $args);
 
                 return false;
             }

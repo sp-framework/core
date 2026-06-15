@@ -68,7 +68,8 @@ class Tasks
                 'is_on_demand'      => 0,
                 'priority'          => 10,
                 'enabled'           => 1,
-                'type'              => 0
+                'type'              => 0,
+                'status'            => 1
             ];
         array_push($taskArr, $taskEntry);
 
@@ -84,7 +85,8 @@ class Tasks
                 'is_on_demand'      => 1,
                 'priority'          => 10,
                 'enabled'           => 0,
-                'type'              => 0
+                'type'              => 0,
+                'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
 
@@ -100,7 +102,8 @@ class Tasks
                 'is_on_demand'      => 1,
                 'priority'          => 10,
                 'enabled'           => 0,
-                'type'              => 0
+                'type'              => 0,
+                'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
 
@@ -116,7 +119,8 @@ class Tasks
                 'is_on_demand'      => 1,
                 'priority'          => 10,
                 'enabled'           => 0,
-                'type'              => 0
+                'type'              => 0,
+                'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
 
@@ -149,7 +153,8 @@ class Tasks
                 'is_on_demand'      => 1,
                 'priority'          => 10,
                 'enabled'           => 0,
-                'type'              => 0
+                'type'              => 0,
+                'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
 
@@ -165,7 +170,8 @@ class Tasks
                 'is_on_demand'      => 1,
                 'priority'          => 5,
                 'enabled'           => 0,
-                'type'              => 0
+                'type'              => 0,
+                'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
 
@@ -199,7 +205,8 @@ class Tasks
                 'is_on_demand'      => 1,
                 'priority'          => 10,
                 'enabled'           => 0,
-                'type'              => 0
+                'type'              => 0,
+                'status'            => 0
             ];
         array_push($taskArr, $taskEntry);
 

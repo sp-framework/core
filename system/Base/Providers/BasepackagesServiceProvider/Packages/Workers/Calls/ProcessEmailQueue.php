@@ -14,40 +14,36 @@ class ProcessEmailQueue extends Calls
 
     public function run(array $args = [])
     {
-        $thisCall = $this;
+        $this->updateJobTask(2, $args);
 
-        return function() use ($thisCall, $args) {
-            $thisCall->updateJobTask(2, $args);
+        $this->args = $this->extractCallArgs($this, $args);
 
-            $this->args = $this->extractCallArgs($thisCall, $args);
+        if (!$this->args) {
+            return;
+        }
 
-            if (!$this->args) {
-                return;
-            }
+        if (!isset($this->args['priority'])) {
+            $this->packagesData->responseCode = 1;
 
             if (!isset($this->args['priority'])) {
-                $thisCall->packagesData->responseCode = 1;
-
-                if (!isset($this->args['priority'])) {
-                    $thisCall->packagesData->responseMessage = 'Parameters priority missing';
-                }
-
-                $this->addJobResult($thisCall->packagesData, $args);
-
-                $thisCall->updateJobTask(3, $args);
-
-                return;
+                $this->packagesData->responseMessage = 'Parameters priority missing';
             }
 
-            if (isset($this->args['confidential']) && $this->args['confidential'] == 'true') {
-                $this->basepackages->emailqueue->processQueue((int) $this->args['priority'], true);
-            } else {
-                $this->basepackages->emailqueue->processQueue((int) $this->args['priority']);
-            }
+            $this->addJobResult($this->packagesData, $args);
 
-            $this->addJobResult($this->basepackages->emailqueue->packagesData, $args);
+            $this->updateJobTask(3, $args);
 
-            $thisCall->updateJobTask(3, $args);
-        };
+            return;
+        }
+
+        if (isset($this->args['confidential']) && $this->args['confidential'] == 'true') {
+            $this->basepackages->emailqueue->processQueue((int) $this->args['priority'], true);
+        } else {
+            $this->basepackages->emailqueue->processQueue((int) $this->args['priority']);
+        }
+
+        $this->addJobResult($this->basepackages->emailqueue->packagesData, $args);
+
+        $this->updateJobTask(3, $args);
     }
 }

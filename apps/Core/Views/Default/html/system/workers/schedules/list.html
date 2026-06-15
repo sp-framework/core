@@ -20,7 +20,7 @@
                 'buttonType'            : 'button',
                 'buttons'               :
                     {
-                        'process-queue' : {
+                        'add-schedule' : {
                             'title'                   : 'Add New Schedule',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
@@ -28,6 +28,31 @@
                             'position'                : 'right',
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'url'                     : links.url('system/workers/schedules/q/id/0')
+                        }
+                    }
+            },
+        'dtSecondaryButtons'    :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'jobs' : {
+                            'title'                   : 'Jobs',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/workers/jobs')
+                        },
+                        'tasks' : {
+                            'title'                   : 'Tasks',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/workers/tasks')
                         }
                     }
             },

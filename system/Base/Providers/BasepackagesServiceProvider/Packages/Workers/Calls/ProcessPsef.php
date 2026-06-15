@@ -8,9 +8,20 @@ class ProcessPsef extends Calls
 {
     public $funcDisplayName = 'Process PSEF';
 
+    protected $args;
+
     protected $raw_args;
 
     protected $raw_cwd;
+
+    public function run(array $args = [])
+    {
+        $this->updateJobTask(2, $args);
+
+        $this->addJobResult($this->addResponse('Ok', 0), $args);
+
+        $this->updateJobTask(3, $args);
+    }
 
     public function getRawCmd()
     {

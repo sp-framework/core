@@ -17,6 +17,31 @@
         'dtFilterShowQuickFilter'   : true,
         'dtFilterButtons'           : ['edit', 'delete', 'add', 'clone', 'reset'],
         'dtFilters'                 : table['filters'],
+        'dtSecondaryButtons'      :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'tasks' : {
+                            'title'                   : 'Tasks',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/workers/tasks')
+                        },
+                        'schedules' : {
+                            'title'                   : 'Schedules',
+                            'size'                    : 'sm',
+                            'type'                    : 'info',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/workers/schedules')
+                        }
+                    }
+            },
         'dtFilterColumns'           : table['filterColumns'],
         'dtTable'                   : table,
         'dtColumns'                 : table['columns'],

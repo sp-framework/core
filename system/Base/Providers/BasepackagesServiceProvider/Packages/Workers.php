@@ -48,13 +48,19 @@ class Workers extends BasePackage
 
     protected $enabledTasks;
 
-    // protected $availableCalls;
+    protected $availableCalls;
 
     protected $outputDir;
 
     public function init(bool $resetCache = false)
     {
         $this->workers = (new WorkersWorkers())->init(true);
+
+        if (!$this->checkIdleWorkers()) {
+            $this->logger->log->alert('No Workers available at ' . date('Y-m-d H:i:s'));
+
+            return false;//We quite as there are no available workers.
+        }
 
         $this->schedules = (new Schedules())->init(true);
 
@@ -104,25 +110,7 @@ class Workers extends BasePackage
 
     public function run()
     {
-        // Task Statuses
-        // 1 - Scheduled
-        // 2 - Running
-        // 3 - Error
-
-        // Job Statuses
-        // 1 - Scheduled
-        // 2 - Running
-        // 3 - Success
-        // 4 - Error
-        // 5 - Warning
-
-
-        // if (!$this->checkIdleWorkers()) {
-        //     $this->logger->log->alert('No Workers available at ' . date('Y-m-d H:i:s'));
-
-        //     return false;//We quite as there are no available workers.
-        // }
-        foreach ($this->enabledTasks as $taskKey => $task) {
+        foreach ($this->enabledTasks as $task) {
             $schedule = $this->schedules->getSchedulesSchedule($task['schedule_id']);
             $class = null;
 
@@ -170,20 +158,30 @@ class Workers extends BasePackage
         // var_dump($this->scheduler);
         // die();
         $this->scheduler->run();
-        // var_dump('done');
-        // $failedJobs = $this->scheduler->getFailedJobs();
-        // var_dump($failedJobs);
-        // if (count($failedJobs) > 0) {
-        //     foreach ($failedJobs as $failedJobKey => $failedJob) {
-        //         $id = $failedJob->getJob()->getId();
-        //         $this->scheduledJobs[$id]['status'] = 4;//Error
-        //         $this->scheduledJobs[$id]['response_code'] = ["1"];
-        //         $this->scheduledJobs[$id]['response_message'] = [$failedJob->getException()->getMessage()];
-        //         $this->scheduledJobs[$id]['response_data'] = $this->helper->encode([]);
 
-        //         $this->jobs->updateJob($this->scheduledJobs[$id]);
-        //     }
-        // }
+        // var_dump('done');
+        $failedJobs = $this->scheduler->getFailedJobs();
+        // trace([$this->scheduler, $failedJobs]);
+        if (count($failedJobs) > 0) {
+            foreach ($failedJobs as $failedJobKey => $failedJob) {
+                $id = $failedJob->getJob()->getId();
+                $this->scheduledJobs[$id]['status'] = 4;//Error
+                $this->scheduledJobs[$id]['response_code'] = ["1"];
+                $this->scheduledJobs[$id]['response_message'] = [$failedJob->getException()->getMessage()];
+                $this->scheduledJobs[$id]['response_data'] = [];
+
+                $this->jobs->updateJob($this->scheduledJobs[$id]);
+
+                $task = $this->enabledTasks[$this->scheduledJobs[$id]['task_id']];
+
+                $task['status'] = 3;//Error
+                $task['force_next_run'] = null;
+                $task['next_run'] = '-';
+                $task['result'] = 'Job has error!';
+
+                $this->tasks->update($task);
+            }
+        }
 
         // $executedJobs = $this->scheduler->getExecutedJobs();
 
@@ -199,30 +197,30 @@ class Workers extends BasePackage
         //     }
         // }
 
-        $stuckTasks = $this->tasks->getRunningTasks();
-        // var_dump($stuckTasks);
-        if ($stuckTasks && count($stuckTasks) > 0) {
-            foreach ($this->scheduledJobs as  $scheduledJob) {
-                foreach ($stuckTasks as $stuckTaskKey => $stuckTask) {
-                    if ($scheduledJob['task_id'] === $stuckTask['id']) {
-                        $stuckTask['status'] = 1;//Reschedule
-                        $stuckTask['result'] = 'Task was stuck and is free now!';
+        // $stuckTasks = $this->tasks->getRunningTasks();
+        // // var_dump($stuckTasks);
+        // if ($stuckTasks && count($stuckTasks) > 0) {
+        //     foreach ($this->scheduledJobs as  $scheduledJob) {
+        //         foreach ($stuckTasks as $stuckTaskKey => $stuckTask) {
+        //             if ($scheduledJob['task_id'] === $stuckTask['id']) {
+        //                 $stuckTask['status'] = 1;//Reschedule
+        //                 $stuckTask['result'] = 'Task was stuck and is free now!';
 
-                        $this->tasks->update($stuckTask);
+        //                 $this->tasks->update($stuckTask);
 
-                        $stuckJob = $this->jobs->getById($scheduledJob['id']);
+        //                 $stuckJob = $this->jobs->getById($scheduledJob['id']);
 
-                        if ($stuckJob && $stuckJob['status'] != 4) {
-                            $stuckJob['status'] = 4;
-                            $stuckJob['response_code'] = ["1"];
-                            $stuckJob['response_message'] = ['Job was stuck and is free now!'];
+        //                 if ($stuckJob && $stuckJob['status'] != 4) {
+        //                     $stuckJob['status'] = 4;
+        //                     $stuckJob['response_code'] = ["1"];
+        //                     $stuckJob['response_message'] = ['Job was stuck and is free now!'];
 
-                            $this->jobs->updateJob($stuckJob);
-                        }
-                    }
-                }
-            }
-        }
+        //                     $this->jobs->updateJob($stuckJob);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         $this->releaseWorkers();
     }
@@ -315,6 +313,7 @@ class Workers extends BasePackage
 
         if ($task['force_next_run'] && $task['force_next_run'] == '1') {
             $task['force_next_run'] = null;
+
             if ($task['is_on_demand'] && $task['is_on_demand'] == '1') {
                 $task['next_run'] = '-';
             } else {
@@ -578,38 +577,22 @@ class Workers extends BasePackage
 
     protected function addToScheduler($task, $schedule, $class)
     {
-        $this->checkIdleWorkers();
+        $this->checkIdleWorkers(true);
 
-        $newJob = $this->addNewJob($task, $schedule);
+        if ($newJob = $this->addNewJob($task, $schedule)) {
+            $args =
+                [
+                    'job'       => $newJob,
+                    'task'      => $task,
+                    'schedule'  => $schedule
+                ];
 
-        if ($newJob['worker_id'] == '0') {
-            $newJob['run_on']               =  ['-'];
-            $newJob['type']                 =  0;
-            $newJob['status']               =  5;//Warning
-            $newJob['execution_time']       =  '0.000';
-            $newJob['response_code']        =  ['1'];
-            $newJob['response_message']     =  ['Task rescheduled for next run as no worker was available. Add more workers to avoid this situation.'];
-            $newJob['response_data']        =  '';
-
-            $this->tasks->forceNextRun($task);
-
-            $this->jobs->updateJob($newJob);
-
-            return;
-        } else {
-            $updateWorker = $this->worker;
-            $updateWorker['status'] = '1';
-
-            $this->workers->updateWorker($updateWorker);
+            $this->addTaskToScheduler($task, $class, $args, $schedule);
         }
+    }
 
-        $args =
-            [
-                'job'       => $newJob,
-                'task'      => $task,
-                'schedule'  => $schedule
-            ];
-
+    protected function addTaskToScheduler($task, $class, $args, $schedule)
+    {
         if ($task['exec_type'] === 'call') {
             $this->scheduleCallSchedules($class, $args, $schedule);
         } else if ($task['exec_type'] === 'php') {
@@ -623,13 +606,17 @@ class Workers extends BasePackage
     {
         if ($schedule['type'] === 'everyminute') {
             $this->scheduler->call(
-                (new $class)->run($args),
+                function() use ($class, $args) {
+                    (new $class)->run($args);
+                },
                 [],
                 $args['task']['id'] . '-' . $schedule['type']
             )->everyminute();
         } else if ($schedule['type'] === 'everyxminutes') {
             $this->scheduler->call(
-                (new $class)->run($args),
+                function() use ($class, $args) {
+                    (new $class)->run($args);
+                },
                 [],
                 $args['task']['id'] . '-' . $schedule['type']
             )->everyminute(
@@ -637,7 +624,9 @@ class Workers extends BasePackage
             );
         } else if ($schedule['type'] === 'everyxminutesbetween') {
             $this->scheduler->call(
-                (new $class)->run($args),
+                function() use ($class, $args) {
+                    (new $class)->run($args);
+                },
                 [],
                 $args['task']['id'] . '-' . $schedule['type']
             )->everyminute(
@@ -645,7 +634,9 @@ class Workers extends BasePackage
             );
         } else if ($schedule['type'] === 'hourly') {
             $this->scheduler->call(
-                (new $class)->run($args),
+                function() use ($class, $args) {
+                    (new $class)->run($args);
+                },
                 [],
                 $args['task']['id'] . '-' . $schedule['type']
             )->hourly(
@@ -653,7 +644,9 @@ class Workers extends BasePackage
             );
         } else if ($schedule['type'] === 'daily') {
             $this->scheduler->call(
-                (new $class)->run($args),
+                function() use ($class, $args) {
+                    (new $class)->run($args);
+                },
                 [],
                 $args['task']['id'] . '-' . $schedule['type']
             )->daily(
@@ -662,7 +655,9 @@ class Workers extends BasePackage
             );
         } else if ($schedule['type'] === 'weekly') {
             $this->scheduler->call(
-                (new $class)->run($args),
+                function() use ($class, $args) {
+                    (new $class)->run($args);
+                },
                 [],
                 $args['task']['id'] . '-' . $schedule['type'] . '-' . $day
             )->weekly(
@@ -672,7 +667,9 @@ class Workers extends BasePackage
             );
         } else if ($schedule['type'] === 'monthly') {
             $this->scheduler->call(
-                (new $class)->run($args),
+                function() use ($class, $args) {
+                    (new $class)->run($args);
+                },
                 [],
                 $args['task']['id'] . '-' . $schedule['type'] . '-' . $month
             )->monthly(
@@ -1055,6 +1052,14 @@ class Workers extends BasePackage
 
     protected function addNewJob($task, $schedule)
     {
+        if ($this->worker['id'] === 0) {
+            $task['status'] = 4;//Reschedule due to no workers
+
+            $this->tasks->forceNextRun($task);
+
+            return false;
+        }
+
         $addJob = $this->jobs->addJob(
             [
                 'task_id'       => $task['id'],
@@ -1069,13 +1074,22 @@ class Workers extends BasePackage
 
             $task = $this->basepackages->workers->tasks->getById($task['id'], false, false);
 
-            $task['via_job'] = 1;
             $task['status'] = 1;//Scheduled
 
             $this->tasks->updateTask($task);
 
+            $updateWorker = $this->worker;
+
+            $updateWorker['status'] = '1';
+
+            $this->workers->updateWorker($updateWorker);
+
             return $this->jobs->packagesData->responseData;
         }
+
+        $this->logger->log->alert('Unable to add job for task ' . $task['id'] . ' at ' . date('Y-m-d H:i:s'));
+
+        return false;
     }
 
     protected function checkPath($path)
@@ -1089,17 +1103,16 @@ class Workers extends BasePackage
         return true;
     }
 
-
-    protected function checkIdleWorkers()
+    protected function checkIdleWorkers($getNextIdleWorker = false)
     {
-        $this->workers = (new WorkersWorkers())->init(true);
-
-        $idleWorkers = $this->workers->init()->getIdleWorkers();
+        $idleWorkers = $this->workers->getIdleWorkers();
 
         if ($idleWorkers && count($idleWorkers) > 0) {
             $this->idleWorkers = $idleWorkers;
 
-            $this->worker = $this->idleWorkers[0];
+            if ($getNextIdleWorker) {
+                $this->worker = $this->idleWorkers[0];
+            }
 
             return true;
         }

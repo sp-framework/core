@@ -43,6 +43,10 @@ class Tasks extends BasePackage
         $data['status'] = 0;
         $data['type'] = 1;//1 for user and 0 for system
 
+        if (isset($data['is_on_demand']) && $data['is_on_demand'] == '1') {
+            $data['schedule_id'] = null;
+        }
+
         if ($this->add($data)) {
             $this->addResponse('Added new task ' . $data['name']);
         } else {
@@ -56,6 +60,10 @@ class Tasks extends BasePackage
 
         if (!isset($data['priority']) || (isset($data['priority']) && $data['priority'] == '0')) {
             $data['priority'] = '1';
+        }
+
+        if (isset($data['is_on_demand']) && $data['is_on_demand'] == '1') {
+            $data['schedule_id'] = null;
         }
 
         $task = array_merge($task, $data);
@@ -101,7 +109,12 @@ class Tasks extends BasePackage
                 $this->ff->setSync(false);
             }
             $task['force_next_run'] = null;
-            $task['status'] = '1';
+            if (isset($task['is_on_demand']) && $task['is_on_demand'] == '1') {
+                $task['status'] = '0';
+            } else {
+                $task['status'] = '1';
+            }
+
             $task['next_run'] = '-';
         } else {
             $task['force_next_run'] = '1';
@@ -142,15 +155,15 @@ class Tasks extends BasePackage
             if ($task['force_next_run'] == 1) {
                 $task['org_schedule_id'] = $task['schedule_id'];
                 $task['schedule_id'] = 2;//Make it minute so it can be picked by the scheduler for next run
-                array_push($taskArr, $task);
+                $taskArr[$task['id']] = $task;
             } else if ($task['enabled'] == 1 && $task['status'] != 2) {//Enabled and not running
-                array_push($taskArr, $task);
+                $taskArr[$task['id']] = $task;
             }
         }
 
-        $sorted = msort($taskArr, 'priority', SORT_REGULAR, SORT_DESC);
+        $sorted = msort($taskArr, 'priority', SORT_REGULAR, SORT_DESC, true);
 
-        $sorted = msort($sorted, 'force_next_run', SORT_REGULAR, SORT_DESC);
+        $sorted = msort($sorted, 'force_next_run', SORT_REGULAR, SORT_DESC, true);
 
         return $sorted;
     }
