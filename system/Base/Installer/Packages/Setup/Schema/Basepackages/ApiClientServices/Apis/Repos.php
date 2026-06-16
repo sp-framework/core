@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\ApiClientServices\Apis;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Repos
 {
@@ -98,6 +99,18 @@ class Repos
                             'type'    => Column::TYPE_JSON,
                             'notNull' => false,
                         ]
+                    )
+                ],
+                'indexes' => [
+                    new Index(
+                        'column_UNIQUE',
+                        [
+                            'api_url',
+                            'org_user',
+                            'repo_url',
+                            'branch'
+                        ],
+                        'UNIQUE'
                     )
                 ]
             ];

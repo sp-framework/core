@@ -211,13 +211,16 @@ class ApiClientServices extends BasePackage
             $this->switchApiModel();
 
             if ($this->add($data)) {
-
                 $data['id'] = $apiId;
 
                 $this->apiStats->initApiCallStats($data);
 
                 $this->addResponse('Added ' . $data['name'] . ' API');
             } else {
+                $this->switchApiModel($data);
+
+                $this->remove($apiId);
+
                 $this->addResponse('Error adding new API.', 1);
             }
         }
