@@ -384,6 +384,10 @@ class Setup
 			$this->cleanOldFfs();
 
 			foreach ($databases as $tableName => $tableClass) {
+				if (!isset($tableClass['schema'])) {
+					continue;
+				}
+
 				if ($tableClass['model'] && $tableClass['model']->getSource()) {
 					$tableName = $tableClass['model']->getSource();
 				}

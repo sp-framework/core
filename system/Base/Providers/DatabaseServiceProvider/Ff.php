@@ -314,6 +314,7 @@ class Ff
             $config = array_merge($config, $configArr);
         }
 
+        $config['uniqueFields'] = [];
         $config['indexes'] = [];
 
         if ($tableModel) {
@@ -324,27 +325,16 @@ class Ff
             return $config;
         }
 
-        if (!isset($tableClass->columns()['columns'])) {
-            return $config;
-        }
-
-        if (is_array($tableClass->columns()['columns']) && count($tableClass->columns()['columns']) === 0) {
-            return $config;
-        }
-
-        if (!isset($tableClass->columns()['indexes']) && !method_exists($tableClass, 'indexes')) {
-            return $config;
-        }
-
-        if ((isset($tableClass->columns()['indexes']) && count($tableClass->columns()['indexes']) === 0) &&
-            (method_exists($tableClass, 'indexes') && count($tableClass->indexes()) === 0)
+        if (!isset($tableClass->columns()['columns']) ||
+            (isset($tableClass->columns()['columns']) &&
+             is_array($tableClass->columns()['columns']) &&
+             count($tableClass->columns()['columns']) === 0)
         ) {
             return $config;
         }
 
-        $config['uniqueFields'] = [];
-        $config['indexes'] = [];
-        if (isset($tableClass->columns()['indexes'])) {
+        //Unique Index
+        if (isset($tableClass->columns()['indexes']) && count($tableClass->columns()['indexes']) !== 0) {
             foreach ($tableClass->columns()['indexes'] as $index) {
                 if ($index->getType() === 'UNIQUE' && $index->getColumns() && count($index->getColumns()) > 0) {
                     $config['uniqueFields'] = $index->getColumns();
@@ -352,7 +342,8 @@ class Ff
             }
         }
 
-        if (method_exists($tableClass, 'indexes')) {
+        //Indexes
+        if ((method_exists($tableClass, 'indexes') && count($tableClass->indexes()) !== 0)) {
             $columns = [];
             $columnsTypeToIndex = [0,2,5,7,8,9,14,22];//int, chars, boolean, varchars
 

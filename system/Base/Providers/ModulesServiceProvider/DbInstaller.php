@@ -124,16 +124,14 @@ class DbInstaller extends BasePackage
             $storesToIndex = [];
 
             foreach ($databases as $tableName => $tableClass) {
-                if (!isset($tableClass['schema']) || !isset($tableClass['model'])) {
+                if (!isset($tableClass['schema'])) {
                     continue;
                 }
 
                 if (isset($tableClass['tableName'])) {
                     $tableName = $tableClass['tableName'];
-                } else if ($tableClass['model']->getSource()) {
+                } else if ($tableClass['model'] && $tableClass['model']->getSource()) {
                     $tableName = $tableClass['model']->getSource();
-                } else {
-                    continue;
                 }
 
                 $tableConfigParams = [];
