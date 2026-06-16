@@ -35,7 +35,13 @@ class ProcessDbSync extends Calls
 
             $this->packagesData->responseData = $result;
 
+            $this->addJobResult($this->packagesData, $args);
+
+            $this->updateJobTask(4, $args);
+
             //Notify the Admins here
+
+            return false;
         }
 
         $this->addJobResult($this->packagesData, $args);

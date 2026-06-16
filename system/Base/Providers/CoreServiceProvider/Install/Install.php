@@ -6,6 +6,7 @@ use System\Base\BasePackage;
 use System\Base\Installer\Packages\Setup\Schema;
 use System\Base\Providers\ModulesServiceProvider\DbInstaller;
 use System\Base\Providers\ModulesServiceProvider\MenuInstaller;
+use System\Base\Providers\ModulesServiceProvider\TaskCallInstaller;
 
 class Install extends BasePackage
 {
@@ -33,9 +34,11 @@ class Install extends BasePackage
             $this->databases = $schemaNamesDatabase;
         }
 
+        $this->menuInstaller = new MenuInstaller;
+
         $this->dbInstaller = new DbInstaller;
 
-        $this->menuInstaller = new MenuInstaller;
+        $this->taskCallInstaller = new TaskCallInstaller;
 
         return $this;
     }
@@ -47,6 +50,8 @@ class Install extends BasePackage
         $this->installMenu();
 
         $this->installDb();
+
+        $this->installTaskCall();
 
         $this->postInstall();
 
@@ -66,6 +71,13 @@ class Install extends BasePackage
     public function installDb()
     {
         $this->dbInstaller->installDb($this->databases);
+
+        return true;
+    }
+
+    public function installTaskCall()
+    {
+        $this->taskCallInstaller->installTaskCall('basepackages');
 
         return true;
     }

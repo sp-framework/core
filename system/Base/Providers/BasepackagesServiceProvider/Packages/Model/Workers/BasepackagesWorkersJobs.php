@@ -14,6 +14,8 @@ class BasepackagesWorkersJobs extends BaseModel
 
     public $cid;
 
+    public $api_call_ids;
+
     public $run_on;
 
     public $status;

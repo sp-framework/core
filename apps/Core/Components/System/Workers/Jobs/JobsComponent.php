@@ -143,7 +143,9 @@ class JobsComponent extends BaseComponent
             $data['run_on'] = $this->helper->decode($data['run_on']);
         }
 
-        $data['run_on'] = $this->helper->last($data['run_on']);
+        if ($data['run_on'] && is_array($data['run_on'])) {
+            $data['run_on'] = $this->helper->last($data['run_on']);
+        }
 
         return $data;
     }

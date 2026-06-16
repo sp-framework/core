@@ -12,54 +12,68 @@ class TaskCallInstaller extends BasePackage
     public function installTaskCall($packageClass)
     {
         try {
-            $packageFile = 'apps/' . implode('/', array_slice(explode('\\', get_class($packageClass)), 1, -1)) . '/package.json';
+            if ($packageClass === 'basepackages') {
+                $package = $this->modules->packages->getPackageByName('Core');
 
-            if ($this->localContent->fileExists($packageFile)) {
-                $installPackageJsonFile = $this->helper->decode($this->localContent->read($packageFile), true);
+                 $callsArr = $this->basepackages->utils->scanDir(
+                    'system/Base/Providers/BasepackagesServiceProvider/Packages/Workers/Calls/'
+                 );
+            } else {
+                $packageFile = 'apps/' . implode('/', array_slice(explode('\\', get_class($packageClass)), 1, -1)) . '/package.json';
 
-                $package = $this->modules->packages->getPackageByClass($installPackageJsonFile['class']);
+                if ($this->localContent->fileExists($packageFile)) {
+                    $installPackageJsonFile = $this->helper->decode($this->localContent->read($packageFile), true);
 
-                if ($package) {
-                    $packageFolder = 'apps/' . implode('/', array_slice(explode('\\', get_class($packageClass)), 1, -2)) . '/TaskCalls/';
+                    $package = $this->modules->packages->getPackageByClass($installPackageJsonFile['class']);
 
-                    $callsArr = $this->basepackages->utils->scanDir($packageFolder);
+                    if ($package) {
+                        $packageFolder = 'apps/' . implode('/', array_slice(explode('\\', get_class($packageClass)), 1, -2)) . '/TaskCalls/';
 
-                    if (count($callsArr['files']) > 0) {
-                        foreach ($callsArr['files'] as $key => $call) {
-                            $call = ucfirst($call);
-                            $call = str_replace('/', '\\', $call);
-                            $call = str_replace('.php', '', $call);
+                        $callsArr = $this->basepackages->utils->scanDir($packageFolder);
+                    }
+                }
+            }
 
-                            $callClass = new $call;
-                            $callReflection = new \ReflectionClass($call);
+            if (isset($callsArr) &&
+                count($callsArr['files']) > 0
+            ) {
+                foreach ($callsArr['files'] as $key => $call) {
+                    $call = ucfirst($call);
+                    $call = str_replace('/', '\\', $call);
+                    $call = str_replace('.php', '', $call);
 
-                            $dbCall = $this->basepackages->workers->calls->getByCallName($callReflection->getShortName());
+                    $callClass = new $call;
+                    $callReflection = new \ReflectionClass($call);
 
-                            if (!$dbCall) {
-                                $dbCall = [];
-                                $dbCall['name'] = $callReflection->getShortName();
-                                $dbCall['display_name'] = $callReflection->getShortName();
-                                $dbCall['class'] = $callReflection->getName();
-                                if ($callReflection->hasProperty('funcDisplayName')) {
-                                    $dbCall['display_name'] = $callReflection->getProperty('funcDisplayName')->getValue($callClass);
-                                }
-                                $dbCall['description'] = '';
-                                if ($callReflection->hasProperty('funcDescription')) {
-                                    $dbCall['description'] = $callReflection->getProperty('funcDescription')->getValue($callClass);
-                                }
-                                $dbCall['can_be_scheduled'] = true;
-                                if ($callReflection->hasProperty('funcCanBeScheduled')) {
-                                    $dbCall['can_be_scheduled'] = $callReflection->getProperty('funcCanBeScheduled')->getValue($callClass);
-                                }
-                                $dbCall['can_be_run_on_demand'] = true;
-                                if ($callReflection->hasProperty('funcCanBeRunOnDemand')) {
-                                    $dbCall['can_be_run_on_demand'] = $callReflection->getProperty('funcCanBeRunOnDemand')->getValue($callClass);
-                                }
-                                $dbCall['package_id'] = $package['id'];
+                    $callDetails = [];
+                    $callDetails['name'] = $callReflection->getShortName();
+                    $callDetails['display_name'] = $callReflection->getShortName();
+                    $callDetails['class'] = $callReflection->getName();
+                    if ($callReflection->hasProperty('funcDisplayName')) {
+                        $callDetails['display_name'] = $callReflection->getProperty('funcDisplayName')->getValue($callClass);
+                    }
+                    $callDetails['description'] = '';
+                    if ($callReflection->hasProperty('funcDescription')) {
+                        $callDetails['description'] = $callReflection->getProperty('funcDescription')->getValue($callClass);
+                    }
+                    $callDetails['can_be_scheduled'] = true;
+                    if ($callReflection->hasProperty('funcCanBeScheduled')) {
+                        $callDetails['can_be_scheduled'] = $callReflection->getProperty('funcCanBeScheduled')->getValue($callClass);
+                    }
+                    $callDetails['can_be_run_on_demand'] = true;
+                    if ($callReflection->hasProperty('funcCanBeRunOnDemand')) {
+                        $callDetails['can_be_run_on_demand'] = $callReflection->getProperty('funcCanBeRunOnDemand')->getValue($callClass);
+                    }
+                    $callDetails['package_id'] = $package['id'];
 
-                                $this->basepackages->workers->calls->addCall($dbCall);
-                            }
-                        }
+                    $dbCall = $this->basepackages->workers->calls->getByCallName($callReflection->getShortName());
+
+                    if (!$dbCall) {
+                        $this->basepackages->workers->calls->addCall($callDetails);
+                    } else {
+                        $callDetails['id'] = $dbCall['id'];
+
+                        $this->basepackages->workers->calls->updateCall($callDetails);
                     }
                 }
             }

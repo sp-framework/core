@@ -47,7 +47,15 @@ class Tasks extends BasePackage
             $data['schedule_id'] = null;
         }
 
-        if ($this->add($data)) {
+        try {
+            $add = $this->add($data);
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        if ($add) {
             $this->addResponse('Added new task ' . $data['name']);
         } else {
             $this->addResponse('Error adding new task', 1);
@@ -68,7 +76,15 @@ class Tasks extends BasePackage
 
         $task = array_merge($task, $data);
 
-        if ($this->update($task)) {
+        try {
+            $update = $this->update($task);
+        } catch (\throwable $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        if ($update) {
             $this->addResponse('Updated task ' . $task['name']);
         } else {
             $this->addResponse('Error updating task', 1);
@@ -239,6 +255,16 @@ class Tasks extends BasePackage
                     [
                         'id' => '3',
                         'name'  => 'Per Day'
+                    ],
+                '4' =>
+                    [
+                        'id' => '4',
+                        'name'  => 'Per Month'
+                    ],
+                '5' =>
+                    [
+                        'id' => '5',
+                        'name'  => 'Per Year'
                     ]
             ];
     }

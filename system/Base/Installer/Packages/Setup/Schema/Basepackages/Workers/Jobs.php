@@ -42,6 +42,13 @@ class Jobs
                             'notNull'       => true,
                         ]
                     ),
+                    new Column(//register call ids from basepackages_api_client_services_calls
+                        'api_call_ids',
+                        [
+                            'type'          => Column::TYPE_JSON,
+                            'notNull'       => false,
+                        ]
+                    ),
                     new Column(
                         'run_on',
                         [

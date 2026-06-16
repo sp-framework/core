@@ -52,44 +52,44 @@ class Jobs extends BasePackage
 
         if ($job['cid'] && $job['cid'] !== 0) {
             $call = $this->basepackages->workers->calls->getById($job['cid']);
+
             //If call package is API Client Services
-            if (isset($job['run_on'][0]) && $job['run_on'][0] !== '' && $job['run_on'][0] != '0' && $job['run_on'][0] !== '-') {
-            trace([$call, $job]);
-                $apiModel = BasepackagesApiClientServicesCalls::class;
+            // if (isset($job['run_on'][0]) && $job['run_on'][0] !== '' && $job['run_on'][0] != '0' && $job['run_on'][0] !== '-') {
+            //     $apiModel = BasepackagesApiClientServicesCalls::class;
 
-                $start = $job['run_on'][0];
-                $timeRan = Carbon::createFromFormat('Y-m-d H:i:s', $start);
-                $timeRan->addSeconds((float) round($job['execution_time'] ?? 0));
-                $end = $timeRan->format('Y-m-d H:i:s');
+            //     $start = $job['run_on'][0];
+            //     $timeRan = Carbon::createFromFormat('Y-m-d H:i:s', $start);
+            //     $timeRan->addSeconds((float) round($job['execution_time'] ?? 0));
+            //     $end = $timeRan->format('Y-m-d H:i:s');
 
-                if ($this->config->databasetype === 'db') {
-                    $callsObj = $apiModel::find(
-                        [
-                            'conditions'        => 'called_at BETWEEN :start: AND :end:',
-                            'bind'              =>
-                                [
-                                    'start'     => $start,
-                                    'end'       => $end
-                                ]
-                        ]
-                    );
-                    $callsArr = $callsObj->toArray();
-                } else {
-                    $apiStore = $this->ff->store((new $apiModel)->getSource());
+            //     if ($this->config->databasetype === 'db') {
+            //         $callsObj = $apiModel::find(
+            //             [
+            //                 'conditions'        => 'called_at BETWEEN :start: AND :end:',
+            //                 'bind'              =>
+            //                     [
+            //                         'start'     => $start,
+            //                         'end'       => $end
+            //                     ]
+            //             ]
+            //         );
+            //         $callsArr = $callsObj->toArray();
+            //     } else {
+            //         $apiStore = $this->ff->store((new $apiModel)->getSource());
 
-                    $callsArr = $apiStore->findBy(['called_at', 'BETWEEN', [$start, $end]]);
-                }
+            //         $callsArr = $apiStore->findBy(['called_at', 'BETWEEN', [$start, $end]]);
+            //     }
 
-                if ($callsArr && count($callsArr) > 0) {
-                    $calls = [];
+            //     if ($callsArr && count($callsArr) > 0) {
+            //         $calls = [];
 
-                    foreach ($callsArr as $key => $call) {
-                        $calls[$call['id']] = $call;
-                    }
+            //         foreach ($callsArr as $key => $call) {
+            //             $calls[$call['id']] = $call;
+            //         }
 
-                    $job['calls'] = $calls;
-                }
-            }
+            //         $job['calls'] = $calls;
+            //     }
+            // }
         }
 
         return $job;
@@ -133,6 +133,10 @@ class Jobs extends BasePackage
             $time = $time->startOfHour()->timestamp;
         } else if ($task['job_log_mode'] == '3') {
             $time = $time->startOfDay()->timestamp;
+        } else if ($task['job_log_mode'] == '4') {
+            $time = $time->startOfMonth()->timestamp;
+        } else if ($task['job_log_mode'] == '5') {
+            $time = $time->startOfYear()->timestamp;
         }
 
         if (!is_int($time)) {

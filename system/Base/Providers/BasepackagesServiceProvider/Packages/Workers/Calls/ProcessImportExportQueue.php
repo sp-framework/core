@@ -32,7 +32,7 @@ class ProcessImportExportQueue extends Calls
 
             $this->addJobResult($this->packagesData, $args);
 
-            $this->updateJobTask(3, $args);
+            $this->updateJobTask(4, $args);
 
             return;
         }
@@ -78,7 +78,7 @@ class ProcessImportExportQueue extends Calls
 
             $this->addJobResult($this->packagesData, $args);
 
-            $this->updateJobTask(3, $args);
+            $this->updateJobTask(4, $args);
 
             return;
         }

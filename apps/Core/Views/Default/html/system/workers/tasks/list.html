@@ -23,24 +23,6 @@
                 'buttonType'            : 'button',
                 'buttons'               :
                     {
-                        'add-task' : {
-                            'title'                   : 'Add New Task',
-                            'size'                    : 'sm',
-                            'type'                    : 'primary',
-                            'icon'                    : 'plus',
-                            'buttonAdditionalClass'   : 'contentAjaxLink',
-                            'position'                : 'right',
-                            'url'                     : links.url('system/workers/tasks/q/id/0')
-                        }
-                    }
-            },
-        'dtPrimaryButtons'      :
-            {
-                'componentId'           : componentId,
-                'sectionId'             : 'listing',
-                'buttonType'            : 'button',
-                'buttons'               :
-                    {
                         'jobs' : {
                             'title'                   : 'Jobs',
                             'size'                    : 'sm',
@@ -56,6 +38,24 @@
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'position'                : 'right',
                             'url'                     : links.url('system/workers/schedules')
+                        }
+                    }
+            },
+        'dtSecondaryButtons'    :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'add-task' : {
+                            'title'                   : 'Add New Task',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/workers/tasks/q/id/0')
                         }
                     }
             },

@@ -112,19 +112,12 @@ class Workers extends BasePackage
     {
         foreach ($this->enabledTasks as $task) {
             $schedule = $this->schedules->getSchedulesSchedule($task['schedule_id']);
-            $class = null;
 
             if (isset($this->availableCalls[$task['cid']])) {
-                if (str_starts_with($this->availableCalls[$task['cid']]['package_class'], 'System')) {
-                    $class = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Workers\\Calls\\' . ucfirst($this->availableCalls[$task['cid']]['name']);
-                } else if (str_starts_with($this->availableCalls[$task['cid']]['package_class'], 'Apps')) {
-                    $packageClassArr = explode('\\', $this->availableCalls[$task['cid']]['package_class']);
-                    unset($packageClassArr[$this->helper->lastKey($packageClassArr)]);
-                    $this->availableCalls[$task['cid']]['package_class'] = implode('\\', $packageClassArr);
+                $class = $this->getClass($task);
+            }
 
-                    $class = $this->availableCalls[$task['cid']]['package_class'] . '\\TaskCalls\\' . ucfirst($this->availableCalls[$task['cid']]['name']);
-                }
-            } else {
+            if (!isset($class)) {
                 $task['enabled'] = 0;
                 $task['status'] = 3;//Error
                 $task['result'] = 'Task call not found!';
@@ -150,16 +143,10 @@ class Workers extends BasePackage
                 $this->scheduleMonthly($task, $schedule, $class);
             }
         }
-        // var_dump($this->enabledTasks);
-        // var_dump($this->scheduledJobs);
-        // die();
-        // var_dump($this->worker);
-        // var_dump($this->scheduler->getQueuedJobs()[0]->getId());
-        // var_dump($this->scheduler);
-        // die();
+
         $this->scheduler->run();
 
-        // var_dump('done');
+
         $failedJobs = $this->scheduler->getFailedJobs();
         // trace([$this->scheduler, $failedJobs]);
         if (count($failedJobs) > 0) {
@@ -238,19 +225,11 @@ class Workers extends BasePackage
             return false;
         }
 
-        $class = null;
-
         if (isset($this->availableCalls[$task['cid']])) {
-            if (str_starts_with($this->availableCalls[$task['cid']]['package_class'], 'System')) {
-                $class = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Workers\\Calls\\' . ucfirst($this->availableCalls[$task['cid']]['name']);
-            } else if (str_starts_with($this->availableCalls[$task['cid']]['package_class'], 'Apps')) {
-                $packageClassArr = explode('\\', $this->availableCalls[$task['cid']]['package_class']);
-                unset($packageClassArr[$this->helper->lastKey($packageClassArr)]);
-                $this->availableCalls[$task['cid']]['package_class'] = implode('\\', $packageClassArr);
+            $class = $this->getClass($task);
+        }
 
-                $class = $this->availableCalls[$task['cid']]['package_class'] . '\\TaskCalls\\' . ucfirst($this->availableCalls[$task['cid']]['name']);
-            }
-        } else {
+        if (!isset($class)) {
             $task['enabled'] = 0;
             $task['status'] = 3;//Error
             $task['result'] = 'Task call not found!';
@@ -465,9 +444,9 @@ class Workers extends BasePackage
         }
     }
 
-    //Only Schedule if less than 1 minute so its schedules for next run.
     protected function shouldSchedule($task, $schedule)
     {
+        //Only Schedule if less than 1 minute so its schedules for next run.
         if ($schedule['type'] === 'everyxminutes' ||
             $schedule['type'] === 'everyxminutesbetween'
         ) {
@@ -1091,6 +1070,10 @@ class Workers extends BasePackage
                     $time = $time->startOfHour()->timestamp;
                 } else if ($task['job_log_mode'] == '3') {
                     $time = $time->startOfDay()->timestamp;
+                } else if ($task['job_log_mode'] == '4') {
+                    $time = $time->startOfMonth()->timestamp;
+                } else if ($task['job_log_mode'] == '5') {
+                    $time = $time->startOfYear()->timestamp;
                 }
 
                 $addJob = $this->jobs->addJob(
@@ -1117,6 +1100,7 @@ class Workers extends BasePackage
                     'type'          => 0,
                     'job_log_mode'  => 1,
                     'job_log_time'  => null,
+                    'cid'           => $task['cid'],
                     'status'        => 1//Scheduled
                 ]
             );
@@ -1199,5 +1183,22 @@ class Workers extends BasePackage
                 }
             }
         }
+    }
+
+    protected function getClass($task)
+    {
+        $class = null;
+
+        if (str_starts_with($this->availableCalls[$task['cid']]['package_class'], 'System')) {
+            $class = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Workers\\Calls\\' . ucfirst($this->availableCalls[$task['cid']]['name']);
+        } else if (str_starts_with($this->availableCalls[$task['cid']]['package_class'], 'Apps')) {
+            $packageClassArr = explode('\\', $this->availableCalls[$task['cid']]['package_class']);
+            unset($packageClassArr[$this->helper->lastKey($packageClassArr)]);
+            $this->availableCalls[$task['cid']]['package_class'] = implode('\\', $packageClassArr);
+
+            $class = $this->availableCalls[$task['cid']]['package_class'] . '\\TaskCalls\\' . ucfirst($this->availableCalls[$task['cid']]['name']);
+        }
+
+        return $class;
     }
 }
