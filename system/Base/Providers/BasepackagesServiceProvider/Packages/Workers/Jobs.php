@@ -50,48 +50,6 @@ class Jobs extends BasePackage
             $job['run_on'] = $this->helper->decode($job['run_on'], true);
         }
 
-        if ($job['cid'] && $job['cid'] !== 0) {
-            $call = $this->basepackages->workers->calls->getById($job['cid']);
-
-            //If call package is API Client Services
-            // if (isset($job['run_on'][0]) && $job['run_on'][0] !== '' && $job['run_on'][0] != '0' && $job['run_on'][0] !== '-') {
-            //     $apiModel = BasepackagesApiClientServicesCalls::class;
-
-            //     $start = $job['run_on'][0];
-            //     $timeRan = Carbon::createFromFormat('Y-m-d H:i:s', $start);
-            //     $timeRan->addSeconds((float) round($job['execution_time'] ?? 0));
-            //     $end = $timeRan->format('Y-m-d H:i:s');
-
-            //     if ($this->config->databasetype === 'db') {
-            //         $callsObj = $apiModel::find(
-            //             [
-            //                 'conditions'        => 'called_at BETWEEN :start: AND :end:',
-            //                 'bind'              =>
-            //                     [
-            //                         'start'     => $start,
-            //                         'end'       => $end
-            //                     ]
-            //             ]
-            //         );
-            //         $callsArr = $callsObj->toArray();
-            //     } else {
-            //         $apiStore = $this->ff->store((new $apiModel)->getSource());
-
-            //         $callsArr = $apiStore->findBy(['called_at', 'BETWEEN', [$start, $end]]);
-            //     }
-
-            //     if ($callsArr && count($callsArr) > 0) {
-            //         $calls = [];
-
-            //         foreach ($callsArr as $key => $call) {
-            //             $calls[$call['id']] = $call;
-            //         }
-
-            //         $job['calls'] = $calls;
-            //     }
-            // }
-        }
-
         return $job;
     }
 
@@ -167,5 +125,27 @@ class Jobs extends BasePackage
         }
 
         return false;
+    }
+
+    public function getRunningJobs()
+    {
+        if ($this->config->databasetype === 'db') {
+            $conditions =
+                [
+                    'conditions'    => 'status = :status:',
+                    'bind'          =>
+                        [
+                            'status'        => 2
+                        ]
+                ];
+
+            $jobs = $this->getByParams($conditions);
+        } else {
+            $this->ffStore = $this->ff->store($this->ffStoreToUse);
+
+            $jobs = $this->ffStore->findBy(['status', '=', 2]);
+        }
+
+        return $jobs;
     }
 }

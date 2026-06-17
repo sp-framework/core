@@ -13,23 +13,23 @@ class WorkersTask extends Task
 
     public function runAction()
     {
-        $initWorkers = $this->basepackages->workers->init();
-
-        if ($initWorkers) {
+        if ($this->basepackages->workers) {
             try {
-                $initWorkers->run();
+                $this->basepackages->workers->run();
             } catch (\throwable $e) {
-                trace([$e]);
+                throw $e;
             }
         }
     }
 
     public function execAction($taskId, $jobId)
     {
-        try {
-            $this->basepackages->workers->exec($taskId, $jobId);
-        } catch (\throwable $e) {
-            trace([$e]);
+        if ($this->basepackages->workers) {
+            try {
+                $this->basepackages->workers->exec($taskId, $jobId);
+            } catch (\throwable $e) {
+                throw $e;
+            }
         }
     }
 }

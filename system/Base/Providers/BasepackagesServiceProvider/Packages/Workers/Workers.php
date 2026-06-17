@@ -74,4 +74,18 @@ class Workers extends BasePackage
             return $workers;
         }
     }
+
+    public function forceReleaseWorkers($workersBeingUsedByJobs)
+    {
+        //We check for jobs that are running and release all other workers.
+        foreach ($this->workers as $worker) {
+            if (!in_array($worker['id'], $workersBeingUsedByJobs)) {
+                $worker['status'] = 0;
+
+                $this->update($worker);
+            }
+        }
+
+        return true;
+    }
 }
