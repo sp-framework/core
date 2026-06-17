@@ -148,7 +148,7 @@ class Workers extends BasePackage
         $this->scheduler->run();
 
         $failedJobs = $this->scheduler->getFailedJobs();
-        // trace([$this->scheduler, $failedJobs]);
+
         if (count($failedJobs) > 0) {
             foreach ($failedJobs as $failedJobKey => $failedJob) {
                 $id = $failedJob->getJob()->getId();
@@ -169,45 +169,6 @@ class Workers extends BasePackage
                 $this->tasks->update($task);
             }
         }
-
-        // $executedJobs = $this->scheduler->getExecutedJobs();
-
-        // if (count($executedJobs) > 0) {
-        //     foreach ($executedJobs as $executedJobKey => $executedJob) {
-        //         // var_dump($executedJob);die();
-        //         // $id = $executedJob->getJob()->getId();
-        //         // var_dump($executedJob->getOutput());
-        //         // $this->scheduledJobs[$id]['status'] = 4;//Error
-        //         // $this->scheduledJobs[$id]['result'] = $failedJob->getException()->getMessage();
-
-        //         // $this->jobs->updateJob($this->scheduledJobs[$id]);
-        //     }
-        // }
-
-        // $stuckTasks = $this->tasks->getRunningTasks();
-        // // var_dump($stuckTasks);
-        // if ($stuckTasks && count($stuckTasks) > 0) {
-        //     foreach ($this->scheduledJobs as  $scheduledJob) {
-        //         foreach ($stuckTasks as $stuckTaskKey => $stuckTask) {
-        //             if ($scheduledJob['task_id'] === $stuckTask['id']) {
-        //                 $stuckTask['status'] = 1;//Reschedule
-        //                 $stuckTask['result'] = 'Task was stuck and is free now!';
-
-        //                 $this->tasks->update($stuckTask);
-
-        //                 $stuckJob = $this->jobs->getById($scheduledJob['id']);
-
-        //                 if ($stuckJob && $stuckJob['status'] != 4) {
-        //                     $stuckJob['status'] = 4;
-        //                     $stuckJob['response_code'] = ["1"];
-        //                     $stuckJob['response_message'] = ['Job was stuck and is free now!'];
-
-        //                     $this->jobs->updateJob($stuckJob);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
 
         $this->releaseWorkers();
     }
