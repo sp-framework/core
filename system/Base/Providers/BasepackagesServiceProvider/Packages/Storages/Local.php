@@ -790,13 +790,17 @@ class Local extends BasePackage
 
         for ($checkPath = count($paths) - 1; $checkPath >= 3; $checkPath--) { //>=3 to ignore images/, cache/, data/, storageID directory
             if (count($this->localContent->listContents($paths[$checkPath], false)->toArray()) === 0) {
-                $this->localContent->deleteDir($paths[$checkPath]);
+                $this->localContent->deleteDirectory($paths[$checkPath]);
             }
         }
     }
 
     public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null, $orgFileName = null, $like = false)
     {
+        if ($newUUID === $oldUUID) {
+            $oldUUID = null;
+        }
+
         if ($array) {
             if ($oldUUID) {
                 $olduuids = $oldUUID;

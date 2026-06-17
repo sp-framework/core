@@ -20,6 +20,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoPostcodes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoRegions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\HouseKeeping;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ImportExport;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Maintenance;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
@@ -126,6 +127,8 @@ class Basepackages
 	protected $pages;
 
 	protected $pageswidgets;
+
+	protected $houseKeeping;
 
 	public function __construct()
 	{
@@ -420,5 +423,12 @@ class Basepackages
 		$this->pageswidgets = (new PagesWidgets())->init();
 
 		return $this->pageswidgets;
+	}
+
+	protected function initHouseKeeping()
+	{
+		$this->houseKeeping = (new HouseKeeping())->init();
+
+		return $this->houseKeeping;
 	}
 }
