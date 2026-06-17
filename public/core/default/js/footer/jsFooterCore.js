@@ -4004,28 +4004,6 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                     $('#' + sectionId + '-tabs-tabLinks li a').each(function() {
                         that._processSubTrees(this);
                     });
-                } else {//Single page form
-                    $('#' + sectionId + '-form .nav-tabs li a').each(function() {
-                        if ($(this).data('jstree') == false) {
-                            return;
-                        }
-
-                        var tabId = $(this).attr('href').replace('#', '');
-                        tabIds.push(tabId);
-                        var tabName = $(this).html().toUpperCase();
-
-                        types[tabId] = {"icon" : "fas fa-fw fa-chevron-right"};
-                        $(formJsTreeSelector).
-                            find('ul').
-                            first().
-                            append(
-                                '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
-                                '<ul data-tabid="' + tabId + '-ul"></ul>' +
-                                '</li>'
-                            );
-
-                        that._populateTree(tabId);
-                    });
                 }
 
                 dataCollection[componentId][sectionId][sectionId + '-form-fields'] =
