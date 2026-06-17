@@ -1030,7 +1030,7 @@ class Workers extends BasePackage
             $grep = $rawCommand;
         }
 
-        exec('ps -ef | grep "' . $grep . '"', $output);
+        exec('ps -ef | grep -F \'' . $grep . '\'', $output);
 
         if (is_array($output) && count($output) > 0) {
             foreach ($output as $outputValue) {
