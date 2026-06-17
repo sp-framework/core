@@ -3914,6 +3914,80 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                 BazContentFieldsValidator.cancelValidatingForm(validationObject);//cancel any form validation as jstree has changed
             }
 
+            _proto._processSubTrees = function _processSubTrees(parentTab, hasParent = false) {
+                var tabId = $(parentTab).attr('href').replace('#', '');
+                tabIds.push(tabId);
+                var tabName = $(parentTab).html().toUpperCase();
+
+                types[tabId] = {"icon" : "fas fa-fw fa-chevron-right"};
+
+                if ($($('#' + tabId + ' .card-header')[0]).find('li a').length > 0) {
+                    if (hasParent) {
+                        $(formJsTreeSelector).
+                            find('[data-tabid="' + hasParent + '"]').
+                            append(
+                                '<ul>' +
+                                '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
+                                '<ul data-tabid="' + tabId + '-ul"></ul>' +
+                                '</li>' +
+                                '</ul>'
+                            );
+                    } else {
+                        $(formJsTreeSelector).
+                            find('ul').
+                            first().
+                            append(
+                                '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
+                                '<ul data-tabid="' + tabId + '-ul"></ul>' +
+                                '</li>'
+                            );
+                    }
+
+                    $($('#' + tabId + ' .card-header')[0]).find('li a').each(function() {
+                        that._processSubTrees(this, tabId);
+                    });
+                } else {
+                    if (hasParent) {
+                        $(formJsTreeSelector).
+                            find('[data-tabid="' + hasParent + '"]').
+                            append(
+                                '<ul>' +
+                                '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
+                                '<ul data-tabid="' + tabId + '-ul"></ul>' +
+                                '</li>' +
+                                '</ul>'
+                            );
+                    } else {
+                        $(formJsTreeSelector).
+                            find('ul').
+                            first().
+                            append(
+                                '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
+                                '<ul data-tabid="' + tabId + '-ul"></ul>' +
+                                '</li>'
+                            );
+
+                        return;
+                    }
+
+                    that._populateTree(tabId);
+                }
+            }
+
+            _proto._populateTree = function _populateTree(tabId) {
+                $('#' + tabId).find("[jstree-search]").each(function() {
+                    if ($(this).attr('jstree-search') !== '') {
+                        $('[data-tabid="' + tabId + '-ul"]').append(
+                            '<li data-tabid="' + tabId +
+                                '" data-jstreeid="' + $(this)[0].id +
+                                '" data-jstree=' + '{"type":' + '"item"}>' +
+                                $(this).attr('jstree-search') +
+                            '</li>'
+                        );
+                    }
+                });
+            }
+
             _proto._buildFormJsTree = function _buildFormJsTree() {
                 formJsTreeSelector = $('#' + sectionId + '-form-fields');
 
@@ -3926,49 +4000,33 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                 types.item = {"icon" : "fas fa-fw fa-angle-right"};
 
                 // Grab Fields from Tabs Note: attr "jstree-search" is used to populate tree
-                $('#' + sectionId + '-form .nav-tabs li a').each(function() {
-                    if ($(this).data('jstree') == false) {
-                        return;
-                    }
-
-                    var tabId = $(this).attr('href').replace('#', '');
-                    tabIds.push(tabId);
-                    var tabName = $(this).html().toUpperCase();
-
-                    types[tabId] = {"icon" : "fas fa-fw fa-chevron-right"};
-
-                    $(formJsTreeSelector).
-                        find('ul').
-                        first().
-                        append(
-                            '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
-                            '<ul data-tabid="' + tabId + '-ul"></ul>' +
-                            '</li>'
-                        );
-
-                    // $('#' + sectionId + '-form-fields li:contains("' + tabName + '")').first().append('<ul></ul>');
-
-                    $('#' + tabId).find("[jstree-search]").each(function() {
-                        var fieldId = this.id.replace('-jstreesearch', '');
-
-                        if ($(this).attr('jstree-search') !== '') {
-                            if (!$('#' + fieldId).parents('.form-group').hasClass('d-none') &&
-                                $('#' + fieldId).attr('disabled') !== 'disabled'
-                            ) {
-                                    // $('#' + sectionId + '-form-fields li:contains("' + tabName + '")').
-                                    // find('ul').
-                                    // first().
-                                    $('[data-tabid="' + tabId + '-ul"]').append(
-                                        '<li data-tabid="' + tabId +
-                                            '" data-jstreeid="' + $(this)[0].id +
-                                            '" data-jstree=' + '{"type":' + '"item"}>' +
-                                            $(this).attr('jstree-search') +
-                                        '</li>'
-                                );
-                            }
-                        }
+                if ($('#' + sectionId + '-tabs-tabLinks li a').length > 0) {
+                    $('#' + sectionId + '-tabs-tabLinks li a').each(function() {
+                        that._processSubTrees(this);
                     });
-                });
+                } else {//Single page form
+                    $('#' + sectionId + '-form .nav-tabs li a').each(function() {
+                        if ($(this).data('jstree') == false) {
+                            return;
+                        }
+
+                        var tabId = $(this).attr('href').replace('#', '');
+                        tabIds.push(tabId);
+                        var tabName = $(this).html().toUpperCase();
+
+                        types[tabId] = {"icon" : "fas fa-fw fa-chevron-right"};
+                        $(formJsTreeSelector).
+                            find('ul').
+                            first().
+                            append(
+                                '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
+                                '<ul data-tabid="' + tabId + '-ul"></ul>' +
+                                '</li>'
+                            );
+
+                        that._populateTree(tabId);
+                    });
+                }
 
                 dataCollection[componentId][sectionId][sectionId + '-form-fields'] =
                     $.extend(dataCollection[componentId][sectionId][sectionId + '-form-fields'], {
@@ -3998,28 +4056,33 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                 // Init jstree selection process
                 $(formJsTreeSelector).on('select_node.jstree', function() {
                     var selfId = $(this).jstree('get_selected',true)[0];
-                    // if (selfId.parent === '#') {
-                        $(formJsTreeSelector).jstree('open_node', selfId);
-                    // } else {
-                        $(tabIds).each(function(index,tabId) {
-                            var tab = $('#' + sectionId + '-form').find('[href="#' + tabId + '"]');
 
-                            $(tab).removeClass('active');
-                            $(tab).attr('area-selected', false);
-                            $('#' + tabId).removeClass('active show');
-                        })
+                    $(formJsTreeSelector).jstree('open_node', selfId);
 
-                        var activateTab = $('#' + sectionId + '-form').find('[href="#' + selfId.data.tabid + '"]');
-                        $(activateTab).addClass('active');
-                        $(activateTab).attr('area-selected', true);
+                    $(tabIds).each(function(index,tabId) {
+                        var tab = $('#' + sectionId + '-form').find('[href="#' + tabId + '"]');
 
-                        $('#' + selfId.data.tabid).addClass('active show');
+                        $(tab).removeClass('active');
+                        $(tab).attr('aria-selected', false);
+                        $('#' + tabId).removeClass('active show');
+                    })
 
-                        $('#' + selfId.data.jstreeid).parent().addClass('bg-info disabled animated fadeIn');
-                        setTimeout(function() {
-                            $('#' + selfId.data.jstreeid).parent().removeClass('bg-info disabled animated fadeIn');
-                        }, 2000);
-                    // }
+                    var activateTab = $('#' + sectionId + '-form').find('[href="#' + selfId.data.tabid + '"]');
+
+                    $(activateTab).parents('.tab-pane').each(function() {
+                        $(this).addClass('active show');
+                        $('#' + sectionId + '-form').find('[href="#' + $(this)[0].id + '"]').addClass('active');
+                    });
+
+                    $(activateTab).addClass('active');
+                    $(activateTab).attr('aria-selected', true);
+
+                    $('#' + selfId.data.tabid).addClass('active show');
+
+                    $('#' + selfId.data.jstreeid).parent().addClass('bg-info disabled animated fadeIn');
+                    setTimeout(function() {
+                        $('#' + selfId.data.jstreeid).parent().removeClass('bg-info disabled animated fadeIn');
+                    }, 2000);
                 });
             }
 
