@@ -368,8 +368,8 @@ class Dropzone
                                                                 $this->fieldParams['lightboxSize'] = $this->adminLTETags->helper->lastKey($attachment['links']);
                                                             }
                                                             $preview .=
-                                                            '<a class="chocolat-image" title="' . $attachment['org_file_name'] . '" href="' . $attachment['links'][$this->fieldParams['lightboxSize']] . '">
-                                                                <img alt="' . $attachment['org_file_name'] . '" src="' . $attachment['links'][$this->fieldParams['thumbnailSize']] . '" class="img-fluid img-thumbnail">
+                                                            '<a class="chocolat-image" title="' . $attachment['org_file_name'] . '" href="' . str_replace('public/', '', $attachment['links'][$this->fieldParams['lightboxSize']]) . '">
+                                                                <img alt="' . $attachment['org_file_name'] . '" src="' . str_replace('public/', '', $attachment['links'][$this->fieldParams['thumbnailSize']]) . '" class="img-fluid img-thumbnail">
                                                             </a>';
 
                                                         } else {
