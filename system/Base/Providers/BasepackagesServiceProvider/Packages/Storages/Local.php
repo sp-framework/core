@@ -806,9 +806,9 @@ class Local extends BasePackage
         }
     }
 
-    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null, $orgFileName = null, $like = false)
+    public function changeOrphanStatus($newUUID = null, $oldUUID = null, bool $array = false, $status = null, $orgFileName = null, $like = false)
     {
-        if ($newUUID === $oldUUID) {
+        if ($oldUUID && $newUUID === $oldUUID) {
             $oldUUID = null;
         }
 
@@ -817,7 +817,7 @@ class Local extends BasePackage
                 $olduuids = $oldUUID;
 
                 foreach ($olduuids as $olduuidKey => $olduuid) {
-                    if (!$status) {
+                    if (!$status || ($status && $status === 0)) {
                         $status = 1;
                     }
 
@@ -828,7 +828,7 @@ class Local extends BasePackage
             if ($newUUID) {
                 $uuids = $newUUID;
                 foreach ($uuids as $uuidKey => $newuuid) {
-                    if (!$status) {
+                    if (!$status || ($status && $status === 1)) {
                         $status = 0;
                     }
 
@@ -837,7 +837,7 @@ class Local extends BasePackage
             }
         } else {
             if ($oldUUID) {
-                if (!$status) {
+                if (!$status || ($status && $status === 0)) {
                     $status = 1;
                 }
 
@@ -845,7 +845,7 @@ class Local extends BasePackage
             }
 
             if ($newUUID || $orgFileName) {
-                if (!$status) {
+                if (!$status || ($status && $status === 1)) {
                     $status = 0;
                 }
 
