@@ -220,7 +220,7 @@ abstract class BasePackage extends Controller
 			$this->view->mutexLock = [];
 		}
 
-		if ($mutexLock = $this->basepackages->mutex->getMutex($this->packageName, $data['id'])) {
+		if ($mutexLock = $this->basepackages->mutex->getMutex(str_replace('\\', '_', $this::class), $data['id'])) {
 			if ($mutexLock['parent_lock_id'] === 0) {
 				$this->view->mutexLock = $mutexLock;
 			}
@@ -233,7 +233,7 @@ abstract class BasePackage extends Controller
 			return;
 		}
 
-		if ($mutexLock = $this->basepackages->mutex->checkMutex($this->packageName, $data['id'])) {
+		if ($mutexLock = $this->basepackages->mutex->checkMutex(str_replace('\\', '_', $this::class), $data['id'])) {
 			if ($mutexLock['parent_lock_id'] === 0) {
 				$this->basepackages->mutex->releaseMutex($mutexLock);
 			}
@@ -1393,7 +1393,7 @@ abstract class BasePackage extends Controller
 			return false;
 		}
 
-		if ($this->mutex && $mutex = $this->basepackages->mutex->checkMutex($this->packageName, $data['id'])) {
+		if ($this->mutex && $mutex = $this->basepackages->mutex->checkMutex(str_replace('\\', '_', $this::class), $data['id'])) {
 			if ($mutex['self'] === false) {
 				//Log here
 				$this->logger->log->error('Entry is locked by: ' . $mutex['account_name'] . '. It cannot be modified!');

@@ -35,13 +35,13 @@ class Mutex extends BasePackage
         return $this->timeout;
     }
 
-    public function getMutex($packageName, $packageRowId)
+    public function getMutex($packageClass, $packageRowId)
     {
         if (!$this->access->auth->check()) {
             return false;
         }
 
-        if ($mutex = $this->checkMutex($packageName, $packageRowId)) {
+        if ($mutex = $this->checkMutex($packageClass, $packageRowId)) {
             //If a parent has already locked and we try to access the child on its own (as parent)
             //We should reset the parent lock
             if ($mutex['parent_lock_id'] !== 0 && !static::$parentLock) {
@@ -51,7 +51,7 @@ class Mutex extends BasePackage
 
                 if ($parent) {
                     $mutex['parent_lock_by_id'] = $parent['parent_lock_id'];
-                    $mutex['parent_lock_by_package'] = $parent['package_name'];
+                    $mutex['parent_lock_by_package'] = $parent['package_class'];
                     $mutex['parent_lock_id'] = 0;
                 }
             } else if (!static::$parentLock) {
@@ -63,7 +63,7 @@ class Mutex extends BasePackage
                 $parent = $this->getById((int) static::$parentLock);
 
                 $parent['parent_lock_by_id'] = $mutex['id'];
-                $parent['parent_lock_by_package'] = $mutex['package_name'];
+                $parent['parent_lock_by_package'] = $mutex['package_class'];
 
                 if ($parent['account_id'] === $mutex['account_id']) {
                     $parent['self'] = true;
@@ -83,7 +83,7 @@ class Mutex extends BasePackage
             return $mutex;
         } else {
             $newMutex = [];
-            $newMutex['package_name'] = $packageName;
+            $newMutex['package_class'] = $packageClass;
             $newMutex['package_row_id'] = $packageRowId;
             $newMutex['account_id'] = $this->access->auth->account()['id'];
             if (static::$parentLock) {
@@ -163,7 +163,7 @@ class Mutex extends BasePackage
         }
     }
 
-    public function checkMutex($packageName, $packageRowId)
+    public function checkMutex($packageClass, $packageRowId)
     {
         if (!$this->access->auth->check()) {
             return false;
@@ -172,17 +172,17 @@ class Mutex extends BasePackage
         if ($this->config->databasetype === 'db') {
             $params =
                 [
-                    'conditions'    => 'package_name = :packageName: AND package_row_id = :packageRowId:',
+                    'conditions'    => 'package_class = :packageClass: AND package_row_id = :packageRowId:',
                     'bind'          =>
                         [
-                            'packageName'           => $packageName,
+                            'packageClass'          => $packageClass,
                             'packageRowId'          => $packageRowId
                         ]
                 ];
         } else {
             $params = [
                 'conditions' => [
-                    ['package_name', '=', $packageName],
+                    ['package_class', '=', $packageClass],
                     ['package_row_id', '=', $packageRowId]
                 ]
             ];

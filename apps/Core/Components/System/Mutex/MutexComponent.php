@@ -43,13 +43,13 @@ class MutexComponent extends BaseComponent
             $this->mutex,
             'system/mutex/view',
             null,
-            ['package_name', 'package_row_id', 'parent_lock_id', 'locked_at', 'account_id'],
+            ['package_class', 'package_row_id', 'parent_lock_id', 'locked_at', 'account_id'],
             false,
-            ['package_name', 'package_row_id', 'parent_lock_id', 'locked_at', 'account_id'],
+            ['package_class', 'package_row_id', 'parent_lock_id', 'locked_at', 'account_id'],
             null,
-            ['parent_lock_id' => 'Locked By', 'locked_at' => 'Locked At | Release At'],
+            ['parent_lock_id' => 'Locked By (Mutex ID)', 'locked_at' => 'Locked At | Release At'],
             $replaceColumns,
-            'package_name'
+            'package_row_id'
         );
 
         $this->view->pick('mutex/list');

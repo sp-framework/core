@@ -22,10 +22,10 @@ class Mutex
                         ]
                     ),
                     new Column(
-                        'package_name',
+                        'package_class',
                         [
                             'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 100,
+                            'size'          => 200,
                             'notNull'       => true
                         ]
                     ),
@@ -62,7 +62,7 @@ class Mutex
                     new Index(
                         'column_UNIQUE',
                         [
-                            'package_name',
+                            'package_class',
                             'package_row_id',
                             'account_id'
                         ],
@@ -79,7 +79,7 @@ class Mutex
             new Index(
                 'column_INDEX',
                 [
-                    'package_name',
+                    'package_class',
                     'package_row_id',
                     'account_id',
                     'parent_lock_id'
