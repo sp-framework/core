@@ -11,6 +11,7 @@ use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToWriteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use System\Base\BasePackage;
+use System\Base\Providers\CoreServiceProvider\Core;
 
 class BackupRestore extends BasePackage
 {
@@ -306,7 +307,8 @@ class BackupRestore extends BasePackage
                     $this->backupInfo['backupName'],
                     filesize(base_path('.backups/' . $this->backupInfo['backupName'])),
                     'application/zip',
-                    true
+                    true,
+                    ['package_class' => Core::class, 'package_row_id' => 1]
                 )
             ) {
                 $this->basepackages->storages->changeOrphanStatus(

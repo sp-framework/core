@@ -179,12 +179,12 @@ class Storages extends BasePackage
         return false;
     }
 
-    public function storeFile($type = null, $directory = null, $file = null, $fileName = null, $size = null, $mimeType = null, $addToDbOnly = false)
+    public function storeFile($type = null, $directory = null, $file = null, $fileName = null, $size = null, $mimeType = null, $addToDbOnly = false, $packageInfo = [])
     {
         $this->initStorage($this->checkPublic($type));
 
         if ($this->storage) {
-            if ($this->storage->store($directory, $file, $fileName, $size, $mimeType, $addToDbOnly)) {
+            if ($this->storage->store($directory, $file, $fileName, $size, $mimeType, $addToDbOnly, $packageInfo)) {
                 $storageData = $this->storage->packagesData->responseData['storageData'];
 
                 if ($addToDbOnly) {
@@ -339,7 +339,7 @@ class Storages extends BasePackage
         return $this->initStorage()->getPublicLink($uuid, $width);
     }
 
-    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null, $orgFileName = null, $like = false)
+    public function changeOrphanStatus($newUUID = null, $oldUUID = null, bool $array = false, $status = null, $orgFileName = null, $like = false)
     {
         return $this->initStorage()->changeOrphanStatus($newUUID, $oldUUID, $array, $status, $orgFileName, $like);
     }

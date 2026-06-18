@@ -53,7 +53,13 @@ class Dropzone
     protected function generateContent()
     {
         if (!isset($this->params['storage'])) {
-            throw new \Exception('storage information missing for dropzone.');
+            throw new \Exception('storage information missing.');
+        }
+        if (!isset($this->params['filePackageClass'])) {
+            throw new \Exception('file package class information missing.');
+        }
+        if (!isset($this->params['filePackageRowId'])) {
+            throw new \Exception('file package row id information missing.');
         }
 
         $this->fieldParams['fieldDropzoneLabel'] =
@@ -870,6 +876,8 @@ class Dropzone
                                         "storagetype"   : "' . $this->params['storage']['permission'] . '",
                                         "setOrphan"     : "' . $this->params['setOrphan'] . '",
                                         "isPointer"     : "' . $this->params['isPointer'] . '",
+                                        "package_class" : "' . $this->params['filePackageClass'] . '",
+                                        "package_row_id": "' . $this->params['filePackageRowId'] . '",
                                         "isBackupFile"  : "' . $this->params['isBackupFile'] . '"
                                     };
 

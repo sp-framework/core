@@ -225,6 +225,24 @@ class Single
             $initialsAvatar = '';
         }
 
+
+        $this->contactsParams['filePackageClass'] =
+            isset($this->params['contactPackageClass']) ?
+            $this->params['contactPackageClass'] :
+            '';
+
+        $this->contactsParams['filePackageRowId'] =
+            isset($this->params['contactPackageRowId']) ?
+            $this->params['contactPackageRowId'] :
+            '';
+
+        if ($this->contactsParams['filePackageClass'] === '') {
+            throw new \Exception('Set contactPackageClass for portrait');
+        }
+        if ($this->contactsParams['filePackageRowId'] === '') {
+            throw new \Exception('Set contactPackageRowId for portrait');
+        }
+
         $portrait .=
             $this->adminLTETags->useTag('fields',
                 [
@@ -245,7 +263,9 @@ class Single
                     'recover'                        => true,
                     'portraitLink'                   => $portraitLink,
                     'maxHeight'                      => $this->contactsParams['maxHeight'],
-                    'maxWidth'                       => $this->contactsParams['maxWidth']
+                    'maxWidth'                       => $this->contactsParams['maxWidth'],
+                    'filePackageClass'               => $this->contactsParams['filePackageClass'],
+                    'filePackageRowId'               => $this->contactsParams['filePackageRowId']
                 ]
             );
 

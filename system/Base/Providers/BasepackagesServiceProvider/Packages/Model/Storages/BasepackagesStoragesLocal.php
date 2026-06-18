@@ -37,4 +37,8 @@ class BasepackagesStoragesLocal extends BaseModel
     public $created;
 
     public $updated;
+
+    public $package_class;
+
+    public $package_row_id;
 }

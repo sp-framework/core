@@ -52,6 +52,13 @@ class Croppie
 
     protected function generateContent()
     {
+        if (!isset($this->params['filePackageClass'])) {
+            throw new \Exception('file package class information missing.');
+        }
+        if (!isset($this->params['filePackageRowId'])) {
+            throw new \Exception('file package row id information missing.');
+        }
+
         $this->fieldParams['fieldCroppieLabel'] =
             isset($this->params['fieldCroppieLabel']) ?
             $this->params['fieldCroppieLabel'] :
@@ -772,6 +779,8 @@ class Croppie
                                 formData.append("setOrphan", "' . $this->params['setOrphan'] . '");
                                 formData.append("fileName", avatarName);
                                 formData.append("storagetype", "' . $this->params['storageType'] . '");
+                                formData.append("package_class", "' . $this->params['filePackageClass'] . '");
+                                formData.append("package_row_id", "' . $this->params['filePackageRowId'] . '");
 
                                 performUpload(formData);
                             }
@@ -839,6 +848,8 @@ class Croppie
                                 formData.append("setOrphan", "' . $this->params['setOrphan'] . '");
                                 formData.append("fileName", imageName);
                                 formData.append("storagetype", "' . $this->params['storageType'] . '");
+                                formData.append("package_class", "' . $this->params['filePackageClass'] . '");
+                                formData.append("package_row_id", "' . $this->params['filePackageRowId'] . '");
                                 formData.append($("#security-token").attr("name"), $("#security-token").val());
 
                                 performUpload(formData);

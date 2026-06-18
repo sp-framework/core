@@ -157,7 +157,8 @@ class Core extends BasePackage
 				$this->backupInfo['backupName'],
 				filesize(base_path('.backupsdb/' . $this->backupInfo['backupName'])),
 				'application/zip',
-				true
+				true,
+				['package_class' => $this::class, 'package_row_id' => 1]
 			)
 		) {
 			$this->basepackages->storages->changeOrphanStatus(
@@ -635,7 +636,8 @@ class Core extends BasePackage
 				$this->backupInfo['backupName'],
 				filesize(base_path('.backupsff/' . $this->backupInfo['backupName'])),
 				'application/zip',
-				true
+				true,
+				['package_class' => $this::class, 'package_row_id' => 1]
 			)
 		) {
 			$this->basepackages->storages->changeOrphanStatus(

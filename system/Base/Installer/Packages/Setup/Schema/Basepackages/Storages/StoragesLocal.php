@@ -132,7 +132,22 @@ class StoragesLocal
                             'notNull' => true,
                             'default' => 'CURRENT_TIMESTAMP',
                         ]
-                    )
+                    ),
+                    new Column(
+                        'package_class',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 200,
+                            'notNull' => true
+                        ]
+                    ),
+                    new Column(//Source Row Id
+                        'package_row_id',
+                        [
+                            'type'    => Column::TYPE_INTEGER,
+                            'notNull' => true
+                        ]
+                    ),
                 ]
             ];
     }
@@ -145,7 +160,9 @@ class StoragesLocal
                 'column_INDEX',
                 [
                     'uuid',
-                    'orphan'
+                    'orphan',
+                    'package_class',
+                    'package_row_id'
                 ],
                 'INDEX'
             )

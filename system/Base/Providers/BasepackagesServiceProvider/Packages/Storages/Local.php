@@ -59,6 +59,8 @@ class Local extends BasePackage
 
     protected $maxImageSize;
 
+    protected $packageInfo;
+
     public function initLocal(array $storage)
     {
         $this->storage = $storage;
@@ -130,8 +132,10 @@ class Local extends BasePackage
         return $this;
     }
 
-    public function store($directory = null, $file = null, $fileName = null, $size = null, $mimeType = null, $addToDbOnly = false)
+    public function store($directory = null, $file = null, $fileName = null, $size = null, $mimeType = null, $addToDbOnly = false, $packageInfo = [])
     {
+        $this->packageInfo = $packageInfo;
+
         if (!$file && $addToDbOnly) {
             $this->directory = $directory;
 
@@ -164,6 +168,11 @@ class Local extends BasePackage
             $this->directory = $directory;
         } else {
             $this->directory = null;
+        }
+
+        if (isset($this->request->getPost()['package_class']) && isset($this->request->getPost()['package_row_id'])) {
+            $this->packageInfo['package_class'] = $this->request->getPost()['package_class'];
+            $this->packageInfo['package_row_id'] = (int) $this->request->getPost()['package_row_id'];
         }
 
         if ((isset($this->request->getPost()['isBackupFile']) && $this->request->getPost()['isBackupFile'] == 'true') ||
@@ -388,7 +397,9 @@ class Local extends BasePackage
                 'orphan'                => 1,
                 'is_pointer'            => $this->isPointer,
                 'created_by'            => $createdBy,
-                'updated_by'            => $updatedBy
+                'updated_by'            => $updatedBy,
+                'package_class'         => isset($this->packageInfo['package_class']) ? $this->packageInfo['package_class'] : 'unknown',
+                'package_row_id'        => isset($this->packageInfo['package_row_id']) ? (int) $this->packageInfo['package_row_id'] : 0
             ];
 
         $this->add($data);
