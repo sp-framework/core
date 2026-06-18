@@ -286,7 +286,7 @@ class ImportExport extends BasePackage
                 $size,
                 'text/csv',
                 false,
-                ['package_class' => $this::class, 'package_row_id' => $data['id']]
+                ['package_class' => str_replace('\\', '_', $this::class), 'package_row_id' => $data['id']]
             )
         ) {
             $this->basepackages->storages->changeOrphanStatus($this->basepackages->storages->packagesData->responseData['uuid']);

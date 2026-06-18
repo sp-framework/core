@@ -308,7 +308,7 @@ class BackupRestore extends BasePackage
                     filesize(base_path('.backups/' . $this->backupInfo['backupName'])),
                     'application/zip',
                     true,
-                    ['package_class' => Core::class, 'package_row_id' => 1]
+                    ['package_class' => str_replace('\\', '_', Core::class), 'package_row_id' => 1]
                 )
             ) {
                 $this->basepackages->storages->changeOrphanStatus(
