@@ -22,10 +22,10 @@ class ContactBook
                     ]
                 ),
                 new Column(
-                    'package_name',
+                    'package_class',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
+                        'size'    => 200,
                         'notNull' => true
                     ]
                 ),
@@ -176,7 +176,7 @@ class ContactBook
                     'column_UNIQUE',
                     [
                         'package_row_id',
-                        'package_name',
+                        'package_class',
                         'full_name'
                     ],
                     'UNIQUE'
@@ -193,7 +193,7 @@ class ContactBook
                 'column_INDEX',
                 [
                     'package_row_id',
-                    'package_name',
+                    'package_class',
                     'first_name',
                     'last_name',
                     'email',

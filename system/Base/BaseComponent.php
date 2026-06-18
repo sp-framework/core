@@ -447,13 +447,13 @@ abstract class BaseComponent extends Controller
 	//Modify Basepackages Addresses from any component
 	public function addressesAction()
 	{
-		if (!isset($this->postData()['package_name']) && !isset($this->postData()['package_row_id'])) {
+		if (!isset($this->postData()['package_class']) && !isset($this->postData()['package_row_id'])) {
 			$this->addResponse('Address package information missing', 1);
 
 			return;
 		}
 
-		if (isset($this->postData()['package_name']) && $this->postData()['package_name'] === '') {
+		if (isset($this->postData()['package_class']) && $this->postData()['package_class'] === '') {
 			$this->addResponse('Address package information missing', 1);
 
 			return;
@@ -488,7 +488,7 @@ abstract class BaseComponent extends Controller
 			if (count($this->postData()['address_ids']) > 0) {
 				foreach ($this->postData()['address_ids'] as $addressId => $address) {
 					if (isset($address['new']) && $address['new'] == 1) {
-						$address['package_name'] = $this->postData()['package_name'];
+						$address['package_class'] = $this->postData()['package_class'];
 						$address['package_row_id'] = (int) $this->postData()['package_row_id'];
 
 						$this->basepackages->addressbook->addAddress($address);
@@ -508,8 +508,8 @@ abstract class BaseComponent extends Controller
 		$addresses = [];
 
 		$addressesArr =
-			$this->basepackages->addressbook->getAddressesByPackageNameAndPackageRowId(
-				$this->postData()['package_name'], $this->postData()['package_row_id']
+			$this->basepackages->addressbook->getAddressesByPackageClassAndPackageRowId(
+				$this->postData()['package_class'], $this->postData()['package_row_id']
 			);
 
 		if ($addressesArr && count($addressesArr) > 0) {
@@ -524,13 +524,13 @@ abstract class BaseComponent extends Controller
 	//Modify Basepackages Contacts from any component
 	public function contactsAction()
 	{
-		if (!isset($this->postData()['package_name']) && !isset($this->postData()['package_row_id'])) {
+		if (!isset($this->postData()['package_class']) && !isset($this->postData()['package_row_id'])) {
 			$this->addResponse('Contact package information missing', 1);
 
 			return;
 		}
 
-		if (isset($this->postData()['package_name']) && $this->postData()['package_name'] === '') {
+		if (isset($this->postData()['package_class']) && $this->postData()['package_class'] === '') {
 			$this->addResponse('Contact package information missing', 1);
 
 			return;
@@ -549,7 +549,7 @@ abstract class BaseComponent extends Controller
 			if (count($this->postData()['contact_ids']) > 0) {
 				foreach ($this->postData()['contact_ids'] as $contactId => $contact) {
 					if (isset($contact['new']) && $contact['new'] == 1) {
-						$contact['package_name'] = $this->postData()['package_name'];
+						$contact['package_class'] = $this->postData()['package_class'];
 						$contact['package_row_id'] = (int) $this->postData()['package_row_id'];
 
 						if (isset($contact['first_name']) && isset($contact['last_name'])) {
@@ -597,8 +597,8 @@ abstract class BaseComponent extends Controller
 		$contacts = [];
 
 		$contactsArr =
-			$this->basepackages->contactbook->getContactsByPackageNameAndPackageRowId(
-				$this->postData()['package_name'], $this->postData()['package_row_id']
+			$this->basepackages->contactbook->getContactsByPackageClassAndPackageRowId(
+				$this->postData()['package_class'], $this->postData()['package_row_id']
 			);
 
 		if ($contactsArr && count($contactsArr) > 0) {

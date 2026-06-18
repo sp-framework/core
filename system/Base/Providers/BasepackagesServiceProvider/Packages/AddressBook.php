@@ -20,7 +20,7 @@ class AddressBook extends BasePackage
         if ($address) {
             unset($address['id']);
             unset($address['name']);
-            unset($address['package_name']);
+            unset($address['package_class']);
 
             return $address;
         }
@@ -61,15 +61,15 @@ class AddressBook extends BasePackage
         }
     }
 
-    public function getAddressesByPackageNameAndPackageRowId($packageName, $packageRowId)
+    public function getAddressesByPackageClassAndPackageRowId($packageClass, $packageRowId)
     {
         if ($this->config->databasetype === 'db') {
             $conditions =
                 [
-                    'conditions'    => 'package_name = :packageName: AND package_row_id = :packageRowId:',
+                    'conditions'    => 'package_class = :packageClass: AND package_row_id = :packageRowId:',
                     'bind'          =>
                         [
-                            'packageName'       => $packageName,
+                            'packageClass'      => $packageClass,
                             'packageRowId'      => $packageRowId
                         ]
                 ];
@@ -77,7 +77,7 @@ class AddressBook extends BasePackage
             $conditions =
                 [
                     'conditions'    => [
-                        ['package_name', '=', $packageName],
+                        ['package_class', '=', $packageClass],
                         ['package_row_id', '=', (int) $packageRowId]
                     ]
                 ];

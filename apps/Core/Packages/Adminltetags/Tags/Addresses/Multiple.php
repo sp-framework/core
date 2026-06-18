@@ -118,17 +118,17 @@ class Multiple
             '';
 
         if ($this->addressesParams['addressPostLink'] !== '') {
-            if (!isset($this->params['addressPackageName'])) {
-                throw new \Exception('addressPostLink requires addressPackageName');
+            if (!isset($this->params['addressPackageClass'])) {
+                throw new \Exception('addressPostLink requires addressPackageClass');
             }
             if (!isset($this->params['addressPackageRowId'])) {
                 throw new \Exception('addressPostLink requires addressPackageRowId');
             }
 
-            $this->addressesParams['addressPackageName'] = $this->params['addressPackageName'];
+            $this->addressesParams['addressPackageClass'] = $this->params['addressPackageClass'];
             $this->addressesParams['addressPackageRowId'] = $this->params['addressPackageRowId'];
         } else {
-            $this->addressesParams['addressPackageName'] = '';
+            $this->addressesParams['addressPackageClass'] = '';
             $this->addressesParams['addressPackageRowId'] = '';
         }
 
@@ -839,7 +839,7 @@ class Multiple
                             function postData() {
                                 var postData = { };
                                 postData[$("#security-token").attr("name")] = $("#security-token").val();
-                                postData["package_name"] = "' . $this->addressesParams['addressPackageName'] . '";
+                                postData["package_class"] = "' . $this->addressesParams['addressPackageClass'] . '";
                                 postData["package_row_id"] = "' . $this->addressesParams['addressPackageRowId'] . '";
                                 postData["address_ids"] = dataCollectionSection["data"]["address_ids"];
                                 postData["delete_address_ids"] = dataCollectionSection["data"]["delete_address_ids"];

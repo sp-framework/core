@@ -88,17 +88,17 @@ class Multiple
             '';
 
         if ($this->contactsParams['contactPostLink'] !== '') {
-            if (!isset($this->params['contactPackageName'])) {
-                throw new \Exception('contactPostLink requires contactPackageName');
+            if (!isset($this->params['contactPackageClass'])) {
+                throw new \Exception('contactPostLink requires contactPackageClass');
             }
             if (!isset($this->params['contactPackageRowId'])) {
                 throw new \Exception('contactPostLink requires contactPackageRowId');
             }
 
-            $this->contactsParams['contactPackageName'] = $this->params['contactPackageName'];
+            $this->contactsParams['contactPackageClass'] = $this->params['contactPackageClass'];
             $this->contactsParams['contactPackageRowId'] = $this->params['contactPackageRowId'];
         } else {
-            $this->contactsParams['contactPackageName'] = '';
+            $this->contactsParams['contactPackageClass'] = '';
             $this->contactsParams['contactPackageRowId'] = '';
         }
 
@@ -965,7 +965,7 @@ class Multiple
                             function postData() {
                                 var postData = { };
                                 postData[$("#security-token").attr("name")] = $("#security-token").val();
-                                postData["package_name"] = "' . $this->contactsParams['contactPackageName'] . '";
+                                postData["package_class"] = "' . $this->contactsParams['contactPackageClass'] . '";
                                 postData["package_row_id"] = "' . $this->contactsParams['contactPackageRowId'] . '";
                                 postData["contact_ids"] = dataCollectionSection["data"]["contact_ids"];
                                 postData["delete_contact_ids"] = dataCollectionSection["data"]["delete_contact_ids"];

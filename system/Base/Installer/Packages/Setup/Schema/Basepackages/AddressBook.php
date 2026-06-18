@@ -22,10 +22,10 @@ class AddressBook
                     ]
                 ),
                 new Column(
-                    'package_name',
+                    'package_class',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
+                        'size'    => 200,
                         'notNull' => true
                     ]
                 ),
@@ -158,7 +158,7 @@ class AddressBook
                     'column_UNIQUE',
                     [
                         'package_row_id',
-                        'package_name',
+                        'package_class',
                         'address_reference'
                     ],
                     'UNIQUE'
@@ -175,7 +175,7 @@ class AddressBook
                 'column_INDEX',
                 [
                     'package_row_id',
-                    'package_name',
+                    'package_class',
                     'address_reference'
                 ],
                 'INDEX'

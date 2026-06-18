@@ -20,7 +20,7 @@ class ContactBook extends BasePackage
         if ($contact) {
             unset($contact['id']);
             unset($contact['name']);
-            unset($contact['package_name']);
+            unset($contact['package_class']);
 
             return $contact;
         }
@@ -57,15 +57,15 @@ class ContactBook extends BasePackage
         }
     }
 
-    public function getContactsByPackageNameAndPackageRowId($packageName, $packageRowId)
+    public function getContactsByPackageClassAndPackageRowId($packageClass, $packageRowId)
     {
         if ($this->config->databasetype === 'db') {
             $conditions =
                 [
-                    'conditions'    => 'package_name = :packageName: AND package_row_id = :packageRowId:',
+                    'conditions'    => 'package_class = :packageClass: AND package_row_id = :packageRowId:',
                     'bind'          =>
                         [
-                            'packageName'       => $packageName,
+                            'packageClass'      => $packageClass,
                             'packageRowId'      => $packageRowId
                         ]
                 ];
@@ -73,7 +73,7 @@ class ContactBook extends BasePackage
             $conditions =
                 [
                     'conditions'    => [
-                        ['package_name', '=', $packageName],
+                        ['package_class', '=', $packageClass],
                         ['package_row_id', '=', (int) $packageRowId]
                     ]
                 ];
