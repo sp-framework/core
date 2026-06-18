@@ -8,7 +8,7 @@ class BasepackagesMutex extends BaseModel
 {
     public $id;
 
-    public $package_name;
+    public $package_class;
 
     public $package_row_id;
 
