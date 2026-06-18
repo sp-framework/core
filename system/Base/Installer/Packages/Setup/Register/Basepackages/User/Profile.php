@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\User;
 
 use LasseRafn\InitialAvatarGenerator\InitialAvatar;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profiles;
 
 class Profile
 {
@@ -21,7 +22,7 @@ class Profile
                 'first_name'            => 'System',
                 'last_name'             => 'Administrator',
                 'full_name'             => 'System Administrator',
-                'package_name'          => 'UsersProfiles',
+                'package_class'         => str_replace('\\', '_', Profiles::class),
                 'package_row_id'        => 1
             ];
 
@@ -41,7 +42,7 @@ class Profile
                 'state_name'            => null,
                 'country_id'            => null,
                 'country_name'          => null,
-                'package_name'          => 'UsersProfiles',
+                'package_class'         => str_replace('\\', '_', Profiles::class),
                 'package_row_id'        => 1
             ];
 

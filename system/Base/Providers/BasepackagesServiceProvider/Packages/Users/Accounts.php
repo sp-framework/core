@@ -14,6 +14,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accou
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profiles;
 
 class Accounts extends BasePackage
 {
@@ -81,12 +82,12 @@ class Accounts extends BasePackage
             }
 
             $account['profile'] = [];
-            if ($account['profile_package_name'] === 'UsersProfiles') {
+            if ($account['profile_package_class'] === str_replace('\\', '_', Profiles::class)) {
                 if ($this->model->getProfile()) {
                     $account['profile'] = $this->model->getProfile()->toArray();
                 }
             // } else {
-            //     $profilePackage = $this->modules->packages->getPackageByName($account['profile_package_name']);
+            //     $profilePackage = $this->modules->packages->getPackageByName($account['profile_package_class']);
 
             //     if ($profilePackage) {
             //         $profilePackageClass = new $profilePackage['class']();
@@ -124,8 +125,8 @@ class Accounts extends BasePackage
             return $account;
         } else {
             if ($this->ffData) {
-                // if ($this->ffData['profile_package_name'] !== 'UsersProfiles') {
-                //     $profilePackage = $this->modules->packages->getPackageByName($this->ffData['profile_package_name']);
+                // if ($this->ffData['profile_package_class'] !== str_replace('\\', '_', Profiles::class)) {
+                //     $profilePackage = $this->modules->packages->getPackageByName($this->ffData['profile_package_class']);
 
                 //     if ($profilePackage) {
                 //         $profilePackageClass = new $profilePackage['class']();
@@ -183,7 +184,7 @@ class Accounts extends BasePackage
         $account = $this->checkAccountBy($data['email']);
 
         if ($account) {
-            if (isset($data['profile_package_name']) && $data['profile_package_name'] !== 'UsersProfiles') {
+            if (isset($data['profile_package_class']) && $data['profile_package_class'] !== str_replace('\\', '_', Profiles::class)) {
                 $account = array_merge($account, $data);
 
                 $account['account_id'] = $account['id'];
@@ -212,8 +213,8 @@ class Accounts extends BasePackage
 
         $data['password_set_on'] = time();
 
-        if (!isset($data['profile_package_name'])) {
-            $data['profile_package_name'] = 'UsersProfiles';
+        if (!isset($data['profile_package_class'])) {
+            $data['profile_package_class'] = str_replace('\\', '_', Profiles::class);
         }
         if (!isset($data['profile_package_row_id'])) {
             $data['profile_package_row_id'] = '0';
@@ -230,7 +231,7 @@ class Accounts extends BasePackage
 
             $this->basepackages->profiles->addProfile($data);
 
-            if ($data['profile_package_name'] === 'UsersProfiles') {
+            if ($data['profile_package_class'] === str_replace('\\', '_', Profiles::class)) {
                 $data['profile_package_row_id'] = $this->basepackages->profiles->packagesData->last['id'];
 
                 $this->update($data);
@@ -332,13 +333,13 @@ class Accounts extends BasePackage
             $data['twofa_otp_secret'] = null;
         }
 
-        if (!isset($data['profile_package_name']) ||
-            $data['profile_package_name'] === ''
+        if (!isset($data['profile_package_class']) ||
+            $data['profile_package_class'] === ''
         ) {
-            if (isset($account['profile_package_name'])) {
-                $data['profile_package_name'] = $account['profile_package_name'];
+            if (isset($account['profile_package_class'])) {
+                $data['profile_package_class'] = $account['profile_package_class'];
             } else {
-                $data['profile_package_name'] = 'UsersProfiles';
+                $data['profile_package_class'] = str_replace('\\', '_', Profiles::class);
             }
         }
         if (!isset($data['profile_package_row_id'])) {
@@ -358,7 +359,7 @@ class Accounts extends BasePackage
                 $this->emailNewPassword($data['email'], $password);
             }
 
-            if ($data['profile_package_name'] === 'UsersProfiles') {
+            if ($data['profile_package_class'] === str_replace('\\', '_', Profiles::class)) {
                 $this->basepackages->profiles->updateProfileViaAccount($data);
             }
 
@@ -466,6 +467,9 @@ class Accounts extends BasePackage
         $data['override_role'] = '0';
         $data['permissions'] = $this->helper->encode([]);
         $data['force_pwreset'] = '1';
+        $data['status'] = '1';
+        $data['profile_package_class'] = str_replace('\\', '_', Profiles::class);
+        $data['profile_package_row_id'] = '0';
         $data['status'] = '1';
 
         $data['email'] = strtolower($data['email']);

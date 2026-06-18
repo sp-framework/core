@@ -30,7 +30,7 @@ class BasepackagesUsersAccounts extends BaseModel
 
     public $domain;
 
-    public $profile_package_name;
+    public $profile_package_class;
 
     public $profile_package_row_id;
 

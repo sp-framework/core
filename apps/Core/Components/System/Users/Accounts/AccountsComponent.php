@@ -7,6 +7,7 @@ use Apps\Core\Packages\Business\Directory\Contacts\Contacts;
 use Apps\Core\Packages\Crms\Customers\Customers;
 use Apps\Core\Packages\Hrms\Employees\Employees;
 use System\Base\BaseComponent;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profiles;
 
 class AccountsComponent extends BaseComponent
 {
@@ -125,11 +126,11 @@ class AccountsComponent extends BaseComponent
             $this->accounts,
             'system/users/accounts/view',
             null,
-            ['profile_package_row_id', 'status', 'email', 'username', 'role_id', 'first_name', 'last_name', 'profile_package_name'],
+            ['profile_package_row_id', 'status', 'email', 'username', 'role_id', 'first_name', 'last_name', 'profile_package_class'],
             true,
             ['status', 'email', 'username', 'role_id', 'first_name', 'last_name'],
             $controlActions,
-            ['role_id' => 'role (ID)', 'profile_package_name' => 'Used By', 'profile_package_row_id' => 'link'],
+            ['role_id' => 'role (ID)', 'profile_package_class' => 'Used By', 'profile_package_row_id' => 'link'],
             $replaceColumns,
             'email'
         );
@@ -182,9 +183,9 @@ class AccountsComponent extends BaseComponent
         $profile = null;
         $componentRoute = null;
 
-        $profilePackage = $this->modules->packages->getPackageByName($data['profile_package_name']);
+        $profilePackage = $this->modules->packages->getPackageByClass(str_replace('_', '\\', $data['profile_package_class']));
 
-        if ($data['profile_package_name'] === 'UsersProfiles') {
+        if ($data['profile_package_class'] === str_replace('\\', '_', Profiles::class)) {
             $profile = $this->basepackages->profiles->getById($data['profile_package_row_id']);
         } else if ($profilePackage) {
             try {
@@ -196,17 +197,21 @@ class AccountsComponent extends BaseComponent
             }
         }
 
-        if ($data['profile_package_name'] === 'UsersProfiles' &&
-            $profilePackage
-        ) {
-            if (isset($profilePackage['settings']) &&
-                is_string($profilePackage['settings'])
-            ) {
-                $profilePackage['settings'] = $this->helper->decode($profilePackage['settings'], true);
-            }
+        $profilePackageClassArr = explode('_', $data['profile_package_class']);
 
-            if (isset($profilePackage['settings']['componentRoute'])) {
-                $componentRoute = $profilePackage['settings']['componentRoute'];
+        if ($profilePackage) {
+            if ($data['profile_package_class'] === str_replace('\\', '_', Profiles::class) ||
+                strtolower($profilePackageClassArr[1]) === $this->apps->getAppInfo()['app_type']
+            ) {
+                if (isset($profilePackage['settings']) &&
+                    is_string($profilePackage['settings'])
+                ) {
+                    $profilePackage['settings'] = $this->helper->decode($profilePackage['settings'], true);
+                }
+
+                if (isset($profilePackage['settings']['componentRoute'])) {
+                    $componentRoute = $profilePackage['settings']['componentRoute'];
+                }
             }
         }
 
@@ -219,6 +224,12 @@ class AccountsComponent extends BaseComponent
             }
         } else {
             $data['profile_package_row_id'] = '-';
+        }
+
+        if ($data['profile_package_class'] === str_replace('\\', '_', Profiles::class)) {
+            $data['profile_package_class'] = 'Profiles';
+        } else {
+            $data['profile_package_class'] = $profilePackageClassArr[1] . $this->helper->last($profilePackageClassArr);
         }
 
         return $data;

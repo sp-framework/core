@@ -53,10 +53,10 @@ class Accounts
                         ]
                     ),
                     new Column(
-                        'profile_package_name',
+                        'profile_package_class',
                         [
                             'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 100,
+                            'size'          => 200,
                             'notNull'       => true
                         ]
                     ),

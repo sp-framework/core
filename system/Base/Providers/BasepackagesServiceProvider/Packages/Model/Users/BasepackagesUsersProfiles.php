@@ -6,6 +6,7 @@ use System\Base\BaseModel;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesContactBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profiles;
 
 class BasepackagesUsersProfiles extends BaseModel
 {
@@ -39,9 +40,9 @@ class BasepackagesUsersProfiles extends BaseModel
             [
                 'alias'                 => 'contact',
                 'params'                => [
-                    'conditions'        => 'package_name = :package_name:',
+                    'conditions'        => 'package_class = :package_class:',
                     'bind'              => [
-                        'package_name'  => 'UsersProfiles'
+                        'package_class'  => str_replace('\\', '_', Profiles::class)
                     ]
                 ]
             ]
@@ -54,9 +55,9 @@ class BasepackagesUsersProfiles extends BaseModel
             [
                 'alias'                 => 'addresses',
                 'params'                => [
-                    'conditions'        => 'package_name = :package_name:',
+                    'conditions'        => 'package_class = :package_class:',
                     'bind'              => [
-                        'package_name'  => 'UsersProfiles'
+                        'package_class'  => str_replace('\\', '_', Profiles::class)
                     ]
                 ]
             ]

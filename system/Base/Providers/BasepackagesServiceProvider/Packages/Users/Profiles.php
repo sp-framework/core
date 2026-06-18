@@ -80,7 +80,7 @@ class Profiles extends BasePackage
             }
         } else {
             $this->setFFRelations(true);
-            $this->setFFRelationsConditions(['addresses' => ['package_name', '=', 'UsersProfiles'], 'contact' => ['package_name', '=', 'UsersProfiles']]);
+            $this->setFFRelationsConditions(['addresses' => ['package_class', '=', str_replace('\\', '_', $this::class)], 'contact' => ['package_class', '=', str_replace('\\', '_', $this::class)]]);
 
             $profile = $this->getFirst('account_id', $accountId, false, true, null, [], true);
 
@@ -154,7 +154,7 @@ class Profiles extends BasePackage
 
         $contact = $profile['contact'];
 
-        $contact['package_name'] = 'UsersProfiles';
+        $contact['package_class'] = str_replace('\\', '_', $this::class);
 
         $contact['package_row_id'] = $profile['id'];
 
@@ -218,7 +218,7 @@ class Profiles extends BasePackage
 
         $contact = $profile['contact'];
 
-        $contact['package_name'] = 'UsersProfiles';
+        $contact['package_class'] = str_replace('\\', '_', $this::class);
 
         $contact['package_row_id'] = $profile['id'];
 
@@ -248,7 +248,7 @@ class Profiles extends BasePackage
             if (count($data['address_ids']) > 0) {
                 foreach ($data['address_ids'] as $addressId => $address) {
                     if (isset($address['new']) && $address['new'] == 1) {
-                        $address['package_name'] = 'UsersProfiles';
+                        $address['package_class'] = str_replace('\\', '_', $this::class);
                         $address['package_row_id'] = $profile['id'];
 
                         $this->basepackages->addressbook->addAddress($address);
@@ -315,7 +315,7 @@ class Profiles extends BasePackage
     protected function addProfileContact($data)
     {
         $contact = [];
-        $contact['package_name'] = 'UsersProfiles';
+        $contact['package_class'] = str_replace('\\', '_', $this::class);
         $contact['package_row_id'] = $data['id'];
         $contact['portrait'] = '';
         $contact['initials_avatar'] = json_encode($this->generateInitialsAvatar($data));
@@ -352,7 +352,7 @@ class Profiles extends BasePackage
         $address['state_name']          = '';
         $address['country_id']          = null;
         $address['country_name']        = '';
-        $address['package_name']        = 'UsersProfiles';
+        $address['package_class']        = str_replace('\\', '_', $this::class);
         $address['package_row_id']      = $this->packagesData->last['id'];
 
         return $this->basepackages->addressbook->addAddress($address);

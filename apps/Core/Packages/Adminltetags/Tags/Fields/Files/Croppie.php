@@ -781,6 +781,7 @@ class Croppie
                                 formData.append("storagetype", "' . $this->params['storageType'] . '");
                                 formData.append("package_class", "' . $this->params['filePackageClass'] . '");
                                 formData.append("package_row_id", "' . $this->params['filePackageRowId'] . '");
+                                formData.append($("#security-token").attr("name"), $("#security-token").val());
 
                                 performUpload(formData);
                             }

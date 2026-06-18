@@ -2,6 +2,8 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Basepackages\User;
 
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profiles;
+
 class Account
 {
     public function register($db, $ff, $email, $password, $helper)
@@ -12,7 +14,7 @@ class Account
                 'email'                     => $email,
                 'username'                  => explode('@', $email)[0],
                 'domain'                    => explode('@', $email)[1],
-                'profile_package_name'      => 'UsersProfiles',
+                'profile_package_class'     => str_replace('\\', '_', Profiles::class),
                 'profile_package_row_id'    => 1
             ];
 

@@ -1,11 +1,11 @@
 <div class="row vdivide">
     <div class="col-md-3 col-sm-12">
-        {% if profile['contact']['portrait'] is defined and profile['contact']['portrait'] !== '' %}
+        {% if profile['contact']['portrait'] is defined and profile['contact']['portrait'] != '' %}
             {% set portraitLink = links.url('system/storages/q/uuid/' ~ profile['contact']['portrait'] ~ '/w/200') %}
         {% else %}
             {% set portraitLink = '' %}
         {% endif %}
-        {% if profile['contact']['initials_avatar']['large'] is defined and profile['contact']['initials_avatar']['large'] !== '' %}
+        {% if profile['contact']['initials_avatar']['large'] is defined and profile['contact']['initials_avatar']['large'] != '' %}
             {% set initialsAvatar = profile['contact']['initials_avatar'] %}
         {% else %}
             {% set initialsAvatar = '' %}
@@ -27,7 +27,9 @@
                 'avatar'                         : true,
                 'remove'                         : true,
                 'recover'                        : true,
-                'portraitLink'                   : portraitLink
+                'portraitLink'                   : portraitLink,
+                'filePackageClass'               : 'System_Base_Providers_BasepackagesServiceProvider_Packages_Users_Profiles',
+                'filePackageRowId'               : profile['id']
             ]
         )}}
     </div>
