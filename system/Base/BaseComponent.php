@@ -694,7 +694,7 @@ abstract class BaseComponent extends Controller
 				return false;
 			}
 
-			$package = $this->modules->packages->getPackageByName($this->postData()['packageName']);
+			$package = $this->modules->packages->getPackageByClass(str_replace('_', '\\', $this->postData()['packageClass']));
 
 			if ($package) {
 				$this->alPackage['package'] = $this->usePackage($package['class']);

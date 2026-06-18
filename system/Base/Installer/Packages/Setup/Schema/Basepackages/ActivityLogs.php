@@ -44,10 +44,10 @@ class ActivityLogs
                         ]
                     ),
                     new Column(
-                        'package_name',
+                        'package_class',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 100,
+                            'size'    => 200,
                             'notNull' => true
                         ]
                     ),
@@ -77,7 +77,7 @@ class ActivityLogs
                 'column_INDEX',
                 [
                     'package_row_id',
-                    'package_name',
+                    'package_class',
                     'activity_type',
                     'account_id'
                 ],

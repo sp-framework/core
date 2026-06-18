@@ -2241,16 +2241,16 @@ abstract class BasePackage extends Controller
 			}
 		}
 
-		return $this->basepackages->activityLogs->addLog($this->packageName, $data, $oldData);
+		return $this->basepackages->activityLogs->addLog(str_replace('\\', '_', $this::class), $data, $oldData);
 	}
 
-	public function getActivityLogs(int $id, $postLink, $newFirst = true, $page = 1, $packageName = null)
+	public function getActivityLogs(int $id, $postLink, $newFirst = true, $page = 1, $packageClass = null)
 	{
-		if ($packageName) {
-			return $this->basepackages->activityLogs->getLogs($packageName, $id, $postLink, $newFirst, $page);
+		if ($packageClass) {
+			return $this->basepackages->activityLogs->getLogs($packageClass, $id, $postLink, $newFirst, $page);
 		}
 
-		return $this->basepackages->activityLogs->getLogs($this->packageName, $id, $postLink, $newFirst, $page);
+		return $this->basepackages->activityLogs->getLogs(str_replace('\\', '_', $this::class), $id, $postLink, $newFirst, $page);
 	}
 
 	public function getNotes(int $id, $newFirst = true, $page = 1, $packageName = null)

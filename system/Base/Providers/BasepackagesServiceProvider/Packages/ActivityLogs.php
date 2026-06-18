@@ -22,22 +22,22 @@ class ActivityLogs extends BasePackage
         return $this;
     }
 
-    public function addLog($packageName, array $data, array $oldData = null)
+    public function addLog($packageClass, array $data, array $oldData = null)
     {
         $dataId = $data['id'];
         unset($data['id']);
 
         $data = $this->removeSessionToken($data);
-        if (isset($data['package_name'])) {
-            unset($data['package_name']);
+        if (isset($data['package_class'])) {
+            unset($data['package_class']);
         }
 
         if ($oldData) {
             if (isset($oldData['id'])) {
                 unset($oldData['id']);
             }
-            if (isset($oldData['package_name'])) {
-                unset($oldData['package_name']);
+            if (isset($oldData['package_class'])) {
+                unset($oldData['package_class']);
             }
 
             $activityData = $this->getDifference($this->jsonData($data), $this->jsonData($oldData));
@@ -47,7 +47,7 @@ class ActivityLogs extends BasePackage
             }
 
             //Check if there are any logs from before, if not, we change from type UPDATE to type ADD
-            $this->getLogs(packageName: $packageName, packageRowId: $dataId, getCount: true);
+            $this->getLogs(packageClass: $packageClass, packageRowId: $dataId, getCount: true);
 
             if (isset($this->packagesData->paginationCounters['total_items']) && $this->packagesData->paginationCounters['total_items'] > 0) {
                 $log['activity_type'] = self::ACTIVITY_TYPE_UPDATE;
@@ -80,7 +80,7 @@ class ActivityLogs extends BasePackage
             }
         }
 
-        $log['package_name'] = $packageName;
+        $log['package_class'] = $packageClass;
 
         $log['package_row_id'] = $dataId;
 
@@ -97,7 +97,7 @@ class ActivityLogs extends BasePackage
         }
     }
 
-    public function getLogs($packageName, int $packageRowId, $postLink = null, bool $newFirst = true, $page = 1, $getCount = false)
+    public function getLogs($packageClass, int $packageRowId, $postLink = null, bool $newFirst = true, $page = 1, $getCount = false)
     {
         $logsArr = [];
 
@@ -109,7 +109,7 @@ class ActivityLogs extends BasePackage
 
         $pagedLogs = $this->getPaged(
             [
-                'conditions'    => '-|package_name|equals|' . $packageName . '&and|package_row_id|equals|' . $packageRowId . '&',
+                'conditions'    => '-|package_class|equals|' . $packageClass . '&and|package_row_id|equals|' . $packageRowId . '&',
                 'order'         => $order,
                 'limit'         => 5,
                 'page'          => $page
@@ -129,7 +129,7 @@ class ActivityLogs extends BasePackage
         if (count($logsArr['data']) > 0) {
             foreach ($logsArr['data'] as $key => &$log) {
                 unset($log['id']);
-                unset($log['package_name']);
+                unset($log['package_class']);
                 unset($log['package_row_id']);
 
                 if ($log['account_id'] != 0) {
@@ -167,7 +167,7 @@ class ActivityLogs extends BasePackage
 
             $logsArr['postLink'] = $postLink;
             $logsArr['id'] = $packageRowId;
-            $logsArr['packageName'] = $packageName;
+            $logsArr['packageClass'] = $packageClass;
             $logsArr['postLink'] = $postLink;
         }
 

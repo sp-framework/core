@@ -214,7 +214,7 @@ class Activitylogs extends Adminltetags
                     var postData = { };
                     postData[$("#security-token").attr("name")] = $("#security-token").val();
                     postData["id"] = ' . $this->params['activityLogs']['id'] . ';
-                    postData["packageName"] = "' . $this->params['activityLogs']['packageName'] . '";
+                    postData["packageClass"] = "' . $this->params['activityLogs']['packageClass'] . '";
                     postData["postLink"] = "' . $this->params['activityLogs']['postLink'] . '";
 
                     if ($(this).is(".activity-logs-previous")) {
