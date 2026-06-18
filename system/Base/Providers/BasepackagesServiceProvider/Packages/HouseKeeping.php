@@ -26,8 +26,11 @@ class HouseKeeping extends BasePackage
 
     protected function cleanStorageOrphans()
     {
-        //Sync database entries with physical entries.
-        //If entry is in db and file dont exist, remove from DB and vice versa.
+        //We remove orphans that are marked by the developer
+        //If in case a developer misses a reference and the file db entry gets stuck (not marked as orphan but the reference is deleted)
+        //We scan for the referring entry and if it does not exists, we delete it.
+        //In case there are multiple file entries pointing to the same referring entry, we cross check the UUID in the referring db entry.
+        //If the entry does not match, we remove the file entry.
         $storages = $this->basepackages->storages->getAll()->storages;
 
         if ($storages && count($storages) > 0) {
@@ -41,12 +44,29 @@ class HouseKeeping extends BasePackage
 
                     if ($files) {
                         foreach ($files as $file) {
-                            if ($file['is_pointer']) {
-                                continue;
-                            }
-
-                            if ($file['orphan']) {
+                            if ($file['orphan']) {//If file is orphan, we remove
                                 $this->basepackages->storages->removeFile($file['uuid'], $storage['permission'], true);
+                            } else {//else we check if the package row id exists and remove if package row id does not exists.
+                                try {
+                                    $packageClass = str_replace('_', '\\', $file['package_class']);
+
+                                    $packageClass = new $packageClass;
+
+                                    $packageRow = $packageClass->getById($file['package_row_id']);
+
+                                    if ($packageRow) {
+                                        //Find UUID in package row information
+                                        $key = recursive_array_search($file['uuid'], $packageRow);
+
+                                        if (!$key) {
+                                            $this->basepackages->storages->removeFile($file['uuid'], $storage['permission'], true);
+                                        }
+                                    } else {
+                                        $this->basepackages->storages->removeFile($file['uuid'], $storage['permission'], true);
+                                    }
+                                } catch (\throwable $e) {
+                                    $this->basepackages->storages->removeFile($file['uuid'], $storage['permission'], true);
+                                }
                             }
                         }
                     }
