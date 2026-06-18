@@ -225,6 +225,11 @@ class Single
             $initialsAvatar = '';
         }
 
+        if (isset($this->params['setOrphan']) && $this->params['setOrphan'] === false) {
+            $this->contactsParams['setOrphan'] = 'false';
+        } else {
+            $this->contactsParams['setOrphan'] = 'true';
+        }
 
         $this->contactsParams['filePackageClass'] =
             isset($this->params['contactPackageClass']) ?
@@ -261,6 +266,7 @@ class Single
                     'avatar'                         => true,
                     'remove'                         => true,
                     'recover'                        => true,
+                    'setOrphan'                      => $this->contactsParams['setOrphan'],
                     'portraitLink'                   => $portraitLink,
                     'maxHeight'                      => $this->contactsParams['maxHeight'],
                     'maxWidth'                       => $this->contactsParams['maxWidth'],

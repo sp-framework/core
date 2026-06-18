@@ -559,10 +559,23 @@ abstract class BaseComponent extends Controller
 						}
 
 						$this->basepackages->contactbook->addContact($contact);
+
+						if ($contact['portrait'] !== '') {
+							$this->basepackages->storages->changeOrphanStatus(newUUID : $contact['portrait'], status: 0);
+						}
 					} else {
 						$dbContact = $this->basepackages->contactbook->getById($contactId);
 
 						if ($dbContact) {
+							$oldPortrait = null;
+							$newPortrait = null;
+							if ($dbContact['portrait'] !== '') {
+								$oldPortrait = $dbContact['portrait'];
+							}
+							if ($this->postData()['contact_ids'][$contactId]['portrait'] !== '') {
+								$newPortrait = $this->postData()['contact_ids'][$contactId]['portrait'];
+							}
+
 							$dbContact = array_merge($dbContact, $this->postData()['contact_ids'][$contactId]);
 
 							if (isset($dbContact['first_name']) && isset($dbContact['last_name'])) {
@@ -572,6 +585,10 @@ abstract class BaseComponent extends Controller
 							}
 
 							$this->basepackages->contactbook->updateContact($dbContact);
+
+							if ($this->postData()['contact_ids'][$contactId]['portrait'] !== '') {
+								$this->basepackages->storages->changeOrphanStatus(newUUID : $newPortrait, oldUUID: $oldPortrait, status: 0);
+							}
 						}
 					}
 				}
@@ -589,6 +606,10 @@ abstract class BaseComponent extends Controller
 
 					if ($dbContact) {
 						$this->basepackages->contactbook->removeContact($dbContact);
+
+						if ($dbContact['portrait'] !== '') {
+							$this->basepackages->storages->changeOrphanStatus(oldUUID : $dbContact['portrait'], status: 1);
+						}
 					}
 				}
 			}
