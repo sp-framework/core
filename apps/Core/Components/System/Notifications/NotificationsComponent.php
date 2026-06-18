@@ -171,7 +171,7 @@ class NotificationsComponent extends BaseComponent
             $link = '#';
 
             if (array_key_exists(strtolower($data['package_name']), $this->packageLinks())) {
-                $link = $this->links->url($this->packageLinks()[$data['package_name']] . '/q/id/' . $data['package_row_id']);
+                $link = $this->links->url($this->packageLinks()[strtolower($data['package_name'])] . '/q/id/' . $data['package_row_id']);
             } else if ($key = array_search(strtolower($data['package_name']), $this->packageLinks())) {
                 $link = $this->links->url($this->packageLinks()[$key] . '/q/id/' . $data['package_row_id']);
             }
