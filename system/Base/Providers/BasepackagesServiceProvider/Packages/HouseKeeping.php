@@ -2,7 +2,10 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
+use League\Flysystem\UnableToCheckExistence;
+use League\Flysystem\UnableToDeleteFile;
 use System\Base\BasePackage;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
 
 class HouseKeeping extends BasePackage
 {
@@ -173,6 +176,63 @@ class HouseKeeping extends BasePackage
                     $this->basepackages->tags->remove($tag['id']);
 
                     $clearedEntries[$tagKey] = ['package_class' => $tag['package_class'], 'package_row_ids' => $tag['package_row_ids'], 'reason' => $e->getMessage()];
+                }
+            }
+        }
+
+        return ['totalEntries' => $totalEntries, 'clearedEntries' => $clearedEntries];
+    }
+
+    protected function cleanStaleSessions()
+    {
+        //Check session entries in DB and session entries in the var/cache/session directory. Clean old stale sessions.
+        $sessionModel = new BasepackagesUsersAccountsSessions;
+
+        if ($this->config->databasetype === 'db') {
+            $sessions = $sessionModel::findAll();
+        } else {
+            $sessionStore = $this->ff->store($sessionModel->getSource());
+
+            $sessions = $sessionStore->findAll();
+        }
+
+        $totalEntries = 0;
+        $clearedEntries = [];
+
+        if ($sessions && count($sessions) > 0) {
+            $totalEntries = count($sessions);
+
+            $now = (\Carbon\Carbon::now())->timestamp;
+
+            foreach ($sessions as $session) {
+                $remove = false;
+
+                if ($now > $session['session_absolute_timeout']) {
+                    $clearedEntries[$session['session_id']] = ['reason' => 'Absolute timeout!'];
+
+                    $remove = true;
+                } else if ($now > $session['session_idle_timeout']) {
+                    $clearedEntries[$session['session_id']] = ['reason' => 'Idle timeout!'];
+
+                    $remove = true;
+                }
+
+                if ($remove) {
+                    try {
+                        if ($this->localContent->fileExists('var/storage/cache/session/' . $session['session_id'])) {
+                            $this->localContent->delete('var/storage/cache/session/' . $session['session_id']);
+                        }
+
+                        if ($this->config->databasetype === 'db') {
+                            $sessionModel::findFirst(['id = ' . $session['id']]);
+
+                            $sessionModel->delete();
+                        } else {
+                            $sessionStore->deleteById((int) $session['id']);
+                        }
+                    } catch (\throwable | UnableToCheckExistence | UnableToDeleteFile $e) {
+                        //Do Nothing
+                    }
                 }
             }
         }
