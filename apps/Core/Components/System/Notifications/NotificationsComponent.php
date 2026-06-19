@@ -52,6 +52,17 @@ class NotificationsComponent extends BaseComponent
                 return $dataArr;
             };
 
+        $quickFilterConditions = function() {
+            if (str_contains($this->postData()['conditions'], 'account_id')) {
+                throw new \Exception('Cannot access other users data!');
+            }
+
+            return
+                str_replace(
+                    '-|', '-|app_id|equals|' . $this->apps->getAppInfo()['id'] . '&and|account_id|equals|' . $this->access->auth->account()['id'] . '&and|' , $this->postData()['conditions']
+                );
+        };
+
         $this->generateDTContent(
             $this->notifications,
             'system/notifications/view',
@@ -75,7 +86,10 @@ class NotificationsComponent extends BaseComponent
             false,
             null,
             false,
-            false
+            false,
+            [],
+            [],
+            $quickFilterConditions
         );
 
         $this->view->pick('notifications/list');

@@ -589,40 +589,54 @@ abstract class BasePackage extends Controller
 
 	public function getPaged(array $params = [], bool $resetCache = false, bool $enableCache = true, $arrayData = false)
 	{
+		if (isset($this->postData()['resetCache']) && $this->postData()['resetCache'] == 'true') {
+			$resetCache = true;
+		}
+
 		//Empty columns causes SQL error :APL0:
 		if (isset($params['columns']) && count($params['columns']) === 0) {
 			unset($params['columns']);
 		}
 
-		if (isset($this->postData()['page'])) {
-			$pageParams['currentPage'] = (int) $this->postData()['page'];
-		} else if (isset($params['page'])) {
-			$pageParams['currentPage'] = $params['page'];
-		} else {
-			$pageParams['currentPage'] = 1;
+		if (isset($this->postData()['filter'])) {
+			$filter = $this->basepackages->filters->getById((int) $this->postData()['filter']);
+
+			if ($filter) {
+				$params['conditions'] = $filter['conditions'];
+			}
 		}
 
-		if (isset($this->postData()['conditions'])) {
-			$pageParams['conditions'] = $this->postData()['conditions'];
-		} else if (isset($params['conditions'])) {
+		if (isset($params['conditions'])) {
 			$pageParams['conditions'] = $params['conditions'];
 		} else {
 			$pageParams['conditions'] = '';
 		}
 
-		if (isset($this->postData()['limit'])) {
-			$pageParams['limit'] = (int) $this->postData()['limit'];
-		} else if (isset($params['limit'])) {
+		if (isset($params['page'])) {
+			$pageParams['currentPage'] = $params['page'];
+		} else if (isset($this->postData()['page'])) {
+			$pageParams['currentPage'] = (int) $this->postData()['page'];
+		} else {
+			$pageParams['currentPage'] = 1;
+		}
+
+		if (isset($params['limit'])) {
 			$pageParams['limit'] = $params['limit'];
+		} else if (isset($this->postData()['limit'])) {
+			$pageParams['limit'] = (int) $this->postData()['limit'];
 		} else {
 			$pageParams['limit'] = 20;
 		}
 
-		if (isset($this->postData()['resetCache']) && $this->postData()['resetCache'] == 'true') {
-			$resetCache = true;
-		}
-
-		if (isset($this->postData()['order']) &&
+		if (isset($params['order'])) {
+			$params =
+				array_merge(
+					$params,
+					[
+						'order'	=> $params['order']
+					]
+				);
+		} else if (isset($this->postData()['order']) &&
 			$this->postData()['order'] !== ''
 		) {
 			$params =
@@ -630,14 +644,6 @@ abstract class BasePackage extends Controller
 					$params,
 					[
 						'order'	=> $this->postData()['order']
-					]
-				);
-		} else if (isset($params['order'])) {
-			$params =
-				array_merge(
-					$params,
-					[
-						'order'	=> $params['order']
 					]
 				);
 		} else {
@@ -670,9 +676,12 @@ abstract class BasePackage extends Controller
 		if ($this->access->auth->check()) {
 			if ($this->request->isPost() &&
 				(count($this->postData()) === 0 ||
-				(!isset($this->postData()['page']) && !isset($this->postData()['limit']) && !isset($this->postData()['conditions'])))
+				 (!isset($this->postData()['page']) && !isset($this->postData()['limit']) &&
+				  !isset($this->postData()['filter']) && !isset($this->postData()['quick_filter'])
+				 )
+				)
 			) {
-				$envParams = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], false, true);
+				$envParams = $this->basepackages->accounts->checkEnv($this->access->auth->account()['id']);
 
 				if ($envParams) {
 					if (isset($envParams['params'])) {
@@ -686,7 +695,7 @@ abstract class BasePackage extends Controller
 			}
 
 			//Add to Users Env
-			$this->basepackages->accounts->checkUpdateEnv($this->access->auth->account['id'], ['params' => $params, 'pageParams' => $pageParams]);
+			$this->basepackages->accounts->updateEnv($this->access->auth->account['id'], ['params' => $params, 'pageParams' => $pageParams]);
 		}
 
 		if (!$arrayData && isset($pageParams)) {
@@ -2253,14 +2262,14 @@ abstract class BasePackage extends Controller
 		return $this->basepackages->activityLogs->getLogs(str_replace('\\', '_', $this::class), $id, $postLink, $newFirst, $page);
 	}
 
-	public function getNotes(int $id, $newFirst = true, $page = 1, $packageName = null)
-	{
-		if ($packageName) {
-			return $this->basepackages->notes->getNotes($packageName, $id, $newFirst, $page);
-		}
+	// public function getNotesLogs(int $id, $newFirst = true, $page = 1, $packageName = null)
+	// {
+	// 	if ($packageName) {
+	// 		return $this->basepackages->notes->getNotes($packageName, $id, $newFirst, $page);
+	// 	}
 
-		return $this->basepackages->notes->getNotes($this->packageName, $id, $newFirst, $page);
-	}
+	// 	return $this->basepackages->notes->getNotes($this->packageName, $id, $newFirst, $page);
+	// }
 
 	protected function initStorages()
 	{

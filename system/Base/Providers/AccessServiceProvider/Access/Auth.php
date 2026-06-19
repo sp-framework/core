@@ -749,9 +749,9 @@ class Auth extends BasePackage
         return $this->account;
     }
 
-    public function check()
+    public function check($resetCache = false)
     {
-        if ($this->account) {
+        if (!$resetCache && $this->account) {
             return true;
         }
 

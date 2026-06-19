@@ -789,7 +789,47 @@ class Accounts extends BasePackage
         return false;
     }
 
-    public function checkUpdateEnv($id, $params = [], $getAppParams = false, $getRouteParams = false)
+    public function checkEnv($id, $getRouteParams = true, $getAppParams = false)
+    {
+        $envModel = new BasepackagesUsersAccountsEnv;
+
+        if ($this->config->databasetype === 'db') {
+            $accountEnv = $envModel::findFirst(['account_id = ' . $id]);
+        } else {
+            $envStore = $this->ff->store($envModel->getSource());
+
+            $accountEnv = $envStore->findOneBy(['account_id', '=', $id]);
+        }
+
+        $routeArr = explode('/q/', $this->request->getURI());
+        if ($this->domains->domain['exclusive_to_default_app']) {
+            $route = str_replace('/' . $this->apps->getAppInfo()['route'], '', $routeArr[0]);
+        } else {
+            $route = $routeArr[0];
+        }
+
+        if ($accountEnv) {
+            if ($getRouteParams) {
+                if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
+                    return $accountEnv['params'][$this->apps->getAppInfo()['id']][$route];
+                } else {
+                    return false;
+                }
+            }
+
+            if ($getAppParams) {
+                if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
+                    return $accountEnv['params'][$this->apps->getAppInfo()['id']];
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function updateEnv($id, $params = [], $getRouteParams = true, $getAppParams = false)
     {
         $envModel = new BasepackagesUsersAccountsEnv;
 
@@ -813,6 +853,11 @@ class Accounts extends BasePackage
             return true;
         }
 
+        if (isset($this->postData()['quick_filter']) && isset($this->postData()['conditions'])) {
+            $params['params']['conditions'] = $this->postData()['conditions'];
+            $params['pageParams']['conditions'] = $this->postData()['conditions'];
+        }
+
         if ($accountEnv) {
             $update = false;
 
@@ -827,7 +872,15 @@ class Accounts extends BasePackage
                     $accountEnv['params'][$this->apps->getAppInfo()['id']][$route] = [];
                 }
 
-                $accountEnv['params'][$this->apps->getAppInfo()['id']][$route] = $params;
+                if (count($accountEnv['params'][$this->apps->getAppInfo()['id']][$route]) > 0) {
+                    $accountEnv['params'][$this->apps->getAppInfo()['id']][$route]
+                        = array_merge(
+                            $accountEnv['params'][$this->apps->getAppInfo()['id']][$route],
+                            $params
+                        );
+                } else {
+                    $accountEnv['params'][$this->apps->getAppInfo()['id']][$route] = $params;
+                }
 
                 $update = true;
             }
@@ -867,20 +920,8 @@ class Accounts extends BasePackage
             $this->opCache->removeCache('account_' . $id, 'core');
         }
 
-        if ($getAppParams) {
-            if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
-                return $accountEnv['params'][$this->apps->getAppInfo()['id']];
-            } else {
-                return false;
-            }
-        }
-
-        if ($getRouteParams) {
-            if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
-                return $accountEnv['params'][$this->apps->getAppInfo()['id']][$route];
-            } else {
-                return false;
-            }
+        if ($getRouteParams || $getAppParams) {
+            return $this->checkEnv($id, $getRouteParams, $getAppParams);
         }
 
         if ($this->config->databasetype === 'db') {

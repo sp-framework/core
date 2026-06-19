@@ -968,9 +968,9 @@ abstract class BaseComponent extends Controller
 		}
 
 		if ($this->request->isPost() && $this->isJson()) {
-			if ($this->access->auth->check()) {
+			if ($this->access->auth->check(true)) {
 				if (!isset($this->access->auth->account()['env'])) {
-					$routeEnv = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], false, true);
+					$routeEnv = $this->basepackages->accounts->updateEnv($this->access->auth->account()['id']);
 				} else {
 					$routeArr = explode('/q/', $this->request->getURI());
 					if ($this->domains->domain['exclusive_to_default_app']) {
@@ -979,17 +979,17 @@ abstract class BaseComponent extends Controller
 						$route = $routeArr[0];
 					}
 
-					if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$route])) {
+					if (isset($this->access->auth->account()['env']['params'][$this->apps->getAppInfo()['id']][$route])) {
 						$routeEnv = $this->access->auth->account()['env']['params'][$this->apps->getAppInfo()['id']][$route];
 					} else {
-						$routeEnv = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], false, true);
+						$routeEnv = $this->basepackages->accounts->updateEnv($this->access->auth->account()['id']);
 					}
 				}
 
 				if ($routeEnv) {
 					$this->view->routeEnv = $routeEnv;
 				}
-				// $accountEnv = $this->basepackages->accounts->checkUpdateEnv($this->access->auth->account()['id'], [], true);
+				// $accountEnv = $this->basepackages->accounts->checkEnv($this->access->auth->account()['id'], false, true);
 
 				// if ($accountEnv) {
 				// 	$this->view->accountEnv = $accountEnv;
