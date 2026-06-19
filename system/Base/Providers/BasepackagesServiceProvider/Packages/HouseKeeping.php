@@ -126,4 +126,57 @@ class HouseKeeping extends BasePackage
 
         return ['totalEntries' => $totalEntries, 'clearedEntries' => $clearedEntries];
     }
+
+    protected function cleanUnusedTags()
+    {
+        // For tags, we cross check the package_row_ids with the package class. If it does not exists, we remove the tags.
+        $tags = $this->basepackages->tags->getAll(true)->tags;
+
+        $totalEntries = 0;
+        $clearedEntries = [];
+
+        if ($tags && count($tags) > 0) {
+            $totalEntries = count($tags);
+
+            foreach ($tags as $tagKey => $tag) {
+                if (count($tag['package_row_ids']) === 0) {
+                    $this->basepackages->tags->remove($tag['id']);
+
+                    $clearedEntries[$tagKey] = ['package_class' => $tag['package_class'], 'package_row_ids' => $tag['package_row_ids'], 'reason' => 'Tag not being used!'];
+
+                    continue;
+                }
+
+                try {
+                    $packageClass = str_replace('_', '\\', $tag['package_class']);
+
+                    $packageClass = new $packageClass;
+
+                    foreach ($tag['package_row_ids'] as $packageRowKey => $packageRowId) {
+                        $packageRow = $packageClass->getById($packageRowId);
+
+                        if (!$packageRow) {
+                            unset($tag['package_row_ids'][$packageRowKey]);
+
+                            $clearedEntries[$tagKey] = ['package_class' => $tag['package_class'], 'package_row_id' => $packageRowId, 'reason' => 'package_row_id does not exist!'];
+                        }
+                    }
+
+                    if (count($tag['package_row_ids']) > 0) {
+                        $this->basepackages->tags->update($tag);
+                    } else {
+                        $this->basepackages->tags->remove($tag['id']);
+
+                        $clearedEntries[$tagKey] = ['package_class' => $tag['package_class'], 'package_row_ids' => $tag['package_row_ids'], 'reason' => 'Tag not being used!'];
+                    }
+                } catch (\throwable $e) {
+                    $this->basepackages->tags->remove($tag['id']);
+
+                    $clearedEntries[$tagKey] = ['package_class' => $tag['package_class'], 'package_row_ids' => $tag['package_row_ids'], 'reason' => $e->getMessage()];
+                }
+            }
+        }
+
+        return ['totalEntries' => $totalEntries, 'clearedEntries' => $clearedEntries];
+    }
 }
