@@ -989,11 +989,7 @@ abstract class BaseComponent extends Controller
 				if ($routeEnv) {
 					$this->view->routeEnv = $routeEnv;
 				}
-				// $accountEnv = $this->basepackages->accounts->checkEnv($this->access->auth->account()['id'], false, true);
 
-				// if ($accountEnv) {
-				// 	$this->view->accountEnv = $accountEnv;
-				// }
 				if (isset($this->notifyPackage)) {
 					$this->addToNotification(null, null);
 				}

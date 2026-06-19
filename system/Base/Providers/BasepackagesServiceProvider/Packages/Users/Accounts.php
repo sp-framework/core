@@ -789,7 +789,7 @@ class Accounts extends BasePackage
         return false;
     }
 
-    public function checkEnv($id, $getRouteParams = true, $getAppParams = false)
+    public function checkEnv($id, $getRouteParams = true, $getAppParams = false, $getUserEnv = false)
     {
         $envModel = new BasepackagesUsersAccountsEnv;
 
@@ -820,6 +820,14 @@ class Accounts extends BasePackage
             if ($getAppParams) {
                 if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
                     return $accountEnv['params'][$this->apps->getAppInfo()['id']];
+                } else {
+                    return false;
+                }
+            }
+
+            if ($getUserEnv) {
+                if (isset($accountEnv)) {
+                    return $accountEnv;
                 } else {
                     return false;
                 }
@@ -929,6 +937,69 @@ class Accounts extends BasePackage
         } else {
             return $envStore->getLast();
         }
+    }
+
+    public function removeEnvRouteParams($data)
+    {
+        if ($this->access->auth->check()) {
+            $id = $this->access->auth->account()['id'];
+        } else {
+            $this->addResponse('User not logged in or account not found!', 1);
+
+            return false;
+        }
+
+        $envModel = new BasepackagesUsersAccountsEnv;
+
+        if ($this->config->databasetype === 'db') {
+            $accountEnv = $envModel::findFirst(['account_id = ' . $id]);
+        } else {
+            $envStore = $this->ff->store($envModel->getSource());
+
+            $accountEnv = $envStore->findOneBy(['account_id', '=', $id]);
+        }
+
+        $routeArr = explode('/q/', $this->request->getURI());
+        if ($this->domains->domain['exclusive_to_default_app']) {
+            $route = str_replace('/' . $this->apps->getAppInfo()['route'], '', $routeArr[0]);
+        } else {
+            $route = $routeArr[0];
+        }
+
+        $update = false;
+        if (isset($data['remove_all'])) {
+            if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
+                $accountEnv['params'][$this->apps->getAppInfo()['id']] = [];
+            }
+
+            $update = true;
+        } else {
+            if (isset($accountEnv['params'][$this->apps->getAppInfo()['id']][$data['route']])) {
+                unset($accountEnv['params'][$this->apps->getAppInfo()['id']][$data['route']]);
+            }
+
+            $update = true;
+        }
+
+        if ($update) {
+            if ($this->config->databasetype === 'db') {
+                $accountEnv->assign($accountEnv);
+
+                $accountEnv->update();
+            } else {
+                $envStore->setValidateData(false);
+
+                $envStore->update($accountEnv);
+            }
+
+            $this->addResponse('Remove route params');
+
+            return true;
+        }
+
+        $this->addResponse('Not able to remove route params', 1);
+
+        return false;
     }
 
     public function addUpdateCanLogin($id, $canLogin)

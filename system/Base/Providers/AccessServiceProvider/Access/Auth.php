@@ -159,7 +159,7 @@ class Auth extends BasePackage
 
         $this->basepackages->accounts->addUpdateSecurity($this->account['id'], $this->account['security']);
 
-        $this->basepackages->accounts->checkUpdateEnv($this->account['id']);
+        $this->basepackages->accounts->checkEnv($this->account['id']);
 
         $this->setSessionAndRecaller($data);
 
