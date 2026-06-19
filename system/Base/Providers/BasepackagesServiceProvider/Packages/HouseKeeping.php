@@ -6,6 +6,7 @@ use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToDeleteFile;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages\Local;
 
 class HouseKeeping extends BasePackage
 {
@@ -24,7 +25,7 @@ class HouseKeeping extends BasePackage
             }
         }
 
-        trace([$taskResponse]);
+        $this->addResponse('Ok', 0, ['taskResponse' => $taskResponse]);
     }
 
     protected function cleanStorageOrphans()
@@ -44,10 +45,12 @@ class HouseKeeping extends BasePackage
                 $clearedEntries['storage_' . $storage['id']] = [];
 
                 if ($storage['type'] === 'local') {
+                    $localStorage = new Local;
+
                     if ($this->config->databasetype === 'db') {
-                        $files = $this->basepackages->storages->getFiles(['params' => ['conditions' => ['storages_id' => $storage['id']]]]);
+                        $files = $localStorage->getByParams(['conditions' => ['storages_id' => $storage['id']]]);
                     } else {
-                        $files = $this->basepackages->storages->getFiles(['params' => ['conditions' => ['storages_id', '=', $storage['id']]]]);
+                        $files = $localStorage->getByParams(['conditions' => ['storages_id', '=', $storage['id']]]);
                     }
 
                     if ($files) {

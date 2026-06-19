@@ -18,15 +18,21 @@ class ProcessRepoSync extends Calls
         $this->args = $this->extractCallArgs($this, $args);
 
         if (!$this->args) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Call function arguments missing';
+
+            $this->addJobResult($this->packagesData, $args);
+
+            $this->updateJobTask(4, $args);
+
             return;
         }
 
         if (!isset($this->args['api_id'])) {
             $this->packagesData->responseCode = 1;
 
-            if (!isset($this->args['api_id'])) {
-                $this->packagesData->responseMessage = 'Parameters api_id missing';
-            }
+            $this->packagesData->responseMessage = 'Call function argument "api_id" missing';
 
             $this->addJobResult($this->packagesData, $args);
 

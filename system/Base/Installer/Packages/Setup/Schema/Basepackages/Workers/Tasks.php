@@ -53,14 +53,14 @@ class Tasks
                     new Column(
                         'is_on_demand',
                         [
-                            'type'          => Column::TYPE_TINYINTEGER,
+                            'type'          => Column::TYPE_BOOLEAN,
                             'notNull'       => false,
                         ]
                     ),
                     new Column(
                         'enabled',
                         [
-                            'type'          => Column::TYPE_TINYINTEGER,
+                            'type'          => Column::TYPE_BOOLEAN,
                             'notNull'       => true,
                         ]
                     ),

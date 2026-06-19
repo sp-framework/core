@@ -105,7 +105,7 @@ class JobsComponent extends BaseComponent
         } else if ($data['status'] == '4') {
             $data['status'] = '<span class="badge badge-danger text-uppercase">Error!</span>';
         } else if ($data['status'] == '5') {
-            $data['status'] = '<span class="badge badge-warning text-uppercase">Rescheduled!</span>';
+            $data['status'] = '<span class="badge badge-warning text-uppercase">Rescheduled (No worker)</span>';
         }
 
         return $data;

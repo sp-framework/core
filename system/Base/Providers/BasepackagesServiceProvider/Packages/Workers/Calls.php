@@ -110,14 +110,14 @@ class Calls extends BasePackage
     // 3 - Success
     // 4 - Error
     // 5 - Warning
-    public function updateJobTask($status, $args)
+    public function updateJobTask($status, &$args)
     {
         $this->updateJob($status, $args);
 
         $this->updateTask($status, $args);
     }
 
-    protected function updateJob($status, $args)
+    protected function updateJob($status, &$args)
     {
         if (!$this->jobRunOn) {
             $this->jobRunOn = date('Y-m-d H:i:s');
@@ -126,9 +126,7 @@ class Calls extends BasePackage
         if (isset($args['job'])) {
             $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
 
-            if ($job['status'] != 4) {
-                $job['status'] = $status;
-            }
+            $job['status'] = $status;
 
             if ($status == 2) {
                 $this->startTime = microtime(true);
@@ -160,11 +158,13 @@ class Calls extends BasePackage
                 }
             }
 
-            $this->basepackages->workers->jobs->update($job, false);
+            $this->basepackages->workers->jobs->updateJob($job, false);
+
+            $args['job'] = $this->basepackages->workers->jobs->packagesData->last;
         }
     }
 
-    protected function updateTask($status, $args)
+    protected function updateTask($status, &$args)
     {
         if (isset($args['task'])) {
             $task = $this->basepackages->workers->tasks->getById($args['task']['id'], false, false);
@@ -180,15 +180,23 @@ class Calls extends BasePackage
                 }
 
                 $task['previous_run'] = $job['run_on'][0];
+            } else {
+                $task['status'] = $status;
+            }
+
+            if ($task['status'] == 4) {
+                $task['enabled'] = false;
             }
 
             $task['via_job'] = 1;
 
             $this->basepackages->workers->tasks->updateTask($task, false);
+
+            $args['task'] = $this->basepackages->workers->tasks->packagesData->last;
         }
     }
 
-    public function addJobResult($packagesData, $args)
+    public function addJobResult($packagesData, &$args)
     {
         if (isset($args['job'])) {
             $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
@@ -272,7 +280,9 @@ class Calls extends BasePackage
                 }
             }
 
-            $this->basepackages->workers->jobs->update($job, false);
+            $this->basepackages->workers->jobs->updateJob($job, false);
+
+            $args['job'] = $this->basepackages->workers->jobs->packagesData->last;
         }
     }
 

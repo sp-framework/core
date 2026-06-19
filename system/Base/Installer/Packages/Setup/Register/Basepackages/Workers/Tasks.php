@@ -65,9 +65,9 @@ class Tasks
                 'cid'               => $dbCall['id'],
                 'call_args'         => '{"priority":"1", "confidential":true}',
                 'schedule_id'       => 1,
-                'is_on_demand'      => 0,
+                'is_on_demand'      => false,
                 'priority'          => 10,
-                'enabled'           => 1,
+                'enabled'           => true,
                 'type'              => 0,
                 'job_log_mode'      => 3,
                 'status'            => 1
@@ -83,9 +83,9 @@ class Tasks
                 'cid'               => $dbCall['id'],
                 'call_args'         => '{"priority":"1"}',
                 'schedule_id'       => 0,
-                'is_on_demand'      => 1,
+                'is_on_demand'      => true,
                 'priority'          => 10,
-                'enabled'           => 0,
+                'enabled'           => false,
                 'type'              => 0,
                 'job_log_mode'      => 3,
                 'status'            => 0
@@ -101,9 +101,9 @@ class Tasks
                 'cid'               => $dbCall['id'],
                 'call_args'         => '{"priority":"2"}',
                 'schedule_id'       => 0,
-                'is_on_demand'      => 1,
+                'is_on_demand'      => true,
                 'priority'          => 10,
-                'enabled'           => 0,
+                'enabled'           => false,
                 'type'              => 0,
                 'job_log_mode'      => 3,
                 'status'            => 0
@@ -119,9 +119,9 @@ class Tasks
                 'cid'               => $dbCall['id'],
                 'call_args'         => '{"priority":"3"}',
                 'schedule_id'       => 0,
-                'is_on_demand'      => 1,
+                'is_on_demand'      => true,
                 'priority'          => 10,
-                'enabled'           => 0,
+                'enabled'           => false,
                 'type'              => 0,
                 'job_log_mode'      => 3,
                 'status'            => 0
@@ -154,9 +154,9 @@ class Tasks
                 'cid'               => $dbCall['id'],
                 'call_args'         => '{"process":"export"}',
                 'schedule_id'       => 0,
-                'is_on_demand'      => 1,
+                'is_on_demand'      => true,
                 'priority'          => 10,
-                'enabled'           => 0,
+                'enabled'           => false,
                 'type'              => 0,
                 'job_log_mode'      => 3,
                 'status'            => 0
@@ -172,9 +172,9 @@ class Tasks
                 'cid'               => $dbCall['id'],
                 'call_args'         => '{"process":"import"}',
                 'schedule_id'       => 0,
-                'is_on_demand'      => 1,
+                'is_on_demand'      => true,
                 'priority'          => 5,
-                'enabled'           => 0,
+                'enabled'           => false,
                 'type'              => 0,
                 'job_log_mode'      => 3,
                 'status'            => 0
@@ -198,7 +198,6 @@ class Tasks
             $dbCall = $dbCall[0];
         }
 
-
         //DB Sync (Hybrid Mode)
         $taskEntry =
             [
@@ -208,11 +207,46 @@ class Tasks
                 'cid'               => $dbCall['id'],
                 'call_args'         => '{}',
                 'schedule_id'       => 0,
-                'is_on_demand'      => 1,
+                'is_on_demand'      => true,
                 'priority'          => 10,
-                'enabled'           => 0,
+                'enabled'           => false,
                 'type'              => 0,
                 'job_log_mode'      => 3,
+                'status'            => 0
+            ];
+        array_push($taskArr, $taskEntry);
+
+        if ($this->databasetype !== 'db') {
+            $dbCall = $callStore->findBy(['name', '=', 'ProcessHousekeeping']);
+        } else {
+            $dbCall =
+                $this->db->fetchAll(
+                    "SELECT * FROM basepackages_workers_calls WHERE name = :name",
+                    Enum::FETCH_ASSOC,
+                    [
+                        "name" => 'ProcessHousekeeping',
+                    ]
+                );
+        }
+
+        if ($dbCall && count($dbCall) > 0) {
+            $dbCall = $dbCall[0];
+        }
+
+        //Housekeeping
+        $taskEntry =
+            [
+                'name'              => 'HouseKeeping',
+                'description'       => 'Run house keeping jobs on various packages like cleaning orphan files, stale sessions, etc.',
+                'exec_type'         => 'call',
+                'cid'               => $dbCall['id'],
+                'call_args'         => '{"tasks":["cleanStorageOrphans","cleanActivityLogs","cleanUnusedTags","cleanStaleSessions"]}',
+                'schedule_id'       => 7,//Everyday at midnight
+                'is_on_demand'      => false,
+                'priority'          => 10,
+                'enabled'           => true,
+                'type'              => 0,
+                'job_log_mode'      => 4,//Monthly logs
                 'status'            => 0
             ];
         array_push($taskArr, $taskEntry);

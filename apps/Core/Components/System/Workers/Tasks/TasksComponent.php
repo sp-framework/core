@@ -59,7 +59,7 @@ class TasksComponent extends BaseComponent
             $this->view->schedules = $this->schedules;
 
             if ($this->getData()['id'] != 0) {
-                $task = $this->tasks->getById($this->getData()['id']);
+                $task = $this->tasks->getById((int) $this->getData()['id']);
 
                 if (!$task) {
                     return $this->throwIdNotFound();
@@ -189,7 +189,11 @@ class TasksComponent extends BaseComponent
         } else if ($data['status'] == '2') {
             $data['status'] = '<span class="badge badge-info text-uppercase">Running...</span>';
         } else if ($data['status'] == '3') {
+            $data['status'] = '<span class="badge badge-success text-uppercase">Success!</span>';
+        } else if ($data['status'] == '4') {
             $data['status'] = '<span class="badge badge-danger text-uppercase">Error!</span>';
+        } else if ($data['status'] == '5') {
+            $data['status'] = '<span class="badge badge-warning text-uppercase">Rescheduled (no workers)</span>';
         }
 
         if ($data['force_next_run'] == '1') {
