@@ -25,7 +25,7 @@ class Tags extends BasePackage
             $data['swatch'] = strtoupper(\Colors\RandomColor::one(['luminosity' => 'light']));
         }
 
-        if (!$package = $this->modules->packages->getPackageByName($data['package_class'])) {
+        if (!$package = $this->modules->packages->getPackageByClass(str_replace('_', '\\', $data['package_class']))) {
             $this->addResponse('Package name provided is incorrect.', 1);
 
             return false;
@@ -68,7 +68,8 @@ class Tags extends BasePackage
         ) {
             unset($data['swatch']);
         }
-        if (!$package = $this->modules->packages->getPackageByName($data['package_class'])) {
+
+        if (!$package = $this->modules->packages->getPackageByClass(str_replace('_', '\\', $data['package_class']))) {
             $this->addResponse('Package name provided is incorrect.', 1);
 
             return false;
