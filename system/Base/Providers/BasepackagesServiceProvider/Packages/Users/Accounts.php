@@ -808,6 +808,11 @@ class Accounts extends BasePackage
             $route = $routeArr[0];
         }
 
+        //We do not add update/remove env
+        if (str_ends_with($route, 'update') || str_ends_with($route, 'remove')) {
+            return true;
+        }
+
         if ($accountEnv) {
             $update = false;
 
