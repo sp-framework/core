@@ -9,7 +9,7 @@ class ActivityLogs extends BasePackage
 {
     protected $modelToUse = BasepackagesActivityLogs::class;
 
-    protected $packageNameS = 'activitylogs';
+    protected $packageName = 'activityLogs';
 
     public $activityLogs;
 
