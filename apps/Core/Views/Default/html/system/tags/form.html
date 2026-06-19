@@ -1,7 +1,7 @@
 {% if tag['id'] is defined %}
     {% set tagId = tag['id'] %}
     {% set tagName = tag['name'] %}
-    {% set tagPackage = tag['package_name'] %}
+    {% set tagPackage = tag['package_class'] %}
     {% set tagDescription = tag['description'] %}
     {% set tagSwatch = tag['swatch'] %}
 {% else %}
@@ -67,7 +67,7 @@
                         'componentName'                        : componentName,
                         'componentId'                          : componentId,
                         'sectionId'                            : sectionId,
-                        'fieldId'                              : 'package_name',
+                        'fieldId'                              : 'package_class',
                         'fieldLabel'                           : 'Package',
                         'fieldType'                            : 'select2',
                         'fieldHelp'                            : true,
@@ -191,7 +191,7 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-package_name'                        : {
+        '{{componentId}}-{{sectionId}}-package_class'                       : {
             placeholder: 'SELECT PACKAGE'
         },
         '{{componentId}}-{{sectionId}}-description'                         : { },
@@ -206,11 +206,11 @@ dataCollectionSection =
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                                : 'required',
-                '{{componentId}}-{{sectionId}}-package_name'                        : 'required'
+                '{{componentId}}-{{sectionId}}-package_class'                       : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                                : 'Please enter state name',
-                '{{componentId}}-{{sectionId}}-package_name'                        : 'Please package'
+                '{{componentId}}-{{sectionId}}-package_class'                       : 'Please package'
             }
         }
     });

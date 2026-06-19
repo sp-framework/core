@@ -4,6 +4,7 @@ namespace Apps\Core\Components\System\Geo\Holidays;
 
 use Apps\Core\Packages\Adminltetags\Traits\DynamicTable;
 use System\Base\BaseComponent;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoHolidays;
 
 class HolidaysComponent extends BaseComponent
 {
@@ -51,7 +52,7 @@ class HolidaysComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
-                $holidayTagsArr = $this->basepackages->tags->getTagsByPackageNameAndPackageRowId('GeoHolidays', $holiday['id']);
+                $holidayTagsArr = $this->basepackages->tags->getTagsByPackageClassAndPackageRowId(str_replace('\\', '_', GeoHolidays::Class), $holiday['id']);
 
                 if (count($holidayTagsArr) > 0) {
                     foreach ($holidayTagsArr as $tag) {
@@ -68,7 +69,7 @@ class HolidaysComponent extends BaseComponent
 
             $this->view->holidayTags = $holidayTags;
 
-            $this->view->tags = $this->basepackages->tags->getTagsByPackageName('GeoHolidays');
+            $this->view->tags = $this->basepackages->tags->getTagsByPackageClass(str_replace('\\', '_', GeoHolidays::Class));
 
             $this->view->pick('holidays/view');
 

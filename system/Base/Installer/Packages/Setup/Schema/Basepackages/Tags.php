@@ -46,10 +46,10 @@ class Tags
                     ]
                 ),
                 new Column(
-                    'package_name',
+                    'package_class',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
+                        'size'    => 200,
                         'notNull' => true
                     ]
                 ),
@@ -66,7 +66,7 @@ class Tags
                     'column_UNIQUE',
                     [
                         'name',
-                        'package_name'
+                        'package_class'
                     ],
                     'UNIQUE'
                 )
@@ -85,7 +85,7 @@ class Tags
                 'column_INDEX',
                 [
                     'name',
-                    'package_name'
+                    'package_class'
                 ],
                 'INDEX'
             )

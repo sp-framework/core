@@ -108,7 +108,7 @@ class GeoHolidays extends BasePackage
                 if (isset($data['tags']['data']) && count($data['tags']['data']) > 0) {
                     foreach ($data['tags']['data'] as $oldTag) {
                         if (!$this->basepackages->tags->updateTag(
-                            ['id' => $oldTag, 'package_name' => 'GeoHolidays', 'package_row_id' => $this->packagesData->last['id']]
+                            ['id' => $oldTag, 'package_class' => str_replace('\\', '_', $this::Class), 'package_row_id' => $this->packagesData->last['id']]
                         )) {
                             $this->addResponse(
                                 $this->basepackages->tags->packagesData->responseMessage,
@@ -123,7 +123,7 @@ class GeoHolidays extends BasePackage
                 if (isset($data['tags']['newTags']) && count($data['tags']['newTags']) > 0) {
                     foreach ($data['tags']['newTags'] as $newTag) {
                         if (!$this->basepackages->tags->addTag(
-                            ['name' => $newTag, 'package_name' => 'GeoHolidays', 'package_row_id' => $this->packagesData->last['id']]
+                            ['name' => $newTag, 'package_class' => str_replace('\\', '_', $this::Class), 'package_row_id' => $this->packagesData->last['id']]
                         )) {
                             $this->addResponse(
                                 $this->basepackages->tags->packagesData->responseMessage,
@@ -326,7 +326,7 @@ class GeoHolidays extends BasePackage
         $holiday = array_replace($holiday, $data);
 
         if ($this->update($holiday)) {
-            $currentTags = $this->basepackages->tags->getTagsByPackageNameAndPackageRowId('GeoHolidays', $holiday['id']);
+            $currentTags = $this->basepackages->tags->getTagsByPackageClassAndPackageRowId(str_replace('\\', '_', $this::Class), $holiday['id']);
 
             if (count($currentTags) > 0) {
                 foreach ($currentTags as $currentTag) {
@@ -351,7 +351,7 @@ class GeoHolidays extends BasePackage
             if (isset($data['tags']['data']) && count($data['tags']['data']) > 0) {
                 foreach ($data['tags']['data'] as $oldTag) {
                     if (!$this->basepackages->tags->updateTag(
-                        ['id' => $oldTag, 'package_name' => 'GeoHolidays', 'package_row_id' => $this->packagesData->last['id']]
+                        ['id' => $oldTag, 'package_class' => str_replace('\\', '_', $this::Class), 'package_row_id' => $this->packagesData->last['id']]
                     )) {
                         $this->addResponse(
                             $this->basepackages->tags->packagesData->responseMessage,
@@ -366,7 +366,7 @@ class GeoHolidays extends BasePackage
             if (isset($data['tags']['newTags']) && count($data['tags']['newTags']) > 0) {
                 foreach ($data['tags']['newTags'] as $newTag) {
                     if (!$this->basepackages->tags->addTag(
-                        ['name' => $newTag, 'package_name' => 'GeoHolidays', 'package_row_id' => $this->packagesData->last['id']]
+                        ['name' => $newTag, 'package_class' => str_replace('\\', '_', $this::Class), 'package_row_id' => $this->packagesData->last['id']]
                     )) {
                         $this->addResponse(
                             $this->basepackages->tags->packagesData->responseMessage,
@@ -395,7 +395,7 @@ class GeoHolidays extends BasePackage
         }
 
         if ($this->remove($holiday['id'])) {
-            $currentTags = $this->basepackages->tags->getTagsByPackageNameAndPackageRowId('GeoHolidays', $holiday['id']);
+            $currentTags = $this->basepackages->tags->getTagsByPackageClassAndPackageRowId(str_replace('\\', '_', $this::Class), $holiday['id']);
 
             if (count($currentTags) > 0) {
                 foreach ($currentTags as $currentTag) {
