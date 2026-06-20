@@ -103,30 +103,17 @@ final class Bootstrap
         } else {
             $this->error = $container->getShared('error');
 
-            $this->logger->log->info(
-                'Session ID: ' . $session->getId() . '. Connection ID: ' . $connection->getId()
-            );
-
             $application = new Application($container);
 
             $helper = $container->getShared('helper');
 
             $response = $application->handle($helper->reduceSlashes($_SERVER["REQUEST_URI"]));
 
-            $this->logger->log->debug('Dispatched');
-
             if (!$response->isSent()) {
                 $response->send();
-
-                $this->logger->log->debug('Response Sent.');
-
             } else {
                 echo $response->getContent();
-
-                $this->logger->log->debug('Response Echoed.');
             }
-
-            $this->logger->log->info('Session End');
 
             $this->logger->commit();
         }

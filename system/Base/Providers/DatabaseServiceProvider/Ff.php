@@ -619,7 +619,7 @@ class Ff
                 return true;
             }
         } else {
-            throw new \Exception('Database type set to flat file, cannot sync.');
+            throw new \Exception('Database type is not hybrid, cannot sync.');
         }
 
         return false;
