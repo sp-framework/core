@@ -21,10 +21,16 @@
             {% set job['response_data'] = helper.encode(job['response_data']) %}
         {% endif %}
         {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-data"><strong class="text-uppercase">Data: </strong> ' ~ job['response_data'] ~ '</div><br>' %}
-        {% set jobResult = jobResult ~ '<button class="btn btn-xs btn-info mr-1" id="' ~ componentId ~ '-' ~ sectionId ~ '-format-data" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-magic"></i> FORMAT DATA</button><br><br>' %}
     {% else %}
         {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-data"><strong class="text-uppercase">Data: </strong> -</div><br>' %}
     {% endif %}
+    {% if job['email_results'] is defined %}
+        {% if is_array(job['email_results']) %}
+            {% set job['email_results'] = helper.encode(job['email_results']) %}
+        {% endif %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-email"><strong class="text-uppercase">Email Results: </strong> ' ~ job['email_results'] ~ '</div><br>' %}
+    {% endif %}
+    {% set jobResult = jobResult ~ '<button class="btn btn-xs btn-info mr-1" id="' ~ componentId ~ '-' ~ sectionId ~ '-format-data" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-magic"></i> FORMAT DATA</button><br><br>' %}
     <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
         <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
             <div class="row">
@@ -131,6 +137,23 @@ dataCollectionSection =
 
                         if (obj) {
                             $('#{{componentId}}-{{sectionId}}-data').html('<strong class="text-uppercase">Data: </strong>' + BazHelpers.createHtmlList({'obj': obj}));
+                        }
+                    }
+
+                    html = '{{job["email_results"]}}';
+                    regex = /{.*}/g;
+                    found = html.match(regex);
+
+                    if (found) {
+                        //eslint-disable-next-line
+                        data = found[0].replaceAll('\"', '"');
+                        //eslint-disable-next-line
+                        data = data.replaceAll('\\', '\\\\\\\\');
+
+                        obj = JSON.parse(data);
+
+                        if (obj) {
+                            $('#{{componentId}}-{{sectionId}}-email').html('<strong class="text-uppercase">EMAIL RESULTS: </strong>' + BazHelpers.createHtmlList({'obj': obj}));
                         }
                     }
 
