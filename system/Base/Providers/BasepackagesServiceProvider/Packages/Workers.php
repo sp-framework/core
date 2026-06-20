@@ -210,7 +210,15 @@ class Workers extends BasePackage
             return;
         }
 
-        $this->execRun($call, $args);
+        $callPackagesData = $this->execRun($call, $args);
+
+        if ($callPackagesData && $callPackagesData->responseCode !== 0) {
+            $data['responseCode'] = $callPackagesData->responseCode;
+            $data['responseMessage'] = 'Error: ' . $callPackagesData->responseMessage;
+            $data['responseData'] = $callPackagesData->responseData ?? [];
+
+            $call->addJobResult((object) $data, $args);
+        }
     }
 
     protected function execRun($call, $args)
