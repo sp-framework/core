@@ -246,11 +246,11 @@ class Storages extends BasePackage
         }
     }
 
-    public function removeFile(string $uuid, $type = null, $purge = null)
+    public function removeFile(string $uuid, $type = null, $purge = null, $removeDb = null, $removeFile = null)
     {
         $this->initStorage($this->checkPublic($type));
 
-        if ($this->storage->removeFile($uuid, $this->checkPurge($purge))) {
+        if ($this->storage->removeFile($uuid, $this->checkPurge($purge), $removeDb, $removeFile)) {
             $this->addResponse($this->storage->packagesData->responseMessage, $this->storage->packagesData->responseCode);
 
             return true;

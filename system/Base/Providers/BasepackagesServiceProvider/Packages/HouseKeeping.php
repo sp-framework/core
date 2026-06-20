@@ -45,7 +45,9 @@ class HouseKeeping extends BasePackage
                 $clearedEntries['storage_' . $storage['id']] = [];
 
                 if ($storage['type'] === 'local') {
-                    $localStorage = new Local;
+                    $storage = $this->jsonData($storage, true);
+
+                    $localStorage = (new Local)->initLocal($storage);
 
                     if ($this->config->databasetype === 'db') {
                         $files = $localStorage->getByParams(['conditions' => ['storages_id' => $storage['id']]]);
@@ -58,9 +60,23 @@ class HouseKeeping extends BasePackage
 
                         foreach ($files as $file) {
                             if ($file['orphan']) {//If file is orphan, we remove
-                                $this->basepackages->storages->removeFile($file['uuid'], $storage['permission'], true);
+                                $localStorage->removeFile($file['uuid'], true);
 
                                 $clearedEntries['storage_' . $storage['id']]['file_' . $file['uuid']] = ['package_class' => $file['package_class'], 'package_row_id' => $file['package_row_id'], 'reason' => 'file orphan'];
+                            } else if ($file['is_pointer']) {
+                                try {
+                                    if (!$this->localContent->fileExists($file['uuid_location'] . $file['org_file_name'])) {
+                                        $localStorage->removeFile($file['uuid'], true, true, false);
+
+                                        $clearedEntries['storage_' . $storage['id']]['file_' . $file['uuid']] = ['package_class' => $file['package_class'], 'package_row_id' => $file['package_row_id'], 'reason' => $file['uuid_location'] . $file['org_file_name'] . ' pointer file does not exists!'];
+
+                                        continue;
+                                    }
+                                } catch (\throwable | UnableToCheckExistence $e) {
+                                    $localStorage->removeFile($file['uuid'], true, true, false);
+
+                                    $clearedEntries['storage_' . $storage['id']]['file_' . $file['uuid']] = ['package_class' => $file['package_class'], 'package_row_id' => $file['package_row_id'], 'reason' => $e->getMessage()];
+                                }
                             } else {//else we check if the package row id exists and remove if package row id does not exists.
                                 try {
                                     $packageClass = str_replace('_', '\\', $file['package_class']);
@@ -74,17 +90,17 @@ class HouseKeeping extends BasePackage
                                         $key = recursive_array_search($file['uuid'], $packageRow);
 
                                         if (!$key) {
-                                            $this->basepackages->storages->removeFile($file['uuid'], $storage['permission'], true);
+                                            $localStorage->removeFile($file['uuid'], true);
 
                                             $clearedEntries['storage_' . $storage['id']]['file_' . $file['uuid']] = ['package_class' => $file['package_class'], 'package_row_id' => $file['package_row_id'], 'reason' => 'package_row_id does not have file assigned, file should be orphan!'];
                                         }
                                     } else {
-                                        $this->basepackages->storages->removeFile($file['uuid'], $storage['permission'], true);
+                                        $localStorage->removeFile($file['uuid'], true);
 
                                         $clearedEntries['storage_' . $storage['id']]['file_' . $file['uuid']] = ['package_class' => $file['package_class'], 'package_row_id' => $file['package_row_id'], 'reason' => 'package_row_id does not exist!'];
                                     }
                                 } catch (\throwable $e) {
-                                    $this->basepackages->storages->removeFile($file['uuid'], $storage['permission'], true);
+                                    $localStorage->removeFile($file['uuid'], true);
 
                                      $clearedEntries['storage_' . $storage['id']]['file_' . $file['uuid']] = ['package_class' => $file['package_class'], 'package_row_id' => $file['package_row_id'], 'reason' => $e->getMessage()];
                                 }
@@ -234,7 +250,7 @@ class HouseKeeping extends BasePackage
                             $sessionStore->deleteById((int) $session['id']);
                         }
                     } catch (\throwable | UnableToCheckExistence | UnableToDeleteFile $e) {
-                        //Do Nothing
+                        $clearedEntries[$session['session_id']] = ['reason' => 'Error: ' . $e->getMessage()];
                     }
                 }
             }
