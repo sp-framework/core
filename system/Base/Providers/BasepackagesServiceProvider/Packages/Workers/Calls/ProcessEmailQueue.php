@@ -42,14 +42,26 @@ class ProcessEmailQueue extends Calls
             return;
         }
 
-        if (isset($this->args['confidential']) && $this->args['confidential'] == 'true') {
-            $this->basepackages->emailqueue->processQueue((int) $this->args['priority'], true);
-        } else {
-            $this->basepackages->emailqueue->processQueue((int) $this->args['priority']);
+        try {
+            if (isset($this->args['confidential']) && $this->args['confidential'] == 'true') {
+                $this->basepackages->emailqueue->processQueue((int) $this->args['priority'], true);
+            } else {
+                $this->basepackages->emailqueue->processQueue((int) $this->args['priority']);
+            }
+
+            $this->addJobResult($this->basepackages->emailqueue->packagesData, $args);
+
+            $this->updateJobTask(3, $args);
+        } catch (\throwable $e) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = $e->getMessage();
+
+            $this->addJobResult($this->packagesData, $args);
+
+            $this->updateJobTask(4, $args);
+
+            return;
         }
-
-        $this->addJobResult($this->basepackages->emailqueue->packagesData, $args);
-
-        $this->updateJobTask(3, $args);
     }
 }
