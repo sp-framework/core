@@ -223,10 +223,10 @@ class Calls extends BasePackage
                 $responseMessage = [];
                 $responseData = [];
 
-                $this->jobRunOn = $this->jobRunOn;
+                $jobRunOn = date('Y-m-d H:i:s');
 
                 if (isset($packagesData->responseCode)) {
-                    $responseCode[$this->jobRunOn] = $packagesData->responseCode;
+                    $responseCode[$jobRunOn] = $packagesData->responseCode;
                 }
 
                 if ($job['response_code'] && is_string($job['response_code'])) {
@@ -240,7 +240,7 @@ class Calls extends BasePackage
                 }
 
                 if (isset($packagesData->responseMessage)) {
-                    $responseMessage[$this->jobRunOn] = $packagesData->responseMessage;
+                    $responseMessage[$jobRunOn] = $packagesData->responseMessage;
                 }
 
                 if ($job['response_message'] && is_string($job['response_message'])) {
@@ -254,7 +254,7 @@ class Calls extends BasePackage
                 }
 
                 if (isset($packagesData->responseData)) {
-                    $responseData[$this->jobRunOn] = $packagesData->responseData;
+                    $responseData[$jobRunOn] = $packagesData->responseData;
                 }
 
                 if ($job['response_data']) {
