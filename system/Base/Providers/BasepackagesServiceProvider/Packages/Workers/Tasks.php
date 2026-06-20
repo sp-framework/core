@@ -47,6 +47,10 @@ class Tasks extends BasePackage
             $data['schedule_id'] = null;
         }
 
+        if (isset($data['email'])) {
+            $data['email'] = trim(str_replace(' ', '', $data['email']));
+        }
+
         try {
             $add = $this->add($data);
         } catch (\throwable $e) {
@@ -72,6 +76,10 @@ class Tasks extends BasePackage
 
         if (isset($data['is_on_demand']) && $data['is_on_demand'] == '1') {
             $data['schedule_id'] = null;
+        }
+
+        if (isset($data['email'])) {
+            $data['email'] = trim(str_replace(' ', '', $data['email']));
         }
 
         $task = array_merge($task, $data);

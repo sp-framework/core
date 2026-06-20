@@ -35,4 +35,6 @@ class BasepackagesWorkersJobs extends BaseModel
     public $response_message;
 
     public $response_data;
+
+    public $email_results;
 }

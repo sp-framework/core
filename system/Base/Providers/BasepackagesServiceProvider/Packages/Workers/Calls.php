@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
+use Phalcon\Filter\Validation\Validator\Email;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersCalls;
 
@@ -18,6 +19,8 @@ class Calls extends BasePackage
     protected $startTime;
 
     protected $stopTime;
+
+    protected $jobResultPackagesData;
 
     public function init(bool $resetCache = false)
     {
@@ -158,7 +161,7 @@ class Calls extends BasePackage
                 }
             }
 
-            $this->basepackages->workers->jobs->updateJob($job, false);
+            $this->basepackages->workers->jobs->updateJob($job);
 
             $args['job'] = $this->basepackages->workers->jobs->packagesData->last;
         }
@@ -190,14 +193,20 @@ class Calls extends BasePackage
 
             $task['via_job'] = 1;
 
-            $this->basepackages->workers->tasks->updateTask($task, false);
+            $this->basepackages->workers->tasks->updateTask($task);
 
             $args['task'] = $this->basepackages->workers->tasks->packagesData->last;
+
+            if ($status == 3 || $status == 4) {//Send email on success or error
+                $this->emailTaskResult($args);
+            }
         }
     }
 
     public function addJobResult($packagesData, &$args)
     {
+        $this->jobResultPackagesData = $packagesData;
+
         $this->addResponse($packagesData->responseMessage ?? 'OK', $packagesData->responseCode ?? 0, $packagesData->responseData ?? []);
 
         if (isset($args['job'])) {
@@ -282,7 +291,7 @@ class Calls extends BasePackage
                 }
             }
 
-            $this->basepackages->workers->jobs->updateJob($job, false);
+            $this->basepackages->workers->jobs->updateJob($job);
 
             $args['job'] = $this->basepackages->workers->jobs->packagesData->last;
         }
@@ -317,5 +326,68 @@ class Calls extends BasePackage
         }
 
         return false;
+    }
+
+    protected function emailTaskResult($args)
+    {
+        $emailSent = [];
+
+        if (isset($args['task']['email_service_id']) && $args['task']['email'] !== '') {
+            $emailAddresses = explode(',', $args['task']['email']);
+
+            foreach ($emailAddresses as $emailAddress) {
+                $this->validation->init()->add('email', Email::class, ["message" => "Please enter valid email address."]);
+
+                $validated = $this->validation->validate(['email' => $emailAddress])->jsonSerialize();
+
+                if (count($validated) === 0) {
+                    try {
+                        $emailSettings = $this->basepackages->emailservices->getById($args['task']['email_service_id']);
+
+                        if ($emailSettings && $this->basepackages->email->setup($emailSettings)) {
+                            $emailSettings = $this->basepackages->email->getEmailSettings();
+
+                            $this->basepackages->email->setSender($emailSettings['from_address'], $emailSettings['from_address']);
+                            $this->basepackages->email->setRecipientTo($emailAddress, $emailAddress);
+                            $this->basepackages->email->setSubject(strtoupper('Job result for task : ' . $args['task']['name'] . '. Job ID : ' . $args['job']['id']));
+                            $this->basepackages->email->setBody(printArrayList($this->jobResultPackagesData));
+
+                            $logs = $this->basepackages->email->sendNewEmail();
+
+                            if ($logs === true) {
+                                $emailSent[$emailAddress] = 'Email sent successfully';
+                            } else {
+                                $emailSent[$emailAddress] = $logs;
+                            }
+                        } else {
+                            $messages = 'Error: Email service not configured!';
+
+                            $emailSent[$emailAddress] = $messages;
+                        }
+                    } catch (\throwable $e) {
+                        trace([$e]);
+                        $emailSent[$emailAddress] = $e->getMessage();
+                    }
+
+                    continue;
+                }
+
+                $messages = 'Error: ';
+
+                foreach ($validated as $key => $value) {
+                    $messages .= $emailAddress . ' : ' . $value['message'];
+                }
+
+                $emailSent[$emailAddress] = $messages;
+            }
+        }
+
+        if (count($emailSent) > 0) {
+            $lastRunOn = $this->helper->last($args['job']['run_on']);
+
+            $args['job']['email_results'][$lastRunOn] = $emailSent;
+
+            $this->basepackages->workers->jobs->updateJob($args['job']);
+        }
     }
 }

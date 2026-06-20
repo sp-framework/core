@@ -119,6 +119,13 @@ class Jobs
                             'type'          => Column::TYPE_JSON,
                             'notNull'       => false,
                         ]
+                    ),
+                    new Column(
+                        'email_results',
+                        [
+                            'type'          => Column::TYPE_JSON,
+                            'notNull'       => false,
+                        ]
                     )
                 ]
             ];

@@ -43,6 +43,8 @@ class BasepackagesWorkersTasks extends BaseModel
 
     public $job_log_mode;
 
+    public $email_service_id;
+
     public $email;
 
     public $result;

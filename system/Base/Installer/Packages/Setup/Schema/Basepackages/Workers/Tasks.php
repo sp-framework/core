@@ -139,6 +139,13 @@ class Tasks
                         ]
                     ),
                     new Column(
+                        'email_service_id',
+                        [
+                            'type'          => Column::TYPE_SMALLINTEGER,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
                         'email',
                         [
                             'type'          => Column::TYPE_VARCHAR,

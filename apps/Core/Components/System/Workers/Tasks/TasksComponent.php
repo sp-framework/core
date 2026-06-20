@@ -58,6 +58,8 @@ class TasksComponent extends BaseComponent
 
             $this->view->schedules = $this->schedules;
 
+            $this->view->emailservices = $this->basepackages->emailservices->getAll()->emailServices;
+
             if ($this->getData()['id'] != 0) {
                 $task = $this->tasks->getById((int) $this->getData()['id']);
 
