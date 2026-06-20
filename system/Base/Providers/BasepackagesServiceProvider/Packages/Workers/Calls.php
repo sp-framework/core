@@ -170,8 +170,10 @@ class Calls extends BasePackage
     protected function updateTask($status, &$args)
     {
         if (isset($args['task'])) {
+            $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
             $task = $this->basepackages->workers->tasks->getById($args['task']['id'], false, false);
 
+            $job['status'] = $status;
             $task['status'] = $status;
 
             if ($status == 3) {
@@ -198,22 +200,28 @@ class Calls extends BasePackage
 
             if ($status == 3 || $status == 4) {//Send email on success or error
                 $task['status'] = 2;
+                $job['status'] = 2;
 
                 $this->basepackages->workers->tasks->updateTask($task);
+                $this->basepackages->workers->jobs->updateJob($job);
 
                 $args['task'] = $this->basepackages->workers->tasks->packagesData->last;
+                $args['job'] = $this->basepackages->workers->jobs->packagesData->last;
 
                 $this->emailTaskResult($args);
 
                 $task['status'] = $status;
+                $job['status'] = $status;
 
                 if ($status == 3) {
                     $task['status'] = 1;
                 }
 
                 $this->basepackages->workers->tasks->updateTask($task);
+                $this->basepackages->workers->jobs->updateJob($job);
 
                 $args['task'] = $this->basepackages->workers->tasks->packagesData->last;
+                $args['job'] = $this->basepackages->workers->jobs->packagesData->last;
             }
         }
     }
