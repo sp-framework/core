@@ -131,7 +131,7 @@ class Calls extends BasePackage
 
             $job['status'] = $status;
 
-            if ($status == 2) {
+            if ($job['status'] == 2) {
                 $this->startTime = microtime(true);
                 if ($job['run_on']) {
                     if (is_string($job['run_on'])) {
@@ -143,7 +143,7 @@ class Calls extends BasePackage
                 } else {
                     $job['run_on'] = [$this->jobRunOn];
                 }
-            } else if ($status == 3) {
+            } else if ($job['status'] == 3) {
                 $this->stopTime = microtime(true);
 
                 if (isset($job['execution_times'])) {
@@ -172,10 +172,11 @@ class Calls extends BasePackage
         if (isset($args['task'])) {
             $task = $this->basepackages->workers->tasks->getById($args['task']['id'], false, false);
 
-            if ($status == 2) {
-                $task['status'] = 2;
-            } else if ($status == 3) {
+            $task['status'] = $status;
+
+            if ($status == 3) {
                 $task['status'] = 1;
+
                 $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
 
                 if (is_string($job['run_on'])) {
@@ -183,8 +184,6 @@ class Calls extends BasePackage
                 }
 
                 $task['previous_run'] = $job['run_on'][0];
-            } else {
-                $task['status'] = $status;
             }
 
             if ($task['status'] == 4) {
@@ -198,7 +197,23 @@ class Calls extends BasePackage
             $args['task'] = $this->basepackages->workers->tasks->packagesData->last;
 
             if ($status == 3 || $status == 4) {//Send email on success or error
+                $task['status'] = 2;
+
+                $this->basepackages->workers->tasks->updateTask($task);
+
+                $args['task'] = $this->basepackages->workers->tasks->packagesData->last;
+
                 $this->emailTaskResult($args);
+
+                $task['status'] = $status;
+
+                if ($status == 3) {
+                    $task['status'] = 1;
+                }
+
+                $this->basepackages->workers->tasks->updateTask($task);
+
+                $args['task'] = $this->basepackages->workers->tasks->packagesData->last;
             }
         }
     }

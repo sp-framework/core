@@ -198,10 +198,6 @@ class TasksComponent extends BaseComponent
             $data['status'] = '<span class="badge badge-warning text-uppercase">Rescheduled (no workers)</span>';
         }
 
-        if ($data['force_next_run'] == '1') {
-            return $data;
-        }
-
         return $data;
     }
 
