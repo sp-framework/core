@@ -675,11 +675,11 @@ if (!function_exists('findKeysByValue')) {
                     return $subPath;
                 }
             } elseif ($value === $search) {
-                return array_merge($keys, [$key]);
+                $keys = array_merge($keys, [$key]);
             }
         }
 
-        return [];
+        return $keys;
     }
 }
 

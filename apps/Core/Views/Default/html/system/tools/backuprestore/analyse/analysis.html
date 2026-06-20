@@ -315,11 +315,11 @@ if (!dataCollectionComponent['{{componentId}}-analysis']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-analysis-password'                 : { },
-        '{{componentId}}-analysis-root_password'            : {
+        '{{componentId}}-analysis-password'                 : {
             afterInit : function() {
                 BazProgress.buildProgressBar($('#restore-progress'));
             }
-        }
+        },
+        '{{componentId}}-analysis-root_password'            : { }
     });
 </script>
