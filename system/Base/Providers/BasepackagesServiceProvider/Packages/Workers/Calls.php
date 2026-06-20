@@ -198,6 +198,8 @@ class Calls extends BasePackage
 
     public function addJobResult($packagesData, &$args)
     {
+        $this->addResponse($packagesData->responseMessage ?? 'OK', $packagesData->responseCode ?? 0, $packagesData->responseData ?? []);
+
         if (isset($args['job'])) {
             $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
 

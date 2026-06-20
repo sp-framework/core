@@ -217,6 +217,8 @@ class Workers extends BasePackage
     {
         try {
             $call->run($args);
+
+            return $call->packagesData;
         } catch (\throwable $e) {
             $data['responseCode'] = 1;
             $data['responseMessage'] = 'Exception: ' . $e->getMessage();
@@ -242,7 +244,17 @@ class Workers extends BasePackage
                     (int) date('s') <= (int) $second ||
                     (int) $second === 0
                 ) {
-                    $this->execRun($call, $args);
+                    $callPackagesData = $this->execRun($call, $args);
+
+                    if ($callPackagesData && $callPackagesData->responseCode !== 0) {
+                        $data['responseCode'] = $callPackagesData->responseCode;
+                        $data['responseMessage'] = 'Error: ' . $callPackagesData->responseMessage;
+                        $data['responseData'] = $callPackagesData->responseData ?? [];
+
+                        $call->addJobResult((object) $data, $args);
+
+                        return;
+                    }
                 }
 
                 if ($key !== array_key_last($seconds)) {

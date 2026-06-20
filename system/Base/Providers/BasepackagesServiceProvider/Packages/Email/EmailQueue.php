@@ -104,11 +104,19 @@ class EmailQueue extends BasePackage
 
     public function processQueue($processPriority = 0, $confidential = false, $id = null)
     {
+        $emailServices = $this->basepackages->emailservices->getAll()->emailServices;
+
+        if (count($emailServices) === 0) {
+            $this->addResponse('No email service available!', 1);
+
+            return;
+        }
         if ($this->queueLock === true && $processPriority === $this->priorityToProcess) {
             $this->addResponse('Another process is clearing the queue, please wait...', 1);
 
             return;
         }
+
         if ($processPriority != 0) {
             $this->priorityToProcess = (int) $processPriority;
         } else {
