@@ -117,7 +117,11 @@ class BackupRestore extends BasePackage
         $this->now = Carbon::now();
         $this->backupInfo['request'] = $data;
         $this->backupInfo['takenAt'] = $this->now->format('Y-m-d H:i:s');
-        $this->backupInfo['createdBy'] = $this->access->auth->check() ? $this->access->auth->account()['email'] : 'System';
+        if (PHP_SAPI === 'cli') {
+            $this->backupInfo['createdBy'] = 'System';
+        } else {
+            $this->backupInfo['createdBy'] = $this->access->auth->check() ? $this->access->auth->account()['email'] : 'System';
+        }
         $this->backupInfo['backupName'] = 'backup-' . $this->now->getTimestamp() . '.zip';
         $this->backupInfo['dbs'] = [];
         $this->backupInfo['dirs'] = [];
@@ -180,14 +184,14 @@ class BackupRestore extends BasePackage
 
         if (!$viaExternalScript) {
             $this->basepackages->progress->preCheckComplete();
+        }
 
-            foreach ($this->backupProgressMethods as $method) {
-                if ($this->withProgress($method['method'], $data) === false) {
-                     return false;
-                }
-
-                usleep(500);
+        foreach ($this->backupProgressMethods as $method) {
+            if ($this->withProgress($method['method'], $data) === false) {
+                 return false;
             }
+
+            usleep(500);
         }
 
         return true;
@@ -421,6 +425,12 @@ class BackupRestore extends BasePackage
 
     public function finishBackup(array $data)
     {
+        if (PHP_SAPI === 'cli') {
+            $this->addResponse('Backup complete', 0, ['backupFile' => base_path('.backups/' . $this->backupInfo['backupName'])]);
+
+            return true;
+        }
+
         $this->method = 'finishBackup';
 
         try {
@@ -848,7 +858,7 @@ class BackupRestore extends BasePackage
                     $this->backupInfo['dirs'] = array_merge($this->backupInfo['dirs'], ['fo' . $key => $dir]);
                 } else {
                     if (strpos($dir, 'Html_compiled') === false) {
-                        if ($dir === 'system/') {
+                        if (str_starts_with($dir, 'system/')) {
                             if (isset($this->backupInfo['request']['systems_dir']) && $this->backupInfo['request']['systems_dir'] == 'true') {
                                 $this->backupInfo['dirs'] = array_merge($this->backupInfo['dirs'], ['fo' . $key => $dir]);
                             } else {
