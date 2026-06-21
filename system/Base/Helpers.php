@@ -703,3 +703,16 @@ if (!function_exists('findKeyLocation')) {
         return null;
     }
 }
+
+if (!function_exists('command_exists')) {
+    function command_exists(string $command): bool
+    {
+        // Determine the OS and appropriate command validation utility
+        $isWindows = (false !== stripos(PHP_OS, 'win'));
+        $testCommand = $isWindows ? "where " . escapeshellarg($command) : "command -v " . escapeshellarg($command);
+
+        $output = shell_exec($testCommand);
+
+        return !is_null($output) && trim($output) !== '';
+    }
+}
