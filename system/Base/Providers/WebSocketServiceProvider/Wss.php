@@ -18,7 +18,7 @@ class Wss
 
     protected $logger;
 
-    public function __construct($config, $helper, $logger)
+    public function __construct($config, $helper, $logger = null)
     {
         $this->config = $config;
 
@@ -40,7 +40,7 @@ class Wss
             return;
         }
 
-        if ($this->config->websocket->port == '0' || $this->config->websocket->port === '') {
+        if ($this->config->websocket->port == '0' || $this->config->websocket->port === '' && $this->logger) {
             $this->logger->log->debug(
                 'Websocket is configured to connect on port ' .
                 $this->config->websocket->port .
