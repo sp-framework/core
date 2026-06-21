@@ -74,6 +74,8 @@ final class Bootstrap
 
         $this->config = $container->getShared('config');
 
+        date_default_timezone_set($this->config->locale->timezone);
+
         if ($this->config->debug) {
             ini_set('display_errors', 1);
             ini_set('display_startup_errors', 1);
