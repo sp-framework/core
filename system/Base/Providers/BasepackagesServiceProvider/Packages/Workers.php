@@ -134,14 +134,10 @@ class Workers extends BasePackage
                 $this->scheduleEveryXMinutes($task, $schedule, $class);
             } else if ($schedule['type'] === 'everyxminutesbetween') {
                 $this->scheduleEveryXMinutesBetween($task, $schedule, $class);
-            } else if ($schedule['type'] === 'hourly') {
-                $this->scheduleHourly($task, $schedule, $class);
-            } else if ($schedule['type'] === 'daily') {
-                $this->scheduleDaily($task, $schedule, $class);
-            } else if ($schedule['type'] === 'weekly') {
-                $this->scheduleWeekly($task, $schedule, $class);
-            } else if ($schedule['type'] === 'monthly') {
-                $this->scheduleMonthly($task, $schedule, $class);
+            } else {
+                if ($this->shouldSchedule($task, $schedule)) {
+                    $this->addToScheduler($task, $schedule, $class);
+                }
             }
         }
 
@@ -385,46 +381,6 @@ class Workers extends BasePackage
         }
     }
 
-    protected function scheduleHourly($task, $schedule, $class)
-    {
-        if ($this->shouldSchedule($task, $schedule)) {
-            $this->addToScheduler($task, $schedule, $class);
-        }
-    }
-
-    protected function scheduleDaily($task, $schedule, $class)
-    {
-        if ($this->shouldSchedule($task, $schedule)) {
-            $this->addToScheduler($task, $schedule, $class);
-        }
-    }
-
-    protected function scheduleWeekly($task, $schedule, $class)
-    {
-        if (!in_array($this->dayOfWeek, $schedule['params']['weekly_days'])) {
-            return false;
-        }
-
-        if ($this->shouldSchedule($task, $schedule)) {
-            $this->addToScheduler($task, $schedule, $class);
-        }
-    }
-
-    protected function scheduleMonthly($task, $schedule, $class)
-    {
-        if (!in_array($this->month, $schedule['params']['monthly_months'])) {
-            return false;
-        }
-
-        if ($this->dateOfMonth != $schedule['params']['monthly_day']) {
-            return false;
-        }
-
-        if ($this->shouldSchedule($task, $schedule)) {
-            $this->addToScheduler($task, $schedule, $class);
-        }
-    }
-
     protected function shouldSchedule($task, $schedule)
     {
         //Only Schedule if less than 1 minute so its schedules for next run.
@@ -459,76 +415,106 @@ class Workers extends BasePackage
         } else if ($schedule['type'] === 'weekly') {
             $this->cron =
                 $this->weekly(
-                    $this->dayOfWeek,
+                    (int) $this->helper->first($schedule['params']['weekly_days']),
                     (int) $schedule['params']['weekly_hours'],
                     (int) $schedule['params']['weekly_minutes']
                 )->executionTime;
 
-            $secsLeft = $this->cron->getNextRunDate()->getTimestamp() - time();
-
             $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
 
-            if ($secsLeft > 43200) {//gt 12 hrs means the time has passed so get next time.
-                if (count($schedule['params']['weekly_days']) > 1) {
-                    if ($this->dayOfWeek == $this->helper->last($schedule['params']['weekly_days'])) {//If Saturday, the next day of execution will be 1st of array.
-                        $this->cron =
-                            $this->weekly(
-                                (int) $this->helper->first($schedule['params']['weekly_days']),
-                                (int) $schedule['params']['weekly_hours'],
-                                (int) $schedule['params']['weekly_minutes']
-                            )->executionTime;
+            if (count($schedule['params']['weekly_days']) > 1) {
+                if ($this->dayOfWeek == $this->helper->last($schedule['params']['weekly_days'])) {//If Saturday, the next day of execution will be 1st of array.
+                    $this->cron =
+                        $this->weekly(
+                            (int) $this->helper->first($schedule['params']['weekly_days']),
+                            (int) $schedule['params']['weekly_hours'],
+                            (int) $schedule['params']['weekly_minutes']
+                        )->executionTime;
 
-                        $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
-                    } else {
-                        $dayOfWeekKey = array_search($this->dayOfWeek, $schedule['params']['weekly_days']);
+                    $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
+                } else {
+                    $dayOfWeekKey = array_search($this->dayOfWeek, $schedule['params']['weekly_days']);
 
-                        $nextKey = prefix_get_next_key_array($schedule['params']['weekly_days'], $dayOfWeekKey);
+                    $nextKey = prefix_get_next_key_array($schedule['params']['weekly_days'], $dayOfWeekKey);
 
-                        $this->cron =
-                            $this->weekly(
-                                (int) $schedule['params']['weekly_days'][$nextKey],
-                                (int) $schedule['params']['weekly_hours'],
-                                (int) $schedule['params']['weekly_minutes']
-                            )->executionTime;
+                    $this->cron =
+                        $this->weekly(
+                            (int) $schedule['params']['weekly_days'][$nextKey],
+                            (int) $schedule['params']['weekly_hours'],
+                            (int) $schedule['params']['weekly_minutes']
+                        )->executionTime;
 
-                        $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
-                    }
+                    $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
                 }
             }
         } else if ($schedule['type'] === 'monthly') {
+            // Validate Date if someone is trying to set end of month.
+            if ((int) $schedule['params']['monthly_day'] > 27) {
+                $year = date('Y');
+                if ((int) $this->helper->first($schedule['params']['monthly_months']) < $this->month) {
+                    $year = $year + 1;//next year
+                }
+
+                if (!checkdate((int) $this->helper->first($schedule['params']['monthly_months']), (int) $schedule['params']['monthly_day'], date('Y'))) {
+                    $correctDate = new \DateTime(date('y') . '-' . (int) $this->helper->first($schedule['params']['monthly_months']) . '-1');//First of month
+                    $correctDate->modify('last day of this month');
+                    $schedule['params']['monthly_day'] = $correctDate->format('d');
+                }
+            }
+
             $this->cron =
                 $this->monthly(
-                    (int) $this->month,
-                    (int) $this->dateOfMonth,
+                    (int) $this->helper->first($schedule['params']['monthly_months']),
+                    (int) $schedule['params']['monthly_day'],
                     (int) $schedule['params']['monthly_hours'],
                     (int) $schedule['params']['monthly_minutes']
                 )->executionTime;
 
-            $secsLeft = $this->cron->getNextRunDate()->getTimestamp() - time();
-
             $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
 
-            if ($secsLeft > 86400) { //gt 1 day means the time has passed so get next time.
-                if (count($schedule['params']['monthly_months']) > 1) {
-                    if ($this->month == $this->helper->last($schedule['params']['monthly_months'])) {//If December, the next day of execution will be 1st of array.
-                        $this->cron =
-                            $this->monthly(
-                                (int) $this->helper->first($schedule['params']['monthly_months']),
-                                (int) $this->dateOfMonth,
-                                (int) $schedule['params']['monthly_hours'],
-                                (int) $schedule['params']['monthly_minutes']
-                            )->executionTime;
+            if (count($schedule['params']['monthly_months']) > 1) {
+                if ($this->month == $this->helper->last($schedule['params']['monthly_months'])) {//If December, the next day of execution will be 1st of array.
+                    $year = date('Y');
+                    if ((int) $this->helper->first($schedule['params']['monthly_months']) < $this->month) {
+                        $year = $year + 1;//next year
+                    }
 
-                        $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
-                    } else {
-                        $monthKey = array_search($this->month, $schedule['params']['monthly_months']);
+                    if (!checkdate((int) $this->helper->first($schedule['params']['monthly_months']), (int) $schedule['params']['monthly_day'], date('Y'))) {
+                        $correctDate = new \DateTime(date('y') . '-' . (int) $this->helper->first($schedule['params']['monthly_months']) . '-1');//First of month
+                        $correctDate->modify('last day of this month');
+                        $schedule['params']['monthly_day'] = $correctDate->format('d');
+                    }
 
+                    $this->cron =
+                        $this->monthly(
+                            (int) $this->helper->first($schedule['params']['monthly_months']),
+                            (int) $schedule['params']['monthly_day'],
+                            (int) $schedule['params']['monthly_hours'],
+                            (int) $schedule['params']['monthly_minutes']
+                        )->executionTime;
+
+                    $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
+                } else {
+                    $monthKey = array_search($this->month, $schedule['params']['monthly_months']);
+
+                    if ($monthKey) {
                         $nextKey = prefix_get_next_key_array($schedule['params']['monthly_months'], $monthKey);
+
+                        $year = date('Y');
+                        if ((int) $schedule['params']['monthly_months'][$nextKey] < $this->month) {
+                            $year = $year + 1;//next year
+                        }
+
+                        if (!checkdate((int) $schedule['params']['monthly_months'][$nextKey], (int) $schedule['params']['monthly_day'], date('Y'))) {
+                            $correctDate = new \DateTime(date('y') . '-' . (int) $this->helper->first($schedule['params']['monthly_months']) . '-1');//First of month
+                            $correctDate->modify('last day of this month');
+                            $schedule['params']['monthly_day'] = $correctDate->format('d');
+                        }
 
                         $this->cron =
                             $this->monthly(
                                 (int) $schedule['params']['monthly_months'][$nextKey],
-                                (int) $this->dateOfMonth,
+                                (int) $schedule['params']['monthly_day'],
                                 (int) $schedule['params']['monthly_hours'],
                                 (int) $schedule['params']['monthly_minutes']
                             )->executionTime;
