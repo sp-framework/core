@@ -217,6 +217,41 @@ class Tasks
         array_push($taskArr, $taskEntry);
 
         if ($this->databasetype !== 'db') {
+            $dbCall = $callStore->findBy(['name', '=', 'ProcessSystemBackup']);
+        } else {
+            $dbCall =
+                $this->db->fetchAll(
+                    "SELECT * FROM basepackages_workers_calls WHERE name = :name",
+                    Enum::FETCH_ASSOC,
+                    [
+                        "name" => 'ProcessSystemBackup',
+                    ]
+                );
+        }
+
+        if ($dbCall && count($dbCall) > 0) {
+            $dbCall = $dbCall[0];
+        }
+
+        //System Backup
+        $taskEntry =
+            [
+                'name'              => 'System Backup',
+                'description'       => 'Run system backup once a day.',
+                'exec_type'         => 'call',
+                'cid'               => $dbCall['id'],
+                'call_args'         => '{"apps_dir":"false","systems_dir":"false","public_dir":"false","private_dir":"false","html_compiled_dir":"false","var_dir":"false","external_dir":"false","external_vendor_dir":"false","old_backups_dir":"false","database":"false","keys":"false","password_protect":"","notes":"","rclone_to_gdrive":"false","rclone_remote_drive":"","rclone_remote_path":""}',
+                'schedule_id'       => 7,//Everyday at midnight
+                'is_on_demand'      => false,
+                'priority'          => 10,//Run before Housekeeping
+                'enabled'           => true,
+                'type'              => 0,
+                'job_log_mode'      => 4,//Monthly logs
+                'status'            => 0
+            ];
+        array_push($taskArr, $taskEntry);
+
+        if ($this->databasetype !== 'db') {
             $dbCall = $callStore->findBy(['name', '=', 'ProcessHousekeeping']);
         } else {
             $dbCall =
@@ -243,7 +278,7 @@ class Tasks
                 'call_args'         => '{"tasks":["cleanStorageOrphans","cleanActivityLogs","cleanUnusedTags","cleanStaleSessions"]}',
                 'schedule_id'       => 7,//Everyday at midnight
                 'is_on_demand'      => false,
-                'priority'          => 10,
+                'priority'          => 8,//Run after backup has been complete
                 'enabled'           => true,
                 'type'              => 0,
                 'job_log_mode'      => 4,//Monthly logs
