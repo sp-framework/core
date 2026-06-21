@@ -46,7 +46,9 @@ class ProcessSystemBackup extends Calls
 
             if ($this->basepackages->backuprestore->packagesData->responseCode == 0) {
                 if (isset($this->args['rclone_to_gdrive']) && $this->args['rclone_to_gdrive'] == 'true') {
-                    if (!isset($this->args['rclone_remote_drive']) || !isset($this->args['rclone_remote_path'])) {
+                    if ((!isset($this->args['rclone_remote_drive']) || (isset($this->args['rclone_remote_drive']) && $this->args['rclone_remote_drive'] === '')) ||
+                        (!isset($this->args['rclone_remote_path']) || (isset($this->args['rclone_remote_path']) && $this->args['rclone_remote_path'] === ''))
+                    ) {
                         throw new \Exception('Rclone remote drive and remote path information missing');
                     }
 
