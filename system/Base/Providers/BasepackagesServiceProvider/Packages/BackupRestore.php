@@ -87,7 +87,7 @@ class BackupRestore extends BasePackage
         }
     }
 
-    public function backup(array $data, $viaModuleInstaller = false)
+    public function backup(array $data, $viaExternalScript = false)
     {
         set_time_limit(3600);//1Hr
 
@@ -105,7 +105,7 @@ class BackupRestore extends BasePackage
         if ($noOptions) {
             $this->addResponse('Nothing to backup!', 1, []);
 
-            if (!$viaModuleInstaller) {
+            if (!$viaExternalScript) {
                 $this->basepackages->progress->preCheckComplete(false);
 
                 $this->basepackages->progress->resetProgress();
@@ -126,17 +126,13 @@ class BackupRestore extends BasePackage
         if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true' ||
             isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] == 'true'
         ) {
-            if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true') {
-                $this->backupInfo['request']['systems_dir'] = 'true';
-            }
-
             if (!isset($this->backupInfo['request']['password_protect']) ||
                 (isset($this->backupInfo['request']['password_protect']) &&
                 $this->backupInfo['request']['password_protect'] === '')
             ) {
-                $this->addResponse('Protect password missing!', 1, []);
+                $this->addResponse('Password required for taking backup of database or security keys.', 1, []);
 
-                if (!$viaModuleInstaller) {
+                if (!$viaExternalScript) {
                     $this->basepackages->progress->preCheckComplete(false);
 
                     $this->basepackages->progress->resetProgress();
@@ -146,31 +142,43 @@ class BackupRestore extends BasePackage
             }
         }
 
+        $unregisterMethods = [];
         $noFilesOptions = true;
         foreach ($data as $key => $value) {
             if (str_contains($key, '_dir') && $value == 'true') {
                 $noFilesOptions = false;
+
+                break;
             }
         }
         if ($noFilesOptions) {
-            if ($viaModuleInstaller) {
-                $this->basepackages->progress->unregisterMethods(['createBackup'], 'method', ['generateStructure']);
-            } else {
-                $this->basepackages->progress->unregisterMethods(['generateStructure']);
+            if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'false') {
+                array_push($unregisterMethods, 'generateStructure');
             }
         }
 
         if (!isset($this->backupInfo['request']['database']) ||
             (isset($this->backupInfo['request']['database']) && $this->backupInfo['request']['database'] != 'true')
         ) {
-            if ($viaModuleInstaller) {
-                $this->basepackages->progress->unregisterMethods(['createBackup'], 'method', ['performDbBackup']);
+            array_push($unregisterMethods, 'performDbBackup');
+        }
+
+        if (count($unregisterMethods) > 0) {
+            if ($viaExternalScript) {
+                $this->basepackages->progress->unregisterMethods(['createBackup'], 'method', $unregisterMethods);
             } else {
-                $this->basepackages->progress->unregisterMethods(['performDbBackup']);
+                $this->basepackages->progress->unregisterMethods($unregisterMethods);
+            }
+
+            if (in_array('generateStructure', $unregisterMethods)) {
+                unset($this->backupProgressMethods[0]);
+            }
+            if (in_array('performDbBackup', $unregisterMethods)) {
+                unset($this->backupProgressMethods[1]);
             }
         }
 
-        if (!$viaModuleInstaller) {
+        if (!$viaExternalScript) {
             $this->basepackages->progress->preCheckComplete();
 
             foreach ($this->backupProgressMethods as $method) {
@@ -211,7 +219,9 @@ class BackupRestore extends BasePackage
             if (isset($this->backupInfo['request']['apps_dir']) && $this->backupInfo['request']['apps_dir'] == 'true') {
                 $steps['apps_dir'] = true;
             }
-            if (isset($this->backupInfo['request']['systems_dir']) && $this->backupInfo['request']['systems_dir'] == 'true') {
+            if (isset($this->backupInfo['request']['systems_dir']) && $this->backupInfo['request']['systems_dir'] == 'true' ||
+                isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true'
+            ) {
                 $steps['systems_dir'] = true;
             }
             if (isset($this->backupInfo['request']['public_dir']) && $this->backupInfo['request']['public_dir'] == 'true') {
@@ -262,18 +272,26 @@ class BackupRestore extends BasePackage
                     $text = 'Generating structure for old backups dir...';
                 }
 
-                $this->basepackages->progress->updateProgress(
-                    method: $this->method,
-                    counters: ['stepsTotal' => $stepsTotal, 'stepsCurrent' => $stepsCurrent],
-                    text: $text
-                );
+                if (PHP_SAPI !== 'cli') {
+                    $this->basepackages->progress->updateProgress(
+                        method: $this->method,
+                        counters: ['stepsTotal' => $stepsTotal, 'stepsCurrent' => $stepsCurrent],
+                        text: $text
+                    );
+                }
 
                 if ($step === 'database') {
                     $this->getContent($this->basepackages->utils->scanDir('.ff/'));
                 } else if ($step === 'apps_dir') {
                     $this->getContent($this->basepackages->utils->scanDir('apps/'));
                 } else if ($step === 'systems_dir') {
-                    $this->getContent($this->basepackages->utils->scanDir('system/'));
+                    if (isset($this->backupInfo['request']['systems_dir']) && $this->backupInfo['request']['systems_dir'] == 'true') {
+                        $this->getContent($this->basepackages->utils->scanDir('system/'));
+                    } else {
+                        if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true') {
+                            $this->getContent($this->basepackages->utils->scanDir('system/', false));
+                        }
+                    }
                 } else if ($step === 'public_dir') {
                     $this->getContent($this->basepackages->utils->scanDir('public/'));
                 } else if ($step === 'private_dir') {
@@ -295,7 +313,9 @@ class BackupRestore extends BasePackage
         } catch (\Exception | \throwable $e) {
             $this->addResponse('Backup Error: ' . $e->getMessage(), 1);
 
-            $this->basepackages->progress->resetProgress();
+            if (PHP_SAPI !== 'cli') {
+                $this->basepackages->progress->resetProgress();
+            }
 
             return false;
         }
@@ -312,11 +332,13 @@ class BackupRestore extends BasePackage
             foreach ($this->backupInfo['files'] as $file) {
                 $stepsCurrent++;
 
-                $this->basepackages->progress->updateProgress(
-                    method: $this->method,
-                    counters: ['stepsTotal' => $stepsTotal, 'stepsCurrent' => $stepsCurrent],
-                    text: $file
-                );
+                if (PHP_SAPI !== 'cli') {
+                    $this->basepackages->progress->updateProgress(
+                        method: $this->method,
+                        counters: ['stepsTotal' => $stepsTotal, 'stepsCurrent' => $stepsCurrent],
+                        text: $file
+                    );
+                }
 
                 if (!$this->addToZip(base_path($file), $file)) {
                     return false;
@@ -345,7 +367,9 @@ class BackupRestore extends BasePackage
         } catch (\Exception | \throwable $e) {
             $this->addResponse('Backup Error: ' . $e->getMessage(), 1);
 
-            $this->basepackages->progress->resetProgress();
+            if (PHP_SAPI !== 'cli') {
+                $this->basepackages->progress->resetProgress();
+            }
 
             return false;
         }
@@ -382,7 +406,9 @@ class BackupRestore extends BasePackage
             } catch (\Exception | \throwable $e) {
                 $this->addResponse('Backup Error: ' . $e->getMessage(), 1);
 
-                $this->basepackages->progress->resetProgress();
+                if (PHP_SAPI !== 'cli') {
+                    $this->basepackages->progress->resetProgress();
+                }
 
                 return false;
             }
@@ -430,7 +456,9 @@ class BackupRestore extends BasePackage
         } catch (\Exception | \throwable $e) {
             $this->addResponse('Backup Error: ' . $e->getMessage(), 1);
 
-            $this->basepackages->progress->resetProgress();
+            if (PHP_SAPI !== 'cli') {
+                $this->basepackages->progress->resetProgress();
+            }
         }
 
         return false;
@@ -459,7 +487,9 @@ class BackupRestore extends BasePackage
 
                 $this->addResponse('Could not set provided password for file ' . $name, 1, []);
 
-                $this->basepackages->progress->resetProgress();
+                if (PHP_SAPI !== 'cli') {
+                    $this->basepackages->progress->resetProgress();
+                }
 
                 return false;
             }
@@ -469,7 +499,9 @@ class BackupRestore extends BasePackage
 
                 $this->addResponse('Could not zip file: ' . $name, 1, []);
 
-                $this->basepackages->progress->resetProgress();
+                if (PHP_SAPI !== 'cli') {
+                    $this->basepackages->progress->resetProgress();
+                }
 
                 return false;
             }
@@ -480,6 +512,10 @@ class BackupRestore extends BasePackage
 
     public function restore(array $data)
     {
+        if (PHP_SAPI === 'cli') {
+            return true;
+        }
+
         if (!isset($data['id'])) {
             $this->addResponse('Please provide backup file id', 1, []);
 
@@ -533,6 +569,10 @@ class BackupRestore extends BasePackage
 
     protected function unzipBackupFiles($data)
     {
+        if (PHP_SAPI === 'cli') {
+            return true;
+        }
+
         if (!$this->zip->extractTo(base_path('var/tmp/backups/' . $this->fileNameLocation))) {
             $this->addResponse('Error unzipping backup file. Please upload backup again.', 1);
 
@@ -546,6 +586,10 @@ class BackupRestore extends BasePackage
 
     protected function performDbRestore($data)
     {
+        if (PHP_SAPI === 'cli') {
+            return true;
+        }
+
         if (isset($data['dbs'])) {
             if (!isset($data['root_username']) || !isset($data['root_username'])) {
                 $this->addResponse('Root Username & Password required to restore databases.', 1);
@@ -645,6 +689,10 @@ class BackupRestore extends BasePackage
 
     protected function performStructureRestore($data)
     {
+        if (PHP_SAPI === 'cli') {
+            return true;
+        }
+
         if (isset($data['restore_structure'])) {
             if (isset($data['restore_structure']['folders'])) {
                 foreach ($data['restore_structure']['folders'] as $restoreStructureFolders) {
@@ -734,6 +782,10 @@ class BackupRestore extends BasePackage
 
     public function analyseBackinfoFile($id)
     {
+        if (PHP_SAPI === 'cli') {
+            return true;
+        }
+
         $fileInfo = $this->basepackages->storages->getFileInfo($id);
 
         if ($fileInfo) {
@@ -791,11 +843,25 @@ class BackupRestore extends BasePackage
 
         foreach ($localContent['dirs'] as $key => $dir) {
             $key = $dirsKeyCount + $key;
-            if (isset($this->backupInfo['request']['html_compiled_dir']) && $this->backupInfo['request']['html_compiled_dir'] == 'true') {
-                $this->backupInfo['dirs'] = array_merge($this->backupInfo['dirs'], ['fo' . $key => $dir]);
-            } else {
-                if (strpos($dir, 'Html_compiled') === false) {
+            if (strpos($dir, '.git') === false && strpos($dir, 'linter-backup') === false) {
+                if (isset($this->backupInfo['request']['html_compiled_dir']) && $this->backupInfo['request']['html_compiled_dir'] == 'true') {
                     $this->backupInfo['dirs'] = array_merge($this->backupInfo['dirs'], ['fo' . $key => $dir]);
+                } else {
+                    if (strpos($dir, 'Html_compiled') === false) {
+                        if ($dir === 'system/') {
+                            if (isset($this->backupInfo['request']['systems_dir']) && $this->backupInfo['request']['systems_dir'] == 'true') {
+                                $this->backupInfo['dirs'] = array_merge($this->backupInfo['dirs'], ['fo' . $key => $dir]);
+                            } else {
+                                if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true' &&
+                                    ($dir === 'system/')
+                                ) {
+                                    $this->backupInfo['dirs'] = array_merge($this->backupInfo['dirs'], ['fo' . $key => $dir]);
+                                }
+                            }
+                        } else {
+                            $this->backupInfo['dirs'] = array_merge($this->backupInfo['dirs'], ['fo' . $key => $dir]);
+                        }
+                    }
                 }
             }
         }
@@ -807,9 +873,15 @@ class BackupRestore extends BasePackage
                     $this->backupInfo['files'] = array_merge($this->backupInfo['files'], ['fi' . $key => $file]);
                 } else {
                     if (strpos($file, 'Html_compiled') === false) {
-                        if ($file === 'system/.keys' || $file === 'system/.dbkeys') {
-                            if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true') {
+                        if (str_starts_with($file, 'system/')) {
+                            if (isset($this->backupInfo['request']['systems_dir']) && $this->backupInfo['request']['systems_dir'] == 'true') {
                                 $this->backupInfo['files'] = array_merge($this->backupInfo['files'], ['fi' . $key => $file]);
+                            } else {
+                                if (isset($this->backupInfo['request']['keys']) && $this->backupInfo['request']['keys'] == 'true' &&
+                                    ($file === 'system/.keys' || $file === 'system/.dbkeys')
+                                ) {
+                                    $this->backupInfo['files'] = array_merge($this->backupInfo['files'], ['fi' . $key => $file]);
+                                }
                             }
                         } else {
                             $this->backupInfo['files'] = array_merge($this->backupInfo['files'], ['fi' . $key => $file]);
@@ -858,7 +930,7 @@ class BackupRestore extends BasePackage
 
     public function getBackupProgressMethods()
     {
-        $this->backupProgressMethods =
+        return $this->backupProgressMethods =
             [
                 [
                     'method'    => 'generateStructure',
@@ -879,8 +951,6 @@ class BackupRestore extends BasePackage
                     'text'      => 'Fnishing up...'
                 ]
             ];
-
-        return $this->backupProgressMethods;
     }
 
     protected function registerBackupProgressMethods()
@@ -892,7 +962,7 @@ class BackupRestore extends BasePackage
 
     public function getRestoreProgressMethods()
     {
-        $this->restoreProgressMethods =
+        return $this->restoreProgressMethods =
             [
                 [
                     'method'    => 'unzipBackupFiles',
@@ -907,8 +977,6 @@ class BackupRestore extends BasePackage
                     'text'      => 'Restore databases...'
                 ]
             ];
-
-        return $this->restoreProgressMethods;
     }
 
     protected function registerRestoreProgressMethods()
