@@ -1265,6 +1265,12 @@ class Core extends BasePackage
 		if (isset($data['timeout_session_absolute'])) {
 			$this->core['settings']['timeout']['session_absolute'] = (int) $data['timeout_session_absolute'];
 		}
+		if (isset($data['country_iso3'])) {
+			$this->core['settings']['locale']['country_iso3'] = $data['country_iso3'];
+		}
+		if (isset($data['timezone'])) {
+			$this->core['settings']['locale']['timezone'] = $data['timezone'];
+		}
 
 		$this->update($this->core);
 
@@ -1449,6 +1455,11 @@ if ($this->core['settings']['databasetype'] === 'hybrid') {
 			"cookies"						=> ' . $this->core['settings']['timeout']['cookies'] . ',
 			"session_idle"					=> ' . $this->core['settings']['timeout']['session_idle'] . ',
 			"session_absolute"				=> ' . $this->core['settings']['timeout']['session_absolute'] . '
+		],
+		"locale"			=>
+		[
+			"country_iso3"					=> "' . $this->core['settings']['locale']['country_iso3'] . '",
+			"timezone"						=> "' . $this->core['settings']['locale']['timezone'] . '",
 		]
 	];';
 

@@ -182,6 +182,10 @@ class CoreComponent extends BaseComponent
 
             $this->view->ffStores = $ffStores;
 
+            $this->view->countries = $this->basepackages->geoCountries->getAll()->geoCountries;
+
+            $this->view->timezones = $this->basepackages->geoTimezones->getAll()->geoTimezones;
+
             $this->view->core = $core;
         }
     }

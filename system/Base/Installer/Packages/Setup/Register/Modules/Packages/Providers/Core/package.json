@@ -139,6 +139,11 @@
 			"cookies" : 86400,
 			"session_idle" : 86400,
 			"session_absolute" : 2592000
+		},
+		"locale" :
+		{
+			"country" : "",
+			"timezone" : ""
 		}
 	}
 }

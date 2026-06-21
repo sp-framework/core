@@ -237,7 +237,8 @@
                                                     <legend class="text-uppercase">Geo Location</legend>
                                                     <div class="row">
                                                         <div class="col">
-                                                            <div class="form-group">
+                                                            <div class="form-group mb-0">
+                                                                <label class="text-uppercase text-xs" for="country">Country *</label>
                                                                 <select class="custom-select rounded-0" style="padding: 0.375rem 1.75rem 0.375rem 0.75rem;" id="country">
                                                                     <?php foreach ($countries as $key => $value) {
                                                                         $selected = '';
@@ -252,6 +253,22 @@
                                                             </div>
                                                         </div>
                                                         <div class="col">
+                                                            <div class="form-group mb-0">
+                                                                <label class="text-uppercase text-xs" for="timezone">Timezone *</label>
+                                                                <select class="custom-select rounded-0" style="padding: 0.375rem 1.75rem 0.375rem 0.75rem;" id="timezone">
+                                                                    <?php foreach ($timezones as $key => $value) {
+                                                                        $selected = '';
+
+                                                                        if ($value['zoneName'] === 'Australia/Melbourne') {
+                                                                            $selected = 'selected=""';
+                                                                        }
+
+                                                                        echo '<option value="' . $value['zoneName'] . '"' . $selected . '>' . $value['zoneName'] . '</option>';
+                                                                    } ?>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+<!--                                                         <div class="col">
                                                             <div class="form-group">
                                                                 <div class="checkbox icheck-danger">
                                                                     <input type="checkbox" name="ip2location" id="ip2location">
@@ -260,9 +277,9 @@
                                                                     </label>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                            <small class="text-danger">Note: Depending on ip database, ip2location database can take several minutes to install.</small>
+                                                        </div> -->
                                                     </div>
-                                                    <small class="text-danger">Note: Depending on ip database, ip2location database can take several minutes to install.</small>
                                                     <legend class="text-uppercase mt-3">Security</legend>
                                                     <div class="row">
                                                         <div class="col">
@@ -653,7 +670,8 @@
                                 "dev"                   : $('#dev')[0].checked,
                                 "databasetype"          : $('#databasetype').val(),
                                 "country"               : $('#country').val(),
-                                "ip2location"           : $('#ip2location')[0].checked
+                                "timezone"              : $('#timezone').val()
+                                // "ip2location"           : $('#ip2location')[0].checked
                             });
 
                         $('.installer-progress-bar').css('width', '0%');

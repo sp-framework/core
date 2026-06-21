@@ -811,6 +811,12 @@ Class Setup
 					true
 				);
 
+			$this->view->timezones =
+				$this->helper->decode(
+					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/TimeZones.json'),
+					true
+				);
+
 			$this->view->coreJson =
 				$this->helper->decode(
 					$this->localContent->read('system/Base/Installer/Packages/Setup/Register/Modules/Packages/Providers/Core/package.json'),

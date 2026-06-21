@@ -89,6 +89,11 @@ return
 			"cookies"						=> 86400,
 			"session_idle" 					=> 86400,
 			"session_absolute" 				=> 2592000
+		],
+		"locale"			=>
+		[
+			"country_iso3"  				=> "",
+			"timezone"  					=> ""
 		]
 	];';
 			$this->writeBaseFile();
@@ -253,6 +258,11 @@ if ($this->coreJson['settings']['databasetype'] === 'hybrid') {
 			"cookies"						=> ' . $this->coreJson['settings']['timeout']['cookies'] . ',
 			"session_idle"					=> ' . $this->coreJson['settings']['timeout']['session_idle'] . ',
 			"session_absolute"				=> ' . $this->coreJson['settings']['timeout']['session_absolute'] . '
+		],
+		"locale"			=>
+		[
+			"country_iso3"  				=> "' . $this->postData['country'] . '",
+			"timezone"  					=> "' . $this->postData['timezone'] . '"
 		]
 	];';
 
