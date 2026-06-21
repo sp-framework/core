@@ -51,7 +51,11 @@ class ProcessEmailQueue extends Calls
 
             $this->addJobResult($this->basepackages->emailqueue->packagesData, $args);
 
-            $this->updateJobTask(3, $args);
+            if ($this->basepackages->emailqueue->packagesData->responseCode == 0) {
+                $this->updateJobTask(3, $args);
+            } else {
+                $this->updateJobTask(4, $args);
+            }
         } catch (\throwable $e) {
             $this->packagesData->responseCode = 1;
 
