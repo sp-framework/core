@@ -39,8 +39,6 @@ class ProcessDbSync extends Calls
 
             $this->updateJobTask(4, $args);
 
-            //Notify the Admins here
-
             return false;
         }
 
