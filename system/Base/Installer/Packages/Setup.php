@@ -744,7 +744,7 @@ class Setup
 
 	protected function registerCountriesStateAndCities()
 	{
-		return (new RegisterCountries())->registerSelectedCountryStatesAndCities($this->ff, $this->localContent, $this->postData['country'], $this->postData['ip2location'], $this->helper);
+		return (new RegisterCountries())->registerSelectedCountryStatesAndCities($this->ff, $this->localContent, $this->postData['country'], null, $this->helper);
 	}
 
 	protected function registerTimezones()

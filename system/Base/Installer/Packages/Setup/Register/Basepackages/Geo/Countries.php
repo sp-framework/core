@@ -148,7 +148,7 @@ class Countries
         }
     }
 
-    public function registerSelectedCountryStatesAndCities($ff, $localContent, $country, $ip2location, $helper)
+    public function registerSelectedCountryStatesAndCities($ff, $localContent, $country, $ip2location = null, $helper)
     {
         // /etc/apache2.conf - Change the timeout to 3600 else you will get Gateway Timeout, revert back when done to 300 (5 mins)
         // Timeout 3600
