@@ -667,8 +667,8 @@ class Workers extends BasePackage
         $phpArgs = [
             'workers' => null,
             'exec' => null,
-            $args['task']['id'] => null,
-            $args['job']['id'] => null
+            'taskId' => $args['task']['id'],
+            'jobId' => $args['job']['id']
         ];
 
         if (method_exists($class,'getPhpArgs')) {
