@@ -286,6 +286,41 @@ class Tasks
             ];
         array_push($taskArr, $taskEntry);
 
+        if ($this->databasetype !== 'db') {
+            $dbCall = $callStore->findBy(['name', '=', 'ProcessRepoSync']);
+        } else {
+            $dbCall =
+                $this->db->fetchAll(
+                    "SELECT * FROM basepackages_workers_calls WHERE name = :name",
+                    Enum::FETCH_ASSOC,
+                    [
+                        "name" => 'ProcessRepoSync',
+                    ]
+                );
+        }
+
+        if ($dbCall && count($dbCall) > 0) {
+            $dbCall = $dbCall[0];
+        }
+
+        //Check for Core updates.
+        $taskEntry =
+            [
+                'name'              => 'Check for update (Core)',
+                'description'       => 'Run monthly checks for core updates.',
+                'exec_type'         => 'call',
+                'cid'               => $dbCall['id'],
+                'call_args'         => '{"api_id":1}',
+                'schedule_id'       => 11,//Everyday at midnight
+                'is_on_demand'      => false,
+                'priority'          => 10,//Run after backup has been complete
+                'enabled'           => true,
+                'type'              => 0,
+                'job_log_mode'      => 5,//Yearly logs
+                'status'            => 0//Keeping disabled as API needs to be configured before enabling it.
+            ];
+        array_push($taskArr, $taskEntry);
+
         return $taskArr;
     }
 }

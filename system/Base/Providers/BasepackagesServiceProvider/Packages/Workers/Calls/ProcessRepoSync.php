@@ -50,8 +50,6 @@ class ProcessRepoSync extends Calls
                 $this->packagesData->responseMessage = $this->modules->manager->packagesData->responseMessage;
 
                 $this->packagesData->responseData = ['counter' => $counter, 'calls' => $this->basepackages->apiClientServices->usedApi->getWebCalls()];
-
-                //Notify Admins here.
             } else {
                 $this->packagesData->responseCode = $this->modules->manager->packagesData->responseCode;
 
