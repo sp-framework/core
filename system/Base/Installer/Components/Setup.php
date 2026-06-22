@@ -214,7 +214,17 @@ Class Setup
 					$this->registerProgressMethods();
 				}
 			}
-		} catch (\Exception $e) {
+		} catch (\throwable $e) {
+			if (strpos($e->getMessage(), 'Class') !== false) {
+				if ($this->request->isGet()) {
+					$this->populateComposerJsonFile();
+				}
+
+				$this->renderView(true);
+
+				exit;
+			}
+
 			if (!$onlyUpdateDb) {
 				$this->progress->preCheckComplete(false);
 
@@ -479,7 +489,7 @@ Class Setup
 					return $this->response->send();
 				}
 			}
-		} else if ($this->request->isPost() && isset($this->postData['session'])) {
+		} else if ($this->request->isPost() && isset($this->postData['session']) && !isset($this->postData['composer'])) {
 			if (isset($this->postData['checkPwStrength']) && isset($this->postData['pass'])) {
 				$strength = $this->checkPwStrength($this->postData['pass']);
 
@@ -522,6 +532,8 @@ Class Setup
 
 				return $this->response->send();
 			}
+		} else if(isset($this->postData['composer'])) {
+			$this->renderView(true);
 		} else {
 			$this->renderView(false, $onlyUpdateDb, $message);
 		}
@@ -721,14 +733,14 @@ Class Setup
 							$this->view->responseCode = 1;
 							$this->view->responseMessage = 'External packages installation error!';
 						}
-
-						$this->view->responseData = $progress;
 					} catch (\throwable $exception) {
-						$progress = array_merge($progress, ['composer' => 'Error retrieving external packages installer information...']);
+						$progress = array_merge($progress, ['composer' => 'Error retrieving external packages installer information...', 'composer_error' => true]);
 
 						$this->view->responseCode = 1;
 						$this->view->responseMessage = 'External packages installation error!';
 					}
+
+					$this->view->responseData = $progress;
 				} else {
 					$this->setupPackage = new SetupPackage($this->container, $this->postData, $precheckFail);
 
@@ -738,8 +750,6 @@ Class Setup
 						$callResult = $this->progress->getCallResult('executeComposer');
 
 						if ($callResult === false) {
-							$this->progress->resetProgress();
-
 							$this->view->responseCode = 3;
 
 							$this->view->responseMessage = 'External packages installation error!';

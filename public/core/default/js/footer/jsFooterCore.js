@@ -12339,10 +12339,6 @@ var BazProgress = function() {
                                 $(element).attr('hidden', false);
                             }
 
-                            if (callableFunc && callableFunc['onComplete']) {
-                                callableFunc['onComplete'](response);
-                            }
-
                             downloadTotal = 0;
                             downloadedBytes = 0;
                             uploadTotal = 0;
@@ -12363,6 +12359,12 @@ var BazProgress = function() {
                             $('.progress-remote, .remote-progress-span').attr('hidden', true);
                             $('#' + $(element)[0].id + '-cancel').attr('hidden', true);
                             $('body').trigger('bazProgressComplete');
+
+                            if (callableFunc && callableFunc['onComplete']) {
+                                callableFunc['onComplete'](response);
+
+                                return;
+                            }
                         }
                     } else {
                         resetProgressCounter();

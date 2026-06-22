@@ -1,27 +1,28 @@
 {
     "require": {
-        "composer\/composer": "^2.7",
+        "composer\/composer": "^2.10@dev",
         "cweagans\/composer-patches": "^1.7",
         "league\/oauth2-server": "^8.5",
         "cboden\/ratchet": "^0.4.4",
         "react\/zmq": "^0.4.0",
-        "react/socket" : "^1.15"
+        "react\/socket": "^1.15",
+        "league\/flysystem": "^3.24"
     },
     "config": {
         "allow-plugins": {
-            "cweagans\/composer-patches": true
+            "cweagans/composer-patches": true
         }
     },
     "extra": {
         "patches": {
-            "react\/socket": {
-                "phpv8.3 support": "patches\/react_socket_connection.patch"
+            "react/socket": {
+                "phpv8.3 support": "patches/react_socket_connection.patch"
             },
-            "cboden\/ratchet": {
-                "phpv8.3 support": "patches\/cboden_ratchet_ioconnection.patch"
+            "cboden/ratchet": {
+                "phpv8.3 support": "patches/cboden_ratchet_ioconnection.patch"
             },
-            "league\/oauth2-server": {
-                "extract client_id": "patches\/league_oauth2_server_bearertokenvalidator.patch"
+            "league/oauth2-server": {
+                "extract client_id": "patches/league_oauth2_server_bearertokenvalidator.patch"
             }
         }
     }
