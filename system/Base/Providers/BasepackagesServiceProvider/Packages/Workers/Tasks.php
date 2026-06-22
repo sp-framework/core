@@ -82,6 +82,8 @@ class Tasks extends BasePackage
             $data['email'] = trim(str_replace(' ', '', $data['email']));
         }
 
+        $data['status'] = 0;
+
         $task = array_merge($task, $data);
 
         try {
