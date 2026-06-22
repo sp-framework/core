@@ -22,7 +22,7 @@ class WorkersTask extends Task
         }
     }
 
-    public function execAction($taskId, $jobId)
+    public function execAction($taskKeyword, $taskId, $jobKeyword, $jobId)
     {
         if ($this->basepackages->workers) {
             try {
