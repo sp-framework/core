@@ -196,12 +196,10 @@ class Auth extends BasePackage
 
         $this->clearAccountSessionId();
 
+        $this->cookies->reset();
+
         if ($this->opCache && $this->opCache->checkCache('account_' . $this->account['id'], 'core')) {
             $this->opCache->removeCache('account_' . $this->account['id'], 'core');
-        }
-
-        if ($this->cookies->has($this->cookieKey)) {
-            $this->cookies->delete($this->cookieKey);
         }
 
         if ($this->session->has('_PHCOOKIE_' . $this->cookieKey)) {
