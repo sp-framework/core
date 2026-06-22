@@ -414,6 +414,8 @@ class Auth extends BasePackage
                 $this->basepackages->accounts->addUpdateSecurity($account['id'], $account['security']);
             }
 
+            date_default_timezone_set($account['profile']['locale_timezone']);
+
             $this->account = $account;
         } else {
             $this->secTools->hashPassword(rand());//Randomize so we take same time to respond as if the account exists.

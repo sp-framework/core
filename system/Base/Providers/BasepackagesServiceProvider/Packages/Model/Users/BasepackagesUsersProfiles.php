@@ -16,9 +16,9 @@ class BasepackagesUsersProfiles extends BaseModel
 
     public $account_id;
 
-    public $locale_country_id;
+    public $locale_country_iso3;
 
-    public $locale_timezone_id;
+    public $locale_timezone;
 
     public $settings;
 

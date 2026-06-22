@@ -7,13 +7,13 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profiles;
 
 class Profile
 {
-    public function register($db, $ff)
+    public function register($db, $ff, $country, $timezone)
     {
         $profile =
             [
                 'account_id'                    => 1,
-                'locale_country_id'             => 0,
-                'locale_timezone_id'            => 0,
+                'locale_country_iso3'           => $country,
+                'locale_timezone'               => $timezone,
                 'settings'                      => '[]'
             ];
 

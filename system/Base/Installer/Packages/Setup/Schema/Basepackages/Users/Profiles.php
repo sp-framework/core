@@ -29,16 +29,18 @@ class Profiles
                         ]
                     ),
                     new Column(
-                        'locale_country_id',
+                        'locale_country_iso3',
                         [
-                            'type'          => Column::TYPE_SMALLINTEGER,
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 3,
                             'notNull'       => false,
                         ]
                     ),
                     new Column(
-                        'locale_timezone_id',
+                        'locale_timezone',
                         [
-                            'type'          => Column::TYPE_SMALLINTEGER,
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 50,
                             'notNull'       => false,
                         ]
                     ),

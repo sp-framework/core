@@ -160,6 +160,10 @@ class Profiles extends BasePackage
 
         $this->basepackages->contactbook->updateContact($contact);
 
+        $profile['locale_country_iso3'] = $data['locale_country_iso3'];
+
+        $profile['locale_timezone'] = $data['locale_timezone'];
+
         if ($this->update($profile)) {
             $this->addResponse('Profile updated');
         } else {
@@ -275,6 +279,14 @@ class Profiles extends BasePackage
         if ($this->opCache && $this->opCache->checkCache('packages', 'core')) {
             $this->opCache->removeCache('packages', 'core');
         }
+
+        if ($this->opCache && $this->opCache->checkCache('account_' . $data['account_id'], 'core')) {
+            $this->opCache->removeCache('account_' . $data['account_id'], 'core');
+        }
+
+        $profile['locale_country_iso3'] = $data['locale_country_iso3'];
+
+        $profile['locale_timezone'] = $data['locale_timezone'];
 
         if ($this->update($profile)) {
             $this->basepackages->storages->changeOrphanStatus($data['portrait'], $portrait);

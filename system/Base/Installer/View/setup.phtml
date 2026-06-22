@@ -240,12 +240,13 @@
                                                             <div class="form-group mb-0">
                                                                 <label class="text-uppercase text-xs" for="country">Country *</label>
                                                                 <select class="custom-select rounded-0" style="padding: 0.375rem 1.75rem 0.375rem 0.75rem;" id="country">
+                                                                    <?php echo '<option value="0">SELECT COUNTRY</option>'; ?>
                                                                     <?php foreach ($countries as $key => $value) {
                                                                         $selected = '';
 
-                                                                        if ($value['iso3'] === 'AUS') {
-                                                                            $selected = 'selected=""';
-                                                                        }
+                                                                        // if ($value['iso3'] === 'AUS') {
+                                                                        //     $selected = 'selected=""';
+                                                                        // }
 
                                                                         echo '<option value="' . $value['iso3'] . '"' . $selected . '>' . $value['name'] . '</option>';
                                                                     } ?>
@@ -256,12 +257,13 @@
                                                             <div class="form-group mb-0">
                                                                 <label class="text-uppercase text-xs" for="timezone">Timezone *</label>
                                                                 <select class="custom-select rounded-0" style="padding: 0.375rem 1.75rem 0.375rem 0.75rem;" id="timezone">
+                                                                    <?php echo '<option value="0">SELECT TIMEZONE</option>'; ?>
                                                                     <?php foreach ($timezones as $key => $value) {
                                                                         $selected = '';
 
-                                                                        if ($value['zoneName'] === 'Australia/Melbourne') {
-                                                                            $selected = 'selected=""';
-                                                                        }
+                                                                        // if ($value['zoneName'] === 'Australia/Melbourne') {
+                                                                        //     $selected = 'selected=""';
+                                                                        // }
 
                                                                         echo '<option value="' . $value['zoneName'] . '"' . $selected . '>' . $value['zoneName'] . '</option>';
                                                                     } ?>
@@ -555,6 +557,16 @@
                     } else if ($('#password').val() === '' && !onlyFf) {
                         $('#password').addClass('is-invalid');
                         $('#password').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if (($('#country').val() === '' || $('#country').val() == '0')) {
+                        $('#country').addClass('is-invalid');
+                        $('#country').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                    } else if (($('#timezone').val() === '' || $('#timezone').val() == '0')) {
+                        $('#timezone').addClass('is-invalid');
+                        $('#timezone').focus(function() {
                             $(this).removeClass('is-invalid');
                         });
                     } else if (($('#create').length > 0 && $('#create-grant').length > 0) &&

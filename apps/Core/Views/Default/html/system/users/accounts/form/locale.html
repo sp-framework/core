@@ -1,10 +1,10 @@
-{% set countryId = 0 %}
-{% if account['profile']['locale_country_id'] is defined %}
-    {% set countryId = account['profile']['locale_country_id'] %}
+{% set countryIso3 = "" %}
+{% if account['profile']['locale_country_iso3'] is defined %}
+    {% set countryIso3 = account['profile']['locale_country_iso3'] %}
 {% endif %}
-{% set timezoneId = 0 %}
-{% if account['profile']['locale_timezone_id'] is defined %}
-    {% set timezoneId = account['profile']['locale_timezone_id'] %}
+{% set timezone = 0 %}
+{% if account['profile']['locale_timezone'] is defined %}
+    {% set timezone = account['profile']['locale_timezone'] %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -14,7 +14,7 @@
                 'componentName'                        : componentName,
                 'componentId'                          : componentId,
                 'sectionId'                            : sectionId,
-                'fieldId'                              : 'locale_country_id',
+                'fieldId'                              : 'locale_country_iso3',
                 'fieldLabel'                           : 'Country',
                 'fieldType'                            : 'select2',
                 'fieldHelp'                            : true,
@@ -25,10 +25,10 @@
                 'fieldBazPostOnCreate'                 : true,
                 'fieldBazPostOnUpdate'                 : true,
                 'fieldDataSelect2Options'              : countries,
-                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsKey'           : 'iso3',
                 'fieldDataSelect2OptionsValue'         : 'name',
                 'fieldDataSelect2OptionsArray'         : true,
-                'fieldDataSelect2OptionsSelected'      : countryId
+                'fieldDataSelect2OptionsSelected'      : countryIso3
             ]
         )}}
     </div>
@@ -39,7 +39,7 @@
                 'componentName'                        : componentName,
                 'componentId'                          : componentId,
                 'sectionId'                            : sectionId,
-                'fieldId'                              : 'locale_timezone_id',
+                'fieldId'                              : 'locale_timezone',
                 'fieldLabel'                           : 'Timezone',
                 'fieldType'                            : 'select2',
                 'fieldHelp'                            : true,
@@ -50,10 +50,10 @@
                 'fieldBazPostOnCreate'                 : true,
                 'fieldBazPostOnUpdate'                 : true,
                 'fieldDataSelect2Options'              : timezones,
-                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsKey'           : 'zone_name',
                 'fieldDataSelect2OptionsValue'         : 'zone_name',
                 'fieldDataSelect2OptionsArray'         : true,
-                'fieldDataSelect2OptionsSelected'      : timezoneId
+                'fieldDataSelect2OptionsSelected'      : timezone
             ]
         )}}
     </div>
