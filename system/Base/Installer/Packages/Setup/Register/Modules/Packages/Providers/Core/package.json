@@ -142,7 +142,7 @@
 		},
 		"locale" :
 		{
-			"country" : "",
+			"country_iso3" : "",
 			"timezone" : ""
 		}
 	}
