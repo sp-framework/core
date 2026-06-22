@@ -244,9 +244,9 @@
                                                                     <?php foreach ($countries as $key => $value) {
                                                                         $selected = '';
 
-                                                                        // if ($value['iso3'] === 'AUS') {
-                                                                        //     $selected = 'selected=""';
-                                                                        // }
+                                                                        if ($value['iso3'] === 'AUS') {
+                                                                            $selected = 'selected=""';
+                                                                        }
 
                                                                         echo '<option value="' . $value['iso3'] . '"' . $selected . '>' . $value['name'] . '</option>';
                                                                     } ?>
@@ -261,9 +261,9 @@
                                                                     <?php foreach ($timezones as $key => $value) {
                                                                         $selected = '';
 
-                                                                        // if ($value['zoneName'] === 'Australia/Melbourne') {
-                                                                        //     $selected = 'selected=""';
-                                                                        // }
+                                                                        if ($value['zoneName'] === 'Australia/Melbourne') {
+                                                                            $selected = 'selected=""';
+                                                                        }
 
                                                                         echo '<option value="' . $value['zoneName'] . '"' . $selected . '>' . $value['zoneName'] . '</option>';
                                                                     } ?>
