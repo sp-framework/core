@@ -171,12 +171,6 @@ class Jobs extends BasePackage
             return false;
         }
 
-        if ($job['status'] != '2') {
-            $this->addResponse('Job is no longer running.');
-
-            return false;
-        }
-
         //Get Process ID from task
         $task = $this->basepackages->workers->tasks->getById((int) $job['task_id']);
 
@@ -184,6 +178,12 @@ class Jobs extends BasePackage
             $this->addResponse('Task with ID not found', 1);
 
             return false;
+        }
+
+        if ($task['exec_type'] !== 'raw' && $job['status'] != '2') {
+            $this->addResponse('Job is no longer running.');
+
+            return true;
         }
 
         if ($job['pid'] && $job['pid'] > 0) {
@@ -197,12 +197,66 @@ class Jobs extends BasePackage
 
             $call = new $call['class'];
 
-            $call->terminate($task, $job);
+            if ($call->terminate($task, $job)) {
+                $job['pid'] = null;
+
+                $this->update($job);
+
+                $this->addResponse('Job terminated!');
+
+                return true;
+            }
+
+            $this->addResponse('Job could not be terminated!', 1);
+
+            return false;
+        } else {
+            $this->addResponse('Job is no longer running.');
 
             return true;
         }
 
         $this->addResponse('Job cannot be terminated as there are other calls running along with this job. Change script type to PHP or RAW to terminate this job.', 1);
+
+        return false;
+    }
+
+    public function getJobLogs($data)
+    {
+        $job = $this->getById((int) $data['job_id']);
+
+        if (!$job) {
+            $this->addResponse('Job with ID not found', 1);
+
+            return false;
+        }
+
+        $task = $this->basepackages->workers->tasks->getById((int) $job['task_id']);
+
+        if (!$task) {
+            $this->addResponse('Task with ID not found', 1);
+
+            return false;
+        }
+
+        $logs = null;
+        if (file_exists(base_path('var/workers/output/' . $job['id'] . '.log'))) {
+            $logs = file_get_contents(base_path('var/workers/output/' . $job['id'] . '.log'));
+        } else {
+            $this->addResponse('Log file does not exists', 1);
+
+            return false;
+        }
+
+        if ($logs) {
+            $logs = str_replace(PHP_EOL, '<br>', $logs);
+
+            $this->addResponse('Log file read successfully', 0, ['logs' => $logs]);
+
+            return true;
+        }
+
+        $this->addResponse('Error reading log file.', 1);
 
         return false;
     }

@@ -1,4 +1,57 @@
+{% set jobTask = [] %}
+{% set jobJob = [] %}
+{% if task is defined and task['exec_type'] == 'raw' %}
+    {% set jobTask = task %}
+    <div class="row mb-2">
+        <div class="col">
+            {{adminltetags.useTag('buttons',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'buttonType'                     : 'button',
+                    'buttons'                        :
+                        [
+                            'logs'          : [
+                                'title'                    : 'View Logs',
+                                'size'                     : 'xs',
+                                'type'                     : 'info',
+                                'icon'                     : 'clipboard-list',
+                                'position'                 : 'left'
+                            ],
+                            'terminate'          : [
+                                'title'                    : 'Terminate',
+                                'size'                     : 'xs',
+                                'type'                     : 'danger',
+                                'icon'                     : 'circle-xmark',
+                                'position'                 : 'right'
+                            ]
+                        ]
+                ]
+            )}}
+            {{adminltetags.useTag('modal',
+                [
+                    'component'                 : component,
+                    'componentName'             : componentName,
+                    'componentId'               : componentId,
+                    'sectionId'                 : sectionId,
+                    'modalId'                   : 'logs-modal',
+                    'modalBodyContent'          : '',
+                    'modalType'                 : 'info',
+                    'modalSize'                 : 'xl',
+                    'modalHeader'               : true,
+                    'modalHeaderCloseButton'    : true,
+                    'modalFooter'               : true,
+                    'modalEscClose'             : true,
+                    'modalTitle'                : '<i class="fa fas fa-fw fa-clipboard-list"></i> Logs'
+                ]
+            )}}
+        </div>
+    </div>
+{% endif %}
 {% if job['id'] is defined %}
+    {% set jobJob = job %}
     {% set jobResult = '' %}
     {% if job['response_code'] is defined %}
         {% if is_array(job['response_code']) %}
@@ -30,7 +83,7 @@
         {% endif %}
         {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-email"><strong class="text-uppercase">Email Results: </strong> ' ~ job['email_results'] ~ '</div><br>' %}
     {% endif %}
-    {% set jobResult = jobResult ~ '<button class="btn btn-xs btn-info mr-1" id="' ~ componentId ~ '-' ~ sectionId ~ '-format-data" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-magic"></i> FORMAT DATA</button><br><br>' %}
+    {% set jobResult = jobResult ~ '<button class="btn btn-xs btn-info mr-1" id="' ~ componentId ~ '-' ~ sectionId ~ '-format-data" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-wand-magic-sparkles"></i> FORMAT DATA</button><br><br>' %}
     <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
         <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
             <div class="row">
@@ -56,8 +109,11 @@
             </div>
         </fieldset>
     </form>
-    <script>
-/* globals BazHelpers */
+{% endif %}
+{% set jobTask = json_encode(jobTask, 16) %}
+{% set jobJob = json_encode(jobJob, 16) %}
+<script>
+/* globals BazHelpers paginatedPNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -81,6 +137,15 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
     dataCollectionSectionForm =
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
+
+if (!dataCollectionSectionForm['vars']) {
+    dataCollectionSectionForm['vars'] = { };
+}
+if (!dataCollectionSectionForm['funcs']) {
+    dataCollectionSectionForm['funcs'] = { };
+}
+dataCollectionSectionForm['vars']['task'] = JSON.parse('{{jobTask}}');
+dataCollectionSectionForm['vars']['job'] = JSON.parse('{{jobJob}}');
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -159,6 +224,61 @@ dataCollectionSection =
 
                     $(this).attr('hidden', true);
                 });
+
+                $('#{{componentId}}-{{sectionId}}-logs').off();
+                $('#{{componentId}}-{{sectionId}}-logs').click(function(e) {
+                    e.preventDefault();
+
+                    if (dataCollectionSectionForm['vars']['job']['id']) {
+                        var postData = { };
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['job_id'] = dataCollectionSectionForm['vars']['job']['id'];
+
+                        $.post('{{links.url("system/workers/jobs/getJobLogs")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $("#security-token").attr("name", response.tokenKey);
+                                $("#security-token").val(response.token);
+                            }
+
+                            if (response.responseCode === 0) {
+                                if (response.responseData.logs) {
+                                    $('#{{componentId}}-{{sectionId}}-logs-modal .modal-body').empty().html(response.responseData.logs);
+
+                                    $('#{{componentId}}-{{sectionId}}-logs-modal').modal('show');
+                                }
+                            } else if (response.responseCode === 1) {
+                                paginatedPNotify('error', {'text' : response.responseMessage});
+                            }
+                        }, 'json');
+
+                    }
+                });
+
+
+                $('#{{componentId}}-{{sectionId}}-terminate').off();
+                $('#{{componentId}}-{{sectionId}}-terminate').click(function(e) {
+                    e.preventDefault();
+
+                    if (dataCollectionSectionForm['vars']['job']['id']) {
+                        var postData = { };
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+                        postData['id'] = dataCollectionSectionForm['vars']['job']['id'];
+
+                        $.post('{{links.url("system/workers/jobs/terminate")}}', postData, function(response) {
+                            if (response.tokenKey && response.token) {
+                                $("#security-token").attr("name", response.tokenKey);
+                                $("#security-token").val(response.token);
+                            }
+
+                            if (response.responseCode === 0) {
+                                paginatedPNotify('success', {'text' : response.responseMessage});
+                            } else if (response.responseCode === 1) {
+                                paginatedPNotify('error', {'text' : response.responseMessage});
+                            }
+                        }, 'json');
+
+                    }
+                });
             }
         },
         '{{componentId}}-{{sectionId}}-form'                    : {
@@ -169,4 +289,3 @@ dataCollectionSection =
         }
     });
 </script>
-{% endif %}

@@ -132,17 +132,11 @@ class Calls extends BasePackage
 
             $job['status'] = $status;
 
-            if ($task['exec_type'] === 'raw') {
-                if (method_exists($this, 'terminate')) {
-                    $job['can_terminate'] = true;
-                }
+            if (method_exists($this, 'terminate')) {
+                $job['can_terminate'] = true;
             }
 
             if ($job['status'] == 2) {
-                if (method_exists($this, 'terminate')) {
-                    $job['can_terminate'] = true;
-                }
-
                 $this->startTime = microtime(true);
                 if ($job['run_on']) {
                     if (is_string($job['run_on'])) {

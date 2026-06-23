@@ -713,6 +713,10 @@ class Workers extends BasePackage
             $phpArgs = array_merge($phpArgs, (new $class)->getPhpArgs());
         }
 
+        if (method_exists($class, 'terminate')) {
+            $args['job']['can_terminate'] = true;
+        }
+
         $phpScript = base_path('public/index.php');
 
         if ($schedule['type'] === 'everyxseconds' ||
@@ -877,6 +881,12 @@ class Workers extends BasePackage
             $rawArgs = $class->getRawArgs();
         }
 
+        if (method_exists($class, 'terminate')) {
+            $args['job']['can_terminate'] = true;
+
+            $this->jobs->updateJob($args['job']);
+        }
+
         if ($schedule['type'] === 'everyminute') {
             $this->scheduler->raw(
                 $rawCmd,
@@ -1002,19 +1012,19 @@ class Workers extends BasePackage
     protected function processThen($args, $rawCmd = false)
     {
         if ($rawCmd) {
-            $args['job']['pid'] = $this->getTaskProcessId($args['task'], null, $rawCmd);
-
-            $this->basepackages->workers->jobs->updateJob($args['job']);
-
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseMessage = 'Job sent for execution successfully. Check log file : var/workers/output/' . $args['job']['id'] . '.log';
+            $this->packagesData->responseMessage = 'Job sent for execution successfully.';
 
-            $this->packagesData->responseData = [];
+            $this->packagesData->responseData = ['Check log file : var/workers/output/' . $args['job']['id'] . '.log'];
 
             $this->calls->addJobResult($this->packagesData, $args);
 
             $this->calls->updateJobTask(3, $args);
+
+            $args['job']['pid'] = $this->getTaskProcessId($args['task'], null, $rawCmd);
+
+            $this->basepackages->workers->jobs->updateJob($args['job']);
         } else {
             $args['job']['pid'] = $this->getTaskProcessId($args['task'], base_path('public/index.php workers exec'));
 
@@ -1063,7 +1073,10 @@ class Workers extends BasePackage
 
                     if ($phpScript && str_contains($outputValue, 'taskId'))  {
                         $found = true;
-                    } else if ($rawCommand && str_ends_with($outputValue, $grep) && !str_ends_with($outputValue, 'grep -F ' . $grep)) {
+                    } else if ($rawCommand &&
+                        (str_ends_with($outputValue, $grep) && !str_ends_with($outputValue, 'grep -F ' . $grep)) ||
+                        (str_ends_with($outputValue, '/dev/null 2>&1 &'))
+                    ) {
                         $found = true;
                     }
 

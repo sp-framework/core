@@ -14,6 +14,8 @@ class JobsComponent extends BaseComponent
     public function initialize()
     {
         $this->jobs = $this->basepackages->workers->jobs;
+
+        $this->tasks = $this->basepackages->workers->tasks;
     }
 
     /**
@@ -27,6 +29,12 @@ class JobsComponent extends BaseComponent
 
                 if (!$job) {
                     return $this->throwIdNotFound();
+                }
+
+                $task = $this->tasks->getById((int) $job['task_id']);
+
+                if ($task) {
+                    $this->view->task = $task;
                 }
 
                 $this->view->job = $job;
@@ -174,6 +182,19 @@ class JobsComponent extends BaseComponent
         $this->addResponse(
             $this->jobs->packagesData->responseMessage,
             $this->jobs->packagesData->responseCode
+        );
+    }
+
+    public function getJobLogsAction()
+    {
+        $this->requestIsPost();
+
+        $this->jobs->getJobLogs($this->postData());
+
+        $this->addResponse(
+            $this->jobs->packagesData->responseMessage,
+            $this->jobs->packagesData->responseCode,
+            $this->jobs->packagesData->responseData ?? [],
         );
     }
 }

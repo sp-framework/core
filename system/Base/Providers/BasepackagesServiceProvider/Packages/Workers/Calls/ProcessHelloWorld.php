@@ -66,6 +66,7 @@ class ProcessHelloWorld extends Calls
     /*
     * If we want to terminate a running job, we can only do it if terminate method is available in the call.
     * Calls will register that the job can be terminated via system/workers/jobs/terminate route by adding a can_terminate flag in the DB.
+    * Must return true to update job pid to null
     */
     public function terminate($task, $job)
     {
@@ -80,6 +81,12 @@ class ProcessHelloWorld extends Calls
 
         $this->updateJobTask(3, $args);
 
-        exec("kill -9 " . $task['pid']);
+        exec("kill -9 " . $job['pid'], $output, $result);
+
+        if ($result === 0) {
+            return true;
+        }
+
+        return false;
     }
 }
