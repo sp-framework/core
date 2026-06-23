@@ -1,29 +1,29 @@
 
 <input id="security-token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
-{% if activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
-    {% if activeLayout === 'topnav' %}
+{% if activeLayout == 'topnav' or activeLayout == 'landing' or activeLayout == 'topnavsidebar' %}
+    {% if activeLayout == 'topnav' or activeLayout == 'landing' %}
         <nav class="main-header navbar navbar-expand-lg navbar-light bg-light" id="main_navbar">
     {% else %}
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <div class="container">
     {% endif %}
-{% elseif activeLayout === 'default' %}
+{% elseif activeLayout == 'default' %}
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <div class="container-fluid">
 {% endif %}
-        {% if activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
-            {% if activeLayout === 'topnavsidebar' %}
+        {% if activeLayout == 'topnav' or activeLayout == 'topnavsidebar' %}
+            {% if activeLayout == 'topnavsidebar' %}
                 {% if str_starts_with(assets.get('branding').getCodes()[0].getContent(), 'public') %}
-                    <img src="{{str_replace('public/', '', links.url(assets.get('branding').getCodes()[0].getContent(), true))}}" alt="{{appName}} Logo" class="brand-image" style="height:30px">
+                    <img src="{{str_replace('public/', '', links.url(assets.get('branding').getCodes()[0].getContent(), true))}}" alt="{{appName}} Logo" class="brand-image" style="height:{{assets.get('branding').getCodes()[0].getAttributes()['maxHeight']}}px">
                 {% else %}
-                    <img src="{{links.images(assets.get('branding').getCodes()[0].getContent())}}" alt="{{appName}} Logo" class="brand-image" style="height:30px">
+                    <img src="{{links.images(assets.get('branding').getCodes()[0].getContent())}}" alt="{{appName}} Logo" class="brand-image" style="height:{{assets.get('branding').getCodes()[0].getattributes()['maxHeight']}}px">
                 {% endif %}
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a id="push-menu" data-widget="pushmenu" class="nav-link" role="button" href="#"><i class="fas fa-bars"></i></a>
                     </li>
                 </ul>
-            {% elseif activeLayout === 'topnav' %}
+            {% elseif activeLayout == 'topnav' %}
                 {% if str_starts_with(assets.get('branding').getCodes()[0].getContent(), 'public') %}
                     <img src="{{str_replace('public/', '', links.url(assets.get('branding').getCodes()[0].getContent(), true))}}" alt="{{appName}} Logo" class="brand-image" style="height:30px">
                 {% else %}
@@ -32,8 +32,8 @@
                 {% include modules.views.getPhalconViewPath() ~ 'layouts/common/header/topnav' with ['activeLayout': activeLayout] %}
             {% endif %}
         {% endif %}
-        {% if activeLayout === 'default' or activeLayout === 'topnavsidebar' %}
-            {% if activeLayout === 'default' %}
+        {% if activeLayout == 'default' or activeLayout == 'topnavsidebar' %}
+            {% if activeLayout == 'default' %}
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a id="push-menu" data-widget="pushmenu" class="nav-link" role="button" href="#"><i class="fas fa-bars"></i></a>
@@ -55,17 +55,17 @@
             {% endif %}
         {% endif %}
     </div>
-{% if activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
-    {% if activeLayout === 'topnav' or activeLayout === 'topnavsidebar' %}
+{% if activeLayout == 'topnav' or activeLayout == 'topnavsidebar' %}
+    {% if activeLayout == 'topnav' or activeLayout == 'topnavsidebar' %}
         </nav>
     {% else %}
         </div>
         </nav>
     {% endif %}
-{% elseif activeLayout === 'default' %}
+{% elseif activeLayout == 'default' %}
 </nav>
 {% endif %}
-{% if activeLayout === 'default' or activeLayout === 'topnavsidebar' %}
+{% if activeLayout == 'default' or activeLayout == 'topnavsidebar' %}
     {% if access.auth.check() %}
         <script>
 /* globals BazCore */
@@ -96,3 +96,4 @@ $('#logout').click(function(e) {
     {% endif %}
 {% endif %}
 {% include modules.views.getPhalconViewPath() ~ 'layouts/common/header/breadcrumb' %}
+

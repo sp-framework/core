@@ -146,6 +146,8 @@ class RegisterComponent extends BaseComponent
             $this->response->setStatusCode(404);
 
             return $this->response->send();
+
+            exit;
         }
 
         $this->view->setLayout('auth');

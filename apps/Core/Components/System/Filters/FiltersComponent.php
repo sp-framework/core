@@ -65,6 +65,7 @@ class FiltersComponent extends BaseComponent
         } else {
             $replaceColumns = null;
         }
+
         $controlActions =
             [
                 'actionsToEnable'       =>
