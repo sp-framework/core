@@ -128,10 +128,21 @@ class Calls extends BasePackage
 
         if (isset($args['job'])) {
             $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
+            $task = $this->basepackages->workers->tasks->getById($args['task']['id'], false, false);
 
             $job['status'] = $status;
 
+            if ($task['exec_type'] === 'raw') {
+                if (method_exists($this, 'terminate')) {
+                    $job['can_terminate'] = true;
+                }
+            }
+
             if ($job['status'] == 2) {
+                if (method_exists($this, 'terminate')) {
+                    $job['can_terminate'] = true;
+                }
+
                 $this->startTime = microtime(true);
                 if ($job['run_on']) {
                     if (is_string($job['run_on'])) {
@@ -183,6 +194,10 @@ class Calls extends BasePackage
 
                 if (is_string($job['run_on'])) {
                     $job['run_on'] = $this->helper->decode($job['run_on'], true);
+                }
+
+                if (!isset($job['run_on'][0])) {
+                    $job['run_on'] = [$this->jobRunOn];
                 }
 
                 $task['previous_run'] = $job['run_on'][0];

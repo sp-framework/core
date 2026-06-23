@@ -64,11 +64,11 @@ class JobsComponent extends BaseComponent
             $this->jobs,
             'system/workers/jobs/view',
             $conditions,
-            ['task_id', 'worker_id', 'run_on', 'status', 'total_execution_time'],
+            ['task_id', 'worker_id', 'run_on', 'status', 'total_execution_time', 'can_terminate'],
             true,
-            ['task_id', 'worker_id', 'run_on', 'status', 'total_execution_time'],
+            ['task_id', 'worker_id', 'run_on', 'status', 'total_execution_time', 'can_terminate'],
             $controlActions,
-            ['task_id'=>'task', 'worker_id'=>'worker'],
+            ['task_id' => 'task', 'worker_id' => 'worker', 'can_terminate' => 'terminate'],
             $replaceColumns,
             'id',
             null,
@@ -86,6 +86,7 @@ class JobsComponent extends BaseComponent
             $data = $this->formatTask($dataKey, $data);
             $data = $this->formatWorker($dataKey, $data);
             $data = $this->formatRunon($dataKey, $data);
+            $data = $this->formatTerminate($dataKey, $data);
             $data = $this->formatStatus($dataKey, $data);
         }
 
@@ -148,5 +149,31 @@ class JobsComponent extends BaseComponent
         }
 
         return $data;
+    }
+
+    protected function formatTerminate($rowId, $data)
+    {
+        if ($data['can_terminate'] && $data['status'] == '2') {
+            $data['can_terminate'] =
+                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-remove-__control-' . $rowId . '" href="' . $this->links->url('system/workers/jobs/terminate/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-danger btn-xs rowTerminate text-uppercase" data-notificationtextfromcolumn="id">
+                    <i class="fas fa-fw fa-xs fa-circle-xmark"></i>
+                </a>';
+        } else {
+            $data['can_terminate'] = '-';
+        }
+
+        return $data;
+    }
+
+    public function terminateAction()
+    {
+        $this->requestIsPost();
+
+        $this->jobs->terminateJob($this->postData());
+
+        $this->addResponse(
+            $this->jobs->packagesData->responseMessage,
+            $this->jobs->packagesData->responseCode
+        );
     }
 }

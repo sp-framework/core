@@ -42,6 +42,13 @@ class Jobs
                             'notNull'       => true,
                         ]
                     ),
+                    new Column(//Process Id
+                        'pid',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => false,
+                        ]
+                    ),
                     new Column(//register call ids from basepackages_api_client_services_calls
                         'api_call_ids',
                         [
@@ -97,6 +104,13 @@ class Jobs
                         [
                             'type'          => Column::TYPE_INTEGER,
                             'notNull'       => false
+                        ]
+                    ),
+                    new Column(
+                        'can_terminate',
+                        [
+                            'type'          => Column::TYPE_BOOLEAN,
+                            'notNull'       => true
                         ]
                     ),
                     new Column(

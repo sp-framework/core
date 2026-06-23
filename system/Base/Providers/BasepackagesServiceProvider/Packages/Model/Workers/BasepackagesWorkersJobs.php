@@ -14,6 +14,8 @@ class BasepackagesWorkersJobs extends BaseModel
 
     public $cid;
 
+    public $pid;
+
     public $api_call_ids;
 
     public $run_on;
@@ -29,6 +31,8 @@ class BasepackagesWorkersJobs extends BaseModel
     public $job_log_mode;
 
     public $job_log_time;
+
+    public $can_terminate;
 
     public $response_code;
 

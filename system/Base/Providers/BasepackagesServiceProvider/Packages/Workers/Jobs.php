@@ -148,4 +148,62 @@ class Jobs extends BasePackage
 
         return $jobs;
     }
+
+    public function terminateJob($data)
+    {
+        if (!$this->access->auth->check()) {
+            $this->addResponse('Only logged in users can terminate jobs!', 1);
+
+            return false;
+        }
+
+        $job = $this->getById((int) $data['id']);
+
+        if (!$job) {
+            $this->addResponse('Job with ID not found', 1);
+
+            return false;
+        }
+
+        if (!$job['can_terminate']) {
+            $this->addResponse('Job cannot be terminated.', 1);
+
+            return false;
+        }
+
+        if ($job['status'] != '2') {
+            $this->addResponse('Job is no longer running.');
+
+            return false;
+        }
+
+        //Get Process ID from task
+        $task = $this->basepackages->workers->tasks->getById((int) $job['task_id']);
+
+        if (!$task) {
+            $this->addResponse('Task with ID not found', 1);
+
+            return false;
+        }
+
+        if ($job['pid'] && $job['pid'] > 0) {
+            $call = $this->basepackages->workers->calls->getById((int) $job['cid']);
+
+            if (!$call) {
+                $this->addResponse('Call with ID not found', 1);
+
+                return false;
+            }
+
+            $call = new $call['class'];
+
+            $call->terminate($task, $job);
+
+            return true;
+        }
+
+        $this->addResponse('Job cannot be terminated as there are other calls running along with this job. Change script type to PHP or RAW to terminate this job.', 1);
+
+        return false;
+    }
 }

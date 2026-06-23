@@ -100,13 +100,6 @@ class Tasks
                             'notNull'       => false,
                         ]
                     ),
-                    new Column(//Raw Process Id
-                        'pid',
-                        [
-                            'type'          => Column::TYPE_INTEGER,
-                            'notNull'       => false,
-                        ]
-                    ),
                     new Column(
                         'previous_run',
                         [
