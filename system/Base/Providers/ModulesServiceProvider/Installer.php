@@ -963,6 +963,8 @@ class Installer extends BasePackage
 
             try {
                 $this->apiClient->useMethod($collection, $method, $args)->getResponse();
+
+                return true;
                 //As we have provided sink information, this should be downloaded and stored at the sink location.
             } catch (\throwable $e) {
                 $this->queue['results'][$taskName][$module['module_type']][$module['id']]['precheck'] = 'fail';
@@ -1597,54 +1599,7 @@ class Installer extends BasePackage
             $this->queue['settings']['backupSettings']['notes'] = 'Backup taken while processing module installer queue with ID: ' . $this->queue['id'];
         }
 
-        $backupInit = $this->basepackages->backuprestore->init()->backup($this->queue['settings']['backupSettings'], true);
-
-        if (!$backupInit) {
-            $this->basepackages->progress->resetProgress();
-
-            $this->addResponse('Error initializing backup! Contact developer', 1);
-
-            return false;
-        }
-
-        $progress = $this->basepackages->progress->getProgress();
-
-        if (is_string($progress)) {
-            $progress = $this->helper->decode($progress, true);
-        }
-
-        if ($progress['runners']['running']['method'] === 'createBackup') {
-            if (isset($progress['runners']['running']['childs']) &&
-                is_array($progress['runners']['running']['childs']) &&
-                count($progress['runners']['running']['childs']) > 0
-            ) {
-                foreach ($progress['runners']['running']['childs'] as $child) {
-                    $method = $child['method'];
-
-                    $this->basepackages->progress->updateProgress('createBackup', null, false, $method);
-
-                    if ($method === 'finishBackup') {
-                        $call = $this->basepackages->backuprestore->$method($this->queue['settings']['backupSettings']);
-                    } else {
-                        $call = $this->basepackages->backuprestore->$method();
-                    }
-
-                    if ($call === false) {
-                        $this->basepackages->progress->resetProgress();
-
-                        $this->addResponse($this->basepackages->backuprestore->packagesData->responseMessage, 1);
-
-                        return false;
-                    }
-
-                    if ($call !== false) {
-                        $call = true;
-                    }
-
-                    $this->basepackages->progress->updateProgress('createBackup', $call, false, $method);
-                }
-            }
-
+        if ($this->basepackages->backuprestore->init()->backup($this->queue['settings']['backupSettings'], 'createBackup')) {
             return true;
         }
 
@@ -1776,6 +1731,8 @@ class Installer extends BasePackage
                 }
             }
         }
+
+        $this->basepackages->progress->init(null, $this->progressFileName);
 
         $this->basepackages->progress->registerMethods($this->runPrecheckProgressMethods);
     }
@@ -2057,6 +2014,8 @@ class Installer extends BasePackage
                 }
             }
         }
+
+        $this->basepackages->progress->init(null, $this->progressFileName);
 
         $this->basepackages->progress->registerMethods($this->runProcessProgressMethods);
     }

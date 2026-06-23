@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {% set queueTasksCounterInstall = 0 %}
 {% set queueTasksCounterUpdate = 0 %}
 {% set queueTasksCounterUninstall = 0 %}
@@ -658,18 +658,7 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-keys'                                    : {
-            afterInit : function() {
-                $('#{{componentId}}-{{sectionId}}-keys').click(function() {
-                    if ($(this)[0].checked === true) {
-                        $('#{{componentId}}-{{sectionId}}-systems_dir').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-systems_dir')[0].checked = true;
-                    } else {
-                        $('#{{componentId}}-{{sectionId}}-systems_dir').attr('disabled', false);
-                    }
-                });
-            }
-        },
+        '{{componentId}}-{{sectionId}}-keys'                                    : { },
         '{{componentId}}-{{sectionId}}-password_protect'                        : { },
         '{{componentId}}-{{sectionId}}-notes'                                   : { },
         '{{componentId}}-{{sectionId}}-email_report'                            : { },
@@ -770,3 +759,4 @@ $(document).ready(function() {
         ]
     )}}
 </div>
+<!-- htmlmin:ignore -->

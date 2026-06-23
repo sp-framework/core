@@ -23,43 +23,43 @@
 {% set settingsBackupSettingsBackup = 'backup-off' %}
 {% set settingsBackupSettingsPasswordProtectDisabled = true %}
 {% set settingsBackupSettingsNotesDisabled = true %}
-{% if queue['settings']['backupSettings']['backup'] == true %}
+{% if queue['settings']['backupSettings']['backup'] == 'true' %}
     {% set settingsBackupSettingsPasswordProtectDisabled = false %}
     {% set settingsBackupSettingsNotesDisabled = false %}
     {% set settingsBackupSettingsBackup = 'backup-on' %}
-    {% if queue['settings']['backupSettings']['apps_dir'] == true %}
+    {% if queue['settings']['backupSettings']['apps_dir'] == 'true' %}
         {% set settingsBackupSettingsAppsDirChecked = true %}
         {% set settingsBackupSettingsKeysDisabled = true %}
     {% endif %}
-    {% if queue['settings']['backupSettings']['systems_dir'] == true %}
+    {% if queue['settings']['backupSettings']['systems_dir'] == 'true' %}
         {% set settingsBackupSettingsSystemsDirChecked = true %}
         {% set settingsBackupSettingsKeysChecked = true %}
     {% endif %}
-    {% if queue['settings']['backupSettings']['public_dir'] == true %}
+    {% if queue['settings']['backupSettings']['public_dir'] == 'true' %}
         {% set settingsBackupSettingsPublicDirChecked = true %}
     {% endif %}
-    {% if queue['settings']['backupSettings']['private_dir'] == true %}
+    {% if queue['settings']['backupSettings']['private_dir'] == 'true' %}
         {% set settingsBackupSettingsPrivateDirChecked = true %}
     {% endif %}
-    {% if queue['settings']['backupSettings']['external_dir'] == true %}
+    {% if queue['settings']['backupSettings']['external_dir'] == 'true' %}
         {% set settingsBackupSettingsExternalDirChecked = true %}
     {% endif %}
-    {% if queue['settings']['backupSettings']['html_compiled_dir'] == true %}
+    {% if queue['settings']['backupSettings']['html_compiled_dir'] == 'true' %}
         {% set settingsBackupSettingsHTMLCompiledDirChecked = true %}
     {% endif %}
-    {% if queue['settings']['backupSettings']['var_dir'] == true %}
+    {% if queue['settings']['backupSettings']['var_dir'] == 'true' %}
         {% set settingsBackupSettingsVarDirChecked = true %}
     {% endif %}
-    {% if queue['settings']['backupSettings']['external_vendor_dir'] == true %}
+    {% if queue['settings']['backupSettings']['external_vendor_dir'] == 'true' %}
         {% set settingsBackupSettingsExternalVendorDirChecked = true %}
     {% endif %}
-    {% if queue['settings']['backupSettings']['old_backups_dir'] == true %}
+    {% if queue['settings']['backupSettings']['old_backups_dir'] == 'true' %}
         {% set settingsBackupSettingsOldBackupsDirChecked = true %}
     {% endif %}
-    {% if queue['settings']['backupSettings']['database'] == true %}
+    {% if queue['settings']['backupSettings']['database'] == 'true' %}
         {% set settingsBackupSettingsDatabaseChecked = true %}
     {% endif %}
-    {% if queue['settings']['backupSettings']['keys'] == true %}
+    {% if queue['settings']['backupSettings']['keys'] == 'true' %}
         {% set settingsBackupSettingsKeysChecked = true %}
     {% endif %}
 {% else %}
@@ -78,15 +78,15 @@
     {% set settingsBackupSettingsNotesDisabled = true %}
 {% endif %}
 {% set settingsFilesDeleteSourceFilesChecked = false %}
-{% if queue['settings']['files']['deleteSourceFiles'] == true %}
+{% if queue['settings']['files']['deleteSourceFiles'] == 'true' %}
     {% set settingsFilesDeleteSourceFilesChecked = true %}
 {% endif %}
 {% set settingsFilesDeleteDestinationFilesChecked = false %}
-{% if queue['settings']['files']['deleteDestinationFiles'] == true %}
+{% if queue['settings']['files']['deleteDestinationFiles'] == 'true' %}
     {% set settingsFilesDeleteDestinationFilesChecked = true %}
 {% endif %}
 {% set settingsInstallerForceUninstallChecked = false %}
-{% if queue['settings']['installer']['forceUninstall'] == true %}
+{% if queue['settings']['installer']['forceUninstall'] == 'true' %}
     {% set settingsInstallerForceUninstallChecked = true %}
 {% endif %}
 <div class="row">

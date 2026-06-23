@@ -45,13 +45,15 @@ class BackupRestore extends BasePackage
             $this->localContent->createDirectory('var/tmp/backups/');
         }
 
-        $this->basepackages->progress->init(null, 'backuprestore');
-
         if ($process === 'backup') {
+            $this->basepackages->progress->init(null, 'backuprestore');
+
             $this->basepackages->progress->deleteProgressFile();
 
             $this->registerBackupProgressMethods();
         } else if ($process === 'restore') {
+            $this->basepackages->progress->init(null, 'backuprestore');
+
             $this->basepackages->progress->deleteProgressFile();
 
             $this->registerRestoreProgressMethods();
@@ -60,7 +62,7 @@ class BackupRestore extends BasePackage
         return $this;
     }
 
-    protected function withProgress($method, $arguments)
+    protected function withProgress($method, $arguments, $viaExternalScript = null)
     {
         if (method_exists($this, $method)) {
             if (is_array($arguments)) {
@@ -68,7 +70,19 @@ class BackupRestore extends BasePackage
             }
 
             if (PHP_SAPI !== 'cli') {
-                $this->basepackages->progress->updateProgress($method, null, false);
+                $child = null;
+
+                if ($viaExternalScript) {
+                    $child = $method;
+
+                    $method = $viaExternalScript;
+                }
+
+                $this->basepackages->progress->updateProgress($method, null, false, $child);
+
+                if ($child) {
+                    $method = $child;
+                }
 
                 $call = call_user_func_array([$this, $method], $arguments);
 
@@ -78,7 +92,17 @@ class BackupRestore extends BasePackage
                     $call = true;
                 }
 
-                $this->basepackages->progress->updateProgress($method, $call, false);
+                if ($viaExternalScript) {
+                    $child = $method;
+
+                    $method = $viaExternalScript;
+                }
+
+                $this->basepackages->progress->updateProgress($method, $call, false, $child);
+
+                if ($child) {
+                    $method = $child;
+                }
 
                 return $callResult;
             }
@@ -87,7 +111,7 @@ class BackupRestore extends BasePackage
         }
     }
 
-    public function backup(array $data, $viaExternalScript = false)
+    public function backup(array $data, $viaExternalScript = null)
     {
         set_time_limit(3600);//1Hr
 
@@ -187,7 +211,7 @@ class BackupRestore extends BasePackage
         }
 
         foreach ($this->backupProgressMethods as $method) {
-            if ($this->withProgress($method['method'], $data) === false) {
+            if ($this->withProgress($method['method'], $data, $viaExternalScript) === false) {
                  return false;
             }
 
