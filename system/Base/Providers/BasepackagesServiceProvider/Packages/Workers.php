@@ -1059,9 +1059,9 @@ class Workers extends BasePackage
                 return getmypid();
             }
 
-            return 0;
+            return $pid;
         } else {
-            return null;
+            return $pid;
         }
 
         exec('ps -ef | grep -F \'' . $grep . '\'', $output);
@@ -1108,6 +1108,12 @@ class Workers extends BasePackage
             return false;
         }
 
+        $pid = null;
+
+        if ($task['exec_type'] === 'call') {
+            $pid = $this->getTaskProcessId($task);
+        }
+
         if ($task['job_log_mode'] != '1') {
             $job = $this->jobs->getJobByMode($task);
 
@@ -1133,7 +1139,8 @@ class Workers extends BasePackage
                         'job_log_time'  => $time,
                         'cid'           => $task['cid'],
                         'status'        => 1,//Scheduled
-                        'can_terminate' => false
+                        'can_terminate' => false,
+                        'pid'           => $pid
                     ]
                 );
 
@@ -1151,7 +1158,8 @@ class Workers extends BasePackage
                     'job_log_time'  => null,
                     'cid'           => $task['cid'],
                     'status'        => 1,//Scheduled
-                    'can_terminate' => false
+                    'can_terminate' => false,
+                    'pid'           => $pid
                 ]
             );
 
