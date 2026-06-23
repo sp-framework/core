@@ -62,6 +62,7 @@ class ProcessHelloWorld extends Calls
     public function getRawCmd()
     {
         return $this->raw_cwd = 'echo "Hello World!"';
+    }
 
     /*
     * If we want to terminate a running job, we can only do it if terminate method is available in the call.
