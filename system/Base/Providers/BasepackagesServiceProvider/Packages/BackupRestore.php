@@ -407,6 +407,10 @@ class BackupRestore extends BasePackage
     {
         $this->method = 'performDbBackup';
 
+        if ($this->core->core['settings']['databasetype'] === 'ff') {
+            return true;
+        }
+
         foreach ($this->core->core['settings']['dbs'] as $dbKey => $db) {
             try {
                 $db['password'] = $this->crypt->decryptBase64($db['password'], $this->getDbKey($db));
