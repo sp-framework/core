@@ -51,7 +51,7 @@ class ProcessHelloWorld extends Calls
         } else {
             $this->packagesData->responseMessage = $this->args['user'] . ' says Hello World!';
         }
-        sleep(50);
+
         $this->packagesData->responseCode = 0;
 
         $this->addJobResult($this->packagesData, $args);

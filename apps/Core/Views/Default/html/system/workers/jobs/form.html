@@ -113,7 +113,7 @@
 {% set jobTask = json_encode(jobTask, 16) %}
 {% set jobJob = json_encode(jobJob, 16) %}
 <script>
-/* globals BazHelpers paginatedPNotify */
+/* globals BazHelpers paginatedPNotify Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -260,23 +260,44 @@ dataCollectionSection =
                     e.preventDefault();
 
                     if (dataCollectionSectionForm['vars']['job']['id']) {
-                        var postData = { };
-                        postData[$('#security-token').attr('name')] = $('#security-token').val();
-                        postData['id'] = dataCollectionSectionForm['vars']['job']['id'];
-
-                        $.post('{{links.url("system/workers/jobs/terminate")}}', postData, function(response) {
-                            if (response.tokenKey && response.token) {
-                                $("#security-token").attr("name", response.tokenKey);
-                                $("#security-token").val(response.token);
+                        Swal.fire({
+                            title                       : '<span class="text-danger"> Terminate job with ID :' + dataCollectionSectionForm['vars']['job']['id'] + '?</span>',
+                            icon                        : 'question',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            buttonsStyling              : false,
+                            confirmButtonText           : 'Terminate',
+                            customClass                 : {
+                                'confirmButton'             : 'btn btn-danger text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                            },
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : true,
+                            allowEscapeKey              : true,
+                            didOpen                     : function() {
+                                window.dataCollection.env.sounds.swalSound.play();
                             }
+                        }).then((result) => {
+                            if (result.value) {
+                                var postData = { };
+                                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                                postData['id'] = dataCollectionSectionForm['vars']['job']['id'];
 
-                            if (response.responseCode === 0) {
-                                paginatedPNotify('success', {'text' : response.responseMessage});
-                            } else if (response.responseCode === 1) {
-                                paginatedPNotify('error', {'text' : response.responseMessage});
+                                $.post('{{links.url("system/workers/jobs/terminate")}}', postData, function(response) {
+                                    if (response.tokenKey && response.token) {
+                                        $("#security-token").attr("name", response.tokenKey);
+                                        $("#security-token").val(response.token);
+                                    }
+
+                                    if (response.responseCode === 0) {
+                                        paginatedPNotify('success', {'text' : response.responseMessage});
+                                    } else if (response.responseCode === 1) {
+                                        paginatedPNotify('error', {'text' : response.responseMessage});
+                                    }
+                                }, 'json');
                             }
-                        }, 'json');
-
+                        });
                     }
                 });
             }

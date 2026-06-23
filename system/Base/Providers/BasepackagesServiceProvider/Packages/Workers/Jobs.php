@@ -198,7 +198,9 @@ class Jobs extends BasePackage
             $call = new $call['class'];
 
             if ($call->terminate($task, $job)) {
+                $job = $this->getById((int) $data['id']);
                 $job['pid'] = null;
+                $job['status'] = 3;
 
                 $this->update($job);
 
