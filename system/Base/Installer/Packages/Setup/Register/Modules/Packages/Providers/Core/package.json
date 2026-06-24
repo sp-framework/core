@@ -14,7 +14,7 @@
 		{
 			"require" : 
 			{
-				"composer/composer" : "^2.7",
+				"composer/composer" : "^2.10@dev",
 				"cweagans/composer-patches" : "^1.7",
 				"league/flysystem" : "^3.24",
 				"phpmailer/phpmailer" : "^6.9",
