@@ -156,12 +156,10 @@ dataCollectionSection =
                         }
                     });
 
-                    dataCollectionSectionForm['vars']['modulesTable'].on('page', function() {
+                    dataCollectionSectionForm['vars']['modulesTable'].on('draw', function() {
                         resetButtons();
                     });
-                    dataCollectionSectionForm['vars']['modulesTable'].on('search.dt', function() {
-                        resetButtons();
-                    });
+
                     dataCollectionSectionForm['vars']['modulesTable'].on('select.dt', function(e, dt, type, indexes) {
                         var moduleType = dataCollectionSectionForm['vars']['modulesTable'].rows(indexes).data()[0][4];
                         if (moduleType === 'views (sub)') {
