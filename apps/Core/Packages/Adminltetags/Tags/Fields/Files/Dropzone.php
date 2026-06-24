@@ -718,8 +718,8 @@ class Dropzone
                                                 newList +=';
                                                 if ($this->params['storage']['permission'] === 'public') {
                                                     $inclJs .=
-                                                        '\'<a class="chocolat-image" title="\' + file.name + \'" href="\' + response.responseData.publicLinks[1] + \'">\' +
-                                                            \'<img alt="\' + file.name + \'" src="\' + response.responseData.publicLinks[0] + \'" class="img-fluid img-thumbnail">\' +
+                                                        '\'<a class="chocolat-image" title="\' + file.name + \'" href="\' + response.responseData.publicLinks[1].replace("public/", "") + \'">\' +
+                                                            \'<img alt="\' + file.name + \'" src="\' + response.responseData.publicLinks[0].replace("public/", "") + \'" class="img-fluid img-thumbnail">\' +
                                                         \'</a>\';';
                                                 } else {
                                                     $inclJs .=
@@ -747,7 +747,7 @@ class Dropzone
 
                                                 if ($this->params['storage']['permission'] === 'public') {
                                                     $inclJs .=
-                                                        '\'<a data-uuid="\' + response.responseData.uuid + \'" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="\' + response.responseData.publicLinks[0] + \'" target="_blank">\' +
+                                                        '\'<a data-uuid="\' + response.responseData.uuid + \'" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="\' + response.responseData.publicLinks[0].replace("public/", "") + \'" target="_blank">\' +
                                                             \'<i class="fa fa-fw fa-download"></i>\' +
                                                         \'</a>\';';
                                                 } else {
