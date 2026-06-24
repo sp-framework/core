@@ -945,8 +945,23 @@ class Queues extends BasePackage
             $hasPatch = false;
 
             if ($composerJsonFile && isset($composerJsonFile['require'])) {
+                if (isset($composerJsonFile['require'][$composerPackage])) {
+                    //Check if installed version is same as what we want to install. if installed and same, continue.
+                    if ($composerJsonFile['require'][$composerPackage] === $version) {
+                        continue;
+                    } else {
+                        //If installed version is higher than what the package want, continue.
+                        $installedVersion = $this->getComposerPackageVersion($composerJsonFile['require'][$composerPackage]);
+                        $requiredVersion = $this->getComposerPackageVersion($version);
+
+                        if (Version::greaterThan($installedVersion, $requiredVersion)) {
+                            continue;
+                        }
+                    }
+                }
+
                 //We bind the external package to the internal component/package/middleware.
-                //When we uninstal a component/package/middleware, we also remove the composer package.
+                //When we uninstall a component/package/middleware, we also remove the composer package.
                 //If a composer package is being shared by multiple modules, it is not removed.
                 //If the module that is being removed is the only one that this composer package requires, composer package will also be removed.
                 $composerJsonFile['require'][$composerPackage] = $version;
@@ -1114,6 +1129,8 @@ class Queues extends BasePackage
         $version = str_replace('^', '', $version);
         //Remove .*
         $version = str_replace('.*', '', $version);
+        //Remove @dev
+        $version = str_replace('@dev', '', $version);
 
         $versionArr = explode('.', $version);
 
