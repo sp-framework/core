@@ -2,6 +2,8 @@
 
 namespace System\Base\Installer\Packages\Setup\Register\Modules;
 
+use Phalcon\Db\Enum;
+
 class Component
 {
 	public function register($db, $ff, $componentFile, $menuId, $helper)
@@ -85,7 +87,7 @@ class Component
 		if ($db) {
 			$component =
 				$db->fetchAll(
-					"SELECT * FROM modules_components WHERE class LIKE :class",
+					"SELECT * FROM modules_components WHERE class = :class",
 					Enum::FETCH_ASSOC,
 					[
 						"class" => $componentFile['class'],
@@ -97,7 +99,7 @@ class Component
 				[
 					'menu_id' 			=> $menuId
 				],
-				"id = " . $component['id']
+				"id = " . $component[0]['id']
 			);
 		}
 
